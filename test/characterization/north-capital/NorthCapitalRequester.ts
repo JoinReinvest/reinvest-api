@@ -1,6 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
 import FormData from 'form-data';
 import NorthCapitalException from "../NorthCapitalException";
+import moment from "moment";
 
 export default class NorthCapitalRequester {
     clientId: string;
@@ -11,6 +12,19 @@ export default class NorthCapitalRequester {
         this.clientId = clientId;
         this.developerAPIKey = developerAPIKey;
         this.url = url
+    }
+
+    private async putRequest(endpoint: string, data: any): Promise<any> {
+        try {
+            const putData = this.extendWithCredentials(data);
+            const response: AxiosResponse = await axios
+                .put(`${this.url}/${endpoint}`, putData);
+
+            return response.data;
+        } catch (error) {
+            const {response: {data: {statusCode, statusDesc}}} = error;
+            throw new NorthCapitalException(statusCode, statusDesc);
+        }
     }
 
     private async postRequest(endpoint: string, data: any): Promise<any> {
@@ -27,15 +41,22 @@ export default class NorthCapitalRequester {
     }
 
     private transformToFormData(data: any): FormData {
+        const extendedData = this.extendWithCredentials(data);
         const formData = new FormData();
-        formData.append('clientID', this.clientId);
-        formData.append('developerAPIKey', this.developerAPIKey);
 
-        for (const key of Object.keys(data)) {
-            formData.append(key, data[key]);
+        for (const key of Object.keys(extendedData)) {
+            formData.append(key, extendedData[key]);
         }
 
         return formData;
+    }
+
+    private extendWithCredentials(data: any): any {
+        return {
+            clientID: this.clientId,
+            developerAPIKey: this.developerAPIKey,
+            ...data
+        };
     }
 
     public async linkExternalAchAccount(accountId: string): Promise<string> {
@@ -82,4 +103,174 @@ export default class NorthCapitalRequester {
 
         return statusCode === 101;
     }
+
+    async createAccount(
+        investorAccountName: string,
+        type: "Individual" | "Entity",
+        accountOrigin: "domestic_account" | "international_account",
+        streetAddress: string,
+        city: string,
+        state: string,
+        zip: string,
+        country: string,
+        KycStatus: "Pending" | "Auto Approved" | "Manually Approved" | "Disapproved",
+        AmlStatus: "Pending" | "Auto Approved" | "Manually Approved" | "Disapproved",
+        accreditedStatus: "Pending" | "Self Accredited" | "Verified Accredited" | "Not Accredited",
+        principalApprovalStatus: "Pending" | "Approved" | "Not Approve",
+    ): Promise<string> {
+        const endpoint = 'tapiv3/index.php/v3/createAccount';
+        const data = {
+            accountRegistration: investorAccountName,
+            type,
+            domesticYN: accountOrigin,
+            streetAddress1: streetAddress,
+            city,
+            state,
+            zip,
+            country,
+            KYCstatus: KycStatus,
+            AMLstatus: AmlStatus,
+            AccreditedStatus: accreditedStatus,
+            approvalStatus: principalApprovalStatus
+        };
+
+        const response = await this.putRequest(endpoint, data);
+        const {statusCode, statusDesc, accountDetails: [{accountId}]} = response;
+
+        return accountId;
+    }
+
+    async createParty(
+        domicile: "U.S. Citizen" | "U.S. Resident" | "non-resident",
+        firstName: string,
+        lastName: string,
+        dateOfBirth: Date,
+        streetAddress: string,
+        city: string,
+        state: string,
+        zip: string,
+        country: string,
+        email: string,
+    ): Promise<string> {
+        const endpoint = 'tapiv3/index.php/v3/createParty';
+        const data = {
+            firstName,
+            lastName,
+            domicile,
+            dob: moment(dateOfBirth).format("MM-DD-YYYY"),
+            primCountry: country,
+            primAddress1: streetAddress,
+            primCity: city,
+            primState: state,
+            primZip: zip,
+            emailAddress: email
+        };
+
+        const response = await this.putRequest(endpoint, data);
+        const {statusCode, statusDesc, partyDetails: [status, [{partyId}]]} = response;
+
+        return partyId;
+    }
+
+    async linkPartyToAccount(
+        accountId: string,
+        relatedEntryType: "Account" | "IndivACParty" | "EntityACParty",
+        relatedEntryId: string,
+        linkType: "owner" | "manager" | "member" | "officer" | "director" | "spouse" | "beneficiary" | "trustee" | "custodian" | "parentco" | "subsidiary" | "other" | "acgroup" | "advisor" | "attorney" | "proxy",
+        isMainParty: boolean
+    ): Promise<string> {
+        const endpoint = 'tapiv3/index.php/v3/createLink';
+        const data = {
+            firstEntryType: "Account",
+            firstEntry: accountId,
+            relatedEntryType,
+            relatedEntry: relatedEntryId,
+            linkType,
+            primary_value: isMainParty ? 1 : 0
+        };
+
+        const response = await this.putRequest(endpoint, data);
+        const {statusCode, statusDesc, linkDetails: [status, [{id: linkId}]]} = response;
+
+        return linkId;
+    }
+
+    async createTrade(
+        offeringId: string,
+        accountId: string,
+        transactionType: "ACH" | "WIRE" | "CHECK" | "CREDITCARD" | "TBD/IRA",
+        numberOfShares: string,
+        ipAddress: string
+    ) {
+        const endpoint = 'tapiv3/index.php/v3/createTrade';
+        const data = {
+            offeringId,
+            accountId,
+            transactionType,
+            transactionUnits: numberOfShares,
+            createdIpAddress: ipAddress
+        };
+
+        const response = await this.postRequest(endpoint, data);
+        const {statusCode, statusDesc, purchaseDetails: [status, [{tradeId, transactionId}]]} = response;
+
+        return tradeId;
+    }
+
+    async createEscrowAccount(
+        offeringId: string,
+        overFundingAmount: string,
+        bankName: string,
+        offeringAccountNumber: string,
+        accountFullName: string
+    ) {
+        const endpoint = 'tapiv3/index.php/v3/createEscrowAccount';
+        const data = {
+            offeringId,
+            overFundingAmount,
+            bankName,
+            offeringAccountNumber,
+            accountFullName
+        };
+
+        const response = await this.putRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            "Financial Escrow Details": [status, [statusAgain, [{issuerId, escrowAccountStatus}]]]
+        } = response;
+
+        return escrowAccountStatus;
+    }
+
+    async moveFundsFromExternalAccounts(
+        accountId: string,
+        offeringId: string,
+        tradeId: string,
+        externalAccountNickName: string,
+        amount: string,
+        description: string,
+        ipAddress: string
+    ): Promise<string> {
+        const endpoint = 'tapiv3/index.php/v3/externalFundMove';
+        const data = {
+            accountId,
+            offeringId,
+            tradeId,
+            NickName: externalAccountNickName,
+            amount,
+            description,
+            checkNumber: tradeId,
+            createdIpAddress: ipAddress
+        }
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            TradeFinancialDetails: [{RefNum, fundStatus}]
+        } = response;
+
+        return RefNum;
+    }
+
 }

@@ -1,42 +1,35 @@
 import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
-import expectThrowsAsync from "../expectThrowsAsync";
+import {NORTH_CAPITAL_CONFIG} from "../../../config";
+import ConfigurationCacheService from "../configurationCacheService";
 
-const CLIENT_ID = 'client_id',
-    DEVELOPER_API_KEY = 'api_key',
-    NORTH_CAPITAL_API_URL = 'https://api-sandboxdash.norcapsecurities.com';
+const cacheService = new ConfigurationCacheService();
+const {CLIENT_ID, DEVELOPER_API_KEY, API_URL} = NORTH_CAPITAL_CONFIG;
 
-describe('Creating ACH Plaid', () => {
-    const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, NORTH_CAPITAL_API_URL)
+describe('Given I am individual with an account in North Capital', () => {
+    const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
+    let accountId: string = cacheService.readValue('ACCOUNT_ID');
 
-    it('Invalid Developer Api Key response', async () => {
-        const accountId = "P12345"
-        const requester = new NorthCapitalRequester(CLIENT_ID, 'invalid_api_key', NORTH_CAPITAL_API_URL)
+    context('When I want to start investing', () => {
 
-        await expectThrowsAsync(
-            () => requester.linkExternalAchAccount(accountId),
-            'Request error: [103] Invalid Developer Key/Client ID OR Developer Key not Active'
-        );
-    });
+        it('Then I need to be able to link external account with Plaid', async () => {
+            const accountUrl = await requester.linkExternalAchAccount(accountId);
 
-    it('Creating external account', async () => {
-        const status = await requester.createExternalAchAccount(
-            "123",
-            "Test ReInvest",
-            "ReTest",
-            "BankName", // what bank is that? Is it investor bank or the bank where we send money?
-            "123",
-            "123",
-            "10.0.0.115"
-        );
+            expect(accountUrl).to.be.a('string');
+        });
 
-        expect(status).is.false;
-    });
+        it('Or Then I need to create my own integration with Plain ', async () => {
+            const status = await requester.createExternalAchAccount(
+                "123",
+                "Test ReInvest",
+                "ReTest",
+                "BankName", // what bank is that? Is it investor bank or the bank where we send money?
+                "123",
+                "123",
+                "10.0.0.115"
+            );
 
-    it('Linking external account', async () => {
-        const accountId = "P12345" //  what account id is that? From createAccount or createExternalAccount? It seems that this is External Account
-        const accountUrl = await requester.linkExternalAchAccount(accountId);
-
-        expect(accountUrl).to.be('string');
+            expect(status).is.false;
+        });
     });
 });
