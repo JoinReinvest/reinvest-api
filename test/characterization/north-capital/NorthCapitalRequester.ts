@@ -273,4 +273,80 @@ export default class NorthCapitalRequester {
         return RefNum;
     }
 
+    async getExternalFundMoveInfo(accountId: string, fundsTransferRefNumber: string): Promise<string> {
+        const endpoint = 'tapiv3/index.php/v3/getExternalFundMoveInfo';
+        const data = {
+            accountId,
+            RefNum: fundsTransferRefNumber
+        }
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            investorExternalAccountDetails: {fundStatus: status, error}
+        } = response;
+
+        return status;
+    }
+
+    async performBasicVerification(partyId: string) {
+        const endpoint = 'tapiv3/index.php/v3/performKycAmlBasic';
+        const data = {
+            partyId
+        }
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            kyc: {
+                kycstatus,
+                amlstatus,
+                response: details
+            }
+        } = response;
+
+        return {
+            kyc: kycstatus,
+            aml: amlstatus,
+            details
+        };
+    }
+
+    async createEntity(
+        domicile: "U.S. Citizen" | "U.S. Resident" | "non-resident",
+        entityName: string,
+        country: string,
+        streetAddress: string,
+        city: string,
+        state: string,
+        zip: string,
+        email: string,
+        ipAddress: string
+    ) {
+        const endpoint = 'tapiv3/index.php/v3/createEntity';
+        const data = {
+            domicile,
+            entityName,
+            primCountry: country,
+            primAddress1: streetAddress,
+            primCity: city,
+            primState: state,
+            primZip: zip,
+            emailAddress: email,
+            createdIpAddress: ipAddress
+        };
+
+        const response = await this.putRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            entityDetails: [
+                status,
+                [{partyId}]
+            ]
+        } = response;
+
+        return partyId;
+
+    }
 }

@@ -2,6 +2,7 @@ import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
 import ConfigurationCacheService from "../configurationCacheService";
 import {NORTH_CAPITAL_CONFIG} from "../../../config";
+import expectThrowsAsync from "../expectThrowsAsync";
 
 const {CLIENT_ID, DEVELOPER_API_KEY, API_URL, OFFERING_ID} = NORTH_CAPITAL_CONFIG;
 const cacheService = new ConfigurationCacheService();
@@ -11,8 +12,7 @@ describe('Given ' +
     'primary party is linked, ' +
     'bank account is linked, ' +
     'offer is created, ' +
-    'escrow account is created, ' +
-    'escrow account is active', () => {
+    'escrow account is created and active', () => {
     const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
     const offeringId = OFFERING_ID;
     let accountId: string = cacheService.readValue('ACCOUNT_ID');
@@ -20,6 +20,7 @@ describe('Given ' +
     context('When I want to buy shares', async () => {
         const shares: string = '100';
         let tradeId: string = cacheService.readValue('TRADE_ID');
+        let fundsTransferRefNumber: string = cacheService.readValue('FUNDS_TRANSFER_REF_NO');
 
 
         it('Then I should be able to create a trade', async () => {
@@ -33,23 +34,49 @@ describe('Given ' +
 
             expect(tradeId).to.be.a('string');
 
-            await cacheService.cacheValue('TRADE_ID', accountId);
+            await cacheService.cacheValue('TRADE_ID', tradeId);
         });
 
         it('And Then I should be able to transfer my funds to the escrow account', async () => {
-            const transferReferenceNumber = await requester.moveFundsFromExternalAccounts(
+            fundsTransferRefNumber = await requester.moveFundsFromExternalAccounts(
                 accountId,
                 offeringId,
                 tradeId,
-                'ReTest',
+                'Plaid Checking - Wells Fargo',
+                "1", // $1 for 100 shares of $0.01
+                "Test funds transfer",
+                "10.0.0.1"
+            );
+
+            expect(fundsTransferRefNumber).to.be.a('string');
+
+            await cacheService.cacheValue('FUNDS_TRANSFER_REF_NO', fundsTransferRefNumber);
+        });
+
+        it('And Then I should NOT be able to transfer my funds with the same trade twice', async () => {
+            const request = requester.moveFundsFromExternalAccounts(
+                accountId,
+                offeringId,
+                tradeId,
+                'Plaid Checking - Wells Fargo',
                 "1",
                 "Test funds transfer",
                 "10.0.0.1"
             );
 
-            expect(transferReferenceNumber).to.be.a('string');
+            await expectThrowsAsync(
+                () => request,
+                'Request error: [210] ACH request already sent this trade.'
+            )
+        });
 
-            await cacheService.cacheValue('FUNDS_TRANSFER_REF_NO', transferReferenceNumber);
+        it('And Then I should be able to check the status of my payment', async () => {
+            const status = await requester.getExternalFundMoveInfo(
+                accountId,
+                fundsTransferRefNumber
+            );
+
+            expect(status).is.equal('Pending');
         });
     });
 });

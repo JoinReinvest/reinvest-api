@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "test:characterization": "ts-mocha -p tsconfig.json test/characterization/**/*.test.ts",
-    "test": "mocha -r ts-node/register  'test/**/*.ts'"
+    "test": "mocha -r ts-node/register --timeout 10000 'test/**/*.ts'"
   },
   "author": "",
   "license": "ISC",

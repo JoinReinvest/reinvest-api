@@ -18,18 +18,18 @@ describe('Given I am individual with an account in North Capital', () => {
             expect(accountUrl).to.be.a('string');
         });
 
-        it('Or Then I need to create my own integration with Plain ', async () => {
-            const status = await requester.createExternalAchAccount(
-                "123",
-                "Test ReInvest",
-                "ReTest",
-                "BankName", // what bank is that? Is it investor bank or the bank where we send money?
-                "123",
-                "123",
-                "10.0.0.115"
-            );
-
-            expect(status).is.false;
+        it.skip('Or Then I need to create my own integration with Plain ', async () => {
+            // const status = await requester.createExternalAchAccount(
+            //     "123",
+            //     "Test ReInvest",
+            //     "ReTest",
+            //     "BankName", // what bank is that? Is it investor bank or the bank where we send money?
+            //     "123",
+            //     "123",
+            //     "10.0.0.115"
+            // );
+            //
+            // expect(status).is.false;
         });
     });
 });

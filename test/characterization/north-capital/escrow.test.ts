@@ -3,13 +3,13 @@ import NorthCapitalRequester from "./NorthCapitalRequester";
 import {NORTH_CAPITAL_CONFIG} from "../../../config";
 import expectThrowsAsync from "../expectThrowsAsync";
 
-const {CLIENT_ID, DEVELOPER_API_KEY, API_URL} = NORTH_CAPITAL_CONFIG;
+const {CLIENT_ID, DEVELOPER_API_KEY, API_URL, OFFERING_ID} = NORTH_CAPITAL_CONFIG;
 
 describe('Given I am an issuer and I am an admin', () => {
     const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
 
     context('When I have created offer without escrow account', () => {
-        const offeringId = NORTH_CAPITAL_CONFIG.OFFERING_ID;
+        const offeringId = OFFERING_ID;
 
         it('Then I should be able to create an escrow account', async () => {
             const escrowAccountStatus = await requester.createEscrowAccount(
