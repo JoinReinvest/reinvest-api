@@ -78,5 +78,25 @@ describe('Given ' +
 
             expect(status).is.equal('Pending');
         });
+
+        it('And Then I should be able to check the details of my payment', async () => {
+            const details = await requester.getExternalFundMoveDetails(
+                accountId,
+                fundsTransferRefNumber
+            );
+
+            expect(details).contains.keys('accountId', 'fundStatus', 'transactionstatus');
+            expect(details.fundStatus).is.equal('Pending');
+            expect(details.transactionstatus).is.equal('Pending');
+        });
+
+        it('And Then I should be able to get all ACH Pending transactions', async () => {
+            const listOfTransactions = await requester.getAchPendingTransactionsForAccount(
+                accountId
+            );
+
+            expect(listOfTransactions).is.an('array');
+            expect(listOfTransactions).to.not.be.empty;
+        });
     });
 });

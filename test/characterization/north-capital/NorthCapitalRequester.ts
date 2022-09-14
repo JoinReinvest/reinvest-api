@@ -289,6 +289,37 @@ export default class NorthCapitalRequester {
         return status;
     }
 
+    async getExternalFundMoveDetails(accountId: string, fundsTransferRefNumber: string): Promise<any> {
+        const endpoint = 'tapiv3/index.php/v3/getExternalFundMove';
+        const data = {
+            accountId,
+            RefNum: fundsTransferRefNumber
+        }
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            investorExternalAccountDetails: [details]
+        } = response;
+
+        return details;
+    }
+
+    async getAchPendingTransactionsForAccount(accountId: string): Promise<any[]> {
+        const endpoint = 'tapiv3/index.php/v3/getAchPendingId';
+        const data = {
+            accountId
+        }
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            investorExternalAccountDetails: listOfTransactions
+        } = response;
+
+        return listOfTransactions;
+    }
+
     async performBasicVerification(partyId: string) {
         const endpoint = 'tapiv3/index.php/v3/performKycAmlBasic';
         const data = {
@@ -348,5 +379,87 @@ export default class NorthCapitalRequester {
 
         return partyId;
 
+    }
+
+    async getAccountDetails(accountId: string): Promise<any> {
+        const endpoint = 'tapiv3/index.php/v3/getAccount';
+        const data = {
+            accountId
+        };
+
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            accountDetails: details
+        } = response;
+
+        return details;
+    }
+
+    async listOfferingPurchaseHistory(offeringId: string): Promise<any[]> {
+        const endpoint = 'tapiv3/index.php/v3/getOfferingPurchaseHistory';
+        const data = {
+            offeringId
+        };
+
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            "Offering purchased details": {
+                offering_purchase_history: purchaseHistory
+            }
+        } = response;
+
+        return purchaseHistory;
+    }
+
+    async getOfferingDetails(offeringId: string): Promise<any> {
+        const endpoint = 'tapiv3/index.php/v3/getOfferingDetails';
+        const data = {
+            offeringId
+        };
+
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            "Offering purchased details": [details]
+        } = response;
+
+        return details;
+    }
+
+    async getOffering(offeringId: string): Promise<any> {
+        const endpoint = 'tapiv3/index.php/v3/getOffering';
+        const data = {
+            offeringId
+        };
+
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            offeringDetails: [details]
+        } = response;
+
+        return details;
+    }
+
+    async getOfferingEscrowAccount(offeringId: string): Promise<any> {
+        const endpoint = 'tapiv3/index.php/v3/getEscrowAccount';
+        const data = {
+            offeringId
+        };
+
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            "Financial Escrow Details": details
+        } = response;
+
+        return details;
     }
 }
