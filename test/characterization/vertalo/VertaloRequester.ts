@@ -28,7 +28,7 @@ export default class VertaloRequester {
         const response: AxiosResponse = await axios
             .get(`${this.url}/token/login?client_id=${this.clientId}&client_secret=${this.clientSecret}`);
 
-        return response.data.token;
+        return response.data.token ?? "invalid";
     }
 
     public async preAuthorize() {
@@ -44,7 +44,7 @@ export default class VertaloRequester {
                     {
                         headers: {
                             "Authorization": `Bearer ${token}`,
-                            // "Content-Type": "application/json; charset=utf-8",
+                            "Content-Type": "application/json; charset=utf-8",
                         }
                     });
 
@@ -164,5 +164,27 @@ export default class VertaloRequester {
         const {makeCustomer: {customer: {id: customerId, investorId}}} = await this.mutationRequest(mutationQuery);
 
         return {customerId, investorId};
+    }
+
+    async createAtsInvestor(name: string, email: string
+    ): Promise<any> {
+        const mutationQuery = `
+            mutation {
+              makeInvestor (
+                input: {
+                  name: "${name}"
+                  email: "${email}"
+                }
+              ) {
+              account {
+                  id
+                }
+              }
+            }
+        `
+
+        const {makeInvestor: {account: {id: investorId}}} = await this.mutationRequest(mutationQuery);
+
+        return investorId;
     }
 }

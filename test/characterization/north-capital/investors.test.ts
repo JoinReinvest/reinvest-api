@@ -74,6 +74,13 @@ describe('Given I am an individual person and I want to create an account in the
             expect(details).to.be.an('object');
             expect(details.accountId).to.be.equal(accountId);
         });
+
+        it('And Then I should be able to get all trades for my account', async () => {
+            const trades = await requester.getAccountTrades(accountId);
+
+            expect(trades).is.an('array');
+            expect(trades).to.be.not.empty;
+        });
     });
 
     context('When I am an organization or trust', () => {

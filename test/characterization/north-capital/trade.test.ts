@@ -13,12 +13,12 @@ describe('Given ' +
     'bank account is linked, ' +
     'offer is created, ' +
     'escrow account is created and active', () => {
-    const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
+    const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL);
     const offeringId = OFFERING_ID;
     let accountId: string = cacheService.readValue('ACCOUNT_ID');
 
     context('When I want to buy shares', async () => {
-        const shares: string = '100';
+        const shares: string = '2.00000';
         let tradeId: string = cacheService.readValue('TRADE_ID');
         let fundsTransferRefNumber: string = cacheService.readValue('FUNDS_TRANSFER_REF_NO');
 
@@ -35,6 +35,16 @@ describe('Given ' +
             expect(tradeId).to.be.a('string');
 
             await cacheService.cacheValue('TRADE_ID', tradeId);
+        });
+
+        it('And Then I should be able to check the details of my trade', async () => {
+            const tradeHistory = await requester.getTradeHistory(
+                accountId,
+                tradeId
+            );
+            expect(tradeHistory).to.be.an('array');
+            expect(tradeHistory).to.not.be.empty;
+            expect(tradeHistory[0]).contains.keys('totalAmount', 'totalShares', 'orderStatus');
         });
 
         it('And Then I should be able to transfer my funds to the escrow account', async () => {

@@ -1,12 +1,11 @@
 import {expect} from "chai";
 import VertaloRequester from "./VertaloRequester";
+import {VERTALO_CONFIG} from "../../../config";
 
-const VERTALO_URL = "https://www.sandbox.vertalo.com"
-const CLIENT_ID = "client_id"
-const CLIENT_SECRET = "client_secret"
+const {CLIENT_ID, CLIENT_SECRET, API_URL} = VERTALO_CONFIG;
 
 describe('Execute issuer actions', () => {
-    let vertaloRequester: VertaloRequester = new VertaloRequester(CLIENT_ID, CLIENT_SECRET, VERTALO_URL);
+    let vertaloRequester: VertaloRequester = new VertaloRequester(CLIENT_ID, CLIENT_SECRET, API_URL);
     let assetId: string;
     let roundId: string;
     let allocationId: string;

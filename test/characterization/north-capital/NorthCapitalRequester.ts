@@ -305,6 +305,23 @@ export default class NorthCapitalRequester {
         return details;
     }
 
+    async getTradeHistory(accountId: string, tradeId: string): Promise<any> {
+        const endpoint = 'tapiv3/index.php/v3/getTrade';
+        const data = {
+            accountId,
+            tradeId,
+        }
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            partyDetails: tradeHistory
+        } = response;
+
+        return tradeHistory;
+    }
+
+
     async getAchPendingTransactionsForAccount(accountId: string): Promise<any[]> {
         const endpoint = 'tapiv3/index.php/v3/getAchPendingId';
         const data = {
@@ -395,6 +412,27 @@ export default class NorthCapitalRequester {
         } = response;
 
         return details;
+    }
+
+    /**
+     * List the latest trade state with totalAmount price investor paid, but without number of shares
+     * so based on that we are not able to calculate original unit share price
+     * @param accountId
+     */
+    async getAccountTrades(accountId: string): Promise<any[]> {
+        const endpoint = 'tapiv3/index.php/v3/getAccountTradeHistory';
+        const data = {
+            accountId
+        };
+
+        const response = await this.postRequest(endpoint, data);
+        const {
+            statusCode,
+            statusDesc,
+            accountDetails: trades
+        } = response;
+
+        return trades;
     }
 
     async listOfferingPurchaseHistory(offeringId: string): Promise<any[]> {
