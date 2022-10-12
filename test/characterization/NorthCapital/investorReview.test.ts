@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
-import ConfigurationCacheService from "../configurationCacheService";
+import ConfigurationCacheService from "../ConfigurationCacheService";
 import {NORTH_CAPITAL_CONFIG} from "../../../config";
 
 const {CLIENT_ID, DEVELOPER_API_KEY, API_URL} = NORTH_CAPITAL_CONFIG;

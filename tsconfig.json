@@ -3,18 +3,24 @@
     "sourceMap": true,
     "target": "es6",
     "module": "commonjs",
-    "outDir": "./dist",
-    "baseUrl": "./src",
+    "outDir": "./build",
+    "baseUrl": "./Reinvest",
+    "strict": true,
+    "paths": {
+      "GenericAdapter": ["../shared/GenericAdapter"]
+    },
     "esModuleInterop": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "experimentalDecorators": true
   },
   "include": [
-    "src/**/*",
-    "test/**/*"
+    "Reinvest/**/*",
+    "shared/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "Reinvest/**/*.test.ts",
+    "node_modules",
+    "tsconfig.json"
   ]
 }

@@ -1,6 +1,8 @@
 node_modules/
 .idea/
 **.js
-dist
+build
 .env
+test/.env.characterization
 test/artifacts/*
+yarn-error.log

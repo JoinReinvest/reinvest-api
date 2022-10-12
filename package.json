@@ -2,13 +2,27 @@
   "name": "reinvest-api",
   "version": "1.0.0",
   "description": "ReInvest API",
-  "main": "index.js",
+  "main": "Reinvest/index.ts",
   "scripts": {
-    "watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "test:characterization": "ts-mocha -p tsconfig.json test/characterization/**/*.test.ts",
-    "test": "mocha -r ts-node/register --timeout 10000 'test/**/*.ts'"
+    "dev": "nodemon",
+    "build": "tsc -p tsconfig.json",
+    "start": "node build/Reinvest/index.js",
+    "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
+    "test": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'"
   },
-  "author": "",
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "modules"
+    ],
+    "exec": "node -r tsconfig-paths/register -r ts-node/register ./Reinvest/index.ts",
+    "ext": "ts, js"
+  },
+  "author": "Lukasz Duraj <https://www.linkedin.com/in/%C5%82ukasz-duraj-a4872317b/>",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",

@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
-import ConfigurationCacheService from "../configurationCacheService";
+import ConfigurationCacheService from "../ConfigurationCacheService";
 import {NORTH_CAPITAL_CONFIG} from "../../../config";
 import expectThrowsAsync from "../expectThrowsAsync";
 
