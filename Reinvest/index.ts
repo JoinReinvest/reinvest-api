@@ -1,4 +1,4 @@
-import {Investments} from "./Investments/src/bootstrap";
+import {Investments} from "Investments/src/bootstrap"
 
 Investments.boot({
     database: {
