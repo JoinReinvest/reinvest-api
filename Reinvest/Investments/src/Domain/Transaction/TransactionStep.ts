@@ -2,5 +2,6 @@ export enum TransactionStep {
     Same,
     TransactionCreated,
     TradeCreated,
-    FundsTransferInitiated
+    FundsTransferInitiated,
+    WaitForManualAction,
 }

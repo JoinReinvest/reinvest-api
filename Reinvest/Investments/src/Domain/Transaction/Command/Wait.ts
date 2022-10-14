@@ -1,9 +1,9 @@
 import {TransactionCommand} from "./TransactionCommand";
 
-export class NothingToRun implements TransactionCommand {
+export class Wait implements TransactionCommand {
     transactionCommandGuard: boolean = true
 
     public static create() {
-        return new NothingToRun();
+        return new Wait();
     }
 }

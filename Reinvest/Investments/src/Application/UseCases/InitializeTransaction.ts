@@ -3,17 +3,22 @@ import {TransactionException} from "../../Domain/Transaction/TransactionExceptio
 import {TransactionCreated} from "../../Domain/Transaction/Events/TransactionCreated";
 import {InitializeTransactionCommand} from "./InitializeTransactionCommand";
 import {Result} from "../../Domain/Commons/Result";
+import {UniqueIdGenerator} from "../Tools/UniqueIdGenerator";
+import {TransactionId} from "../../Domain/Transaction/ValueObject/TransactionId";
 
 
 export class InitializeTransaction {
     private transactionRepository: TransactionRepositoryInterface;
+    private idGenerator: UniqueIdGenerator;
 
-    constructor(transactionRepository: TransactionRepositoryInterface) {
+    constructor(transactionRepository: TransactionRepositoryInterface, idGenerator: UniqueIdGenerator) {
         this.transactionRepository = transactionRepository;
+        this.idGenerator = idGenerator;
     }
 
     public async execute(command: InitializeTransactionCommand) {
         const transactionCreated = new TransactionCreated(
+            TransactionId.fromUniqueId(this.idGenerator.create()),
             command.portfolioId,
             command.investorAccountId,
             command.amountToInvest

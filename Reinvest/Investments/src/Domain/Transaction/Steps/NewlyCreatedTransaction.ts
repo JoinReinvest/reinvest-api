@@ -5,39 +5,50 @@ import {TransactionDecision} from "../TransactionDecision";
 import {Transaction} from "../Transaction";
 import {CreateTradeCommand} from "../Command/CreateTradeCommand";
 import {TransactionStateChange} from "../TransactionStateChange";
-import {NothingToRun} from "../Command/NothingToRun";
+import {TransactionId} from "../ValueObject/TransactionId";
+import {TransferFundsCommand} from "../Command/TransferFundsCommand";
+import {CommonTransaction} from "./CommonTransaction";
 
-export class NewlyCreatedTransaction implements Transaction {
+export class NewlyCreatedTransaction extends CommonTransaction implements Transaction {
     transactionGuard: boolean = true;
 
+    constructor(transactionId: TransactionId) {
+        super(transactionId);
+    }
+
     public execute(event: TransactionEvent): TransactionDecision {
+        super.validateEvent(event);
+
         switch (true) {
             case event instanceof TransactionCreated:
                 return this.createTrade(event as TransactionCreated);
             case event instanceof TradeCreatedEvent:
-                break;
+                return this.initFundsTransfer(event as TradeCreatedEvent);
             default:
-                break;
+                return super.execute(event);
         }
+    }
 
-
+    private createTrade(event: TransactionCreated): TransactionDecision {
         return new TransactionDecision(
-            NothingToRun.create(),
-            TransactionStateChange.noChange()
+            CreateTradeCommand.create(
+                this.transactionId,
+                event.portfolioId,
+                event.investorAccountId,
+                event.amountToInvest
+            ),
+            TransactionStateChange.noChange(this.transactionId)
         )
     }
 
-
-    private createTrade(event: TransactionCreated): TransactionDecision {
-        const commandToExecute = new CreateTradeCommand(
-            event.portfolioId,
-            event.investorAccountId,
-            event.amountToInvest
-        );
-
+    private initFundsTransfer(event: TradeCreatedEvent): TransactionDecision {
         return new TransactionDecision(
-            commandToExecute,
-            TransactionStateChange.noChange()
+            TransferFundsCommand.create(this.transactionId),
+            TransactionStateChange.tradeCreated(
+                this.transactionId,
+                event.unitPrice,
+                event.numberOfShares
+            )
         )
     }
 }
