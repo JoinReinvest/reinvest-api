@@ -10,8 +10,6 @@ import {TransferFundsCommand} from "../Command/TransferFundsCommand";
 import {CommonTransaction} from "./CommonTransaction";
 
 export class NewlyCreatedTransaction extends CommonTransaction implements Transaction {
-    transactionGuard: boolean = true;
-
     constructor(transactionId: TransactionId) {
         super(transactionId);
     }
