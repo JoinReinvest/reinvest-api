@@ -1,7 +1,7 @@
 import {TransactionCommand} from "./TransactionCommand";
-import {PortfolioId} from "../../../../Model/PortfolioId";
-import {InvestorAccountId} from "../../../../Model/InvestorAccountId";
-import {Money} from "../../../../Model/Money";
+import {PortfolioId} from "../../Commons/PortfolioId";
+import {InvestorAccountId} from "../../Commons/InvestorAccountId";
+import {Money} from "../../Commons/Money";
 
 export class CreateTradeCommand implements TransactionCommand {
     transactionCommandGuard: boolean = true;

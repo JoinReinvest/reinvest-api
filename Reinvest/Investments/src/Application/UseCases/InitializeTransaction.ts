@@ -1,8 +1,9 @@
-import {TransactionRepositoryInterface} from "../ProcessManager/Transaction/TransactionRepositoryInterface";
+import {TransactionRepositoryInterface} from "../../Domain/Transaction/TransactionRepositoryInterface";
+import {TransactionException} from "../../Domain/Transaction/TransactionException";
+import {TransactionCreated} from "../../Domain/Transaction/Events/TransactionCreated";
 import {InitializeTransactionCommand} from "./InitializeTransactionCommand";
-import {TransactionCreated} from "../../Model/DomainEvents/TransactionCreated";
-import {Result} from "../Commons/Result";
-import {TransactionException} from "../ProcessManager/Transaction/TransactionException";
+import {Result} from "../../Domain/Commons/Result";
+
 
 export class InitializeTransaction {
     private transactionRepository: TransactionRepositoryInterface;

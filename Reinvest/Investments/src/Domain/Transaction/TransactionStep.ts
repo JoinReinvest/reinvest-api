@@ -1,4 +1,4 @@
-export enum TransactionStatus {
+export enum TransactionStep {
     Same,
     TransactionCreated,
     TradeCreated,

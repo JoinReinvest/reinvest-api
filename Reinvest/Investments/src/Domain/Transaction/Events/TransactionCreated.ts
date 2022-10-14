@@ -1,7 +1,7 @@
 import {AbstractTransactionEvent} from "./TransactionEvent";
-import {PortfolioId} from "../PortfolioId";
-import {InvestorAccountId} from "../InvestorAccountId";
-import {Money} from "../Money";
+import {PortfolioId} from "../../Commons/PortfolioId";
+import {InvestorAccountId} from "../../Commons/InvestorAccountId";
+import {Money} from "../../Commons/Money";
 
 export class TransactionCreated extends AbstractTransactionEvent {
     private readonly _portfolioId: PortfolioId;

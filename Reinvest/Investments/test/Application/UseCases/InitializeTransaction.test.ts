@@ -1,13 +1,13 @@
 import {expect} from "chai";
 import * as sinon from "ts-sinon";
 
-import {InvestorAccountId} from "../../../src/Model/InvestorAccountId";
-import {Result} from "../../../src/Application/Commons/Result";
-import {Money} from "../../../src/Model/Money";
-import {PortfolioId} from "../../../src/Model/PortfolioId";
+import {Result} from "../../../src/Domain/Commons/Result";
 import {InitializeTransactionCommand} from "../../../src/Application/UseCases/InitializeTransactionCommand";
-import {TransactionRepositoryInterface} from "../../../src/Application/ProcessManager/Transaction/TransactionRepositoryInterface";
 import {InitializeTransaction} from "../../../src/Application/UseCases/InitializeTransaction";
+import {InvestorAccountId} from "../../../src/Domain/Commons/InvestorAccountId";
+import {Money} from "../../../src/Domain/Commons/Money";
+import {PortfolioId} from "../../../src/Domain/Commons/PortfolioId";
+import {TransactionRepositoryInterface} from "../../../src/Domain/Transaction/TransactionRepositoryInterface";
 
 describe('Given the user is an investor', () => {
     const investorAccountId: InvestorAccountId = new InvestorAccountId("123456");

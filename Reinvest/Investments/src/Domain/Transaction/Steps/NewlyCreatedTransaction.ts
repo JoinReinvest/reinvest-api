@@ -1,6 +1,6 @@
-import {TransactionEvent} from "../../../../Model/DomainEvents/TransactionEvent";
-import {TransactionCreated} from "../../../../Model/DomainEvents/TransactionCreated";
-import {TradeCreatedEvent} from "../../../../Model/DomainEvents/TradeCreatedEvent";
+import {TransactionEvent} from "../Events/TransactionEvent";
+import {TransactionCreated} from "../Events/TransactionCreated";
+import {TradeCreatedEvent} from "../Events/TradeCreatedEvent";
 import {TransactionDecision} from "../TransactionDecision";
 import {Transaction} from "../Transaction";
 import {CreateTradeCommand} from "../Command/CreateTradeCommand";
@@ -22,7 +22,7 @@ export class NewlyCreatedTransaction implements Transaction {
 
 
         return new TransactionDecision(
-            new NothingToRun(),
+            NothingToRun.create(),
             TransactionStateChange.noChange()
         )
     }
@@ -34,6 +34,7 @@ export class NewlyCreatedTransaction implements Transaction {
             event.investorAccountId,
             event.amountToInvest
         );
+
         return new TransactionDecision(
             commandToExecute,
             TransactionStateChange.noChange()
