@@ -11,19 +11,22 @@ import {
 import {ManualActionReason} from "../../../../src/Domain/Transaction/ValueObject/ManualActionReason";
 import {SharesIssuanceFailed} from "../../../../src/Domain/Transaction/Events/SharesIssuanceFailed";
 import {WaitForAdminManualAction} from "../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
+import {SharesId} from "../../../../src/Domain/Commons/SharesId";
 
 describe('Given the cancellation period ended and awaiting for shares issuance', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new SharesIssuanceAwaitingTransaction(transactionId);
 
     context('When the share were issued', () => {
-        const sharesWereIssued = new SharesWereIssued(transactionId);
+        const sharesId = new SharesId('1');
+        const sharesWereIssued = new SharesWereIssued(transactionId, sharesId);
 
         it('Then the transaction should be successful', async () => {
             const decision: TransactionDecision = transaction.execute(sharesWereIssued);
 
             expect(decision.command).is.instanceof(DoNothing);
             expect(decision.stateChange.status).is.equal(TransactionState.CompletedWithSuccess);
+            expect(decision.stateChange.metadata.sharesId).is.equal(sharesId);
         });
     });
 

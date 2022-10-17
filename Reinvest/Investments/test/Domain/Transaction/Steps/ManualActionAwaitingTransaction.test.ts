@@ -28,7 +28,6 @@ describe('Given the transaction is awaiting manual action', () => {
             expect(decision.stateChange.status).is.equal(lastTransactionState);
             const counter = decision.stateChange.metadata.lastActionRetryCounter as Counter;
             expect(counter.isHigherEqualThan(0)).is.true;
-
         });
     });
 });

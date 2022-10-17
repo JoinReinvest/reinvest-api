@@ -30,7 +30,7 @@ export class SharesIssuanceAwaitingTransaction extends CommonTransaction impleme
     private completeWithSuccess(event: SharesWereIssued): TransactionDecision {
         return new TransactionDecision(
             DoNothing.create(),
-            TransactionStateChange.completeWithSuccess(this.transactionId)
+            TransactionStateChange.completeWithSuccess(this.transactionId, event.sharesId)
         )
     }
 }

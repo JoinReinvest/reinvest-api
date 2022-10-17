@@ -5,10 +5,12 @@ import {UnitPrice} from "./ValueObject/UnitPrice";
 import {Counter} from "../Commons/Counter";
 import {ManualActionReason} from "./ValueObject/ManualActionReason";
 import {FailureCompletionReason} from "./ValueObject/FailureCompletionReason";
+import {SharesId} from "../Commons/SharesId";
 
 export type TransactionMetadata = {
     unitPrice: UnitPrice | undefined,
     numberOfShares: NumberOfShares | undefined,
+    sharesId: SharesId | undefined,
     lastActionRetryCounter: Counter | undefined,
     manualActionReason: ManualActionReason | undefined,
     failureReason: FailureCompletionReason | undefined
@@ -108,8 +110,11 @@ export class TransactionStateChange {
         return state;
     }
 
-    static completeWithSuccess(transactionId: TransactionId) {
-        return new TransactionStateChange(transactionId, TransactionState.CompletedWithSuccess);
+    static completeWithSuccess(transactionId: TransactionId, sharesId: SharesId) {
+        const state = new TransactionStateChange(transactionId, TransactionState.CompletedWithSuccess);
+        state._metadata.sharesId = sharesId;
+
+        return state
     }
 
     static tradeUnwindAwaiting(transactionId: TransactionId) {
