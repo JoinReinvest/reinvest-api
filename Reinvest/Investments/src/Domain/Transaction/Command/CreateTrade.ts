@@ -4,7 +4,7 @@ import {InvestorAccountId} from "../../Commons/InvestorAccountId";
 import {Money} from "../../Commons/Money";
 import {TransactionId} from "../ValueObject/TransactionId";
 
-export class CreateTradeCommand implements TransactionCommand {
+export class CreateTrade implements TransactionCommand {
     transactionCommandGuard: boolean = true;
 
     private readonly _transactionId: TransactionId;
@@ -19,8 +19,8 @@ export class CreateTradeCommand implements TransactionCommand {
         this._amountToInvest = amountToInvest;
     }
 
-    static create(transactionId: TransactionId, portfolioId: PortfolioId, investorAccountId: InvestorAccountId, amountToInvest: Money): CreateTradeCommand {
-        return new CreateTradeCommand(
+    static create(transactionId: TransactionId, portfolioId: PortfolioId, investorAccountId: InvestorAccountId, amountToInvest: Money): CreateTrade {
+        return new CreateTrade(
             transactionId,
             portfolioId,
             investorAccountId,

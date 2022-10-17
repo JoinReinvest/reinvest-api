@@ -1,7 +1,7 @@
 import {TransactionCommand} from "./TransactionCommand";
 import {TransactionId} from "../ValueObject/TransactionId";
 
-export class TransferFundsCommand implements TransactionCommand {
+export class TransferFunds implements TransactionCommand {
     transactionCommandGuard: boolean = true;
 
     private readonly _transactionId: TransactionId;
@@ -11,7 +11,7 @@ export class TransferFundsCommand implements TransactionCommand {
     }
 
     static create(transactionId: TransactionId) {
-        return new TransferFundsCommand(transactionId);
+        return new TransferFunds(transactionId);
     }
 
     get transactionId(): TransactionId {

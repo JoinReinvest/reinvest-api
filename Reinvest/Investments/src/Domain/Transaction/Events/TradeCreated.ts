@@ -3,7 +3,7 @@ import {TransactionId} from "../ValueObject/TransactionId";
 import {NumberOfShares} from "../ValueObject/NumberOfShares";
 import {UnitPrice} from "../ValueObject/UnitPrice";
 
-export class TradeCreatedEvent extends AbstractTransactionEvent {
+export class TradeCreated extends AbstractTransactionEvent {
     private readonly _numberOfShares: NumberOfShares;
     private readonly _unitPrice: UnitPrice;
 
