@@ -1,21 +1,21 @@
 import {expect} from "chai";
 
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
-import {Counter} from "../../../../src/Domain/Commons/Counter";
-import {ManualActionReason} from "../../../../src/Domain/Transaction/ValueObject/ManualActionReason";
-import {WaitForAdminManualAction} from "../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
-import {TransactionCancelled} from "../../../../src/Domain/Transaction/Events/TransactionCancelled";
-import {UnwindTrade} from "../../../../src/Domain/Transaction/Command/UnwindTrade";
-import {DoNothing} from "../../../../src/Domain/Transaction/Command/DoNothing";
-import {FailureCompletionReason} from "../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {Counter} from "../../../../../src/Domain/Commons/Counter";
+import {ManualActionReason} from "../../../../../src/Domain/Transaction/ValueObject/ManualActionReason";
+import {WaitForAdminManualAction} from "../../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
+import {TransactionCancelled} from "../../../../../src/Domain/Transaction/Events/TransactionCancelled";
+import {UnwindTrade} from "../../../../../src/Domain/Transaction/Command/UnwindTrade";
+import {DoNothing} from "../../../../../src/Domain/Transaction/Command/DoNothing";
+import {FailureCompletionReason} from "../../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
 import {
     NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION,
     TradeUnwindAwaitingTransaction
-} from "../../../../src/Domain/Transaction/States/TradeUnwindAwaitingTransaction";
-import {TradeUnwound} from "../../../../src/Domain/Transaction/Events/TradeUnwound";
-import {TradeUnwoundFailed} from "../../../../src/Domain/Transaction/Events/TradeUnwoundFailed";
+} from "../../../../../src/Domain/Transaction/States/TradeUnwindAwaitingTransaction";
+import {TradeUnwound} from "../../../../../src/Domain/Transaction/Events/TradeUnwound";
+import {TradeUnwoundFailed} from "../../../../../src/Domain/Transaction/Events/TradeUnwoundFailed";
 
 context('Given the transaction was cancelled and the system is awaiting for trade unwind', () => {
     const transactionId = new TransactionId('123456');

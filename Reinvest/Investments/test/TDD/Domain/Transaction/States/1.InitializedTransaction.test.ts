@@ -1,14 +1,14 @@
 import {expect} from "chai";
 
-import {TransactionCreated} from "../../../../src/Domain/Transaction/Events/TransactionCreated";
-import {InvestorAccountId} from "../../../../src/Domain/Commons/InvestorAccountId";
-import {Money} from "../../../../src/Domain/Commons/Money";
-import {PortfolioId} from "../../../../src/Domain/Commons/PortfolioId";
-import {InitializedTransaction} from "../../../../src/Domain/Transaction/States/InitializedTransaction";
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {CreateTrade} from "../../../../src/Domain/Transaction/Command/CreateTrade";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {TransactionCreated} from "../../../../../src/Domain/Transaction/Events/TransactionCreated";
+import {InvestorAccountId} from "../../../../../src/Domain/Commons/InvestorAccountId";
+import {Money} from "../../../../../src/Domain/Commons/Money";
+import {PortfolioId} from "../../../../../src/Domain/Commons/PortfolioId";
+import {InitializedTransaction} from "../../../../../src/Domain/Transaction/States/InitializedTransaction";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {CreateTrade} from "../../../../../src/Domain/Transaction/Command/CreateTrade";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
 
 context('Given the transaction was initialized', () => {
     const transactionId = new TransactionId('123456');

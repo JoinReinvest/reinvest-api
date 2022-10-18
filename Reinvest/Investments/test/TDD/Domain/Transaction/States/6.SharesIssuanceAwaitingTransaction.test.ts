@@ -1,17 +1,17 @@
 import {expect} from "chai";
 
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
-import {DoNothing} from "../../../../src/Domain/Transaction/Command/DoNothing";
-import {SharesWereIssued} from "../../../../src/Domain/Transaction/Events/SharesWereIssued";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {DoNothing} from "../../../../../src/Domain/Transaction/Command/DoNothing";
+import {SharesWereIssued} from "../../../../../src/Domain/Transaction/Events/SharesWereIssued";
 import {
     SharesIssuanceAwaitingTransaction
-} from "../../../../src/Domain/Transaction/States/SharesIssuanceAwaitingTransaction";
-import {ManualActionReason} from "../../../../src/Domain/Transaction/ValueObject/ManualActionReason";
-import {SharesIssuanceFailed} from "../../../../src/Domain/Transaction/Events/SharesIssuanceFailed";
-import {WaitForAdminManualAction} from "../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
-import {SharesId} from "../../../../src/Domain/Commons/SharesId";
+} from "../../../../../src/Domain/Transaction/States/SharesIssuanceAwaitingTransaction";
+import {ManualActionReason} from "../../../../../src/Domain/Transaction/ValueObject/ManualActionReason";
+import {SharesIssuanceFailed} from "../../../../../src/Domain/Transaction/Events/SharesIssuanceFailed";
+import {WaitForAdminManualAction} from "../../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
+import {SharesId} from "../../../../../src/Domain/Commons/SharesId";
 
 context('Given the cancellation period ended and awaiting for shares issuance', () => {
     const transactionId = new TransactionId('123456');

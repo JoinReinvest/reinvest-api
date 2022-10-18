@@ -1,28 +1,28 @@
 import {expect} from "chai";
 
-import {Money} from "../../../../src/Domain/Commons/Money";
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TradeCreated} from "../../../../src/Domain/Transaction/Events/TradeCreated";
-import {Currency} from "../../../../src/Domain/Commons/Currency";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
-import {NumberOfShares} from "../../../../src/Domain/Transaction/ValueObject/NumberOfShares";
-import {UnitPrice} from "../../../../src/Domain/Transaction/ValueObject/UnitPrice";
-import {TransferFunds} from "../../../../src/Domain/Transaction/Command/TransferFunds";
-import {Counter} from "../../../../src/Domain/Commons/Counter";
+import {Money} from "../../../../../src/Domain/Commons/Money";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TradeCreated} from "../../../../../src/Domain/Transaction/Events/TradeCreated";
+import {Currency} from "../../../../../src/Domain/Commons/Currency";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {NumberOfShares} from "../../../../../src/Domain/Transaction/ValueObject/NumberOfShares";
+import {UnitPrice} from "../../../../../src/Domain/Transaction/ValueObject/UnitPrice";
+import {TransferFunds} from "../../../../../src/Domain/Transaction/Command/TransferFunds";
+import {Counter} from "../../../../../src/Domain/Commons/Counter";
 import {
     NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION,
     TradeAwaitingTransaction
-} from "../../../../src/Domain/Transaction/States/TradeAwaitingTransaction";
-import {InvestorAccountId} from "../../../../src/Domain/Commons/InvestorAccountId";
-import {PortfolioId} from "../../../../src/Domain/Commons/PortfolioId";
-import {TransactionCreated} from "../../../../src/Domain/Transaction/Events/TransactionCreated";
-import {CreateTrade} from "../../../../src/Domain/Transaction/Command/CreateTrade";
-import {ManualActionReason} from "../../../../src/Domain/Transaction/ValueObject/ManualActionReason";
-import {TradeFailed} from "../../../../src/Domain/Transaction/Events/TradeFailed";
-import {WaitForAdminManualAction} from "../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
-import {TransactionCancelled} from "../../../../src/Domain/Transaction/Events/TransactionCancelled";
-import {UnwindTrade} from "../../../../src/Domain/Transaction/Command/UnwindTrade";
+} from "../../../../../src/Domain/Transaction/States/TradeAwaitingTransaction";
+import {InvestorAccountId} from "../../../../../src/Domain/Commons/InvestorAccountId";
+import {PortfolioId} from "../../../../../src/Domain/Commons/PortfolioId";
+import {TransactionCreated} from "../../../../../src/Domain/Transaction/Events/TransactionCreated";
+import {CreateTrade} from "../../../../../src/Domain/Transaction/Command/CreateTrade";
+import {ManualActionReason} from "../../../../../src/Domain/Transaction/ValueObject/ManualActionReason";
+import {TradeFailed} from "../../../../../src/Domain/Transaction/Events/TradeFailed";
+import {WaitForAdminManualAction} from "../../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
+import {TransactionCancelled} from "../../../../../src/Domain/Transaction/Events/TransactionCancelled";
+import {UnwindTrade} from "../../../../../src/Domain/Transaction/Command/UnwindTrade";
 
 context('Given the investment was created and awaiting for a trade', () => {
     const transactionId = new TransactionId('123456');

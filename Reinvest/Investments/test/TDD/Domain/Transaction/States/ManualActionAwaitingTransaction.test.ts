@@ -1,14 +1,14 @@
 import {expect} from "chai";
 
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
 import {
     ManualActionAwaitingTransaction
-} from "../../../../src/Domain/Transaction/States/ManualActionAwaitingTransaction";
-import {Counter} from "../../../../src/Domain/Commons/Counter";
-import {TransactionResumed} from "../../../../src/Domain/Transaction/Events/TransactionResumed";
-import {ResumeLastEvent} from "../../../../src/Domain/Transaction/Command/ResumeLastEvent";
+} from "../../../../../src/Domain/Transaction/States/ManualActionAwaitingTransaction";
+import {Counter} from "../../../../../src/Domain/Commons/Counter";
+import {TransactionResumed} from "../../../../../src/Domain/Transaction/Events/TransactionResumed";
+import {ResumeLastEvent} from "../../../../../src/Domain/Transaction/Command/ResumeLastEvent";
 
 context('Given the transaction is awaiting manual action', () => {
     const transactionId = new TransactionId('123456');

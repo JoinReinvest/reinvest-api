@@ -1,13 +1,13 @@
 import {expect} from "chai";
 
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
 import {
     CancellationPeriodEndAwaitingTransaction
-} from "../../../../src/Domain/Transaction/States/CancellationPeriodEndAwaitingTransaction";
-import {CancellationPeriodEnded} from "../../../../src/Domain/Transaction/Events/CancellationPeriodEnded";
-import {IssueShares} from "../../../../src/Domain/Transaction/Command/IssueShares";
+} from "../../../../../src/Domain/Transaction/States/CancellationPeriodEndAwaitingTransaction";
+import {CancellationPeriodEnded} from "../../../../../src/Domain/Transaction/Events/CancellationPeriodEnded";
+import {IssueShares} from "../../../../../src/Domain/Transaction/Command/IssueShares";
 
 context('Given the payment was successful and awaiting when cancellation period end', () => {
     const transactionId = new TransactionId('123456');

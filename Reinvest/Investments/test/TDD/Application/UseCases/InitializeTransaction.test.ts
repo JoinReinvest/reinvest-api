@@ -1,15 +1,15 @@
 import {expect} from "chai";
 import * as sinon from "ts-sinon";
 
-import {Result} from "../../../src/Domain/Commons/Result";
-import {InitializeTransactionCommand} from "../../../src/Application/UseCases/InitializeTransactionCommand";
-import {InitializeTransaction} from "../../../src/Application/UseCases/InitializeTransaction";
-import {InvestorAccountId} from "../../../src/Domain/Commons/InvestorAccountId";
-import {Money} from "../../../src/Domain/Commons/Money";
-import {PortfolioId} from "../../../src/Domain/Commons/PortfolioId";
-import {TransactionRepositoryInterface} from "../../../src/Domain/Transaction/TransactionRepositoryInterface";
-import {UniqueIdGenerator} from "../../../src/Application/Tools/UniqueIdGenerator";
-import {UniqueId} from "../../../src/Domain/Commons/UniqueId";
+import {Result} from "../../../../src/Domain/Commons/Result";
+import {InitializeTransactionCommand} from "../../../../src/Application/UseCases/InitializeTransactionCommand";
+import {InitializeTransaction} from "../../../../src/Application/UseCases/InitializeTransaction";
+import {InvestorAccountId} from "../../../../src/Domain/Commons/InvestorAccountId";
+import {Money} from "../../../../src/Domain/Commons/Money";
+import {PortfolioId} from "../../../../src/Domain/Commons/PortfolioId";
+import {TransactionRepositoryInterface} from "../../../../src/Domain/Transaction/TransactionRepositoryInterface";
+import {UniqueIdGenerator} from "../../../../src/Application/Tools/UniqueIdGenerator";
+import {UniqueId} from "../../../../src/Domain/Commons/UniqueId";
 
 context('Given the user is an investor', () => {
     const investorAccountId: InvestorAccountId = new InvestorAccountId("123456");

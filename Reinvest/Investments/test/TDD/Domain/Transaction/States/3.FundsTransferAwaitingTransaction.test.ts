@@ -1,24 +1,24 @@
 import {expect} from "chai";
 
-import {Money} from "../../../../src/Domain/Commons/Money";
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TradeCreated} from "../../../../src/Domain/Transaction/Events/TradeCreated";
-import {Currency} from "../../../../src/Domain/Commons/Currency";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
-import {NumberOfShares} from "../../../../src/Domain/Transaction/ValueObject/NumberOfShares";
-import {UnitPrice} from "../../../../src/Domain/Transaction/ValueObject/UnitPrice";
-import {TransferFunds} from "../../../../src/Domain/Transaction/Command/TransferFunds";
-import {FundsTransferInitialized} from "../../../../src/Domain/Transaction/Events/FundsTransferInitialized";
-import {DoNothing} from "../../../../src/Domain/Transaction/Command/DoNothing";
-import {Counter} from "../../../../src/Domain/Commons/Counter";
-import {WaitForManualAction} from "../../../../src/Domain/Transaction/Command/WaitForManualAction";
+import {Money} from "../../../../../src/Domain/Commons/Money";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TradeCreated} from "../../../../../src/Domain/Transaction/Events/TradeCreated";
+import {Currency} from "../../../../../src/Domain/Commons/Currency";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {NumberOfShares} from "../../../../../src/Domain/Transaction/ValueObject/NumberOfShares";
+import {UnitPrice} from "../../../../../src/Domain/Transaction/ValueObject/UnitPrice";
+import {TransferFunds} from "../../../../../src/Domain/Transaction/Command/TransferFunds";
+import {FundsTransferInitialized} from "../../../../../src/Domain/Transaction/Events/FundsTransferInitialized";
+import {DoNothing} from "../../../../../src/Domain/Transaction/Command/DoNothing";
+import {Counter} from "../../../../../src/Domain/Commons/Counter";
+import {WaitForManualAction} from "../../../../../src/Domain/Transaction/Command/WaitForManualAction";
 import {
     FundsTransferAwaitingTransaction,
     NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION
-} from "../../../../src/Domain/Transaction/States/FundsTransferAwaitingTransaction";
-import {FundsTransferInitializationFailed} from "../../../../src/Domain/Transaction/Events/FundsTransferInitializationFailed";
-import {FailureCompletionReason} from "../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
+} from "../../../../../src/Domain/Transaction/States/FundsTransferAwaitingTransaction";
+import {FundsTransferInitializationFailed} from "../../../../../src/Domain/Transaction/Events/FundsTransferInitializationFailed";
+import {FailureCompletionReason} from "../../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
 
 context('Given the trade was created and awaiting for a funds transfer initialization', () => {
     const transactionId = new TransactionId('123456');

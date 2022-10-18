@@ -45,18 +45,18 @@
     * Tools: Mocha + Chai + Sinon
 * Explanations:
     * TDD:
-        * We are implementing business domain first
+        * We implement business domain first
         * We don't have any integration parts at the very beginning, so we need a way to execute our business logic
           somehow
         * Using TDD we can write unit tests that allow us to execute the code in separation from the lower layers of the
           application
-        * Also, this is a way implementing test first and the code
+        * Also, this is a way of implementing test first and then the code
     * BDD:
         * We implement tests in the BDD way, using the Gherkin syntax (Given/When/Then)
         * We describe tests in the declarative way, also understandable for the business
         * Then, we group unit tests into features and scenarios
-        * Thanks to that we can have benefits from unit tests for classes and group them into consistent features that
-          represent some system behaviour
+        * Thanks to that we can have benefits from unit tests for classes and group them into features that
+          represent some consistent system behaviour
     * Mocha:
         * Well known testing library that supports many testing interfaces (TDD/BDD/Exports/Require)
         * There is a Typescript library for Mocha: ts-mocha

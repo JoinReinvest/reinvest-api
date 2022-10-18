@@ -1,14 +1,14 @@
 import {expect} from "chai";
 
-import {TransactionDecision} from "../../../../src/Domain/Transaction/TransactionDecision";
-import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
-import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
-import {DoNothing} from "../../../../src/Domain/Transaction/Command/DoNothing";
-import {FailureCompletionReason} from "../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
-import {FundsTransferInitialized} from "../../../../src/Domain/Transaction/Events/FundsTransferInitialized";
-import {PaymentAwaitingTransaction} from "../../../../src/Domain/Transaction/States/PaymentAwaitingTransaction";
-import {SuccessfulPayment} from "../../../../src/Domain/Transaction/Events/SuccessfulPayment";
-import {FailedPayment} from "../../../../src/Domain/Transaction/Events/FailedPayment";
+import {TransactionDecision} from "../../../../../src/Domain/Transaction/TransactionDecision";
+import {TransactionState} from "../../../../../src/Domain/Transaction/ValueObject/TransactionState";
+import {TransactionId} from "../../../../../src/Domain/Transaction/ValueObject/TransactionId";
+import {DoNothing} from "../../../../../src/Domain/Transaction/Command/DoNothing";
+import {FailureCompletionReason} from "../../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
+import {FundsTransferInitialized} from "../../../../../src/Domain/Transaction/Events/FundsTransferInitialized";
+import {PaymentAwaitingTransaction} from "../../../../../src/Domain/Transaction/States/PaymentAwaitingTransaction";
+import {SuccessfulPayment} from "../../../../../src/Domain/Transaction/Events/SuccessfulPayment";
+import {FailedPayment} from "../../../../../src/Domain/Transaction/Events/FailedPayment";
 
 context('Given the funds transfer was initiated and awaiting for payment', () => {
     const transactionId = new TransactionId('123456');
