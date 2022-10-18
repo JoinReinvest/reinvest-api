@@ -15,7 +15,7 @@ context('Given the transaction is awaiting manual action', () => {
     const lastTransactionState = TransactionState.PaymentAwaiting;
     const transaction = new ManualActionAwaitingTransaction(transactionId, lastTransactionState);
 
-    describe('When a user resumed the transaction', () => {
+    describe('When a user resumes the transaction', () => {
         const transactionResumed = new TransactionResumed(transactionId);
 
         it('Then the transaction should resume the last state', async () => {

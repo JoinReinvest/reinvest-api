@@ -24,11 +24,11 @@ import {WaitForAdminManualAction} from "../../../../src/Domain/Transaction/Comma
 import {TransactionCancelled} from "../../../../src/Domain/Transaction/Events/TransactionCancelled";
 import {UnwindTrade} from "../../../../src/Domain/Transaction/Command/UnwindTrade";
 
-context('Given the investment was created and awaiting for trade created event', () => {
+context('Given the investment was created and awaiting for a trade', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new TradeAwaitingTransaction(transactionId, Counter.init());
 
-    describe('When system created a trade', () => {
+    describe('When the system creates the trade', () => {
         const numberOfShares = new NumberOfShares(1000);
         const unitPrice = UnitPrice.fromMoney(new Money(1.0, Currency.USD));
         const tradeCreated = new TradeCreated(transactionId, numberOfShares, unitPrice);
@@ -44,7 +44,7 @@ context('Given the investment was created and awaiting for trade created event',
         });
     });
 
-    describe('When system was not able to create a trade', () => {
+    describe('When system was not able to create the trade', () => {
         const tradeFailed = new TradeFailed(transactionId);
 
         it('Then the transaction should decide to wait for manual action', async () => {

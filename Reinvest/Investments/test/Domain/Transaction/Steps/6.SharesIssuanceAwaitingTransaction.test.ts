@@ -17,7 +17,7 @@ context('Given the cancellation period ended and awaiting for shares issuance', 
     const transactionId = new TransactionId('123456');
     const transaction = new SharesIssuanceAwaitingTransaction(transactionId);
 
-    describe('When the share were issued', () => {
+    describe('When the system issues shares', () => {
         const sharesId = new SharesId('1');
         const sharesWereIssued = new SharesWereIssued(transactionId, sharesId);
 
@@ -30,7 +30,7 @@ context('Given the cancellation period ended and awaiting for shares issuance', 
         });
     });
 
-    describe('When the shares issuance failed', () => {
+    describe('When the shares issuance fails', () => {
         const sharesIssuanceFailed = new SharesIssuanceFailed(transactionId);
 
         it('Then the system should wait for the admin manual action', async () => {

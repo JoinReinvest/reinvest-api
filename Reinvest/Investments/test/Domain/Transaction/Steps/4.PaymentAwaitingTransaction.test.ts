@@ -14,7 +14,7 @@ context('Given the funds transfer was initiated and awaiting for payment', () =>
     const transactionId = new TransactionId('123456');
     const transaction = new PaymentAwaitingTransaction(transactionId);
 
-    describe('When the system published the event that funds were transferred into the escrow account', () => {
+    describe('When the system notifies about successful payment', () => {
         const successfulPayment = new SuccessfulPayment(transactionId);
 
         it('Then the transaction should do nothing and wait for the end of cancellation period', async () => {

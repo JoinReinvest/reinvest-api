@@ -21,7 +21,7 @@ context('Given the transaction was cancelled and the system is awaiting for trad
     const transactionId = new TransactionId('123456');
     const transaction = new TradeUnwindAwaitingTransaction(transactionId, Counter.init());
 
-    describe('When the system unwound the trade', () => {
+    describe('When the system unwinds the trade', () => {
         const tradeUnwound = new TradeUnwound(transactionId);
 
         it('Then the transaction should complete with failure', async () => {
@@ -47,7 +47,7 @@ context('Given the transaction was cancelled and the system is awaiting for trad
         });
     });
 
-    describe('When system re-published a transaction cancelled event', () => {
+    describe('When system re-publishes the transaction cancelled event', () => {
         const transactionCancelled = new TransactionCancelled(transactionId);
 
         it('Then the transaction should initialize again the trade unwinding process', async () => {

@@ -20,11 +20,11 @@ import {
 import {FundsTransferInitializationFailed} from "../../../../src/Domain/Transaction/Events/FundsTransferInitializationFailed";
 import {FailureCompletionReason} from "../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
 
-context('Given the trade was created and awaiting for funds initialized event', () => {
+context('Given the trade was created and awaiting for a funds transfer initialization', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new FundsTransferAwaitingTransaction(transactionId, Counter.init());
 
-    describe('When the system published the funds transfer initiated event', () => {
+    describe('When the system initializes the funds transfer', () => {
         const fundsTransferInitiatedEvent = new FundsTransferInitialized(transactionId);
 
         it('Then the transaction should do nothing and waits for payment', async () => {

@@ -14,7 +14,7 @@ context('Given the transaction was initialized', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new InitializedTransaction(transactionId);
 
-    describe('When system published the created event', () => {
+    describe('When the system starts the investment process', () => {
         const investorAccountId = new InvestorAccountId("123456");
         const amountToInvest = new Money(1000.0);
         const portfolioId = new PortfolioId("1");
