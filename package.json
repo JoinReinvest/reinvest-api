@@ -8,7 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node build/Reinvest/index.js",
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
-    "test": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'"
+    "test": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'"
   },
   "nodemonConfig": {
     "ignore": [
