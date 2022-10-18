@@ -13,11 +13,11 @@ import {SharesIssuanceFailed} from "../../../../src/Domain/Transaction/Events/Sh
 import {WaitForAdminManualAction} from "../../../../src/Domain/Transaction/Command/WaitForAdminManualAction";
 import {SharesId} from "../../../../src/Domain/Commons/SharesId";
 
-describe('Given the cancellation period ended and awaiting for shares issuance', () => {
+context('Given the cancellation period ended and awaiting for shares issuance', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new SharesIssuanceAwaitingTransaction(transactionId);
 
-    context('When the share were issued', () => {
+    describe('When the share were issued', () => {
         const sharesId = new SharesId('1');
         const sharesWereIssued = new SharesWereIssued(transactionId, sharesId);
 
@@ -30,7 +30,7 @@ describe('Given the cancellation period ended and awaiting for shares issuance',
         });
     });
 
-    context('When the shares issuance failed', () => {
+    describe('When the shares issuance failed', () => {
         const sharesIssuanceFailed = new SharesIssuanceFailed(transactionId);
 
         it('Then the system should wait for the admin manual action', async () => {

@@ -9,11 +9,11 @@ import {
 import {CancellationPeriodEnded} from "../../../../src/Domain/Transaction/Events/CancellationPeriodEnded";
 import {IssueShares} from "../../../../src/Domain/Transaction/Command/IssueShares";
 
-describe('Given the payment was successful and awaiting when cancellation period end', () => {
+context('Given the payment was successful and awaiting when cancellation period end', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new CancellationPeriodEndAwaitingTransaction(transactionId);
 
-    context('When the cancellation period end', () => {
+    describe('When the cancellation period end', () => {
         const cancellationPeriodEnded = new CancellationPeriodEnded(transactionId);
 
         it('Then the transaction should request shares issuance', async () => {

@@ -1,16 +1,16 @@
 import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
-import {NORTH_CAPITAL_CONFIG} from "../../../config";
+import {NORTH_CAPITAL_CONFIG} from "../../config";
 import ConfigurationCacheService from "../ConfigurationCacheService";
 
 const cacheService = new ConfigurationCacheService();
 const {CLIENT_ID, DEVELOPER_API_KEY, API_URL} = NORTH_CAPITAL_CONFIG;
 
-describe('Given I am individual with an account in North Capital', () => {
+context('Given I am individual with an account in North Capital', () => {
     const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
     let accountId: string = cacheService.readValue('ACCOUNT_ID');
 
-    context('When I want to start investing', () => {
+    describe('When I want to start investing', () => {
 
         it('Then I need to be able to link external account with Plaid', async () => {
             const accountUrl = await requester.linkExternalAchAccount(accountId);

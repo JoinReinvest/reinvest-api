@@ -20,11 +20,11 @@ import {
 import {FundsTransferInitializationFailed} from "../../../../src/Domain/Transaction/Events/FundsTransferInitializationFailed";
 import {FailureCompletionReason} from "../../../../src/Domain/Transaction/ValueObject/FailureCompletionReason";
 
-describe('Given the trade was created and awaiting for funds initialized event', () => {
+context('Given the trade was created and awaiting for funds initialized event', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new FundsTransferAwaitingTransaction(transactionId, Counter.init());
 
-    context('When the system published the funds transfer initiated event', () => {
+    describe('When the system published the funds transfer initiated event', () => {
         const fundsTransferInitiatedEvent = new FundsTransferInitialized(transactionId);
 
         it('Then the transaction should do nothing and waits for payment', async () => {
@@ -35,7 +35,7 @@ describe('Given the trade was created and awaiting for funds initialized event',
         });
     });
 
-    context('When the funds transfer failed', () => {
+    describe('When the funds transfer failed', () => {
         const fundsTransferFailed = new FundsTransferInitializationFailed(transactionId);
 
         it('Then the transaction should complete with failure', async () => {
@@ -48,7 +48,7 @@ describe('Given the trade was created and awaiting for funds initialized event',
         });
     });
 
-    context('When system re-published a trade created event', () => {
+    describe('When system re-published a trade created event', () => {
         const numberOfShares = new NumberOfShares(1000);
         const unitPrice = UnitPrice.fromMoney(new Money(1.0, Currency.USD));
         const tradeCreated = new TradeCreated(transactionId, numberOfShares, unitPrice);

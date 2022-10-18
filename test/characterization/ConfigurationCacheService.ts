@@ -13,11 +13,11 @@ export default class ConfigurationCacheService {
         fs.appendFile(this.cacheFile, `${name}="${value}"\n`, () => {});
     }
 
-    readValue(value: string) {
+    readValue(value: string): string {
         if (!process.env[value]) {
             return "";
         }
 
-        return process.env[value];
+        return process.env[value] as string;
     }
 }

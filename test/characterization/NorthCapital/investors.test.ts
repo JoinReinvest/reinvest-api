@@ -1,15 +1,15 @@
 import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
 import ConfigurationCacheService from "../ConfigurationCacheService";
-import {NORTH_CAPITAL_CONFIG} from "../../../config";
+import {NORTH_CAPITAL_CONFIG} from "../../config";
 
 const {CLIENT_ID, DEVELOPER_API_KEY, API_URL} = NORTH_CAPITAL_CONFIG;
 const cacheService = new ConfigurationCacheService();
 
-describe('Given I am an individual person and I want to create an account in the North Capital', () => {
+context('Given I am an individual person and I want to create an account in the North Capital', () => {
     const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
 
-    context('When I am a U.S. Citizen', () => {
+    describe('When I am a U.S. Citizen', () => {
         let accountId: string = cacheService.readValue('ACCOUNT_ID');
         let partyId: string = cacheService.readValue('PARTY_ID');
         let linkId: string = cacheService.readValue('PARTY_ACCOUNT_LINK_ID');
@@ -83,7 +83,7 @@ describe('Given I am an individual person and I want to create an account in the
         });
     });
 
-    context('When I am an organization or trust', () => {
+    describe('When I am an organization or trust', () => {
         let accountId: string = cacheService.readValue('COMPANY_ACCOUNT_ID');
         let partyId: string = cacheService.readValue('COMPANY_PARTY_ID');
         let entityId: string = cacheService.readValue('COMPANY_ENTITY_ID');

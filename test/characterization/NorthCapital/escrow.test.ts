@@ -1,14 +1,14 @@
 import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
-import {NORTH_CAPITAL_CONFIG} from "../../../config";
+import {NORTH_CAPITAL_CONFIG} from "../../config";
 import expectThrowsAsync from "../expectThrowsAsync";
 
 const {CLIENT_ID, DEVELOPER_API_KEY, API_URL, OFFERING_ID} = NORTH_CAPITAL_CONFIG;
 
-describe('Given I am an issuer and I am an admin', () => {
+context('Given I am an issuer and I am an admin', () => {
     const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
 
-    context('When I have created offer without escrow account', () => {
+    describe('When I have created offer without escrow account', () => {
         const offeringId = OFFERING_ID;
 
         it('Then I should not be able to get the escrow account for the offering if offering not exists', async () => {
@@ -53,7 +53,7 @@ describe('Given I am an issuer and I am an admin', () => {
 
     });
 
-    context('When I have created offer with an escrow account', () => {
+    describe('When I have created offer with an escrow account', () => {
         const offeringId = NORTH_CAPITAL_CONFIG.OFFERING_ID;
 
         it('Then I should not be able to create an escrow account', async () => {

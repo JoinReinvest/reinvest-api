@@ -1,13 +1,13 @@
 import {expect} from "chai";
 import NorthCapitalRequester from "./NorthCapitalRequester";
 import ConfigurationCacheService from "../ConfigurationCacheService";
-import {NORTH_CAPITAL_CONFIG} from "../../../config";
+import {NORTH_CAPITAL_CONFIG} from "../../config";
 import expectThrowsAsync from "../expectThrowsAsync";
 
 const {CLIENT_ID, DEVELOPER_API_KEY, API_URL, OFFERING_ID} = NORTH_CAPITAL_CONFIG;
 const cacheService = new ConfigurationCacheService();
 
-describe('Given ' +
+context('Given ' +
     'I have the North Capital account, ' +
     'primary party is linked, ' +
     'bank account is linked, ' +
@@ -17,7 +17,7 @@ describe('Given ' +
     const offeringId = OFFERING_ID;
     let accountId: string = cacheService.readValue('ACCOUNT_ID');
 
-    context('When I want to buy shares', async () => {
+    describe('When I want to buy shares', async () => {
         const shares: string = '2.00000';
         let tradeId: string = cacheService.readValue('TRADE_ID');
         let fundsTransferRefNumber: string = cacheService.readValue('FUNDS_TRANSFER_REF_NO');

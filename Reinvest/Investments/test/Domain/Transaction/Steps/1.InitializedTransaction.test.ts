@@ -10,11 +10,11 @@ import {CreateTrade} from "../../../../src/Domain/Transaction/Command/CreateTrad
 import {TransactionState} from "../../../../src/Domain/Transaction/ValueObject/TransactionState";
 import {TransactionId} from "../../../../src/Domain/Transaction/ValueObject/TransactionId";
 
-describe('Given the transaction was initialized', () => {
+context('Given the transaction was initialized', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new InitializedTransaction(transactionId);
 
-    context('When system published the created event', () => {
+    describe('When system published the created event', () => {
         const investorAccountId = new InvestorAccountId("123456");
         const amountToInvest = new Money(1000.0);
         const portfolioId = new PortfolioId("1");

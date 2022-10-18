@@ -10,12 +10,12 @@ import {Counter} from "../../../../src/Domain/Commons/Counter";
 import {TransactionResumed} from "../../../../src/Domain/Transaction/Events/TransactionResumed";
 import {ResumeLastEvent} from "../../../../src/Domain/Transaction/Command/ResumeLastEvent";
 
-describe('Given the transaction is awaiting manual action', () => {
+context('Given the transaction is awaiting manual action', () => {
     const transactionId = new TransactionId('123456');
     const lastTransactionState = TransactionState.PaymentAwaiting;
     const transaction = new ManualActionAwaitingTransaction(transactionId, lastTransactionState);
 
-    context('When a user resumed the transaction', () => {
+    describe('When a user resumed the transaction', () => {
         const transactionResumed = new TransactionResumed(transactionId);
 
         it('Then the transaction should resume the last state', async () => {

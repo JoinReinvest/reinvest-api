@@ -17,11 +17,11 @@ import {
 import {TradeUnwound} from "../../../../src/Domain/Transaction/Events/TradeUnwound";
 import {TradeUnwoundFailed} from "../../../../src/Domain/Transaction/Events/TradeUnwoundFailed";
 
-describe('Given the transaction was cancelled and the system is awaiting for trade unwind', () => {
+context('Given the transaction was cancelled and the system is awaiting for trade unwind', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new TradeUnwindAwaitingTransaction(transactionId, Counter.init());
 
-    context('When the system unwound the trade', () => {
+    describe('When the system unwound the trade', () => {
         const tradeUnwound = new TradeUnwound(transactionId);
 
         it('Then the transaction should complete with failure', async () => {
@@ -34,7 +34,7 @@ describe('Given the transaction was cancelled and the system is awaiting for tra
         });
     });
 
-    context('When system was not able to unwind the trade', () => {
+    describe('When system was not able to unwind the trade', () => {
         const tradeUnwoundFailed = new TradeUnwoundFailed(transactionId);
 
         it('Then the transaction should decide to wait for admin manual action', async () => {
@@ -47,7 +47,7 @@ describe('Given the transaction was cancelled and the system is awaiting for tra
         });
     });
 
-    context('When system re-published a transaction cancelled event', () => {
+    describe('When system re-published a transaction cancelled event', () => {
         const transactionCancelled = new TransactionCancelled(transactionId);
 
         it('Then the transaction should initialize again the trade unwinding process', async () => {

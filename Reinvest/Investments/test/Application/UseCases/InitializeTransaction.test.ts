@@ -11,10 +11,10 @@ import {TransactionRepositoryInterface} from "../../../src/Domain/Transaction/Tr
 import {UniqueIdGenerator} from "../../../src/Application/Tools/UniqueIdGenerator";
 import {UniqueId} from "../../../src/Domain/Commons/UniqueId";
 
-describe('Given the user is an investor', () => {
+context('Given the user is an investor', () => {
     const investorAccountId: InvestorAccountId = new InvestorAccountId("123456");
 
-    context('When the user want to invest some money into REIT portfolio', () => {
+    describe('When the user want to invest some money into REIT portfolio', () => {
         const amountToInvest: Money = new Money(1000.0);
         const portfolioId: PortfolioId = new PortfolioId("1");
         const transactionRepository = sinon.stubInterface<TransactionRepositoryInterface>();

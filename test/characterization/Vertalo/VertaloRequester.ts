@@ -16,7 +16,7 @@ export default class VertaloRequester {
     }
 
     private async getToken(): Promise<string> {
-        if (this.authorizationToken === null || this.tokenValidBefore < new Date()) {
+        if (this.authorizationToken === null || <Date>this.tokenValidBefore < new Date()) {
             this.authorizationToken = await this.authorize()
             this.tokenValidBefore = new Date(new Date().getTime() + (60 * 60000));
         }
@@ -50,6 +50,7 @@ export default class VertaloRequester {
 
             return response.data;
         } catch (error) {
+            // @ts-ignore
             throw new Error(`Request error: ${error.message}`)
         }
     }

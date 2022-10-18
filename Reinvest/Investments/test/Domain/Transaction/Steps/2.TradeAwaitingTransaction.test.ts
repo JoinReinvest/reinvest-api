@@ -24,11 +24,11 @@ import {WaitForAdminManualAction} from "../../../../src/Domain/Transaction/Comma
 import {TransactionCancelled} from "../../../../src/Domain/Transaction/Events/TransactionCancelled";
 import {UnwindTrade} from "../../../../src/Domain/Transaction/Command/UnwindTrade";
 
-describe('Given the investment was created and awaiting for trade created event', () => {
+context('Given the investment was created and awaiting for trade created event', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new TradeAwaitingTransaction(transactionId, Counter.init());
 
-    context('When system created a trade', () => {
+    describe('When system created a trade', () => {
         const numberOfShares = new NumberOfShares(1000);
         const unitPrice = UnitPrice.fromMoney(new Money(1.0, Currency.USD));
         const tradeCreated = new TradeCreated(transactionId, numberOfShares, unitPrice);
@@ -44,7 +44,7 @@ describe('Given the investment was created and awaiting for trade created event'
         });
     });
 
-    context('When system was not able to create a trade', () => {
+    describe('When system was not able to create a trade', () => {
         const tradeFailed = new TradeFailed(transactionId);
 
         it('Then the transaction should decide to wait for manual action', async () => {
@@ -57,7 +57,7 @@ describe('Given the investment was created and awaiting for trade created event'
         });
     });
 
-    context('When system re-published a transaction created event', () => {
+    describe('When system re-published a transaction created event', () => {
         const investorAccountId = new InvestorAccountId("123456");
         const amountToInvest = new Money(1000.0);
         const portfolioId = new PortfolioId("1");
@@ -86,7 +86,7 @@ describe('Given the investment was created and awaiting for trade created event'
         });
     });
 
-    context('When a user cancelled the trade', () => {
+    describe('When a user cancelled the trade', () => {
         const transactionCancelled = new TransactionCancelled(transactionId);
 
         it('Then the trade should be unwind', async () => {

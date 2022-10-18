@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import VertaloRequester from "./VertaloRequester";
-import {VERTALO_CONFIG} from "../../../config";
+import {VERTALO_CONFIG} from "../../config";
 
 const {CLIENT_ID, CLIENT_SECRET, API_URL} = VERTALO_CONFIG;
 

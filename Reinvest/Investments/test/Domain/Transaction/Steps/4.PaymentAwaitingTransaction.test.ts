@@ -10,11 +10,11 @@ import {PaymentAwaitingTransaction} from "../../../../src/Domain/Transaction/Sta
 import {SuccessfulPayment} from "../../../../src/Domain/Transaction/Events/SuccessfulPayment";
 import {FailedPayment} from "../../../../src/Domain/Transaction/Events/FailedPayment";
 
-describe('Given the funds transfer was initiated and awaiting for payment', () => {
+context('Given the funds transfer was initiated and awaiting for payment', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new PaymentAwaitingTransaction(transactionId);
 
-    context('When the system published the event that funds were transferred into the escrow account', () => {
+    describe('When the system published the event that funds were transferred into the escrow account', () => {
         const successfulPayment = new SuccessfulPayment(transactionId);
 
         it('Then the transaction should do nothing and wait for the end of cancellation period', async () => {
@@ -25,7 +25,7 @@ describe('Given the funds transfer was initiated and awaiting for payment', () =
         });
     });
 
-    context('When the payment failed', () => {
+    describe('When the payment failed', () => {
         const failedPayment = new FailedPayment(transactionId);
 
         it('Then the transaction should complete with failure', async () => {
@@ -38,7 +38,7 @@ describe('Given the funds transfer was initiated and awaiting for payment', () =
         });
     });
 
-    context('When the system re-published the funds transfer initiated event', () => {
+    describe('When the system re-published the funds transfer initiated event', () => {
         const fundsTransferInitiatedEvent = new FundsTransferInitialized(transactionId);
 
         it('Then the transaction should do nothing', async () => {
