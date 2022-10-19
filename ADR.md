@@ -2,7 +2,7 @@
 
 ## Deployment Architecture decision
 
-### Decision from 12th of October 2022
+#### Decision of October 12, 2022
 
 * Author: Lukasz Duraj
 * Drivers:
@@ -33,7 +33,7 @@
 
 ## Testing decision
 
-### Decision from 12th of October 2022
+#### Decision of October 12, 2022
 
 * Author: Lukasz Duraj
 * Drivers:
@@ -70,6 +70,7 @@
         * "Context" into "Given" - what is the current state
         * "Describe" into "When" - what action is done
         * "It" into "Then" - what result do we expect
+        * Unit tests for file should be named with pattern: `*.test.ts`
     * Unit tests should be grouped into `*.feature.ts` files
         * Ever file should contain a single "feature" that we represent as "Context" from Mocha
         * Every "feature" should contain one to many "scenarios" represented as "Describe" from Mocha

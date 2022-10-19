@@ -20,6 +20,7 @@
   ],
   "exclude": [
     "Reinvest/**/*.test.ts",
+    "Reinvest/**/*.feature.ts",
     "node_modules",
     "tsconfig.json"
   ]

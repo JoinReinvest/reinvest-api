@@ -1,10 +1,10 @@
-# Architecture Decision Record for Investments module
+# Architecture Decision Record for Legal Entities Module
 
 ## Application Architecture decision
 
 ### Decisions
 
-#### Decision of October 12, 2022
+#### Decision of October 18, 2022
 
 * Author: Lukasz Duraj
 * Drivers:
@@ -12,9 +12,8 @@
     * ability to mix user's and system's actions within one process
 * Decision: Using Hexagonal Architecture + CQRS
 * Explanations:
-  The Investment module implements Transaction process manager that coordinates the process of buying shares.
-  The process is quite long, complex and depends on many events.
-  We need a clear distinction between the decision the process manager is made and execution of that decision.
+    Creating legal entities is a process that contains a lot of factors. To handle it in a clear way we are going to use 
+    hexagonal architecture. 
 * Consequences:
     * increase the complexity as we need to go through all layers in the specific direction
     * using CQRS introduces extra proxy between actual call and execution of code
