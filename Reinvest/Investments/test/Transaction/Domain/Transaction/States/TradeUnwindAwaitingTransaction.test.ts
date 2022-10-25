@@ -19,7 +19,7 @@ import {TradeUnwoundFailed} from "../../../../../src/Transaction/Domain/Events/T
 
 context('Given the transaction was cancelled and the system is awaiting for trade unwind', () => {
     const transactionId = new TransactionId('123456');
-    const transaction = new TradeUnwindAwaitingTransaction(transactionId, Counter.init());
+    const transaction = new TradeUnwindAwaitingTransaction(transactionId, Counter.init(), FailureCompletionReason.CannotSignSubscriptionAgreement);
 
     describe('When the system unwinds the trade', () => {
         const tradeUnwound = new TradeUnwound(transactionId);
@@ -30,7 +30,7 @@ context('Given the transaction was cancelled and the system is awaiting for trad
             expect(decision.command).is.instanceof(DoNothing);
 
             expect(decision.stateChange.status).is.equal(TransactionState.CompletedWithFailure);
-            expect(decision.stateChange.metadata.failureReason).is.equal(FailureCompletionReason.TransactionCancelled);
+            expect(decision.stateChange.metadata.failureReason).is.equal(FailureCompletionReason.CannotSignSubscriptionAgreement);
         });
     });
 
@@ -59,7 +59,7 @@ context('Given the transaction was cancelled and the system is awaiting for trad
         });
 
         it('Then if it re-published the event more then max retries then it should request for the admin manual action', async () => {
-            const transaction = new TradeUnwindAwaitingTransaction(transactionId, Counter.init(NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION));
+            const transaction = new TradeUnwindAwaitingTransaction(transactionId, Counter.init(NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION), FailureCompletionReason.CannotSignSubscriptionAgreement);
             const decision: TransactionDecision = transaction.execute(transactionCancelled);
 
             expect(decision.command).is.instanceof(WaitForAdminManualAction);

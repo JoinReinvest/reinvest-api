@@ -5,4 +5,5 @@ export enum ManualActionReason {
     SharesIssuanceFailed,
     TradeUnwindFailed,
     CannotInitializeUnwindingProcess,
+    CannotSignSubscriptionAgreement,
 }

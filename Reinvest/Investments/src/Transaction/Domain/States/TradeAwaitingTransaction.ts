@@ -4,7 +4,6 @@ import {TransactionDecision} from "../TransactionDecision";
 import {Transaction} from "../Transaction";
 import {TransactionStateChange} from "../TransactionStateChange";
 import {TransactionId} from "../ValueObject/TransactionId";
-import {TransferFunds} from "../Command/TransferFunds";
 import {Counter} from "../../../Commons/Counter";
 import {CommonTransaction} from "./CommonTransaction";
 import {TransactionCreated} from "../Events/TransactionCreated";
@@ -12,6 +11,8 @@ import {CreateTrade} from "../Command/CreateTrade";
 import {TradeFailed} from "../Events/TradeFailed";
 import {ManualActionReason} from "../ValueObject/ManualActionReason";
 import {TransactionCancelled} from "../Events/TransactionCancelled";
+import {SignSubscriptionAgreement} from "../Command/SignSubscriptionAgreement";
+import {FailureCompletionReason} from "../ValueObject/FailureCompletionReason";
 
 export const NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION = 5; // ?
 
@@ -30,11 +31,11 @@ export class TradeAwaitingTransaction extends CommonTransaction implements Trans
             case event instanceof TransactionCreated:
                 return this.retryCreateTrade(event as TransactionCreated);
             case event instanceof TradeCreated:
-                return this.initializeFundsTransfer(event as TradeCreated);
+                return this.signSubscriptionAgreement(event as TradeCreated);
             case event instanceof TradeFailed:
                 return super.waitForAdminManualAction(ManualActionReason.TradeCreationFailed);
             case event instanceof TransactionCancelled:
-                return this.unwindTrade();
+                return this.cancelTrade();
             default:
                 return super.execute(event);
         }
@@ -56,10 +57,11 @@ export class TradeAwaitingTransaction extends CommonTransaction implements Trans
         )
     }
 
-    private initializeFundsTransfer(event: TradeCreated): TransactionDecision {
+
+    private signSubscriptionAgreement(event: TradeCreated): TransactionDecision {
         return new TransactionDecision(
-            TransferFunds.create(this.transactionId),
-            TransactionStateChange.fundsTransferAwaiting(
+            SignSubscriptionAgreement.create(this.transactionId),
+            TransactionStateChange.signingSubscriptionAgreementAwaiting(
                 this.transactionId,
                 event.unitPrice,
                 event.numberOfShares

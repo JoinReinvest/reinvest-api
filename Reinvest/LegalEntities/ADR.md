@@ -10,7 +10,7 @@
 * Drivers:
     * clear and easy to understand business rules/steps of the process
     * ability to mix user's and system's actions within one process
-* Decision: Using Hexagonal Architecture + CQRS
+* Decision: Layered architecture
 * Explanations:
     Creating legal entities is a process that contains a lot of factors. To handle it in a clear way we are going to use 
     hexagonal architecture. 

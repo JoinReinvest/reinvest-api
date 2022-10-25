@@ -6,6 +6,8 @@ import {Counter} from "../../Commons/Counter";
 import {ManualActionReason} from "./ValueObject/ManualActionReason";
 import {FailureCompletionReason} from "./ValueObject/FailureCompletionReason";
 import {SharesId} from "../../Commons/SharesId";
+import {InvestmentVerificationStatus, InvestorVerificationStatus} from "./ValueObject/VerificationStatus";
+import {GracePeriodStatus} from "./ValueObject/GracePeriodStatus";
 
 export type TransactionMetadata = {
     unitPrice: UnitPrice | undefined,
@@ -13,7 +15,11 @@ export type TransactionMetadata = {
     sharesId: SharesId | undefined,
     lastActionRetryCounter: Counter | undefined,
     manualActionReason: ManualActionReason | undefined,
-    failureReason: FailureCompletionReason | undefined
+    failureReason: FailureCompletionReason | undefined,
+    unwindReason: FailureCompletionReason | undefined,
+    investorVerificationStatus: InvestorVerificationStatus | undefined,
+    investmentVerificationStatus: InvestmentVerificationStatus | undefined,
+    gracePeriodStatus: GracePeriodStatus | undefined,
 }
 
 export class TransactionStateChange {
@@ -57,10 +63,24 @@ export class TransactionStateChange {
         return state;
     }
 
-    public static fundsTransferAwaiting(transactionId: TransactionId, unitPrice: UnitPrice, numberOfShares: NumberOfShares): TransactionStateChange {
-        const state = new TransactionStateChange(transactionId, TransactionState.FundsTransferAwaiting);
+    static signingSubscriptionAgreementAwaiting(transactionId: TransactionId, unitPrice: UnitPrice, numberOfShares: NumberOfShares) {
+        const state = new TransactionStateChange(transactionId, TransactionState.SigningSubscriptionAwaiting);
         state._metadata.unitPrice = unitPrice;
         state._metadata.numberOfShares = numberOfShares;
+        state._metadata.lastActionRetryCounter = Counter.init();
+
+        return state;
+    }
+
+    public static retrySigningSubscriptionAgreementAwaiting(transactionId: TransactionId, signingSubscriptionAgreementCounter: Counter): TransactionStateChange {
+        const state = new TransactionStateChange(transactionId, TransactionState.Same);
+        state._metadata.lastActionRetryCounter = signingSubscriptionAgreementCounter;
+
+        return state;
+    }
+
+    public static fundsTransferAwaiting(transactionId: TransactionId): TransactionStateChange {
+        const state = new TransactionStateChange(transactionId, TransactionState.FundsTransferAwaiting);
         state._metadata.lastActionRetryCounter = Counter.init();
 
         return state;
@@ -80,8 +100,8 @@ export class TransactionStateChange {
         return state;
     }
 
-    public static cancellationPeriodEndAwaiting(transactionId: TransactionId): TransactionStateChange {
-        return new TransactionStateChange(transactionId, TransactionState.CancellationPeriodEndAwaiting);
+    public static verificationAwaiting(transactionId: TransactionId): TransactionStateChange {
+        return new TransactionStateChange(transactionId, TransactionState.VerificationAwaiting);
     }
 
     public static sharesIssuanceAwaiting(transactionId: TransactionId): TransactionStateChange {
@@ -105,6 +125,7 @@ export class TransactionStateChange {
 
     static completeWithFailure(transactionId: TransactionId, reason: FailureCompletionReason) {
         const state = new TransactionStateChange(transactionId, TransactionState.CompletedWithFailure);
+        state._metadata.lastActionRetryCounter = Counter.init();
         state._metadata.failureReason = reason;
 
         return state;
@@ -117,9 +138,25 @@ export class TransactionStateChange {
         return state
     }
 
-    static tradeUnwindAwaiting(transactionId: TransactionId) {
+    static verificationStatus(
+        transactionId: TransactionId,
+        goToState: TransactionState,
+        investorVerificationStatus: InvestorVerificationStatus,
+        investmentVerificationStatus: InvestmentVerificationStatus,
+        gracePeriodStatus: GracePeriodStatus
+    ) {
+        const state = new TransactionStateChange(transactionId, goToState);
+        state._metadata.investorVerificationStatus = investorVerificationStatus;
+        state._metadata.investmentVerificationStatus = investmentVerificationStatus;
+        state._metadata.gracePeriodStatus = gracePeriodStatus;
+
+        return state;
+    }
+
+    static tradeUnwindAwaiting(transactionId: TransactionId, reason: FailureCompletionReason) {
         const state = new TransactionStateChange(transactionId, TransactionState.TradeUnwindAwaiting);
         state._metadata.lastActionRetryCounter = Counter.init();
+        state._metadata.unwindReason = reason;
 
         return state;
     }

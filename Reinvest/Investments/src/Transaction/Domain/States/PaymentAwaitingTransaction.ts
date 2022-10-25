@@ -9,6 +9,7 @@ import {FailureCompletionReason} from "../ValueObject/FailureCompletionReason";
 import {SuccessfulPayment} from "../Events/SuccessfulPayment";
 import {FailedPayment} from "../Events/FailedPayment";
 import {TransactionCancelled} from "../Events/TransactionCancelled";
+import {VerifyInvestor} from "../Command/VerifyInvestor";
 
 export class PaymentAwaitingTransaction extends CommonTransaction implements Transaction {
     constructor(transactionId: TransactionId) {
@@ -20,20 +21,20 @@ export class PaymentAwaitingTransaction extends CommonTransaction implements Tra
 
         switch (true) {
             case event instanceof SuccessfulPayment:
-                return this.waitForEndOfCancellationPeriod(event as SuccessfulPayment);
+                return this.verifyInvestor(event as SuccessfulPayment);
             case event instanceof FailedPayment:
-                return super.completeInvestmentWithFailure(FailureCompletionReason.PaymentFailed);
+                return super.cancelTrade(FailureCompletionReason.PaymentFailed);
             case event instanceof TransactionCancelled:
-                return this.unwindTrade();
+                return this.cancelTrade();
             default:
                 return super.execute(event);
         }
     }
 
-    private waitForEndOfCancellationPeriod(event: SuccessfulPayment): TransactionDecision {
+    private verifyInvestor(event: SuccessfulPayment): TransactionDecision {
         return new TransactionDecision(
-            DoNothing.create(),
-            TransactionStateChange.cancellationPeriodEndAwaiting(this.transactionId)
+            VerifyInvestor.create(this.transactionId),
+            TransactionStateChange.verificationAwaiting(this.transactionId)
         )
     }
 }

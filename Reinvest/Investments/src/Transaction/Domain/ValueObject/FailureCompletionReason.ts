@@ -1,5 +1,7 @@
 export enum FailureCompletionReason {
     FundsTransferInitializationFailed,
     PaymentFailed,
-    TransactionCancelled,
+    TransactionCancelledManually,
+    CannotSignSubscriptionAgreement,
+    TransactionForcedManuallyToQuit,
 }

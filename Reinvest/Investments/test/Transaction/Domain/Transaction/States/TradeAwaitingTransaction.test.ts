@@ -23,6 +23,7 @@ import {TradeFailed} from "../../../../../src/Transaction/Domain/Events/TradeFai
 import {WaitForAdminManualAction} from "../../../../../src/Transaction/Domain/Command/WaitForAdminManualAction";
 import {TransactionCancelled} from "../../../../../src/Transaction/Domain/Events/TransactionCancelled";
 import {UnwindTrade} from "../../../../../src/Transaction/Domain/Command/UnwindTrade";
+import {SignSubscriptionAgreement} from "../../../../../src/Transaction/Domain/Command/SignSubscriptionAgreement";
 
 context('Given the investment was created and awaiting for a trade', () => {
     const transactionId = new TransactionId('123456');
@@ -33,12 +34,12 @@ context('Given the investment was created and awaiting for a trade', () => {
         const unitPrice = UnitPrice.fromMoney(new Money(1.0, Currency.USD));
         const tradeCreated = new TradeCreated(transactionId, numberOfShares, unitPrice);
 
-        it('Then the transaction should decide to initialize funds transfer', async () => {
+        it('Then the transaction should decide to sign the subscription agreement', async () => {
             const decision: TransactionDecision = transaction.execute(tradeCreated);
 
-            expect(decision.command).is.instanceof(TransferFunds);
+            expect(decision.command).is.instanceof(SignSubscriptionAgreement);
 
-            expect(decision.stateChange.status).is.equal(TransactionState.FundsTransferAwaiting);
+            expect(decision.stateChange.status).is.equal(TransactionState.SigningSubscriptionAwaiting);
             expect(decision.stateChange.metadata.numberOfShares).is.equal(numberOfShares);
             expect(decision.stateChange.metadata.unitPrice).is.equal(unitPrice);
         });

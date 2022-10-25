@@ -13,7 +13,7 @@ import {SharesIssuanceFailed} from "../../../../../src/Transaction/Domain/Events
 import {WaitForAdminManualAction} from "../../../../../src/Transaction/Domain/Command/WaitForAdminManualAction";
 import {SharesId} from "../../../../../src/Commons/SharesId";
 
-context('Given the cancellation period ended and awaiting for shares issuance', () => {
+context('Given the trade was disbursed and awaiting for shares issuance', () => {
     const transactionId = new TransactionId('123456');
     const transaction = new SharesIssuanceAwaitingTransaction(transactionId);
 

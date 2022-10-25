@@ -5,12 +5,14 @@ context('Feature: Investment process', () => {
     });
 
     describe('Scenario: Investment process decisions step by step', () => {
-        require('./Transaction/Domain/Transaction/States/1.InitializedTransaction.test');
-        require('./Transaction/Domain/Transaction/States/2.TradeAwaitingTransaction.test');
-        require('./Transaction/Domain/Transaction/States/3.FundsTransferAwaitingTransaction.test');
-        require('./Transaction/Domain/Transaction/States/4.PaymentAwaitingTransaction.test');
-        require('./Transaction/Domain/Transaction/States/5.CancellationPeriodEndAwaitingTransaction.test');
-        require('./Transaction/Domain/Transaction/States/6.SharesIssuanceAwaitingTransaction.test');
+        require('./Transaction/Domain/Transaction/States/InitializedTransaction.test');
+        require('./Transaction/Domain/Transaction/States/TradeAwaitingTransaction.test');
+        require('./Transaction/Domain/Transaction/States/SubscriptionAgreementAwaitingTransaction.test');
+        require('./Transaction/Domain/Transaction/States/FundsTransferAwaitingTransaction.test');
+        require('./Transaction/Domain/Transaction/States/PaymentAwaitingTransaction.test');
+        require('./Transaction/Domain/Transaction/States/VerificationAwaitingTransaction.test');
+        require('./Transaction/Domain/Transaction/States/DisbursementAwaitingTransaction.test');
+        require('./Transaction/Domain/Transaction/States/SharesIssuanceAwaitingTransaction.test');
     });
 
     describe('Scenario: Investment process decisions for extra actions', () => {

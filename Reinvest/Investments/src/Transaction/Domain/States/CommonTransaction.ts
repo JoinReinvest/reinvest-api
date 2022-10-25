@@ -53,17 +53,17 @@ export class CommonTransaction implements Transaction {
         )
     }
 
+    protected cancelTrade(reason: FailureCompletionReason = FailureCompletionReason.TransactionCancelledManually) {
+        return new TransactionDecision(
+            UnwindTrade.create(this.transactionId),
+            TransactionStateChange.tradeUnwindAwaiting(this.transactionId, reason)
+        )
+    }
+
     protected completeInvestmentWithFailure(reason: FailureCompletionReason) {
         return new TransactionDecision(
             DoNothing.create(),
             TransactionStateChange.completeWithFailure(this.transactionId, reason)
-        )
-    }
-
-    protected unwindTrade() {
-        return new TransactionDecision(
-            UnwindTrade.create(this.transactionId),
-            TransactionStateChange.tradeUnwindAwaiting(this.transactionId)
         )
     }
 }

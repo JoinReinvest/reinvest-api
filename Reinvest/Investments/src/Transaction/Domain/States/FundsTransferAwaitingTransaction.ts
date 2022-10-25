@@ -13,6 +13,7 @@ import {ManualActionReason} from "../ValueObject/ManualActionReason";
 import {FundsTransferInitializationFailed} from "../Events/FundsTransferInitializationFailed";
 import {FailureCompletionReason} from "../ValueObject/FailureCompletionReason";
 import {TransactionCancelled} from "../Events/TransactionCancelled";
+import {SubscriptionAgreementSigned} from "../Events/SubscriptionAgreementSigned";
 
 export const NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION = 3;
 
@@ -28,20 +29,20 @@ export class FundsTransferAwaitingTransaction extends CommonTransaction implemen
         super.validateEvent(event);
 
         switch (true) {
-            case event instanceof TradeCreated:
-                return this.retryInitializeFundsTransfer(event as TradeCreated);
+            case event instanceof SubscriptionAgreementSigned:
+                return this.retryInitializeFundsTransfer(event as SubscriptionAgreementSigned);
             case event instanceof FundsTransferInitialized:
                 return this.waitForPayment(event as FundsTransferInitialized);
             case event instanceof FundsTransferInitializationFailed:
-                return super.completeInvestmentWithFailure(FailureCompletionReason.FundsTransferInitializationFailed);
+                return super.cancelTrade(FailureCompletionReason.FundsTransferInitializationFailed);
             case event instanceof TransactionCancelled:
-                return this.unwindTrade();
+                return this.cancelTrade();
             default:
                 return super.execute(event);
         }
     }
 
-    private retryInitializeFundsTransfer(event: TradeCreated) {
+    private retryInitializeFundsTransfer(event: SubscriptionAgreementSigned) {
         if (this.fundsTransferInitializationCounter.isHigherEqualThan(NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION)) {
             return super.waitForManualAction(ManualActionReason.CannotInitializeFundsTransfer);
         }
