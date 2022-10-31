@@ -10,7 +10,7 @@
     * We are in the learning phase of the business processes
     * Long-lived application
 * Decision: Modular Monolith
-* Explanations:
+* Context:
   Currently we are in the MVP phase, and we are still learning the business processes.
   We don't have any drivers that could lead us into microservices application.
 * Consequences:
@@ -43,7 +43,7 @@
 * Decision:
     * Style of testing: TDD + BDD style
     * Tools: Mocha + Chai + Sinon
-* Explanations:
+* Context:
     * TDD:
         * We implement business domain first
         * We don't have any integration parts at the very beginning, so we need a way to execute our business logic

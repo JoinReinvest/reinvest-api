@@ -14,7 +14,7 @@
     - OutputAdapter: output data to DB/Filesystem/Queue
     - Dependencies flow: (InputPort)Downstream--Upstream(OutputPort) (upstream is not aware of downstream)
     - Execution flow: InputPort ---> OutputPort
-* Explanations:
+* Context:
     - Legal entities' data is gathered only to display in the UI and push it to the external system
     - No logic behind it
     - Simple CRUD

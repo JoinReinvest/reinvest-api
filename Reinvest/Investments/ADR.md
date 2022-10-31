@@ -11,7 +11,7 @@
     * clear and easy to understand business rules/steps of the process
     * ability to mix user's and system's actions within one process
 * Decision: Using Hexagonal Architecture + CQRS
-* Explanations:
+* Context:
   The Investment module implements Transaction process manager that coordinates the process of buying shares.
   The process is quite long, complex and depends on many events.
   We need a clear distinction between the decision the process manager is made and execution of that decision.
