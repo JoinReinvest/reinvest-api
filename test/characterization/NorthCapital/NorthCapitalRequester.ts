@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from 'axios';
 import FormData from 'form-data';
-import NorthCapitalException from "../NorthCapitalException";
+import NorthCapitalException from "./NorthCapitalException";
 import moment from "moment";
 
 export default class NorthCapitalRequester {

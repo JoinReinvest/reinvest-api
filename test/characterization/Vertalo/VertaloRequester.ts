@@ -1,9 +1,12 @@
 import axios, {AxiosResponse} from "axios";
+import VertaloException from "./VertaloException";
 
+type roles = 'empty' | 'initial' | 'account_admin'
 export default class VertaloRequester {
     clientId: string;
     clientSecret: string;
-    authorizationToken: string | null;
+    authorizationToken: { token: string, role: roles };
+    roles: any;
     tokenValidBefore: Date | null;
     url: string;
 
@@ -11,31 +14,83 @@ export default class VertaloRequester {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.url = url
-        this.authorizationToken = null
+        this.roles = {}
+        this.authorizationToken = {token: '', role: 'empty'};
         this.tokenValidBefore = null
     }
 
     private async getToken(): Promise<string> {
-        if (this.authorizationToken === null || <Date>this.tokenValidBefore < new Date()) {
-            this.authorizationToken = await this.authorize()
-            this.tokenValidBefore = new Date(new Date().getTime() + (60 * 60000));
+        if (this.authorizationToken.role === 'empty' || <Date>this.tokenValidBefore < new Date()) {
+            const {token: {access_token}, roles: {data: roles}} = await this.authorize()
+            this.roles = roles.reduce((tempRoles: any, role: any) => {
+                tempRoles[role.user_role] = role;
+                return tempRoles;
+            }, {});
+
+            this.setToken(access_token, 'initial');
         }
 
-        return this.authorizationToken;
+        return this.authorizationToken.token;
     }
 
-    private async authorize(): Promise<string> {
-        const response: AxiosResponse = await axios
-            .get(`${this.url}/token/login?client_id=${this.clientId}&client_secret=${this.clientSecret}`);
-
-        return response.data.token ?? "invalid";
+    private setToken(token: string, role: roles): void {
+        this.authorizationToken = {token, role};
+        this.tokenValidBefore = new Date(new Date().getTime() + (60 * 60000));
     }
 
-    public async preAuthorize() {
-        await this.getToken();
+    private clearToken(): void {
+        this.authorizationToken = {token: '', role: 'empty'};
+        this.tokenValidBefore = null
+    }
+
+    private async authorize(): Promise<any> {
+        try {
+            const response: AxiosResponse = await axios
+                .get(`${this.url}/authenticate/token/login?client_id=${this.clientId}&client_secret=${this.clientSecret}`);
+            return response.data;
+        } catch (error: any) {
+            throw new VertaloException(error.message, {status: error.response.status});
+        }
+    }
+
+    private async authorizeAsAccountAdmin(): Promise<any> {
+        if (this.authorizationToken.role === 'account_admin') {
+            return;
+        } else if (this.authorizationToken.role !== 'initial') {
+            this.clearToken();
+            await this.preAuthorize();
+        }
+
+        const {account_admin: {users_account_id: userAccountId}} = this.roles;
+
+        const {access_token} = await this.authorizeByRole(userAccountId);
+        this.setToken(access_token, 'account_admin');
+
+    }
+
+    private async authorizeByRole(userAccountId: string): Promise<any> {
+        try {
+            const token = await this.getToken();
+            const response: AxiosResponse = await axios
+                .get(`${this.url}/authenticate/token/role/${userAccountId}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+
+            return response.data.token;
+        } catch (error: any) {
+            throw new VertaloException(error.response.status, error.message);
+        }
+    }
+
+    public async preAuthorize(): Promise<string> {
+        return await this.getToken();
     }
 
     private async mutationRequest(mutationQuery: string): Promise<any> {
+        await this.authorizeAsAccountAdmin();
         const token = await this.getToken()
         try {
             const response: AxiosResponse = await axios
@@ -44,11 +99,11 @@ export default class VertaloRequester {
                     {
                         headers: {
                             "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json; charset=utf-8",
+                            "Content-Type": "application/json",
                         }
                     });
 
-            return response.data;
+            return response.data.data;
         } catch (error) {
             // @ts-ignore
             throw new Error(`Request error: ${error.message}`)
@@ -116,6 +171,7 @@ export default class VertaloRequester {
     }
 
     async createAllocation(roundId: string,
+                           issuerId: string,
                            name: string,
                            opensOn: string,
                            closesOn: string
@@ -125,9 +181,10 @@ export default class VertaloRequester {
               createAllocation (
                 input: {
                   allocation: {
-                    roundId: "${roundId}"
-                    name: "${name}"
-                    opensOn: "${opensOn}"
+                    issuerId: "${issuerId}",
+                    roundId: "${roundId}",
+                    name: "${name}",
+                    opensOn: "${opensOn}",
                     closesOn: "${closesOn}"
                   }
                 }
@@ -150,7 +207,7 @@ export default class VertaloRequester {
             mutation {
               makeCustomer (
                 input: {
-                  name: "${name}"
+                  name: "${name}",
                   _email: "${email}"
                 }
               ) {
@@ -187,5 +244,120 @@ export default class VertaloRequester {
         const {makeInvestor: {account: {id: investorId}}} = await this.mutationRequest(mutationQuery);
 
         return investorId;
+    }
+
+    async createDistribution(allocationId: string, investorEmail: string, sharesAmount: string
+    ): Promise<any> {
+        const mutationQuery = `
+      mutation {
+          makeDistribution (
+            input: {
+              _allocationId: "${allocationId}"
+              amount: "${sharesAmount}"
+              accountEmail: "${investorEmail}"
+            }
+          ) {
+            distribution {
+              id
+              status
+            }
+          }
+        }
+        `
+
+        const {
+            makeDistribution: {
+                distribution: {
+                    id: distributionId,
+                    status
+                }
+            }
+        } = await this.mutationRequest(mutationQuery);
+
+        return {distributionId, status};
+    }
+
+    async updateDistributionStatus(distributionId: string, statusToUpdate: "open" | "closed"
+    ): Promise<boolean> {
+        const mutationQuery = `
+            mutation {
+              updateDistributionById (
+                input: {
+                  id: "${distributionId}"
+                  distributionPatch: {status: "${statusToUpdate}"}
+                }
+              ) {
+                distribution {
+                  id
+                  status
+                }
+              }
+            }
+        `
+
+        const {updateDistributionById: {distribution: {status}}} = await this.mutationRequest(mutationQuery);
+
+        return status === statusToUpdate;
+    }
+
+    async markPayment(distributionId: string, paymentAmount: string
+    ): Promise<any> {
+        const mutationQuery = `
+            mutation {
+              createDistributionPayment(
+                input: {
+                  distributionPayment: {
+                    distributionId: "${distributionId}"
+                    amount: "${paymentAmount}"
+                  }
+                }
+              ) {
+                distributionPayment {
+                  id
+                  paidOn
+                }
+              }
+            }
+        `
+
+        const {
+            createDistributionPayment: {
+                distributionPayment: {
+                    id: paymentId,
+                    paidOn
+                }
+            }
+        } = await this.mutationRequest(mutationQuery);
+
+        return {paymentId, paidOn};
+
+    }
+
+    async issueShares(distributionId: string): Promise<any> {
+        const mutationQuery = `
+            mutation {
+              issueDistributions (
+                input: {
+                  distributionIds: [
+                    "${distributionId}"
+                  ]
+                }
+              ) {
+                issuanceEvents {
+                  holdingId
+                }
+              }
+            }
+        `
+
+        const {
+            issueDistributions: {
+                issuanceEvents: [{
+                    holdingId
+                }]
+            }
+        } = await this.mutationRequest(mutationQuery);
+
+        return holdingId;
     }
 }
