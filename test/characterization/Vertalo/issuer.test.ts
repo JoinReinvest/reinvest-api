@@ -10,8 +10,8 @@ describe('Execute issuer actions', () => {
     let vertaloRequester: VertaloRequester = new VertaloRequester(CLIENT_ID, CLIENT_SECRET, API_URL);
     let distributionId = cacheService.readValue('VERTALO_DISTRIBUTION_ID');
     // const investorEmail = "bob3@test.com";
-    const investorName = "devkick";
-    const investorEmail = "issuer@devkick.pl";
+    const investorName = "Bob";
+    const investorEmail = "bob3@test.com";
     before(async () => await vertaloRequester.preAuthorize())
 
     it('create investor', async () => {
