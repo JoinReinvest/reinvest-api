@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 import VertaloException from "./VertaloException";
 
 type roles = 'empty' | 'initial' | 'account_admin'
@@ -89,13 +89,13 @@ export default class VertaloRequester {
         return await this.getToken();
     }
 
-    private async mutationRequest(mutationQuery: string): Promise<any> {
+    private async sendRequest(query: string): Promise<any> {
         await this.authorizeAsAccountAdmin();
         const token = await this.getToken()
         try {
             const response: AxiosResponse = await axios
                 .post(`${this.url}/token/api/v2/graphql`,
-                    {"query": mutationQuery},
+                    {"query": query},
                     {
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -130,7 +130,7 @@ export default class VertaloRequester {
             }
         `
 
-        const {createAsset: {asset: {id}}} = await this.mutationRequest(mutationQuery);
+        const {createAsset: {asset: {id}}} = await this.sendRequest(mutationQuery);
 
         return id;
     }
@@ -165,7 +165,7 @@ export default class VertaloRequester {
             }
         `
 
-        const {makeRound: {round: {id}}} = await this.mutationRequest(mutationQuery);
+        const {makeRound: {round: {id}}} = await this.sendRequest(mutationQuery);
 
         return id;
     }
@@ -196,7 +196,7 @@ export default class VertaloRequester {
             }
         `
 
-        const {createAllocation: {allocation: {id}}} = await this.mutationRequest(mutationQuery);
+        const {createAllocation: {allocation: {id}}} = await this.sendRequest(mutationQuery);
 
         return id;
     }
@@ -219,7 +219,7 @@ export default class VertaloRequester {
             }
         `
 
-        const {makeCustomer: {customer: {id: customerId, investorId}}} = await this.mutationRequest(mutationQuery);
+        const {makeCustomer: {customer: {id: customerId, investorId}}} = await this.sendRequest(mutationQuery);
 
         return {customerId, investorId};
     }
@@ -241,7 +241,7 @@ export default class VertaloRequester {
             }
         `
 
-        const {makeInvestor: {account: {id: investorId}}} = await this.mutationRequest(mutationQuery);
+        const {makeInvestor: {account: {id: investorId}}} = await this.sendRequest(mutationQuery);
 
         return investorId;
     }
@@ -272,7 +272,7 @@ export default class VertaloRequester {
                     status
                 }
             }
-        } = await this.mutationRequest(mutationQuery);
+        } = await this.sendRequest(mutationQuery);
 
         return {distributionId, status};
     }
@@ -295,7 +295,7 @@ export default class VertaloRequester {
             }
         `
 
-        const {updateDistributionById: {distribution: {status}}} = await this.mutationRequest(mutationQuery);
+        const {updateDistributionById: {distribution: {status}}} = await this.sendRequest(mutationQuery);
 
         return status === statusToUpdate;
     }
@@ -327,7 +327,7 @@ export default class VertaloRequester {
                     paidOn
                 }
             }
-        } = await this.mutationRequest(mutationQuery);
+        } = await this.sendRequest(mutationQuery);
 
         return {paymentId, paidOn};
 
@@ -356,8 +356,39 @@ export default class VertaloRequester {
                     holdingId
                 }]
             }
-        } = await this.mutationRequest(mutationQuery);
+        } = await this.sendRequest(mutationQuery);
 
         return holdingId;
+    }
+
+    async queryCapTable(roundId: string): Promise<any> {
+        const query = `
+            query {
+              roundById(id: ${roundId}) {
+                tokenByTokenId {
+                  capTablesByTokenId {
+                    nodes {
+                      id
+                      amount
+                      blockchainAddressByBlockchainAddressId {
+                        accountsBlockchainAddressesByBlockchainAddressId {
+                          nodes {
+                            name
+                            accountByAccountId {
+                                email
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        `
+
+        const response = await this.sendRequest(query);
+
+        return response;
     }
 }

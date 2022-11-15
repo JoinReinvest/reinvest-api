@@ -5,7 +5,10 @@ export class NonEmptyString {
 }
 
 export class AnyString {
-    constructor() {
+    protected data: string;
+
+    constructor(data: string = "") {
+        this.data = data;
     }
 
 }
@@ -28,7 +31,7 @@ export class DateTime {
 
 }
 
-export class Id {
+export class Uuid {
     constructor() {
     }
 
