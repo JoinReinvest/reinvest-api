@@ -10,8 +10,8 @@
 * Drivers:
     * This is simple CRUD
 * Decision: 2-layered architecture
-    - InputPort: input data from HTTP/ or ports/adapters to other modules
-    - OutputAdapter: output data to DB/Filesystem/Queue
+    - Port: input data from HTTP/ or ports/adapters to other modules
+    - Adapter: output data to DB/Filesystem/Queue
     - Dependencies flow: (InputPort)Downstream--Upstream(OutputPort) (upstream is not aware of downstream)
     - Execution flow: InputPort ---> OutputPort
 * Context:

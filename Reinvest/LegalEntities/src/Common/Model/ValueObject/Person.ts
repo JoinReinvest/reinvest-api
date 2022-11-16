@@ -17,14 +17,14 @@ export class SSN extends NonEmptyString {
 
 
 export class Person {
+    private id: Id;
+    private profileId: ProfileId;
     private firstName: FirstName;
     private lastName: LastName;
     private ssn: SSN;
     private domicile: Domicile;
     private address: Address;
     private dateOfBirth: DateOfBirth;
-    private id: Id;
-    private profileId: ProfileId;
     private identityDocument: IdentityDocument;
 
     constructor(id: Id,
