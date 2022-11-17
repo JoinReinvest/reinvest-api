@@ -15,7 +15,7 @@
     * This is edge module to register objects on the North Capital and Vertalo sides.
 * Decision: 3-layered architecture
     - Port: input data from HTTP/ or ports/adapters to other modules
-    - Integration: integration logic between
+    - IntegrationLogic: integration logic between
     - Adapter: output data to DB/Filesystem/Queue/North Capital/Vertalo
     - Dependencies flow: Downstream--->Upstream (upstream is not aware of downstream)
     - Execution flow: Port ---> Integration -----> OutputPort
