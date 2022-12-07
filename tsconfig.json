@@ -16,12 +16,14 @@
   },
   "include": [
     "Reinvest/**/*",
-    "shared/**/*"
+    "shared/**/*",
+    "devops/**/*"
   ],
   "exclude": [
     "Reinvest/**/*.test.ts",
     "Reinvest/**/*.feature.ts",
     "node_modules",
-    "tsconfig.json"
+    "tsconfig.json",
+    "test/**/*"
   ]
 }

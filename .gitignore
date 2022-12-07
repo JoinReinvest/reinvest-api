@@ -6,3 +6,5 @@ build
 test/.env.characterization
 test/artifacts/*
 yarn-error.log
+.serverless
+.esbuild

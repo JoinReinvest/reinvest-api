@@ -28,6 +28,14 @@ context('Given I am an issuer and I am an admin', () => {
             expect(details).to.has.keys('escrowAccountNumber', 'pendingAmount', 'fundedAmount', 'committedAmount');
         });
 
+        it('Then I should be able to get the offering purchase details', async () => {
+            const details = await requester.getOfferingPurchaseDetails(
+                offeringId
+            );
+
+            expect(details).to.be.an('object');
+        });
+
         it('Then I should be able to get the offering', async () => {
             const details = await requester.getOffering(
                 offeringId

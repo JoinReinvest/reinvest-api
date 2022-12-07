@@ -22,7 +22,7 @@ describe('Execute issuer actions', () => {
     })
 
     it('create distribution', async () => {
-        const {distributionId, status} = await vertaloRequester.createDistribution(ALLOCATION_ID, investorEmail, "154");
+        const {distributionId, status} = await vertaloRequester.createDistribution(ALLOCATION_ID, investorEmail, "164");
 
         expect(distributionId).to.be.a("string");
         expect(status).to.be.equal("drafted");
@@ -43,7 +43,7 @@ describe('Execute issuer actions', () => {
     })
 
     it('Mark distribution payment', async () => {
-        const {paymentId, paidOn} = await vertaloRequester.markPayment(distributionId, "154");
+        const {paymentId, paidOn} = await vertaloRequester.markPayment(distributionId, "164");
 
         expect(paymentId).to.be.a("string");
         expect(paidOn).to.be.a("string");

@@ -471,6 +471,23 @@ export default class NorthCapitalRequester {
         return details;
     }
 
+    async getOfferingPurchaseDetails(offeringId: string): Promise<any> {
+        const endpoint = 'tapiv3/index.php/v3/getOfferingPurchaseHistory';
+        const data = {
+            offeringId
+        };
+
+        const response = await this.postRequest(endpoint, data);
+
+        const {
+            statusCode,
+            statusDesc,
+            "Offering purchased details": details
+        } = response;
+
+        return details;
+    }
+
     async getOffering(offeringId: string): Promise<any> {
         const endpoint = 'tapiv3/index.php/v3/getOffering';
         const data = {

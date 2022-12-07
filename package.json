@@ -7,9 +7,13 @@
     "dev": "nodemon",
     "build": "tsc -p tsconfig.json",
     "start": "node build/Reinvest/index.js",
+
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",
-    "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'"
+    "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'",
+    "deploy:production": "NODE_ENV=production serverless deploy -s production",
+    "destroy:production": "NODE_ENV=production serverless remove -s production",
+    "local": "serverless offline start -s development"
   },
   "nodemonConfig": {
     "ignore": [
@@ -28,19 +32,30 @@
   "dependencies": {
     "axios": "^0.27.2",
     "dotenv": "^16.0.2",
+    "express": "^4.18.2",
     "form-data": "^4.0.0",
     "moment": "^2.29.4",
     "nodemon": "^2.0.19",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.7.4"
+    "serverless-http": "^3.1.0",
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
+    "@serverless/typescript": "serverless/typescript",
     "@types/chai": "^4.3.3",
+    "@types/express": "^4.17.14",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^18.7.14",
     "chai": "^4.3.6",
+    "esbuild": "^0.16.1",
     "mocha": "^10.0.0",
+    "serverless": "^3.25.1",
+    "serverless-bundle": "^5.5.0",
+    "serverless-domain-manager": "^6.2.1",
+    "serverless-esbuild": "^1.33.2",
+    "serverless-offline": "^11.6.0",
+    "serverless-offline-sqs": "^7.3.1",
+    "ts-loader": "^9.4.2",
     "ts-mocha": "^10.0.0",
-    "ts-sinon": "^2.0.2"
+    "ts-sinon": "^2.0.2",
+    "typescript": "^4.9.3"
   }
 }

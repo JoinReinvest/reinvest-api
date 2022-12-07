@@ -18,7 +18,7 @@ context('Given ' +
     let accountId: string = cacheService.readValue('ACCOUNT_ID');
 
     describe('When I want to buy shares', async () => {
-        const shares: string = '2.00000';
+        const shares: string = '3';
         let tradeId: string = cacheService.readValue('TRADE_ID');
         let fundsTransferRefNumber: string = cacheService.readValue('FUNDS_TRANSFER_REF_NO');
 
@@ -53,7 +53,7 @@ context('Given ' +
                 offeringId,
                 tradeId,
                 'Plaid Checking - Wells Fargo',
-                "1", // $1 for 100 shares of $0.01
+                "6", // $1 for 100 shares of $0.01
                 "Test funds transfer",
                 "10.0.0.1"
             );
