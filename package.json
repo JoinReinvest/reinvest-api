@@ -7,12 +7,11 @@
     "dev": "nodemon",
     "build": "tsc -p tsconfig.json",
     "start": "node build/Reinvest/index.js",
-
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",
     "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'",
-    "deploy:production": "NODE_ENV=production serverless deploy -s production",
-    "destroy:production": "NODE_ENV=production serverless remove -s production",
+    "deploy:staging": "NODE_ENV=staging serverless deploy -s staging",
+    "destroy:staging": "NODE_ENV=staging serverless remove -s staging",
     "local": "serverless offline start -s development"
   },
   "nodemonConfig": {

@@ -1,10 +1,10 @@
 import type {AWS} from '@serverless/typescript';
 
 const serverlessConfiguration: AWS = {
-    service: 'LUKASZD',
+    service: '${env:APPLICATION_NAME}',
     frameworkVersion: '3',
     useDotenv: true,
-    plugins: ['serverless-offline', 'serverless-offline-sqs','serverless-esbuild'], //  'serverless-domain-manager'
+    plugins: ['serverless-offline', 'serverless-offline-sqs', 'serverless-esbuild'], //  'serverless-domain-manager'
     provider: {
         name: 'aws',
         runtime: 'nodejs16.x',
@@ -49,6 +49,41 @@ const serverlessConfiguration: AWS = {
     },
     resources: {
         Resources: {
+            CognitoSMSRole: {
+                Type: 'AWS::IAM::Role',
+                Properties: {
+                    AssumeRolePolicyDocument: {
+                        Statement: [
+                            {
+                                Effect: 'Allow',
+                                Action: 'sts:AssumeRole',
+                                Principal: {
+                                    Service: 'cognito-idp.amazonaws.com',
+                                },
+                                Condition: {
+                                    StringEquals: {
+                                        "sts:ExternalId": '${self:service}-user-pool-${sls:stage}-external-id',
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                    Policies: [
+                        {
+                            PolicyName: 'CognitoSendSMS',
+                            PolicyDocument: {
+                                Statement: [
+                                    {
+                                        Effect: 'Allow',
+                                        Action: ['sns:Publish'],
+                                        Resource: '*'
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
+            },
             ApiLambdaRole: {
                 Type: 'AWS::IAM::Role',
                 Properties: {
@@ -79,8 +114,130 @@ const serverlessConfiguration: AWS = {
                     ],
                 },
             },
+            CognitoUserPool: {
+                Type: 'AWS::Cognito::UserPool',
+                DeletionPolicy: '${env:COGNITO_RETENTION_POLICY}', // Retain for prod, Delete for staging
+                Properties: {
+                    UserPoolName: '${self:service}-user-pool-${sls:stage}',
+                    UsernameAttributes: ['email'],
+                    Policies: {
+                        PasswordPolicy: {
+                            MinimumLength: 8,
+                            RequireLowercase: false,
+                            RequireNumbers: true,
+                            RequireSymbols: false,
+                            RequireUppercase: true,
+                        },
+                    },
+                    MfaConfiguration: 'OPTIONAL',
+                    AccountRecoverySetting: {
+                        RecoveryMechanisms: [
+                            {
+                                Name: 'verified_phone_number',
+                                Priority: 1,
+                            },
+                        ],
+                    },
+                    AutoVerifiedAttributes: ['phone_number'],
+                    UserAttributeUpdateSettings: {
+                        AttributesRequireVerificationBeforeUpdate: ['phone_number'],
+                    },
+                    DeviceConfiguration: {
+                        ChallengeRequiredOnNewDevice: true,
+                    },
+                    SmsConfiguration: {
+                        ExternalId: '${self:service}-user-pool-${sls:stage}-external-id',
+                        SnsCallerArn: {
+                            "Fn::GetAtt": ['CognitoSMSRole', 'Arn']
+                        }
+                    },
+                    Schema: [
+                        {
+                            AttributeDataType: 'String',
+                            Mutable: true,
+                            Name: 'email',
+                            Required: true,
+                        },
+                        {
+                            AttributeDataType: 'String',
+                            Mutable: true,
+                            Name: 'phone_number',
+                            Required: true,
+                        },
+                    ],
+                    UserPoolAddOns: {
+                        AdvancedSecurityMode: 'ENFORCED',
+                    },
+                },
+            },
+            CognitoUserPoolClientPostman: {
+                Type: 'AWS::Cognito::UserPoolClient',
+                Properties: {
+                    TokenValidityUnits: {
+                        AccessToken: 'hours',
+                        IdToken: 'hours',
+                        RefreshToken: 'days',
+                    },
+                    AccessTokenValidity: 8,
+                    IdTokenValidity: 8,
+                    RefreshTokenValidity: 30,
+                    AllowedOAuthFlows: ['implicit'],
+                    AllowedOAuthScopes: ['email', 'openid', 'profile'],
+                    CallbackURLs: ['http://localhost'],
+                    ClientName: 'Postman Test Client',
+                    EnableTokenRevocation: true,
+                    PreventUserExistenceErrors: 'ENABLED',
+                    ExplicitAuthFlows: ['ALLOW_USER_PASSWORD_AUTH', 'ALLOW_REFRESH_TOKEN_AUTH'],
+                    GenerateSecret: false,
+                    SupportedIdentityProviders: ['COGNITO'],
+                    AllowedOAuthFlowsUserPoolClient: true,
+                    UserPoolId: {
+                        Ref: 'CognitoUserPool',
+                    },
+                },
+            },
+            CognitoUserPoolDomain: {
+                Type: 'AWS::Cognito::UserPoolDomain',
+                Properties: {
+                    Domain: '${self:service}-${sls:stage}',
+                    UserPoolId: {
+                        Ref: 'CognitoUserPool',
+                    },
+                },
+            },
+            CognitoUserPoolRiskConfigurationAttachment: {
+                Type: 'AWS::Cognito::UserPoolRiskConfigurationAttachment',
+                Properties: {
+                    ClientId: 'ALL',
+                    AccountTakeoverRiskConfiguration: {
+                        Actions: {
+                            HighAction: {
+                                EventAction: 'BLOCK',
+                                Notify: true
+                            },
+                            MediumAction: {
+                                EventAction: 'MFA_REQUIRED',
+                                Notify: true
+                            },
+                            LowAction: {
+                                EventAction: 'MFA_IF_CONFIGURED',
+                                Notify: true
+                            },
+                        },
+                    },
+                    CompromisedCredentialsRiskConfiguration: {
+                        Actions: {
+                            EventAction: 'BLOCK'
+                        },
+                    },
+                    UserPoolId: {
+                        Ref: 'CognitoUserPool'
+                    }
+                },
+            },
         }
     },
+    package: {individually: true},
     custom: {
         esbuild: {
             bundle: true,
@@ -88,7 +245,7 @@ const serverlessConfiguration: AWS = {
             sourcemap: true,
             exclude: ['aws-sdk'],
             target: 'node16',
-            define: { 'require.resolve': undefined },
+            define: {'require.resolve': undefined},
             platform: 'node',
             concurrency: 10,
         },
