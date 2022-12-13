@@ -31,6 +31,37 @@ const serverlessConfiguration: AWS = {
             // CDN_DOMAIN: '${env:CDN_DOMAIN}',
             // API_DOMAIN: '${env:API_DOMAIN}',
         },
+        logs: {
+            httpApi: false, // turn on Api Gateway logs
+            metrics: true,
+        },
+        httpApi: {
+            cors: true,
+            authorizers: {
+                CognitoAuthorizer: {
+                    type: 'jwt',
+                    identitySource: '$request.header.Authorization',
+                    issuerUrl: {'Fn::GetAtt': ['CognitoUserPool', 'ProviderURL']},
+                    audience: [
+                        {Ref: 'CognitoUserPoolClientPostman'}
+                    ]
+                }
+            }
+        },
+        iam: {
+            role: {
+                statements: [
+                    {
+                        Effect: 'Allow',
+                        Action: [
+                            'cloudwatch:*',
+                            'logs:*'
+                        ],
+                        Resource: "*"
+                    }
+                ]
+            }
+        }
     },
     functions: {
         api: {
@@ -40,8 +71,11 @@ const serverlessConfiguration: AWS = {
             events: [
                 {
                     httpApi: {
-                        method: 'GET',
+                        method: 'ANY',
                         path: '/',
+                        authorizer: {
+                            name: 'CognitoAuthorizer'
+                        }
                     },
                 }
             ],
@@ -85,6 +119,36 @@ const serverlessConfiguration: AWS = {
                 },
             },
             ApiLambdaRole: {
+                Type: 'AWS::IAM::Role',
+                Properties: {
+                    AssumeRolePolicyDocument: {
+                        Statement: [
+                            {
+                                Effect: 'Allow',
+                                Action: 'sts:AssumeRole',
+                                Principal: {
+                                    Service: 'lambda.amazonaws.com',
+                                },
+                            },
+                        ],
+                    },
+                    Policies: [
+                        {
+                            PolicyName: 'ApiLambdaPolicy',
+                            PolicyDocument: {
+                                Statement: [
+                                    {
+                                        Effect: 'Allow',
+                                        Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
+                                        Resource: 'arn:aws:logs:*:*:*',
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
+            },
+            CognitoUserRole: {
                 Type: 'AWS::IAM::Role',
                 Properties: {
                     AssumeRolePolicyDocument: {
@@ -235,6 +299,24 @@ const serverlessConfiguration: AWS = {
                     }
                 },
             },
+            CognitoExecutivesGroup: {
+                Type: 'AWS::Cognito::UserPoolGroup',
+                Properties: {
+                    Description : "Executives group",
+                    GroupName : "Executives",
+                    Precedence : 20,
+                    UserPoolId : {'Ref': 'CognitoUserPool'},
+                }
+            },
+            CognitoAdministratorsGroup: {
+                Type: 'AWS::Cognito::UserPoolGroup',
+                Properties: {
+                    Description : "Administrators group",
+                    GroupName : "Administrators",
+                    Precedence : 10,
+                    UserPoolId : {'Ref': 'CognitoUserPool'},
+                }
+            }
         }
     },
     package: {individually: true},
@@ -252,6 +334,5 @@ const serverlessConfiguration: AWS = {
     }
 
 };
-
 
 module.exports = serverlessConfiguration;

@@ -12,7 +12,8 @@
     "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'",
     "deploy:staging": "NODE_ENV=staging serverless deploy -s staging",
     "destroy:staging": "NODE_ENV=staging serverless remove -s staging",
-    "local": "serverless offline start -s development"
+    "logs:api": "sls logs -s staging -f api -t",
+    "local": "serverless offline start -s staging --noAuth"
   },
   "nodemonConfig": {
     "ignore": [
@@ -43,6 +44,7 @@
     "@types/chai": "^4.3.3",
     "@types/express": "^4.17.14",
     "@types/mocha": "^9.1.1",
+    "aws-sdk": "^2.1273.0",
     "chai": "^4.3.6",
     "esbuild": "^0.16.1",
     "mocha": "^10.0.0",
