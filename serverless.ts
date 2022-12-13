@@ -148,36 +148,6 @@ const serverlessConfiguration: AWS = {
                     ],
                 },
             },
-            CognitoUserRole: {
-                Type: 'AWS::IAM::Role',
-                Properties: {
-                    AssumeRolePolicyDocument: {
-                        Statement: [
-                            {
-                                Effect: 'Allow',
-                                Action: 'sts:AssumeRole',
-                                Principal: {
-                                    Service: 'lambda.amazonaws.com',
-                                },
-                            },
-                        ],
-                    },
-                    Policies: [
-                        {
-                            PolicyName: 'ApiLambdaPolicy',
-                            PolicyDocument: {
-                                Statement: [
-                                    {
-                                        Effect: 'Allow',
-                                        Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
-                                        Resource: 'arn:aws:logs:*:*:*',
-                                    },
-                                ],
-                            },
-                        },
-                    ],
-                },
-            },
             CognitoUserPool: {
                 Type: 'AWS::Cognito::UserPool',
                 DeletionPolicy: '${env:COGNITO_RETENTION_POLICY}', // Retain for prod, Delete for staging
