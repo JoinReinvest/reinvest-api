@@ -10,10 +10,17 @@
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",
     "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'",
+
     "deploy:staging": "NODE_ENV=staging serverless deploy -s staging",
+    "deploy:staging:api": "NODE_ENV=staging serverless deploy function --function api -s staging ",
     "destroy:staging": "NODE_ENV=staging serverless remove -s staging",
+
+    "deploy:production": "NODE_ENV=production serverless deploy -s production",
+    "destroy:production": "NODE_ENV=production serverless remove -s production",
+
     "logs:api": "sls logs -s staging -f api -t",
-    "local": "serverless offline start -s staging --noAuth"
+    "local": "serverless offline start -s staging --noAuth",
+    "costs:estimation": "aws cloudformation estimate-template-cost --template-body file://.serverless/cloudformation-template-create-stack.json"
   },
   "nodemonConfig": {
     "ignore": [
@@ -36,6 +43,7 @@
     "form-data": "^4.0.0",
     "moment": "^2.29.4",
     "nodemon": "^2.0.19",
+    "pg": "^8.8.0",
     "serverless-http": "^3.1.0",
     "ts-node": "^10.9.1"
   },
@@ -54,6 +62,7 @@
     "serverless-esbuild": "^1.33.2",
     "serverless-offline": "^11.6.0",
     "serverless-offline-sqs": "^7.3.1",
+    "serverless-stack-termination-protection": "^2.0.2",
     "ts-loader": "^9.4.2",
     "ts-mocha": "^10.0.0",
     "ts-sinon": "^2.0.2",

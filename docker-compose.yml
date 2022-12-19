@@ -1,0 +1,22 @@
+version: '3'
+
+volumes:
+  postgresqldata:
+    driver: local
+
+
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:14.5-alpine
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=executive
+      - PGDATA=/var/lib/postgresql/data/pv
+      - POSTGRES_DB=lukaszd_staging_db
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresqldata:/var/lib/postgresql/data
+#        logging:
+#          driver: none

@@ -17,13 +17,15 @@
   "include": [
     "Reinvest/**/*",
     "shared/**/*",
-    "devops/**/*"
+    "devops/**/handler.ts"
   ],
   "exclude": [
     "Reinvest/**/*.test.ts",
     "Reinvest/**/*.feature.ts",
     "node_modules",
     "tsconfig.json",
-    "test/**/*"
+    "test/**/*",
+    "serverless.ts",
+    "devops/**/*"
   ]
 }
