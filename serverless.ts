@@ -6,14 +6,11 @@ import {RdsResources} from "./devops/serverless/rds";
 import {BastionResources} from "./devops/serverless/bastion";
 import {S3Resources} from "./devops/serverless/s3";
 
-// @ts-ignore
-// @ts-ignore
-// @ts-ignore
 const serverlessConfiguration: AWS = {
     service: '${env:APPLICATION_NAME}',
     frameworkVersion: '3',
     useDotenv: true,
-    plugins: ['serverless-offline-sqs', 'serverless-esbuild', 'serverless-stack-termination-protection', 'serverless-offline'], //  'serverless-domain-manager'
+    plugins: ['serverless-offline-sqs', 'serverless-esbuild', 'serverless-stack-termination-protection', 'serverless-offline', 'serverless-offline-watcher'], //  'serverless-domain-manager'
     provider: {
         name: 'aws',
         runtime: 'nodejs16.x',
@@ -76,7 +73,16 @@ const serverlessConfiguration: AWS = {
             stages: [
                 'production'
             ],
-        }
+        },
+        'serverless-offline': {
+            useChildProcesses: true
+        },
+        'serverless-offline-watcher': [
+            {
+                path: ["Reinvest", "devops", "shared"],
+                command: `echo "Source files modified"`,
+            },
+        ],
     }
 };
 

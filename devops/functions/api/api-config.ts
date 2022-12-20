@@ -17,13 +17,13 @@ export const ApiLambdaFunction = {
     events: [
         {
             httpApi: {
-                method: 'ANY',
-                path: '/',
+                method: 'POST',
+                path: '/api',
                 authorizer: {
                     name: CognitoAuthorizerName
                 }
             },
-        }
+        },
     ],
 }
 
