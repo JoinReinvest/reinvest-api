@@ -4,12 +4,13 @@ import {CognitoAuthorizer, CognitoResources} from "./devops/serverless/cognito";
 import {ApiLambdaFunction, ApiLambdaResources} from "./devops/functions/api/api-config";
 import {RdsResources} from "./devops/serverless/rds";
 import {BastionResources} from "./devops/serverless/bastion";
+import {S3Resources} from "./devops/serverless/s3";
 
 const serverlessConfiguration: AWS = {
     service: '${env:APPLICATION_NAME}',
     frameworkVersion: '3',
     useDotenv: true,
-    plugins: ['serverless-offline', 'serverless-offline-sqs', 'serverless-esbuild', 'serverless-stack-termination-protection'], //  'serverless-domain-manager'
+    plugins: ['serverless-offline-sqs', 'serverless-esbuild', 'serverless-stack-termination-protection', 'serverless-offline'], //  'serverless-domain-manager'
     provider: {
         name: 'aws',
         runtime: 'nodejs16.x',
@@ -45,6 +46,7 @@ const serverlessConfiguration: AWS = {
             ...VpcResources,
             // ...CognitoResources,
             // ...RdsResources,
+            ...S3Resources,
             ...ApiLambdaResources,
             // ...BastionResources,
         }
@@ -70,7 +72,7 @@ const serverlessConfiguration: AWS = {
             stages: [
                 'production'
             ],
-        },
+        }
     }
 };
 

@@ -134,3 +134,17 @@ export const VpcResources = {
         }
     },
 }
+
+export const EniPolicies = [
+
+    {   // allow to create ENI to access VPC
+        Effect: 'Allow',
+        Action: ['ec2:CreateNetworkInterface', 'ec2:DeleteNetworkInterface', 'ec2:AssignPrivateIpAddresses', 'ec2:UnassignPrivateIpAddresses'],
+        Resource: 'arn:aws:ec2:*:*:*',
+    },
+    {   // allow to describe ENI (works only on all Resources -https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html)
+        Effect: 'Allow',
+        Action: ['ec2:DescribeNetworkInterfaces'],
+        Resource: '*',
+    }
+]

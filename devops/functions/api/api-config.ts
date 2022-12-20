@@ -1,6 +1,8 @@
-import {getPrivateSubnetRefs, getVpcRef} from "../../serverless/vpc";
+import {EniPolicies, getPrivateSubnetRefs, getVpcRef} from "../../serverless/vpc";
 import {CognitoAuthorizerName} from "../../serverless/cognito";
-import {getResourceName, getResourceNameTag} from "../../serverless/utils";
+import {getAttribute, getResourceName} from "../../serverless/utils";
+import {S3Policies} from "../../serverless/s3";
+import {CloudwatchPolicies} from "../../serverless/cloudwatch";
 
 export const ApiLambdaFunction = {
     handler: `devops/functions/api/handler.main`,
@@ -8,7 +10,7 @@ export const ApiLambdaFunction = {
     timeout: 10,
     vpc: {
         securityGroupIds: [
-            {'Fn::GetAtt': ['ApiSecurityGroup', 'GroupId']}
+            getAttribute('ApiSecurityGroup', 'GroupId')
         ],
         subnetIds: [...getPrivateSubnetRefs()]
     },
@@ -46,21 +48,9 @@ export const ApiLambdaResources = {
                     PolicyName: 'ApiLambdaPolicy',
                     PolicyDocument: {
                         Statement: [
-                            {
-                                Effect: 'Allow',
-                                Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
-                                Resource: 'arn:aws:logs:*:*:*',
-                            },
-                            {   // allow to create ENI to access VPC
-                                Effect: 'Allow',
-                                Action: ['ec2:CreateNetworkInterface', 'ec2:DeleteNetworkInterface', 'ec2:AssignPrivateIpAddresses', 'ec2:UnassignPrivateIpAddresses'],
-                                Resource: 'arn:aws:ec2:*:*:*',
-                            },
-                            {   // allow to describe ENI (works only on all Resources -https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html)
-                                Effect: 'Allow',
-                                Action: ['ec2:DescribeNetworkInterfaces'],
-                                Resource: '*',
-                            },
+                            ...CloudwatchPolicies,
+                            ...EniPolicies,
+                            ...S3Policies,
                         ],
                     },
                 },

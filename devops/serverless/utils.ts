@@ -8,3 +8,7 @@ export const getResourceNameTag = (name: string) => ({
 export const getAttribute = (resource: string, attribute: string) => ({
     "Fn::GetAtt": [resource, attribute]
 })
+
+export const joinAttributes = (delimiter: string, attributes: any[]) => ({
+    "Fn::Join": [delimiter, attributes]
+})

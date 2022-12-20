@@ -1,6 +1,9 @@
 import express, {Express, Request, Response} from 'express';
 import axios, {AxiosResponse} from "axios";
-// import pg from 'pg'
+import pg from 'pg'
+
+import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
+import {S3Client, GetObjectCommand, PutObjectCommand, PutObjectCommandInput} from "@aws-sdk/client-s3";
 
 export const app: Express = express();
 
@@ -26,10 +29,35 @@ app.get('/', async (req: Request, res: Response) => {
     // await client.query("insert into users (username) values ('lukas')");
     // const result = await client.query('SELECT * from users');
 
+    //
+    const client = new S3Client({
+        region: 'eu-west-2'
+    });
+    // const getCommand = new GetObjectCommand({
+    //     Bucket: 'lukaszd-staging-avatars',
+    //     Key: 'tomasz.jpeg'
+    // });
+    // const getUrl = await getSignedUrl(client, getCommand, {expiresIn: 3600});
 
+    const putInput: PutObjectCommandInput = {
+        Bucket: 'lukaszd-staging-portfolio',
+        Key: 'property.jpeg',
+        // ResponseContentType: 'image/jpeg',
+        ACL: 'public-read'
+    };
+    const putCommand = new PutObjectCommand(putInput);
+    const getPutCommand = new GetObjectCommand(putInput);
+
+    const putUrl = await getSignedUrl(client, putCommand, {expiresIn: 3600});
+    // const getPutUrl = await getSignedUrl(client, getPutCommand, {expiresIn: 3600});
+    const url =
     res.send({
         // db: result.rows,
         http: response.data,
+        // url: getUrl,
+        putUrl,
+        // getPutUrl,
+        // url,
         // claims: req.event.requestContext.authorizer.jwt.claims,
     });
 });
