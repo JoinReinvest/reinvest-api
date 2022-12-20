@@ -58,7 +58,7 @@ app.get('/', async (req: Request, res: Response) => {
         putUrl,
         // getPutUrl,
         // url,
-        // claims: req.event.requestContext.authorizer.jwt.claims,
+        claims: req.event.requestContext.authorizer.jwt.claims,
     });
 });
 

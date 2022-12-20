@@ -1,4 +1,4 @@
-import {getAttribute} from "./utils";
+import {getAttribute, getResourceName} from "./utils";
 
 export const CognitoResources = {
     CognitoSMSRole: {
@@ -178,12 +178,11 @@ export const CognitoResources = {
 
 export const CognitoAuthorizer = {
     CognitoAuthorizer: {
-        type: 'jwt',
+        type: "jwt",
+        name: getResourceName('cognito-authorizer'),
         identitySource: '$request.header.Authorization',
         issuerUrl: getAttribute('CognitoUserPool', 'ProviderURL'),
-        audience: [
-            {Ref: 'CognitoUserPoolClientPostman'}
-        ]
+        audience: [{Ref: 'CognitoUserPoolClientPostman'}]
     }
 }
 

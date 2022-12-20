@@ -6,6 +6,9 @@ import {RdsResources} from "./devops/serverless/rds";
 import {BastionResources} from "./devops/serverless/bastion";
 import {S3Resources} from "./devops/serverless/s3";
 
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
 const serverlessConfiguration: AWS = {
     service: '${env:APPLICATION_NAME}',
     frameworkVersion: '3',
@@ -33,8 +36,9 @@ const serverlessConfiguration: AWS = {
         },
         httpApi: {
             cors: true,
+            //@ts-ignore
             authorizers: {
-                // ...CognitoAuthorizer,
+                ...CognitoAuthorizer,
             }
         },
     },
@@ -44,11 +48,11 @@ const serverlessConfiguration: AWS = {
     resources: {
         Resources: {
             ...VpcResources,
-            // ...CognitoResources,
-            // ...RdsResources,
+            ...CognitoResources,
+            ...RdsResources,
             ...S3Resources,
             ...ApiLambdaResources,
-            // ...BastionResources,
+            ...BastionResources,
         }
     },
     package: {individually: true},

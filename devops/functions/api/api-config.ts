@@ -19,9 +19,9 @@ export const ApiLambdaFunction = {
             httpApi: {
                 method: 'ANY',
                 path: '/',
-                // authorizer: {
-                //     name: CognitoAuthorizerName
-                // }
+                authorizer: {
+                    name: CognitoAuthorizerName
+                }
             },
         }
     ],
