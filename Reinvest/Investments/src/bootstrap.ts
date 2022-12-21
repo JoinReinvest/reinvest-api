@@ -6,7 +6,7 @@ export namespace Investments {
     }
 
     export function boot(config: Config): void {
-        console.log(config);
+        // console.log(config);
 
     }
 }

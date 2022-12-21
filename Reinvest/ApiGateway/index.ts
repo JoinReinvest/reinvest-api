@@ -8,16 +8,26 @@ import {S3Client, GetObjectCommand, PutObjectCommand, PutObjectCommandInput} fro
 import {ApolloServer} from '@apollo/server';
 import {startServerAndCreateLambdaHandler} from '@as-integrations/aws-lambda';
 import {GraphQLError} from 'graphql';
+import {boot} from "../bootstrap";
 // The GraphQL schema
 
-const typeDefs = `#graphql
-  type Query {
-    hello: String
-  }
+
+const typeDefs = `
+    type User {
+        id: ID!
+        "The name of user"
+        name: String
+        surname: String
+        address: String
+    }
+
+    type Query {
+        hello: String
+    }
+    type Mutation {
+        login(email: String): User
+    }
 `;
-
-
-// A map of functions which return data for the schema.
 
 const resolvers = {
     Query: {
@@ -27,6 +37,18 @@ const resolvers = {
             return 'hello';
         }
     },
+    Mutation: {
+        login: (parent, args, context) => {
+            console.log({parent, args, context});
+            return {
+                ID: 'uuid',
+                name: args.email,
+                surname: 'kowalski',
+                address: 'Factory street'
+            }
+        },
+    }
+
 
 };
 const server = new ApolloServer({
@@ -42,6 +64,7 @@ const server = new ApolloServer({
 
 export const app = startServerAndCreateLambdaHandler(server, {
     context: async ({event, context}) => {
+        boot();
         // throw new GraphQLError('User is not authenticated', {
         //     extensions: {
         //         code: 'UNAUTHENTICATED',

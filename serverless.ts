@@ -5,6 +5,7 @@ import {ApiLambdaFunction, ApiLambdaResources} from "./devops/functions/api/api-
 import {RdsResources} from "./devops/serverless/rds";
 import {BastionResources} from "./devops/serverless/bastion";
 import {S3Resources} from "./devops/serverless/s3";
+import {ExplorerLambdaFunction, ExplorerLambdaResources} from "./devops/functions/explorer/explorer-config";
 
 const serverlessConfiguration: AWS = {
     service: '${env:APPLICATION_NAME}',
@@ -41,6 +42,7 @@ const serverlessConfiguration: AWS = {
     },
     functions: {
         api: ApiLambdaFunction,
+        explorer: ExplorerLambdaFunction,
     },
     resources: {
         Resources: {
@@ -49,6 +51,7 @@ const serverlessConfiguration: AWS = {
             ...RdsResources,
             ...S3Resources,
             ...ApiLambdaResources,
+            ...ExplorerLambdaResources,
             ...BastionResources,
         }
     },
@@ -75,7 +78,8 @@ const serverlessConfiguration: AWS = {
             ],
         },
         'serverless-offline': {
-            useChildProcesses: true
+            useChildProcesses: true,
+            noPrependStageInUrl: true
         },
         'serverless-offline-watcher': [
             {
