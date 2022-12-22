@@ -1,3 +1,4 @@
+
 import express, {Express, Request, Response} from 'express';
 import axios, {AxiosResponse} from "axios";
 import pg from 'pg';
@@ -7,53 +8,12 @@ import {S3Client, GetObjectCommand, PutObjectCommand, PutObjectCommandInput} fro
 
 import {ApolloServer} from '@apollo/server';
 import {startServerAndCreateLambdaHandler} from '@as-integrations/aws-lambda';
-import {GraphQLError} from 'graphql';
 import {boot} from "../bootstrap";
-// The GraphQL schema
+import Schema from './Schema';
 
 
-const typeDefs = `
-    type User {
-        id: ID!
-        "The name of user"
-        name: String
-        surname: String
-        address: String
-    }
-
-    type Query {
-        hello: String
-    }
-    type Mutation {
-        login(email: String): User
-    }
-`;
-
-const resolvers = {
-    Query: {
-        hello: (parent, args, contextValue, info) => {
-            console.log(contextValue.lambdaEvent.requestContext.authorizer);
-
-            return 'hello';
-        }
-    },
-    Mutation: {
-        login: (parent, args, context) => {
-            console.log({parent, args, context});
-            return {
-                ID: 'uuid',
-                name: args.email,
-                surname: 'kowalski',
-                address: 'Factory street'
-            }
-        },
-    }
-
-
-};
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema: Schema,
     includeStacktraceInErrorResponses: false,
     formatError: ((err) => {
         console.error(err)
