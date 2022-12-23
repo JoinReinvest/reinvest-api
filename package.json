@@ -46,6 +46,7 @@
     "form-data": "^4.0.0",
     "graphql": "^16.6.0",
     "moment": "^2.29.4",
+    "node-eventstore-postgre": "^0.2.0",
     "nodemon": "^2.0.19",
     "pg": "^8.8.0",
     "serverless-http": "^3.1.0",

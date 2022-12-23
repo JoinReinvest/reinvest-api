@@ -3,16 +3,12 @@ export const profileDefinitions = `
     type Profile {
         id: ID!
         "The name of user"
-        name: EmailAddress
-        surname: String
-        address: String
+        email: EmailAddress
+        avatarUrl: String
     }
 
     type Query {
-        hello: String
-    }
-    type Mutation {
-        login(email: EmailAddress): Profile
+        getProfile(userId: String): Profile
     }
 `;
 
