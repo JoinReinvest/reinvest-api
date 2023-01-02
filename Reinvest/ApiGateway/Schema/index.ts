@@ -1,19 +1,20 @@
 import {addMocksToSchema} from "@graphql-tools/mock";
 import {SchemaMocks} from "./SchemaMocks";
-import {profileDefinitions} from "./Types/Profile";
 import {EmailAddress} from "./Scalars/EmailAddress";
 import {mergeTypeDefs} from "@graphql-tools/merge";
 import {makeExecutableSchema} from "@graphql-tools/schema";
-import {ProfileMutations} from "./Mutations/createProfile";
+import {Hello} from "./Types/Hello";
+import {Profile} from "./Types/Profile";
 
 const typeDefinitions = [
     EmailAddress.schema,
-    profileDefinitions,
-    ProfileMutations.schema,
+    Hello.schema,
+    Profile.schema,
 ];
 const resolvers = {
+    ...EmailAddress.resolvers,
     Mutation: {
-        ...ProfileMutations.resolvers,
+        // ...ProfileMutations.resolvers,
     },
     Query: {
         // Profile: () => ({
@@ -22,9 +23,9 @@ const resolvers = {
         //     avatarUrl: 'http://some-url.com',
         // })
     },
-    ...EmailAddress.resolvers,
 };
 const typeDefs = mergeTypeDefs(typeDefinitions);
+
 
 export default addMocksToSchema({
     schema: makeExecutableSchema({

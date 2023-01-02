@@ -1,4 +1,4 @@
-export const profileDefinitions = `
+const schema = `
     #graphql
     type Profile {
         id: ID!
@@ -6,11 +6,34 @@ export const profileDefinitions = `
         email: EmailAddress
         avatarUrl: String
     }
-
+    
     type Query {
         getProfile(userId: String): Profile
     }
+    
+    type Mutation {
+        createProfile(userId: String): Profile
+    }
 `;
+
+const resolvers = {
+    createProfile: (parent, {userId}, context) => {
+        // const profileController = new CreateProfileController();
+        // const uuid = profileController.call(userId);
+
+        return {
+            id: 'uuid',
+            email: 'test',
+            avatarUrl: 'kowalski',
+        }
+    },
+
+}
+
+export const Profile = {
+    schema,
+    resolvers
+};
 
 //
 // const resolvers = {

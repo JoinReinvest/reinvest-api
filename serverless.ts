@@ -70,7 +70,7 @@ const serverlessConfiguration: AWS = {
             packager: 'yarn',
         },
         bundle: {
-            ignorePackages: ['pg-native'],
+            // ignorePackages: ['pg-native'],
         },
         serverlessTerminationProtection: {
             stages: [

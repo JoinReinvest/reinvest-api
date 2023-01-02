@@ -7,7 +7,7 @@
     "baseUrl": "./Reinvest",
     "strict": true,
     "paths": {
-      "GenericAdapter": ["../shared/GenericAdapter"]
+      "SimpleAggregator": ["../shared/SimpleAggregator"]
     },
     "esModuleInterop": true,
     "noImplicitAny": true,
