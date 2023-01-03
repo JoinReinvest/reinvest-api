@@ -1,6 +1,6 @@
 import serverless from 'serverless-http';
 
-import {app} from '../../../Reinvest/ApiGateway';
+import {app} from 'Reinvest/ApiGateway';
 
 
 

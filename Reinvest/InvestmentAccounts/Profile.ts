@@ -1,61 +1,44 @@
-import {createEvent, IndividualAttachedToProfile, ProfileCreated, ProfileEvent, profileEvents} from "./Events";
-
-import Aggregate from "../../shared/SimpleAggregator/Aggregate";
-import {AggregateState} from "../../shared/SimpleAggregator/AggregateState";
-import {AttachIndividualToProfile, ProfileCommand, profileCommands} from "InvestmentAccounts/Commands";
+import {IndividualAttachedToProfile, ProfileCreated} from "./Events";
+import {AggregateState} from "SimpleAggregator/Types";
+import {SimpleAggregate} from "SimpleAggregator/SimpleAggregate";
+import {ProfileException} from "Reinvest/InvestmentAccounts/ProfileException";
 
 export type ProfileState = AggregateState & {
+    kind: 'Profile',
     state?: {
-        individualId: string,
+        userId: string,
+        individualId: string | null,
+        accountId: string[]
     }
 }
 
-const defaultState = {}
+class Profile extends SimpleAggregate {
+    // @ts-ignore
+    protected aggregate: ProfileState;
 
-class Profile implements Aggregate {
-    private state: ProfileState;
-
-    constructor(state: ProfileState) {
-        this.state = state;
+    public static create() {
+        return Profile.createAggregate('Profile');
     }
 
-    execute(command: ProfileCommand): ProfileEvent | ProfileEvent[] {
-        switch (command.kind) {
-            case profileCommands.CreateProfile:
-                return this.create();
-            case profileCommands.AttachIndividualToProfile:
-                const {data: {individualId}} = <AttachIndividualToProfile>command;
+    public initialize(userId: string): ProfileCreated {
+        const profileCreated = new ProfileCreated({
+            userId,
+            accountId: []
+        }, this.getId())
 
-                return this.attachIndividual(individualId);
-            default:
-                throw new Error('Not known command');
-        }
-
-    }
-
-    private create(): ProfileCreated {
-        const event = createEvent<ProfileCreated>(profileEvents.ProfileCreated, {...defaultState});
-
-        return this.apply<ProfileCreated>(event);
+        return this.apply(profileCreated);
     }
 
     // command handler
-    private attachIndividual(individualId: string): IndividualAttachedToProfile {
-        const event = <IndividualAttachedToProfile>createEvent(profileEvents.IndividualAttachedToProfile, {individualId});
-        this.apply(event);
+    public attachIndividual(individualId: string): IndividualAttachedToProfile {
+        const currentIndividual = this.getState('individualId');
+        if (currentIndividual) {
+            ProfileException.throw('Individual already attached to the profile');
+        }
 
-        return event;
-    }
+        const event = new IndividualAttachedToProfile({individualId}, this.getId());
 
-    // event apply
-    public apply<Event>(event: ProfileEvent): Event {
-        this.state.state = {...this.state.state, ...event.data};
-
-        return <Event>event;
-    }
-
-    public getSnapshot(): ProfileState {
-        return this.state;
+        return this.apply(event);
     }
 }
 

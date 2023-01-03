@@ -67,7 +67,7 @@
         * Mocking library with Typescript support (ts-sinon)
 * Convention:
     * In unit tests we use functions from Mocha that we map to Gherkin syntax
-        * "Context" into "Given" - what is the current state
+        * "Context" into "Given" - what is the current aggregate
         * "Describe" into "When" - what action is done
         * "It" into "Then" - what result do we expect
         * Unit tests for file should be named with pattern: `*.test.ts`

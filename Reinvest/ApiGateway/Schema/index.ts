@@ -11,21 +11,18 @@ const typeDefinitions = [
     Hello.schema,
     Profile.schema,
 ];
+
 const resolvers = {
     ...EmailAddress.resolvers,
     Mutation: {
-        // ...ProfileMutations.resolvers,
+        ...Profile.mutations,
     },
     Query: {
-        // Profile: () => ({
-        //     id: 'uuid',
-        //     email: 'test@reit.com',
-        //     avatarUrl: 'http://some-url.com',
-        // })
+        ...Profile.queries
     },
 };
-const typeDefs = mergeTypeDefs(typeDefinitions);
 
+const typeDefs = mergeTypeDefs(typeDefinitions);
 
 export default addMocksToSchema({
     schema: makeExecutableSchema({

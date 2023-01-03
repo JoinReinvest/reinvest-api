@@ -1,11 +1,7 @@
-import CommandType from "./CommandType";
-import DomainEventType from "./DomainEventType";
-import {AggregateState} from "./AggregateState";
+import {AggregateState, DomainEvent} from "./Types";
 
 export default interface Aggregate {
-    execute(command: CommandType): DomainEventType | DomainEventType[];
-
-    apply(event: DomainEventType): DomainEventType;
+    apply<Event>(event: DomainEvent): Event;
 
     getSnapshot(): AggregateState;
 }

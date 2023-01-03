@@ -1,14 +1,20 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "target": "es6",
+    "target": "ES2019",
     "module": "commonjs",
     "outDir": "./build",
     "baseUrl": "./Reinvest",
     "strict": true,
     "paths": {
-      "SimpleAggregator": ["../shared/SimpleAggregator"]
+      "Reinvest/*": ["./*"],
+      "SimpleAggregator/*": ["../shared/SimpleAggregator/*"],
+      "Container/*": ["../shared/Container/*"]
     },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./@types"
+    ],
     "esModuleInterop": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
@@ -26,6 +32,7 @@
     "tsconfig.json",
     "test/**/*",
     "serverless.ts",
-    "devops/**/*"
+    "devops/**/*",
+    ".serverless/**/*"
   ]
 }

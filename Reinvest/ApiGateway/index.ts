@@ -1,4 +1,3 @@
-
 import express, {Express, Request, Response} from 'express';
 import axios, {AxiosResponse} from "axios";
 
@@ -25,21 +24,23 @@ const server = new ApolloServer({
 export const app = startServerAndCreateLambdaHandler(server, {
     context: async ({event, context}) => {
         try {
-            boot();
-        } catch(error: any) {
+            const modules = boot();
+
+            // throw new GraphQLError('User is not authenticated', {
+            //     extensions: {
+            //         code: 'UNAUTHENTICATED',
+            //         http: { status: 401 },
+            //     },
+            // });
+
+            return {
+                lambdaEvent: event,
+                lambdaContext: context,
+                modules
+            };
+        } catch (error: any) {
             console.log(error);
         }
-        // throw new GraphQLError('User is not authenticated', {
-        //     extensions: {
-        //         code: 'UNAUTHENTICATED',
-        //         http: { status: 401 },
-        //     },
-        // });
-
-        return {
-            lambdaEvent: event,
-            lambdaContext: context,
-        };
 
     },
 });

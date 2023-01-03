@@ -49,7 +49,8 @@
     "nodemon": "^2.0.19",
     "postgres": "^3.3.2",
     "serverless-http": "^3.1.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "typed-inject": "^3.0.1"
   },
   "devDependencies": {
     "@serverless/typescript": "serverless/typescript",

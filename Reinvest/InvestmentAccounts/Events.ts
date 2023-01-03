@@ -1,30 +1,15 @@
-import DomainEventType from "../../shared/SimpleAggregator/DomainEventType";
+import {DomainEvent, DomainEventInterface, Uninitialized} from "SimpleAggregator/Types";
 
-export type ProfileEvent = DomainEventType;
-
-export const profileEvents = {
-    ProfileCreated: 'ProfileCreated',
-    IndividualAttachedToProfile: 'IndividualAttachedToProfile',
-
+export class ProfileCreated extends DomainEvent implements DomainEventInterface {
+    public kind = 'ProfileCreated';
+    public data: Uninitialized | {
+        userId: string,
+    } = null;
 }
 
-export function createEvent<Event>(kind: string, data = {}): ProfileEvent | Event {
-    return {
-        kind,
-        data,
-    }
-}
-
-export type ProfileCreated = ProfileEvent & {
-    kind: 'ProfileCreated',
-    data: {
+export class IndividualAttachedToProfile extends DomainEvent implements DomainEventInterface {
+    public kind = 'IndividualAttachedToProfile';
+    public data: Uninitialized | {
         individualId: string,
-    }
-}
-
-export type IndividualAttachedToProfile = ProfileEvent & {
-    kind: 'IndividualAttachedToProfile',
-    data: {
-        individualId: string,
-    }
+    } = null;
 }
