@@ -1,4 +1,4 @@
-import { app } from "Reinvest/ApiGateway";
+import { app } from "Reinvest/ApiGateway/src";
 import { boot } from "Reinvest/bootstrap";
 import serverless from "serverless-http";
 

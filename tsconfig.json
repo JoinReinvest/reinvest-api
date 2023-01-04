@@ -8,8 +8,11 @@
     "strict": true,
     "paths": {
       "Reinvest/*": ["./*"],
+      "PostgreSQL/*": ["../shared/hkek-postgresql/*"],
       "SimpleAggregator/*": ["../shared/hkek-simple-aggregator/*"],
-      "Container/*": ["../shared/hkek-container/*"]
+      "Container/*": ["../shared/hkek-container/*"],
+      "ApiGateway/*": ["./ApiGateway/src/*"],
+      "InvestmentAccounts/*": ["./InvestmentAccounts/src/*"]
     },
     "typeRoots": [
       "./node_modules/@types",

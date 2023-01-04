@@ -1,8 +1,8 @@
 import { ContainerInterface } from "Container/Container";
-import { InvestmentAccounts } from "Reinvest/InvestmentAccounts/bootstrap";
+import { InvestmentAccounts } from "InvestmentAccounts/index";
 import ProfileService, {
   ProfileRepository,
-} from "Reinvest/InvestmentAccounts/ProfileService";
+} from "InvestmentAccounts/ProfileService";
 
 export default class ServiceProviders {
   private config: InvestmentAccounts.Config;

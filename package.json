@@ -4,7 +4,7 @@
   "description": "ReInvest API",
   "main": "Reinvest/index.ts",
   "scripts": {
-    "lint": "eslint ./Reinvest ./serverless.ts devops --ext .ts --config ./eslintrc.json",
+    "lint": "eslint ./Reinvest ./serverless.ts devops --ext .ts",
     "lint:fix": "yarn lint --fix",
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",
@@ -15,7 +15,12 @@
     "deploy:production": "NODE_ENV=production serverless deploy -s production",
     "destroy:production": "NODE_ENV=production serverless remove -s production",
     "logs:api": "sls logs -s staging -f api -t",
-    "local": "serverless offline start -s staging --noAuth --reloadHandler"
+    "local": "serverless offline start -s staging --noAuth --reloadHandler",
+    "db:migrate": "esbuild --bundle --target=node16 --platform=node ./Reinvest/migration.ts > migration.js && node migration.js",
+    "db:clean": "rm migration.js",
+    "db:migration:up": "yarn db:migrate migrateUp && yarn db:clean",
+    "db:migration:down": "yarn db:migrate migrateDown && yarn db:clean",
+    "db:migration:latest": "yarn db:migrate migrateLatest && yarn db:clean"
   },
   "author": "Lukasz Duraj <https://www.linkedin.com/in/%C5%82ukasz-duraj-a4872317b/>",
   "license": "ISC",
@@ -31,7 +36,9 @@
     "dotenv": "^16.0.2",
     "express": "^4.18.2",
     "graphql": "^16.6.0",
+    "kysely": "^0.23.3",
     "moment": "^2.29.4",
+    "pg": "^8.8.0",
     "postgres": "^3.3.2",
     "serverless-http": "^3.1.0",
     "typed-inject": "^3.0.1"
@@ -70,5 +77,16 @@
     "ts-node": "^10.9.1",
     "ts-sinon": "^2.0.2",
     "typescript": "^4.9.3"
-  }
+  },
+  "eslintConfig": {
+    "extends": "./eslintrc.json",
+    "ignorePatterns": [
+      "/src/migrations/_template.ts"
+    ],
+    "rules": {
+      "@typescript-eslint/no-inferrable-types": "off",
+      "import/extensions": "off"
+    }
+  },
+  "prettier": "./prettier.json"
 }

@@ -1,14 +1,14 @@
-import { InvestmentAccounts } from "Reinvest/InvestmentAccounts";
+import { InvestmentAccounts } from "InvestmentAccounts/index";
 import { Investments } from "Reinvest/Investments/src/bootstrap";
 import Modules from "Reinvest/Modules";
 
 export function boot(): Modules {
   const modules = new Modules();
-  Investments.boot({
-    database: {
-      connectionString: "connection-string-test",
-    },
-  } as Investments.Config);
+  // Investments.boot({
+  //   database: {
+  //     connectionString: "connection-string-test",
+  //   },
+  // } as Investments.Config);
 
   modules.register(
     InvestmentAccounts.moduleName,
@@ -18,8 +18,6 @@ export function boot(): Modules {
       },
     } as InvestmentAccounts.Config)
   );
-
-  //postgres://executive:password@localhost/lukaszd_staging_db
 
   console.log("App bootstrapped");
 

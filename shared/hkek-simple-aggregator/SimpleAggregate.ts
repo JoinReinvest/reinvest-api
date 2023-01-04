@@ -11,7 +11,7 @@ export class SimpleAggregate implements Aggregate {
     protected static createAggregate<T extends typeof SimpleAggregate>(this: T, kind: string): InstanceType<T> {
         const aggregateState = {
             kind,
-            dateCreated: new Date().toDateString(),
+            dateCreated: new Date(),
             aggregateId: 'testAggregateId',
             version: 1,
             previousVersion: 0
@@ -37,13 +37,16 @@ export class SimpleAggregate implements Aggregate {
         if (!('state' in this.aggregate)) {
             this.aggregate.state = {};
         }
+
         this.aggregate.state = {...this.aggregate.state, ...event.data};
         this.aggregate.version++;
-
         return <Event>event;
     }
 
     public getSnapshot(): AggregateState {
-        return this.aggregate;
+        const aggregate = {...this.aggregate};
+
+        aggregate.state = JSON.stringify(aggregate.state);
+        return aggregate;
     }
 }

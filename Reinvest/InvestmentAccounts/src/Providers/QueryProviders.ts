@@ -1,8 +1,8 @@
 import { ContainerInterface } from "Container/Container";
-import { InvestmentAccounts } from "Reinvest/InvestmentAccounts/bootstrap";
+import { InvestmentAccounts } from "InvestmentAccounts/index";
 import ProfileQuery, {
   QueryProfileRepository,
-} from "Reinvest/InvestmentAccounts/ProfileQuery";
+} from "InvestmentAccounts/ProfileQuery";
 
 export default class QueryProviders {
   private config: InvestmentAccounts.Config;

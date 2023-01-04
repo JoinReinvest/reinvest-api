@@ -2,10 +2,10 @@ import { mergeTypeDefs } from "@graphql-tools/merge";
 import { addMocksToSchema } from "@graphql-tools/mock";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
-import { EmailAddress } from "./Scalars/EmailAddress";
-import { SchemaMocks } from "./SchemaMocks";
-import { Hello } from "./Types/Hello";
-import { Profile } from "./Types/Profile";
+import { EmailAddress } from "ApiGateway/Schema/Scalars/EmailAddress";
+import { SchemaMocks } from "ApiGateway/Schema/SchemaMocks";
+import { Hello } from "ApiGateway/Schema/Types/Hello";
+import { Profile } from "ApiGateway/Schema/Types/Profile";
 
 const typeDefinitions = [EmailAddress.schema, Hello.schema, Profile.schema];
 

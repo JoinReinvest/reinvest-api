@@ -11,7 +11,7 @@ import axios, { AxiosResponse } from "axios";
 import express, { Express, Request, Response } from "express";
 import Modules from "Reinvest/Modules";
 
-import Schema from "./Schema";
+import Schema from "ApiGateway/Schema";
 
 const server = new ApolloServer({
   schema: Schema,
