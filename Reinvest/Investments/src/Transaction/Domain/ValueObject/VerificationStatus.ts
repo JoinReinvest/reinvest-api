@@ -1,9 +1,9 @@
 export enum InvestorVerificationStatus {
-    Unverified,
-    Verified,
+  Unverified,
+  Verified,
 }
 
 export enum InvestmentVerificationStatus {
-    Unverified,
-    Verified,
+  Unverified,
+  Verified,
 }

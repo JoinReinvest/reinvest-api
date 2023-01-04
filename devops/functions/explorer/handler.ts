@@ -1,7 +1,7 @@
-import serverless from 'serverless-http';
-import express from 'express'
+import express from "express";
+import serverless from "serverless-http";
 
-const apiEndpoint = 'http://localhost:3000/api';
+const apiEndpoint = "http://localhost:3000/api";
 const page = `
 <html lang="en">
   <head>
@@ -56,8 +56,8 @@ const page = `
 
 const app = express();
 
-app.get('/explorer', (req: any, res: any) => {
-    res.send(page);
+app.get("/explorer", (req: any, res: any) => {
+  res.send(page);
 });
 
 export const main = serverless(app);

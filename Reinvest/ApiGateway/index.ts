@@ -1,49 +1,50 @@
-import express, {Express, Request, Response} from 'express';
-import axios, {AxiosResponse} from "axios";
-
-
-import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
-import {S3Client, GetObjectCommand, PutObjectCommand, PutObjectCommandInput} from "@aws-sdk/client-s3";
-
-import {ApolloServer} from '@apollo/server';
-import {startServerAndCreateLambdaHandler} from '@as-integrations/aws-lambda';
-import Schema from './Schema';
+import { ApolloServer } from "@apollo/server";
+import { startServerAndCreateLambdaHandler } from "@as-integrations/aws-lambda";
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  PutObjectCommandInput,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import axios, { AxiosResponse } from "axios";
+import express, { Express, Request, Response } from "express";
 import Modules from "Reinvest/Modules";
 
+import Schema from "./Schema";
 
 const server = new ApolloServer({
-    schema: Schema,
-    includeStacktraceInErrorResponses: true, // todo this should be debug flag
-    formatError: ((err) => {
-        console.error(err)
-        return err
-    })
+  schema: Schema,
+  includeStacktraceInErrorResponses: true, // todo this should be debug flag
+  formatError: (err) => {
+    console.error(err);
+
+    return err;
+  },
 });
 
+export const app = (modules: Modules) =>
+  startServerAndCreateLambdaHandler(server, {
+    // @ts-ignore
+    context: async ({ event, context }) => {
+      try {
+        // throw new GraphQLError('User is not authenticated', {
+        //     extensions: {
+        //         code: 'UNAUTHENTICATED',
+        //         http: { status: 401 },
+        //     },
+        // });
 
-export const app = (modules: Modules) => startServerAndCreateLambdaHandler(server, {
-// @ts-ignore
-    context: async ({event, context}) => {
-        try {
-
-            // throw new GraphQLError('User is not authenticated', {
-            //     extensions: {
-            //         code: 'UNAUTHENTICATED',
-            //         http: { status: 401 },
-            //     },
-            // });
-
-            return {
-                lambdaEvent: event,
-                lambdaContext: context,
-                modules
-            };
-        } catch (error: any) {
-            console.log(error);
-        }
-
+        return {
+          lambdaEvent: event,
+          lambdaContext: context,
+          modules,
+        };
+      } catch (error: any) {
+        console.log(error);
+      }
     },
-});
+  });
 // export const app: Express = express();
 //
 //

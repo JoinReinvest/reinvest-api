@@ -1,44 +1,31 @@
 export class NonEmptyString {
-    constructor() {
-    }
-
+  constructor() {}
 }
 
 export class AnyString {
-    protected data: string;
+  protected data: string;
 
-    constructor(data: string = "") {
-        this.data = data;
-    }
-
+  constructor(data = "") {
+    this.data = data;
+  }
 }
 
 export class EnumString {
-    constructor() {
-    }
-
+  constructor() {}
 }
 
 export class Money {
-    constructor() {
-    }
-
+  constructor() {}
 }
 
 export class DateTime {
-    constructor() {
-    }
-
+  constructor() {}
 }
 
 export class Uuid {
-    constructor() {
-    }
-
+  constructor() {}
 }
 
 export class Url {
-    constructor() {
-    }
-
+  constructor() {}
 }

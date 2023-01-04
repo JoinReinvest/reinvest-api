@@ -1,20 +1,20 @@
-import {TransactionCommand} from "./TransactionCommand";
-import {TransactionId} from "../ValueObject/TransactionId";
+import { TransactionId } from "../ValueObject/TransactionId";
+import { TransactionCommand } from "./TransactionCommand";
 
 export class WaitForManualAction implements TransactionCommand {
-    transactionCommandGuard: boolean = true;
+  transactionCommandGuard = true;
 
-    private readonly _transactionId: TransactionId;
+  private readonly _transactionId: TransactionId;
 
-    constructor(transactionId: TransactionId) {
-        this._transactionId = transactionId;
-    }
+  constructor(transactionId: TransactionId) {
+    this._transactionId = transactionId;
+  }
 
-    static create(transactionId: TransactionId) {
-        return new WaitForManualAction(transactionId);
-    }
+  static create(transactionId: TransactionId) {
+    return new WaitForManualAction(transactionId);
+  }
 
-    get transactionId(): TransactionId {
-        return this._transactionId;
-    }
+  get transactionId(): TransactionId {
+    return this._transactionId;
+  }
 }

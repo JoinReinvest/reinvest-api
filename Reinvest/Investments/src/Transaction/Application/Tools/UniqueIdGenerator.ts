@@ -1,5 +1,5 @@
-import {UniqueId} from "../../../Commons/UniqueId";
+import { UniqueId } from "../../../Commons/UniqueId";
 
 export interface UniqueIdGenerator {
-    create(): UniqueId;
+  create(): UniqueId;
 }

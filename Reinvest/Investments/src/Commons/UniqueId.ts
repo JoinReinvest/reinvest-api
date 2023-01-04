@@ -1,11 +1,11 @@
 export class UniqueId {
-    private readonly id: string;
+  private readonly id: string;
 
-    constructor(id: string) {
-        this.id = id;
-    }
+  constructor(id: string) {
+    this.id = id;
+  }
 
-    public toString(): string {
-        return this.id;
-    }
+  public toString(): string {
+    return this.id;
+  }
 }

@@ -1,5 +1,3 @@
 export class CompanyVerification {
-    constructor() {
-    }
-
+  constructor() {}
 }

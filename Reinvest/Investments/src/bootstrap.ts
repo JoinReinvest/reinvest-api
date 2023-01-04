@@ -1,12 +1,11 @@
 export namespace Investments {
-    export type Config = {
-        database: {
-            connectionString: string
-        }
-    }
+  export type Config = {
+    database: {
+      connectionString: string;
+    };
+  };
 
-    export function boot(config: Config): void {
-        // console.log(config);
-
-    }
+  export function boot(config: Config): void {
+    // console.log(config);
+  }
 }

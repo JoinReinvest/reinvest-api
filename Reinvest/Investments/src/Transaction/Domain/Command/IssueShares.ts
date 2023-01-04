@@ -1,9 +1,9 @@
-import {TransactionCommand} from "./TransactionCommand";
+import { TransactionCommand } from "./TransactionCommand";
 
 export class IssueShares implements TransactionCommand {
-    transactionCommandGuard: boolean = true
+  transactionCommandGuard = true;
 
-    public static create() {
-        return new IssueShares();
-    }
+  public static create() {
+    return new IssueShares();
+  }
 }

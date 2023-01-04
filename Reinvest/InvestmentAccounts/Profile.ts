@@ -1,45 +1,53 @@
-import {IndividualAttachedToProfile, ProfileCreated} from "./Events";
-import {AggregateState} from "SimpleAggregator/Types";
-import {SimpleAggregate} from "SimpleAggregator/SimpleAggregate";
-import {ProfileException} from "Reinvest/InvestmentAccounts/ProfileException";
+import { ProfileException } from "Reinvest/InvestmentAccounts/ProfileException";
+import { SimpleAggregate } from "SimpleAggregator/SimpleAggregate";
+import { AggregateState } from "SimpleAggregator/Types";
+
+import { IndividualAttachedToProfile, ProfileCreated } from "./Events";
 
 export type ProfileState = AggregateState & {
-    kind: 'Profile',
-    state?: {
-        userId: string,
-        individualId: string | null,
-        accountId: string[]
-    }
-}
+  kind: "Profile";
+  state?: {
+    accountId: string[];
+    individualId: string | null;
+    userId: string;
+  };
+};
 
 class Profile extends SimpleAggregate {
-    // @ts-ignore
-    protected aggregate: ProfileState;
+  // @ts-ignore
+  protected aggregate: ProfileState;
 
-    public static create() {
-        return Profile.createAggregate('Profile');
+  public static create() {
+    return Profile.createAggregate("Profile");
+  }
+
+  public initialize(userId: string): ProfileCreated {
+    const profileCreated = new ProfileCreated(
+      {
+        userId,
+        accountId: [],
+      },
+      this.getId()
+    );
+
+    return this.apply(profileCreated);
+  }
+
+  // command handler
+  public attachIndividual(individualId: string): IndividualAttachedToProfile {
+    const currentIndividual = this.getState("individualId");
+
+    if (currentIndividual) {
+      ProfileException.throw("Individual already attached to the profile");
     }
 
-    public initialize(userId: string): ProfileCreated {
-        const profileCreated = new ProfileCreated({
-            userId,
-            accountId: []
-        }, this.getId())
+    const event = new IndividualAttachedToProfile(
+      { individualId },
+      this.getId()
+    );
 
-        return this.apply(profileCreated);
-    }
-
-    // command handler
-    public attachIndividual(individualId: string): IndividualAttachedToProfile {
-        const currentIndividual = this.getState('individualId');
-        if (currentIndividual) {
-            ProfileException.throw('Individual already attached to the profile');
-        }
-
-        const event = new IndividualAttachedToProfile({individualId}, this.getId());
-
-        return this.apply(event);
-    }
+    return this.apply(event);
+  }
 }
 
 export default Profile;

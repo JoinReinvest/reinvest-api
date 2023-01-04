@@ -1,5 +1,5 @@
-import {CompanyVerification} from "../CompanyVerification";
+import { CompanyVerification } from "../CompanyVerification";
 
 export interface CompanyVerificationRepositoryInterface {
-    save(companyVerifications: CompanyVerification[]): void;
+  save(companyVerifications: CompanyVerification[]): void;
 }

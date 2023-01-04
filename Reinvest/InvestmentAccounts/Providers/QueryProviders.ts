@@ -1,19 +1,19 @@
-import ProfileQuery, {QueryProfileRepository} from "Reinvest/InvestmentAccounts/ProfileQuery";
-import {InvestmentAccounts} from "Reinvest/InvestmentAccounts/bootstrap";
-import {ContainerInterface} from "Container/Container";
+import { ContainerInterface } from "Container/Container";
+import { InvestmentAccounts } from "Reinvest/InvestmentAccounts/bootstrap";
+import ProfileQuery, {
+  QueryProfileRepository,
+} from "Reinvest/InvestmentAccounts/ProfileQuery";
 
 export default class QueryProviders {
-    private config: InvestmentAccounts.Config;
+  private config: InvestmentAccounts.Config;
 
-    constructor(config: InvestmentAccounts.Config) {
-        this.config = config;
-    }
+  constructor(config: InvestmentAccounts.Config) {
+    this.config = config;
+  }
 
-    public boot(container: ContainerInterface) {
-        container
-            .addClass(QueryProfileRepository)
-            .addClass(ProfileQuery, [
-                QueryProfileRepository.toString()
-            ]);
-    }
+  public boot(container: ContainerInterface) {
+    container
+      .addClass(QueryProfileRepository)
+      .addClass(ProfileQuery, [QueryProfileRepository.toString()]);
+  }
 }

@@ -1,8 +1,6 @@
-import serverless from 'serverless-http';
-
-import {app} from 'Reinvest/ApiGateway';
-import {boot} from "Reinvest/bootstrap";
-
+import { app } from "Reinvest/ApiGateway";
+import { boot } from "Reinvest/bootstrap";
+import serverless from "serverless-http";
 
 const modules = boot();
 

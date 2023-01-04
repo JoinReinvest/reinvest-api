@@ -1,4 +1,4 @@
 export enum Result {
-    Success,
-    Failed
+  Success,
+  Failed,
 }

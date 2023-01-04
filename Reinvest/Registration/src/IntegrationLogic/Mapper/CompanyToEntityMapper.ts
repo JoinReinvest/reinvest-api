@@ -1,8 +1,8 @@
-import {Company} from "../Model/Company";
-import {Entity} from "../../Adapter/NorthCapital/Model/Entity";
+import { Entity } from "../../Adapter/NorthCapital/Model/Entity";
+import { Company } from "../Model/Company";
 
 export class CompanyToEntityMapper {
-    static map(company: Company): Entity {
-        return new Entity();
-    }
+  static map(company: Company): Entity {
+    return new Entity();
+  }
 }

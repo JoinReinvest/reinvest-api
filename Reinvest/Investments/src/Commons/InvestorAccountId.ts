@@ -1,8 +1,7 @@
 export class InvestorAccountId {
-    private accountId: string;
+  private accountId: string;
 
-    constructor(accountId: string) {
-        this.accountId = accountId;
-
-    }
+  constructor(accountId: string) {
+    this.accountId = accountId;
+  }
 }

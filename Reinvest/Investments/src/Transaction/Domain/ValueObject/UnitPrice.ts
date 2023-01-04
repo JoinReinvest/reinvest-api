@@ -1,17 +1,17 @@
-import {Money} from "../../../Commons/Money";
+import { Money } from "../../../Commons/Money";
 
 export class UnitPrice {
-    private readonly _unitPrice: Money;
+  private readonly _unitPrice: Money;
 
-    constructor(unitPrice: Money) {
-        this._unitPrice = unitPrice;
-    }
+  constructor(unitPrice: Money) {
+    this._unitPrice = unitPrice;
+  }
 
-    get unitPrice(): Money {
-        return this._unitPrice;
-    }
+  get unitPrice(): Money {
+    return this._unitPrice;
+  }
 
-    static fromMoney(value: Money) {
-        return new UnitPrice(value);
-    }
+  static fromMoney(value: Money) {
+    return new UnitPrice(value);
+  }
 }

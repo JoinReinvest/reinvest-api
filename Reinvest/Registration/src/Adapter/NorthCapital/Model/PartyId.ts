@@ -1,3 +1,1 @@
-export class PartyId {
-
-}
+export class PartyId {}

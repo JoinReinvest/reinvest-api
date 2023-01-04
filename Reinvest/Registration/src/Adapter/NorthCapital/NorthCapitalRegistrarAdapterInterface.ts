@@ -1,18 +1,18 @@
-import {Party} from "./Model/Party";
-import {PartyId} from "./Model/PartyId";
-import {EntityId} from "./Model/EntityId";
-import {Entity} from "./Model/Entity";
-import {Path} from "../../Common/Model/TypeValidators";
+import { Path } from "../../Common/Model/TypeValidators";
+import { Entity } from "./Model/Entity";
+import { EntityId } from "./Model/EntityId";
+import { Party } from "./Model/Party";
+import { PartyId } from "./Model/PartyId";
 
 export interface NorthCapitalRegistrarAdapterInterface {
-    createParty(party: Party): PartyId;
+  attachDocumentToEntity(path: Path, entityId: EntityId): void;
 
-    createEntity(entity: Entity): EntityId;
+  attachDocumentToParty(path: Path, partyId: PartyId): void;
 
-    attachDocumentToParty(path: Path, partyId: PartyId): void;
+  // it creates a mapping in the REIT db and uses it later to link with NC account
+  attachPartyToEntity(partyId: PartyId, entityId: EntityId): void;
 
-    attachDocumentToEntity(path: Path, entityId: EntityId): void;
+  createEntity(entity: Entity): EntityId;
 
-    // it creates a mapping in the REIT db and uses it later to link with NC account
-    attachPartyToEntity(partyId: PartyId, entityId: EntityId): void;
+  createParty(party: Party): PartyId;
 }

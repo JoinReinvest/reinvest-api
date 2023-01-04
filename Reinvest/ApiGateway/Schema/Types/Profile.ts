@@ -1,4 +1,4 @@
-import {InvestmentAccounts} from "Reinvest/InvestmentAccounts";
+import { InvestmentAccounts } from "Reinvest/InvestmentAccounts";
 
 const schema = `
     #graphql
@@ -22,30 +22,33 @@ const schema = `
 `;
 
 const queries = {
-// @ts-ignore
-    getProfileByUserId: (parent, {userId}, context) => {
-        const module = context.modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Module;
-        const resolvers = module.api();
+  // @ts-ignore
+  getProfileByUserId: (parent, { userId }, context) => {
+    const module = context.modules.get(
+      InvestmentAccounts.moduleName
+    ) as InvestmentAccounts.Module;
+    const resolvers = module.api();
 
-        return resolvers.getProfileByUser(userId);
-    },
-}
+    return resolvers.getProfileByUser(userId);
+  },
+};
 
 const mutations = {
-// @ts-ignore
-    createProfile: (parent, {userId}, context) => {
-        //context.lambdaEvent.requestContext.authorizer
-        const module = context.modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Module;
-        const resolvers = module.api();
-        resolvers.createProfile(userId);
+  // @ts-ignore
+  createProfile: (parent, { userId }, context) => {
+    //context.lambdaEvent.requestContext.authorizer
+    const module = context.modules.get(
+      InvestmentAccounts.moduleName
+    ) as InvestmentAccounts.Module;
+    const resolvers = module.api();
+    resolvers.createProfile(userId);
 
-        return resolvers.getProfileByUser(userId);
-    },
-
-}
+    return resolvers.getProfileByUser(userId);
+  },
+};
 
 export const Profile = {
-    schema,
-    queries,
-    mutations,
+  schema,
+  queries,
+  mutations,
 };

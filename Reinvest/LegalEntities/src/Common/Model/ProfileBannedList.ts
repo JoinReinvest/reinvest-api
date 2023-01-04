@@ -1,5 +1,3 @@
-import {BannedList} from "./ValueObject/BannedList";
+import { BannedList } from "./ValueObject/BannedList";
 
-export class ProfileBannedList extends BannedList {
-
-}
+export class ProfileBannedList extends BannedList {}

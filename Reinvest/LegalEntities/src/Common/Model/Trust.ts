@@ -1,10 +1,6 @@
-import {Company} from "./ValueObject/Company";
-import {Person} from "./ValueObject/Person";
+import { Company } from "./ValueObject/Company";
+import { Person } from "./ValueObject/Person";
 
-export class Trustee extends Person {
+export class Trustee extends Person {}
 
-}
-
-export class Trust extends Company {
-
-}
+export class Trust extends Company {}

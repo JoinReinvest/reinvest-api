@@ -4,7 +4,7 @@
   "description": "ReInvest API",
   "main": "Reinvest/index.ts",
   "scripts": {
-    "lint": "eslint ./Reinvest ./serverless.ts devops --ext .ts",
+    "lint": "eslint ./Reinvest ./serverless.ts devops --ext .ts --config ./eslintrc.json",
     "lint:fix": "yarn lint --fix",
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",

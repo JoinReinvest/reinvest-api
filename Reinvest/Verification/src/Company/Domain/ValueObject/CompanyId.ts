@@ -1,5 +1,3 @@
-import {Id} from "../../../Common/Domain/ValueObject/Id";
+import { Id } from "../../../Common/Domain/ValueObject/Id";
 
-export class CompanyId extends Id {
-
-}
+export class CompanyId extends Id {}

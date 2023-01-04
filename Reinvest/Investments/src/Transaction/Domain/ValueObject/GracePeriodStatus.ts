@@ -1,4 +1,4 @@
 export enum GracePeriodStatus {
-    Ongoing,
-    Ended
+  Ongoing,
+  Ended,
 }

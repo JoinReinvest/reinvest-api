@@ -1,10 +1,5 @@
-import {Uuid} from "./TypeValidators";
+import { Uuid } from "./TypeValidators";
 
-export class Id extends Uuid {
+export class Id extends Uuid {}
 
-}
-
-
-export class ProfileId extends Uuid {
-
-}
+export class ProfileId extends Uuid {}

@@ -1,6 +1,5 @@
-import {PersonVerification} from "../PersonVerification";
+import { PersonVerification } from "../PersonVerification";
 
 export interface PersonVerificationRepositoryInterface {
-
-    save(personVerifications: PersonVerification[]): void;
+  save(personVerifications: PersonVerification[]): void;
 }

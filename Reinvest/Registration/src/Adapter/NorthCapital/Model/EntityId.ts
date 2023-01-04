@@ -1,3 +1,1 @@
-export class EntityId {
-
-}
+export class EntityId {}

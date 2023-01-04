@@ -1,9 +1,7 @@
 export class PortfolioId {
-    private portfolioId: string;
+  private portfolioId: string;
 
-    constructor(portfolioId: string) {
-        this.portfolioId = portfolioId;
-
-    }
-
+  constructor(portfolioId: string) {
+    this.portfolioId = portfolioId;
+  }
 }

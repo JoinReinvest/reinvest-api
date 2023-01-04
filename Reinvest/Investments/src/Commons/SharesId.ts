@@ -1,8 +1,7 @@
 export class SharesId {
-    private sharesId: string;
+  private sharesId: string;
 
-    constructor(sharesId: string) {
-        this.sharesId = sharesId;
-
-    }
+  constructor(sharesId: string) {
+    this.sharesId = sharesId;
+  }
 }

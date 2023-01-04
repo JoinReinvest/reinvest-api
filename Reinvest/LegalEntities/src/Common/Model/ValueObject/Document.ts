@@ -1,36 +1,32 @@
-import {NonEmptyString} from "./TypeValidators";
-import {Id} from "./Id";
+import { Id } from "./Id";
+import { NonEmptyString } from "./TypeValidators";
 
-export class Path extends NonEmptyString {
-
-}
+export class Path extends NonEmptyString {}
 
 export enum DocumentType {
-    ID,
-    Corporate,
-    Other
+  ID,
+  Corporate,
+  Other,
 }
 
 export class Document {
-    private id: Id;
-    private path: Path;
-    private type: DocumentType;
+  private id: Id;
+  private path: Path;
+  private type: DocumentType;
 
-    constructor(id: Id, path: Path, type: DocumentType) {
-        this.id = id;
-        this.path = path;
-        this.type = type;
-    }
+  constructor(id: Id, path: Path, type: DocumentType) {
+    this.id = id;
+    this.path = path;
+    this.type = type;
+  }
 }
 
 export class Documents {
-    private documents: Document[];
+  private documents: Document[];
 
-    constructor(documents: Document[]) {
-        this.documents = documents;
-    }
+  constructor(documents: Document[]) {
+    this.documents = documents;
+  }
 }
 
-export class IdentityDocument extends Document {
-
-}
+export class IdentityDocument extends Document {}

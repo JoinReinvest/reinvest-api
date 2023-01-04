@@ -1,3 +1,1 @@
-export class InvestorId {
-
-}
+export class InvestorId {}

@@ -1,3 +1,1 @@
-export class Party {
-
-}
+export class Party {}

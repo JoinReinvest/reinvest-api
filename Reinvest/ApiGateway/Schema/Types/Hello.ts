@@ -6,5 +6,5 @@ const schema = `
 `;
 
 export const Hello = {
-    schema,
-}
+  schema,
+};

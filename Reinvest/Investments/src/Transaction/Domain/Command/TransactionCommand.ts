@@ -1,3 +1,3 @@
 export interface TransactionCommand {
-    transactionCommandGuard: boolean;
+  transactionCommandGuard: boolean;
 }

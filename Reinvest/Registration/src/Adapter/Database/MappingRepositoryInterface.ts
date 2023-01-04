@@ -1,17 +1,26 @@
-import {PartyId} from "../NorthCapital/Model/PartyId";
-import {Result} from "../../Common/Result";
-import {EntityId} from "../NorthCapital/Model/EntityId";
-import {CompanyId, InvestingAccountId, StakeholderId} from "../../Common/Model/Id";
-import {AccountId} from "../NorthCapital/Model/AccountId";
-import {InvestorId} from "../Vertalo/Model/InvestorId";
+import {
+  CompanyId,
+  InvestingAccountId,
+  StakeholderId,
+} from "../../Common/Model/Id";
+import { Result } from "../../Common/Result";
+import { AccountId } from "../NorthCapital/Model/AccountId";
+import { EntityId } from "../NorthCapital/Model/EntityId";
+import { PartyId } from "../NorthCapital/Model/PartyId";
+import { InvestorId } from "../Vertalo/Model/InvestorId";
 
 export interface MappingRepositoryInterface {
+  mapCompanyToEntity(companyId: CompanyId, entityId: EntityId): Result;
 
-    mapStakeholderToParty(stakeholderId: StakeholderId, partyId: PartyId): Result;
+  mapInvestingAccountToInvestor(
+    investingAccountId: InvestingAccountId,
+    investorId: InvestorId
+  ): Result;
 
-    mapCompanyToEntity(companyId: CompanyId, entityId: EntityId): Result;
+  mapInvestingAccountToNCAccount(
+    investingAccountId: InvestingAccountId,
+    accountId: AccountId
+  ): Result;
 
-    mapInvestingAccountToNCAccount(investingAccountId: InvestingAccountId, accountId: AccountId): Result;
-
-    mapInvestingAccountToInvestor(investingAccountId: InvestingAccountId, investorId: InvestorId): Result;
+  mapStakeholderToParty(stakeholderId: StakeholderId, partyId: PartyId): Result;
 }
