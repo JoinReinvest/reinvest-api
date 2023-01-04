@@ -1,19 +1,6 @@
-import {Investments} from "Investments/src/bootstrap"
-import {InvestmentAccounts} from "Reinvest/InvestmentAccounts/bootstrap";
-
-export class Modules {
-    private modules = {};
-
-    register<Module>(moduleName: string, module: Module): void {
-        // @ts-ignore
-        this.modules[moduleName] = module;
-    }
-
-    get<Module>(moduleName: string): Module {
-        // @ts-ignore
-        return this.modules[moduleName];
-    }
-}
+import {Investments} from "Reinvest/Investments/src/bootstrap"
+import {InvestmentAccounts} from "Reinvest/InvestmentAccounts";
+import Modules from "Reinvest/Modules";
 
 export function boot(): Modules {
     const modules = new Modules();

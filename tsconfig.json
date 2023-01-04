@@ -8,8 +8,8 @@
     "strict": true,
     "paths": {
       "Reinvest/*": ["./*"],
-      "SimpleAggregator/*": ["../shared/SimpleAggregator/*"],
-      "Container/*": ["../shared/Container/*"]
+      "SimpleAggregator/*": ["../shared/hkek-simple-aggregator/*"],
+      "Container/*": ["../shared/hkek-container/*"]
     },
     "typeRoots": [
       "./node_modules/@types",

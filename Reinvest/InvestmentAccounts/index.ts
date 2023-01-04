@@ -36,8 +36,8 @@ export namespace InvestmentAccounts {
         api() {
             this.boot();
             return {
-                createProfileResolver: (userId: string) => createProfileResolver(this.container, userId),
-                getProfileByUserResolver: (userId: string) => getProfileByUserResolver(this.container, userId),
+                createProfile: (userId: string) => createProfileResolver(this.container, userId),
+                getProfileByUser: (userId: string) => getProfileByUserResolver(this.container, userId),
             }
         }
     }
@@ -45,12 +45,4 @@ export namespace InvestmentAccounts {
     export function create(config: InvestmentAccounts.Config) {
         return new InvestmentAccounts.Module(config);
     }
-
-    // export function getContainer(rootContainer: ContainerInterface): ContainerInterface {
-    //     return rootContainer.getValue(InvestmentAccounts.containerToken) as ContainerInterface;
-    // }
-    //
-    // export function setContainer(rootContainer: ContainerInterface, container: ContainerInterface): void {
-    //     rootContainer.addAsValue(InvestmentAccounts.containerToken, container);
-    // }
 }

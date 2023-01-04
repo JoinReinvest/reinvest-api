@@ -1,4 +1,4 @@
-import {InvestmentAccounts} from "Reinvest/InvestmentAccounts/bootstrap";
+import {InvestmentAccounts} from "Reinvest/InvestmentAccounts";
 
 const schema = `
     #graphql
@@ -22,21 +22,24 @@ const schema = `
 `;
 
 const queries = {
+// @ts-ignore
     getProfileByUserId: (parent, {userId}, context) => {
         const module = context.modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Module;
         const resolvers = module.api();
 
-        return resolvers.getProfileByUserResolver(userId);
+        return resolvers.getProfileByUser(userId);
     },
 }
 
 const mutations = {
+// @ts-ignore
     createProfile: (parent, {userId}, context) => {
+        //context.lambdaEvent.requestContext.authorizer
         const module = context.modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Module;
         const resolvers = module.api();
-        resolvers.createProfileResolver(userId);
+        resolvers.createProfile(userId);
 
-        return resolvers.getProfileByUserResolver(userId);
+        return resolvers.getProfileByUser(userId);
     },
 
 }
@@ -46,25 +49,3 @@ export const Profile = {
     queries,
     mutations,
 };
-
-//
-// const resolvers = {
-//     Query: {
-//         hello: (parent, args, contextValue, info) => {
-//             console.log(contextValue.lambdaEvent.requestContext.authorizer);
-//
-//             return 'this is test';
-//         }
-//     },
-//     Mutation: {
-//         login: (parent, args, context) => {
-//             console.log({parent, args, context});
-//             return {
-//                 ID: 'uuid',
-//                 name: args.email,
-//                 surname: 'kowalski',
-//                 address: 'Factory street'
-//             }
-//         },
-//     },
-// };

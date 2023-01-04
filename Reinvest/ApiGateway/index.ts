@@ -7,8 +7,8 @@ import {S3Client, GetObjectCommand, PutObjectCommand, PutObjectCommandInput} fro
 
 import {ApolloServer} from '@apollo/server';
 import {startServerAndCreateLambdaHandler} from '@as-integrations/aws-lambda';
-import {boot} from "../bootstrap";
 import Schema from './Schema';
+import Modules from "Reinvest/Modules";
 
 
 const server = new ApolloServer({
@@ -21,10 +21,10 @@ const server = new ApolloServer({
 });
 
 
-export const app = startServerAndCreateLambdaHandler(server, {
+export const app = (modules: Modules) => startServerAndCreateLambdaHandler(server, {
+// @ts-ignore
     context: async ({event, context}) => {
         try {
-            const modules = boot();
 
             // throw new GraphQLError('User is not authenticated', {
             //     extensions: {
