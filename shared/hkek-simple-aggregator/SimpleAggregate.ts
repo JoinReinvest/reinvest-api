@@ -33,7 +33,7 @@ export class SimpleAggregate implements Aggregate {
     }
 
     // event apply
-    public apply<Event>(event: DomainEvent): Event {
+    public apply<Event extends DomainEvent>(event: Event): Event {
         if (!('state' in this.aggregate)) {
             this.aggregate.state = {};
         }
@@ -44,9 +44,9 @@ export class SimpleAggregate implements Aggregate {
     }
 
     public getSnapshot(): AggregateState {
-        const aggregate = {...this.aggregate};
+        // const aggregate = {...this.aggregate};
 
-        aggregate.state = JSON.stringify(aggregate.state);
-        return aggregate;
+        // aggregate.state = JSON.stringify(aggregate.state);
+        return {...this.aggregate};
     }
 }

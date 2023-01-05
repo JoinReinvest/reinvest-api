@@ -1,4 +1,4 @@
-# Architecture Decision Record for Registration Module
+# Architecture Decision Record for Registration Main
 
 ## Registration responsibilities:
 

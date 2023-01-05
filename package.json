@@ -15,6 +15,7 @@
     "deploy:production": "NODE_ENV=production serverless deploy -s production",
     "destroy:production": "NODE_ENV=production serverless remove -s production",
     "logs:api": "sls logs -s staging -f api -t",
+    "local:server": "docker-compose -f docker-compose.yml up",
     "local": "serverless offline start -s staging --noAuth --reloadHandler",
     "db:migrate": "esbuild --bundle --target=node16 --platform=node ./Reinvest/migration.ts > migration.js && node migration.js",
     "db:clean": "rm migration.js",

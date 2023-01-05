@@ -16,15 +16,16 @@ import {
 import { RdsResources } from "./devops/serverless/rds";
 import { S3Resources } from "./devops/serverless/s3";
 import { VpcResources } from "./devops/serverless/vpc";
+import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-config";
 
 const serverlessConfiguration: AWS = {
   service: "${env:APPLICATION_NAME}",
   frameworkVersion: "3",
   useDotenv: true,
   plugins: [
-    "serverless-offline-sqs",
     "serverless-esbuild",
     "serverless-stack-termination-protection",
+    "serverless-offline-sqs",
     "serverless-offline",
     "serverless-offline-watcher",
   ], //  'serverless-domain-manager'
@@ -59,6 +60,7 @@ const serverlessConfiguration: AWS = {
   functions: {
     api: ApiLambdaFunction,
     explorer: ExplorerLambdaFunction,
+    queue: QueueFunction,
   },
   resources: {
     Resources: {
@@ -69,6 +71,7 @@ const serverlessConfiguration: AWS = {
       ...ApiLambdaResources,
       ...ExplorerLambdaResources,
       ...BastionResources,
+      ...QueueResources,
     },
   },
   package: { individually: true },
@@ -84,6 +87,12 @@ const serverlessConfiguration: AWS = {
       outputBuildFolder: "build",
       concurrency: 10,
       packager: "yarn",
+    },
+    'serverless-offline-sqs': {
+      autoCreate: true,
+      apiVersion: '2012-11-05',
+      region: '${aws:region}',
+      endpoint: 'http://0.0.0.0:9324',
     },
     bundle: {
       ignorePackages: ['pg-native'],

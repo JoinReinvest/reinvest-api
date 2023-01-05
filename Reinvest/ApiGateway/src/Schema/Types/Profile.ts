@@ -26,7 +26,7 @@ const queries = {
     getProfileByUserId: async (parent, {userId}, context) => {
         const module = context.modules.get(
             InvestmentAccounts.moduleName
-        ) as InvestmentAccounts.Module;
+        ) as InvestmentAccounts.Main;
         const resolvers = module.api();
 
         return await resolvers.getProfileByUser(userId);
@@ -39,7 +39,7 @@ const mutations = {
         //context.lambdaEvent.requestContext.authorizer
         const module = context.modules.get(
             InvestmentAccounts.moduleName
-        ) as InvestmentAccounts.Module;
+        ) as InvestmentAccounts.Main;
         const resolvers = module.api();
         await resolvers.createProfile(userId);
 

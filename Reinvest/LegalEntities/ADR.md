@@ -1,4 +1,4 @@
-# Architecture Decision Record for Legal Entities Module
+# Architecture Decision Record for Legal Entities Main
 
 ## Application Architecture decision
 

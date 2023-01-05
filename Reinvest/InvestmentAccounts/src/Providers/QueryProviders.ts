@@ -1,8 +1,8 @@
 import { ContainerInterface } from "Container/Container";
 import { InvestmentAccounts } from "InvestmentAccounts/index";
-import ProfileQuery, {
+import ProfileQueryService, {
   QueryProfileRepository,
-} from "InvestmentAccounts/ProfileQuery";
+} from "InvestmentAccounts/ProfileQueryService";
 
 export default class QueryProviders {
   private config: InvestmentAccounts.Config;
@@ -14,6 +14,6 @@ export default class QueryProviders {
   public boot(container: ContainerInterface) {
     container
       .addClass(QueryProfileRepository)
-      .addClass(ProfileQuery, [QueryProfileRepository.toString()]);
+      .addClass(ProfileQueryService, [QueryProfileRepository.toString()]);
   }
 }

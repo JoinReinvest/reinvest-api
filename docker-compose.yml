@@ -20,3 +20,9 @@ services:
       - postgresqldata:/var/lib/postgresql/data
 #        logging:
 #          driver: none
+
+  elasticmq:
+    image: 'softwaremill/elasticmq'
+    ports:
+      - 9324:9324
+      - 9325:9325

@@ -1,7 +1,7 @@
 import {AggregateState, DomainEvent} from "./Types";
 
 export default interface Aggregate {
-    apply<Event>(event: DomainEvent): Event;
+    apply<Event extends DomainEvent>(event: Event): Event;
 
     getSnapshot(): AggregateState;
 }

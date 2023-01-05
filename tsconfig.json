@@ -11,6 +11,8 @@
       "PostgreSQL/*": ["../shared/hkek-postgresql/*"],
       "SimpleAggregator/*": ["../shared/hkek-simple-aggregator/*"],
       "Container/*": ["../shared/hkek-container/*"],
+      "TechnicalEvents/*": ["../shared/hkek-technical-events/*"],
+
       "ApiGateway/*": ["./ApiGateway/src/*"],
       "InvestmentAccounts/*": ["./InvestmentAccounts/src/*"]
     },

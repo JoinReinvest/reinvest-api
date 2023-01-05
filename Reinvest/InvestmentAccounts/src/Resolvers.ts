@@ -1,5 +1,5 @@
 import { ContainerInterface } from "Container/Container";
-import ProfileQuery from "InvestmentAccounts/ProfileQuery";
+import ProfileQueryService from "InvestmentAccounts/ProfileQueryService";
 import ProfileService from "InvestmentAccounts/ProfileService";
 
 export async function createProfileResolver(
@@ -11,8 +11,8 @@ export async function createProfileResolver(
   await profileService.create(userId);
 }
 
-export async function getProfileByUserResolver(container: any, userId: string): any {
-  const profileQuery = container.getClass(ProfileQuery) as ProfileQuery;
+export async function getProfileByUserResolver(container: any, userId: string): Promise<any> {
+  const profileQuery = container.getClass(ProfileQueryService) as ProfileQueryService;
 
   return await profileQuery.getProfileByUserId(userId);
 }

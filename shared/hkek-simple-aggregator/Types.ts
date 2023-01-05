@@ -7,8 +7,6 @@ export type AggregateState = {
     state?: any,
 }
 
-export type Uninitialized = null;
-
 export type DomainEvent = {
     id: string;
     kind: string,

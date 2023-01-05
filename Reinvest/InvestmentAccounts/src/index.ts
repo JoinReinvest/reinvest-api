@@ -8,6 +8,8 @@ import {
 import ServiceProviders from "InvestmentAccounts/Providers/ServiceProviders";
 import {DbProvider} from "InvestmentAccounts/Storage/DatabaseAdapter";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
+import EventBusProvider from "InvestmentAccounts/Providers/EventBusProvider";
+import {Module} from "Reinvest/Modules";
 
 export namespace InvestmentAccounts {
     export const moduleName = "InvestmentAccounts";
@@ -17,7 +19,11 @@ export namespace InvestmentAccounts {
         };
     };
 
-    export class Module {
+    export const technicalEventHandler = { // todo move to other files + add DI
+        ProfileCreated: async (event: any) => console.log({eventInModuleHandler: event}),
+    };
+
+    export class Main implements Module {
         private readonly config: InvestmentAccounts.Config;
         private readonly container: ContainerInterface;
         private booted = false;
@@ -32,6 +38,7 @@ export namespace InvestmentAccounts {
                 return;
             }
 
+            new EventBusProvider(this.config).boot(this.container);
             new ServiceProviders(this.config).boot(this.container);
             new QueryProviders(this.config).boot(this.container);
 
@@ -41,11 +48,19 @@ export namespace InvestmentAccounts {
         // public module API
         api() {
             this.boot();
-
-            return {
+            return { // move to other file + add DI
                 createProfile: async (userId: string) => await createProfileResolver(this.container, userId),
                 getProfileByUser: async (userId: string) => await getProfileByUserResolver(this.container, userId),
             };
+        }
+
+        isHandleEvent(kind: string): boolean {
+            return kind in technicalEventHandler;
+        }
+
+        technicalEventHandler() {
+            this.boot();
+            return technicalEventHandler;
         }
 
         migration(): MigrationManager {
@@ -60,6 +75,6 @@ export namespace InvestmentAccounts {
     }
 
     export function create(config: InvestmentAccounts.Config) {
-        return new InvestmentAccounts.Module(config);
+        return new InvestmentAccounts.Main(config);
     }
 }

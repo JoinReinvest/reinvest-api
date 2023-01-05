@@ -1,4 +1,4 @@
-# Architecture Decision Record for Verification Module
+# Architecture Decision Record for Verification Main
 
 ## Verification responsibilities:
 

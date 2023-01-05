@@ -22,7 +22,7 @@ class Profile extends SimpleAggregate {
     }
 
     public initialize(userId: string): ProfileCreated {
-        const profileCreated = {
+        const profileCreated = <ProfileCreated>{
             id: this.getId(),
             kind: "ProfileCreated",
             data: {
