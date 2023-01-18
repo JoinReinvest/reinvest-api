@@ -17,6 +17,12 @@ export const ExplorerLambdaFunction = {
         path: "/explorer",
       },
     },
+    {
+      httpApi: {
+        method: "GET",
+        path: "/set-header",
+      },
+    },
   ],
 };
 

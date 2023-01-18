@@ -1,5 +1,5 @@
 import { CloudwatchPolicies } from "../../serverless/cloudwatch";
-import { CognitoAuthorizerName } from "../../serverless/cognito";
+import {CognitoAuthorizer, CognitoAuthorizerName} from "../../serverless/cognito";
 import { S3Policies } from "../../serverless/s3";
 import { getAttribute, getResourceName } from "../../serverless/utils";
 import {
@@ -22,7 +22,7 @@ export const ApiLambdaFunction = {
         method: "POST",
         path: "/api",
         authorizer: {
-          name: CognitoAuthorizerName,
+          name: process.env.NODE_ENV === 'local' ?  "LocalAuthorizer" : "CognitoAuthorizer",
         },
       },
     },

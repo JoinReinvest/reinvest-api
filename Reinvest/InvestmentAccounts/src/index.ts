@@ -20,7 +20,7 @@ export namespace InvestmentAccounts {
     };
 
     export const technicalEventHandler = { // todo move to other files + add DI
-        ProfileCreated: async (event: any) => console.log({eventInModuleHandler: event}),
+        // ProfileCreated: async (event: any) => console.log({eventInModuleHandler: event}),
     };
 
     export class Main implements Module {
@@ -63,7 +63,7 @@ export namespace InvestmentAccounts {
             return technicalEventHandler;
         }
 
-        migration(): MigrationManager {
+        migration(): MigrationManager | never {
             this.boot();
 
             const migrations = require('../migrations');

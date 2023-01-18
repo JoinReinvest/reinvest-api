@@ -12,6 +12,7 @@ import express, { Express, Request, Response } from "express";
 import Modules from "Reinvest/Modules";
 
 import Schema from "ApiGateway/Schema";
+import {GraphQLError} from "graphql";
 
 const server = new ApolloServer({
   schema: Schema,
@@ -23,21 +24,23 @@ const server = new ApolloServer({
   },
 });
 
-export const app = (modules: Modules) =>
-  startServerAndCreateLambdaHandler(server, {
+export const app = (modules: Modules) => {
+  return startServerAndCreateLambdaHandler(server, {
     // @ts-ignore
-    context: async ({ event, context }) => {
+    context: async ({event, context}) => {
       try {
-        // throw new GraphQLError('User is not authenticated', {
-        //     extensions: {
-        //         code: 'UNAUTHENTICATED',
-        //         http: { status: 401 },
-        //     },
-        // });
+
+        if (!event.requestContext.authorizer.jwt.claims.sub) {
+          throw new GraphQLError('User is not authenticated', {
+            extensions: {
+              code: 'UNAUTHENTICATED',
+              http: {status: 401},
+            },
+          });
+        }
 
         return {
-          lambdaEvent: event,
-          lambdaContext: context,
+          userId: event.requestContext.authorizer.jwt.claims.sub,
           modules,
         };
       } catch (error: any) {
@@ -45,7 +48,8 @@ export const app = (modules: Modules) =>
       }
     },
   });
-// export const app: Express = express();
+};
+// export const app: Express = express();.aut
 //
 //
 // app.get('/', async (req: Request, res: Response) => {

@@ -3,6 +3,8 @@ version: '3'
 volumes:
   postgresqldata:
     driver: local
+#  cognitodata:
+#    driver: local
 
 
 services:
@@ -26,3 +28,10 @@ services:
     ports:
       - 9324:9324
       - 9325:9325
+
+#  cognito:
+#    image: 'jagregory/cognito-local:latest'
+#    ports:
+#      - 9229:9229
+#    volumes:
+#      - cognitodata:/app/.cognito

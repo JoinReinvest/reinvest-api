@@ -1,4 +1,5 @@
 import { GraphQLError, GraphQLScalarType, Kind } from "graphql";
+import {makeExecutableSchema} from "@graphql-tools/schema";
 
 const EmailAddressSchema = `
     #graphql
@@ -19,8 +20,15 @@ const EmailAddressResolver = new GraphQLScalarType({
   },
 });
 
+// export const EmailAddress = {
+//   schema: EmailAddressSchema,
+//   resolvers: {
+//     EmailAddress: EmailAddressResolver,
+//   },
+// };
+
 export const EmailAddress = {
-  schema: EmailAddressSchema,
+  typeDefs: EmailAddressSchema,
   resolvers: {
     EmailAddress: EmailAddressResolver,
   },

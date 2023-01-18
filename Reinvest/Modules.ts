@@ -7,7 +7,7 @@ export interface Module {
 
     technicalEventHandler(): { [eventKind: string]: Function }
 
-    migration(): MigrationManager
+    migration(): MigrationManager | never
 }
 
 export default class Modules {
