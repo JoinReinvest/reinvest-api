@@ -49,7 +49,7 @@ export namespace InvestmentAccounts {
         api() {
             this.boot();
             return { // move to other file + add DI
-                createProfile: async (userId: string) => await createProfileResolver(this.container, userId),
+                createProfile: async (userId: string, email: string) => await createProfileResolver(this.container, userId, email),
                 getProfileByUser: async (userId: string) => await getProfileByUserResolver(this.container, userId),
             };
         }

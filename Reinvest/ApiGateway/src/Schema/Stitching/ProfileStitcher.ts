@@ -9,7 +9,7 @@ const extendedProfile = `
     }
 `;
 
-export const stitchWithProfile = (rootSchema: GraphQLSchema) => stitchSchemas({
+export const ProfileStitcher = (rootSchema: GraphQLSchema) => stitchSchemas({
     subschemas: [rootSchema],
     typeDefs: extendedProfile,
     resolvers: {
@@ -18,6 +18,11 @@ export const stitchWithProfile = (rootSchema: GraphQLSchema) => stitchSchemas({
                 selectionSet: `{ id }`,
                 resolve(parent: any, args: any, context: any, info: any) {
                     const profileId: string = parent.id
+                    // return {
+                    //     id: 'xxxyz',
+                    //     firstName: `${profileId}-xx`,
+                    //     lastName: JSON.stringify(args)
+                    // } // direct return instead of schema delegation
                     return delegateToSchema({
                         schema: rootSchema,
                         operation: OperationTypeNode.QUERY,

@@ -1,53 +1,55 @@
-import { ApolloServer } from "@apollo/server";
-import { startServerAndCreateLambdaHandler } from "@as-integrations/aws-lambda";
+import {ApolloServer} from "@apollo/server";
+import {startServerAndCreateLambdaHandler} from "@as-integrations/aws-lambda";
 import {
-  GetObjectCommand,
-  PutObjectCommand,
-  PutObjectCommandInput,
-  S3Client,
+    GetObjectCommand,
+    PutObjectCommand,
+    PutObjectCommandInput,
+    S3Client,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import axios, { AxiosResponse } from "axios";
-import express, { Express, Request, Response } from "express";
+import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
+import axios, {AxiosResponse} from "axios";
+import express, {Express, Request, Response} from "express";
 import Modules from "Reinvest/Modules";
 
 import Schema from "ApiGateway/Schema";
 import {GraphQLError} from "graphql";
+import {Identity} from "Reinvest/Identity/src";
 
 const server = new ApolloServer({
-  schema: Schema,
-  includeStacktraceInErrorResponses: true, // todo this should be debug flag
-  formatError: (err) => {
-    console.error(err);
+    schema: Schema,
+    includeStacktraceInErrorResponses: true, // todo this should be debug flag
+    formatError: (err) => {
+        console.error(err);
 
-    return err;
-  },
+        return err;
+    },
 });
 
 export const app = (modules: Modules) => {
-  return startServerAndCreateLambdaHandler(server, {
-    // @ts-ignore
-    context: async ({event, context}) => {
-      try {
+    return startServerAndCreateLambdaHandler(server, {
+        // @ts-ignore
+        context: async ({event, context}) => {
+            try {
+                if (!event.requestContext.authorizer.jwt.claims.sub) {
+                    throw new GraphQLError('User is not authenticated', {
+                        extensions: {
+                            code: 'UNAUTHENTICATED',
+                            http: {status: 401},
+                        },
+                    });
+                }
+                const userId = event.requestContext.authorizer.jwt.claims.sub;
+                const profileId = modules.get(Identity.moduleName).api().getProfile(userId);
 
-        if (!event.requestContext.authorizer.jwt.claims.sub) {
-          throw new GraphQLError('User is not authenticated', {
-            extensions: {
-              code: 'UNAUTHENTICATED',
-              http: {status: 401},
-            },
-          });
-        }
-
-        return {
-          userId: event.requestContext.authorizer.jwt.claims.sub,
-          modules,
-        };
-      } catch (error: any) {
-        console.log(error);
-      }
-    },
-  });
+                return {
+                    profileId,
+                    modules,
+                };
+            } catch (error: any) {
+                console.log(error);
+            }
+        },
+    });
 };
 // export const app: Express = express();.aut
 //

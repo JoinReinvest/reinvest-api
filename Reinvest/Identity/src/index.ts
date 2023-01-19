@@ -36,6 +36,8 @@ export namespace Identity {
         api() {
             this.boot();
             return { // move to other file + add DI
+                registerUser: (userId: string, profileId: string) => {},
+                getProfile: (userId: string) => '27fad77f-f160-44a8-8611-b19f6e76a253'
             };
         }
 

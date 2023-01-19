@@ -237,3 +237,4 @@ export const CognitoAuthorizer = {
 };
 
 export const CognitoAuthorizerName = "CognitoAuthorizer";
+export const CognitoUserPoolArn = getAttribute("CognitoUserPool", 'Arn');

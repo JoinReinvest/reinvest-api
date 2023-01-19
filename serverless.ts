@@ -17,6 +17,7 @@ import {RdsResources} from "./devops/serverless/rds";
 import {S3Resources} from "./devops/serverless/s3";
 import {VpcResources} from "./devops/serverless/vpc";
 import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-config";
+import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
 
 const serverlessConfiguration: AWS = {
     service: "${env:APPLICATION_NAME}",
@@ -63,11 +64,13 @@ const serverlessConfiguration: AWS = {
         api: ApiLambdaFunction,
         explorer: ExplorerLambdaFunction,
         queue: QueueFunction,
+        cognitoPostSignUpFunction,
     },
     resources: {
         Resources: {
             ...VpcResources,
             ...CognitoResources,
+            ...CognitoPostSignUpResources,
             ...RdsResources,
             ...S3Resources,
             ...ApiLambdaResources,

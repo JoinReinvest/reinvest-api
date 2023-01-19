@@ -10,18 +10,44 @@ const schema = `
     }
 
     type Query {
-        getIndividual(profileId: String): Individual
+        getIndividual: Individual
+    }
+
+    type Mutation {
+        setIndividual(
+            firstName: String
+            middleName: String
+            lastName: String
+        ): Individual
     }
 
 `;
 
 const resolvers = {
+    // Individual: (parent, args, {profileId}) => ({
+    //     id: 'xxx',
+    //     firstName: `${profileId}-xx`,
+    //     lastName: JSON.stringify(args)
+    // }),
     Query: {
-        getIndividual: (parent, {profileId}) => ({
+        getIndividual: (parent, args, {profileId}) => ({
             id: 'xxx',
             firstName: `${profileId}-xx`,
-            lastName: "this is the last name"
+            lastName: JSON.stringify(args)
         })
+    },
+    Mutation: {
+        setIndividual: (parent, {
+            firstName,
+            middleName,
+            lastName,
+        }) => {
+            return {
+                firstName,
+                middleName,
+                lastName,
+            }
+        }
     }
 };
 

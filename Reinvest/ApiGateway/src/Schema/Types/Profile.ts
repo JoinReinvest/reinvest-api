@@ -1,94 +1,70 @@
 import {InvestmentAccounts} from "InvestmentAccounts/index";
-import {makeExecutableSchema} from "@graphql-tools/schema";
-import {EmailAddress} from "ApiGateway/Schema/Scalars/EmailAddress";
-import {mergeTypeDefs} from "@graphql-tools/merge";
 
 const schema = `
     #graphql
+    """
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+    when an unknown printer took a galley of type and scrambled it to make a 
+    type specimen book. It has survived not only five centuries
+    """
     type Profile {
         "Profile Id"
         id: ID!
         "The name of user"
         email: EmailAddress
-        "The Id of the Cognito User"
-        userId: String
         avatarUrl: String
     }
 
+    input ProfileDetailsInput {
+        firstName: String
+        middleName: String
+        lastName: String
+    }
+    
     type Query {
         getProfile: Profile
     }
 
     type Mutation {
-        completeProfileDetails(
-            firstName: String
-            lastName: String
-            middleName: String
-        ): Profile
+        completeProfileDetails(input: ProfileDetailsInput): Profile
     }
 `;
-/**
- *     type Query {
- *         getProfile: Profile
- *     }
- */
-const resolvers = {
-    Query: {
-        getProfile: () => ({
-            id: '1234132-12341-52agf-afgfag',
-            userId: 'this is test-user - id',
-            email: 'lukasz@xyz.pl',
-            avatarUrl: "http://some.com"
-        })
-    },
-    Mutation: {
-        completeProfileDetails: async (parent, {
-            firstName,
-            middleName,
-            lastName
-        }, {userId, modules}) => {
-            //context.lambdaEvent.requestContext.authorizer
-            const module = modules.get(
-                InvestmentAccounts.moduleName
-            ) as InvestmentAccounts.Main;
-            const resolvers = module.api();
-            await resolvers.createProfile(userId);
-
-            return await resolvers.getProfileByUser(userId);
-        },
-    }
-}
-const queries = {
-    // @ts-ignore
-    // getProfileByUserId: async (parent, {userId}, context) => {
-    //     const module = context.modules.get(
-    //         InvestmentAccounts.moduleName
-    //     ) as InvestmentAccounts.Main;
-    //     const resolvers = module.api();
-    //
-    //     return await resolvers.getProfileByUser(userId);
-    // },
-};
-
-// const mutations = {
-//     // @ts-ignore
-//     completeProfileDetails: async (parent, {
-//         firstName,
-//         middleName,
-//         lastName
-//     }, {userId, modules}) => {
-//         //context.lambdaEvent.requestContext.authorizer
-//         const module = modules.get(
-//             InvestmentAccounts.moduleName
-//         ) as InvestmentAccounts.Main;
-//         const resolvers = module.api();
-//         await resolvers.createProfile(userId);
-//
-//         return await resolvers.getProfileByUser(userId);
-//     },
-// };
 
 export const Profile ={
     typeDefs: schema,
-    resolvers,
+    resolvers: {
+        Query: {
+            getProfile: (_, __, {profileId}) => ({
+                id: profileId,
+                email: 'lukasz@xyz.pl',
+                avatarUrl: "http://some.com"
+            })
+        },
+        Mutation: {
+            completeProfileDetails: async (parent, {
+                firstName,
+                middleName,
+                lastName
+            }, {profileId, modules}) => {
+
+                // delegate to LegalEntities modules
+                return {
+                    id: profileId,
+                    email: 'lukasz@xyz.pl',
+                    avatarUrl: "http://some.com"
+                }
+
+
+                //context.lambdaEvent.requestContext.authorizer
+                // const module = modules.get(
+                //     InvestmentAccounts.moduleName
+                // ) as InvestmentAccounts.Main;
+                // const resolvers = module.api();
+                // await resolvers.createProfile(userId);
+                //
+                // return await resolvers.getProfileByUser(userId);
+            },
+        }
+    }
 }

@@ -6,7 +6,7 @@ import {SchemaMocks} from "ApiGateway/Schema/SchemaMocks";
 import {Hello} from "ApiGateway/Schema/Types/Hello";
 import {Profile} from "ApiGateway/Schema/Types/Profile";
 import {Individual} from "ApiGateway/Schema/Types/Individual";
-import {stitchWithProfile} from "ApiGateway/Schema/Stitching/ProfileStitching";
+import {ProfileStitcher} from "ApiGateway/Schema/Stitching/ProfileStitcher";
 
 const executableSchemas = [
     EmailAddress,
@@ -23,15 +23,22 @@ const nonExecutableResolvers = mergeResolvers([
     Individual.resolvers,
 ]);
 
-const mergedSchema = mergeSchemas({
+let schema = mergeSchemas({
     schemas: executableSchemas,
     typeDefs: nonExecutableSchemas,
     resolvers: nonExecutableResolvers
 })
 
-const schema = stitchWithProfile(mergedSchema)
+const stitches = [
+    ProfileStitcher
+];
+
+for (let stitch of stitches) {
+    schema = stitch(schema);
+}
 
 export default schema;
+
 // export default addMocksToSchema({
 //     schema,
 //     mocks: SchemaMocks,
