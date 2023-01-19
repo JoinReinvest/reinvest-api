@@ -20,16 +20,9 @@ const EmailAddressResolver = new GraphQLScalarType({
   },
 });
 
-// export const EmailAddress = {
-//   schema: EmailAddressSchema,
-//   resolvers: {
-//     EmailAddress: EmailAddressResolver,
-//   },
-// };
-
-export const EmailAddress = {
+export const EmailAddress = makeExecutableSchema({
   typeDefs: EmailAddressSchema,
   resolvers: {
     EmailAddress: EmailAddressResolver,
   },
-};
+});

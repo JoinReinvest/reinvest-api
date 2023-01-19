@@ -5,9 +5,6 @@ import {mergeTypeDefs} from "@graphql-tools/merge";
 
 const schema = `
     #graphql
-
-    scalar EmailAddress
-    
     type Profile {
         "Profile Id"
         id: ID!
@@ -36,9 +33,13 @@ const schema = `
  *     }
  */
 const resolvers = {
-    ...EmailAddress.resolvers,
     Query: {
-
+        getProfile: () => ({
+            id: '1234132-12341-52agf-afgfag',
+            userId: 'this is test-user - id',
+            email: 'lukasz@xyz.pl',
+            avatarUrl: "http://some.com"
+        })
     },
     Mutation: {
         completeProfileDetails: async (parent, {
@@ -87,7 +88,7 @@ const queries = {
 //     },
 // };
 
-export const Profile = makeExecutableSchema({
+export const Profile ={
     typeDefs: schema,
     resolvers,
-})
+}

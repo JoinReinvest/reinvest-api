@@ -1,5 +1,3 @@
-import {makeExecutableSchema} from "@graphql-tools/schema";
-
 const schema = `
     #graphql
     type Individual {
@@ -10,20 +8,24 @@ const schema = `
         isCompleted: Boolean
         dateOfBirth: String
     }
-    
+
     type Query {
         getIndividual(profileId: String): Individual
     }
-    
+
 `;
 
 const resolvers = {
     Query: {
-
+        getIndividual: (parent, {profileId}) => ({
+            id: 'xxx',
+            firstName: `${profileId}-xx`,
+            lastName: "this is the last name"
+        })
     }
 };
 
-export const Individual = makeExecutableSchema({
+export const Individual = {
     typeDefs: schema,
     resolvers
-})
+}
