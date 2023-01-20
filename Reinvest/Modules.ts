@@ -1,13 +1,19 @@
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 
+export type Api = { [apiName: string]: Function };
+
 export interface Module {
-    api(): { [apiName: string]: Function }
+    api(): Api;
 
     isHandleEvent(kind: string): boolean;
 
     technicalEventHandler(): { [eventKind: string]: Function }
 
     migration(): MigrationManager | never
+}
+
+export interface ModuleNamespace {
+    moduleName: string;
 }
 
 export default class Modules {
@@ -28,5 +34,10 @@ export default class Modules {
         for (let moduleName of modulesNames) {
             yield this.modules[moduleName];
         }
+    }
+
+    getApi<Namespace extends ModuleNamespace>(namespace: Namespace): Api {
+        const module = this.get(namespace.moduleName) as Module
+        return module.api();
     }
 }

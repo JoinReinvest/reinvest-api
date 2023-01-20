@@ -2,6 +2,7 @@ import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {Investments} from "Reinvest/Investments/src/bootstrap";
 import Modules from "Reinvest/Modules";
 import {Identity} from "Reinvest/Identity/src";
+import {LegalEntities} from "LegalEntities/index";
 
 export function boot(): Modules {
     const modules = new Modules();
@@ -18,6 +19,15 @@ export function boot(): Modules {
                 connectionString: "connection-string-test",
             },
         } as Identity.Config)
+    );
+
+    modules.register(
+        LegalEntities.moduleName,
+        LegalEntities.create({
+            database: {
+                connectionString: "connection-string-test",
+            },
+        } as LegalEntities.Config)
     );
 
 

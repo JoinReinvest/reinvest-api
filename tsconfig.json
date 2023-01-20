@@ -14,7 +14,8 @@
       "TechnicalEvents/*": ["../shared/hkek-technical-events/*"],
 
       "ApiGateway/*": ["./ApiGateway/src/*"],
-      "InvestmentAccounts/*": ["./InvestmentAccounts/src/*"]
+      "InvestmentAccounts/*": ["./InvestmentAccounts/src/*"],
+      "LegalEntities/*": ["./LegalEntities/src/*"]
     },
     "typeRoots": [
       "./node_modules/@types",

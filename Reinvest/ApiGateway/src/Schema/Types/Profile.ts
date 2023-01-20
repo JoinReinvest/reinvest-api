@@ -1,4 +1,6 @@
 import {InvestmentAccounts} from "InvestmentAccounts/index";
+import {LegalEntities} from "LegalEntities/index";
+import Modules from "Reinvest/Modules";
 
 const schema = `
     #graphql
@@ -42,12 +44,9 @@ export const Profile ={
             })
         },
         Mutation: {
-            completeProfileDetails: async (parent, {
-                firstName,
-                middleName,
-                lastName
-            }, {profileId, modules}) => {
-
+            completeProfileDetails: async (parent, parameters, {profileId, modules}: {modules: Modules}) => {
+                const api = modules.getApi(LegalEntities) as LegalEntities.LegalEntitiesApi;
+                api.completePerson(parameters);
                 // delegate to LegalEntities modules
                 return {
                     id: profileId,
