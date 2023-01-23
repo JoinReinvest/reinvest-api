@@ -1,6 +1,5 @@
-import {Person} from "LegalEntities/Common/Model/ValueObject/Person";
 import {PeopleRepository} from "LegalEntities/Adapter/Database/Repository/PeopleRepository";
-import {InputParameters} from "LegalEntities/Port/Api/InputParameters";
+
 
 enum PersonType {
     Individual = "Individual",
@@ -15,7 +14,7 @@ export class PeopleController {
         this.peopleRepository = peopleRepository;
     }
 // personType: PersonType, person: Person
-    public completePerson(inputParameters: InputParameters) {
-        console.log({completePersonController: this, input: inputParameters})
+    public completePerson(firstName: string, lastName: string) {
+        console.log({completePersonController: this, input: [...arguments]})
     }
 }

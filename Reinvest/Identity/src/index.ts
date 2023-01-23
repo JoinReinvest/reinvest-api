@@ -3,13 +3,12 @@ import Container, {ContainerInterface} from "Container/Container";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {Module} from "Reinvest/Modules";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
+import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 
 export namespace Identity {
     export const moduleName = "Identity";
     export type Config = {
-        database: {
-            connectionString: string;
-        };
+        database: PostgreSQLConfig;
     };
 
     export const technicalEventHandler = {};

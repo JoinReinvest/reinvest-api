@@ -1,19 +1,19 @@
 import Container, {ContainerInterface} from "Container/Container";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
+import {DatabaseProvider} from "LegalEntities/Providers/DatabaseProvider";
 import {ControllerProvider} from "LegalEntities/Providers/ControllerProvider";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 import {LegalEntitiesApi} from "LegalEntities/Port/Api/LegalEntitiesApi";
 import {ApiRegistration, executeApi} from "Container/ApiExecutor";
 import {LegalEntitiesTechnicalHandler} from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
-import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
-import {DatabaseServiceProvider} from "LegalEntities/Providers/DatabaseServiceProvider";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
     export type Config = {
-        database: PostgreSQLConfig
+        database: {
+            connectionString: string;
+        };
     };
 
     export type LegalEntitiesApiType = typeof LegalEntitiesApi & Api;
@@ -33,7 +33,7 @@ export namespace LegalEntities {
             if (this.booted) {
                 return;
             }
-            new DatabaseServiceProvider(this.config).boot(this.container);
+            new DatabaseProvider(this.config).boot(this.container);
             new ControllerProvider(this.config).boot(this.container);
 
             this.booted = true;
@@ -56,12 +56,12 @@ export namespace LegalEntities {
 
         migration(): MigrationManager | never {
             this.boot();
-            const migrations = require('../migrations');
-            const dbProvider = new DatabaseProvider<LegalEntitiesDatabase>(this.config.database);
-            return new MigrationManager(dbProvider, {
-                migrations,
-                moduleName: LegalEntities.moduleName
-            });
+            throw new NoMigrationException();
+            // const migrations = require('../migrations');
+            // return new MigrationManager(DbProvider, {
+            //     migrations,
+            //     moduleName: LegalEntities.moduleName
+            // });
         }
 
 

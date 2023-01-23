@@ -10,13 +10,12 @@ import {DbProvider} from "InvestmentAccounts/Storage/DatabaseAdapter";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 import EventBusProvider from "InvestmentAccounts/Providers/EventBusProvider";
 import {Module} from "Reinvest/Modules";
+import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 
 export namespace InvestmentAccounts {
     export const moduleName = "InvestmentAccounts";
     export type Config = {
-        database: {
-            connectionString: string;
-        };
+        database: PostgreSQLConfig;
     };
 
     export const technicalEventHandler = { // todo move to other files + add DI
@@ -37,7 +36,6 @@ export namespace InvestmentAccounts {
             if (this.booted) {
                 return;
             }
-
             new EventBusProvider(this.config).boot(this.container);
             new ServiceProviders(this.config).boot(this.container);
             new QueryProviders(this.config).boot(this.container);

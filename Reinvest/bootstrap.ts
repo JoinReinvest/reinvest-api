@@ -3,9 +3,18 @@ import {Investments} from "Reinvest/Investments/src/bootstrap";
 import Modules from "Reinvest/Modules";
 import {Identity} from "Reinvest/Identity/src";
 import {LegalEntities} from "LegalEntities/index";
+import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 
 export function boot(): Modules {
     const modules = new Modules();
+
+    const databaseConfig = {
+        host: process.env.POSTGRESQL_HOST,
+        user: process.env.POSTGRESQL_USER,
+        password: process.env.POSTGRESQL_PASSWORD,
+        database: process.env.POSTGRESQL_DB,
+    } as PostgreSQLConfig
+
     // Investments.boot({
     //   database: {
     //     connectionString: "connection-string-test",
@@ -15,28 +24,21 @@ export function boot(): Modules {
     modules.register(
         Identity.moduleName,
         Identity.create({
-            database: {
-                connectionString: "connection-string-test",
-            },
+            database: databaseConfig
         } as Identity.Config)
     );
 
     modules.register(
         LegalEntities.moduleName,
         LegalEntities.create({
-            database: {
-                connectionString: "connection-string-test",
-            },
+            database: databaseConfig,
         } as LegalEntities.Config)
     );
-
 
     modules.register(
         InvestmentAccounts.moduleName,
         InvestmentAccounts.create({
-            database: {
-                connectionString: "connection-string-test",
-            },
+            database: databaseConfig,
         } as InvestmentAccounts.Config)
     );
 

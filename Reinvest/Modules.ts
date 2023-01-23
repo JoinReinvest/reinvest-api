@@ -1,13 +1,15 @@
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 
 export type Api = { [apiName: string]: Function };
+export type EventHandler = { [kind: string]: (event: any) => void};
+
 
 export interface Module {
     api(): Api;
 
     isHandleEvent(kind: string): boolean;
 
-    technicalEventHandler(): { [eventKind: string]: Function }
+    technicalEventHandler(): EventHandler;
 
     migration(): MigrationManager | never
 }
@@ -36,8 +38,8 @@ export default class Modules {
         }
     }
 
-    getApi<Namespace extends ModuleNamespace>(namespace: Namespace): Api {
+    getApi<ApiType>(namespace: ModuleNamespace): ApiType {
         const module = this.get(namespace.moduleName) as Module
-        return module.api();
+        return module.api() as ApiType;
     }
 }
