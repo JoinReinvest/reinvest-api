@@ -1,54 +1,41 @@
+import {SessionContext} from "ApiGateway/index";
+
 const schema = `
     #graphql
     type Individual {
-        id: ID!
         firstName: String
         middleName: String
         lastName: String
-        isCompleted: Boolean
         dateOfBirth: String
+        domicile: String
+        address: Address
     }
 
     type Query {
         getIndividual: Individual
     }
-
-    type Mutation {
-        setIndividual(
-            firstName: String
-            middleName: String
-            lastName: String
-        ): Individual
-    }
-
 `;
 
-const resolvers = {
-    // Individual: (parent, args, {profileId}) => ({
-    //     id: 'xxx',
-    //     firstName: `${profileId}-xx`,
-    //     lastName: JSON.stringify(args)
-    // }),
-    Query: {
-        getIndividual: (parent, args, {profileId}) => ({
-            id: 'xxx',
-            firstName: `${profileId}-xx`,
-            lastName: JSON.stringify(args)
-        })
-    },
-    Mutation: {
-        setIndividual: (parent, {
-            firstName,
-            middleName,
-            lastName,
-        }) => {
-            return {
-                firstName,
-                middleName,
-                lastName,
-            }
-        }
+const individualMockResponse = {
+    firstName: "mŁukasz",
+    middleName: "mJohn",
+    lastName: "mBlacksmith",
+    dateOfBirth: "m22/11/2000",
+    domicile: "mUS. Citizen",
+    address: {
+        addressLine1: "mRiver Street",
+        addressLine2: "m170/10",
+        city: "mNew York",
+        zip: "m90210",
+        country: "UmSA",
+        state: "mNew York"
     }
+}
+
+const resolvers = {
+    Query: {
+        getIndividual: (parent: any, args: undefined, context: SessionContext) => individualMockResponse
+    },
 };
 
 export const Individual = {

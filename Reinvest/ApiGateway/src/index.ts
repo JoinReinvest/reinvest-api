@@ -14,6 +14,7 @@ import Modules from "Reinvest/Modules";
 import Schema from "ApiGateway/Schema";
 import {GraphQLError} from "graphql";
 import {Identity} from "Reinvest/Identity/src";
+import IdentityApi = Identity.IdentityApi;
 
 const server = new ApolloServer({
     schema: Schema,
@@ -25,12 +26,16 @@ const server = new ApolloServer({
     },
 });
 
+export type SessionContext = { modules: Modules, profileId: string }
+
 export const app = (modules: Modules) => {
     return startServerAndCreateLambdaHandler(server, {
         // @ts-ignore
         context: async ({event, context}) => {
             try {
-                if (!event.requestContext.authorizer.jwt.claims.sub) {
+                // @ts-ignore
+                const {authorizer} = event.requestContext;
+                if (!authorizer || !authorizer.jwt.claims.sub) {
                     throw new GraphQLError('User is not authenticated', {
                         extensions: {
                             code: 'UNAUTHENTICATED',
@@ -38,10 +43,12 @@ export const app = (modules: Modules) => {
                         },
                     });
                 }
-                const userId = event.requestContext.authorizer.jwt.claims.sub;
-                const profileId = modules.get(Identity.moduleName).api().getProfile(userId);
+                const userId = authorizer.jwt.claims.sub;
 
-                return {
+                const api = modules.getApi<IdentityApi>(Identity);
+                const profileId = api.getProfile(userId);
+
+                return <SessionContext>{
                     profileId,
                     modules,
                 };

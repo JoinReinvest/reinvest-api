@@ -4,6 +4,7 @@ import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {Module} from "Reinvest/Modules";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
+import {ApiRegistration, executeApi} from "Container/ApiExecutor";
 
 export namespace Identity {
     export const moduleName = "Identity";
@@ -12,6 +13,13 @@ export namespace Identity {
     };
 
     export const technicalEventHandler = {};
+    export const identityApi = { // move to other file + add DI
+        registerUser: (userId: string, profileId: string) => () => ({}),
+        // @ts-ignore
+        getProfile: (userId: string): string => () => '27fad77f-f160-44a8-8611-b19f6e76a253'
+    };
+
+    export type IdentityApi = typeof identityApi;
 
     export class Main implements Module {
         private readonly config: Identity.Config;
@@ -32,12 +40,9 @@ export namespace Identity {
         }
 
         // public module API
-        api() {
+        api(): IdentityApi {
             this.boot();
-            return { // move to other file + add DI
-                registerUser: (userId: string, profileId: string) => {},
-                getProfile: (userId: string) => '27fad77f-f160-44a8-8611-b19f6e76a253'
-            };
+            return executeApi(this.container, identityApi as never as ApiRegistration);
         }
 
         isHandleEvent(kind: string): boolean {

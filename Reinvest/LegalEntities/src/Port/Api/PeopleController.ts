@@ -1,9 +1,17 @@
 import {PeopleRepository} from "LegalEntities/Adapter/Database/Repository/PeopleRepository";
 
 
-enum PersonType {
+export enum PersonType {
     Individual = "Individual",
     Stakeholder = "Stakeholder"
+}
+
+export type CompletePersonInput = {
+    firstName?: string
+    middleName?: string
+    lastName?: string
+    dateOfBirth?: string
+    address?: object
 }
 
 export class PeopleController {
@@ -13,8 +21,9 @@ export class PeopleController {
     constructor(peopleRepository: PeopleRepository) {
         this.peopleRepository = peopleRepository;
     }
+
 // personType: PersonType, person: Person
-    public completePerson(firstName: string, lastName: string) {
-        console.log({completePersonController: this, input: [...arguments]})
+    public completePerson(input: CompletePersonInput, profileId: string, personType: PersonType) {
+        console.log({input})
     }
 }

@@ -1,36 +1,48 @@
 import {mergeResolvers, mergeTypeDefs} from "@graphql-tools/merge";
-import {addMocksToSchema} from "@graphql-tools/mock";
 import {mergeSchemas} from "@graphql-tools/schema";
 import {EmailAddress} from "ApiGateway/Schema/Scalars/EmailAddress";
-import {SchemaMocks} from "ApiGateway/Schema/SchemaMocks";
 import {Hello} from "ApiGateway/Schema/Types/Hello";
 import {Profile} from "ApiGateway/Schema/Types/Profile";
 import {Individual} from "ApiGateway/Schema/Types/Individual";
 import {ProfileStitcher} from "ApiGateway/Schema/Stitching/ProfileStitcher";
+import {Account} from "ApiGateway/Schema/Types/Account";
+import {ProfileCompletionStatus} from "ApiGateway/Schema/Types/ProfileCompletionStatus";
+import {PhoneNumberVerification} from "ApiGateway/Schema/Types/Identity";
+import {constraintDirective, constraintDirectiveTypeDefs} from "graphql-constraint-directive";
+import {Address} from "ApiGateway/Schema/Types/Address";
 
 const executableSchemas = [
     EmailAddress,
     Hello,
 ];
 
-const nonExecutableSchemas = mergeTypeDefs([
+const nonExecutableTypeDefs = mergeTypeDefs([
+    constraintDirectiveTypeDefs,
+    Address.typeDefs,
+    Account.typeDefs,
+    ProfileCompletionStatus.typeDefs,
     Profile.typeDefs,
+    PhoneNumberVerification.typeDefs,
     Individual.typeDefs,
 ]);
 
 const nonExecutableResolvers = mergeResolvers([
+    Account.resolvers,
+    ProfileCompletionStatus.resolvers,
     Profile.resolvers,
+    PhoneNumberVerification.resolvers,
     Individual.resolvers,
 ]);
 
 let schema = mergeSchemas({
     schemas: executableSchemas,
-    typeDefs: nonExecutableSchemas,
-    resolvers: nonExecutableResolvers
+    typeDefs: nonExecutableTypeDefs,
+    resolvers: nonExecutableResolvers,
 })
 
 const stitches = [
-    ProfileStitcher
+    constraintDirective(),
+    ProfileStitcher,
 ];
 
 for (let stitch of stitches) {
@@ -39,8 +51,3 @@ for (let stitch of stitches) {
 
 export default schema;
 
-// export default addMocksToSchema({
-//     schema,
-//     mocks: SchemaMocks,
-//     preserveResolvers: true,
-// });

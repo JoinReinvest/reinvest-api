@@ -39,7 +39,7 @@ export default class Modules {
     }
 
     getApi<ApiType>(namespace: ModuleNamespace): ApiType {
-        const module = this.get(namespace.moduleName) as Module
+        const module = this.get(namespace.moduleName);
         return module.api() as ApiType;
     }
 }
