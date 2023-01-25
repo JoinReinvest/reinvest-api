@@ -9,16 +9,18 @@ import {Account} from "ApiGateway/Schema/Types/Account";
 import {ProfileCompletionStatus} from "ApiGateway/Schema/Types/ProfileCompletionStatus";
 import {PhoneNumberVerification} from "ApiGateway/Schema/Types/Identity";
 import {constraintDirective, constraintDirectiveTypeDefs} from "graphql-constraint-directive";
-import {Address} from "ApiGateway/Schema/Types/Address";
+import {DateScalar} from "ApiGateway/Schema/Scalars/DateScalar";
+import {SharedInputs} from "ApiGateway/Schema/Types/SharedInputs";
 
 const executableSchemas = [
     EmailAddress,
+    DateScalar,
     Hello,
 ];
 
 const nonExecutableTypeDefs = mergeTypeDefs([
     constraintDirectiveTypeDefs,
-    Address.typeDefs,
+    SharedInputs.typeDefs,
     Account.typeDefs,
     ProfileCompletionStatus.typeDefs,
     Profile.typeDefs,

@@ -19,13 +19,11 @@ const schema = `
     }
 
     input ProfileDetailsInput {
-        firstName: String
-        middleName: String
-        lastName: String,
+        name: PersonName
         "Date of Birth in format MM/DD/YYYY"
-        dateOfBirth: String @constraint(pattern: "^[0-9]{2}/[0-9]{2}/[0-9]{4}$") ,
-        "Is the investor US. Citizen or US. Resident. Values: citizen, resident"
-        domicile: String @constraint(pattern: "^(citizen|resident)$"),
+        dateOfBirth: USDate
+        "Is the investor US. Citizen or US. Resident"
+        domicile: Domicile
         "A valid SSN number"
         ssn: String
         address: AddressInput
@@ -42,9 +40,13 @@ const schema = `
 
 type CompleteProfileDetailsInput = {
     input: {
-        firstName?: string
-        middleName?: string
-        lastName?: string,
+        name?: {
+            firstName: string
+            middleName?: string
+            lastName: string,
+        },
+        dateOfBirth?: Date,
+
     }
 }
 

@@ -1,5 +1,16 @@
 const schema = `
     #graphql
+    input PersonName {
+        firstName: String!
+        middleName: String
+        lastName: String!
+    }
+
+    enum Domicile {
+        CITIZEN
+        RESIDENT
+    }
+
     input AddressInput {
         addressLine1: String!
         addressLine2: String
@@ -17,9 +28,9 @@ const schema = `
         country: String
         state: String
     }
-`
 
-export const Address = {
+`;
+export const SharedInputs = {
     typeDefs: schema,
 }
 
