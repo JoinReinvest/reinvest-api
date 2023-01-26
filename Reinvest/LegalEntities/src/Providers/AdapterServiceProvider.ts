@@ -2,8 +2,11 @@ import {LegalEntities} from "LegalEntities/index";
 import {ContainerInterface} from "Container/Container";
 import {PeopleRepository} from "LegalEntities/Adapter/Database/Repository/PeopleRepository";
 import {DatabaseAdapterInstance, DatabaseAdapterProvider} from "LegalEntities/Adapter/Database/DatabaseAdapter";
+import {S3Adapter} from "LegalEntities/Adapter/S3/S3Adapter";
+import {FileLinkService} from "LegalEntities/Adapter/S3/FileLinkService";
+import {IdGenerator} from "IdGenerator/IdGenerator";
 
-export class DatabaseServiceProvider {
+export class AdapterServiceProvider {
     private config: LegalEntities.Config;
 
     constructor(config: LegalEntities.Config) {
@@ -12,7 +15,17 @@ export class DatabaseServiceProvider {
 
     public boot(container: ContainerInterface) {
         container
+            .addClass(IdGenerator)
+
+        // database
+        container
             .addAsValue(DatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
             .addClass(PeopleRepository, [DatabaseAdapterInstance])
+
+        // s3
+        container
+            .addAsValue('S3Config', this.config.s3)
+            .addClass(S3Adapter, ['S3Config'])
+            .addClass(FileLinkService, [S3Adapter.toString(), IdGenerator.toString()])
     }
 }

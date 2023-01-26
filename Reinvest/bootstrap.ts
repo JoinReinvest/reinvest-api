@@ -1,19 +1,15 @@
 import {InvestmentAccounts} from "InvestmentAccounts/index";
-import {Investments} from "Reinvest/Investments/src/bootstrap";
 import Modules from "Reinvest/Modules";
 import {Identity} from "Reinvest/Identity/src";
 import {LegalEntities} from "LegalEntities/index";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
+import {DATABASE_CONFIG, S3_CONFIG} from "Reinvest/config";
 
 export function boot(): Modules {
     const modules = new Modules();
 
-    const databaseConfig = {
-        host: process.env.POSTGRESQL_HOST,
-        user: process.env.POSTGRESQL_USER,
-        password: process.env.POSTGRESQL_PASSWORD,
-        database: process.env.POSTGRESQL_DB,
-    } as PostgreSQLConfig
+    const databaseConfig = DATABASE_CONFIG as PostgreSQLConfig
+    const s3Config = S3_CONFIG;
 
     // Investments.boot({
     //   database: {
@@ -32,6 +28,7 @@ export function boot(): Modules {
         LegalEntities.moduleName,
         LegalEntities.create({
             database: databaseConfig,
+            s3: s3Config
         } as LegalEntities.Config)
     );
 

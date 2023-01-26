@@ -7,11 +7,23 @@ export enum PersonType {
 }
 
 export type CompletePersonInput = {
-    firstName?: string
-    middleName?: string
-    lastName?: string
-    dateOfBirth?: string
-    address?: object
+    name?: {
+        firstName: string
+        middleName?: string
+        lastName: string,
+    },
+    dateOfBirth?: Date,
+    address?: {
+        addressLine1: string
+        addressLine2?: string
+        city: string
+        zip: string
+        country: string
+        state: string
+    },
+    idScanFileLink?: {
+        url: string
+    }
 }
 
 export class PeopleController {

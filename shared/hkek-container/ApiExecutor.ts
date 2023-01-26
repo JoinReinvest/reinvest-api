@@ -18,7 +18,7 @@ export function executeApi<ApiType extends Object>(container: ContainerInterface
             const controller = container.getValue(className);
             // @ts-ignore
             apiToExecute[apiName] = async function () {
-                controller[method](...arguments);
+                return controller[method](...arguments);
             }
         }
 

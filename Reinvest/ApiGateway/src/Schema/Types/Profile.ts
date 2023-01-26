@@ -13,20 +13,21 @@ const schema = `
         "The external, nice-looking profile ID"
         externalId: String
         "The name/label of the user"
-        name: String
+        label: String
         avatarUrl: String
         accounts: [AccountOverview]
     }
 
     input ProfileDetailsInput {
         name: PersonName
-        "Date of Birth in format MM/DD/YYYY"
-        dateOfBirth: USDate
+        "Date of Birth in format YYYY-MM-DD"
+        dateOfBirth: ISODate
         "Is the investor US. Citizen or US. Resident"
         domicile: Domicile
         "A valid SSN number"
         ssn: String
         address: AddressInput
+        idScanFileLInk: FileLinkInput
     }
 
     type Query {
@@ -45,8 +46,18 @@ type CompleteProfileDetailsInput = {
             middleName?: string
             lastName: string,
         },
-        dateOfBirth?: Date,
-
+        dateOfBirth?: string,
+        address?: {
+            addressLine1: string
+            addressLine2?: string
+            city: string
+            zip: string
+            country: string
+            state: string
+        },
+        idScanFileLink?: {
+            url: string
+        }
     }
 }
 

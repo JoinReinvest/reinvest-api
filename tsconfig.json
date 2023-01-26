@@ -11,6 +11,7 @@
       "PostgreSQL/*": ["../shared/hkek-postgresql/*"],
       "SimpleAggregator/*": ["../shared/hkek-simple-aggregator/*"],
       "Container/*": ["../shared/hkek-container/*"],
+      "IdGenerator/*": ["../shared/hkek-id-generator/*"],
       "TechnicalEvents/*": ["../shared/hkek-technical-events/*"],
 
       "ApiGateway/*": ["./ApiGateway/src/*"],

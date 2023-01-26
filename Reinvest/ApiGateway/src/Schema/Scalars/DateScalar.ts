@@ -4,18 +4,18 @@ import {makeExecutableSchema} from "@graphql-tools/schema";
 
 const DateSchema = `
     #graphql
-    scalar USDate
+    scalar ISODate
 `;
 
-function isValidUSDate(value: string) {
-    if (!DateTime.isValid(value, 'MM/DD/YYYY')) {
-        throw new GraphQLError("The value format must be MM/DD/YYYY");
+function isValidISODate(value: string) {
+    if (!DateTime.isValid(value, 'YYYY-MM-DD')) {
+        throw new GraphQLError("The value format must be YYYY-MM-DD");
     }
 }
 
 const DateResolver = new GraphQLScalarType({
-    name: 'USDate',
-    description: 'Date in format MM/DD/YYYY',
+    name: 'ISODate',
+    description: 'Date in format YYYY-MM-DD',
 
     // @ts-ignore
     serialize(date: string): string { // BE -> FE
@@ -23,7 +23,7 @@ const DateResolver = new GraphQLScalarType({
     },
     // @ts-ignore
     parseValue(value: string): string { // FE (variable) -> BE
-        isValidUSDate(value);
+        isValidISODate(value);
         return value;
     },
     // @ts-ignore
@@ -32,7 +32,7 @@ const DateResolver = new GraphQLScalarType({
             throw new GraphQLError("The value must be string");
         }
 
-        isValidUSDate(ast.value);
+        isValidISODate(ast.value);
 
         return ast.value;
     },
@@ -43,6 +43,6 @@ const DateResolver = new GraphQLScalarType({
 export const DateScalar = makeExecutableSchema({
     typeDefs: DateSchema,
     resolvers: {
-        USDate: DateResolver,
+        ISODate: DateResolver,
     },
 });

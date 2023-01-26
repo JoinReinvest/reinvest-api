@@ -2,9 +2,10 @@ import {LegalEntities} from "LegalEntities/index";
 import {ContainerInterface} from "Container/Container";
 import {PeopleRepository} from "LegalEntities/Adapter/Database/Repository/PeopleRepository";
 import {PeopleController} from "LegalEntities/Port/Api/PeopleController";
+import {FileLinksController} from "LegalEntities/Port/Api/FileLinksController";
+import {FileLinkService} from "LegalEntities/Adapter/S3/FileLinkService";
 
-
-export class ControllerProvider {
+export class PortsProvider {
     private config: LegalEntities.Config;
 
     constructor(config: LegalEntities.Config) {
@@ -12,7 +13,9 @@ export class ControllerProvider {
     }
 
     public boot(container: ContainerInterface) {
+        //controllers
         container
-            .addClass(PeopleController, [PeopleRepository.toString()]);
+            .addClass(PeopleController, [PeopleRepository.toString()])
+            .addClass(FileLinksController, [FileLinkService.toString()]);
     }
 }

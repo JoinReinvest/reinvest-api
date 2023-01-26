@@ -11,6 +11,7 @@ import {PhoneNumberVerification} from "ApiGateway/Schema/Types/Identity";
 import {constraintDirective, constraintDirectiveTypeDefs} from "graphql-constraint-directive";
 import {DateScalar} from "ApiGateway/Schema/Scalars/DateScalar";
 import {SharedInputs} from "ApiGateway/Schema/Types/SharedInputs";
+import {FileLink} from "ApiGateway/Schema/Types/FileLink";
 
 const executableSchemas = [
     EmailAddress,
@@ -26,6 +27,7 @@ const nonExecutableTypeDefs = mergeTypeDefs([
     Profile.typeDefs,
     PhoneNumberVerification.typeDefs,
     Individual.typeDefs,
+    FileLink.typeDefs,
 ]);
 
 const nonExecutableResolvers = mergeResolvers([
@@ -34,6 +36,7 @@ const nonExecutableResolvers = mergeResolvers([
     Profile.resolvers,
     PhoneNumberVerification.resolvers,
     Individual.resolvers,
+    FileLink.resolvers,
 ]);
 
 let schema = mergeSchemas({

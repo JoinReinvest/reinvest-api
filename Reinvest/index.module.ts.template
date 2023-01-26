@@ -2,7 +2,7 @@ import Container, {ContainerInterface} from "Container/Container";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {DatabaseProvider} from "LegalEntities/Providers/DatabaseProvider";
-import {ControllerProvider} from "LegalEntities/Providers/ControllerProvider";
+import {PortsProvider} from "LegalEntities/Providers/PortsProvider";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 import {LegalEntitiesApi} from "LegalEntities/Port/Api/LegalEntitiesApi";
 import {ApiRegistration, executeApi} from "Container/ApiExecutor";
@@ -34,7 +34,7 @@ export namespace LegalEntities {
                 return;
             }
             new DatabaseProvider(this.config).boot(this.container);
-            new ControllerProvider(this.config).boot(this.container);
+            new PortsProvider(this.config).boot(this.container);
 
             this.booted = true;
         }

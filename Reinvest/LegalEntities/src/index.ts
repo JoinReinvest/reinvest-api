@@ -1,19 +1,20 @@
 import Container, {ContainerInterface} from "Container/Container";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
-import {ControllerProvider} from "LegalEntities/Providers/ControllerProvider";
-import {NoMigrationException} from "PostgreSQL/NoMigrationException";
+import {PortsProvider} from "LegalEntities/Providers/PortsProvider";
 import {LegalEntitiesApi} from "LegalEntities/Port/Api/LegalEntitiesApi";
 import {ApiRegistration, executeApi} from "Container/ApiExecutor";
 import {LegalEntitiesTechnicalHandler} from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
-import {DatabaseServiceProvider} from "LegalEntities/Providers/DatabaseServiceProvider";
+import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
+import {S3Config} from "LegalEntities/Adapter/S3/S3Adapter";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
     export type Config = {
-        database: PostgreSQLConfig
+        database: PostgreSQLConfig,
+        s3: S3Config
     };
 
     export type LegalEntitiesApiType = typeof LegalEntitiesApi & Api;
@@ -33,8 +34,8 @@ export namespace LegalEntities {
             if (this.booted) {
                 return;
             }
-            new DatabaseServiceProvider(this.config).boot(this.container);
-            new ControllerProvider(this.config).boot(this.container);
+            new AdapterServiceProvider(this.config).boot(this.container);
+            new PortsProvider(this.config).boot(this.container);
 
             this.booted = true;
         }
