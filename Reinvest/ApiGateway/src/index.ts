@@ -1,16 +1,6 @@
 import {ApolloServer} from "@apollo/server";
 import {startServerAndCreateLambdaHandler} from "@as-integrations/aws-lambda";
-import {
-    GetObjectCommand,
-    PutObjectCommand,
-    PutObjectCommandInput,
-    S3Client,
-} from "@aws-sdk/client-s3";
-import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
-import axios, {AxiosResponse} from "axios";
-import express, {Express, Request, Response} from "express";
 import Modules from "Reinvest/Modules";
-
 import Schema from "ApiGateway/Schema";
 import {GraphQLError} from "graphql";
 import {Identity} from "Reinvest/Identity/src";
@@ -58,31 +48,3 @@ export const app = (modules: Modules) => {
         },
     });
 };
-// export const app: Express = express();.aut
-//
-//
-// app.get('/', async (req: Request, res: Response) => {
-//     // const requestContext = req.event.requestContext;
-//     // console.log(req.event.requestContext.authorizer.jwt.claims);
-//     const response: AxiosResponse = await axios
-//         .get('https://httpbin.org/get');
-//     // throw new Error('testY');
-//
-//     // const client = new pg.Client({
-//     //     host: 'lukaszd-staging-postgresql.c1eerecii0f7.eu-west-2.rds.amazonaws.com',
-//     //     // host: 'localhost',
-//     //     port: 5432,
-//     //     user: 'executive',
-//     //     password: 'password',
-//     //     database: 'lukaszd_staging_db',
-//     //     connectionTimeoutMillis: 2000,
-//     //     query_timeout: 2000,
-//     // })
-//
-//     // await client.connect();
-//     // await client.query("insert into users (username) values ('lukas')");
-//     // const result = await client.query('SELECT * from users');
-//
-//     //
-
-// });

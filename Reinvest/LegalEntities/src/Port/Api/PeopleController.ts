@@ -12,7 +12,7 @@ export type CompletePersonInput = {
         middleName?: string
         lastName: string,
     },
-    dateOfBirth?: Date,
+    dateOfBirth?: string,
     address?: {
         addressLine1: string
         addressLine2?: string
@@ -21,8 +21,11 @@ export type CompletePersonInput = {
         country: string
         state: string
     },
-    idScanFileLink?: {
-        url: string
+    idScan?: {
+        id: string
+    },
+    avatar?: {
+        id: string
     }
 }
 
@@ -34,7 +37,6 @@ export class PeopleController {
         this.peopleRepository = peopleRepository;
     }
 
-// personType: PersonType, person: Person
     public completePerson(input: CompletePersonInput, profileId: string, personType: PersonType) {
         console.log({input})
     }

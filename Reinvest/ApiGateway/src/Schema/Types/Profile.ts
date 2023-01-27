@@ -27,7 +27,8 @@ const schema = `
         "A valid SSN number"
         ssn: String
         address: AddressInput
-        idScanFileLInk: FileLinkInput
+        idScan: FileLinkInput
+        avatar: FileLinkInput
     }
 
     type Query {
@@ -55,8 +56,11 @@ type CompleteProfileDetailsInput = {
             country: string
             state: string
         },
-        idScanFileLink?: {
-            url: string
+        idScan?: {
+            id: string
+        },
+        avatar?: {
+            id: string
         }
     }
 }

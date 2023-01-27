@@ -34,7 +34,6 @@ export class S3Adapter {
             region: this.config.region
         });
 
-
         const putInput: PutObjectCommandInput = {
             Bucket: bucketName,
             Key: `${catalog}/${fileName}`,

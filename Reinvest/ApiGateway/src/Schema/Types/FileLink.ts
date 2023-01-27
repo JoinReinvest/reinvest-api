@@ -5,7 +5,6 @@ import LegalEntitiesApiType = LegalEntities.LegalEntitiesApiType;
 const schema = `
     #graphql
     input FileLinkInput {
-        url: String!
         id: String!
     }
 
