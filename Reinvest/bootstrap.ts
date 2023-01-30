@@ -4,6 +4,7 @@ import {Identity} from "Reinvest/Identity/src";
 import {LegalEntities} from "LegalEntities/index";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {DATABASE_CONFIG, S3_CONFIG} from "Reinvest/config";
+import {Documents} from "Documents/index";
 
 export function boot(): Modules {
     const modules = new Modules();
@@ -28,8 +29,15 @@ export function boot(): Modules {
         LegalEntities.moduleName,
         LegalEntities.create({
             database: databaseConfig,
-            s3: s3Config
         } as LegalEntities.Config)
+    );
+
+    modules.register(
+        Documents.moduleName,
+        Documents.create({
+            database: databaseConfig,
+            s3: s3Config
+        } as Documents.Config)
     );
 
     modules.register(

@@ -1,6 +1,6 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
-import {PersonType} from "LegalEntities/Port/Api/PeopleController";
+import {PersonType} from "LegalEntities/Port/Api/ProfileController";
 
 const schema = `
     #graphql
@@ -32,10 +32,12 @@ const schema = `
 
     type Query {
         getProfile: Profile
+        canOpenAccount(accountType: AccountType): Boolean
     }
 
     type Mutation {
         completeProfileDetails(input: ProfileDetailsInput): Profile
+        openAccount(draftAccountId: String): Boolean
     }
 `;
 
@@ -85,7 +87,11 @@ export const Profile = {
             getProfile: async (parent: any,
                                input: undefined,
                                {profileId, modules}: SessionContext
-            ) => profileMockResponse
+            ) => profileMockResponse,
+            canOpenAccount: async (parent: any,
+                                   input: undefined,
+                                   {profileId, modules}: SessionContext
+            ) => true
         },
         Mutation: {
             completeProfileDetails: async (parent: any,
@@ -93,9 +99,16 @@ export const Profile = {
                                            {profileId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                api.completePerson(input, profileId, PersonType.Individual);
+                api.completeProfile(input, profileId, PersonType.Individual);
 
                 return profileMockResponse;
+            },
+
+            openAccount: async (parent: any,
+                                {draftAccountId}: any,
+                                {profileId, modules}: SessionContext
+            ) => {
+                return true;
             },
         },
     }

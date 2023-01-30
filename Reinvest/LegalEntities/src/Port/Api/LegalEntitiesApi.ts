@@ -1,15 +1,10 @@
-import {PeopleController} from "LegalEntities/Port/Api/PeopleController";
-import {FileLinksController} from "LegalEntities/Port/Api/FileLinksController";
 import {ContainerInterface} from "Container/Container";
+import {ProfileController} from "LegalEntities/Port/Api/ProfileController";
 
 export type LegalEntitiesApiType = {
-    completePerson: PeopleController["completePerson"],
-    createAvatarFileLink: FileLinksController["createAvatarFileLink"],
-    createDocumentsFileLinks: FileLinksController["createDocumentsFileLinks"],
+    completeProfile: ProfileController["completeProfile"],
 }
 
 export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesApiType => ({
-    completePerson: container.delegateTo(PeopleController, 'completePerson'),
-    createAvatarFileLink: container.delegateTo(FileLinksController, 'createAvatarFileLink'),
-    createDocumentsFileLinks: container.delegateTo(FileLinksController, 'createDocumentsFileLinks'),
+    completeProfile: container.delegateTo(ProfileController, 'completeProfile'),
 })

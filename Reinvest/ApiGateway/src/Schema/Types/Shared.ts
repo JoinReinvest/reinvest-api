@@ -29,8 +29,23 @@ const schema = `
         state: String
     }
 
+    input DollarInput {
+        inCents: Int!,
+        formatted: String
+    }
+
+    type Dollar {
+        inCents: Int
+        display: String
+    }
+    
+    enum AccountType {
+        INDIVIDUAL
+        CORPORATE
+        TRUST
+    }
 `;
-export const SharedInputs = {
+export const Shared = {
     typeDefs: schema,
 }
 

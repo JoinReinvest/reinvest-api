@@ -29,15 +29,15 @@ export type CompletePersonInput = {
     }
 }
 
-export class PeopleController {
-    public static getClassName = (): string => "PeopleController";
+export class ProfileController {
+    public static getClassName = (): string => "ProfileController";
     private peopleRepository: PeopleRepository;
 
     constructor(peopleRepository: PeopleRepository) {
         this.peopleRepository = peopleRepository;
     }
 
-    public completePerson(input: CompletePersonInput, profileId: string, personType: PersonType) {
+    public completeProfile(input: CompletePersonInput, profileId: string, personType: PersonType) {
         console.log({input})
     }
 }

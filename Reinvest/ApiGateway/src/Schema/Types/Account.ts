@@ -1,4 +1,5 @@
 import {SessionContext} from "ApiGateway/index";
+import {LegalEntities} from "LegalEntities/index";
 
 const schema = `
     #graphql
@@ -19,6 +20,7 @@ const schema = `
     type Query {
         getAccount(accountId: String): Account
     }
+
 `;
 
 const accountMockResponse = {
@@ -36,6 +38,8 @@ export const Account = {
                                input: { accountId: string },
                                {profileId, modules}: SessionContext
             ) => {
+                // const legalEntitiesApi = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
                 // const api = modules.getApi<InvestmentAccountsApi>(InvestmentAccounts);
                 return accountMockResponse;
             }

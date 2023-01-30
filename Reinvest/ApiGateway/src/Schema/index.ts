@@ -10,8 +10,9 @@ import {ProfileCompletionStatus} from "ApiGateway/Schema/Types/ProfileCompletion
 import {PhoneNumberVerification} from "ApiGateway/Schema/Types/Identity";
 import {constraintDirective, constraintDirectiveTypeDefs} from "graphql-constraint-directive";
 import {DateScalar} from "ApiGateway/Schema/Scalars/DateScalar";
-import {SharedInputs} from "ApiGateway/Schema/Types/SharedInputs";
-import {FileLink} from "ApiGateway/Schema/Types/FileLink";
+import {Shared} from "ApiGateway/Schema/Types/Shared";
+import {DocumentTypes} from "ApiGateway/Schema/Types/DocumentTypes";
+import {DraftAccount} from "ApiGateway/Schema/Types/DraftAccount";
 
 const executableSchemas = [
     EmailAddress,
@@ -21,22 +22,24 @@ const executableSchemas = [
 
 const nonExecutableTypeDefs = mergeTypeDefs([
     constraintDirectiveTypeDefs,
-    SharedInputs.typeDefs,
+    Shared.typeDefs,
     Account.typeDefs,
+    ...DraftAccount.typeDefs,
     ProfileCompletionStatus.typeDefs,
     Profile.typeDefs,
     PhoneNumberVerification.typeDefs,
     Individual.typeDefs,
-    FileLink.typeDefs,
+    DocumentTypes.typeDefs,
 ]);
 
 const nonExecutableResolvers = mergeResolvers([
     Account.resolvers,
+    DraftAccount.resolvers,
     ProfileCompletionStatus.resolvers,
     Profile.resolvers,
     PhoneNumberVerification.resolvers,
     Individual.resolvers,
-    FileLink.resolvers,
+    DocumentTypes.resolvers,
 ]);
 
 let schema = mergeSchemas({

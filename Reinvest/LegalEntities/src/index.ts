@@ -10,13 +10,11 @@ import {
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
-import {S3Config} from "LegalEntities/Adapter/S3/S3Adapter";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
     export type Config = {
-        database: PostgreSQLConfig,
-        s3: S3Config
+        database: PostgreSQLConfig
     };
 
     export type ApiType = LegalEntitiesApiType & Api;

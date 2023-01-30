@@ -1,4 +1,4 @@
-import {S3Adapter} from "LegalEntities/Adapter/S3/S3Adapter";
+import {S3Adapter} from "Documents/Adapter/S3/S3Adapter";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 
 export type FileLink = {
