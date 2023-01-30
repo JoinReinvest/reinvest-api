@@ -4,7 +4,6 @@ import Modules from "Reinvest/Modules";
 import Schema from "ApiGateway/Schema";
 import {GraphQLError} from "graphql";
 import {Identity} from "Reinvest/Identity/src";
-import IdentityApiType = Identity.IdentityApiType;
 
 const server = new ApolloServer({
     schema: Schema,
@@ -35,7 +34,7 @@ export const app = (modules: Modules) => {
                 }
                 const userId = authorizer.jwt.claims.sub;
 
-                const api = modules.getApi<IdentityApiType>(Identity);
+                const api = modules.getApi<Identity.ApiType>(Identity);
                 const profileId = api.getProfile(userId);
 
                 return <SessionContext>{

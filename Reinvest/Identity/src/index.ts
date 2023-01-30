@@ -1,13 +1,13 @@
 import Container, {ContainerInterface} from "Container/Container";
 
 import {MigrationManager} from "PostgreSQL/MigrationManager";
-import {Api, Module} from "Reinvest/Modules";
+import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {IdentityApi, IdentityApiType} from "Identity/Port/Api/IdentityApi";
 import {PortsProvider} from "Identity/Providers/PortsProvider";
 import {AdapterServiceProvider} from "Identity/Providers/AdapterServiceProvider";
-import {IdentityTechnicalHandler} from "Identity/Port/Events/IdentityTechnicalHandler";
+import {IdentityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/Port/Events/IdentityTechnicalHandler";
 
 export namespace Identity {
     export const moduleName = "Identity";
@@ -16,6 +16,7 @@ export namespace Identity {
     };
 
     export type ApiType = IdentityApiType & Api
+    export type TechnicalHandlerType = IdentityTechnicalHandlerType & EventHandler;
 
     export class Main implements Module {
         private readonly config: Identity.Config;
@@ -45,12 +46,12 @@ export namespace Identity {
         }
 
         isHandleEvent(kind: string): boolean {
-            return kind in IdentityTechnicalHandler;
+            return kind in IdentityTechnicalHandler(new Container());
         }
 
-        technicalEventHandler() {
+        technicalEventHandler(): TechnicalHandlerType {
             this.boot();
-            return IdentityTechnicalHandler;
+            return IdentityTechnicalHandler(this.container);
         }
 
         migration(): MigrationManager | never {
