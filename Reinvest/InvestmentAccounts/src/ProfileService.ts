@@ -6,11 +6,11 @@ import {EventPublisher} from "TechnicalEvents/EventPublisher";
 
 
 export class ProfileRepository {
-    static toString = () => "ProfileRepository";
+    static getClassName = (): string => "ProfileRepository";
 }
 
 class ProfileService {
-    static toString = () => "ProfileService";
+    static getClassName = (): string => "ProfileService";
 
     private readonly profileRepository: ProfileRepository;
     private eventBus: EventBus;
@@ -24,7 +24,7 @@ class ProfileService {
     async create(userId: string) {
         const profile = Profile.create();
         const profileCreated = profile.initialize(userId);
-        const database = DbProvider.provide();
+        // const database = DbProvider.provide();
         const aggregate = profile.getSnapshot();
 
         // const {aggregateId} = await database

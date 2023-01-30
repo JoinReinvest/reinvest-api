@@ -16,7 +16,8 @@
 
       "ApiGateway/*": ["./ApiGateway/src/*"],
       "InvestmentAccounts/*": ["./InvestmentAccounts/src/*"],
-      "LegalEntities/*": ["./LegalEntities/src/*"]
+      "LegalEntities/*": ["./LegalEntities/src/*"],
+      "Identity/*": ["./Identity/src/*"]
     },
     "typeRoots": [
       "./node_modules/@types",

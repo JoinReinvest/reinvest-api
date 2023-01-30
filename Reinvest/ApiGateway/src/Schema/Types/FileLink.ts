@@ -1,6 +1,5 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
-import LegalEntitiesApiType = LegalEntities.LegalEntitiesApiType;
 
 const schema = `
     #graphql
@@ -30,14 +29,14 @@ export const FileLink = {
                                              {numberOfLinks}: { numberOfLinks: number },
                                              {profileId, modules}: SessionContext
             ) => {
-                const api = modules.getApi<LegalEntitiesApiType>(LegalEntities);
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 return api.createDocumentsFileLinks(numberOfLinks, profileId);
             },
             createAvatarFileLink: async (parent: any,
                                          args: any,
                                          {profileId, modules}: SessionContext
             ) => {
-                const api = modules.getApi<LegalEntitiesApiType>(LegalEntities);
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 return api.createAvatarFileLink(profileId);
             },
         },

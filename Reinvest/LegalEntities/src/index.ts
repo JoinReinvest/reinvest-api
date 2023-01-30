@@ -2,9 +2,11 @@ import Container, {ContainerInterface} from "Container/Container";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {PortsProvider} from "LegalEntities/Providers/PortsProvider";
-import {LegalEntitiesApi} from "LegalEntities/Port/Api/LegalEntitiesApi";
-import {ApiRegistration, executeApi} from "Container/ApiExecutor";
-import {LegalEntitiesTechnicalHandler} from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
+import {LegalEntitiesApi, LegalEntitiesApiType} from "LegalEntities/Port/Api/LegalEntitiesApi";
+import {
+    LegalEntitiesTechnicalHandler,
+    LegalEntitiesTechnicalHandlerType
+} from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
@@ -17,8 +19,8 @@ export namespace LegalEntities {
         s3: S3Config
     };
 
-    export type LegalEntitiesApiType = typeof LegalEntitiesApi & Api;
-    export type LegalEntitiesTechnicalHandlerType = typeof LegalEntitiesTechnicalHandler & EventHandler;
+    export type ApiType = LegalEntitiesApiType & Api;
+    export type TechnicalHandlerType = LegalEntitiesTechnicalHandlerType & EventHandler;
 
     export class Main implements Module {
         private readonly config: LegalEntities.Config;
@@ -41,18 +43,18 @@ export namespace LegalEntities {
         }
 
         // public module API
-        api(): LegalEntitiesApiType {
+        api(): ApiType {
             this.boot();
-            return executeApi<LegalEntitiesApiType>(this.container, LegalEntitiesApi as unknown as ApiRegistration);
+            return LegalEntitiesApi(this.container);
         }
 
         isHandleEvent(kind: string): boolean {
-            return kind in LegalEntitiesTechnicalHandler;
+            return kind in LegalEntitiesTechnicalHandler(new Container());
         }
 
-        technicalEventHandler(): LegalEntitiesTechnicalHandlerType {
+        technicalEventHandler(): TechnicalHandlerType {
             this.boot();
-            return executeApi<LegalEntitiesTechnicalHandlerType>(this.container, LegalEntitiesTechnicalHandler as unknown as ApiRegistration);
+            return LegalEntitiesTechnicalHandler(this.container);
         }
 
         migration(): MigrationManager | never {

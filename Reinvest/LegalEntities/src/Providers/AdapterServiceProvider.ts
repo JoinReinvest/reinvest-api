@@ -26,6 +26,6 @@ export class AdapterServiceProvider {
         container
             .addAsValue('S3Config', this.config.s3)
             .addClass(S3Adapter, ['S3Config'])
-            .addClass(FileLinkService, [S3Adapter.toString(), IdGenerator.toString()])
+            .addClass(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()])
     }
 }

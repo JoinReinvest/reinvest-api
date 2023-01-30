@@ -14,7 +14,7 @@ export type S3Config = {
 }
 
 export class S3Adapter {
-    public static toString = () => "S3Adapter";
+    public static getClassName = (): string => "S3Adapter";
     private config: S3Config;
 
     constructor(config: S3Config) {

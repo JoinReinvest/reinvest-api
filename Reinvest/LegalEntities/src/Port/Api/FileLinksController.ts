@@ -1,7 +1,7 @@
 import {FileLink, FileLinkService, FileType} from "../../Adapter/S3/FileLinkService";
 
 export class FileLinksController {
-    public static toString = () => "FileLinksController";
+    public static getClassName = (): string => "FileLinksController";
     private fileLinkService: FileLinkService;
 
 

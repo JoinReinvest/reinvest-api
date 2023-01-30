@@ -17,9 +17,9 @@ export default class EventBusProvider {
 
         const eventBus = new SimpleEventBus(container);
         eventBus
-            .subscribe('ProfileSnapshotChanged', ProfileQueryEventHandler.toString())
+            .subscribe('ProfileSnapshotChanged', ProfileQueryEventHandler.getClassName())
         ;
 
-        container.addAsValue(SimpleEventBus.toString(), eventBus);
+        container.addAsValue(SimpleEventBus.getClassName(), eventBus);
     }
 }

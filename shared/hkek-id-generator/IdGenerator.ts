@@ -6,7 +6,7 @@ export interface IdGeneratorInterface {
 
 
 export class IdGenerator {
-    public static toString = () => "IdGenerator";
+    public static getClassName = () => "IdGenerator";
 
     create(): string {
         return uuidv4();

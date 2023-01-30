@@ -15,6 +15,6 @@ export default class ServiceProviders {
     public boot(container: ContainerInterface) {
         container
             .addClass(ProfileRepository)
-            .addClass(ProfileService, [ProfileRepository.toString(), SimpleEventBus.toString()]);
+            .addClass(ProfileService, [ProfileRepository.getClassName(), SimpleEventBus.getClassName()]);
     }
 }

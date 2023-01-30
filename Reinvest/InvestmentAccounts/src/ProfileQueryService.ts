@@ -2,11 +2,11 @@ import {DbProvider} from "InvestmentAccounts/Storage/DatabaseAdapter";
 import {ProfileQuery} from "InvestmentAccounts/Storage/Queries/ProfileQuery";
 
 export class QueryProfileRepository {
-    static toString = () => "QueryProfileRepository";
+    static getClassName = (): string => "QueryProfileRepository";
 }
 
 class ProfileQueryService {
-    static toString = () => "ProfileQueryService";
+    static getClassName = (): string => "ProfileQueryService";
     private repository: QueryProfileRepository;
 
 

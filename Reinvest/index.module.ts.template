@@ -1,23 +1,26 @@
 import Container, {ContainerInterface} from "Container/Container";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
-import {DatabaseProvider} from "LegalEntities/Providers/DatabaseProvider";
 import {PortsProvider} from "LegalEntities/Providers/PortsProvider";
-import {NoMigrationException} from "PostgreSQL/NoMigrationException";
-import {LegalEntitiesApi} from "LegalEntities/Port/Api/LegalEntitiesApi";
-import {ApiRegistration, executeApi} from "Container/ApiExecutor";
-import {LegalEntitiesTechnicalHandler} from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
+import {LegalEntitiesApi, LegalEntitiesApiType} from "LegalEntities/Port/Api/LegalEntitiesApi";
+import {
+    LegalEntitiesTechnicalHandler,
+    LegalEntitiesTechnicalHandlerType
+} from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
+import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
+import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
+import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
+import {S3Config} from "LegalEntities/Adapter/S3/S3Adapter";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
     export type Config = {
-        database: {
-            connectionString: string;
-        };
+        database: PostgreSQLConfig,
+        s3: S3Config
     };
 
-    export type LegalEntitiesApiType = typeof LegalEntitiesApi & Api;
-    export type LegalEntitiesTechnicalHandlerType = typeof LegalEntitiesTechnicalHandler & EventHandler;
+    export type ApiType = LegalEntitiesApiType & Api;
+    export type TechnicalHandlerType = LegalEntitiesTechnicalHandlerType & EventHandler;
 
     export class Main implements Module {
         private readonly config: LegalEntities.Config;
@@ -33,35 +36,35 @@ export namespace LegalEntities {
             if (this.booted) {
                 return;
             }
-            new DatabaseProvider(this.config).boot(this.container);
+            new AdapterServiceProvider(this.config).boot(this.container);
             new PortsProvider(this.config).boot(this.container);
 
             this.booted = true;
         }
 
         // public module API
-        api(): LegalEntitiesApiType {
+        api(): ApiType {
             this.boot();
-            return executeApi<LegalEntitiesApiType>(this.container, LegalEntitiesApi as unknown as ApiRegistration);
+            return LegalEntitiesApi(this.container);
         }
 
         isHandleEvent(kind: string): boolean {
-            return kind in LegalEntitiesTechnicalHandler;
+            return kind in LegalEntitiesTechnicalHandler(new Container());
         }
 
-        technicalEventHandler(): LegalEntitiesTechnicalHandlerType {
+        technicalEventHandler(): TechnicalHandlerType {
             this.boot();
-            return executeApi<LegalEntitiesTechnicalHandlerType>(this.container, LegalEntitiesTechnicalHandler as unknown as ApiRegistration);
+            return LegalEntitiesTechnicalHandler(this.container);
         }
 
         migration(): MigrationManager | never {
             this.boot();
-            throw new NoMigrationException();
-            // const migrations = require('../migrations');
-            // return new MigrationManager(DbProvider, {
-            //     migrations,
-            //     moduleName: LegalEntities.moduleName
-            // });
+            const migrations = require('../migrations');
+            const dbProvider = new DatabaseProvider<LegalEntitiesDatabase>(this.config.database);
+            return new MigrationManager(dbProvider, {
+                migrations,
+                moduleName: LegalEntities.moduleName
+            });
         }
 
 

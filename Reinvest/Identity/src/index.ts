@@ -1,10 +1,13 @@
 import Container, {ContainerInterface} from "Container/Container";
 
 import {MigrationManager} from "PostgreSQL/MigrationManager";
-import {Module} from "Reinvest/Modules";
+import {Api, Module} from "Reinvest/Modules";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {ApiRegistration, executeApi} from "Container/ApiExecutor";
+import {IdentityApi, IdentityApiType} from "Identity/Port/Api/IdentityApi";
+import {PortsProvider} from "Identity/Providers/PortsProvider";
+import {AdapterServiceProvider} from "Identity/Providers/AdapterServiceProvider";
+import {IdentityTechnicalHandler} from "Identity/Port/Events/IdentityTechnicalHandler";
 
 export namespace Identity {
     export const moduleName = "Identity";
@@ -12,14 +15,7 @@ export namespace Identity {
         database: PostgreSQLConfig;
     };
 
-    export const technicalEventHandler = {};
-    export const identityApi = { // move to other file + add DI
-        registerUser: (userId: string, profileId: string) => () => ({}),
-        // @ts-ignore
-        getProfile: (userId: string): string => () => '27fad77f-f160-44a8-8611-b19f6e76a253'
-    };
-
-    export type IdentityApi = typeof identityApi;
+    export type ApiType = IdentityApiType & Api
 
     export class Main implements Module {
         private readonly config: Identity.Config;
@@ -36,22 +32,25 @@ export namespace Identity {
                 return;
             }
 
+            new PortsProvider(this.config).boot(this.container);
+            new AdapterServiceProvider(this.config).boot(this.container);
+
             this.booted = true;
         }
 
         // public module API
-        api(): IdentityApi {
+        api(): ApiType {
             this.boot();
-            return executeApi(this.container, identityApi as never as ApiRegistration);
+            return IdentityApi(this.container);
         }
 
         isHandleEvent(kind: string): boolean {
-            return kind in technicalEventHandler;
+            return kind in IdentityTechnicalHandler;
         }
 
         technicalEventHandler() {
             this.boot();
-            return technicalEventHandler;
+            return IdentityTechnicalHandler;
         }
 
         migration(): MigrationManager | never {

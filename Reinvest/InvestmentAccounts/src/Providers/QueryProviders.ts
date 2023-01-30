@@ -14,6 +14,6 @@ export default class QueryProviders {
   public boot(container: ContainerInterface) {
     container
       .addClass(QueryProfileRepository)
-      .addClass(ProfileQueryService, [QueryProfileRepository.toString()]);
+      .addClass(ProfileQueryService, [QueryProfileRepository.getClassName()]);
   }
 }

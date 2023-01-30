@@ -1,7 +1,6 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
 import {PersonType} from "LegalEntities/Port/Api/PeopleController";
-import LegalEntitiesApiType = LegalEntities.LegalEntitiesApiType;
 
 const schema = `
     #graphql
@@ -93,7 +92,7 @@ export const Profile = {
                                            {input}: CompleteProfileDetailsInput,
                                            {profileId, modules}: SessionContext
             ) => {
-                const api = modules.getApi<LegalEntitiesApiType>(LegalEntities);
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 api.completePerson(input, profileId, PersonType.Individual);
 
                 return profileMockResponse;

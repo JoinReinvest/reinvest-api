@@ -8,4 +8,4 @@ export interface InvestmentAccountsDatabase {
 
 }
 
-export const DbProvider = (config: PostgreSQLConfig) => (new DatabaseProvider<InvestmentAccountsDatabase>(config));
+export const DbProvider = (config: PostgreSQLConfig): DatabaseProvider<InvestmentAccountsDatabase> => (new DatabaseProvider<InvestmentAccountsDatabase>(config));

@@ -30,7 +30,7 @@ export type CompletePersonInput = {
 }
 
 export class PeopleController {
-    public static toString = () => "PeopleController";
+    public static getClassName = (): string => "PeopleController";
     private peopleRepository: PeopleRepository;
 
     constructor(peopleRepository: PeopleRepository) {

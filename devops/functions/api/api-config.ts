@@ -7,6 +7,7 @@ import {
   getPrivateSubnetRefs,
   getVpcRef,
 } from "../../serverless/vpc";
+import {SMSPolicy} from "../../serverless/sns";
 
 export const ApiLambdaFunction = {
   handler: `devops/functions/api/handler.main`,
@@ -49,7 +50,7 @@ export const ApiLambdaResources = {
         {
           PolicyName: "ApiLambdaPolicy",
           PolicyDocument: {
-            Statement: [...CloudwatchPolicies, ...EniPolicies, ...S3Policies],
+            Statement: [...CloudwatchPolicies, ...EniPolicies, ...S3Policies, SMSPolicy],
           },
         },
       ],

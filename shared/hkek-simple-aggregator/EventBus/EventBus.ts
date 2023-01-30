@@ -14,7 +14,7 @@ export interface EventBus {
 }
 
 export class SimpleEventBus implements EventBus {
-    static toString = () => 'EventBus';
+    static getClassName = (): string => 'EventBus';
 
     private handlers: {
         [kind: string]: string[]

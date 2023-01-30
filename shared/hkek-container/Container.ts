@@ -1,13 +1,19 @@
 import {createInjector, Injector} from 'typed-inject';
 
+export interface NameProvider {
+    getClassName: () => string
+}
+
 export interface ContainerInterface {
     addAsValue(token: string, constant: any): this;
 
-    addClass(classObject: any, injectTokens?: string[]): this;
+    addClass(classObject: NameProvider, injectDependencies?: string[] | NameProvider[]): this;
 
-    getValue(token: string): any;
+    getValue<T>(token: string): T;
 
-    getClass(classObject: any): any;
+    getClass<T>(classObject: NameProvider): T;
+
+    delegateTo(tokenizedClass: NameProvider, methodName: string): any
 }
 
 class Container implements ContainerInterface {
@@ -17,8 +23,8 @@ class Container implements ContainerInterface {
         this.container = createInjector();
     }
 
-    getClass<T extends typeof toString>(classObject: T): T {
-        return this.getValue(classObject.toString());
+    getClass<T>(classObject: NameProvider): T {
+        return this.getValue(classObject.getClassName());
     }
 
     getValue(token: string) {
@@ -32,12 +38,31 @@ class Container implements ContainerInterface {
         return this;
     }
 
-    addClass(classObject: any, injectTokens: string[] = []): this {
-        const token = classObject.toString();
-        classObject.inject = injectTokens;
+    addClass(classObject: NameProvider, injectDependencies: string[] | NameProvider[] = []): this {
+        const token = classObject.getClassName();
+        const tokensToInject = [];
+        for (const tokenToInject of injectDependencies) {
+            if (typeof tokenToInject === 'string') {
+                tokensToInject.push(tokenToInject);
+            } else if ('getClassName' in tokenToInject) {
+                tokensToInject.push(tokenToInject.getClassName());
+            }
+        }
+        // @ts-ignore
+        classObject.inject = tokensToInject;
+        // @ts-ignore
         this.container = this.container.provideClass(token, classObject);
 
         return this;
+    }
+
+    delegateTo(tokenizedClass: NameProvider, methodName: string): any {
+        const containerSelf = this;
+        return async function () {
+            const controller = containerSelf.getValue(tokenizedClass.getClassName()) as Object;
+            // @ts-ignore
+            return controller[methodName](...arguments);
+        }
     }
 }
 

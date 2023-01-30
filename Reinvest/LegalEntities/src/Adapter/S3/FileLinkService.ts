@@ -12,7 +12,7 @@ export enum FileType {
 }
 
 export class FileLinkService {
-    public static toString = () => "FileLinkService";
+    public static getClassName = (): string => "FileLinkService";
     private adapter: S3Adapter;
     private idGenerator: IdGeneratorInterface;
 

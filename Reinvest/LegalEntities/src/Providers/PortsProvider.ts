@@ -15,7 +15,7 @@ export class PortsProvider {
     public boot(container: ContainerInterface) {
         //controllers
         container
-            .addClass(PeopleController, [PeopleRepository.toString()])
-            .addClass(FileLinksController, [FileLinkService.toString()]);
+            .addClass(PeopleController, [PeopleRepository])
+            .addClass(FileLinksController, [FileLinkService]);
     }
 }

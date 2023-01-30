@@ -1,9 +1,15 @@
-// @ts-nocheck
-import {CompletePersonInput, PeopleController, PersonType} from "LegalEntities/Port/Api/PeopleController";
-import {FileLink, FileLinksController} from "LegalEntities/Port/Api/FileLinksController";
+import {PeopleController} from "LegalEntities/Port/Api/PeopleController";
+import {FileLinksController} from "LegalEntities/Port/Api/FileLinksController";
+import {ContainerInterface} from "Container/Container";
 
-export const LegalEntitiesApi = {
-    completePerson: (input: CompletePersonInput, profileId: string, personType: PersonType): void => [PeopleController.toString(), "completePerson"],
-    createAvatarFileLink: (profileId: string): FileLink[] => [FileLinksController.toString(), "createAvatarFileLink"],
-    createDocumentsFileLinks: (numberOfLinks: number, profileId: string): FileLink[] => [FileLinksController.toString(), "createDocumentsFileLinks"],
+export type LegalEntitiesApiType = {
+    completePerson: PeopleController["completePerson"],
+    createAvatarFileLink: FileLinksController["createAvatarFileLink"],
+    createDocumentsFileLinks: FileLinksController["createDocumentsFileLinks"],
 }
+
+export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesApiType => ({
+    completePerson: container.delegateTo(PeopleController, 'completePerson'),
+    createAvatarFileLink: container.delegateTo(FileLinksController, 'createAvatarFileLink'),
+    createDocumentsFileLinks: container.delegateTo(FileLinksController, 'createDocumentsFileLinks'),
+})
