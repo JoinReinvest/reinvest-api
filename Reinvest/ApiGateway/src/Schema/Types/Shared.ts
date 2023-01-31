@@ -30,7 +30,7 @@ const schema = `
     }
 
     input DollarInput {
-        inCents: Int!,
+        inCents: Int! @constraint(min: 0),
         formatted: String
     }
 
@@ -38,7 +38,7 @@ const schema = `
         inCents: Int
         display: String
     }
-    
+
     enum AccountType {
         INDIVIDUAL
         CORPORATE

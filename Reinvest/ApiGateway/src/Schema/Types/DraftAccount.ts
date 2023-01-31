@@ -3,9 +3,14 @@ import {LegalEntities} from "LegalEntities/index";
 
 const sharedSchema = `
     #graphql
-    input NetRange {
-        from: DollarInput,
-        to: DollarInput
+    input NetRangeInput {
+        from: String!,
+        to: String!
+    }
+
+    type NetRange {
+        from: String
+        to: String
     }
 
     type DraftAccount {
@@ -39,22 +44,34 @@ const individualSchema = `
         STUDENT
     }
 
-    input Employer {
+    input EmployerInput {
         nameOfEmployer: String,
         occupation: String,
         industry: String
     }
-    
+
+    type Employer {
+        nameOfEmployer: String,
+        occupation: String,
+        industry: String
+    }
+
+
     input IndividualAccountInput {
-        experience: Experience!,
-        employmentStatus: EmploymentStatus!,
-        employer: Employer,
-        netWorth: NetRange,
-        netIncome: NetRange
+        experience: Experience,
+        employmentStatus: EmploymentStatus,
+        employer: EmployerInput,
+        netWorth: NetRangeInput,
+        netIncome: NetRangeInput
     }
 
     type IndividualDraftAccount {
-        id: ID
+        id: ID,
+        experience: Experience
+        employmentStatus: EmploymentStatus
+        employer: Employer
+        netWorth: NetRange
+        netIncome: NetRange
     }
 
     type Query {
@@ -62,7 +79,7 @@ const individualSchema = `
     }
 
     type Mutation {
-        completeIndividualAccount(accountId: ID): IndividualDraftAccount
+        completeIndividualDraftAccount(accountId: ID, input: IndividualAccountInput): IndividualDraftAccount
     }
 `;
 const corporateTrustSchema = `
@@ -73,15 +90,15 @@ const corporateTrustSchema = `
     type TrustDraftAccount {
         id: ID
     }
-    
+
     type Query {
         getCorporateDraftAccount(accountId: ID): CorporateDraftAccount
         getTrustDraftAccount(accountId: ID): TrustDraftAccount
     }
 
     type Mutation {
-        completeCorporateAccount(accountId: ID): CorporateDraftAccount
-        completeTrustAccount(accountId: ID): TrustDraftAccount
+        completeCorporateDraftAccount(accountId: ID): CorporateDraftAccount
+        completeTrustDraftAccount(accountId: ID): TrustDraftAccount
     }
 `;
 const accountMockResponse = {
@@ -91,22 +108,66 @@ const accountMockResponse = {
     positionTotal: '$5,560'
 }
 
+type NetRange = {
+    from: string,
+    to: string
+}
+
+type IndividualDraftAccountInput = {
+    experience?: "NO_EXPERIENCE" | "SOME_EXPERIENCE" | "VERY_EXPERIENCED" | "EXPERT",
+    employmentStatus?: "EMPLOYED" | "UNEMPLOYED" | "RETIRED" | "STUDENT",
+    employer?: {
+        nameOfEmployer: string,
+        occupation: string,
+        industry: string
+    },
+    netWorth?: NetRange,
+    netIncome?: NetRange
+};
+
 export const DraftAccount = {
     typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
     resolvers: {
         Query: {
-            listAccountDrafts: async (parent: any,input: any,{profileId, modules}: SessionContext) => ([{id: 'test', type: "INDIVIDUAL"}]),
-
-            getIndividualDraftAccount: async (parent: any,input: any,{profileId, modules}: SessionContext) => ([{id: 'test'}]),
-            getCorporateDraftAccount: async (parent: any,input: any,{profileId, modules}: SessionContext) => ([{id: 'test'}]),
-            getTrustDraftAccount: async (parent: any,input: any,{profileId, modules}: SessionContext) => ([{id: 'test'}]),
+            listAccountDrafts: async (parent: any, input: any, {profileId, modules}: SessionContext) => ([{
+                id: 'test',
+                type: "INDIVIDUAL"
+            }]),
+            getIndividualDraftAccount: async (parent: any, {accountId}: any, {
+                profileId,
+                modules
+            }: SessionContext) => ({id: accountId}),
+            getCorporateDraftAccount: async (parent: any, {accountId}: any, {
+                profileId,
+                modules
+            }: SessionContext) => ({id: accountId}),
+            getTrustDraftAccount: async (parent: any, {accountId}: any, {
+                profileId,
+                modules
+            }: SessionContext) => ({id: accountId}),
         },
         Mutation: {
-            createDraftAccount: async (parent: any, {type}: any,{profileId, modules}: SessionContext) => ({id: 'test', type}),
+            createDraftAccount: async (parent: any, {type}: any, {profileId, modules}: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                return api.createDraftAccount(profileId, type);
+            },
             removeDraftAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => true,
-            completeIndividualAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => ([{id: 'test'}]),
-            completeCorporateAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => ([{id: 'test'}]),
-            completeTrustAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => ([{id: 'test'}]),
+            completeIndividualDraftAccount: async (
+                parent: any,
+                {accountId, input}: { accountId: string, input: IndividualDraftAccountInput },
+                {profileId, modules}: SessionContext
+            ) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                return api.completeIndividualDraftAccount(profileId, accountId, input);
+            },
+            completeCorporateDraftAccount: async (parent: any, input: any, {
+                profileId,
+                modules
+            }: SessionContext) => ([{id: 'test'}]),
+            completeTrustDraftAccount: async (parent: any, input: any, {
+                profileId,
+                modules
+            }: SessionContext) => ([{id: 'test'}]),
         }
     }
 }

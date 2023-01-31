@@ -33,8 +33,8 @@ export namespace Identity {
                 return;
             }
 
-            new PortsProvider(this.config).boot(this.container);
             new AdapterServiceProvider(this.config).boot(this.container);
+            new PortsProvider(this.config).boot(this.container);
 
             this.booted = true;
         }
