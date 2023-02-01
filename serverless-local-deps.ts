@@ -4,6 +4,7 @@ import {
     CognitoOutputs,
     CognitoResources,
 } from "./devops/serverless/cognito";
+import {LocalSignUpLambdaFunction, LocalSignUpLambdaResources} from "./devops/functions/localSignUp/local-sign-up-config";
 
 const serverlessConfiguration: AWS = {
     service: "${env:APPLICATION_NAME}",
@@ -23,9 +24,14 @@ const serverlessConfiguration: AWS = {
             SERVERLESS_REGION: "${aws:region}",
         },
     },
+
+    functions: {
+        localSignUp: LocalSignUpLambdaFunction,
+    },
     resources: {
         Resources: {
             ...CognitoResources,
+            ...LocalSignUpLambdaResources,
         },
         Outputs: {
             ...CognitoOutputs,
