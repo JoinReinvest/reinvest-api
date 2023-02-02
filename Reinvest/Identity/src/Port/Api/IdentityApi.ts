@@ -10,7 +10,9 @@ export type IdentityApiType = {
 }
 
 export const IdentityApi = (container: ContainerInterface): IdentityApiType => ({
-    registerUser: (userId: string, profileId: string) => ({}),
+    registerUser: (userId: string, email: string, isVerified: boolean, incentiveToken?: string) => {
+        console.log({userId, email, isVerified, incentiveToken});
+    },
     getProfile: (userId: string): string => '27fad77f-f160-44a8-8611-b19f6e76a253',
 
     setPhoneNumber: container.delegateTo(PhoneController, 'setPhoneNumber'),

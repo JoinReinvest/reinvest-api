@@ -17,6 +17,7 @@
     "deploy:production": "NODE_ENV=production serverless deploy -s production",
     "destroy:production": "NODE_ENV=production serverless remove -s production",
     "logs:api": "sls logs -s staging -f api -t",
+    "logs:postSignUp": "sls logs -s staging -f lukaszd-staging-cognitoPostSignUpFunction -t",
     "local:server": "docker-compose -f docker-compose.yml up",
     "local": "NODE_ENV=local serverless offline start -s staging --ignoreJWTSignature --noTimeout --reloadHandler",
     "db:migrate": "esbuild --bundle --target=node16 --external:pg-native --platform=node ./Reinvest/migration.ts > migration.js && node migration.js",

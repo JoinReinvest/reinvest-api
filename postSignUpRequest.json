@@ -1,0 +1,12 @@
+{
+  "request": {
+    "userAttributes": {
+      "sub": "202e2b8c-e92a-436f-8842-664eff66444e",
+      "email_verified": "true",
+      "cognito:user_status": "CONFIRMED",
+      "cognito:email_alias": "lukaszX@devkick.pl",
+      "custom:incentive_token": "this-is-custom-token-X",
+      "email": "lukaszX@devkick.pl"
+    }
+  }
+}

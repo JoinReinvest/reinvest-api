@@ -1,7 +1,12 @@
 import serverless from "serverless-http";
 
 const express = require('express');
-import {AttributeType, CognitoIdentityProviderClient, SignUpCommand} from "@aws-sdk/client-cognito-identity-provider";
+import {
+    AttributeType,
+    CognitoIdentityProviderClient,
+    ConfirmSignUpCommand,
+    SignUpCommand
+} from "@aws-sdk/client-cognito-identity-provider";
 
 
 const app = express();
@@ -11,14 +16,22 @@ app.post('/local-sign-up', async function (req: any, res: any) {
     const response = {status: "ok", result: null};
     const client = new CognitoIdentityProviderClient({region: "eu-west-2"});
 
-    const topt = !!req.apiGateway.event.queryStringParameters.topt ? req.apiGateway.event.queryStringParameters.topt : null;
-    if (topt) {
+    const {apiGateway: {event: {queryStringParameters}}} = req;
 
+    if (queryStringParameters && queryStringParameters.topt && queryStringParameters.userId) {
+        const {topt, userId} = queryStringParameters;
+        const confirmSignUpCommand = new ConfirmSignUpCommand({
+            ClientId: process.env.CognitoPostmanClientId as string,
+            Username: userId,
+            ConfirmationCode: topt,
+        });
+
+        response["result"] = await client.send(confirmSignUpCommand);
     } else {
-        const setPhoneNumberCommand = new SignUpCommand({
+        const signUpCommand = new SignUpCommand({
             Username: email,
             ClientId: process.env.CognitoPostmanClientId as string,
-            Password: "phpSUCK123",
+            Password: "thisIsTestPassword123",
             UserAttributes: [
                 {
                     Name: 'custom:incentive_token',
@@ -27,8 +40,7 @@ app.post('/local-sign-up', async function (req: any, res: any) {
             ]
         });
 
-        response["result"] = await client.send(setPhoneNumberCommand);
-
+        response["result"] = await client.send(signUpCommand);
     }
 
     res.json(response);
