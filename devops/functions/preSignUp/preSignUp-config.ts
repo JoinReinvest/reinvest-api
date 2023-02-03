@@ -1,11 +1,10 @@
 import {LambdaConfigType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
-import {CognitoUserPoolArn} from "../../serverless/cognito";
 
-const trigger: keyof LambdaConfigType = 'PostConfirmation';
+const trigger: keyof LambdaConfigType = 'PreSignUp';
 
-export const cognitoPostSignUpFunction = {
-    handler: `devops/functions/postSignUp/handler.main`,
-    role: "CognitoPostSignUpLambdaRole",
+export const cognitoPreSignUpFunction = {
+    handler: `devops/functions/preSignUp/handler.main`,
+    role: "CognitoPreSignUpLambdaRole",
     events: [{
         cognitoUserPool: {
             pool: "${self:service}-user-pool-${sls:stage}",
@@ -14,8 +13,8 @@ export const cognitoPostSignUpFunction = {
         },
     }],
 };
-export const CognitoPostSignUpResources = {
-    CognitoPostSignUpLambdaRole: {
+export const CognitoPreSignUpResources = {
+    CognitoPreSignUpLambdaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
             AssumeRolePolicyDocument: {
@@ -39,11 +38,6 @@ export const CognitoPostSignUpResources = {
                                 Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
                                 Resource: 'arn:aws:logs:*:*:*',
                             },
-                            // {
-                            //     Effect: 'Allow',
-                            //     Action: ['cognito-idp:AdminUpdateUserAttributes'],
-                            //     Resource: [CognitoUserPoolArn],
-                            // },
                         ],
                     },
                 },

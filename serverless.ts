@@ -18,7 +18,11 @@ import {S3Resources} from "./devops/serverless/s3";
 import {VpcResources} from "./devops/serverless/vpc";
 import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
-import {LocalSignUpLambdaFunction, LocalSignUpLambdaResources} from "./devops/functions/localSignUp/local-sign-up-config";
+import {
+    LocalSignUpLambdaFunction,
+    LocalSignUpLambdaResources
+} from "./devops/functions/localSignUp/local-sign-up-config";
+import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 
 const serverlessConfiguration: AWS = {
     service: "${env:APPLICATION_NAME}",
@@ -66,12 +70,14 @@ const serverlessConfiguration: AWS = {
         explorer: ExplorerLambdaFunction,
         queue: QueueFunction,
         cognitoPostSignUpFunction,
+        cognitoPreSignUpFunction,
         localSignUp: LocalSignUpLambdaFunction, // to remove after cognito tests
     },
     resources: {
         Resources: {
             ...VpcResources,
             ...CognitoResources,
+            ...CognitoPreSignUpResources,
             ...CognitoPostSignUpResources,
             ...RdsResources,
             ...S3Resources,

@@ -26,7 +26,12 @@ app.post('/local-sign-up', async function (req: any, res: any) {
             ConfirmationCode: topt,
         });
 
-        response["result"] = await client.send(confirmSignUpCommand);
+        try {
+            response["result"] = await client.send(confirmSignUpCommand);
+        } catch (error: any) {
+            response.status = "failed";
+            response["result"] = error.message;
+        }
     } else {
         const signUpCommand = new SignUpCommand({
             Username: email,
@@ -35,12 +40,16 @@ app.post('/local-sign-up', async function (req: any, res: any) {
             UserAttributes: [
                 {
                     Name: 'custom:incentive_token',
-                    Value: "this-is-custom-token-X"
+                    Value: "123456"
                 } as AttributeType
             ]
         });
-
-        response["result"] = await client.send(signUpCommand);
+        try {
+            response["result"] = await client.send(signUpCommand);
+        } catch (error: any) {
+            response.status = "failed";
+            response["result"] = error.message;
+        }
     }
 
     res.json(response);

@@ -9,14 +9,15 @@ import {
     LocalSignUpLambdaResources
 } from "./devops/functions/localSignUp/local-sign-up-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
+import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 
 const serverlessConfiguration: AWS = {
     service: "${env:APPLICATION_NAME}",
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
-        "serverless-dotenv-plugin",
         "serverless-output-to-env",
+        "serverless-dotenv-plugin",
         "serverless-esbuild",
     ],
     provider: {
@@ -34,11 +35,13 @@ const serverlessConfiguration: AWS = {
     functions: {
         localSignUp: LocalSignUpLambdaFunction,
         cognitoPostSignUpFunction,
+        cognitoPreSignUpFunction,
     },
     resources: {
         Resources: {
             ...CognitoResources,
             ...LocalSignUpLambdaResources,
+            ...CognitoPreSignUpResources,
             ...CognitoPostSignUpResources,
         },
         Outputs: {
