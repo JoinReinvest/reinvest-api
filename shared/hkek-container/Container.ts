@@ -7,7 +7,7 @@ export interface NameProvider {
 export interface ContainerInterface {
     addAsValue(token: string, constant: any): this;
 
-    addClass(classObject: NameProvider, injectDependencies?: string[] | NameProvider[]): this;
+    addClass(classObject: NameProvider, injectDependencies?: (string|NameProvider)[]): this;
 
     getValue<T>(token: string): T;
 
@@ -38,7 +38,7 @@ class Container implements ContainerInterface {
         return this;
     }
 
-    addClass(classObject: NameProvider, injectDependencies: string[] | NameProvider[] = []): this {
+    addClass(classObject: NameProvider, injectDependencies: (string|NameProvider)[] = []): this {
         const token = classObject.getClassName();
         const tokensToInject = [];
         for (const tokenToInject of injectDependencies) {

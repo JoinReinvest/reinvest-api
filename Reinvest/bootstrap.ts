@@ -19,10 +19,20 @@ export function boot(): Modules {
     // } as Investments.Config);
 
     modules.register(
+        InvestmentAccounts.moduleName,
+        InvestmentAccounts.create({
+            database: databaseConfig,
+        } as InvestmentAccounts.Config)
+    );
+
+    modules.register(
         Identity.moduleName,
         Identity.create({
-            database: databaseConfig
-        } as Identity.Config)
+                database: databaseConfig
+            } as Identity.Config,
+            {
+                investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main
+            })
     );
 
     modules.register(
@@ -40,12 +50,6 @@ export function boot(): Modules {
         } as Documents.Config)
     );
 
-    modules.register(
-        InvestmentAccounts.moduleName,
-        InvestmentAccounts.create({
-            database: databaseConfig,
-        } as InvestmentAccounts.Config)
-    );
 
     console.log("App bootstrapped");
 

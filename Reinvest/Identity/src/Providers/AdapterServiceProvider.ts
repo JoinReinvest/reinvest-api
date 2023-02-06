@@ -3,6 +3,9 @@ import {ContainerInterface} from "Container/Container";
 import {DatabaseAdapterInstance, DatabaseAdapterProvider} from "Identity/Adapter/Database/DatabaseAdapter";
 import {IdGenerator} from "IdGenerator/IdGenerator";
 import {PhoneRepository} from "Identity/Adapter/Database/Repository/PhoneRepository";
+import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepository";
+import {ProfileService} from "Identity/Adapter/Profile/ProfileService";
+import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 
 export class AdapterServiceProvider {
     private config: Identity.Config;
@@ -15,15 +18,16 @@ export class AdapterServiceProvider {
         container
             .addClass(IdGenerator)
 
+        container
+            .addClass(CognitoService);
+
         // database
         container
             .addAsValue(DatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
             .addClass(PhoneRepository, [DatabaseAdapterInstance])
+            .addClass(UserRepository, [DatabaseAdapterInstance, IdGenerator])
 
-        // s3
-        // container
-        //     .addAsValue('S3Config', this.config.s3)
-        //     .addClass(S3Adapter, ['S3Config'])
-        //     .addClass(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()])
+        container
+            .addClass(ProfileService, ["InvestmentAccounts"]);
     }
 }

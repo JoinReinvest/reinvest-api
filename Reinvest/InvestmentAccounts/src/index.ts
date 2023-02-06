@@ -1,16 +1,19 @@
 import Container, {ContainerInterface} from "Container/Container";
 import QueryProviders from "InvestmentAccounts/Providers/QueryProviders";
-import {
-    createProfileResolver,
-    getProfileByUserResolver,
-} from "InvestmentAccounts/Resolvers";
-
 import ServiceProviders from "InvestmentAccounts/Providers/ServiceProviders";
 import {DbProvider} from "InvestmentAccounts/Storage/DatabaseAdapter";
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 import EventBusProvider from "InvestmentAccounts/Providers/EventBusProvider";
-import {Module} from "Reinvest/Modules";
+import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
+import {
+    investmentAccountsApi,
+    InvestmentAccountsApiType
+} from "InvestmentAccounts/Infrastructure/Api/InvestmentAccountsApi";
+import {
+    investmentAccountsTechnicalHandler, InvestmentAccountsTechnicalHandlerType
+} from "InvestmentAccounts/Infrastructure/Events/InvestmentAccountsTechnicalHandler";
+import PortsProviders from "InvestmentAccounts/Providers/PortsProviders";
 
 export namespace InvestmentAccounts {
     export const moduleName = "InvestmentAccounts";
@@ -18,9 +21,8 @@ export namespace InvestmentAccounts {
         database: PostgreSQLConfig;
     };
 
-    export const technicalEventHandler = { // todo move to other files + add DI
-        // ProfileCreated: async (event: any) => console.log({eventInModuleHandler: event}),
-    };
+    export type ApiType = InvestmentAccountsApiType & Api;
+    export type TechnicalHandlerType = InvestmentAccountsTechnicalHandlerType & EventHandler;
 
     export class Main implements Module {
         private readonly config: InvestmentAccounts.Config;
@@ -39,26 +41,24 @@ export namespace InvestmentAccounts {
             new EventBusProvider(this.config).boot(this.container);
             new ServiceProviders(this.config).boot(this.container);
             new QueryProviders(this.config).boot(this.container);
+            new PortsProviders(this.config).boot(this.container);
 
             this.booted = true;
         }
 
         // public module API
-        api() {
+        api(): ApiType {
             this.boot();
-            return { // move to other file + add DI
-                createProfile: async (userId: string, email: string) => await createProfileResolver(this.container, userId, email),
-                getProfileByUser: async (userId: string) => await getProfileByUserResolver(this.container, userId),
-            };
+            return investmentAccountsApi(this.container);
         }
 
         isHandleEvent(kind: string): boolean {
-            return kind in technicalEventHandler;
+            return kind in investmentAccountsTechnicalHandler(new Container());
         }
 
-        technicalEventHandler() {
+        technicalEventHandler(): TechnicalHandlerType {
             this.boot();
-            return technicalEventHandler;
+            return investmentAccountsTechnicalHandler(this.container);
         }
 
         migration(): MigrationManager | never {

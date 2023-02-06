@@ -35,7 +35,7 @@ export const app = (modules: Modules) => {
                 const userId = authorizer.jwt.claims.sub;
 
                 const api = modules.getApi<Identity.ApiType>(Identity);
-                const profileId = api.getProfile(userId);
+                const profileId = api.getProfileId(userId);
 
                 return <SessionContext>{
                     profileId,

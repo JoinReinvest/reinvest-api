@@ -4,16 +4,21 @@ import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {IdentityApi, IdentityApiType} from "Identity/Port/Api/IdentityApi";
+import {identityApi, IdentityApiType} from "Identity/Port/Api/IdentityApi";
 import {PortsProvider} from "Identity/Providers/PortsProvider";
 import {AdapterServiceProvider} from "Identity/Providers/AdapterServiceProvider";
-import {IdentityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/Port/Events/IdentityTechnicalHandler";
+import {identityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/Port/Events/IdentityTechnicalHandler";
+import {InvestmentAccounts} from "InvestmentAccounts/index";
 
 export namespace Identity {
     export const moduleName = "Identity";
     export type Config = {
         database: PostgreSQLConfig;
     };
+
+    export type ModulesDependencies = {
+        investmentAccounts: InvestmentAccounts.Main
+    }
 
     export type ApiType = IdentityApiType & Api
     export type TechnicalHandlerType = IdentityTechnicalHandlerType & EventHandler;
@@ -22,9 +27,11 @@ export namespace Identity {
         private readonly config: Identity.Config;
         private readonly container: ContainerInterface;
         private booted = false;
+        private modules: Identity.ModulesDependencies;
 
-        constructor(config: Identity.Config) {
+        constructor(config: Identity.Config, modules: ModulesDependencies) {
             this.config = config;
+            this.modules = modules;
             this.container = new Container();
         }
 
@@ -33,6 +40,7 @@ export namespace Identity {
                 return;
             }
 
+            this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
             new AdapterServiceProvider(this.config).boot(this.container);
             new PortsProvider(this.config).boot(this.container);
 
@@ -42,16 +50,16 @@ export namespace Identity {
         // public module API
         api(): ApiType {
             this.boot();
-            return IdentityApi(this.container);
+            return identityApi(this.container);
         }
 
         isHandleEvent(kind: string): boolean {
-            return kind in IdentityTechnicalHandler(new Container());
+            return kind in identityTechnicalHandler(new Container());
         }
 
         technicalEventHandler(): TechnicalHandlerType {
             this.boot();
-            return IdentityTechnicalHandler(this.container);
+            return identityTechnicalHandler(this.container);
         }
 
         migration(): MigrationManager | never {
@@ -59,7 +67,7 @@ export namespace Identity {
         }
     }
 
-    export function create(config: Identity.Config) {
-        return new Identity.Main(config);
+    export function create(config: Identity.Config, modules: Identity.ModulesDependencies) {
+        return new Identity.Main(config, modules);
     }
 }
