@@ -1,4 +1,4 @@
-import { getAttribute, getResourceNameTag } from "./utils";
+import {exportOutput, getAttribute, getResourceNameTag, importOutput} from "./utils";
 
 export const getVpcRef = () => ({ Ref: "Vpc" });
 export const getVpcCidr = () => "10.0.0.0/16";
@@ -10,6 +10,37 @@ export const getPrivateSubnetRefs = () => [
   { Ref: "PrivateSubnetB" },
 ];
 export const getPublicSubnetRef = () => ({ Ref: "PublicSubnetC" });
+export const importVpcRef = () => importOutput('VpcRef');
+export const importPrivateSubnetRefs = () => [
+  importOutput('PrivateSubnetA'),
+  importOutput('PrivateSubnetB'),
+];
+export const importPublicSubnetRef = () => (
+    importOutput('PublicSubnetC')
+);
+
+export const VpcOutputs = {
+  VpcRef: {
+    Value: {Ref: "Vpc"},
+    Description: "The Vpc Ref",
+    ...exportOutput('VpcRef')
+  },
+  PrivateSubnetA: {
+    Value: {Ref: "PrivateSubnetA"},
+    Description: "PrivateSubnetA Ref",
+    ...exportOutput('PrivateSubnetA')
+  },
+  PrivateSubnetB: {
+    Value: {Ref: "PrivateSubnetB"},
+    Description: "PrivateSubnetB Ref",
+    ...exportOutput('PrivateSubnetB')
+  },
+  PublicSubnetC: {
+    Value: {Ref: "PublicSubnetC"},
+    Description: "PublicSubnetC Ref",
+    ...exportOutput('PublicSubnetC')
+  }
+}
 
 export const VpcResources = {
   Vpc: {

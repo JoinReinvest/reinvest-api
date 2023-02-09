@@ -16,6 +16,18 @@
     "destroy:staging": "NODE_ENV=staging serverless remove -s staging",
     "deploy:production": "NODE_ENV=production serverless deploy -s production",
     "destroy:production": "NODE_ENV=production serverless remove -s production",
+    "deploy:development": "NODE_ENV=development serverless deploy -s development",
+    "destroy:development": "NODE_ENV=development serverless remove -s development",
+
+
+    "deploy:saas:development": "NODE_ENV=development serverless deploy -s development --config serverless-saas.ts",
+    "destroy:saas:development": "NODE_ENV=development serverless remove -s development --config serverless-saas.ts",
+    "deploy:saas:integrations": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-saas.ts",
+
+    "deploy:functions:development": "NODE_ENV=development serverless deploy -s development --config serverless-functions.ts",
+    "destroy:functions:development": "NODE_ENV=development serverless remove -s development --config serverless-functions.ts",
+
+
     "logs:api": "sls logs -s staging -f api -t",
     "logs:postSignUp": "sls logs -s staging -f cognitoPostSignUpFunction -t",
     "invoke:postSignUp": "sls invoke local --function cognitoPostSignUpFunction --path ./postSignUpRequest.json",

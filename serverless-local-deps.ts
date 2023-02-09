@@ -23,7 +23,7 @@ const serverlessConfiguration: AWS = {
     provider: {
         name: "aws",
         runtime: "nodejs16.x",
-        region: "eu-west-2",
+        region: "us-east-1",
         environment: {
             SERVERLESS_SERVICE: "${self:service}",
             SERVERLESS_ACCOUNT_ID: "${aws:accountId}",

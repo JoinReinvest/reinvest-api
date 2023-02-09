@@ -14,7 +14,7 @@ const app = express();
 app.post('/local-sign-up', async function (req: any, res: any) {
     const email = "lukaszX@devkick.pl";
     const response = {status: "ok", result: null};
-    const client = new CognitoIdentityProviderClient({region: "eu-west-2"});
+    const client = new CognitoIdentityProviderClient({region: "us-east-1"});
 
     const {apiGateway: {event: {queryStringParameters}}} = req;
 
