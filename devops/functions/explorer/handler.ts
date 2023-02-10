@@ -1,8 +1,8 @@
 import express, {Request} from "express";
 import serverless from "serverless-http";
 
-const hostedUI = process.env.CognitoHostedUiUrl;
-const apiEndpoint = process.env.ApiGatewayUrl + "/api"; // "http://localhost:3000/api";
+const hostedUI = process.env.ExplorerHostedUI;
+const apiEndpoint = process.env.ApiUrl;
 
 const page = `
 <html lang="en">

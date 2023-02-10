@@ -15,13 +15,13 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=executive
       - PGDATA=/var/lib/postgresql/data/pv
-      - POSTGRES_DB=lukaszd_staging_db
+      - POSTGRES_DB=reinvest_staging_db
     ports:
       - 5432:5432
     volumes:
       - postgresqldata:/var/lib/postgresql/data
-#        logging:
-#          driver: none
+  #        logging:
+  #          driver: none
 
   elasticmq:
     image: 'softwaremill/elasticmq'

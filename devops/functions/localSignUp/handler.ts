@@ -40,7 +40,7 @@ app.post('/local-sign-up', async function (req: any, res: any) {
             UserAttributes: [
                 {
                     Name: 'custom:incentive_token',
-                    Value: "123456"
+                    Value: "123458"
                 } as AttributeType
             ]
         });

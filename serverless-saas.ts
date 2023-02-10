@@ -7,7 +7,7 @@ import {BastionResources} from "./devops/serverless/bastion";
 import {ProviderConfiguration} from "./devops/serverless/serverless-common";
 
 const serverlessConfiguration: AWS = {
-    service: "${env:APPLICATION_NAME}",
+    service: "reinvest",
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
@@ -18,6 +18,7 @@ const serverlessConfiguration: AWS = {
     //@ts-ignore
     provider: {...ProviderConfiguration},
     resources: {
+        Description: "REINVEST ${sls:stage} infrastructure - DO NOT REMOVE!",
         Resources: {
             ...VpcResources,
             ...CognitoResources,

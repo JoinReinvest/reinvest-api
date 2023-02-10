@@ -12,7 +12,7 @@ import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/fu
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 
 const serverlessConfiguration: AWS = {
-    service: "${env:APPLICATION_NAME}",
+    service: "reinvest",
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [

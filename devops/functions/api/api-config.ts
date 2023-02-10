@@ -23,7 +23,7 @@ export const ApiLambdaFunction = {
                 method: "POST",
                 path: "/api",
                 authorizer: {
-                    name: process.env.NODE_ENV === 'local' ? "LocalAuthorizer" : "CognitoAuthorizer",
+                    name: process.env.NODE_ENV === 'local' ? "LocalAuthorizer" : CognitoAuthorizerName,
                 },
             },
         },

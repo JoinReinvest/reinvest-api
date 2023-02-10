@@ -1,15 +1,23 @@
 import type {AWS} from "@serverless/typescript";
-import {CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs} from "./devops/serverless/cognito";
-import {ProviderConfiguration, ProviderEnvironment} from "./devops/serverless/serverless-common";
+import {
+    CognitoAuthorizer,
+    CognitoClientResources,
+    CognitoClientsOutputs,
+    CognitoEnvs
+} from "./devops/serverless/cognito";
+import {
+    margeWithApiGatewayUrl,
+    ProviderConfiguration,
+    ProviderEnvironment
+} from "./devops/serverless/serverless-common";
 import {ApiLambdaFunction, ApiLambdaResources} from "./devops/functions/api/api-config";
 import {ExplorerLambdaFunction, ExplorerLambdaResources} from "./devops/functions/explorer/explorer-config";
 import {QueueFunction} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
-import {importOutput, importOutputFrom} from "./devops/serverless/utils";
 
 const serverlessConfiguration: AWS = {
-    service: "${env:APPLICATION_NAME}-functions",
+    service: "reinvest-functions",
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
@@ -17,12 +25,13 @@ const serverlessConfiguration: AWS = {
         "serverless-stack-termination-protection",
         "serverless-esbuild",
     ],
+    // @ts-ignore
     provider: {
         ...ProviderConfiguration,
         environment: {
             ...ProviderEnvironment,
-            ApiGatewayUrl: importOutputFrom('sls-reinvest-functions-development-HttpApiUrl'),
-            CognitoHostedUiUrl: importOutput('CognitoHostedUiUrl'),
+            ...CognitoEnvs,
+            ApiUrl: margeWithApiGatewayUrl('/api')
         },
         apiGateway: {
             minimumCompressionSize: 1024,
@@ -45,12 +54,13 @@ const serverlessConfiguration: AWS = {
         explorer: ExplorerLambdaFunction,
         // queue: QueueFunction,
         // cognitoPostSignUpFunction,
-        // cognitoPreSignUpFunction,
+        cognitoPreSignUpFunction,
     },
     resources: {
+        Description: "REINVEST ${sls:stage} API functions",
         Resources: {
             ...CognitoClientResources,
-            // ...CognitoPreSignUpResources,
+            ...CognitoPreSignUpResources,
             // ...CognitoPostSignUpResources,
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,

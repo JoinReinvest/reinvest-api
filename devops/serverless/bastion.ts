@@ -22,7 +22,7 @@ export const BastionResources = {
     Type: "AWS::EC2::Instance",
     Properties: {
       ImageId: "ami-0b0ea68c435eb488d",
-      KeyName: "${self:service}-${sls:stage}",
+      KeyName: "reinvest-${sls:stage}",
       InstanceType: "t2.micro",
       SubnetId: getPublicSubnetRef(),
       SecurityGroupIds: [{ Ref: "BastionSecurityGroup" }],

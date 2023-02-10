@@ -1,6 +1,6 @@
 import { CloudwatchPolicies } from "../../serverless/cloudwatch";
 import { getAttribute, getResourceName } from "../../serverless/utils";
-import {EniPolicies, getVpcRef, importPrivateSubnetRefs, importVpcRef} from "../../serverless/vpc";
+import {EniPolicies, importPrivateSubnetRefs, importVpcRef} from "../../serverless/vpc";
 
 export const ExplorerLambdaFunction = {
   handler: `devops/functions/explorer/handler.main`,

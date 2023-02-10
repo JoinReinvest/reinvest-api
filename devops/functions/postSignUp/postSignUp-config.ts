@@ -1,5 +1,4 @@
 import {LambdaConfigType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
-import {CognitoUserPoolArn} from "../../serverless/cognito";
 
 const trigger: keyof LambdaConfigType = 'PostConfirmation';
 
@@ -8,7 +7,7 @@ export const cognitoPostSignUpFunction = {
     role: "CognitoPostSignUpLambdaRole",
     events: [{
         cognitoUserPool: {
-            pool: "${self:service}-user-pool-${sls:stage}",
+            pool: "reinvest-user-pool-${sls:stage}",
             trigger,
             existing: true,
         },

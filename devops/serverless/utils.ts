@@ -1,5 +1,5 @@
 export const getResourceName = (name: string, separator: "-" | "_" = "-") =>
-    "${self:service}" + separator + "${sls:stage}" + separator + name;
+    "reinvest" + separator + "${sls:stage}" + separator + name;
 
 export const getResourceNameTag = (name: string) => ({
     Key: "Name",
@@ -16,12 +16,12 @@ export const joinAttributes = (delimiter: string, attributes: any[]) => ({
 
 export const exportOutput = (name: string) => ({
     Export: {
-        Name: "${env:APPLICATION_NAME}-${sls:stage}-" + name
+        Name: "reinvest-${sls:stage}-" + name
     }
 });
 
 export const importOutput = (name: string) => ({
-    "Fn::ImportValue": "${env:APPLICATION_NAME}-${sls:stage}-" + name
+    "Fn::ImportValue": "reinvest-${sls:stage}-" + name
 });
 
 export const importOutputFrom = (name: string) => ({

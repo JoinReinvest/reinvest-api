@@ -37,7 +37,8 @@
     "db:clean": "rm migration.js",
     "db:migration:up": "yarn db:migrate migrateUp && yarn db:clean",
     "db:migration:down": "yarn db:migrate migrateDown && yarn db:clean",
-    "db:migration:latest": "yarn db:migrate migrateLatest && yarn db:clean"
+    "db:migration:latest": "yarn db:migrate migrateLatest && yarn db:clean",
+    "cf:continue": "aws cloudformation continue-update-rollback --stack-name "
   },
   "author": "Lukasz Duraj <https://www.linkedin.com/in/%C5%82ukasz-duraj-a4872317b/>",
   "license": "ISC",

@@ -1,5 +1,4 @@
 import { CloudwatchPolicies } from "../../serverless/cloudwatch";
-import { CognitoAuthorizerName } from "../../serverless/cognito";
 import { S3PoliciesWithImport } from "../../serverless/s3";
 import { getAttribute, getResourceName } from "../../serverless/utils";
 import {

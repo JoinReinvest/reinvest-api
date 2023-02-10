@@ -1,5 +1,7 @@
 import {exportOutput, getAttribute, getResourceName, importOutput} from "./utils";
+import {margeWithApiGatewayUrl} from "./serverless-common";
 
+// SAAS Part
 export const CognitoResources = {
     CognitoSMSRole: {
         Type: "AWS::IAM::Role",
@@ -15,7 +17,7 @@ export const CognitoResources = {
                         Condition: {
                             StringEquals: {
                                 "sts:ExternalId":
-                                    "${self:service}-user-pool-${sls:stage}-external-id",
+                                    "reinvest-user-pool-${sls:stage}-external-id",
                             },
                         },
                     },
@@ -41,7 +43,7 @@ export const CognitoResources = {
         Type: "AWS::Cognito::UserPool",
         DeletionPolicy: "${env:COGNITO_RETENTION_POLICY}", // Retain for prod, Delete for staging
         Properties: {
-            UserPoolName: "${self:service}-user-pool-${sls:stage}",
+            UserPoolName: "reinvest-user-pool-${sls:stage}",
             UsernameAttributes: ["email"],
             Policies: {
                 PasswordPolicy: {
@@ -53,7 +55,6 @@ export const CognitoResources = {
                 },
             },
             MfaConfiguration: "OPTIONAL",
-            // MfaConfiguration: "OFF",
             AccountRecoverySetting: {
                 RecoveryMechanisms: [
                     {
@@ -70,7 +71,7 @@ export const CognitoResources = {
                 ChallengeRequiredOnNewDevice: true,
             },
             SmsConfiguration: {
-                ExternalId: "${self:service}-user-pool-${sls:stage}-external-id",
+                ExternalId: "reinvest-user-pool-${sls:stage}-external-id",
                 SnsCallerArn: getAttribute("CognitoSMSRole", "Arn"),
             },
             EnabledMfas: [
@@ -104,7 +105,7 @@ export const CognitoResources = {
     CognitoUserPoolDomain: {
         Type: "AWS::Cognito::UserPoolDomain",
         Properties: {
-            Domain: "${self:service}-${sls:stage}",
+            Domain: "reinvest-${sls:stage}",
             UserPoolId: {
                 Ref: "CognitoUserPool",
             },
@@ -159,7 +160,38 @@ export const CognitoResources = {
         },
     },
 };
+export const CognitoOutputs = {
+    CognitoUserPoolID: {
+        Value: {Ref: "CognitoUserPool"},
+        Description: "The user pool ID",
+        ...exportOutput('CognitoUserPoolID')
+    },
+    CognitoIssuerUrl: {
+        Value: getAttribute("CognitoUserPool", "ProviderURL"),
+        Description: "CognitoIssuerUrl",
+        ...exportOutput('CognitoIssuerUrl')
+    },
+}
+export const CognitoAuthorizer = {
+    CognitoAuthorizer: {
+        type: "jwt",
+        name: getResourceName("cognito-authorizer"),
+        identitySource: "$request.header.Authorization",
+        issuerUrl: importOutput('CognitoIssuerUrl'),
+        audience: [{Ref: "CognitoUserPoolClientPostman"}],
+    },
+};
 
+// FUNCTIONS Part
+export const getHostedUI = (clientName: string) => ({
+    "Fn::Sub": [
+        "https://reinvest-${sls:stage}.auth.${aws:region}.amazoncognito.com/login?client_id=${CognitoUserPoolClientPostmanClientId}&response_type=token&scope=openid+profile&redirect_uri=${CallbackUrl}",
+        {
+            CognitoUserPoolClientPostmanClientId: {Ref: clientName},
+            CallbackUrl: margeWithApiGatewayUrl("/set-header")
+        }
+    ]
+});
 export const CognitoClientResources = {
     CognitoUserPoolClientPostman: {
         Type: "AWS::Cognito::UserPoolClient",
@@ -174,13 +206,7 @@ export const CognitoClientResources = {
             RefreshTokenValidity: 30,
             AllowedOAuthFlows: ["implicit"],
             AllowedOAuthScopes: ["profile", "openid"],
-            // CallbackURLs: ["http://localhost:3000/set-header"],
-            CallbackURLs: [{
-                "Fn::Sub": [
-                    "https://${ApiGatewayRestApi}/set-header",
-                    {ApiGatewayRestApi: {Ref: "ApiGatewayRestApi"}}
-                ]
-            }],
+            CallbackURLs: [margeWithApiGatewayUrl("/set-header")],
             ClientName: "Postman Test Client",
             EnableTokenRevocation: true,
             PreventUserExistenceErrors: "ENABLED",
@@ -198,7 +224,6 @@ export const CognitoClientResources = {
         },
     },
 }
-
 export const CognitoClientsOutputs = {
     CognitoUserPoolClientPostmanClientId: {
         Value: {Ref: "CognitoUserPoolClientPostman"},
@@ -206,55 +231,12 @@ export const CognitoClientsOutputs = {
         ...exportOutput('CognitoUserPoolClientPostmanClientId')
     },
     CognitoHostedUiUrl: {
-        Value: {
-            "Fn::Sub": [
-                "https://${self:service}-${sls:stage}.auth.${aws:region}.amazoncognito.com/login?client_id=${CognitoUserPoolClientPostmanClientId}&response_type=token&scope=openid+profile&redirect_uri=${CallbackUrl}",
-                {
-                    CognitoUserPoolClientPostmanClientId: {Ref: "CognitoUserPoolClientPostman"},
-                    CallbackUrl:  {
-                        "Fn::Sub": [
-                            "https://${ApiGatewayRestApi}/set-header",
-                            {ApiGatewayRestApi: {Ref: "ApiGatewayRestApi"}}
-                        ]
-                    }
-                }
-            ]
-        },
+        Value: getHostedUI('CognitoUserPoolClientPostman'),
         Description: "The hosted UI URL",
         ...exportOutput('CognitoHostedUiUrl')
     },
 }
-
-export const CognitoOutputs = {
-    CognitoUserPoolID: {
-        Value: {Ref: "CognitoUserPool"},
-        Description: "The user pool ID",
-        ...exportOutput('CognitoUserPoolID')
-    },
-    CognitoIssuerUrl: {
-        Value: getAttribute("CognitoUserPool", "ProviderURL"),
-        Description: "CognitoIssuerUrl",
-        ...exportOutput('CognitoIssuerUrl')
-    },
+export const CognitoEnvs = {
+    ExplorerHostedUI: getHostedUI('CognitoUserPoolClientPostman'),
 }
-
-export const CognitoAuthorizer = {
-    CognitoAuthorizer: {
-        type: "jwt",
-        name: getResourceName("cognito-authorizer"),
-        identitySource: "$request.header.Authorization",
-        issuerUrl: importOutput('CognitoIssuerUrl'),
-        audience: [
-            importOutput("CognitoUserPoolClientPostmanClientId")
-        ],
-
-    },
-    // LocalAuthorizer: {
-    //     identitySource: "$request.header.Authorization",
-    //     issuerUrl: "${env:CognitoIssuerUrl}",
-    //     audience: "${env:CognitoPostmanClientId}"
-    // }
-};
-
 export const CognitoAuthorizerName = "CognitoAuthorizer";
-export const CognitoUserPoolArn = getAttribute("CognitoUserPool", 'Arn');

@@ -25,7 +25,7 @@ import {
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 
 const serverlessConfiguration: AWS = {
-    service: "${env:APPLICATION_NAME}",
+    service: "reinvest",
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
@@ -62,6 +62,11 @@ const serverlessConfiguration: AWS = {
             //@ts-ignore
             authorizers: {
                 ...CognitoAuthorizer,
+                LocalAuthorizer: {
+                    identitySource: "$request.header.Authorization",
+                    issuerUrl: "${env:CognitoIssuerUrl}",
+                    audience: "${env:CognitoPostmanClientId}"
+                }
             },
         },
     },
