@@ -1,8 +1,6 @@
-// @ts-nocheck
-
 import * as dotenv from "dotenv";
 
-dotenv.config({path: "../.env"});
+dotenv.config({path: `./.env.${process.env.NODE_ENV}`});
 
 export const NORTH_CAPITAL_CONFIG = {
     CLIENT_ID: process.env.NORTH_CAPITAL_CLIENT_ID as string,

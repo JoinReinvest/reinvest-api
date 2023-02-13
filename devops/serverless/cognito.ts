@@ -96,6 +96,12 @@ export const CognitoResources = {
                     Name: "incentive_token",
                     Required: false,
                 },
+                {
+                    AttributeDataType: "String",
+                    Mutable: false,
+                    Name: "profile_id",
+                    Required: false,
+                },
             ],
             UserPoolAddOns: {
                 AdvancedSecurityMode: "ENFORCED",

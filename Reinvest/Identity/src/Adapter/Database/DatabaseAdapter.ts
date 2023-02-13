@@ -1,15 +1,17 @@
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {Kysely} from "kysely/dist/esm";
+import {IdentityUser} from "Identity/Adapter/Database/IdentitySchema";
+
+export const userTable = 'identity_user';
 
 export interface IdentityDatabase {
-    // investment_accounts_profile_aggregate: AggregateTable,
-    // investment_accounts_profile_query: ProfileQueryTable,
-
+    [userTable]: IdentityUser,
 }
 
-export const DatabaseAdapterInstance = "DatabaseAdapter";
+export const DatabaseAdapterProvider = "IdentityDatabaseAdapterProvider";
 export type DatabaseAdapter = Kysely<IdentityDatabase>;
+export type DatabaseAdapterProvider = DatabaseProvider<IdentityDatabase>;
 
-export function DatabaseAdapterProvider(config: PostgreSQLConfig): DatabaseAdapter {
-    return new DatabaseProvider<IdentityDatabase>(config).provide() as unknown as DatabaseAdapter;
+export function createIdentityDatabaseAdapterProvider(config: PostgreSQLConfig): DatabaseProvider<IdentityDatabase> {
+    return new DatabaseProvider<IdentityDatabase>(config);
 }

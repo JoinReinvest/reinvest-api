@@ -4,21 +4,21 @@
     "target": "ES2019",
     "module": "commonjs",
     "outDir": "./build",
-    "baseUrl": "./Reinvest",
+    "baseUrl": ".",
     "strict": true,
     "paths": {
-      "Reinvest/*": ["./*"],
-      "PostgreSQL/*": ["../shared/hkek-postgresql/*"],
-      "SimpleAggregator/*": ["../shared/hkek-simple-aggregator/*"],
-      "Container/*": ["../shared/hkek-container/*"],
-      "IdGenerator/*": ["../shared/hkek-id-generator/*"],
-      "TechnicalEvents/*": ["../shared/hkek-technical-events/*"],
+      "Reinvest/*": ["./Reinvest/*"],
+      "PostgreSQL/*": ["./shared/hkek-postgresql/*"],
+      "SimpleAggregator/*": ["./shared/hkek-simple-aggregator/*"],
+      "Container/*": ["./shared/hkek-container/*"],
+      "IdGenerator/*": ["./shared/hkek-id-generator/*"],
+      "TechnicalEvents/*": ["./shared/hkek-technical-events/*"],
 
-      "ApiGateway/*": ["./ApiGateway/src/*"],
-      "InvestmentAccounts/*": ["./InvestmentAccounts/src/*"],
-      "LegalEntities/*": ["./LegalEntities/src/*"],
-      "Documents/*": ["./Documents/src/*"],
-      "Identity/*": ["./Identity/src/*"]
+      "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
+      "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],
+      "LegalEntities/*": ["./Reinvest/LegalEntities/src/*"],
+      "Documents/*": ["./Reinvest/Documents/src/*"],
+      "Identity/*": ["./Reinvest/Identity/src/*"]
     },
     "typeRoots": [
       "./node_modules/@types",

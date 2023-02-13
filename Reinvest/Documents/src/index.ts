@@ -7,6 +7,7 @@ import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {DocumentsDatabase} from "Documents/Adapter/Database/DatabaseAdapter";
 import {AdapterServiceProvider} from "Documents/Providers/AdapterServiceProvider";
 import {S3Config} from "Documents/Adapter/S3/S3Adapter";
+import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 
 export namespace Documents {
     export const moduleName = "Documents";
@@ -53,13 +54,15 @@ export namespace Documents {
         }
 
         migration(): MigrationManager | never {
-            this.boot();
-            const migrations = require('../migrations');
-            const dbProvider = new DatabaseProvider<DocumentsDatabase>(this.config.database);
-            return new MigrationManager(dbProvider, {
-                migrations,
-                moduleName: Documents.moduleName
-            });
+
+            throw new NoMigrationException();
+            // this.boot();
+            // const migrations = require('../migrations');
+            // const dbProvider = new DatabaseProvider<DocumentsDatabase>(this.config.database);
+            // return new MigrationManager(dbProvider, {
+            //     migrations,
+            //     moduleName: Documents.moduleName
+            // });
         }
 
 

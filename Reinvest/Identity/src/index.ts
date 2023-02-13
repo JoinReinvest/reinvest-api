@@ -2,13 +2,13 @@ import Container, {ContainerInterface} from "Container/Container";
 
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
-import {NoMigrationException} from "PostgreSQL/NoMigrationException";
-import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
+import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {identityApi, IdentityApiType} from "Identity/Port/Api/IdentityApi";
 import {PortsProvider} from "Identity/Providers/PortsProvider";
 import {AdapterServiceProvider} from "Identity/Providers/AdapterServiceProvider";
 import {identityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/Port/Events/IdentityTechnicalHandler";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
+import {DatabaseAdapterProvider, IdentityDatabase} from "Identity/Adapter/Database/DatabaseAdapter";
 
 export namespace Identity {
     export const moduleName = "Identity";
@@ -63,7 +63,13 @@ export namespace Identity {
         }
 
         migration(): MigrationManager | never {
-            throw new NoMigrationException('Module does not support database migrations');
+            this.boot();
+            const migrations = require('../migrations');
+            const dbProvider = this.container.getValue<DatabaseProvider<IdentityDatabase>>(DatabaseAdapterProvider);
+            return new MigrationManager(dbProvider, {
+                migrations,
+                moduleName: Identity.moduleName
+            });
         }
     }
 

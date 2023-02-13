@@ -9,7 +9,7 @@ import {
     ExplorerLambdaResources,
 } from "./devops/functions/explorer/explorer-config";
 import {
-    CognitoAuthorizerName, CognitoClientResources, CognitoEnvs, CognitoOutputs,
+    CognitoAuthorizerName, CognitoClientResources, CognitoOutputs,
     CognitoResources,
 } from "./devops/serverless/cognito";
 import {S3Resources} from "./devops/serverless/s3";
@@ -49,7 +49,7 @@ const serverlessConfiguration: AWS = {
             ApiUrl: "http://localhost:3000/api"
         },
         logs: {
-            httpApi: false, // turn on Api Gateway logs
+            httpApi: true, // turn on Api Gateway logs
             metrics: true,
         },
         httpApi: {

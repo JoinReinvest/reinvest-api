@@ -1,10 +1,17 @@
 import {LambdaConfigType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
+import {getAttribute, getResourceName} from "../..//serverless/utils";
+import {EniPolicies, importPrivateSubnetRefs, importVpcRef} from "../..//serverless/vpc";
+import {CloudwatchPolicies} from "../../serverless/cloudwatch";
 
 const trigger: keyof LambdaConfigType = 'PostConfirmation';
 
 export const cognitoPostSignUpFunction = {
     handler: `devops/functions/postSignUp/handler.main`,
     role: "CognitoPostSignUpLambdaRole",
+    vpc: {
+        securityGroupIds: [getAttribute("PostSignUpSecurityGroup", "GroupId")],
+        subnetIds: [...importPrivateSubnetRefs()],
+    },
     events: [{
         cognitoUserPool: {
             pool: "reinvest-user-pool-${sls:stage}",
@@ -30,23 +37,23 @@ export const CognitoPostSignUpResources = {
             },
             Policies: [
                 {
-                    PolicyName: 'ApiLambdaPolicy',
+                    PolicyName: 'PostSignUpLambdaPolicy',
                     PolicyDocument: {
                         Statement: [
-                            {
-                                Effect: 'Allow',
-                                Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
-                                Resource: 'arn:aws:logs:*:*:*',
-                            },
-                            // {
-                            //     Effect: 'Allow',
-                            //     Action: ['cognito-idp:AdminUpdateUserAttributes'],
-                            //     Resource: [CognitoUserPoolArn],
-                            // },
+                            ...CloudwatchPolicies,
+                            ...EniPolicies
                         ],
                     },
                 },
             ],
+        },
+    },
+    PostSignUpSecurityGroup: {
+        Type: "AWS::EC2::SecurityGroup",
+        Properties: {
+            GroupName: getResourceName("sg-postsignup-lambda"),
+            GroupDescription: getResourceName("sg-postsignup-lambda"),
+            VpcId: importVpcRef(),
         },
     },
 }

@@ -14,12 +14,18 @@ export class UserRegistrationController {
         this.cognitoService = cognitoService;
     }
 
-    async registerUser(userId: string, email: string, isVerified: boolean, incentiveToken: string | null): Promise<boolean> {
-        const profileId = await this.userRepository.createUser(userId, email, isVerified, incentiveToken);
-        const isProfileCreated = await this.profileService.createProfile(profileId, email);
-        if (isProfileCreated) {
-            await this.cognitoService.setProfileAttribute(userId, profileId);
+    async registerUser(userId: string, email: string, incentiveToken: string | null): Promise<boolean> {
+        try {
+            const profileId = await this.userRepository.createUser(userId, email, incentiveToken);
+            const isProfileCreated = await this.profileService.createProfile(profileId, email);
+            if (isProfileCreated) {
+                await this.cognitoService.setProfileAttribute(userId, profileId);
+            }
+
+            return true;
+        } catch (error: any) {
+            console.error(error.message);
+            return false;
         }
-        return true;
     }
 }

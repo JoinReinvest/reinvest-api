@@ -12,9 +12,9 @@
 
     "db:migrate": "esbuild --bundle --target=node16 --external:pg-native --platform=node ./Reinvest/migration.ts > migration.js && node migration.js",
     "db:clean": "rm migration.js",
-    "db:migration:up": "yarn db:migrate migrateUp && yarn db:clean",
-    "db:migration:down": "yarn db:migrate migrateDown && yarn db:clean",
-    "db:migration:latest": "yarn db:migrate migrateLatest && yarn db:clean",
+    "db:migration:up": "NODE_ENV=development yarn db:migrate migrateUp && yarn db:clean",
+    "db:migration:down": "NODE_ENV=development yarn db:migrate migrateDown && yarn db:clean",
+    "db:migration:latest": "NODE_ENV=development yarn db:migrate migrateLatest && yarn db:clean",
 
     "dev:deploy:saas": "NODE_ENV=development serverless deploy -s development --config serverless-saas.ts",
     "dev:deploy:functions": "NODE_ENV=development serverless deploy -s development --config serverless-functions.ts",
@@ -28,8 +28,8 @@
     "integrations:destroy:saas": "NODE_ENV=integrations serverless remove -s integrations --config serverless-saas.ts",
     "integrations:destroy:functions": "NODE_ENV=integrations serverless remove -s integrations --config serverless-functions.ts",
 
-    "local": "NODE_ENV=local serverless offline start -s development --ignoreJWTSignature --noTimeout --reloadHandler --config serverless-local.ts",
-    "local:invoke:postSignUp": "sls invoke local --function cognitoPostSignUpFunction --path ./postSignUpRequest.json",
+    "local": "NODE_ENV=development serverless offline start -s development --ignoreJWTSignature --noTimeout --reloadHandler --config serverless-local.ts",
+    "local:invoke:postSignUp": "NODE_ENV=development sls invoke local -s development --function cognitoPostSignUpFunction --path ./devops/local/postSignUpRequest.json --config serverless-local.ts",
     "local:server": "docker-compose -f docker-compose.yml up"
 
   },

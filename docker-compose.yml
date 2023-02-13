@@ -15,7 +15,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=executive
       - PGDATA=/var/lib/postgresql/data/pv
-      - POSTGRES_DB=reinvest_staging_db
+      - POSTGRES_DB=reinvest_development_db
     ports:
       - 5432:5432
     volumes:

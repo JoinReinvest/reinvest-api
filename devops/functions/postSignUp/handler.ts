@@ -1,6 +1,6 @@
 import {PostAuthenticationTriggerHandler} from 'aws-lambda';
 import {boot} from "Reinvest/bootstrap";
-import {Identity} from "Reinvest/Identity/src";
+import {Identity} from "Identity/index";
 
 export const main: PostAuthenticationTriggerHandler = async (event, context, callback) => {
     const {request: {userAttributes}} = event;
@@ -15,13 +15,17 @@ export const main: PostAuthenticationTriggerHandler = async (event, context, cal
         return;
     }
 
-    const isVerified = emailVerified === "true";
+    if (!emailVerified) {
+        callback('EMAIL_NOT_VERIFIED', event);
+        return;
+    }
+
     const userId = sub;
     const incentiveToken = !token || token.length === 0 ? null : token;
 
     const modules = boot();
     const identity = modules.getApi<Identity.ApiType>(Identity);
-    await identity.registerUser(userId, email, isVerified, incentiveToken);
+    await identity.registerUser(userId, email, incentiveToken);
 
     callback(null, event);
 };

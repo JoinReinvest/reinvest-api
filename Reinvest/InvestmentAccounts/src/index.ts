@@ -14,6 +14,7 @@ import {
     investmentAccountsTechnicalHandler, InvestmentAccountsTechnicalHandlerType
 } from "InvestmentAccounts/Infrastructure/Events/InvestmentAccountsTechnicalHandler";
 import PortsProviders from "InvestmentAccounts/Providers/PortsProviders";
+import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 
 export namespace InvestmentAccounts {
     export const moduleName = "InvestmentAccounts";
@@ -62,13 +63,14 @@ export namespace InvestmentAccounts {
         }
 
         migration(): MigrationManager | never {
-            this.boot();
-
-            const migrations = require('../migrations');
-            return new MigrationManager(DbProvider, {
-                migrations,
-                moduleName: InvestmentAccounts.moduleName
-            });
+            throw new NoMigrationException();
+            // this.boot();
+            //
+            // const migrations = require('../migrations');
+            // return new MigrationManager(DbProvider, {
+            //     migrations,
+            //     moduleName: InvestmentAccounts.moduleName
+            // });
         }
     }
 

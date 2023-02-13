@@ -11,7 +11,6 @@ export function boot(): Modules {
 
     const databaseConfig = DATABASE_CONFIG as PostgreSQLConfig
     const s3Config = S3_CONFIG;
-
     // Investments.boot({
     //   database: {
     //     connectionString: "connection-string-test",
@@ -49,9 +48,6 @@ export function boot(): Modules {
             s3: s3Config
         } as Documents.Config)
     );
-
-
-    console.log("App bootstrapped");
 
     return modules;
 }

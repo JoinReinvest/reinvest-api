@@ -10,6 +10,7 @@ import {
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
+import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
@@ -56,13 +57,14 @@ export namespace LegalEntities {
         }
 
         migration(): MigrationManager | never {
-            this.boot();
-            const migrations = require('../migrations');
-            const dbProvider = new DatabaseProvider<LegalEntitiesDatabase>(this.config.database);
-            return new MigrationManager(dbProvider, {
-                migrations,
-                moduleName: LegalEntities.moduleName
-            });
+            throw new NoMigrationException();
+            // this.boot();
+            // const migrations = require('../migrations');
+            // const dbProvider = new DatabaseProvider<LegalEntitiesDatabase>(this.config.database);
+            // return new MigrationManager(dbProvider, {
+            //     migrations,
+            //     moduleName: LegalEntities.moduleName
+            // });
         }
 
 

@@ -6,16 +6,20 @@ export type PostgreSQLConfig = { database: string; password: string; host: strin
 
 export class DatabaseProvider<Database> {
     private readonly config: PostgreSQLConfig;
+    private instance: Kysely<Database> | null = null;
 
     constructor(config: PostgreSQLConfig) {
         this.config = config
     }
 
     provide(): Kysely<Database> {
-        return new Kysely<Database>({
-            dialect: new PostgresDialect({
-                pool: new Pool(this.config)
-            })
-        });
+        if (this.instance === null) {
+            this.instance = new Kysely<Database>({
+                dialect: new PostgresDialect({
+                    pool: new Pool(this.config)
+                })
+            });
+        }
+        return this.instance;
     }
 }

@@ -1,6 +1,6 @@
 import {Identity} from "Identity/index";
 import {ContainerInterface} from "Container/Container";
-import {DatabaseAdapterInstance, DatabaseAdapterProvider} from "Identity/Adapter/Database/DatabaseAdapter";
+import {DatabaseAdapterProvider, createIdentityDatabaseAdapterProvider} from "Identity/Adapter/Database/DatabaseAdapter";
 import {IdGenerator} from "IdGenerator/IdGenerator";
 import {PhoneRepository} from "Identity/Adapter/Database/Repository/PhoneRepository";
 import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepository";
@@ -23,9 +23,9 @@ export class AdapterServiceProvider {
 
         // database
         container
-            .addAsValue(DatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
-            .addClass(PhoneRepository, [DatabaseAdapterInstance])
-            .addClass(UserRepository, [DatabaseAdapterInstance, IdGenerator])
+            .addAsValue(DatabaseAdapterProvider, createIdentityDatabaseAdapterProvider(this.config.database))
+            .addClass(PhoneRepository, [DatabaseAdapterProvider])
+            .addClass(UserRepository, [DatabaseAdapterProvider, IdGenerator])
 
         container
             .addClass(ProfileService, ["InvestmentAccounts"]);
