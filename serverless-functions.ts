@@ -21,7 +21,7 @@ const serverlessConfiguration: AWS = {
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
-        "serverless-dotenv-plugin",
+        "serverless-output-to-env",
         "serverless-stack-termination-protection",
         "serverless-esbuild",
     ],
@@ -30,7 +30,7 @@ const serverlessConfiguration: AWS = {
         ...ProviderConfiguration,
         environment: {
             ...ProviderEnvironment,
-            ...CognitoEnvs,
+            ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
             ApiUrl: margeWithApiGatewayUrl('/api')
         },
         apiGateway: {
@@ -88,6 +88,14 @@ const serverlessConfiguration: AWS = {
         },
         serverlessTerminationProtection: {
             stages: ["production"],
+        },
+        outputToEnv: {
+            fileName: "./.env.${sls:stage}",
+            overwrite: false,
+            map: {
+                LocalCognitoClientId: "LocalCognitoClientId",
+                LocalHostedUiUrl: "LocalHostedUiUrl",
+            }
         },
     },
 };

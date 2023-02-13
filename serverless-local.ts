@@ -8,12 +8,10 @@ import {
     ExplorerLambdaFunction,
     ExplorerLambdaResources,
 } from "./devops/functions/explorer/explorer-config";
-import {BastionResources} from "./devops/serverless/bastion";
 import {
-    CognitoAuthorizer, CognitoOutputs,
+    CognitoAuthorizerName, CognitoClientResources, CognitoEnvs, CognitoOutputs,
     CognitoResources,
 } from "./devops/serverless/cognito";
-import {RdsResources} from "./devops/serverless/rds";
 import {S3Resources} from "./devops/serverless/s3";
 import {VpcResources} from "./devops/serverless/vpc";
 import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-config";
@@ -23,20 +21,19 @@ import {
     LocalSignUpLambdaResources
 } from "./devops/functions/localSignUp/local-sign-up-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
+import {ProviderEnvironment} from "./devops/serverless/serverless-common";
 
 const serverlessConfiguration: AWS = {
-    service: "reinvest",
+    service: "reinvest-local",
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
         "serverless-dotenv-plugin",
-        "serverless-output-to-env",
         "serverless-offline-sqs",
         "serverless-offline",
         "serverless-offline-watcher",
-        "serverless-stack-termination-protection",
         "serverless-esbuild",
-    ], //  'serverless-domain-manager'
+    ],
     provider: {
         name: "aws",
         runtime: "nodejs16.x",
@@ -46,12 +43,10 @@ const serverlessConfiguration: AWS = {
             shouldStartNameWithService: true,
         },
         environment: {
-            AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
-            NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
-            SERVERLESS_SERVICE: "${self:service}",
-            SERVERLESS_ACCOUNT_ID: "${aws:accountId}",
-            SERVERLESS_STAGE: "${sls:stage}",
-            SERVERLESS_REGION: "${aws:region}",
+            ...ProviderEnvironment,
+            // @ts-ignore
+            ExplorerHostedUI: "${env:LocalHostedUiUrl}",
+            ApiUrl: "http://localhost:3000/api"
         },
         logs: {
             httpApi: false, // turn on Api Gateway logs
@@ -61,11 +56,10 @@ const serverlessConfiguration: AWS = {
             cors: true,
             //@ts-ignore
             authorizers: {
-                ...CognitoAuthorizer,
-                LocalAuthorizer: {
+                [CognitoAuthorizerName]: {
                     identitySource: "$request.header.Authorization",
                     issuerUrl: "${env:CognitoIssuerUrl}",
-                    audience: "${env:CognitoPostmanClientId}"
+                    audience: "${env:LocalCognitoClientId}"
                 }
             },
         },
@@ -76,21 +70,20 @@ const serverlessConfiguration: AWS = {
         queue: QueueFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
-        localSignUp: LocalSignUpLambdaFunction, // to remove after cognito tests
+        localSignUp: LocalSignUpLambdaFunction,
     },
     resources: {
         Resources: {
             ...VpcResources,
             ...CognitoResources,
+            ...CognitoClientResources,
             ...CognitoPreSignUpResources,
             ...CognitoPostSignUpResources,
-            ...RdsResources,
             ...S3Resources,
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,
-            ...BastionResources,
             ...QueueResources,
-            ...LocalSignUpLambdaResources, // to remove after cognito tests
+            ...LocalSignUpLambdaResources,
         },
         Outputs: {
             ...CognitoOutputs,
@@ -132,16 +125,6 @@ const serverlessConfiguration: AWS = {
                 command: `echo "Source files modified"`,
             },
         ],
-        outputToEnv: {
-            fileName: "./.env",
-            overwrite: false,
-            map: {
-                CognitoHostedUiUrl: "HostedUIURL",
-                CognitoUserPoolID: "CognitoUserPoolID",
-                CognitoPostmanClientId: "CognitoUserPoolClientPostmanClientId",
-                CognitoIssuerUrl: "CognitoIssuerUrl",
-            }
-        },
     },
 };
 

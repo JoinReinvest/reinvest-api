@@ -11,12 +11,16 @@ const serverlessConfiguration: AWS = {
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
-        "serverless-dotenv-plugin",
-        // "serverless-output-to-env",
+        "serverless-output-to-env",
         "serverless-stack-termination-protection",
     ],
     //@ts-ignore
-    provider: {...ProviderConfiguration},
+    provider: {
+        ...ProviderConfiguration,
+        environment: {
+            COGNITO_RETENTION_POLICY: 'Delete'
+        }
+    },
     resources: {
         Description: "REINVEST ${sls:stage} infrastructure - DO NOT REMOVE!",
         Resources: {
@@ -36,16 +40,14 @@ const serverlessConfiguration: AWS = {
         serverlessTerminationProtection: {
             stages: ["production"],
         },
-        // outputToEnv: {
-        //     fileName: "../../../.env",
-        //     overwrite: false,
-        //     map: {
-        //         CognitoHostedUiUrl: "HostedUIURL",
-        //         CognitoUserPoolID: "CognitoUserPoolID",
-        //         CognitoPostmanClientId: "CognitoUserPoolClientPostmanClientId",
-        //         CognitoIssuerUrl: "CognitoIssuerUrl",
-        //     }
-        // },
+        outputToEnv: {
+            fileName: "./.env.${sls:stage}",
+            overwrite: false,
+            map: {
+                CognitoUserPoolID: "CognitoUserPoolID",
+                CognitoIssuerUrl: "CognitoIssuerUrl",
+            }
+        },
     },
 };
 

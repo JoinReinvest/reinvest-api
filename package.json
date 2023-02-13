@@ -9,36 +9,29 @@
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",
     "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'",
-    "deploy:local": "NODE_ENV=staging serverless deploy -s staging --config serverless-local-deps.ts",
-    "destroy:local": "NODE_ENV=staging serverless remove -s staging --config serverless-local-deps.ts",
-    "deploy:staging": "NODE_ENV=staging serverless deploy -s staging",
-    "deploy:staging:api": "NODE_ENV=staging serverless deploy function --function api -s staging ",
-    "destroy:staging": "NODE_ENV=staging serverless remove -s staging",
-    "deploy:production": "NODE_ENV=production serverless deploy -s production",
-    "destroy:production": "NODE_ENV=production serverless remove -s production",
-    "deploy:development": "NODE_ENV=development serverless deploy -s development",
-    "destroy:development": "NODE_ENV=development serverless remove -s development",
 
-
-    "deploy:saas:development": "NODE_ENV=development serverless deploy -s development --config serverless-saas.ts",
-    "destroy:saas:development": "NODE_ENV=development serverless remove -s development --config serverless-saas.ts",
-    "deploy:saas:integrations": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-saas.ts",
-
-    "deploy:functions:development": "NODE_ENV=development serverless deploy -s development --config serverless-functions.ts",
-    "destroy:functions:development": "NODE_ENV=development serverless remove -s development --config serverless-functions.ts",
-
-
-    "logs:api": "sls logs -s staging -f api -t",
-    "logs:postSignUp": "sls logs -s staging -f cognitoPostSignUpFunction -t",
-    "invoke:postSignUp": "sls invoke local --function cognitoPostSignUpFunction --path ./postSignUpRequest.json",
-    "local:server": "docker-compose -f docker-compose.yml up",
-    "local": "NODE_ENV=local serverless offline start -s staging --ignoreJWTSignature --noTimeout --reloadHandler",
     "db:migrate": "esbuild --bundle --target=node16 --external:pg-native --platform=node ./Reinvest/migration.ts > migration.js && node migration.js",
     "db:clean": "rm migration.js",
     "db:migration:up": "yarn db:migrate migrateUp && yarn db:clean",
     "db:migration:down": "yarn db:migrate migrateDown && yarn db:clean",
     "db:migration:latest": "yarn db:migrate migrateLatest && yarn db:clean",
-    "cf:continue": "aws cloudformation continue-update-rollback --stack-name "
+
+    "dev:deploy:saas": "NODE_ENV=development serverless deploy -s development --config serverless-saas.ts",
+    "dev:deploy:functions": "NODE_ENV=development serverless deploy -s development --config serverless-functions.ts",
+    "dev:destroy:saas": "NODE_ENV=development serverless remove -s development --config serverless-saas.ts",
+    "dev:destroy:functions": "NODE_ENV=development serverless remove -s development --config serverless-functions.ts",
+    "dev:logs:api": "sls logs -s development -f api -t",
+    "dev:logs:postSignUp": "sls logs -s development -f cognitoPostSignUpFunction -t",
+
+    "integrations:deploy:saas": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-saas.ts",
+    "integrations:deploy:functions": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-functions.ts",
+    "integrations:destroy:saas": "NODE_ENV=integrations serverless remove -s integrations --config serverless-saas.ts",
+    "integrations:destroy:functions": "NODE_ENV=integrations serverless remove -s integrations --config serverless-functions.ts",
+
+    "local": "NODE_ENV=local serverless offline start -s development --ignoreJWTSignature --noTimeout --reloadHandler --config serverless-local.ts",
+    "local:invoke:postSignUp": "sls invoke local --function cognitoPostSignUpFunction --path ./postSignUpRequest.json",
+    "local:server": "docker-compose -f docker-compose.yml up"
+
   },
   "author": "Lukasz Duraj <https://www.linkedin.com/in/%C5%82ukasz-duraj-a4872317b/>",
   "license": "ISC",

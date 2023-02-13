@@ -178,22 +178,23 @@ export const CognitoAuthorizer = {
         name: getResourceName("cognito-authorizer"),
         identitySource: "$request.header.Authorization",
         issuerUrl: importOutput('CognitoIssuerUrl'),
-        audience: [{Ref: "CognitoUserPoolClientPostman"}],
+        audience: [{Ref: "WebsiteCognito"}],
     },
 };
 
 // FUNCTIONS Part
-export const getHostedUI = (clientName: string) => ({
+export const getHostedUI = (clientName: string, callbackUrl: any) => ({
     "Fn::Sub": [
-        "https://reinvest-${sls:stage}.auth.${aws:region}.amazoncognito.com/login?client_id=${CognitoUserPoolClientPostmanClientId}&response_type=token&scope=openid+profile&redirect_uri=${CallbackUrl}",
+        "https://reinvest-${sls:stage}.auth.${aws:region}.amazoncognito.com/login?client_id=${CognitoClientId}&response_type=token&scope=openid+profile&redirect_uri=${CallbackUrl}",
         {
-            CognitoUserPoolClientPostmanClientId: {Ref: clientName},
-            CallbackUrl: margeWithApiGatewayUrl("/set-header")
+            CognitoClientId: {Ref: clientName},
+            CallbackUrl: callbackUrl
         }
     ]
 });
+export const localCallbackUrl = "http://localhost:3000/set-header";
 export const CognitoClientResources = {
-    CognitoUserPoolClientPostman: {
+    WebsiteCognito: {
         Type: "AWS::Cognito::UserPoolClient",
         Properties: {
             TokenValidityUnits: {
@@ -218,25 +219,61 @@ export const CognitoClientResources = {
             SupportedIdentityProviders: ["COGNITO"],
             AllowedOAuthFlowsUserPoolClient: true,
             UserPoolId: importOutput('CognitoUserPoolID'),
-            // WriteAttributes: [
-            //     'custom:incentive_token',
-            // ]
+        },
+    },
+    LocalCognito: {
+        Type: "AWS::Cognito::UserPoolClient",
+        Properties: {
+            TokenValidityUnits: {
+                AccessToken: "hours",
+                IdToken: "hours",
+                RefreshToken: "days",
+            },
+            AccessTokenValidity: 8,
+            IdTokenValidity: 8,
+            RefreshTokenValidity: 30,
+            AllowedOAuthFlows: ["implicit"],
+            AllowedOAuthScopes: ["profile", "openid"],
+            CallbackURLs: [localCallbackUrl],
+            ClientName: "Cognito client for localhost",
+            EnableTokenRevocation: true,
+            PreventUserExistenceErrors: "ENABLED",
+            ExplicitAuthFlows: [
+                "ALLOW_USER_PASSWORD_AUTH",
+                "ALLOW_REFRESH_TOKEN_AUTH",
+            ],
+            GenerateSecret: false,
+            SupportedIdentityProviders: ["COGNITO"],
+            AllowedOAuthFlowsUserPoolClient: true,
+            UserPoolId: importOutput('CognitoUserPoolID'),
         },
     },
 }
 export const CognitoClientsOutputs = {
-    CognitoUserPoolClientPostmanClientId: {
-        Value: {Ref: "CognitoUserPoolClientPostman"},
+    WebsiteCognitoClientId: {
+        Value: {Ref: "WebsiteCognito"},
         Description: "The app client",
-        ...exportOutput('CognitoUserPoolClientPostmanClientId')
+        ...exportOutput('WebsiteCognitoClientId')
     },
-    CognitoHostedUiUrl: {
-        Value: getHostedUI('CognitoUserPoolClientPostman'),
+    LocalCognitoClientId: {
+        Value: {Ref: "LocalCognito"},
+        Description: "The local app client",
+        ...exportOutput('LocalClientId')
+    },
+    WebsiteHostedUiUrl: {
+        Value: getHostedUI('WebsiteCognito', margeWithApiGatewayUrl("/set-header")),
         Description: "The hosted UI URL",
-        ...exportOutput('CognitoHostedUiUrl')
+        ...exportOutput('WebsiteHostedUiUrl')
+    },
+    LocalHostedUiUrl: {
+        Value: getHostedUI('LocalCognito', localCallbackUrl),
+        Description: "The hosted UI URL for local",
+        ...exportOutput('LocalCognitoHostedUiUrl')
     },
 }
 export const CognitoEnvs = {
-    ExplorerHostedUI: getHostedUI('CognitoUserPoolClientPostman'),
+    WebsiteExplorerHostedUI: getHostedUI('WebsiteCognito', margeWithApiGatewayUrl("/set-header")),
+    LocalExplorerHostedUI: getHostedUI('LocalCognito', localCallbackUrl),
+
 }
 export const CognitoAuthorizerName = "CognitoAuthorizer";

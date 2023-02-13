@@ -3,6 +3,8 @@ node_modules/
 **.js
 build
 .env
+.env.*
+!.env.dist
 test/.env.characterization
 test/artifacts/*
 yarn-error.log
