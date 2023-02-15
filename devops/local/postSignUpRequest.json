@@ -1,11 +1,11 @@
 {
   "request": {
     "userAttributes": {
-      "sub": "202e2b8c-e92a-436f-8842-664eff66444e",
+      "sub": "202e2b8c-e92a-436f-8842-664eff664442",
       "email_verified": "true",
       "cognito:user_status": "CONFIRMED",
       "custom:incentive_token": "123A1CDA",
-      "email": "lukasz@devkick.pl"
+      "email": "lukasz3@devkick.pl"
     }
   }
 }

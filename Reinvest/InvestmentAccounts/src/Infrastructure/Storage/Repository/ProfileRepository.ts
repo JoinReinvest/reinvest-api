@@ -34,7 +34,6 @@ export class ProfileRepository {
                 kind: "ProfileSnapshotChanged",
                 data: snapshot.state
             };
-
             this.eventBus
                 .publishMany(events)
                 .publish(snapshotChanged)

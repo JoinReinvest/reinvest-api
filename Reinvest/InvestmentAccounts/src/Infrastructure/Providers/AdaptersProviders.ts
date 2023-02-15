@@ -9,6 +9,7 @@ import ProfileQueryService, {QueryProfileRepository} from "InvestmentAccounts/Pr
 import {AggregateRepository} from "SimpleAggregator/Storage/AggregateRepository";
 import {ProfileRepository} from "InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository";
 import {TransactionalAdapter} from "InvestmentAccounts/Infrastructure/Storage/TransactionalAdapter";
+import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
 
 export default class AdaptersProviders {
     private config: InvestmentAccounts.Config;
@@ -18,11 +19,13 @@ export default class AdaptersProviders {
     }
 
     public boot(container: ContainerInterface) {
+        container.addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container));
+
         container
             .addAsValue(investmentAccountsDatabaseProviderName, createInvestmentAccountsDatabaseAdapterProvider(this.config.database))
             .addClass(TransactionalAdapter, [investmentAccountsDatabaseProviderName])
             .addClassOfType<InvestmentAccountDbProvider>(AggregateRepository, [investmentAccountsDatabaseProviderName])
-            .addClass(ProfileRepository, [AggregateRepository, TransactionalAdapter])
+            .addClass(ProfileRepository, [AggregateRepository, TransactionalAdapter, SimpleEventBus])
         ;
         container
             .addClass(ProfileQuery, [investmentAccountsDatabaseProviderName])
