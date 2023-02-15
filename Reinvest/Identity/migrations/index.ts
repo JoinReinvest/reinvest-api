@@ -1,2 +1,1 @@
-export * as identity_1_create_user from './identity_1_create_user';
-
+export * as migration_15022023143400 from './identity_1_create_user';

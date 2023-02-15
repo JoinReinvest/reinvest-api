@@ -1,26 +1,16 @@
-import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepository";
-import {ProfileService} from "Identity/Adapter/Profile/ProfileService";
-import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
+import {UserRegistrationService} from "Identity/Service/UserRegistrationService";
 
 export class UserRegistrationController {
     public static getClassName = (): string => "UserRegistrationController";
-    private userRepository: UserRepository;
-    private profileService: ProfileService;
-    private cognitoService: CognitoService;
+    private registrationService: UserRegistrationService;
 
-    constructor(userRepository: UserRepository, profileService: ProfileService, cognitoService: CognitoService) {
-        this.userRepository = userRepository;
-        this.profileService = profileService;
-        this.cognitoService = cognitoService;
+    constructor(registrationService: UserRegistrationService) {
+        this.registrationService = registrationService;
     }
 
     async registerUser(userId: string, email: string, incentiveToken: string | null): Promise<boolean> {
         try {
-            const profileId = await this.userRepository.createUser(userId, email, incentiveToken);
-            const isProfileCreated = await this.profileService.createProfile(profileId, email);
-            if (isProfileCreated) {
-                await this.cognitoService.setProfileAttribute(userId, profileId);
-            }
+            await this.registrationService.registerUser(userId, email, incentiveToken);
 
             return true;
         } catch (error: any) {

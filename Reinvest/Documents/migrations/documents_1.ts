@@ -1,5 +1,5 @@
 import {Kysely} from 'kysely';
-import {InvestmentAccountsDatabase} from "InvestmentAccounts/Storage/DatabaseAdapter";
+import {InvestmentAccountsDatabase} from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
 import {DocumentsDatabase} from "Documents/Adapter/Database/DatabaseAdapter";
 
 export async function up(db: Kysely<DocumentsDatabase>): Promise<void> {

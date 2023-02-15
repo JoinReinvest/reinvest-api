@@ -1,20 +1,17 @@
 import Container, {ContainerInterface} from "Container/Container";
-import QueryProviders from "InvestmentAccounts/Providers/QueryProviders";
-import ServiceProviders from "InvestmentAccounts/Providers/ServiceProviders";
-import {DbProvider} from "InvestmentAccounts/Storage/DatabaseAdapter";
-import {MigrationManager} from "PostgreSQL/MigrationManager";
-import EventBusProvider from "InvestmentAccounts/Providers/EventBusProvider";
+import EventBusProvider from "InvestmentAccounts/Infrastructure/Providers/EventBusProvider";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {
     investmentAccountsApi,
     InvestmentAccountsApiType
-} from "InvestmentAccounts/Infrastructure/Api/InvestmentAccountsApi";
+} from "InvestmentAccounts/Infrastructure/Ports/InvestmentAccountsApi";
 import {
     investmentAccountsTechnicalHandler, InvestmentAccountsTechnicalHandlerType
 } from "InvestmentAccounts/Infrastructure/Events/InvestmentAccountsTechnicalHandler";
-import PortsProviders from "InvestmentAccounts/Providers/PortsProviders";
-import {NoMigrationException} from "PostgreSQL/NoMigrationException";
+import PortsProviders from "InvestmentAccounts/Infrastructure/Providers/PortsProviders";
+import AdaptersProviders from "InvestmentAccounts/Infrastructure/Providers/AdaptersProviders";
+import UseCaseProviders from "InvestmentAccounts/Infrastructure/Providers/UseCaseProviders";
 
 export namespace InvestmentAccounts {
     export const moduleName = "InvestmentAccounts";
@@ -39,10 +36,11 @@ export namespace InvestmentAccounts {
             if (this.booted) {
                 return;
             }
-            new EventBusProvider(this.config).boot(this.container);
-            new ServiceProviders(this.config).boot(this.container);
-            new QueryProviders(this.config).boot(this.container);
+
+            new AdaptersProviders(this.config).boot(this.container);
+            new UseCaseProviders(this.config).boot(this.container);
             new PortsProviders(this.config).boot(this.container);
+            new EventBusProvider(this.config).boot(this.container);
 
             this.booted = true;
         }
@@ -62,15 +60,8 @@ export namespace InvestmentAccounts {
             return investmentAccountsTechnicalHandler(this.container);
         }
 
-        migration(): MigrationManager | never {
-            throw new NoMigrationException();
-            // this.boot();
-            //
-            // const migrations = require('../migrations');
-            // return new MigrationManager(DbProvider, {
-            //     migrations,
-            //     moduleName: InvestmentAccounts.moduleName
-            // });
+        migration() {
+            return require('../migrations');
         }
     }
 

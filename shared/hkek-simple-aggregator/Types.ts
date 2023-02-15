@@ -1,8 +1,9 @@
 export type AggregateState = {
     kind: string,
     dateCreated: Date,
+    dateUpdated: Date,
     aggregateId: string,
-    version: number,
+    currentVersion: number,
     previousVersion: number,
     state?: any,
 }

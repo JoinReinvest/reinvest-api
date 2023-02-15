@@ -1,7 +1,8 @@
 import {ContainerInterface} from "Container/Container";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
-import {ProfileQueryEventHandler} from "InvestmentAccounts/EventHandlers";
+import {ProfileQueryEventHandler} from "InvestmentAccounts/Infrastructure/Events/EventHandlers";
+import {ProfileQuery} from "InvestmentAccounts/Infrastructure/Storage/Queries/ProfileQuery";
 
 export default class EventBusProvider {
     private config: InvestmentAccounts.Config;
@@ -12,7 +13,7 @@ export default class EventBusProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(ProfileQueryEventHandler, [])
+            .addClass(ProfileQueryEventHandler, [ProfileQuery])
 
 
         const eventBus = new SimpleEventBus(container);

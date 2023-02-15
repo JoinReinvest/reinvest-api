@@ -2,7 +2,7 @@ import {MigrationResultSet, Migrator} from "kysely";
 import {DatabaseProvider} from "PostgreSQL/DatabaseProvider";
 import {Migration} from "kysely/dist/cjs/migration/migrator";
 
-export type MigrationConfig = { moduleName: string, migrations: Promise<Record<string, Migration>> };
+export type MigrationConfig = { migrations: Promise<Record<string, Migration>> };
 
 export class MigrationManager {
     private readonly config: MigrationConfig;
@@ -23,18 +23,18 @@ export class MigrationManager {
         const {error, results} = await callback(migrator);
         results?.forEach(it => {
             if (it.status === 'Success') {
-                console.log(`[${this.config.moduleName}] migration "${it.migrationName}" was executed successfully`);
+                console.log(`Migration "${it.migrationName}" was executed successfully`);
             } else if (it.status === 'Error') {
-                console.error(`[${this.config.moduleName}] failed to execute migration "${it.migrationName}"`);
+                console.error(`Failed to execute migration "${it.migrationName}"`);
             }
         });
 
         if (error) {
-            console.error(`[${this.config.moduleName}] failed to migrate`);
+            console.error(`Failed to migrate`);
             console.error(error);
             process.exit(1);
-        } else if(typeof results === 'undefined' || results.length === 0) {
-            console.log(`[${this.config.moduleName}] No migrations to execute`);
+        } else if (typeof results === 'undefined' || results.length === 0) {
+            console.log(`No migrations to execute`);
         }
         await db.destroy();
     }

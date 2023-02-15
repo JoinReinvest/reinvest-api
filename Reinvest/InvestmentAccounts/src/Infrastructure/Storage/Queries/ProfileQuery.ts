@@ -1,5 +1,5 @@
-import {ProfileSnapshotChanged} from "InvestmentAccounts/Storage/Queries/Events/ProfileSnapshotChanged";
-import {DbProvider} from "InvestmentAccounts/Storage/DatabaseAdapter";
+import {ProfileSnapshotChanged} from "InvestmentAccounts/Infrastructure/Storage/Queries/Events/ProfileSnapshotChanged";
+import {InvestmentAccountDbProvider} from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
 
 export interface ProfileQueryTable {
     profileId: string,
@@ -20,14 +20,22 @@ type ProfileQueryStructure = {
 };
 
 export class ProfileQuery {
+    static getClassName = (): string => "ProfileQuery";
+    private databaseProvider: InvestmentAccountDbProvider;
+
+    constructor(databaseProvider: InvestmentAccountDbProvider) {
+        this.databaseProvider = databaseProvider;
+    }
+
     async getQuery(filters: ProfileQueryStructure['filters']): Promise<any> {
-        const database = DbProvider.provide();
+        const database = this.databaseProvider.provide();
 
         let profileQuery = database
             .selectFrom('investment_accounts_profile_query')
             .select(['userId', 'data']);
 
         for (let filter in filters) {
+            // @ts-ignore
             profileQuery = profileQuery.where(filter, '=', filters[filter])
         }
 
@@ -53,7 +61,7 @@ export class ProfileQuery {
 
     private async updateProfileQuery(id: string, data: ProfileSnapshotChanged['data']) {
         const query = await this.getQuery({profileId: id});
-        const database = DbProvider.provide();
+        const database = this.databaseProvider.provide();
         if (!query) {
             const dataToInsert = {
                 id,
