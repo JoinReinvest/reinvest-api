@@ -56,7 +56,7 @@ export namespace LegalEntities {
             return LegalEntitiesTechnicalHandler(this.container);
         }
 
-        migration(): MigrationManager | never {
+        migration() {
             throw new NoMigrationException();
             // this.boot();
             // const migrations = require('../migrations');

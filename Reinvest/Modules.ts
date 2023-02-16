@@ -11,7 +11,7 @@ export interface Module {
 
     technicalEventHandler(): EventHandler;
 
-    migration(): MigrationManager | never
+    migration(): any
 }
 
 export interface ModuleNamespace {

@@ -8,6 +8,7 @@ import {AdapterServiceProvider} from "Identity/Providers/AdapterServiceProvider"
 import {identityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/Port/Events/IdentityTechnicalHandler";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {ServicesProvider} from "Identity/Providers/ServicesProvider";
+import * as IdentityMigrations from "../migrations";
 
 export namespace Identity {
     export const moduleName = "Identity";
@@ -63,7 +64,7 @@ export namespace Identity {
         }
 
         migration() {
-            return require('../migrations');
+            return IdentityMigrations;
         }
     }
 

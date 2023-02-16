@@ -53,7 +53,7 @@ export namespace Documents {
             return {};
         }
 
-        migration(): MigrationManager | never {
+        migration() {
 
             throw new NoMigrationException();
             // this.boot();
