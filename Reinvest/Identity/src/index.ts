@@ -1,14 +1,13 @@
 import Container, {ContainerInterface} from "Container/Container";
 
-import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
-import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
+import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {identityApi, IdentityApiType} from "Identity/Port/Api/IdentityApi";
 import {PortsProvider} from "Identity/Providers/PortsProvider";
 import {AdapterServiceProvider} from "Identity/Providers/AdapterServiceProvider";
 import {identityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/Port/Events/IdentityTechnicalHandler";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
-import {DatabaseAdapterProvider, IdentityDatabase} from "Identity/Adapter/Database/DatabaseAdapter";
+import {ServicesProvider} from "Identity/Providers/ServicesProvider";
 
 export namespace Identity {
     export const moduleName = "Identity";
@@ -42,6 +41,7 @@ export namespace Identity {
 
             this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
             new AdapterServiceProvider(this.config).boot(this.container);
+            new ServicesProvider(this.config).boot(this.container);
             new PortsProvider(this.config).boot(this.container);
 
             this.booted = true;
@@ -62,14 +62,8 @@ export namespace Identity {
             return identityTechnicalHandler(this.container);
         }
 
-        migration(): MigrationManager | never {
-            this.boot();
-            const migrations = require('../migrations');
-            const dbProvider = this.container.getValue<DatabaseProvider<IdentityDatabase>>(DatabaseAdapterProvider);
-            return new MigrationManager(dbProvider, {
-                migrations,
-                moduleName: Identity.moduleName
-            });
+        migration() {
+            return require('../migrations');
         }
     }
 

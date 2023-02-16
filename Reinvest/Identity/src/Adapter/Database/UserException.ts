@@ -1,5 +1,6 @@
 export enum USER_EXCEPTION_CODES {
-    USER_ALREADY_EXISTS = 1001
+    USER_ALREADY_EXISTS = 1001,
+    CANNOT_GENERATE_UNIQUE_TOKEN = 1002
 }
 
 export class UserException extends Error {

@@ -5,7 +5,9 @@ import {
 export type ProfileCreated = DomainEvent & {
     kind: "ProfileCreated",
     data: {
-        userId: string
+        individualAccountId: null,
+        corporateAccountIds: [],
+        trustAccountIds: [],
     }
 }
 

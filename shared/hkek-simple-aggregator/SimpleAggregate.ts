@@ -8,12 +8,13 @@ export class SimpleAggregate implements Aggregate {
         this.aggregate = aggregate;
     }
 
-    protected static createAggregate<T extends typeof SimpleAggregate>(this: T, kind: string): InstanceType<T> {
+    protected static createAggregate<T extends typeof SimpleAggregate>(this: T, kind: string, aggregateId: string): InstanceType<T> {
         const aggregateState = {
             kind,
             dateCreated: new Date(),
-            aggregateId: 'testAggregateId',
-            version: 1,
+            dateUpdated: new Date(),
+            aggregateId,
+            currentVersion: 0,
             previousVersion: 0
         } as AggregateState;
 
@@ -39,14 +40,11 @@ export class SimpleAggregate implements Aggregate {
         }
 
         this.aggregate.state = {...this.aggregate.state, ...event.data};
-        this.aggregate.version++;
+        this.aggregate.currentVersion++;
         return <Event>event;
     }
 
     public getSnapshot(): AggregateState {
-        // const aggregate = {...this.aggregate};
-
-        // aggregate.state = JSON.stringify(aggregate.state);
         return {...this.aggregate};
     }
 }

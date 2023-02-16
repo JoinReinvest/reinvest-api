@@ -1,5 +1,5 @@
 import {ContainerInterface} from "Container/Container";
-import {CreateProfileController} from "InvestmentAccounts/Infrastructure/Controller/CreateProfileController";
+import {CreateProfileController} from "InvestmentAccounts/Infrastructure/Ports/Controller/CreateProfileController";
 
 export type InvestmentAccountsApiType = {
     createProfile: CreateProfileController["execute"],

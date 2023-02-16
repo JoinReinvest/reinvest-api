@@ -10,7 +10,7 @@ export async function up(db: Kysely<IdentityDatabase>): Promise<void> {
         .addColumn('email', 'varchar(255)', col => col.notNull().unique())
         .addColumn('invitedByIncentiveToken', 'varchar(10)', col => col.defaultTo(sql`NULL`))
         .addColumn('userIncentiveToken', 'varchar(10)', col => col.unique())
-        .addColumn('createdAt', 'date', col => col.notNull().defaultTo(sql`now()`))
+        .addColumn('createdAt', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
         .execute();
 }
 

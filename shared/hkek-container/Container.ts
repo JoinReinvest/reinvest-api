@@ -9,6 +9,8 @@ export interface ContainerInterface {
 
     addClass(classObject: NameProvider, injectDependencies?: (string|NameProvider)[]): this;
 
+    addClassOfType<ClassType>(classObject: NameProvider, injectDependencies?: (string|NameProvider)[]): this;
+
     getValue<T>(token: string): T;
 
     getClass<T>(classObject: NameProvider): T;
@@ -52,6 +54,24 @@ class Container implements ContainerInterface {
         classObject.inject = tokensToInject;
         // @ts-ignore
         this.container = this.container.provideClass(token, classObject);
+
+        return this;
+    }
+
+    addClassOfType<ClassType>(classObject: NameProvider, injectDependencies: (string|NameProvider)[] = []): this {
+        const token = classObject.getClassName();
+        const tokensToInject = [];
+        for (const tokenToInject of injectDependencies) {
+            if (typeof tokenToInject === 'string') {
+                tokensToInject.push(tokenToInject);
+            } else if ('getClassName' in tokenToInject) {
+                tokensToInject.push(tokenToInject.getClassName());
+            }
+        }
+        // @ts-ignore
+        classObject.inject = tokensToInject;
+        // @ts-ignore
+        this.container = this.container.provideClass(token, classObject<ClassType>);
 
         return this;
     }

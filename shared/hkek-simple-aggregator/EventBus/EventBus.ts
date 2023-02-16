@@ -8,6 +8,8 @@ export interface EventHandler<Event extends DomainEvent> {
 export interface EventBus {
     publish(event: DomainEvent): this;
 
+    publishMany(events: [DomainEvent]): this;
+
     subscribe(forKind: string, handler: string): this;
 
     subscribeHandlerForKinds(handler: string, forKinds: string[]): this;
@@ -34,6 +36,14 @@ export class SimpleEventBus implements EventBus {
         for (let handlerName of this.handlers[kind]) {
             const handler = this.container.getValue(handlerName) as EventHandler<any>;
             handler.handle(event);
+        }
+
+        return this;
+    }
+
+    public publishMany(events: [DomainEvent]): this {
+        for (const event of events) {
+            this.publish(event);
         }
 
         return this;
