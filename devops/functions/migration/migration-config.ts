@@ -47,21 +47,13 @@ export const MigrationLambdaResources = {
         Properties: {
             GroupName: getResourceName("sg-migration-lambda"),
             GroupDescription: getResourceName("sg-migration-lambda"),
-            SecurityGroupEgress: [
-                {
-                    IpProtocol: "TCP",
-                    CidrIp: "0.0.0.0/0",
-                    ToPort: 5432,
-                    FromPort: 5432,
-                },
-            ],
             VpcId: importVpcRef()
         },
     },
-    MigrationInvoker: {
-        Type: "AWS::CloudFormation::CustomResource",
-        Properties: {
-            ServiceToken: getAttribute('MigrationLambdaFunction', 'Arn'),
-        }
-    }
+    // MigrationInvoker: {
+    //     Type: "AWS::CloudFormation::CustomResource",
+    //     Properties: {
+    //         ServiceToken: getAttribute('MigrationLambdaFunction', 'Arn'),
+    //     }
+    // }
 };

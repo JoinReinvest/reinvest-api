@@ -6673,6 +6673,11 @@ cfn-resolver-lib@^1.1.7:
     lodash "^4.17.15"
     traverse "^0.6.6"
 
+cfn-response@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/cfn-response/-/cfn-response-1.0.1.tgz#a8ec03950c0683c51495e8ca680d9dc0b884b137"
+  integrity sha512-mHfgHUcGpIbmioV/gQ//5V+b8em/ZKFwAgzmbycflJ1q0AU66wlhIgarkYc4JXGgIca+0lxg+XEKO4ZwyZedaw==
+
 chai@^4.3.6:
   version "4.3.6"
   resolved "https://registry.yarnpkg.com/chai/-/chai-4.3.6.tgz#ffe4ba2d9fa9d6680cc0b370adae709ec9011e9c"

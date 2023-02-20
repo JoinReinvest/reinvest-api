@@ -53,6 +53,14 @@ export const CognitoPostSignUpResources = {
         Properties: {
             GroupName: getResourceName("sg-postsignup-lambda"),
             GroupDescription: getResourceName("sg-postsignup-lambda"),
+            SecurityGroupEgress: [
+                {
+                    IpProtocol: "TCP",
+                    CidrIp: "0.0.0.0/0",
+                    ToPort: 5432,
+                    FromPort: 5432,
+                },
+            ],
             VpcId: importVpcRef(),
         },
     },

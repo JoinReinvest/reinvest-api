@@ -58,15 +58,7 @@ export const RdsOutputs = {
         ...exportOutput('DatabaseName')
     },
     DatabaseHost: {
-        Value: {
-            "Fn::Sub": [
-                "${Host}:${Port}",
-                {
-                    Host: getAttribute('RdsPostgresDBInstance', 'Endpoint.Address'),
-                    Port: getAttribute('RdsPostgresDBInstance', 'Endpoint.Port'),
-                }
-            ]
-        },
+        Value: getAttribute('RdsPostgresDBInstance', 'Endpoint.Address'),
         Description: "Database host",
         ...exportOutput('DatabaseHost')
     },
