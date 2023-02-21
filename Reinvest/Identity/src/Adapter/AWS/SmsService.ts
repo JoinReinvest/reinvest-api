@@ -15,14 +15,13 @@ export class SmsService {
     }
 
     public async sendSmsWithToken(oneTimeToken: OneTimeToken) {
-        const phoneNumber = oneTimeToken.getPhoneNumber();
+        const sms = oneTimeToken.getSms();
         const client = new SNSClient({
             region: this.config.region
         });
-        const token = oneTimeToken.getToken();
         const command = new PublishCommand({
-            Message: `Your authentication code is ${token}`,
-            PhoneNumber: phoneNumber.getFullPhoneNumber(),
+            Message: `Your authentication code is ${sms.code}`,
+            PhoneNumber: sms.phoneNumber,
         });
         await client.send(command);
 

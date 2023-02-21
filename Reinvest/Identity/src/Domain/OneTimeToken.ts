@@ -42,12 +42,11 @@ export class OneTimeToken {
         }
     }
 
-    public getPhoneNumber(): PhoneNumber {
-        return this.phoneNumber;
-    }
-
-    public getToken(): string {
-        return this.token;
+    public getSms() {
+        return {
+            phoneNumber: this.phoneNumber.getFullPhoneNumber(),
+            code: this.token
+        }
     }
 
     public verifyToken(TOPTToken: string): PhoneEvent {
