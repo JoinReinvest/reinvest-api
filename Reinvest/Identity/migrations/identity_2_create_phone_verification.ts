@@ -4,7 +4,7 @@ import {IdentityDatabase, phoneVerificationTable} from "Identity/Adapter/Databas
 export async function up(db: Kysely<IdentityDatabase>): Promise<void> {
     await db.schema
         .createTable(phoneVerificationTable)
-        .addColumn('userId', 'varchar(255)', col => col.primaryKey().notNull().unique())
+        .addColumn('userId', 'uuid', col => col.primaryKey().notNull().unique())
         .addColumn('countryCode', 'varchar(4)', col => col.notNull())
         .addColumn('phoneNumber', 'varchar(20)', col => col.notNull())
         .addColumn('topt', 'varchar(6)', col => col.unique())

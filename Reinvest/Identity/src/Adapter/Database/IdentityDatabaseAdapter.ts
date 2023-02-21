@@ -25,8 +25,6 @@ export type PhoneCodeRow = Pick<SelectablePhoneCode,
     tries: number | null;
     createdAt: Date | null;
     expiresAfterMinutes: number | null;
-} & {
-    tries: number | null;
 };
 
 export type SelectablePhoneCode = Selectable<IdentityPhoneVerification>;

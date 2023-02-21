@@ -4,9 +4,9 @@ import {IdentityDatabase} from "Identity/Adapter/Database/IdentityDatabaseAdapte
 export async function up(db: Kysely<IdentityDatabase>): Promise<void> {
     await db.schema
         .createTable('identity_user')
-        .addColumn('id', 'varchar(36)', col => col.primaryKey().notNull().unique())
-        .addColumn('cognitoUserId', 'varchar(255)', col => col.notNull().unique())
-        .addColumn('profileId', 'varchar(36)', col => col.notNull().unique())
+        .addColumn('id', 'uuid', col => col.primaryKey().notNull().unique())
+        .addColumn('cognitoUserId', 'uuid', col => col.notNull().unique())
+        .addColumn('profileId', 'uuid', col => col.notNull().unique())
         .addColumn('email', 'varchar(255)', col => col.notNull().unique())
         .addColumn('invitedByIncentiveToken', 'varchar(10)', col => col.defaultTo(sql`NULL`))
         .addColumn('userIncentiveToken', 'varchar(10)', col => col.unique())

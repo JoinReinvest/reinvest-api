@@ -8,7 +8,7 @@ export class TransactionId {
   }
 
   static fromUniqueId(id: UniqueId) {
-    return new TransactionId(id.getClassName());
+    return new TransactionId(id.toString());
   }
 
   toString(): string {
@@ -16,6 +16,6 @@ export class TransactionId {
   }
 
   isEqualTo(id: TransactionId): boolean {
-    return this.id === id.getClassName();
+    return this.id === id.toString();
   }
 }

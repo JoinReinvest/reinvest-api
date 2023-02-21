@@ -4,7 +4,7 @@ import {InvestmentAccountsDatabase} from "InvestmentAccounts/Infrastructure/Stor
 export async function up(db: Kysely<InvestmentAccountsDatabase>): Promise<void> {
     await db.schema
         .createTable('investment_accounts_profile_query')
-        .addColumn('profileId', 'varchar(36)', col => col.notNull().unique())
+        .addColumn('profileId', 'uuid', col => col.notNull().unique())
         .addColumn('data', 'json')
         .execute();
 
