@@ -1,5 +1,5 @@
 import {Kysely, sql} from 'kysely';
-import {IdentityDatabase} from "../src/Adapter/Database/DatabaseAdapter";
+import {IdentityDatabase} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 
 export async function up(db: Kysely<IdentityDatabase>): Promise<void> {
     await db.schema

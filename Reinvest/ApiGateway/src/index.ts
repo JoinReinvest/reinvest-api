@@ -15,7 +15,7 @@ const server = new ApolloServer({
     },
 });
 
-export type SessionContext = { modules: Modules, profileId: string }
+export type SessionContext = { modules: Modules, profileId: string, userId: string }
 
 export const app = (modules: Modules) => {
     return startServerAndCreateLambdaHandler(server, {
@@ -38,6 +38,7 @@ export const app = (modules: Modules) => {
                 const profileId = api.getProfileId(userId);
 
                 return <SessionContext>{
+                    userId,
                     profileId,
                     modules,
                 };

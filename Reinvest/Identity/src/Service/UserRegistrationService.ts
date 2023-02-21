@@ -35,9 +35,11 @@ export class UserRegistrationService {
             }
             console.log({profileId});
 
-            const isProfileCreated = await this.profileService.createProfile(profileId, email);
-            if (isProfileCreated) {
-                await this.cognitoService.setProfileAttribute(userId, profileId);
+            const isProfileCreated = await this.profileService.createProfile(profileId);
+            try {
+                await this.cognitoService.setProfileAttribute(userId, profileId); // TODO custom token cannot be updated!!
+            } catch (error: any) {
+                console.log('Cannot update profile id', error.message, error);
             }
 
             return true;

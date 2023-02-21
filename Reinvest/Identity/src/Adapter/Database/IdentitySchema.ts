@@ -10,4 +10,15 @@ export interface IdentityUser {
     createdAt: string;
 }
 
+export interface IdentityPhoneVerification {
+    userId: string;
+    countryCode: string;
+    phoneNumber: string;
+    topt: string;
+    tries: number,
+    createdAt: Date;
+    expiresAfterMinutes: number;
+}
+
 export type InsertableUser = Insertable<IdentityUser>;
+export type InsertableOneTimeToken = Insertable<IdentityPhoneVerification>;

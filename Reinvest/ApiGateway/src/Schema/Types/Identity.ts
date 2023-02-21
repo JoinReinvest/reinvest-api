@@ -16,10 +16,10 @@ export const PhoneNumberVerification = {
         Mutation: {
             setPhoneNumber: async (parent: any,
                                    {countryCode, phoneNumber}: { countryCode: string, phoneNumber: string },
-                                   {profileId, modules}: SessionContext
+                                   {userId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<Identity.ApiType>(Identity);
-                return api.setPhoneNumber(profileId, countryCode, phoneNumber);
+                return api.setPhoneNumber(userId, countryCode, phoneNumber);
             },
             verifyPhoneNumber: async (parent: any,
                                       {
@@ -27,10 +27,10 @@ export const PhoneNumberVerification = {
                                           phoneNumber,
                                           authCode
                                       }: { countryCode: string, phoneNumber: string, authCode: string },
-                                      {profileId, modules}: SessionContext
+                                      {userId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<Identity.ApiType>(Identity);
-                return api.verifyPhoneNumber(profileId, countryCode, phoneNumber, authCode);
+                return api.verifyPhoneNumber(userId, countryCode, phoneNumber, authCode);
             },
         }
     }

@@ -36,6 +36,7 @@ const serverlessConfiguration: AWS = {
             ApiUrl: margeWithApiGatewayUrl('/api'),
             POSTGRESQL_HOST: importOutput('DatabaseHost'),
             POSTGRESQL_DB: importOutput('DatabaseName'),
+            CognitoUserPoolID: importOutput('CognitoUserPoolID'),
             POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
             POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}",
         },

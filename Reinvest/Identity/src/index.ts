@@ -9,11 +9,15 @@ import {identityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/P
 import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {ServicesProvider} from "Identity/Providers/ServicesProvider";
 import * as IdentityMigrations from "../migrations";
+import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
+import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
 
 export namespace Identity {
     export const moduleName = "Identity";
     export type Config = {
         database: PostgreSQLConfig;
+        SNS: SNSConfig,
+        Cognito: CognitoConfig,
     };
 
     export type ModulesDependencies = {

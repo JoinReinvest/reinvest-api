@@ -9,7 +9,7 @@ export class ProfileService {
         this.investmentAccounts = investmentAccounts;
     }
 
-    async createProfile(profileId: string, email: string): Promise<boolean> {
-        return this.investmentAccounts.api().createProfile(profileId, email);
+    async createProfile(profileId: string): Promise<boolean> {
+        return this.investmentAccounts.api().createProfile(profileId);
     }
 }
