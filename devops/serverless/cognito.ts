@@ -102,6 +102,12 @@ export const CognitoResources = {
                     Name: "profile_id",
                     Required: false,
                 },
+                {
+                    AttributeDataType: "String",
+                    Mutable: true,
+                    Name: "profile_uuid",
+                    Required: false,
+                },
             ],
             UserPoolAddOns: {
                 AdvancedSecurityMode: "ENFORCED",
@@ -171,6 +177,11 @@ export const CognitoOutputs = {
         Value: {Ref: "CognitoUserPool"},
         Description: "The user pool ID",
         ...exportOutput('CognitoUserPoolID')
+    },
+    CognitoUserPoolArn: {
+        Value: getAttribute("CognitoUserPool", "Arn"),
+        Description: "The user pool Arn",
+        ...exportOutput('CognitoUserPoolArn')
     },
     CognitoIssuerUrl: {
         Value: getAttribute("CognitoUserPool", "ProviderURL"),
@@ -283,3 +294,12 @@ export const CognitoEnvs = {
 
 }
 export const CognitoAuthorizerName = "CognitoAuthorizer";
+export const CognitoUpdateAttributesPolicyBasedOnOutputArn = [
+    {
+        Effect: "Allow",
+        Action: [
+            "cognito-idp:AdminUpdateUserAttributes",
+        ],
+        Resource: importOutput('CognitoUserPoolArn'),
+    },
+];

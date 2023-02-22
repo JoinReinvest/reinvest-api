@@ -36,6 +36,7 @@ const serverlessConfiguration: AWS = {
             ApiUrl: margeWithApiGatewayUrl('/api'),
             POSTGRESQL_HOST: importOutput('DatabaseHost'),
             POSTGRESQL_DB: importOutput('DatabaseName'),
+            CognitoUserPoolID: importOutput('CognitoUserPoolID'),
             POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
             POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}",
         },
@@ -60,7 +61,7 @@ const serverlessConfiguration: AWS = {
         explorer: ExplorerLambdaFunction,
         migration: MigrationLambdaFunction,
         // queue: QueueFunction,
-        // cognitoPostSignUpFunction,
+        cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
     },
     resources: {
@@ -68,7 +69,7 @@ const serverlessConfiguration: AWS = {
         Resources: {
             ...CognitoClientResources,
             ...CognitoPreSignUpResources,
-            // ...CognitoPostSignUpResources,
+            ...CognitoPostSignUpResources,
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,
             ...MigrationLambdaResources,

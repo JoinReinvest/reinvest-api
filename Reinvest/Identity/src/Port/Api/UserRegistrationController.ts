@@ -14,7 +14,7 @@ export class UserRegistrationController {
 
             return true;
         } catch (error: any) {
-            console.error(error.message);
+            console.log(error.message);
             return false;
         }
     }

@@ -1,21 +1,22 @@
-import {DatabaseAdapterProvider, userTable} from "Identity/Adapter/Database/DatabaseAdapter";
+import {IdentityDatabaseAdapterProvider, userTable} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 import {InsertableUser} from "Identity/Adapter/Database/IdentitySchema";
 import {USER_EXCEPTION_CODES, UserException} from "Identity/Adapter/Database/UserException";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
+import {UniqueTokenGenerator, UniqueTokenGeneratorInterface} from "IdGenerator/UniqueTokenGenerator";
 
 const INCENTIVE_TOKEN_SIZE = 8;
 
 export class UserRepository {
     public static getClassName = (): string => "UserRepository";
-    private databaseAdapterProvider: DatabaseAdapterProvider;
-    private idGenerator: IdGeneratorInterface;
+    private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
+    private uniqueTokenGenerator: UniqueTokenGeneratorInterface;
 
-    constructor(databaseAdapterProvider: DatabaseAdapterProvider, idGenerator: IdGeneratorInterface) {
+    constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider, uniqueTokenGenerator: UniqueTokenGeneratorInterface) {
         this.databaseAdapterProvider = databaseAdapterProvider;
-        this.idGenerator = idGenerator;
+        this.uniqueTokenGenerator = uniqueTokenGenerator;
     }
 
-    async registerUser(id: string, profileId: string, userIncentiveToken: string, cognitoUserId: string, email: string, invitedByIncentiveToken: string | null): Promise<void|never> {
+    async registerUser(id: string, profileId: string, userIncentiveToken: string, cognitoUserId: string, email: string, invitedByIncentiveToken: string | null): Promise<void | never> {
         try {
             await this.databaseAdapterProvider.provide().insertInto(userTable).values(<InsertableUser>{
                 id,
@@ -31,7 +32,7 @@ export class UserRepository {
     }
 
     public async generateUniqueIncentiveToken(tries: number = 1): Promise<string> {
-        const userIncentiveToken = this.idGenerator.generateRandomString(INCENTIVE_TOKEN_SIZE);
+        const userIncentiveToken = this.uniqueTokenGenerator.generateRandomString(INCENTIVE_TOKEN_SIZE);
         const doesTokenExist = await this.verifyIncentiveTokenUniqueness(userIncentiveToken);
 
         if (doesTokenExist) {

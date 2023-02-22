@@ -5,6 +5,9 @@ import {ProfileService} from "Identity/Adapter/Profile/ProfileService";
 import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 import {UserRegistrationService} from "Identity/Service/UserRegistrationService";
 import {IdGenerator} from "IdGenerator/IdGenerator";
+import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationService";
+import {PhoneRepository} from "Identity/Adapter/Database/Repository/PhoneRepository";
+import {UniqueTokenGenerator} from "IdGenerator/UniqueTokenGenerator";
 
 export class ServicesProvider {
     private config: Identity.Config;
@@ -14,8 +17,9 @@ export class ServicesProvider {
     }
 
     public boot(container: ContainerInterface) {
-        //controllers
         container
             .addClass(UserRegistrationService, [UserRepository, ProfileService, CognitoService, IdGenerator])
+            .addClass(PhoneRegistrationService, [UserRepository, PhoneRepository, UniqueTokenGenerator])
+        ;
     }
 }

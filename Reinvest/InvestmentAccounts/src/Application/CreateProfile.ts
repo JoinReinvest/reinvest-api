@@ -14,13 +14,14 @@ class CreateProfile {
     async execute(profileId: string) {
         const checkIfExists = await this.profileRepository.restore(profileId);
         if (checkIfExists !== null) {
-            throw new ProfileException('Profile already exists');
+            throw new ProfileException(`Profile ${profileId} already exists`);
         }
 
         const profile = Profile.create(profileId);
         const profileCreated = profile.initialize();
 
         await this.profileRepository.storeAndPublish([profileCreated], profile.getSnapshot());
+        console.log(`Profile ${profileId} created`);
     }
 }
 

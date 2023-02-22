@@ -3,7 +3,7 @@ import {Kysely} from "kysely";
 export async function createAggregateTable<Database>(db: Kysely<Database>, tableName: string) {
     await db.schema
         .createTable(tableName)
-        .addColumn('aggregateId', 'varchar(36)', col => col.primaryKey().notNull().unique())
+        .addColumn('aggregateId', 'uuid', col => col.primaryKey().notNull().unique())
         .addColumn('dateCreated', 'timestamp', col => col.notNull())
         .addColumn('dateUpdated', 'timestamp', col => col.notNull())
         .addColumn('currentVersion', 'bigint', col => col.notNull())

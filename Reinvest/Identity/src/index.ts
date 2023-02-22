@@ -9,11 +9,21 @@ import {identityTechnicalHandler, IdentityTechnicalHandlerType} from "Identity/P
 import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {ServicesProvider} from "Identity/Providers/ServicesProvider";
 import * as IdentityMigrations from "../migrations";
+import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
+import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
+import {
+    DatabaseAdapterProvider,
+    IdentityDatabase,
+    IdentityDatabaseAdapterProvider
+} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
+import {DatabaseAdapter} from "Documents/Adapter/Database/DatabaseAdapter";
 
 export namespace Identity {
     export const moduleName = "Identity";
     export type Config = {
         database: PostgreSQLConfig;
+        SNS: SNSConfig,
+        Cognito: CognitoConfig,
     };
 
     export type ModulesDependencies = {
@@ -65,6 +75,12 @@ export namespace Identity {
 
         migration() {
             return IdentityMigrations;
+        }
+
+        async close(): Promise<void> {
+            if (this.booted) {
+                await this.container.getValue<IdentityDatabaseAdapterProvider>(DatabaseAdapterProvider).close();
+            }
         }
     }
 

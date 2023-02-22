@@ -6,7 +6,6 @@ import {
 } from "@aws-sdk/client-s3";
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 
-
 export type S3Config = {
     region: string,
     avatarsBucket: string,

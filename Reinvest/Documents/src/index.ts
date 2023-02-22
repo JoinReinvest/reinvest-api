@@ -54,17 +54,11 @@ export namespace Documents {
         }
 
         migration() {
-
             throw new NoMigrationException();
-            // this.boot();
-            // const migrations = require('../migrations');
-            // const dbProvider = new DatabaseProvider<DocumentsDatabase>(this.config.database);
-            // return new MigrationManager(dbProvider, {
-            //     migrations,
-            //     moduleName: Documents.moduleName
-            // });
         }
 
+        async close(): Promise<void> {
+        }
 
     }
 

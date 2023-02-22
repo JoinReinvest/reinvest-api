@@ -12,7 +12,7 @@ export class CreateProfileController {
         try {
             await this.createProfile.execute(profileId);
         } catch (error: any) {
-            console.error(error.message);
+            console.log(error.message);
             return false;
         }
         return true;
