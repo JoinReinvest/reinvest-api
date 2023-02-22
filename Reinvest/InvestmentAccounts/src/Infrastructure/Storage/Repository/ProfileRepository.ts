@@ -1,8 +1,6 @@
 import {AggregateRepository} from "SimpleAggregator/Storage/AggregateRepository";
 import {AggregateState, DomainEvent} from "SimpleAggregator/Types";
-import {
-    InvestmentAccountDbProvider,
-} from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
+import {InvestmentAccountDbProvider,} from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import Profile from "InvestmentAccounts/Domain/Profile";
 import {ProfileSnapshotChanged} from "InvestmentAccounts/Infrastructure/Storage/Queries/Events/ProfileSnapshotChanged";
@@ -39,6 +37,7 @@ export class ProfileRepository {
                 this.eventBus
                     .publishMany(events)
                     .publish(snapshotChanged)
+                ;
             });
     }
 
@@ -46,6 +45,7 @@ export class ProfileRepository {
         try {
             return await this.aggregateRepository.restore<Profile>(this.tableName, profileId);
         } catch (error: any) {
+            console.log(`Aggregate restoration info: aggregate ${profileId} not exists`);
             return null;
         }
     }

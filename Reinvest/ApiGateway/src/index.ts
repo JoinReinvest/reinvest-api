@@ -9,7 +9,7 @@ const server = new ApolloServer({
     schema: Schema,
     includeStacktraceInErrorResponses: true, // todo this should be debug flag
     formatError: (err) => {
-        console.error(err);
+        console.log(err);
 
         return err;
     },

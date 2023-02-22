@@ -27,7 +27,7 @@ export class CognitoService {
             UserPoolId: this.config.userPoolID,
             UserAttributes: [
                 {
-                    Name: 'custom:profile_id',
+                    Name: 'custom:profile_uuid',
                     Value: profileId
                 } as AttributeType
             ]
@@ -57,7 +57,7 @@ export class CognitoService {
 
     private async sendAttributeUpdateCommand(command: AdminUpdateUserAttributesCommand): Promise<boolean> {
         const client = this.getClient();
-        const response = await client.send(command);
+        await client.send(command);
 
         return true;
     }

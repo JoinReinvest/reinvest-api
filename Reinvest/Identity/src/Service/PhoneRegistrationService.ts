@@ -29,7 +29,7 @@ export class PhoneRegistrationService {
 
             return this.phoneRepository.storeToken(oneTimeToken);
         } catch (error: any) {
-            console.error(error.message);
+            console.log(error.message);
             return false;
         }
     }
@@ -41,7 +41,7 @@ export class PhoneRegistrationService {
 
             return this.phoneRepository.applyEvent(event);
         } catch (error: any) {
-            console.error(error.message);
+            console.log(error.message);
             return false;
         }
     }

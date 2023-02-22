@@ -1,7 +1,7 @@
 import {MigrationManager} from "PostgreSQL/MigrationManager";
 
 export type Api = { [apiName: string]: Function };
-export type EventHandler = { [kind: string]: (event: any) => void};
+export type EventHandler = { [kind: string]: (event: any) => void };
 
 
 export interface Module {
@@ -11,7 +11,9 @@ export interface Module {
 
     technicalEventHandler(): EventHandler;
 
-    migration(): any
+    migration(): any;
+
+    close(): Promise<void>;
 }
 
 export interface ModuleNamespace {
@@ -41,5 +43,13 @@ export default class Modules {
     getApi<ApiType>(namespace: ModuleNamespace): ApiType {
         const module = this.get(namespace.moduleName);
         return module.api() as ApiType;
+    }
+
+    async close() {
+        const modulesNames = Object.keys(this.modules);
+        for (let moduleName of modulesNames) {
+            const module = this.modules[moduleName];
+            await module.close();
+        }
     }
 }

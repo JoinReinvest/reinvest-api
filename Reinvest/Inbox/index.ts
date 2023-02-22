@@ -23,7 +23,7 @@ export class Inbox {
 
             }
         } catch (error: any) {
-            console.error(error);
+            console.log(error);
         }
     }
 }

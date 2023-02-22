@@ -57,6 +57,8 @@ export namespace Documents {
             throw new NoMigrationException();
         }
 
+        async close(): Promise<void> {
+        }
 
     }
 

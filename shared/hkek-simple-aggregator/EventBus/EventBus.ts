@@ -2,7 +2,7 @@ import {DomainEvent} from "SimpleAggregator/Types";
 import {ContainerInterface} from "Container/Container";
 
 export interface EventHandler<Event extends DomainEvent> {
-    handle(event: Event): void;
+    handle(event: Event): Promise<void>;
 }
 
 export interface EventBus {

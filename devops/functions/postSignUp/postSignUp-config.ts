@@ -2,6 +2,7 @@ import {LambdaConfigType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import {getAttribute, getResourceName} from "../..//serverless/utils";
 import {EniPolicies, importPrivateSubnetRefs, importVpcRef} from "../..//serverless/vpc";
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
+import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "../../serverless/cognito";
 
 const trigger: keyof LambdaConfigType = 'PostConfirmation';
 
@@ -41,7 +42,8 @@ export const CognitoPostSignUpResources = {
                     PolicyDocument: {
                         Statement: [
                             ...CloudwatchPolicies,
-                            ...EniPolicies
+                            ...EniPolicies,
+                            ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
                         ],
                     },
                 },
@@ -53,14 +55,6 @@ export const CognitoPostSignUpResources = {
         Properties: {
             GroupName: getResourceName("sg-postsignup-lambda"),
             GroupDescription: getResourceName("sg-postsignup-lambda"),
-            SecurityGroupEgress: [
-                {
-                    IpProtocol: "TCP",
-                    CidrIp: "0.0.0.0/0",
-                    ToPort: 5432,
-                    FromPort: 5432,
-                },
-            ],
             VpcId: importVpcRef(),
         },
     },

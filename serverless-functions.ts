@@ -61,7 +61,7 @@ const serverlessConfiguration: AWS = {
         explorer: ExplorerLambdaFunction,
         migration: MigrationLambdaFunction,
         // queue: QueueFunction,
-        // cognitoPostSignUpFunction,
+        cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
     },
     resources: {
@@ -69,7 +69,7 @@ const serverlessConfiguration: AWS = {
         Resources: {
             ...CognitoClientResources,
             ...CognitoPreSignUpResources,
-            // ...CognitoPostSignUpResources,
+            ...CognitoPostSignUpResources,
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,
             ...MigrationLambdaResources,
