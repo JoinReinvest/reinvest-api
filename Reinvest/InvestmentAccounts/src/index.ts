@@ -12,6 +12,11 @@ import {
 import PortsProviders from "InvestmentAccounts/Infrastructure/Providers/PortsProviders";
 import AdaptersProviders from "InvestmentAccounts/Infrastructure/Providers/AdaptersProviders";
 import UseCaseProviders from "InvestmentAccounts/Infrastructure/Providers/UseCaseProviders";
+import * as InvestmentAccountsMigrations from "../migrations";
+import {
+    InvestmentAccountDbProvider,
+    investmentAccountsDatabaseProviderName
+} from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
 
 export namespace InvestmentAccounts {
     export const moduleName = "InvestmentAccounts";
@@ -61,7 +66,13 @@ export namespace InvestmentAccounts {
         }
 
         migration() {
-            return require('../migrations');
+            return InvestmentAccountsMigrations;
+        }
+
+        async close(): Promise<void> {
+            if (this.booted) {
+                await this.container.getValue<InvestmentAccountDbProvider>(investmentAccountsDatabaseProviderName).close();
+            }
         }
     }
 

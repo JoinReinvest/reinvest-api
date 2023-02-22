@@ -28,21 +28,29 @@ export class UserRegistrationService {
             let profileId = await this.userRepository.getUserProfileId(userId);
 
             if (profileId === null) {
+                console.log(`Creating user: ${userId}`);
                 profileId = this.idGenerator.create();
                 const id = this.idGenerator.create();
                 const userIncentiveToken = await this.userRepository.generateUniqueIncentiveToken();
                 await this.userRepository.registerUser(id, profileId, userIncentiveToken, userId, email, incentiveToken);
+                console.log(`User created: ${userId} with profile id ${profileId}`);
+            } else {
+                console.log(`User ${userId} already exists with profile id ${profileId}`);
             }
-            console.log({profileId});
 
-            const isProfileCreated = await this.profileService.createProfile(profileId, email);
-            if (isProfileCreated) {
+            console.log(`Creating profile id ${profileId}`);
+            await this.profileService.createProfile(profileId);
+
+            try {
+                console.log(`Registering profile ${profileId} in Cognito for user ${userId}`);
                 await this.cognitoService.setProfileAttribute(userId, profileId);
+                console.log(`Profile ${profileId} for user ${userId} registered in Cognito`);
+            } catch (error: any) {
+                console.log(`Cannot register profile ${profileId} for user ${userId} in Cognito: ${error.message}`);
             }
-
             return true;
         } catch (error: any) {
-            console.error(error.message);
+            console.log(`[UserRegistrationService/registerUser] ${error.message}`);
             return false;
         }
     }

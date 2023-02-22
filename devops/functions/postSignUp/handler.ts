@@ -3,6 +3,7 @@ import {boot} from "Reinvest/bootstrap";
 import {Identity} from "Identity/index";
 
 export const main: PostAuthenticationTriggerHandler = async (event, context, callback) => {
+    console.log('[PostSignUp] Profile registration started', event);
     const {request: {userAttributes}} = event;
     if (!userAttributes) {
         callback('MISSING_USER_ATTRIBUTES', event);
@@ -20,12 +21,17 @@ export const main: PostAuthenticationTriggerHandler = async (event, context, cal
         return;
     }
 
+    console.log(`[PostSignUp] Register user ${sub} with referral code "${token}"`);
     const userId = sub;
     const incentiveToken = !token || token.length === 0 ? null : token;
 
     const modules = boot();
     const identity = modules.getApi<Identity.ApiType>(Identity);
     await identity.registerUser(userId, email, incentiveToken);
+    await modules.close();
 
+
+    console.log('Post Authentication profile registration finished');
     callback(null, event);
+    return;
 };

@@ -56,17 +56,12 @@ export namespace LegalEntities {
             return LegalEntitiesTechnicalHandler(this.container);
         }
 
-        migration(): MigrationManager | never {
+        migration() {
             throw new NoMigrationException();
-            // this.boot();
-            // const migrations = require('../migrations');
-            // const dbProvider = new DatabaseProvider<LegalEntitiesDatabase>(this.config.database);
-            // return new MigrationManager(dbProvider, {
-            //     migrations,
-            //     moduleName: LegalEntities.moduleName
-            // });
         }
 
+        async close(): Promise<void> {
+        }
 
     }
 

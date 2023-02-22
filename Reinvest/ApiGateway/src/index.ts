@@ -9,13 +9,13 @@ const server = new ApolloServer({
     schema: Schema,
     includeStacktraceInErrorResponses: true, // todo this should be debug flag
     formatError: (err) => {
-        console.error(err);
+        console.log(err);
 
         return err;
     },
 });
 
-export type SessionContext = { modules: Modules, profileId: string }
+export type SessionContext = { modules: Modules, profileId: string, userId: string }
 
 export const app = (modules: Modules) => {
     return startServerAndCreateLambdaHandler(server, {
@@ -38,6 +38,7 @@ export const app = (modules: Modules) => {
                 const profileId = api.getProfileId(userId);
 
                 return <SessionContext>{
+                    userId,
                     profileId,
                     modules,
                 };

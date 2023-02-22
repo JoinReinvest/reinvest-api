@@ -22,6 +22,7 @@ import {
 } from "./devops/functions/localSignUp/local-sign-up-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {ProviderEnvironment} from "./devops/serverless/serverless-common";
+import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-local",
@@ -67,6 +68,7 @@ const serverlessConfiguration: AWS = {
     functions: {
         api: ApiLambdaFunction,
         explorer: ExplorerLambdaFunction,
+        migration: MigrationLambdaFunction,
         queue: QueueFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
@@ -82,6 +84,7 @@ const serverlessConfiguration: AWS = {
             ...S3Resources,
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,
+            ...MigrationLambdaResources,
             ...QueueResources,
             ...LocalSignUpLambdaResources,
         },

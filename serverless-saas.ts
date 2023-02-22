@@ -1,9 +1,9 @@
 import type {AWS} from "@serverless/typescript";
 import {VpcOutputs, VpcResources} from "./devops/serverless/vpc";
 import {CognitoOutputs, CognitoResources} from "./devops/serverless/cognito";
-import {RdsResources} from "./devops/serverless/rds";
+import {RdsOutputs, RdsResources} from "./devops/serverless/rds";
 import {S3Outputs, S3Resources} from "./devops/serverless/s3";
-import {BastionResources} from "./devops/serverless/bastion";
+import {BastionOutputs, BastionResources} from "./devops/serverless/bastion";
 import {ProviderConfiguration} from "./devops/serverless/serverless-common";
 
 const serverlessConfiguration: AWS = {
@@ -34,6 +34,8 @@ const serverlessConfiguration: AWS = {
             ...CognitoOutputs,
             ...VpcOutputs,
             ...S3Outputs,
+            ...RdsOutputs,
+            ...BastionOutputs,
         }
     },
     custom: {
@@ -46,6 +48,9 @@ const serverlessConfiguration: AWS = {
             map: {
                 CognitoUserPoolID: "CognitoUserPoolID",
                 CognitoIssuerUrl: "CognitoIssuerUrl",
+                BastionHostName: "BastionHostName",
+                DatabaseName: "DatabaseName",
+                DatabaseHost: "DatabaseHost",
             }
         },
     },

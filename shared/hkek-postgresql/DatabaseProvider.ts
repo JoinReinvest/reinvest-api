@@ -22,4 +22,13 @@ export class DatabaseProvider<Database> {
         }
         return this.instance;
     }
+
+    async close() {
+        if (this.instance === null) {
+            return;
+        }
+
+        await this.instance.destroy();
+        this.instance = null;
+    }
 }

@@ -102,6 +102,12 @@ export const CognitoResources = {
                     Name: "profile_id",
                     Required: false,
                 },
+                {
+                    AttributeDataType: "String",
+                    Mutable: true,
+                    Name: "profile_uuid",
+                    Required: false,
+                },
             ],
             UserPoolAddOns: {
                 AdvancedSecurityMode: "ENFORCED",
@@ -172,6 +178,11 @@ export const CognitoOutputs = {
         Description: "The user pool ID",
         ...exportOutput('CognitoUserPoolID')
     },
+    CognitoUserPoolArn: {
+        Value: getAttribute("CognitoUserPool", "Arn"),
+        Description: "The user pool Arn",
+        ...exportOutput('CognitoUserPoolArn')
+    },
     CognitoIssuerUrl: {
         Value: getAttribute("CognitoUserPool", "ProviderURL"),
         Description: "CognitoIssuerUrl",
@@ -218,7 +229,7 @@ export const CognitoClientResources = {
             EnableTokenRevocation: true,
             PreventUserExistenceErrors: "ENABLED",
             ExplicitAuthFlows: [
-                "ALLOW_USER_PASSWORD_AUTH",
+                "ALLOW_USER_SRP_AUTH",
                 "ALLOW_REFRESH_TOKEN_AUTH",
             ],
             GenerateSecret: false,
@@ -245,7 +256,7 @@ export const CognitoClientResources = {
             EnableTokenRevocation: true,
             PreventUserExistenceErrors: "ENABLED",
             ExplicitAuthFlows: [
-                "ALLOW_USER_PASSWORD_AUTH",
+                "ALLOW_USER_SRP_AUTH",
                 "ALLOW_REFRESH_TOKEN_AUTH",
             ],
             GenerateSecret: false,
@@ -283,3 +294,12 @@ export const CognitoEnvs = {
 
 }
 export const CognitoAuthorizerName = "CognitoAuthorizer";
+export const CognitoUpdateAttributesPolicyBasedOnOutputArn = [
+    {
+        Effect: "Allow",
+        Action: [
+            "cognito-idp:AdminUpdateUserAttributes",
+        ],
+        Resource: importOutput('CognitoUserPoolArn'),
+    },
+];

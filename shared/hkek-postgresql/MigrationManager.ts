@@ -40,20 +40,20 @@ export class MigrationManager {
     }
 
     async migrateUp() {
-        return await this.run(migrator => {
-            return migrator.migrateUp();
+        return await this.run(async migrator => {
+            return await migrator.migrateUp();
         });
     }
 
     async migrateDown() {
-        return await this.run(migrator => {
-            return migrator.migrateDown();
+        return await this.run(async migrator => {
+            return await migrator.migrateDown();
         });
     }
 
     async migrateToLatest() {
-        return await this.run(migrator => {
-            return migrator.migrateToLatest();
+        return await this.run(async migrator => {
+            return await migrator.migrateToLatest();
         });
     }
 

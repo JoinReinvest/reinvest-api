@@ -15,6 +15,8 @@ import {ExplorerLambdaFunction, ExplorerLambdaResources} from "./devops/function
 import {QueueFunction} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
+import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
+import {importOutput} from "./devops/serverless/utils";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -31,7 +33,12 @@ const serverlessConfiguration: AWS = {
         environment: {
             ...ProviderEnvironment,
             ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
-            ApiUrl: margeWithApiGatewayUrl('/api')
+            ApiUrl: margeWithApiGatewayUrl('/api'),
+            POSTGRESQL_HOST: importOutput('DatabaseHost'),
+            POSTGRESQL_DB: importOutput('DatabaseName'),
+            CognitoUserPoolID: importOutput('CognitoUserPoolID'),
+            POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
+            POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,
@@ -52,8 +59,9 @@ const serverlessConfiguration: AWS = {
     functions: {
         api: ApiLambdaFunction,
         explorer: ExplorerLambdaFunction,
+        migration: MigrationLambdaFunction,
         // queue: QueueFunction,
-        // cognitoPostSignUpFunction,
+        cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
     },
     resources: {
@@ -61,9 +69,10 @@ const serverlessConfiguration: AWS = {
         Resources: {
             ...CognitoClientResources,
             ...CognitoPreSignUpResources,
-            // ...CognitoPostSignUpResources,
+            ...CognitoPostSignUpResources,
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,
+            ...MigrationLambdaResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,
@@ -95,6 +104,7 @@ const serverlessConfiguration: AWS = {
             map: {
                 LocalCognitoClientId: "LocalCognitoClientId",
                 LocalHostedUiUrl: "LocalHostedUiUrl",
+                WebsiteHostedUiUrl: "WebsiteHostedUiUrl",
             }
         },
     },
