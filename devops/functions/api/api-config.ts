@@ -1,5 +1,9 @@
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
-import {CognitoAuthorizer, CognitoAuthorizerName} from "../../serverless/cognito";
+import {
+    CognitoAuthorizer,
+    CognitoAuthorizerName,
+    CognitoUpdateAttributesPolicyBasedOnOutputArn
+} from "../../serverless/cognito";
 import {S3PoliciesWithImport} from "../../serverless/s3";
 import {getAttribute, getResourceName} from "../../serverless/utils";
 import {
@@ -50,7 +54,13 @@ export const ApiLambdaResources = {
                 {
                     PolicyName: "ApiLambdaPolicy",
                     PolicyDocument: {
-                        Statement: [...CloudwatchPolicies, ...EniPolicies, ...S3PoliciesWithImport, SMSPolicy],
+                        Statement: [
+                            ...CloudwatchPolicies,
+                            ...EniPolicies,
+                            ...S3PoliciesWithImport,
+                            ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
+                            SMSPolicy
+                        ],
                     },
                 },
             ],

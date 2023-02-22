@@ -4,7 +4,7 @@ import {CognitoOutputs, CognitoResources} from "./devops/serverless/cognito";
 import {RdsOutputs, RdsResources} from "./devops/serverless/rds";
 import {S3Outputs, S3Resources} from "./devops/serverless/s3";
 import {BastionOutputs, BastionResources} from "./devops/serverless/bastion";
-import {ProviderConfiguration} from "./devops/serverless/serverless-common";
+import {ProviderConfiguration, ProviderEnvironment} from "./devops/serverless/serverless-common";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest",
@@ -18,6 +18,7 @@ const serverlessConfiguration: AWS = {
     provider: {
         ...ProviderConfiguration,
         environment: {
+            ...ProviderEnvironment,
             COGNITO_RETENTION_POLICY: 'Delete'
         }
     },
