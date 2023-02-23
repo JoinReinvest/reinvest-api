@@ -15,19 +15,29 @@ const schema = `
         label: String
         avatarUrl: String
         accounts: [AccountOverview]
+        isCompleted: Boolean
     }
 
     input ProfileDetailsInput {
+        "An investor name"
         name: PersonName
         "Date of Birth in format YYYY-MM-DD"
         dateOfBirth: ISODate
-        "Is the investor US. Citizen or US. Resident"
-        domicile: Domicile
+        "Is the investor US. Citizen or US. Resident with Green Card or Visa"
+        domicile: DomicileInput
         "A valid SSN number"
-        ssn: String
+        ssn: SSNInput
+        "Permanent address of an investor"
         address: AddressInput
-        idScan: FileLinkInput
+        """
+        ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
+        Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
+        """
+        idScan: [FileLinkInput]
+        "Previously uploaded avatar. Please provide the id returned in @createAvatarFileLink mutation"
         avatar: FileLinkInput
+        "FINRA, Politician, Trading company stakeholder statements"
+        statements: [StatementInput]
     }
 
     type Query {
@@ -36,6 +46,11 @@ const schema = `
     }
 
     type Mutation {
+        """
+        Profile onboarding mutation.
+        Every field in the input can be requested separately.
+        To verify if all required fields are provided see the @Profile.isCompleted field
+        """
         completeProfileDetails(input: ProfileDetailsInput): Profile
         openAccount(draftAccountId: String): Boolean
     }
@@ -57,12 +72,36 @@ type CompleteProfileDetailsInput = {
             country: string
             state: string
         },
-        idScan?: {
+        idScan?: [{
             id: string
-        },
+        }],
         avatar?: {
             id: string
-        }
+        },
+        domicile?: {
+            type: "CITIZEN" | "GREEN_CARD" | "VISA",
+            forGreenCard?: {
+                birthCountry: string,
+                citizenshipCountry: string,
+            },
+            forVisa?: {
+                birthCountry: string,
+                citizenshipCountry: string,
+                visaType: string,
+            }
+        },
+        statements?: [{
+            type: "FINRAMember" | "TradingCompanyStakeholder" | "Politician",
+            forFINRA?: {
+                name: string,
+            }
+            forPolitician?: {
+                description: string,
+            },
+            forStakeholder?: {
+                tickerSymbol: [string]
+            }
+        }]
     }
 }
 
@@ -89,17 +128,18 @@ export const Profile = {
                                {profileId, modules}: SessionContext
             ) => profileMockResponse,
             canOpenAccount: async (parent: any,
-                                   input: undefined,
+                                   data: undefined,
                                    {profileId, modules}: SessionContext
             ) => true
         },
         Mutation: {
             completeProfileDetails: async (parent: any,
-                                           {input}: CompleteProfileDetailsInput,
+                                           data: CompleteProfileDetailsInput,
                                            {profileId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                api.completeProfile(input, profileId, PersonType.Individual);
+                const {input} = data;
+                api.completeProfile(input, profileId);
 
                 return profileMockResponse;
             },

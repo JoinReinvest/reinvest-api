@@ -4,6 +4,7 @@ import {Documents} from "Documents/index";
 const schema = `
     #graphql
     input FileLinkInput {
+        "This is @FileLink.id"
         id: String!
     }
 

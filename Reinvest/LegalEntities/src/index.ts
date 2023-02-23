@@ -1,16 +1,14 @@
 import Container, {ContainerInterface} from "Container/Container";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
-import {MigrationManager} from "PostgreSQL/MigrationManager";
+import * as LegalEntitiesMigrations from "../migrations";
 import {PortsProvider} from "LegalEntities/Providers/PortsProvider";
 import {LegalEntitiesApi, LegalEntitiesApiType} from "LegalEntities/Port/Api/LegalEntitiesApi";
 import {
     LegalEntitiesTechnicalHandler,
     LegalEntitiesTechnicalHandlerType
 } from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
-import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
+import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
-import {NoMigrationException} from "PostgreSQL/NoMigrationException";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
@@ -57,7 +55,7 @@ export namespace LegalEntities {
         }
 
         migration() {
-            throw new NoMigrationException();
+            return LegalEntitiesMigrations;
         }
 
         async close(): Promise<void> {

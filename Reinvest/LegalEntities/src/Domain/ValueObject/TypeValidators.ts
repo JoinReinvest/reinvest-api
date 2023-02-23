@@ -22,6 +22,10 @@ export class DateTime {
   constructor() {}
 }
 
+export class IsoDate {
+  constructor() {}
+}
+
 export class Uuid {
   constructor() {}
 }

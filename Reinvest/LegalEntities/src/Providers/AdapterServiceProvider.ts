@@ -1,9 +1,10 @@
 import {LegalEntities} from "LegalEntities/index";
 import {ContainerInterface} from "Container/Container";
-import {PeopleRepository} from "LegalEntities/Adapter/Database/Repository/PeopleRepository";
-import {DatabaseAdapterInstance, DatabaseAdapterProvider} from "LegalEntities/Adapter/Database/DatabaseAdapter";
-import {S3Adapter} from "LegalEntities/Adapter/S3/S3Adapter";
-import {FileLinkService} from "LegalEntities/Adapter/S3/FileLinkService";
+import { ProfileRepository} from "LegalEntities/Adapter/Database/Repository/ProfileRepository";
+import {
+    LegalEntitiesDatabaseAdapterInstanceProvider,
+    createLegalEntitiesDatabaseAdapterProvider
+} from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {IdGenerator} from "IdGenerator/IdGenerator";
 
 export class AdapterServiceProvider {
@@ -19,7 +20,7 @@ export class AdapterServiceProvider {
 
         // database
         container
-            .addAsValue(DatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
-            .addClass(PeopleRepository, [DatabaseAdapterInstance])
+            .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
+            .addClass(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
     }
 }

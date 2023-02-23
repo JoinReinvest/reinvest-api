@@ -1,15 +1,19 @@
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {Kysely} from "kysely/dist/esm";
+import {Kysely} from "kysely";
+import {LegalEntitiesPerson, LegalEntitiesProfile} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
+
+export const legalEntitiesPersonTable = "legal_entities_person";
+export const legalEntitiesProfileTable = "legal_entities_profile";
 
 export interface LegalEntitiesDatabase {
-    // investment_accounts_profile_aggregate: AggregateTable,
-    // investment_accounts_profile_query: ProfileQueryTable,
-
+    [legalEntitiesPersonTable]: LegalEntitiesPerson,
+    [legalEntitiesProfileTable]: LegalEntitiesProfile,
 }
 
-export const DatabaseAdapterInstance = "DatabaseAdapter";
-export type DatabaseAdapter = Kysely<LegalEntitiesDatabase>;
+export const LegalEntitiesDatabaseAdapterInstanceProvider = "LegalEntitiesDatabaseAdapterProvider";
+export type LegalEntitiesDatabaseAdapter = Kysely<LegalEntitiesDatabase>;
+export type LegalEntitiesDatabaseAdapterProvider = DatabaseProvider<LegalEntitiesDatabase>;
 
-export function DatabaseAdapterProvider(config: PostgreSQLConfig): DatabaseAdapter {
-    return new DatabaseProvider<LegalEntitiesDatabase>(config).provide() as unknown as DatabaseAdapter;
+export function createLegalEntitiesDatabaseAdapterProvider(config: PostgreSQLConfig): LegalEntitiesDatabaseAdapterProvider {
+    return new DatabaseProvider<LegalEntitiesDatabase>(config);
 }

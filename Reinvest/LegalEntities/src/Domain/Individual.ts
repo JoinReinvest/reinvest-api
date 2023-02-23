@@ -1,14 +1,14 @@
-import { Address, Domicile } from "./ValueObject/Address";
-import { IdentityDocument } from "./ValueObject/Document";
-import { Id, ProfileId } from "./ValueObject/Id";
+import { Address, Domicile } from "Reinvest/LegalEntities/src/Domain/ValueObject/Address";
+import { IdentityDocument } from "Reinvest/LegalEntities/src/Domain/ValueObject/Document";
+import { Id, ProfileId } from "Reinvest/LegalEntities/src/Domain/ValueObject/Id";
 import {
   DateOfBirth,
   FirstName,
   LastName,
   Person,
   SSN,
-} from "./ValueObject/Person";
-import { AnyString, Money } from "./ValueObject/TypeValidators";
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/Person";
+import { AnyString, Money } from "Reinvest/LegalEntities/src/Domain/ValueObject/TypeValidators";
 
 export class NetWorth extends Money {}
 
