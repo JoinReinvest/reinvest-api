@@ -1,9 +1,9 @@
 import {Kysely, sql} from 'kysely';
-import {IdentityDatabase} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
+import {IdentityDatabase, userTable} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 
 export async function up(db: Kysely<IdentityDatabase>): Promise<void> {
     await db.schema
-        .createTable('identity_user')
+        .createTable(userTable)
         .addColumn('id', 'uuid', col => col.primaryKey().notNull().unique())
         .addColumn('cognitoUserId', 'uuid', col => col.notNull().unique())
         .addColumn('profileId', 'uuid', col => col.notNull().unique())
@@ -15,5 +15,5 @@ export async function up(db: Kysely<IdentityDatabase>): Promise<void> {
 }
 
 export async function down(db: Kysely<IdentityDatabase>): Promise<void> {
-    await db.schema.dropTable('identity_user').execute();
+    await db.schema.dropTable(userTable).execute();
 }
