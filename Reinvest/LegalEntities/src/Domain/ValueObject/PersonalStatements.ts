@@ -1,3 +1,6 @@
+import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
+import {EnumString} from "LegalEntities/Domain/ValueObject/TypeValidators";
+
 export type PersonalStatementInput = {
     type: "FINRAMember" | "TradingCompanyStakeholder" | "Politician",
     forFINRA?: {
@@ -11,9 +14,22 @@ export type PersonalStatementInput = {
     }
 }
 
-export class PersonalStatement {
+export class PersonalStatementType extends EnumString {
+    constructor(value: string) {
+        super(value, ["FINRAMember", "TradingCompanyStakeholder", "Politician"]);
+    }
+}
+
+
+export class PersonalStatement implements ToObject {
 
     static create(rawStatement: PersonalStatementInput): PersonalStatement {
         return new PersonalStatement();
+    }
+
+    toObject(): PersonalStatementInput {
+        return {
+            type: 'Politician',
+        }
     }
 }

@@ -29,8 +29,8 @@ export class UserRegistrationService {
 
             if (profileId === null) {
                 console.log(`Creating user: ${userId}`);
-                profileId = this.idGenerator.create();
-                const id = this.idGenerator.create();
+                profileId = this.idGenerator.createUuid();
+                const id = this.idGenerator.createUuid();
                 const userIncentiveToken = await this.userRepository.generateUniqueIncentiveToken();
                 await this.userRepository.registerUser(id, profileId, userIncentiveToken, userId, email, incentiveToken);
                 console.log(`User created: ${userId} with profile id ${profileId}`);

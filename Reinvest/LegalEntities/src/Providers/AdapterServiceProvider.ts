@@ -21,6 +21,6 @@ export class AdapterServiceProvider {
         // database
         container
             .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
-            .addClass(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
+            .addClass(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
     }
 }

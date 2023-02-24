@@ -1,9 +1,9 @@
 const schema = `
     #graphql
     input PersonName {
-        firstName: String!
+        firstName: String! @constraint(minLength: 1)
         middleName: String
-        lastName: String!
+        lastName: String! @constraint(minLength: 1)
     }
 
     enum DomicileType {
@@ -22,9 +22,9 @@ const schema = `
         citizenshipCountry: String!
         visaType: String!
     }
-    
+
     """
-    An investor statement of domicile type. 
+    An investor statement of domicile type.
     Choose the right one and add details depending on the chosen type
     """
     input DomicileInput {
@@ -34,7 +34,7 @@ const schema = `
     }
 
     input SSNInput {
-        value: String!
+        ssn: String!
     }
 
     input AddressInput {
@@ -75,6 +75,7 @@ const schema = `
         FINRAMember
         TradingCompanyStakeholder
         Politician
+        AccreditedInvestor
     }
 
     input TradingCompanyStakeholderInput {
@@ -88,11 +89,21 @@ const schema = `
         description: String!
     }
 
+    enum AccreditedInvestorStatement {
+        I_AM_AN_ACCREDITED_INVESTOR
+        I_AM_NOT_EXCEEDING_10_PERCENT_OF_MY_NET_WORTH_OR_ANNUAL_INCOME
+    }
+
+    "Only one of these statements can be valid"
+    input AccreditedInvestorInput {
+        statement: AccreditedInvestorStatement!
+    }
+
     """
     An investor statements for:
     - being a FINRA member
     - politician
-    - public trading company stakholder
+    - public trading company stakeholder
     Choose type and add details depending on the chosen type
     """
     input StatementInput {
@@ -100,6 +111,7 @@ const schema = `
         forFINRA: FINRAStatementInput
         forPolitician: PoliticianStatementInput
         forStakeholder: TradingCompanyStakeholderInput
+        forAccreditedInvestor: AccreditedInvestorInput
     }
 `;
 export const Shared = {

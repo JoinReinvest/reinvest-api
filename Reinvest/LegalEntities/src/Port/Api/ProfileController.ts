@@ -2,16 +2,18 @@ import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/Profi
 import {PersonalName, PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
 import {DateOfBirth, DateOfBirthInput} from "LegalEntities/Domain/ValueObject/DateOfBirth";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {Avatar, AvatarInput, IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
+import {Avatar, IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
 import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
 import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
+import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
 
 export type CompleteProfileInput = {
     name?: PersonalNameInput,
     dateOfBirth?: DateOfBirthInput,
     address?: AddressInput,
-    idScan?: IdScanInput,
-    avatar?: AvatarInput,
+    idScan?: [{ id: string }],
+    avatar?: { id: string },
+    SSN?: SSNInput,
     domicile?: DomicileInput,
     statements?: [PersonalStatementInput]
 }
@@ -42,23 +44,27 @@ export class ProfileController {
                 const data = input[step];
                 switch (step) {
                     case 'name':
-                        const name = PersonalName.create(data);
-                        profile.completeName(name);
+                        profile.setName(PersonalName.create(data));
                         break;
                     case 'dateOfBirth':
-                        profile.completeDateOfBirth(DateOfBirth.create(data));
+                        profile.setDateOfBirth(DateOfBirth.create(data));
                         break;
                     case 'address':
-                        profile.completeAddress(Address.create(data));
+                        profile.setAddress(Address.create(data));
                         break;
                     case 'idScan':
-                        profile.completeIdentityDocument(IdentityDocument.create(data));
+                        const ids = data.map((idObject: { id: string }) => idObject.id);
+                        profile.setIdentityDocument(IdentityDocument.create({ids, path: profileId}));
                         break;
                     case 'avatar':
-                        profile.completeAvatarDocument(Avatar.create(data));
+                        const {id} = data;
+                        profile.setAvatarDocument(Avatar.create({id, path: profileId}));
                         break;
                     case 'domicile':
-                        profile.completeDomicile(Domicile.create(data));
+                        profile.setDomicile(Domicile.create(data));
+                        break;
+                    case 'ssn':
+                        profile.setSSN(SSN.create(data));
                         break;
                     case 'statements':
                         for (const rawStatement of data) {

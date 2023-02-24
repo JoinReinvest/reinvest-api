@@ -24,7 +24,7 @@ export class FileLinkService {
     async createFileLinks(type: FileType, catalog: string, numberOfLinks: number = 1): Promise<FileLink[]> {
         const fileLinks = <FileLink[]>[];
         for (let i = 0; i < numberOfLinks; i++) {
-            const id = this.idGenerator.create();
+            const id = this.idGenerator.createUuid();
             const url = type === FileType.AVATAR
                 ? await this.adapter.generatePutSignedUrlForAvatar(catalog, id)
                 : await this.adapter.generatePutSignedUrlForDocument(catalog, id)

@@ -1,6 +1,6 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
-import {PersonType} from "LegalEntities/Port/Api/ProfileController";
+import {CompleteProfileInput} from "LegalEntities/Port/Api/ProfileController";
 
 const schema = `
     #graphql
@@ -57,52 +57,7 @@ const schema = `
 `;
 
 type CompleteProfileDetailsInput = {
-    input: {
-        name?: {
-            firstName: string
-            middleName?: string
-            lastName: string,
-        },
-        dateOfBirth?: string,
-        address?: {
-            addressLine1: string
-            addressLine2?: string
-            city: string
-            zip: string
-            country: string
-            state: string
-        },
-        idScan?: [{
-            id: string
-        }],
-        avatar?: {
-            id: string
-        },
-        domicile?: {
-            type: "CITIZEN" | "GREEN_CARD" | "VISA",
-            forGreenCard?: {
-                birthCountry: string,
-                citizenshipCountry: string,
-            },
-            forVisa?: {
-                birthCountry: string,
-                citizenshipCountry: string,
-                visaType: string,
-            }
-        },
-        statements?: [{
-            type: "FINRAMember" | "TradingCompanyStakeholder" | "Politician",
-            forFINRA?: {
-                name: string,
-            }
-            forPolitician?: {
-                description: string,
-            },
-            forStakeholder?: {
-                tickerSymbol: [string]
-            }
-        }]
-    }
+    input: CompleteProfileInput
 }
 
 const profileMockResponse = {
@@ -139,7 +94,7 @@ export const Profile = {
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 const {input} = data;
-                api.completeProfile(input, profileId);
+                await api.completeProfile(input, profileId);
 
                 return profileMockResponse;
             },

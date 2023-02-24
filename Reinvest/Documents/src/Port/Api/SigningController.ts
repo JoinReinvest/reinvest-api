@@ -17,6 +17,6 @@ export class SigningController {
     ): Promise<SignatureId> {
         console.log({signatureArguments: arguments});
 
-        return <SignatureId>{signatureId: (new IdGenerator()).create()};
+        return <SignatureId>{signatureId: (new IdGenerator()).createUuid()};
     }
 }
