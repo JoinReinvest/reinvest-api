@@ -16,7 +16,8 @@ export type CompleteProfileInput = {
     SSN?: SSNInput,
     domicile?: DomicileInput,
     statements?: PersonalStatementInput[],
-    removeStatements?: PersonalStatementInput[]
+    removeStatements?: PersonalStatementInput[],
+    verifyAndFinish: boolean
 }
 
 
@@ -69,6 +70,7 @@ export class ProfileController {
                         break;
                     case 'statements':
                         for (const rawStatement of data) {
+                            console.log(rawStatement);
                             const statement = PersonalStatement.create(rawStatement);
                             profile.addStatement(statement);
                         }
@@ -78,6 +80,8 @@ export class ProfileController {
                             const {type} = rawStatement;
                             profile.removeStatement(type);
                         }
+                        break;
+                    case 'verifyAndFinish':
                         break;
                     default:
                         console.error(`Unknown step: ${step}`);
@@ -90,8 +94,17 @@ export class ProfileController {
             }
         }
 
-        await this.profileRepository.storeProfile(profile);
+        if (input.verifyAndFinish) {
+            if (profile.verifyCompletion()) {
+                profile.setAsCompleted();
+            } else {
+                errors.push('Profile completion verification failed');
+            }
+        }
 
+        if (errors.length === 0) {
+            await this.profileRepository.storeProfile(profile);
+        }
         return errors;
     }
 }

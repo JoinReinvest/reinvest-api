@@ -1,6 +1,7 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
 import {CompleteProfileInput} from "LegalEntities/Port/Api/ProfileController";
+import {ApolloError} from "apollo-server-errors";
 
 const schema = `
     #graphql
@@ -40,6 +41,8 @@ const schema = `
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"
         removeStatements: [StatementInput]
+        "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
+        verifyAndFinish: Boolean
     }
 
     type Query {
@@ -51,7 +54,8 @@ const schema = `
         """
         Profile onboarding mutation.
         Every field in the input can be requested separately.
-        To verify if all required fields are provided see the @Profile.isCompleted field
+        In case of any failure all changes in the request are not stored in the database.
+        To finish onboarding send field 'verifyAndFinish'
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
         openAccount(draftAccountId: String): Boolean
@@ -96,8 +100,10 @@ export const Profile = {
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 const {input} = data;
-                await api.completeProfile(input, profileId);
-
+                const errors = await api.completeProfile(input, profileId);
+                if (errors.length > 0) {
+                    throw new ApolloError(JSON.stringify(errors));
+                }
                 return profileMockResponse;
             },
 

@@ -1,8 +1,4 @@
 import {expect} from "chai";
-import * as sinon from "ts-sinon";
-import {ProfileRepository} from "Reinvest/LegalEntities/src/Adapter/Database/Repository/ProfileRepository";
-import {LegalEntitiesDatabaseAdapterProvider} from "Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter";
-import {IdGeneratorInterface} from "shared/hkek-id-generator/IdGenerator";
 import {Profile} from "Reinvest/LegalEntities/src/Domain/Profile";
 import {PersonalName, PersonalNameInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/PersonalName";
 import {DateOfBirth, DateOfBirthInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/DateOfBirth";
@@ -22,7 +18,6 @@ import {
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Domicile";
 import {SSN, SSNInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
 import {
-    AccreditedInvestorStatement,
     AccreditedInvestorStatements, ForAccreditedInvestor,
     ForFINRA,
     ForPolitician,
@@ -33,24 +28,17 @@ import {
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/PersonalStatements";
 
 context("Given the user wants to complete the profile", () => {
-    const dbProvider = sinon.stubInterface<LegalEntitiesDatabaseAdapterProvider>();
-    const idGenerator = sinon.stubInterface<IdGeneratorInterface>();
-    const profileRepository = new ProfileRepository(dbProvider, idGenerator);
 
-    describe("When user provides data for the first time", async () => {
+    describe("When user provides data for the first time, the system creates a new profile", async () => {
         const externalId = "123456789";
-        idGenerator.createNumericId.returns(externalId);
-
-        it("Then the system must create the profile", async () => {
-            const profile = await profileRepository.findOrCreateProfile('123');
-            expect(profile.toObject().externalId).is.equal(externalId);
-        });
-
         const profile = new Profile('123', externalId, '');
 
-        it("Then store the empty profile in the database", async () => {
-            const outputProfile = profile.toObject();
-            expect(outputProfile.name).to.be.null;
+        const verifyProfile = (expectedResult: boolean) => {
+            expect(profile.verifyCompletion()).to.be.equal(expectedResult);
+        }
+
+        it("Then verify the profile and should not be completed yet", async () => {
+            verifyProfile(false);
         });
 
         it("Then complete the name", async () => {
@@ -392,7 +380,7 @@ context("Given the user wants to complete the profile", () => {
 
         const checkAccreditedInvestor = (statement: AccreditedInvestorStatements) => {
             const input = <PersonalStatementInput>{
-                type: PersonalStatementType.AccreditedInvestorStatement,
+                type: PersonalStatementType.AccreditedInvestor,
                 forAccreditedInvestor: {
                     statement
                 }
@@ -403,20 +391,29 @@ context("Given the user wants to complete the profile", () => {
 
             expect(statements).length(3);
             const forAccreditedInvestor = statements[2].forAccreditedInvestor as ForAccreditedInvestor;
-            expect(statements[2].type).to.be.equal(PersonalStatementType.AccreditedInvestorStatement);
+            expect(statements[2].type).to.be.equal(PersonalStatementType.AccreditedInvestor);
             expect(forAccreditedInvestor.statement).to.be.equal(statement);
         };
+
+        it("Then verify the profile and should not be completed yet", async () => {
+            verifyProfile(false);
+        });
 
         it("And Then add the statement that you are an accredited investor", async () => {
             checkAccreditedInvestor(AccreditedInvestorStatements.I_AM_AN_ACCREDITED_INVESTOR);
         });
+
+        it("Then verify the profile and should be completed now", async () => {
+            verifyProfile(true);
+        });
+
         it("And Then change you statement that you are not accredited investor", async () => {
             checkAccreditedInvestor(AccreditedInvestorStatements.I_AM_NOT_EXCEEDING_10_PERCENT_OF_MY_NET_WORTH_OR_ANNUAL_INCOME);
         });
 
         it("Or add the statement without all required data Then expects validation error", async () => {
             const input = <PersonalStatementInput>{
-                type: PersonalStatementType.AccreditedInvestorStatement
+                type: PersonalStatementType.AccreditedInvestor
             };
 
             try {

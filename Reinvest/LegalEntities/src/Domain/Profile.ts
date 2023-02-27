@@ -9,20 +9,22 @@ import {
     PersonalStatementType
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {SSN} from "LegalEntities/Domain/ValueObject/SSN";
+import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
+import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
-export type ProfileInputType = {
+export type ProfileSchema = {
     profileId: string,
     externalId: string,
     label: string,
     name: PersonalNameInput | null,
-    ssn: SSN | null,
+    ssn: SSNInput | null,
     dateOfBirth: DateOfBirthInput | null,
     address: AddressInput | null,
     idScan: IdScanInput | null,
     avatar: AvatarInput | null,
     domicile: DomicileInput | null,
-    statements: PersonalStatementInput[]
+    statements: PersonalStatementInput[],
+    isCompleted: boolean,
 }
 
 export class Profile {
@@ -37,6 +39,7 @@ export class Profile {
     private avatar: Avatar | null = null;
     private domicile: Domicile | null = null;
     private statements: PersonalStatement[] = [];
+    private completed: boolean = false;
 
     constructor(profileId: string, externalId: string, label: string) {
         this.profileId = profileId;
@@ -89,14 +92,69 @@ export class Profile {
     }
 
     isCompleted(): boolean {
-        return false;
+        return this.completed;
     }
 
-    static create(data: ProfileInputType) {
+    setAsCompleted() {
+        this.completed = true;
+    }
+
+    static create(data: ProfileSchema): Profile {
+        try {
+            const {
+                profileId, externalId, label, name,
+                dateOfBirth, address, idScan, avatar, domicile,
+                ssn, statements, isCompleted
+            } = data;
+            const profile = new Profile(profileId, externalId, label);
+
+            if (name) {
+                profile.setName(PersonalName.create(name));
+            }
+
+            if (dateOfBirth) {
+                profile.setDateOfBirth(DateOfBirth.create(dateOfBirth));
+            }
+
+            if (address) {
+                profile.setAddress(Address.create(address));
+            }
+
+            if (idScan) {
+                profile.setIdentityDocument(IdentityDocument.create(idScan));
+            }
+
+            if (avatar) {
+                profile.setAvatarDocument(Avatar.create(avatar));
+            }
+
+            if (domicile) {
+                profile.setDomicile(Domicile.create(domicile));
+            }
+
+            if (ssn) {
+                profile.setSSN(SSN.create(ssn));
+            }
+
+            if (statements) {
+                for (const rawStatement of statements) {
+                    const statement = PersonalStatement.create(rawStatement);
+                    profile.addStatement(statement);
+                }
+            }
+
+            if (isCompleted) {
+                profile.setAsCompleted();
+            }
+
+            return profile;
+        } catch (error: any) {
+            throw new ValidationError('Invalid profile');
+        }
 
     }
 
-    toObject(): ProfileInputType {
+    toObject(): ProfileSchema {
         return {
             profileId: this.profileId,
             externalId: this.externalId,
@@ -109,6 +167,7 @@ export class Profile {
             avatar: this.get(this.avatar),
             domicile: this.get(this.domicile),
             statements: this.statements.map(statement => statement.toObject()),
+            isCompleted: this.completed
         }
     }
 
@@ -118,5 +177,30 @@ export class Profile {
         }
 
         return value.toObject();
+    }
+
+    verifyCompletion() {
+        const isAnyNull =
+            this.ssn === null ||
+            this.name === null ||
+            this.dateOfBirth === null ||
+            this.address === null ||
+            this.idScan === null ||
+            this.avatar === null ||
+            this.domicile === null;
+
+        if (isAnyNull) {
+            return false;
+        }
+
+        const isAccreditedInvestorStatementExist = this.statements.find(
+            (statement: PersonalStatement) => statement.isType(PersonalStatementType.AccreditedInvestor)
+        );
+
+        if (!isAccreditedInvestorStatementExist) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -5,7 +5,7 @@ export enum PersonalStatementType {
     FINRAMember = "FINRAMember",
     TradingCompanyStakeholder = "TradingCompanyStakeholder",
     Politician = "Politician",
-    AccreditedInvestorStatement = "AccreditedInvestorStatement"
+    AccreditedInvestor = "AccreditedInvestor"
 }
 
 export type ForFINRA = {
@@ -56,7 +56,7 @@ export abstract class PersonalStatement implements ToObject {
                 case PersonalStatementType.TradingCompanyStakeholder:
                     const {tickerSymbols} = forStakeholder as ForStakeholder;
                     return new TradingCompanyStakeholderStatement(tickerSymbols);
-                case PersonalStatementType.AccreditedInvestorStatement:
+                case PersonalStatementType.AccreditedInvestor:
                     const {statement} = forAccreditedInvestor as ForAccreditedInvestor;
                     return new AccreditedInvestorStatement(statement);
                 default:
@@ -124,7 +124,6 @@ export class PoliticianStatement extends PersonalStatement implements ToObject {
     constructor(description: string) {
         super(PersonalStatementType.Politician);
         this.description = description;
-
     }
 
     toObject(): PersonalStatementInput {
@@ -141,7 +140,7 @@ export class AccreditedInvestorStatement extends PersonalStatement implements To
     private statement: AccreditedInvestorStatements;
 
     constructor(statement: AccreditedInvestorStatements) {
-        super(PersonalStatementType.AccreditedInvestorStatement);
+        super(PersonalStatementType.AccreditedInvestor);
         this.statement = statement;
 
     }

@@ -31,22 +31,6 @@ export class AnyString {
     }
 }
 
-export class EnumString {
-    private value: string;
-
-    constructor(value: string, options: string[]) {
-        if (!(value in options)) {
-            throw new ValidationError(`Value "${value} is not on of ${options}`);
-        }
-
-        this.value = value;
-    }
-
-    toString(): string {
-        return this.value;
-    }
-}
-
 export class Money {
     constructor() {
     }

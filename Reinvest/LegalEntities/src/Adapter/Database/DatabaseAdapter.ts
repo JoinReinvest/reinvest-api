@@ -1,12 +1,12 @@
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {Kysely} from "kysely";
-import {LegalEntitiesPerson, LegalEntitiesProfile} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
+import {LegalEntitiesProfile} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 
-export const legalEntitiesPersonTable = "legal_entities_person";
+// export const legalEntitiesPersonTable = "legal_entities_person";
 export const legalEntitiesProfileTable = "legal_entities_profile";
 
 export interface LegalEntitiesDatabase {
-    [legalEntitiesPersonTable]: LegalEntitiesPerson,
+    // [legalEntitiesPersonTable]: LegalEntitiesPerson,
     [legalEntitiesProfileTable]: LegalEntitiesProfile,
 }
 
