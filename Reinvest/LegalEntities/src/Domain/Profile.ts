@@ -3,7 +3,11 @@ import {DateOfBirth, DateOfBirthInput} from "LegalEntities/Domain/ValueObject/Da
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
 import {Avatar, AvatarInput, IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
 import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
-import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
+import {
+    PersonalStatement,
+    PersonalStatementInput,
+    PersonalStatementType
+} from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {SSN} from "LegalEntities/Domain/ValueObject/SSN";
 
@@ -70,7 +74,18 @@ export class Profile {
     }
 
     addStatement(statement: PersonalStatement) {
-        this.statements.push(statement);
+        const statements = this.statements.filter(
+            (currentStatement: PersonalStatement) => !statement.isTheSameType(currentStatement)
+        );
+
+        statements.push(statement);
+        this.statements = statements;
+    }
+
+    removeStatement(statementType: PersonalStatementType) {
+        this.statements = this.statements.filter(
+            (statement: PersonalStatement) => !statement.isType(statementType)
+        );
     }
 
     isCompleted(): boolean {

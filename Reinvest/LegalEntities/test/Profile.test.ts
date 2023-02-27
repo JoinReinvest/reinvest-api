@@ -17,9 +17,20 @@ import {
     Domicile,
     DomicileInput,
     DomicileType,
-    GreenCardInput, VisaInput
+    GreenCardInput,
+    VisaInput
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Domicile";
 import {SSN, SSNInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
+import {
+    AccreditedInvestorStatement,
+    AccreditedInvestorStatements, ForAccreditedInvestor,
+    ForFINRA,
+    ForPolitician,
+    ForStakeholder,
+    PersonalStatement,
+    PersonalStatementInput,
+    PersonalStatementType
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/PersonalStatements";
 
 context("Given the user wants to complete the profile", () => {
     const dbProvider = sinon.stubInterface<LegalEntitiesDatabaseAdapterProvider>();
@@ -307,5 +318,113 @@ context("Given the user wants to complete the profile", () => {
                 expect(error).to.exist;
             }
         });
+
+        it("Then add the statement that you are a FINRA member", async () => {
+            const input = <PersonalStatementInput>{
+                type: PersonalStatementType.FINRAMember,
+                forFINRA: {
+                    name: "Dalmore"
+                }
+            };
+            profile.addStatement(PersonalStatement.create(input))
+            const profileOutput = profile.toObject();
+            const statements = profileOutput.statements as PersonalStatementInput[];
+
+            expect(statements).length(1);
+            const forFINRA = statements[0].forFINRA as ForFINRA;
+            expect(statements[0].type).to.be.equal(PersonalStatementType.FINRAMember);
+            expect(forFINRA.name).to.be.equal("Dalmore");
+        });
+
+        const politicianStatementCheck = (description: string) => {
+            const input = <PersonalStatementInput>{
+                type: PersonalStatementType.Politician,
+                forPolitician: {
+                    description
+                }
+            };
+            profile.addStatement(PersonalStatement.create(input))
+            const profileOutput = profile.toObject();
+            const statements = profileOutput.statements as PersonalStatementInput[];
+
+            expect(statements).length(2);
+            const forPolitician = statements[1].forPolitician as ForPolitician;
+            expect(statements[1].type).to.be.equal(PersonalStatementType.Politician);
+            expect(forPolitician.description).to.be.equal(description);
+        }
+
+        it("And Then add the statement that you are a politician", async () => {
+            const description = "Politician of some party";
+            politicianStatementCheck(description);
+        });
+
+        it("And Then change the statement that you are a politician", async () => {
+            const description = "Politician of another party";
+            politicianStatementCheck(description);
+        });
+
+        it("And Then remove the statement that you are a politician", async () => {
+            profile.removeStatement(PersonalStatementType.Politician);
+            const profileOutput = profile.toObject();
+            const statements = profileOutput.statements as PersonalStatementInput[];
+
+            expect(statements).length(1);
+            expect(statements[0].type).to.be.equal(PersonalStatementType.FINRAMember);
+        });
+
+        it("And Then add the statement that you are a public trading company stakeholder", async () => {
+            const tickerSymbols = ["RED", "BLUE"];
+            const input = <PersonalStatementInput>{
+                type: PersonalStatementType.TradingCompanyStakeholder,
+                forStakeholder: {
+                    tickerSymbols
+                }
+            };
+            profile.addStatement(PersonalStatement.create(input))
+            const profileOutput = profile.toObject();
+            const statements = profileOutput.statements as PersonalStatementInput[];
+
+            expect(statements).length(2);
+            const forStakeholder = statements[1].forStakeholder as ForStakeholder;
+            expect(statements[1].type).to.be.equal(PersonalStatementType.TradingCompanyStakeholder);
+            expect(forStakeholder.tickerSymbols).to.include.members(tickerSymbols);
+        });
+
+        const checkAccreditedInvestor = (statement: AccreditedInvestorStatements) => {
+            const input = <PersonalStatementInput>{
+                type: PersonalStatementType.AccreditedInvestorStatement,
+                forAccreditedInvestor: {
+                    statement
+                }
+            };
+            profile.addStatement(PersonalStatement.create(input))
+            const profileOutput = profile.toObject();
+            const statements = profileOutput.statements as PersonalStatementInput[];
+
+            expect(statements).length(3);
+            const forAccreditedInvestor = statements[2].forAccreditedInvestor as ForAccreditedInvestor;
+            expect(statements[2].type).to.be.equal(PersonalStatementType.AccreditedInvestorStatement);
+            expect(forAccreditedInvestor.statement).to.be.equal(statement);
+        };
+
+        it("And Then add the statement that you are an accredited investor", async () => {
+            checkAccreditedInvestor(AccreditedInvestorStatements.I_AM_AN_ACCREDITED_INVESTOR);
+        });
+        it("And Then change you statement that you are not accredited investor", async () => {
+            checkAccreditedInvestor(AccreditedInvestorStatements.I_AM_NOT_EXCEEDING_10_PERCENT_OF_MY_NET_WORTH_OR_ANNUAL_INCOME);
+        });
+
+        it("Or add the statement without all required data Then expects validation error", async () => {
+            const input = <PersonalStatementInput>{
+                type: PersonalStatementType.AccreditedInvestorStatement
+            };
+
+            try {
+                profile.addStatement(PersonalStatement.create(input))
+            } catch (error: any) {
+                expect(error).to.exist;
+            }
+        });
+
     });
 });

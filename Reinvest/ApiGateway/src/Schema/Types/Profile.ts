@@ -36,8 +36,10 @@ const schema = `
         idScan: [FileLinkInput]
         "Previously uploaded avatar. Please provide the id returned in @createAvatarFileLink mutation"
         avatar: FileLinkInput
-        "FINRA, Politician, Trading company stakeholder statements"
+        "FINRA, Politician, Trading company stakeholder, accredited investor statements"
         statements: [StatementInput]
+        "If an investor decided to remove one of the statements during onboarding"
+        removeStatements: [StatementInput]
     }
 
     type Query {

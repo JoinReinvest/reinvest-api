@@ -11,11 +11,12 @@ export type CompleteProfileInput = {
     name?: PersonalNameInput,
     dateOfBirth?: DateOfBirthInput,
     address?: AddressInput,
-    idScan?: [{ id: string }],
+    idScan?: { id: string }[],
     avatar?: { id: string },
     SSN?: SSNInput,
     domicile?: DomicileInput,
-    statements?: [PersonalStatementInput]
+    statements?: PersonalStatementInput[],
+    removeStatements?: PersonalStatementInput[]
 }
 
 
@@ -70,6 +71,12 @@ export class ProfileController {
                         for (const rawStatement of data) {
                             const statement = PersonalStatement.create(rawStatement);
                             profile.addStatement(statement);
+                        }
+                        break;
+                    case 'removeStatements':
+                        for (const rawStatement of data) {
+                            const {type} = rawStatement;
+                            profile.removeStatement(type);
                         }
                         break;
                     default:

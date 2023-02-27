@@ -79,7 +79,7 @@ const schema = `
     }
 
     input TradingCompanyStakeholderInput {
-        tickerSymbol: [String!]!
+        tickerSymbols: [String!]!
     }
 
     input FINRAStatementInput {

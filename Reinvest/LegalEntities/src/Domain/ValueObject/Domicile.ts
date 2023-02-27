@@ -25,12 +25,6 @@ export type DomicileInput = {
 }
 
 export abstract class Domicile implements ToObject {
-    protected type: DomicileType;
-
-    constructor(type: DomicileType) {
-        this.type = type;
-    }
-
     static create(domicile: DomicileInput): Domicile {
         const {type, forGreenCard, forVisa} = domicile;
         try {
@@ -43,6 +37,8 @@ export abstract class Domicile implements ToObject {
                 case DomicileType.VISA:
                     const {birthCountry: birth, citizenshipCountry: citizenship, visaType} = forVisa as VisaInput;
                     return new VisaResident(birth, citizenship, visaType);
+                default:
+                    throw new ValidationError("Wrong domicile type");
             }
         } catch (error: any) {
             throw new ValidationError('Missing domicile details');
@@ -55,13 +51,9 @@ export abstract class Domicile implements ToObject {
 }
 
 export class USCitizen extends Domicile implements ToObject {
-    constructor() {
-        super(DomicileType.CITIZEN);
-    }
-
     toObject(): DomicileInput {
         return {
-            type: this.type
+            type: DomicileType.CITIZEN
         }
     }
 }
@@ -71,14 +63,14 @@ export class GreenCardResident extends Domicile implements ToObject {
     private citizenshipCountry: string;
 
     constructor(birthCountry: string, citizenshipCountry: string) {
-        super(DomicileType.GREEN_CARD);
+        super();
         this.birthCountry = birthCountry;
         this.citizenshipCountry = citizenshipCountry;
     }
 
     toObject(): DomicileInput {
         return {
-            type: this.type,
+            type: DomicileType.GREEN_CARD,
             forGreenCard: {
                 birthCountry: this.birthCountry,
                 citizenshipCountry: this.citizenshipCountry
@@ -93,7 +85,7 @@ export class VisaResident extends Domicile implements ToObject {
     private visaType: string;
 
     constructor(birthCountry: string, citizenshipCountry: string, visaType: string) {
-        super(DomicileType.VISA);
+        super();
         this.birthCountry = birthCountry;
         this.citizenshipCountry = citizenshipCountry;
         this.visaType = visaType;
@@ -101,7 +93,7 @@ export class VisaResident extends Domicile implements ToObject {
 
     toObject(): DomicileInput {
         return {
-            type: this.type,
+            type: DomicileType.VISA,
             forVisa: {
                 birthCountry: this.birthCountry,
                 citizenshipCountry: this.citizenshipCountry,
