@@ -286,15 +286,13 @@ context("Given the user wants to complete the profile", () => {
         });
 
         it("Then complete the SSN", async () => {
-            const input = <SSNInput>{
-                ssn: 'AAA-GG-SSSS'
-            };
+            const input = 'AAA-GG-SSSS'
             profile.setSSN(SSN.create(input))
 
             const profileOutput = profile.toObject();
             const ssn = profileOutput.ssn as unknown as SSNInput;
 
-            expect(ssn.ssn).to.be.equal(input.ssn);
+            expect(ssn).to.be.equal(input);
         });
 
         it("Or complete the SSN without details Then expects validation error", async () => {
