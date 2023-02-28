@@ -1,0 +1,45 @@
+name: functions-github-actions
+on:
+  push:
+    branches:
+      - development
+      - integrations
+      - staging
+      - main
+jobs:
+  build-check-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up environment
+        run: |
+          CURRENT_BRANCH=${GITHUB_REF##*/} 
+          echo "Current branch: ${CURRENT_BRANCH}"
+          if [ $CURRENT_BRANCH == "development" ]; then
+            ENVIRONMENT="DEVELOPMENT"
+          elif [ $CURRENT_BRANCH == "integrations" ]; then
+            ENVIRONMENT="INTEGRATIONS"
+          elif [ $CURRENT_BRANCH == "staging" ]; then
+            ENVIRONMENT="STAGING"
+          elif [ $CURRENT_BRANCH == "main" ]; then
+            ENVIRONMENT="PRODUCTION"
+          else
+            echo "Wrong branch";
+            exit 1;
+          fi
+          echo "Current environment: ${ENVIRONMENT}"
+          echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: "Install dependencies"
+        run: yarn install
+      - name: "Run unit tests"
+        run: yarn tdd
+      - name: "Deploy functions"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
+          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
+        run: "yarn dev:deploy:functions"
