@@ -6,8 +6,7 @@ import {SessionContext} from "ApiGateway/index";
 const extendedProfile = `
     #graphql
     extend type Profile {
-        details: Individual
-        completionStatus: ProfileCompletionStatus
+        accounts: [AccountOverview]
     }
 `;
 
@@ -16,31 +15,31 @@ export const ProfileStitcher = (rootSchema: GraphQLSchema) => stitchSchemas({
     typeDefs: extendedProfile,
     resolvers: {
         Profile: {
-            details: {
-                selectionSet: `{id}`,
+            accounts: {
+                selectionSet: `{externalId}`,
                 resolve(parent: any, args: any, context: SessionContext, info: any) {
                     return delegateToSchema({
                         schema: rootSchema,
                         operation: OperationTypeNode.QUERY,
-                        fieldName: 'getIndividual',
+                        fieldName: 'getAccountsOverview',
                         args,
                         context,
                         info
                     })
                 }
             },
-            completionStatus: {
-                resolve(parent: any, args: any, context: SessionContext, info: any) {
-                    return delegateToSchema({
-                        schema: rootSchema,
-                        operation: OperationTypeNode.QUERY,
-                        fieldName: 'profileCompletionStatus',
-                        args,
-                        context,
-                        info
-                    })
-                }
-            },
+            // completionStatus: {
+            //     resolve(parent: any, args: any, context: SessionContext, info: any) {
+            //         return delegateToSchema({
+            //             schema: rootSchema,
+            //             operation: OperationTypeNode.QUERY,
+            //             fieldName: 'profileCompletionStatus',
+            //             args,
+            //             context,
+            //             info
+            //         })
+            //     }
+            // },
         }
     }
 })

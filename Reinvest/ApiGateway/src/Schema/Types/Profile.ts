@@ -5,6 +5,19 @@ import {ApolloError} from "apollo-server-errors";
 
 const schema = `
     #graphql
+    type ProfileDetails {
+        firstName: String
+        middleName: String
+        lastName: String
+        dateOfBirth: String
+        domicile: Domicile
+        address: Address
+        ssn: String
+        idScan: [FileLink]
+        avatar: FileLink
+        statements: [Statement]
+    }
+
     """
     An investor profile information.
     Returns data about investor details, accounts and notifications
@@ -15,8 +28,8 @@ const schema = `
         "The name/label of the user"
         label: String
         avatarUrl: String
-        accounts: [AccountOverview]
         isCompleted: Boolean
+        details: ProfileDetails
     }
 
     input ProfileDetailsInput {
@@ -46,7 +59,9 @@ const schema = `
     }
 
     type Query {
+        """[MOCK]"""
         getProfile: Profile
+        """[MOCK]"""
         canOpenAccount(accountType: AccountType): Boolean
     }
 
@@ -58,6 +73,8 @@ const schema = `
         To finish onboarding send field 'verifyAndFinish'
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
+
+        """[MOCK]"""
         openAccount(draftAccountId: String): Boolean
     }
 `;
@@ -67,17 +84,46 @@ type CompleteProfileDetailsInput = {
 }
 
 const profileMockResponse = {
-    externalId: "m478167880",
-    name: "mBrandon Rule",
+    externalId: "478167880",
+    label: "John Doe",
     avatarUrl: "https://thumbs.dreamstime.com/b/test-icon-vector-question-mark-female-user-person-profile-avatar-symbol-help-sign-glyph-pictogram-illustration-test-168789128.jpg",
-    accounts: [
-        {
-            id: 'mc73ad8f6-4328-4151-9cc8-3694b71054f6',
-            type: 'mIndividual',
-            avatarUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU',
-            positionTotal: 'm$5,560'
-        }
-    ],
+    isCompleted: true,
+    details: {
+        firstName: "John",
+        middleName: "",
+        lastName: "Doe",
+        dateOfBirth: "2000-01-01",
+        domicile: {
+            type: "CITIZEN"
+        },
+        address: {
+            addressLine1: "River Street",
+            addressLine2: "170/10",
+            city: "New York",
+            zip: "90210",
+            country: "USA",
+            state: "New York"
+        },
+        ssn: "12-XXX-XXX9",
+        idScan: [{
+            id: "f94cc755-b524-4c7b-8a91-866c2e35e84b",
+            url: "https://thumbs.dreamstime.com/b/test-icon-vector-question-mark-female-user-person-profile-avatar-symbol-help-sign-glyph-pictogram-illustration-test-168789128.jpg"
+        }],
+        avatar: {
+            id: "f94cc755-b524-4c7b-8a91-866c2e35e84b",
+            url: "https://thumbs.dreamstime.com/b/test-icon-vector-question-mark-female-user-person-profile-avatar-symbol-help-sign-glyph-pictogram-illustration-test-168789128.jpg"
+        },
+        statements: [
+            {
+                type: "AccreditedInvestor",
+                details: ["I_AM_AN_ACCREDITED_INVESTOR"]
+            },
+            {
+                type: "FINRAMember",
+                details: ["FinraCompanyName Ltd."]
+            }
+        ]
+    }
 };
 
 export const Profile = {

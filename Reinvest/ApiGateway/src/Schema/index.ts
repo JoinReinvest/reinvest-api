@@ -3,7 +3,6 @@ import {mergeSchemas} from "@graphql-tools/schema";
 import {EmailAddress} from "ApiGateway/Schema/Scalars/EmailAddress";
 import {Hello} from "ApiGateway/Schema/Types/Hello";
 import {Profile} from "ApiGateway/Schema/Types/Profile";
-import {Individual} from "ApiGateway/Schema/Types/Individual";
 import {ProfileStitcher} from "ApiGateway/Schema/Stitching/ProfileStitcher";
 import {Account} from "ApiGateway/Schema/Types/Account";
 import {ProfileCompletionStatus} from "ApiGateway/Schema/Types/ProfileCompletionStatus";
@@ -28,7 +27,6 @@ const nonExecutableTypeDefs = mergeTypeDefs([
     ProfileCompletionStatus.typeDefs,
     Profile.typeDefs,
     PhoneNumberVerification.typeDefs,
-    Individual.typeDefs,
     DocumentTypes.typeDefs,
 ]);
 
@@ -38,7 +36,6 @@ const nonExecutableResolvers = mergeResolvers([
     ProfileCompletionStatus.resolvers,
     Profile.resolvers,
     PhoneNumberVerification.resolvers,
-    Individual.resolvers,
     DocumentTypes.resolvers,
 ]);
 
