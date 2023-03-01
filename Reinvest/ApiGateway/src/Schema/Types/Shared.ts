@@ -6,19 +6,34 @@ const schema = `
         lastName: String! @constraint(minLength: 1)
     }
 
+    input EmailInput {
+        email: EmailAddress!
+    }
+
+    input LegalNameInput {
+        name: String!
+    }
+
     enum DomicileType {
         CITIZEN
         GREEN_CARD
         VISA
     }
 
+    type Domicile {
+        type: DomicileType
+        birthCountry: String
+        citizenshipCountry: String
+        visaType: String
+    }
+
     input GreenCardInput {
-        birthCountry: String!,
+        birthCountry: String!
         citizenshipCountry: String!
     }
 
     input VisaInput {
-        birthCountry: String!,
+        birthCountry: String!
         citizenshipCountry: String!
         visaType: String!
     }
@@ -35,6 +50,10 @@ const schema = `
 
     input SSNInput {
         ssn: String!
+    }
+
+    input EINInput {
+        ein: String!
     }
 
     input AddressInput {
@@ -56,7 +75,7 @@ const schema = `
     }
 
     input DollarInput {
-        inCents: Int! @constraint(min: 0),
+        inCents: Int! @constraint(min: 0)
         formatted: String
     }
 
