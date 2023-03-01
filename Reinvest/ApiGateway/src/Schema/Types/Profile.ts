@@ -1,6 +1,6 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
-import {CompleteProfileInput} from "LegalEntities/Port/Api/ProfileController";
+import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileController";
 import {ApolloError} from "apollo-server-errors";
 
 const schema = `
@@ -83,49 +83,6 @@ type CompleteProfileDetailsInput = {
     input: CompleteProfileInput
 }
 
-const profileMockResponse = {
-    externalId: "478167880",
-    label: "John Doe",
-    avatarUrl: "https://thumbs.dreamstime.com/b/test-icon-vector-question-mark-female-user-person-profile-avatar-symbol-help-sign-glyph-pictogram-illustration-test-168789128.jpg",
-    isCompleted: true,
-    details: {
-        firstName: "John",
-        middleName: "",
-        lastName: "Doe",
-        dateOfBirth: "2000-01-01",
-        domicile: {
-            type: "CITIZEN"
-        },
-        address: {
-            addressLine1: "River Street",
-            addressLine2: "170/10",
-            city: "New York",
-            zip: "90210",
-            country: "USA",
-            state: "New York"
-        },
-        ssn: "12-XXX-XXX9",
-        idScan: [{
-            id: "f94cc755-b524-4c7b-8a91-866c2e35e84b",
-            url: "https://thumbs.dreamstime.com/b/test-icon-vector-question-mark-female-user-person-profile-avatar-symbol-help-sign-glyph-pictogram-illustration-test-168789128.jpg"
-        }],
-        avatar: {
-            id: "f94cc755-b524-4c7b-8a91-866c2e35e84b",
-            url: "https://thumbs.dreamstime.com/b/test-icon-vector-question-mark-female-user-person-profile-avatar-symbol-help-sign-glyph-pictogram-illustration-test-168789128.jpg"
-        },
-        statements: [
-            {
-                type: "AccreditedInvestor",
-                details: ["I_AM_AN_ACCREDITED_INVESTOR"]
-            },
-            {
-                type: "FINRAMember",
-                details: ["FinraCompanyName Ltd."]
-            }
-        ]
-    }
-};
-
 export const Profile = {
     typeDefs: schema,
     resolvers: {
@@ -133,7 +90,10 @@ export const Profile = {
             getProfile: async (parent: any,
                                input: undefined,
                                {profileId, modules}: SessionContext
-            ) => profileMockResponse,
+            ) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                return api.getProfile(profileId);
+            },
             canOpenAccount: async (parent: any,
                                    data: undefined,
                                    {profileId, modules}: SessionContext
@@ -150,7 +110,8 @@ export const Profile = {
                 if (errors.length > 0) {
                     throw new ApolloError(JSON.stringify(errors));
                 }
-                return profileMockResponse;
+
+                return api.getProfile(profileId);
             },
 
             openAccount: async (parent: any,

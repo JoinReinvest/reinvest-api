@@ -21,8 +21,8 @@ export type CompleteProfileInput = {
 }
 
 
-export class ProfileController {
-    public static getClassName = (): string => "ProfileController";
+export class CompleteProfileController {
+    public static getClassName = (): string => "CompleteProfileController";
     private profileRepository: ProfileRepository;
 
     constructor(profileRepository: ProfileRepository) {
