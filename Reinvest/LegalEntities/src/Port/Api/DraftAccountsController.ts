@@ -24,7 +24,7 @@ export class DraftAccountsController {
 
     public async createDraftAccount(profileId: string, type: AccountType): Promise<{ id: string, type: AccountType }> {
         return {
-            id: (new IdGenerator()).create(),
+            id: (new IdGenerator()).createUuid(),
             type
         }
     }
@@ -37,7 +37,7 @@ export class DraftAccountsController {
 
 
         return {
-            id: (new IdGenerator()).create(),
+            id: (new IdGenerator()).createUuid(),
             type: "INDIVIDUAL",
             ...individualInput
         }

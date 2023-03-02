@@ -1,6 +1,7 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
-import {PersonType} from "LegalEntities/Port/Api/ProfileController";
+import {CompleteProfileInput} from "LegalEntities/Port/Api/ProfileController";
+import {ApolloError} from "apollo-server-errors";
 
 const schema = `
     #graphql
@@ -15,19 +16,33 @@ const schema = `
         label: String
         avatarUrl: String
         accounts: [AccountOverview]
+        isCompleted: Boolean
     }
 
     input ProfileDetailsInput {
+        "An investor name"
         name: PersonName
         "Date of Birth in format YYYY-MM-DD"
         dateOfBirth: ISODate
-        "Is the investor US. Citizen or US. Resident"
-        domicile: Domicile
+        "Is the investor US. Citizen or US. Resident with Green Card or Visa"
+        domicile: DomicileInput
         "A valid SSN number"
-        ssn: String
+        ssn: SSNInput
+        "Permanent address of an investor"
         address: AddressInput
-        idScan: FileLinkInput
+        """
+        ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
+        Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
+        """
+        idScan: [FileLinkInput]
+        "Previously uploaded avatar. Please provide the id returned in @createAvatarFileLink mutation"
         avatar: FileLinkInput
+        "FINRA, Politician, Trading company stakeholder, accredited investor statements"
+        statements: [StatementInput]
+        "If an investor decided to remove one of the statements during onboarding"
+        removeStatements: [StatementInput]
+        "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
+        verifyAndFinish: Boolean
     }
 
     type Query {
@@ -36,34 +51,19 @@ const schema = `
     }
 
     type Mutation {
+        """
+        Profile onboarding mutation.
+        Every field in the input can be requested separately.
+        In case of any failure all changes in the request are not stored in the database.
+        To finish onboarding send field 'verifyAndFinish'
+        """
         completeProfileDetails(input: ProfileDetailsInput): Profile
         openAccount(draftAccountId: String): Boolean
     }
 `;
 
 type CompleteProfileDetailsInput = {
-    input: {
-        name?: {
-            firstName: string
-            middleName?: string
-            lastName: string,
-        },
-        dateOfBirth?: string,
-        address?: {
-            addressLine1: string
-            addressLine2?: string
-            city: string
-            zip: string
-            country: string
-            state: string
-        },
-        idScan?: {
-            id: string
-        },
-        avatar?: {
-            id: string
-        }
-    }
+    input: CompleteProfileInput
 }
 
 const profileMockResponse = {
@@ -89,18 +89,21 @@ export const Profile = {
                                {profileId, modules}: SessionContext
             ) => profileMockResponse,
             canOpenAccount: async (parent: any,
-                                   input: undefined,
+                                   data: undefined,
                                    {profileId, modules}: SessionContext
             ) => true
         },
         Mutation: {
             completeProfileDetails: async (parent: any,
-                                           {input}: CompleteProfileDetailsInput,
+                                           data: CompleteProfileDetailsInput,
                                            {profileId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                api.completeProfile(input, profileId, PersonType.Individual);
-
+                const {input} = data;
+                const errors = await api.completeProfile(input, profileId);
+                if (errors.length > 0) {
+                    throw new ApolloError(JSON.stringify(errors));
+                }
                 return profileMockResponse;
             },
 

@@ -36,5 +36,5 @@
     * This is simple CRUD
 * Decision: Only integration testing
 * Explanations:
-    - We just create model objects, validate them and save to DB/S3 and send an event
+    - We just createUuid model objects, validate them and save to DB/S3 and send an event
     - No logic to test with units

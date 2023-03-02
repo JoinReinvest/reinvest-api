@@ -15,5 +15,5 @@ export async function up(db: Kysely<IdentityDatabase>): Promise<void> {
 }
 
 export async function down(db: Kysely<IdentityDatabase>): Promise<void> {
-    await db.schema.dropTable('identity_user').execute();
+    await db.schema.dropTable(phoneVerificationTable).execute();
 }

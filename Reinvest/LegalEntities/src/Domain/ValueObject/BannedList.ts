@@ -1,4 +1,4 @@
-import { NonEmptyString } from "./TypeValidators";
+import { NonEmptyString } from "Reinvest/LegalEntities/src/Domain/ValueObject/TypeValidators";
 
 export class ObfuscatedId extends NonEmptyString {}
 

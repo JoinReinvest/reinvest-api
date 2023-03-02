@@ -1,14 +1,59 @@
 const schema = `
     #graphql
     input PersonName {
-        firstName: String!
+        firstName: String! @constraint(minLength: 1)
         middleName: String
-        lastName: String!
+        lastName: String! @constraint(minLength: 1)
     }
 
-    enum Domicile {
+    input EmailInput {
+        email: EmailAddress!
+    }
+
+    input LegalNameInput {
+        name: String!
+    }
+
+    enum DomicileType {
         CITIZEN
-        RESIDENT
+        GREEN_CARD
+        VISA
+    }
+
+    type Domicile {
+        type: DomicileType
+        birthCountry: String
+        citizenshipCountry: String
+        visaType: String
+    }
+
+    input GreenCardInput {
+        birthCountry: String!
+        citizenshipCountry: String!
+    }
+
+    input VisaInput {
+        birthCountry: String!
+        citizenshipCountry: String!
+        visaType: String!
+    }
+
+    """
+    An investor statement of domicile type.
+    Choose the right one and add details depending on the chosen type
+    """
+    input DomicileInput {
+        type: DomicileType!
+        forGreenCard: GreenCardInput
+        forVisa: VisaInput
+    }
+
+    input SSNInput {
+        ssn: String!
+    }
+
+    input EINInput {
+        ein: String!
     }
 
     input AddressInput {
@@ -30,7 +75,7 @@ const schema = `
     }
 
     input DollarInput {
-        inCents: Int! @constraint(min: 0),
+        inCents: Int! @constraint(min: 0)
         formatted: String
     }
 
@@ -43,6 +88,49 @@ const schema = `
         INDIVIDUAL
         CORPORATE
         TRUST
+    }
+
+    enum StatementType {
+        FINRAMember
+        TradingCompanyStakeholder
+        Politician
+        AccreditedInvestor
+    }
+
+    input TradingCompanyStakeholderInput {
+        tickerSymbols: [String!]!
+    }
+
+    input FINRAStatementInput {
+        name: String!
+    }
+    input PoliticianStatementInput {
+        description: String!
+    }
+
+    enum AccreditedInvestorStatement {
+        I_AM_AN_ACCREDITED_INVESTOR
+        I_AM_NOT_EXCEEDING_10_PERCENT_OF_MY_NET_WORTH_OR_ANNUAL_INCOME
+    }
+
+    "Only one of these statements can be valid"
+    input AccreditedInvestorInput {
+        statement: AccreditedInvestorStatement!
+    }
+
+    """
+    An investor statements for:
+    - being a FINRA member
+    - politician
+    - public trading company stakeholder
+    Choose type and add details depending on the chosen type
+    """
+    input StatementInput {
+        type: StatementType!
+        forFINRA: FINRAStatementInput
+        forPolitician: PoliticianStatementInput
+        forStakeholder: TradingCompanyStakeholderInput
+        forAccreditedInvestor: AccreditedInvestorInput
     }
 `;
 export const Shared = {

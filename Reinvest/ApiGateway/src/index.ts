@@ -7,7 +7,7 @@ import {Identity} from "Reinvest/Identity/src";
 
 const server = new ApolloServer({
     schema: Schema,
-    includeStacktraceInErrorResponses: true, // todo this should be debug flag
+    includeStacktraceInErrorResponses: false, // todo this should be debug flag
     formatError: (err) => {
         console.log(err);
 
