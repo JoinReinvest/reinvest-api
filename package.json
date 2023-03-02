@@ -20,7 +20,7 @@
     "development:destroy:functions": "NODE_ENV=development serverless remove -s development --config serverless-functions.ts",
     "development:logs:api": "sls logs -s development -f api -t",
     "development:logs:postSignUp": "sls logs -s development -f cognitoPostSignUpFunction -t",
-    "development:invoke:migration": "NODE_ENV=development sls invoke -s development --function migration --config serverless-functions.ts",
+    "development:invoke:migrateUp": "NODE_ENV=development sls invoke -s development --function migration --config serverless-functions.ts",
     "development:invoke:migrateDown": "NODE_ENV=development sls invoke -s development --function migration --data 'down' --config serverless-functions.ts",
     "integrations:deploy:saas": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-saas.ts",
     "integrations:deploy:functions": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-functions.ts",
@@ -28,7 +28,7 @@
     "integrations:destroy:functions": "NODE_ENV=integrations serverless remove -s integrations --config serverless-functions.ts",
     "local": "NODE_ENV=development serverless offline start -s development --ignoreJWTSignature --noTimeout --reloadHandler --config serverless-local.ts",
     "local:invoke:postSignUp": "NODE_ENV=development sls invoke local -s development --function cognitoPostSignUpFunction --path ./devops/local/postSignUpRequest.json --config serverless-local.ts",
-    "local:invoke:migration": "NODE_ENV=development sls invoke local -s development --function migration --config serverless-local.ts",
+    "local:invoke:migrateUp": "NODE_ENV=development sls invoke local -s development --function migration --config serverless-local.ts",
     "local:invoke:migrateDown": "NODE_ENV=development sls invoke local -s development --function migration --data 'down' --config serverless-local.ts",
     "local:server": "docker-compose -f docker-compose.yml up"
   },

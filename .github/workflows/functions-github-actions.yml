@@ -45,4 +45,4 @@ jobs:
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:functions"
-          yarn "${environment,,}:invoke:migration"
+          yarn "${environment,,}:invoke:migrateUp"
