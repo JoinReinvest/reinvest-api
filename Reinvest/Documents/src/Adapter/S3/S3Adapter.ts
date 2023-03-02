@@ -1,10 +1,6 @@
-import {
-    GetObjectCommand,
-    PutObjectCommand,
-    PutObjectCommandInput,
-    S3Client,
-} from "@aws-sdk/client-s3";
+import {GetObjectCommand, PutObjectCommand, PutObjectCommandInput, S3Client,} from "@aws-sdk/client-s3";
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
+import {FileType} from "Documents/Adapter/S3/FileLinkService";
 
 export type S3Config = {
     region: string,
@@ -43,13 +39,19 @@ export class S3Adapter {
         return getSignedUrl(client, putCommand, {expiresIn: 3600});
     }
 
-    public getSignedGetUrl() {
+    public async getSignedGetUrl(type: FileType, catalog: string, fileName: string) {
+        const client = new S3Client({
+            region: this.config.region
+        });
 
-        // const getCommand = new GetObjectCommand({
-        //     Bucket: 'lukaszd-staging-avatars',
-        //     Key: 'tomasz.jpeg'
-        // });
-        // const getUrl = await getSignedUrl(client, getCommand, {expiresIn: 3600});
+        const bucketName = type === FileType.AVATAR ? this.config.avatarsBucket : this.config.documentsBucket;
+
+        const getCommand = new GetObjectCommand({
+            Bucket: bucketName,
+            Key: `${catalog}/${fileName}`,
+        });
+
+        return getSignedUrl(client, getCommand, {expiresIn: 3600});
     }
 
 }

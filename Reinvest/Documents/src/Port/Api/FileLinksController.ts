@@ -17,4 +17,9 @@ export class FileLinksController {
     public async createDocumentsFileLinks(numberOfLinks: number, profileId: string): Promise<FileLink[]> {
         return this.fileLinkService.createFileLinks(FileType.DOCUMENT, profileId, numberOfLinks);
     }
+
+    public async getAvatarLink(id: string, catalog: string): Promise<FileLink> {
+        return this.fileLinkService.getAvatarFileLink(id, catalog);
+    }
+
 }

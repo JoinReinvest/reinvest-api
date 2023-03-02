@@ -10,14 +10,12 @@ export class DocumentsService {
         this.documentsModule = documentsModule;
     }
 
-    async getLink(fileInput: FileInput | null): Promise<FileLink | null> {
+    async getAvatarFileLink(fileInput: FileInput | null): Promise<FileLink | null> {
         if (fileInput === null) {
             return null;
         }
-        // this.documentsModule.api()
-        return {
-            id: fileInput.id,
-            url: "test"
-        }
+        const {id, path} = fileInput;
+
+        return await this.documentsModule.api().getAvatarLink(id, path)
     }
 }

@@ -55,7 +55,7 @@ export class GetProfileController {
         return {
             externalId: profileObject.externalId,
             label: profileObject.label,
-            avatar: await this.documents.getLink(profileObject.avatar),
+            avatar: await this.documents.getAvatarFileLink(profileObject.avatar),
             isCompleted: profileObject.isCompleted,
             details: {
                 firstName: profileObject.name?.firstName,

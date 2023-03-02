@@ -52,6 +52,8 @@ const serverlessConfiguration: AWS = {
                 BastionHostName: "BastionHostName",
                 DatabaseName: "DatabaseName",
                 DatabaseHost: "DatabaseHost",
+                S3_BUCKET_DOCUMENTS: "S3_BUCKET_DOCUMENTS",
+                S3_BUCKET_AVATARS: "S3_BUCKET_AVATARS"
             }
         },
     },

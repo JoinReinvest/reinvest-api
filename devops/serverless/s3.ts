@@ -109,6 +109,16 @@ export const S3Outputs = {
         Description: "Avatars bucket Arn",
         ...exportOutput('AvatarsBucketArn')
     },
+    DocumentsBucketName: {
+        Value: getResourceName("documents"),
+        Description: "Documents bucket name",
+        ...exportOutput('DocumentsBucketName')
+    },
+    AvatarsBucketName: {
+        Value: getResourceName("avatars"),
+        Description: "Avatars bucket name",
+        ...exportOutput('AvatarsBucketName')
+    },
     PortfolioBucketArn: {
         Value: getAttribute("BucketPortfolio", "Arn"),
         Description: "Portfolio bucket Arn",

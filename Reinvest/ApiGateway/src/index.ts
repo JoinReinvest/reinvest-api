@@ -4,8 +4,6 @@ import Modules from "Reinvest/Modules";
 import Schema from "ApiGateway/Schema";
 import {GraphQLError} from "graphql";
 import {Identity} from "Reinvest/Identity/src";
-import {ApolloServerErrorCode} from "@apollo/server/errors";
-import {ApolloError} from "apollo-server-errors";
 
 const server = new ApolloServer({
     schema: Schema,
