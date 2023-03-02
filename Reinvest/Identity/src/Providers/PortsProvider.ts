@@ -1,13 +1,11 @@
 import {Identity} from "Identity/index";
 import {ContainerInterface} from "Container/Container";
 import {PhoneController} from "Identity/Port/Api/PhoneController";
-import {PhoneRepository} from "Identity/Adapter/Database/Repository/PhoneRepository";
 import {UserRegistrationController} from "Identity/Port/Api/UserRegistrationController";
 import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepository";
-import {ProfileService} from "Identity/Adapter/Profile/ProfileService";
-import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 import {UserRegistrationService} from "Identity/Service/UserRegistrationService";
 import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationService";
+import {ProfileController} from "Identity/Port/Api/ProfileController";
 
 export class PortsProvider {
     private config: Identity.Config;
@@ -19,6 +17,7 @@ export class PortsProvider {
     public boot(container: ContainerInterface) {
         //controllers
         container
+            .addClass(ProfileController, [UserRepository])
             .addClass(PhoneController, [PhoneRegistrationService])
             .addClass(UserRegistrationController, [UserRegistrationService])
         ;

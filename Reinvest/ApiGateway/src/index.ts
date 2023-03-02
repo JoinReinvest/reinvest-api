@@ -4,6 +4,8 @@ import Modules from "Reinvest/Modules";
 import Schema from "ApiGateway/Schema";
 import {GraphQLError} from "graphql";
 import {Identity} from "Reinvest/Identity/src";
+import {ApolloServerErrorCode} from "@apollo/server/errors";
+import {ApolloError} from "apollo-server-errors";
 
 const server = new ApolloServer({
     schema: Schema,
@@ -33,9 +35,12 @@ export const app = (modules: Modules) => {
                     });
                 }
                 const userId = authorizer.jwt.claims.sub;
-
                 const api = modules.getApi<Identity.ApiType>(Identity);
-                const profileId = api.getProfileId(userId);
+                const profileId = await api.getProfileId(userId);
+
+                if (profileId === null) {
+                    throw new GraphQLError('Profile not exist');
+                }
 
                 return <SessionContext>{
                     userId,

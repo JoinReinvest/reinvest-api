@@ -2,6 +2,7 @@ import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
 import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileController";
 import {ApolloError} from "apollo-server-errors";
+import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
 
 const schema = `
     #graphql
@@ -13,8 +14,7 @@ const schema = `
         domicile: Domicile
         address: Address
         ssn: String
-        idScan: [FileLink]
-        avatar: FileLink
+        idScan: [FileLinkId]
         statements: [Statement]
     }
 
@@ -27,7 +27,7 @@ const schema = `
         externalId: String
         "The name/label of the user"
         label: String
-        avatarUrl: String
+        avatar: GetAvatarLink
         isCompleted: Boolean
         details: ProfileDetails
     }
@@ -90,7 +90,7 @@ export const Profile = {
             getProfile: async (parent: any,
                                input: undefined,
                                {profileId, modules}: SessionContext
-            ) => {
+            ): Promise<ProfileResponse> => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 return api.getProfile(profileId);
             },
@@ -103,7 +103,7 @@ export const Profile = {
             completeProfileDetails: async (parent: any,
                                            data: CompleteProfileDetailsInput,
                                            {profileId, modules}: SessionContext
-            ) => {
+            ): Promise<ProfileResponse> => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 const {input} = data;
                 const errors = await api.completeProfile(input, profileId);

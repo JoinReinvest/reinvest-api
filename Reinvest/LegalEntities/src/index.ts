@@ -9,12 +9,18 @@ import {
 } from "LegalEntities/Port/Events/LegalEntitiesTechnicalHandler";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
+import {InvestmentAccounts} from "InvestmentAccounts/index";
+import {Documents} from "Documents/index";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
     export type Config = {
         database: PostgreSQLConfig
     };
+
+    export type ModulesDependencies = {
+        documents: Documents.Main
+    }
 
     export type ApiType = LegalEntitiesApiType & Api;
     export type TechnicalHandlerType = LegalEntitiesTechnicalHandlerType & EventHandler;
@@ -23,9 +29,11 @@ export namespace LegalEntities {
         private readonly config: LegalEntities.Config;
         private booted = false;
         private container: ContainerInterface;
+        private modules: LegalEntities.ModulesDependencies;
 
-        constructor(config: LegalEntities.Config) {
+        constructor(config: LegalEntities.Config, modules: ModulesDependencies) {
             this.config = config;
+            this.modules = modules;
             this.container = new Container();
         }
 
@@ -33,6 +41,8 @@ export namespace LegalEntities {
             if (this.booted) {
                 return;
             }
+
+            this.container.addAsValue('Documents', this.modules.documents);
             new AdapterServiceProvider(this.config).boot(this.container);
             new PortsProvider(this.config).boot(this.container);
 
@@ -63,7 +73,7 @@ export namespace LegalEntities {
 
     }
 
-    export function create(config: LegalEntities.Config) {
-        return new LegalEntities.Main(config);
+    export function create(config: LegalEntities.Config, modules: LegalEntities.ModulesDependencies) {
+        return new LegalEntities.Main(config, modules);
     }
 }

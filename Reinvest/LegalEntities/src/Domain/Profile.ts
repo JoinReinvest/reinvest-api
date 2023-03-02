@@ -171,6 +171,10 @@ export class Profile {
         }
     }
 
+    getStatements(): PersonalStatement[] {
+        return this.statements;
+    }
+
     private get(value: ToObject | null) {
         if (value === null) {
             return null;

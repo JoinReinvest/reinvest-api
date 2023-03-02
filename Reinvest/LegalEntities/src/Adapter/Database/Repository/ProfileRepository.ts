@@ -29,7 +29,7 @@ export class ProfileRepository {
         return profile;
     }
 
-    private async findProfile(profileId: string): Promise<Profile | null> {
+    public async findProfile(profileId: string): Promise<Profile | null> {
         const data = await this.databaseAdapterProvider.provide()
             .selectFrom(legalEntitiesProfileTable)
             .select(['profileId', 'externalId', 'label', 'name', 'ssn', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements', 'isCompleted'])
@@ -88,11 +88,12 @@ export class ProfileRepository {
         return rawProfile;
     }
 
-    async isSSNUnique(ssn: SSN): Promise<boolean> {
+    async isSSNUnique(ssn: SSN, profileId: string): Promise<boolean> {
         const isProfileWithTheSSNExist = await this.databaseAdapterProvider.provide()
             .selectFrom(legalEntitiesProfileTable)
             .select(['profileId'])
             .where('ssn', '=', ssn.toObject())
+            .where('profileId', '!=', profileId)
             .limit(1)
             .executeTakeFirst();
 

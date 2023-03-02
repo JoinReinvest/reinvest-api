@@ -4,6 +4,7 @@ import {CompleteProfileController} from "LegalEntities/Port/Api/CompleteProfileC
 import {DraftAccountsController} from "LegalEntities/Port/Api/DraftAccountsController";
 import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/ProfileRepository";
 import {GetProfileController} from "LegalEntities/Port/Api/GetProfileController";
+import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
 
 export class PortsProvider {
     private config: LegalEntities.Config;
@@ -16,7 +17,7 @@ export class PortsProvider {
         //controllers
         container
             .addClass(CompleteProfileController, [ProfileRepository])
-            .addClass(GetProfileController, [ProfileRepository])
+            .addClass(GetProfileController, [ProfileRepository, DocumentsService])
             .addClass(DraftAccountsController)
         ;
     }

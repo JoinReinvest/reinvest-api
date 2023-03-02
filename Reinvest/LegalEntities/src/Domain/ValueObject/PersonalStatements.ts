@@ -71,11 +71,19 @@ export abstract class PersonalStatement implements ToObject {
         return this.type === type;
     }
 
+    getType(): PersonalStatementType {
+        return this.type;
+    }
+
     isTheSameType(statement: PersonalStatement): boolean {
         return statement.isType(this.type);
     }
 
     toObject(): PersonalStatementInput {
+        throw new Error("You can not use an abstract class directly");
+    }
+
+    getDetails(): string[] {
         throw new Error("You can not use an abstract class directly");
     }
 }
@@ -97,6 +105,10 @@ export class FINRAMemberStatement extends PersonalStatement implements ToObject 
             }
         }
     }
+
+    getDetails(): string[] {
+        return [this.name];
+    }
 }
 
 export class TradingCompanyStakeholderStatement extends PersonalStatement implements ToObject {
@@ -116,6 +128,10 @@ export class TradingCompanyStakeholderStatement extends PersonalStatement implem
             }
         }
     }
+
+    getDetails(): string[] {
+        return this.tickerSymbols;
+    }
 }
 
 export class PoliticianStatement extends PersonalStatement implements ToObject {
@@ -133,6 +149,10 @@ export class PoliticianStatement extends PersonalStatement implements ToObject {
                 description: this.description
             }
         }
+    }
+
+    getDetails(): string[] {
+        return [this.description];
     }
 }
 
@@ -152,5 +172,9 @@ export class AccreditedInvestorStatement extends PersonalStatement implements To
                 statement: this.statement
             }
         }
+    }
+
+    getDetails(): string[] {
+        return [this.statement];
     }
 }

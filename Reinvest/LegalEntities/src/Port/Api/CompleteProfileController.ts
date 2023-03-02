@@ -68,7 +68,7 @@ export class CompleteProfileController {
                     case 'ssn':
                         const {ssn: ssnValue} = data;
                         const ssn = SSN.create(ssnValue);
-                        if (await this.profileRepository.isSSNUnique(ssn)) {
+                        if (await this.profileRepository.isSSNUnique(ssn, profileId)) {
                             profile.setSSN(ssn);
                         } else {
                             errors.push('SSN_IS_NOT_UNIQUE');
