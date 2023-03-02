@@ -1,17 +1,16 @@
 import {migrate} from "Reinvest/migration";
 
-const response = require('cfn-response');
-
-export const main = async (event: any, context: any) => {
+export const main = async (event: any, context: any, callback: any) => {
+    const migrationType = event === 'down' ? 'migrateDown' : 'migrateLatest';
     try {
-        console.log('Starting migration');
-        await migrate('migrateLatest')
+        console.log('Starting migration: ' + migrationType);
+        await migrate(migrationType);
         console.log('Migration finished!');
     } catch (error: any) {
+        callback(error, {event, migrationType, status: false});
         console.log({error});
-    } finally {
-        if (event.ResponseURL) { // called by cloudformation
-            response.send(event, context, response.SUCCESS, {status: true});
-        }
+        return;
     }
+
+    callback(null, {event, migrationType, status: true});
 };
