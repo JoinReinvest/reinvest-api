@@ -27,7 +27,7 @@ export interface LegalEntitiesProfile {
     isCompleted: boolean;
 }
 
-export const LegalEntitiesJsonFields = ['ssn', 'name', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements'];
+export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements'];
 
 export type InsertableProfile = Insertable<LegalEntitiesProfile>;
 // export type InsertablePerson = Insertable<LegalEntitiesPerson>;

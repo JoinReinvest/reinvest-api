@@ -13,7 +13,7 @@ export type CompleteProfileInput = {
     address?: AddressInput,
     idScan?: { id: string }[],
     avatar?: { id: string },
-    SSN?: SSNInput,
+    SSN?: { ssn: SSNInput },
     domicile?: DomicileInput,
     statements?: PersonalStatementInput[],
     removeStatements?: PersonalStatementInput[],
@@ -66,7 +66,13 @@ export class ProfileController {
                         profile.setDomicile(Domicile.create(data));
                         break;
                     case 'ssn':
-                        profile.setSSN(SSN.create(data));
+                        const {ssn: ssnValue} = data;
+                        const ssn = SSN.create(ssnValue);
+                        if (await this.profileRepository.isSSNUnique(ssn)) {
+                            profile.setSSN(ssn);
+                        } else {
+                            errors.push('SSN_IS_NOT_UNIQUE');
+                        }
                         break;
                     case 'statements':
                         for (const rawStatement of data) {
@@ -94,7 +100,7 @@ export class ProfileController {
             }
         }
 
-        if (input.verifyAndFinish) {
+        if (errors.length === 0 && input.verifyAndFinish) {
             if (profile.verifyCompletion()) {
                 profile.setAsCompleted();
             } else {
@@ -102,9 +108,8 @@ export class ProfileController {
             }
         }
 
-        if (errors.length === 0) {
-            await this.profileRepository.storeProfile(profile);
-        }
+        await this.profileRepository.storeProfile(profile);
+
         return errors;
     }
 }

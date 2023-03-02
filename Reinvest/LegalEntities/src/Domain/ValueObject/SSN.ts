@@ -1,18 +1,15 @@
 import {NonEmptyString, ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 
-export type SSNInput = {
-    ssn: string
-}
+export type SSNInput = string;
 
 export class SSN extends NonEmptyString implements ToObject {
     constructor(value: string) {
         super(value, "SSN");
     }
 
-    static create(data: SSNInput): SSN {
+    static create(ssn: SSNInput): SSN {
         try {
-            const {ssn} = data;
             return new SSN(ssn);
         } catch (error: any) {
             throw new ValidationError('Missing SSN value');
@@ -20,8 +17,6 @@ export class SSN extends NonEmptyString implements ToObject {
     }
 
     toObject(): SSNInput {
-        return {
-            ssn: this.value,
-        }
+        return this.value
     }
 }

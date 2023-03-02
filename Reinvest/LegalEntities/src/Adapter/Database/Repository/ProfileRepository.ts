@@ -8,6 +8,7 @@ import {
     LegalEntitiesJsonFields,
     LegalEntitiesProfile
 } from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
+import {SSN} from "LegalEntities/Domain/ValueObject/SSN";
 
 export class ProfileRepository {
     public static getClassName = (): string => "ProfileRepository";
@@ -85,5 +86,16 @@ export class ProfileRepository {
         }
 
         return rawProfile;
+    }
+
+    async isSSNUnique(ssn: SSN): Promise<boolean> {
+        const isProfileWithTheSSNExist = await this.databaseAdapterProvider.provide()
+            .selectFrom(legalEntitiesProfileTable)
+            .select(['profileId'])
+            .where('ssn', '=', ssn.toObject())
+            .limit(1)
+            .executeTakeFirst();
+
+        return !isProfileWithTheSSNExist;
     }
 }
