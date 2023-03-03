@@ -41,13 +41,13 @@ export class UserRegistrationService {
             console.log(`Creating profile id ${profileId}`);
             await this.profileService.createProfile(profileId);
 
-            try {
-                console.log(`Registering profile ${profileId} in Cognito for user ${userId}`);
-                await this.cognitoService.setProfileAttribute(userId, profileId);
-                console.log(`Profile ${profileId} for user ${userId} registered in Cognito`);
-            } catch (error: any) {
-                console.log(`Cannot register profile ${profileId} for user ${userId} in Cognito: ${error.message}`);
-            }
+            // try {
+            //     console.log(`Registering profile ${profileId} in Cognito for user ${userId}`);
+            //     await this.cognitoService.setProfileAttribute(userId, profileId);
+            //     console.log(`Profile ${profileId} for user ${userId} registered in Cognito`);
+            // } catch (error: any) {
+            //     console.log(`Cannot register profile ${profileId} for user ${userId} in Cognito: ${error.message}`);
+            // }
             return true;
         } catch (error: any) {
             console.log(`[UserRegistrationService/registerUser] ${error.message}`);
