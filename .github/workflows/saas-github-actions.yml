@@ -28,21 +28,24 @@ jobs:
           fi
           echo "Current environment: ${ENVIRONMENT}"
           echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
-#      - uses: actions/checkout@v3
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: '16'
-#      - name: "Install dependencies"
-#        run: yarn install
-#      - name: "Run unit tests"
-#        run: yarn tdd
-#      - name: "Deploy functions and migrate db"
-#        env:
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
-#          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
-#        run: |
-#          environment=${{env.ENVIRONMENT}}
-#          yarn "${environment,,}:deploy:functions"
-#          yarn "${environment,,}:invoke:migrateUp"
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: "Install dependencies"
+        run: yarn install
+      - name: "Deploy saas"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
+          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
+          COGNITO_RETENTION_POLICY: ${{ secrets[format('{0}_COGNITO_RETENTION_POLICY', env.ENVIRONMENT)] }}
+          POSTGRESQL_MAIN_USER: ${{ secrets[format('{0}_POSTGRESQL_MAIN_USER', env.ENVIRONMENT)] }}
+          POSTGRESQL_MAIN_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_MAIN_PASSWORD', env.ENVIRONMENT)] }}
+          POSTGRESQL_AWS_DB_INSTANCE: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_INSTANCE', env.ENVIRONMENT)] }}
+          POSTGRESQL_AWS_DB_RETENTION_POLICY: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_RETENTION_POLICY', env.ENVIRONMENT)] }}
+          POSTGRESQL_AWS_DB_STORAGE_GB: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_STORAGE_GB', env.ENVIRONMENT)] }}
+        run: |
+          environment=${{env.ENVIRONMENT}}
+          yarn "${environment,,}:deploy:saas"
