@@ -1,9 +1,5 @@
 import {exportOutput, getAttribute, getResourceName, importOutput, joinAttributes} from "./utils";
 
-const getDocumentsArn = () => getAttribute("BucketDocuments", "Arn");
-const getAvatarsArn = () => getAttribute("BucketAvatars", "Arn");
-const getPortfolioArn = () => getAttribute("BucketPortfolio", "Arn");
-
 const importDocumentsArn = () => importOutput("DocumentsBucketArn");
 const importAvatarsArn = () => importOutput("AvatarsBucketArn");
 const importPortfolioArn = () => importOutput("PortfolioBucketArn");

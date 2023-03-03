@@ -96,18 +96,18 @@ export const CognitoResources = {
                     Name: "incentive_token",
                     Required: false,
                 },
-                {
-                    AttributeDataType: "String",
-                    Mutable: false,
-                    Name: "profile_id",
-                    Required: false,
-                },
-                {
-                    AttributeDataType: "String",
-                    Mutable: true,
-                    Name: "profile_uuid",
-                    Required: false,
-                },
+                // {
+                //     AttributeDataType: "String",
+                //     Mutable: false,
+                //     Name: "profile_id",
+                //     Required: false,
+                // },
+                // {
+                //     AttributeDataType: "String",
+                //     Mutable: true,
+                //     Name: "profile_uuid",
+                //     Required: false,
+                // },
             ],
             UserPoolAddOns: {
                 AdvancedSecurityMode: "ENFORCED",
@@ -153,24 +153,24 @@ export const CognitoResources = {
             },
         },
     },
-    CognitoExecutivesGroup: {
-        Type: "AWS::Cognito::UserPoolGroup",
-        Properties: {
-            Description: "Executives group",
-            GroupName: "Executives",
-            Precedence: 20,
-            UserPoolId: {Ref: "CognitoUserPool"},
-        },
-    },
-    CognitoAdministratorsGroup: {
-        Type: "AWS::Cognito::UserPoolGroup",
-        Properties: {
-            Description: "Administrators group",
-            GroupName: "Administrators",
-            Precedence: 10,
-            UserPoolId: {Ref: "CognitoUserPool"},
-        },
-    },
+    // CognitoExecutivesGroup: {
+    //     Type: "AWS::Cognito::UserPoolGroup",
+    //     Properties: {
+    //         Description: "Executives group",
+    //         GroupName: "Executives",
+    //         Precedence: 20,
+    //         UserPoolId: {Ref: "CognitoUserPool"},
+    //     },
+    // },
+    // CognitoAdministratorsGroup: {
+    //     Type: "AWS::Cognito::UserPoolGroup",
+    //     Properties: {
+    //         Description: "Administrators group",
+    //         GroupName: "Administrators",
+    //         Precedence: 10,
+    //         UserPoolId: {Ref: "CognitoUserPool"},
+    //     },
+    // },
 };
 export const CognitoOutputs = {
     CognitoUserPoolID: {

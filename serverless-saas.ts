@@ -19,7 +19,12 @@ const serverlessConfiguration: AWS = {
         ...ProviderConfiguration,
         environment: {
             ...ProviderEnvironment,
-            COGNITO_RETENTION_POLICY: 'Delete'
+            COGNITO_RETENTION_POLICY: 'Delete',
+            POSTGRESQL_AWS_DB_INSTANCE: "${env:POSTGRESQL_AWS_DB_INSTANCE}",
+            POSTGRESQL_AWS_DB_RETENTION_POLICY: "${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}",
+            POSTGRESQL_AWS_DB_STORAGE_GB: "${env:POSTGRESQL_AWS_DB_STORAGE_GB}",
+            POSTGRESQL_MAIN_USER: "${env:POSTGRESQL_MAIN_USER}",
+            POSTGRESQL_MAIN_PASSWORD: "${env:POSTGRESQL_MAIN_PASSWORD}",
         }
     },
     resources: {

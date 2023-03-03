@@ -33,17 +33,17 @@ export const RdsResources = {
     },
     RdsPostgresDBInstance: {
         Type: "AWS::RDS::DBInstance",
-        DeletionPolicy: "Delete", // TODO change to Snapshot
-        UpdateReplacePolicy: "Delete", // TODO change to Snapshot
+        DeletionPolicy: "${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}",
+        UpdateReplacePolicy: "${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}",
         Properties: {
             AvailabilityZone: getPrivateAZ(),
             DBInstanceIdentifier: getResourceName("postgresql"),
-            AllocatedStorage: "5", // in GB
-            DBInstanceClass: "db.t3.micro", // the smallest one for tests!
+            AllocatedStorage: "${env:POSTGRESQL_AWS_DB_STORAGE_GB}",
+            DBInstanceClass: "${env:POSTGRESQL_AWS_DB_INSTANCE}",
             Engine: "postgres",
             DBName: getResourceName("db", "_"),
-            MasterUsername: "executive", // use envs!
-            MasterUserPassword: "password", // use envs!
+            MasterUsername: "${env:POSTGRESQL_MAIN_USER}",
+            MasterUserPassword: "${env:POSTGRESQL_MAIN_PASSWORD}",
             Tags: [getResourceNameTag("postgresql")],
             DBSubnetGroupName: {Ref: "RdsPrivateSubnetsGroup"},
             VPCSecurityGroups: [{Ref: "RdsSecurityGroup"}],
