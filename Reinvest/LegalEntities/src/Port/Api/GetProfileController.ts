@@ -15,19 +15,19 @@ export type ProfileResponse = {
     avatar: FileLink | null,
     isCompleted: boolean,
     details: {
-        firstName: string | undefined,
-        middleName: string | undefined,
-        lastName: string | undefined,
+        firstName?: string,
+        middleName?: string,
+        lastName?: string,
         dateOfBirth: string | null,
         domicile: {
-            type: DomicileType | undefined,
-            birthCountry: String | undefined,
-            citizenshipCountry: String | undefined,
-            visaType: String | undefined,
+            type?: DomicileType,
+            birthCountry?: String,
+            citizenshipCountry?: String,
+            visaType?: String,
         },
         ssn: string | null,
         address: AddressInput | null,
-        idScan: { id: string }[] | undefined,
+        idScan?: { id: string }[],
         statements: {
             type: PersonalStatementType,
             details: string[]
