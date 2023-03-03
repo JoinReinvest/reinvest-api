@@ -22,6 +22,14 @@ export function boot(): Modules {
     // } as Investments.Config);
 
     modules.register(
+        Documents.moduleName,
+        Documents.create({
+            database: databaseConfig,
+            s3: s3Config
+        } as Documents.Config)
+    );
+
+    modules.register(
         InvestmentAccounts.moduleName,
         InvestmentAccounts.create({
             database: databaseConfig,
@@ -44,16 +52,11 @@ export function boot(): Modules {
         LegalEntities.moduleName,
         LegalEntities.create({
             database: databaseConfig,
-        } as LegalEntities.Config)
+        } as LegalEntities.Config, {
+            documents: modules.get(Documents.moduleName) as Documents.Main
+        })
     );
 
-    modules.register(
-        Documents.moduleName,
-        Documents.create({
-            database: databaseConfig,
-            s3: s3Config
-        } as Documents.Config)
-    );
 
     return modules;
 }

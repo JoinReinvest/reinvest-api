@@ -13,16 +13,16 @@ import {
 } from "./ValueObject/VerificationStatus";
 
 export type TransactionMetadata = {
-  failureReason: FailureCompletionReason | undefined;
-  gracePeriodStatus: GracePeriodStatus | undefined;
-  investmentVerificationStatus: InvestmentVerificationStatus | undefined;
-  investorVerificationStatus: InvestorVerificationStatus | undefined;
-  lastActionRetryCounter: Counter | undefined;
-  manualActionReason: ManualActionReason | undefined;
-  numberOfShares: NumberOfShares | undefined;
-  sharesId: SharesId | undefined;
-  unitPrice: UnitPrice | undefined;
-  unwindReason: FailureCompletionReason | undefined;
+  failureReason?: FailureCompletionReason,
+  gracePeriodStatus?: GracePeriodStatus,
+  investmentVerificationStatus?: InvestmentVerificationStatus,
+  investorVerificationStatus?: InvestorVerificationStatus,
+  lastActionRetryCounter?: Counter,
+  manualActionReason?: ManualActionReason,
+  numberOfShares?: NumberOfShares,
+  sharesId?: SharesId,
+  unitPrice?: UnitPrice
+  unwindReason?: FailureCompletionReason
 };
 
 export class TransactionStateChange {

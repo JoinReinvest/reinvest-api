@@ -8,10 +8,13 @@ export class Path extends NonEmptyString {
     }
 }
 
-export type AvatarInput = {
+export type FileInput = {
     id: string,
     path: string
 }
+
+export type AvatarInput = FileInput
+
 export type IdScanInput = {
     ids: string[],
     path: string

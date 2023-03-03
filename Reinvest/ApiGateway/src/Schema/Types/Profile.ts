@@ -1,10 +1,23 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
-import {CompleteProfileInput} from "LegalEntities/Port/Api/ProfileController";
+import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileController";
 import {ApolloError} from "apollo-server-errors";
+import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
 
 const schema = `
     #graphql
+    type ProfileDetails {
+        firstName: String
+        middleName: String
+        lastName: String
+        dateOfBirth: String
+        domicile: Domicile
+        address: Address
+        ssn: String
+        idScan: [FileLinkId]
+        statements: [Statement]
+    }
+
     """
     An investor profile information.
     Returns data about investor details, accounts and notifications
@@ -14,9 +27,9 @@ const schema = `
         externalId: String
         "The name/label of the user"
         label: String
-        avatarUrl: String
-        accounts: [AccountOverview]
+        avatar: GetAvatarLink
         isCompleted: Boolean
+        details: ProfileDetails
     }
 
     input ProfileDetailsInput {
@@ -46,7 +59,9 @@ const schema = `
     }
 
     type Query {
+        """[MOCK]"""
         getProfile: Profile
+        """[MOCK]"""
         canOpenAccount(accountType: AccountType): Boolean
     }
 
@@ -58,6 +73,8 @@ const schema = `
         To finish onboarding send field 'verifyAndFinish'
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
+
+        """[MOCK]"""
         openAccount(draftAccountId: String): Boolean
     }
 `;
@@ -66,20 +83,6 @@ type CompleteProfileDetailsInput = {
     input: CompleteProfileInput
 }
 
-const profileMockResponse = {
-    externalId: "m478167880",
-    name: "mBrandon Rule",
-    avatarUrl: "https://thumbs.dreamstime.com/b/test-icon-vector-question-mark-female-user-person-profile-avatar-symbol-help-sign-glyph-pictogram-illustration-test-168789128.jpg",
-    accounts: [
-        {
-            id: 'mc73ad8f6-4328-4151-9cc8-3694b71054f6',
-            type: 'mIndividual',
-            avatarUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU',
-            positionTotal: 'm$5,560'
-        }
-    ],
-};
-
 export const Profile = {
     typeDefs: schema,
     resolvers: {
@@ -87,7 +90,10 @@ export const Profile = {
             getProfile: async (parent: any,
                                input: undefined,
                                {profileId, modules}: SessionContext
-            ) => profileMockResponse,
+            ): Promise<ProfileResponse> => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                return api.getProfile(profileId);
+            },
             canOpenAccount: async (parent: any,
                                    data: undefined,
                                    {profileId, modules}: SessionContext
@@ -97,14 +103,15 @@ export const Profile = {
             completeProfileDetails: async (parent: any,
                                            data: CompleteProfileDetailsInput,
                                            {profileId, modules}: SessionContext
-            ) => {
+            ): Promise<ProfileResponse> => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 const {input} = data;
                 const errors = await api.completeProfile(input, profileId);
                 if (errors.length > 0) {
                     throw new ApolloError(JSON.stringify(errors));
                 }
-                return profileMockResponse;
+
+                return api.getProfile(profileId);
             },
 
             openAccount: async (parent: any,

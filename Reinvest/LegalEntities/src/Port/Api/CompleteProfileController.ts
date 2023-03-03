@@ -21,8 +21,8 @@ export type CompleteProfileInput = {
 }
 
 
-export class ProfileController {
-    public static getClassName = (): string => "ProfileController";
+export class CompleteProfileController {
+    public static getClassName = (): string => "CompleteProfileController";
     private profileRepository: ProfileRepository;
 
     constructor(profileRepository: ProfileRepository) {
@@ -68,7 +68,7 @@ export class ProfileController {
                     case 'ssn':
                         const {ssn: ssnValue} = data;
                         const ssn = SSN.create(ssnValue);
-                        if (await this.profileRepository.isSSNUnique(ssn)) {
+                        if (await this.profileRepository.isSSNUnique(ssn, profileId)) {
                             profile.setSSN(ssn);
                         } else {
                             errors.push('SSN_IS_NOT_UNIQUE');

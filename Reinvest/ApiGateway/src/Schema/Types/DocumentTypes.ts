@@ -3,14 +3,33 @@ import {Documents} from "Documents/index";
 
 const schema = `
     #graphql
+    "Link id input"
     input FileLinkInput {
-        "This is @FileLink.id"
+        "This is @PutFileLink.id"
         id: String!
     }
 
-    type FileLink {
-        url: String
+    "Link id"
+    type FileLinkId {
         id: String
+    }
+
+    "Link id + url to read the avatar"
+    type GetAvatarLink {
+        id: String
+        url: String
+    }
+
+    "Link id + url to read the document"
+    type GetDocumentLink {
+        id: String
+        url: String
+    }
+
+    "Link id + PUT url to store resource in the storage"
+    type PutFileLink {
+        id: String
+        url: String
     }
 
     input GenericFieldInput {
@@ -40,9 +59,9 @@ const schema = `
     type Mutation {
         createDocumentsFileLinks(
             numberOfLinks: Int! @constraint(min:1, max: 10)
-        ): [FileLink]
+        ): [PutFileLink]
 
-        createAvatarFileLink: FileLink
+        createAvatarFileLink: PutFileLink
 
         signDocumentFromTemplate(
             templateId: TemplateName!,

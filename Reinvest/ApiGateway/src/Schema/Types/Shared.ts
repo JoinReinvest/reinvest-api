@@ -132,6 +132,11 @@ const schema = `
         forStakeholder: TradingCompanyStakeholderInput
         forAccreditedInvestor: AccreditedInvestorInput
     }
+
+    type Statement {
+        type: StatementType,
+        details: [String]
+    }
 `;
 export const Shared = {
     typeDefs: schema,

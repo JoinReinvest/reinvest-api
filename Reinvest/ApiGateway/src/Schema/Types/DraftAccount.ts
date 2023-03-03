@@ -80,7 +80,7 @@ const individualSchema = `
         employer: Employer
         netWorth: NetRange
         netIncome: NetRange
-        avatar: FileLink
+        avatar: GetAvatarLink
     }
 
     type Query {
@@ -101,7 +101,7 @@ const corporateTrustSchema = `
         ssn: String
         address: Address
         domicile: Domicile
-        idScan: [FileLink]
+        idScan: [FileLinkId]
         email: EmailAddress
     }
 
@@ -113,8 +113,8 @@ const corporateTrustSchema = `
         ein: String
         annualRevenue: String
         numberOfEmployees: String
-        companyDocuments: [FileLink]
-        avatar: FileLink
+        companyDocuments: [FileLinkId]
+        avatar: GetAvatarLink
         stakeholders: [Stakeholder]
         companyType: CorporateCompanyType
     }
@@ -126,8 +126,8 @@ const corporateTrustSchema = `
         ein: String
         annualRevenue: String
         numberOfEmployees: String
-        companyDocuments: [FileLink]
-        avatar: FileLink
+        companyDocuments: [FileLinkId]
+        avatar: GetAvatarLink
         stakeholders: [Stakeholder]
         companyType: TrustCompanyType
     }
@@ -248,13 +248,10 @@ const corporateTrustMockResponse = (isTrust: boolean = false) => ({
     annualRevenue: "$100000-$5000000",
     numberOfEmployees: "<10",
     companyDocuments: [{
-        url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU",
         id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
     }, {
-        url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU",
         id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
     }, {
-        url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU",
         id: "d98ad8f6-4328-4151-9cc8-3694b710444s4"
     }],
     avatar: {
@@ -280,7 +277,6 @@ const corporateTrustMockResponse = (isTrust: boolean = false) => ({
 
         },
         idScan: [{
-            url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU",
             id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
         }],
         email: "john.doe@devkick.pl"

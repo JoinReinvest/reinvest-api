@@ -33,4 +33,10 @@ export class FileLinkService {
         }
         return fileLinks;
     }
+
+    async getAvatarFileLink(id: string, catalog: string): Promise<FileLink> {
+        const url = await this.adapter.getSignedGetUrl(FileType.AVATAR, catalog, id);
+
+        return {id, url};
+    }
 }

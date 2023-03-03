@@ -1,8 +1,10 @@
 import {LegalEntities} from "LegalEntities/index";
 import {ContainerInterface} from "Container/Container";
-import {ProfileController} from "LegalEntities/Port/Api/ProfileController";
+import {CompleteProfileController} from "LegalEntities/Port/Api/CompleteProfileController";
 import {DraftAccountsController} from "LegalEntities/Port/Api/DraftAccountsController";
 import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/ProfileRepository";
+import {GetProfileController} from "LegalEntities/Port/Api/GetProfileController";
+import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
 
 export class PortsProvider {
     private config: LegalEntities.Config;
@@ -14,8 +16,8 @@ export class PortsProvider {
     public boot(container: ContainerInterface) {
         //controllers
         container
-
-            .addClass(ProfileController, [ProfileRepository])
+            .addClass(CompleteProfileController, [ProfileRepository])
+            .addClass(GetProfileController, [ProfileRepository, DocumentsService])
             .addClass(DraftAccountsController)
         ;
     }
