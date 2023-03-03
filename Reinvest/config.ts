@@ -24,16 +24,16 @@ export const DATABASE_CONFIG = {
 }
 
 export const S3_CONFIG = {
-    region: process.env.AWS_REGION as string,
+    region: process.env.INFRASTRUCTURE_AWS_REGION as string,
     avatarsBucket: process.env.S3_BUCKET_AVATARS as string,
     documentsBucket: process.env.S3_BUCKET_DOCUMENTS as string,
 }
 
 export const COGNITO_CONFIG = {
-    region: process.env.AWS_REGION as string,
+    region: process.env.INFRASTRUCTURE_AWS_REGION as string,
     userPoolID: process.env.CognitoUserPoolID as string,
 }
 
 export const SNS_CONFIG = {
-    region: process.env.AWS_REGION as string,
+    region: process.env.INFRASTRUCTURE_AWS_REGION as string,
 }

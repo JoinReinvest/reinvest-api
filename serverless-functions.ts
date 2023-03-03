@@ -41,7 +41,7 @@ const serverlessConfiguration: AWS = {
             S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
             POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
             POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}",
-            AWS_REGION: "${aws:region}"
+            INFRASTRUCTURE_AWS_REGION: "${aws:region}"
         },
         apiGateway: {
             minimumCompressionSize: 1024,
