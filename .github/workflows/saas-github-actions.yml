@@ -13,7 +13,7 @@ jobs:
       - name: Set up environment
         run: |
           CURRENT_TAG=${GITHUB_REF##*/} 
-          echo "Current tag: ${$CURRENT_TAG}"
+          echo "Current tag: ${CURRENT_TAG}"
           if [ $CURRENT_TAG == "DEVELOPMENT_SAAS_DEPLOYMENT" ]; then
             ENVIRONMENT="DEVELOPMENT"
           elif [ $CURRENT_TAG == "INTEGRATIONS_SAAS_DEPLOYMENT" ]; then

@@ -33,7 +33,12 @@
     "local:invoke:postSignUp": "NODE_ENV=development sls invoke local -s development --function cognitoPostSignUpFunction --path ./devops/local/postSignUpRequest.json --config serverless-local.ts",
     "local:invoke:migrateUp": "NODE_ENV=development sls invoke local -s development --function migration --config serverless-local.ts",
     "local:invoke:migrateDown": "NODE_ENV=development sls invoke local -s development --function migration --data 'down' --config serverless-local.ts",
-    "local:server": "docker-compose -f docker-compose.yml up"
+    "local:server": "docker-compose -f docker-compose.yml up",
+
+    "development:redeploy:saas": "tag=DEVELOPMENT_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
+    "integrations:redeploy:saas": "tag=INTEGRATIONS_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
+    "staging:redeploy:saas": "tag=STAGING_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
+    "production:redeploy:saas": "tag=PRODUCTION_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} "
   },
   "author": "Lukasz Duraj <https://www.linkedin.com/in/%C5%82ukasz-duraj-a4872317b/>",
   "license": "ISC",
