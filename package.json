@@ -29,6 +29,11 @@
     "staging:invoke:migrateUp": "NODE_ENV=staging sls invoke -s staging --function migration --config serverless-functions.ts",
     "staging:invoke:migrateDown": "NODE_ENV=staging sls invoke -s staging --function migration --data 'down' --config serverless-functions.ts",
 
+    "production:deploy:saas": "NODE_ENV=production serverless deploy -s production --config serverless-saas.ts",
+    "production:deploy:functions": "NODE_ENV=production serverless deploy -s production --config serverless-functions.ts",
+    "production:invoke:migrateUp": "NODE_ENV=production sls invoke -s production --function migration --config serverless-functions.ts",
+    "production:invoke:migrateDown": "NODE_ENV=production sls invoke -s production --function migration --data 'down' --config serverless-functions.ts",
+
     "local": "NODE_ENV=development serverless offline start -s development --ignoreJWTSignature --noTimeout --reloadHandler --config serverless-local.ts",
     "local:invoke:postSignUp": "NODE_ENV=development sls invoke local -s development --function cognitoPostSignUpFunction --path ./devops/local/postSignUpRequest.json --config serverless-local.ts",
     "local:invoke:migrateUp": "NODE_ENV=development sls invoke local -s development --function migration --config serverless-local.ts",
