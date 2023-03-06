@@ -16,6 +16,19 @@ const schema = `
         ssn: String
         idScan: [FileLinkId]
         statements: [Statement]
+        experience: Experience
+    }
+
+    # TODO Move it to profile completion
+    enum Experience {
+        NO_EXPERIENCE
+        SOME_EXPERIENCE
+        VERY_EXPERIENCED
+        EXPERT
+    }
+
+    input ExperienceInput {
+        experience: Experience
     }
 
     """
@@ -54,6 +67,7 @@ const schema = `
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"
         removeStatements: [StatementInput]
+        investingExperience: ExperienceInput
         "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
         verifyAndFinish: Boolean
     }

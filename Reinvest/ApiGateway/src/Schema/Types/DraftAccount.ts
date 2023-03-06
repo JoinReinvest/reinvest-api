@@ -36,14 +36,6 @@ const sharedSchema = `
 `;
 const individualSchema = `
     #graphql
-    # TODO Move it to profile completion
-    enum Experience {
-        NO_EXPERIENCE
-        SOME_EXPERIENCE
-        VERY_EXPERIENCED
-        EXPERT
-    }
-
     enum EmploymentStatus {
         EMPLOYED
         UNEMPLOYED

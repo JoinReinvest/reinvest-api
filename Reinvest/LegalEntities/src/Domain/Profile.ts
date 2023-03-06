@@ -11,6 +11,7 @@ import {
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
 import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
 
 export type ProfileSchema = {
     profileId: string,
@@ -23,6 +24,7 @@ export type ProfileSchema = {
     idScan: IdScanInput | null,
     avatar: AvatarInput | null,
     domicile: DomicileInput | null,
+    investingExperience: InvestingExperienceInput | null,
     statements: PersonalStatementInput[],
     isCompleted: boolean,
 }
@@ -38,6 +40,7 @@ export class Profile {
     private idScan: IdentityDocument | null = null;
     private avatar: Avatar | null = null;
     private domicile: Domicile | null = null;
+    private investingExperience: InvestingExperience | null = null;
     private statements: PersonalStatement[] = [];
     private completed: boolean = false;
 
@@ -76,6 +79,10 @@ export class Profile {
         this.domicile = domicile;
     }
 
+    setInvestingExperience(investingExperience: InvestingExperience): void {
+        this.investingExperience = investingExperience;
+    }
+
     addStatement(statement: PersonalStatement) {
         const statements = this.statements.filter(
             (currentStatement: PersonalStatement) => !statement.isTheSameType(currentStatement)
@@ -104,7 +111,7 @@ export class Profile {
             const {
                 profileId, externalId, label, name,
                 dateOfBirth, address, idScan, avatar, domicile,
-                ssn, statements, isCompleted
+                ssn, investingExperience, statements, isCompleted
             } = data;
             const profile = new Profile(profileId, externalId, label);
 
@@ -134,6 +141,10 @@ export class Profile {
 
             if (ssn) {
                 profile.setSSN(SSN.create(ssn));
+            }
+
+            if (investingExperience) {
+                profile.setInvestingExperience(InvestingExperience.create(investingExperience));
             }
 
             if (statements) {
@@ -166,6 +177,7 @@ export class Profile {
             idScan: this.get(this.idScan),
             avatar: this.get(this.avatar),
             domicile: this.get(this.domicile),
+            investingExperience: this.get(this.investingExperience),
             statements: this.statements.map(statement => statement.toObject()),
             isCompleted: this.completed
         }
@@ -190,7 +202,7 @@ export class Profile {
             this.dateOfBirth === null ||
             this.address === null ||
             this.idScan === null ||
-            this.avatar === null ||
+            this.investingExperience === null ||
             this.domicile === null;
 
         if (isAnyNull) {

@@ -1,7 +1,7 @@
 {
   "request": {
     "userAttributes": {
-      "sub": "c651d402-039c-410b-8223-e94b43996447",
+      "sub": "f1877917-9e48-4637-b896-36649848a5b8",
       "email_verified": "true",
       "cognito:user_status": "CONFIRMED",
       "custom:incentive_token": "123A1CDA",
