@@ -26,6 +26,10 @@ import {
     PersonalStatementInput,
     PersonalStatementType
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/PersonalStatements";
+import {
+    InvestingExperience, InvestingExperienceInput,
+    InvestingExperienceType
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/InvestingExperience";
 
 context("Given the user wants to complete the profile", () => {
 
@@ -300,6 +304,40 @@ context("Given the user wants to complete the profile", () => {
 
             try {
                 profile.setSSN(SSN.create(input))
+            } catch (error: any) {
+                expect(error).to.exist;
+            }
+        });
+
+        it("Then complete the investing experience", async () => {
+            const input = {
+                experience: InvestingExperienceType.EXPERT
+            }
+            profile.setInvestingExperience(InvestingExperience.create(input))
+
+            const profileOutput = profile.toObject();
+            const experience = profileOutput.investingExperience as InvestingExperienceInput;
+
+            expect(experience.experience).to.be.equal(input.experience);
+        });
+
+        it("Or complete the investing experience with wrong data, Then expects validation error", async () => {
+            const input = {
+                experience: 'WRONG_VALUE'
+            } as unknown as InvestingExperienceInput;
+
+            try {
+                profile.setInvestingExperience(InvestingExperience.create(input))
+            } catch (error: any) {
+                expect(error).to.exist;
+            }
+        });
+
+        it("Or complete the investing experience without details Then expects validation error", async () => {
+            const input = <InvestingExperienceInput>{}
+
+            try {
+                profile.setInvestingExperience(InvestingExperience.create(input))
             } catch (error: any) {
                 expect(error).to.exist;
             }
