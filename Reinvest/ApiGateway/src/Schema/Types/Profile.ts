@@ -19,7 +19,6 @@ const schema = `
         experience: Experience
     }
 
-    # TODO Move it to profile completion
     enum Experience {
         NO_EXPERIENCE
         SOME_EXPERIENCE
