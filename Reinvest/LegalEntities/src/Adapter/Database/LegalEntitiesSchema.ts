@@ -24,10 +24,11 @@ export interface LegalEntitiesProfile {
     avatar: string | null;
     domicile: string | null;
     statements: string | null;
+    investingExperience: string | null;
     isCompleted: boolean;
 }
 
-export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements'];
+export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements', 'investingExperience'];
 
 export type InsertableProfile = Insertable<LegalEntitiesProfile>;
 // export type InsertablePerson = Insertable<LegalEntitiesPerson>;

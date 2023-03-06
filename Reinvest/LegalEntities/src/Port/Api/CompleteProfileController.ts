@@ -6,6 +6,7 @@ import {Avatar, IdentityDocument} from "LegalEntities/Domain/ValueObject/Documen
 import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
 import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
+import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
 
 export type CompleteProfileInput = {
     name?: PersonalNameInput,
@@ -15,6 +16,7 @@ export type CompleteProfileInput = {
     avatar?: { id: string },
     SSN?: { ssn: SSNInput },
     domicile?: DomicileInput,
+    investingExperience?: InvestingExperienceInput,
     statements?: PersonalStatementInput[],
     removeStatements?: PersonalStatementInput[],
     verifyAndFinish: boolean
@@ -30,7 +32,6 @@ export class CompleteProfileController {
     }
 
     public async completeProfile(input: CompleteProfileInput, profileId: string): Promise<string[]> {
-        console.log({input})
         let profile = await this.profileRepository.findOrCreateProfile(profileId);
 
         const errors = []
@@ -65,6 +66,9 @@ export class CompleteProfileController {
                     case 'domicile':
                         profile.setDomicile(Domicile.create(data));
                         break;
+                    case 'investingExperience':
+                        profile.setInvestingExperience(InvestingExperience.create(data));
+                        break;
                     case 'ssn':
                         const {ssn: ssnValue} = data;
                         const ssn = SSN.create(ssnValue);
@@ -76,7 +80,6 @@ export class CompleteProfileController {
                         break;
                     case 'statements':
                         for (const rawStatement of data) {
-                            console.log(rawStatement);
                             const statement = PersonalStatement.create(rawStatement);
                             profile.addStatement(statement);
                         }
