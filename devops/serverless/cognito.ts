@@ -230,6 +230,7 @@ export const CognitoClientResources = {
             PreventUserExistenceErrors: "ENABLED",
             ExplicitAuthFlows: [
                 "ALLOW_USER_SRP_AUTH",
+                "ALLOW_USER_PASSWORD_AUTH",
                 "ALLOW_REFRESH_TOKEN_AUTH",
             ],
             GenerateSecret: false,
