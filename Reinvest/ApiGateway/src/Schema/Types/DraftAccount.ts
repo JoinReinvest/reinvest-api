@@ -1,5 +1,6 @@
 import {SessionContext} from "ApiGateway/index";
 import {LegalEntities} from "LegalEntities/index";
+import {GraphQLError} from "graphql";
 
 const sharedSchema = `
     #graphql
@@ -105,6 +106,7 @@ const corporateTrustSchema = `
         ein: String
         annualRevenue: String
         numberOfEmployees: String
+        industry: String
         companyDocuments: [FileLinkId]
         avatar: GetAvatarLink
         stakeholders: [Stakeholder]
@@ -118,6 +120,7 @@ const corporateTrustSchema = `
         ein: String
         annualRevenue: String
         numberOfEmployees: String
+        industry: String
         companyDocuments: [FileLinkId]
         avatar: GetAvatarLink
         stakeholders: [Stakeholder]
@@ -134,6 +137,10 @@ const corporateTrustSchema = `
 
     input NumberOfEmployeesInput {
         numberOfEmployees: String!
+    }
+
+    input IndustryInput {
+        industry: String!
     }
 
     enum CorporateCompanyType {
@@ -171,6 +178,7 @@ const corporateTrustSchema = `
         ein: EINInput
         annualRevenue: AnnualRevenueInput
         numberOfEmployees: NumberOfEmployeesInput
+        industry: IndustryInput
         companyDocuments: [FileLinkInput]
         removeDocuments: [FileLinkInput]
         avatar: FileLinkInput
@@ -185,6 +193,7 @@ const corporateTrustSchema = `
         ein: EINInput
         annualRevenue: AnnualRevenueInput
         numberOfEmployees: NumberOfEmployeesInput
+        industry: IndustryInput
         companyDocuments: [FileLinkInput]
         removeDocuments: [FileLinkInput]
         avatar: FileLinkInput
@@ -239,6 +248,7 @@ const corporateTrustMockResponse = (isTrust: boolean = false) => ({
     ein: "12-3456789",
     annualRevenue: "$100000-$5000000",
     numberOfEmployees: "<10",
+    industry: "Housekeeping",
     companyDocuments: [{
         id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
     }, {
@@ -317,8 +327,17 @@ export const DraftAccount = {
         Mutation: {
             createDraftAccount: async (parent: any, {type}: any, {profileId, modules}: SessionContext) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                return api.createDraftAccount(profileId, type);
-            },
+                const {status, id, message} = await api.createDraftAccount(profileId, type);
+                if (!status) {
+                    throw new GraphQLError(message as string);
+                }
+
+                return {
+                    id,
+                    type
+                }
+            }
+            ,
             removeDraftAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => true,
             completeIndividualDraftAccount: async (
                 parent: any,

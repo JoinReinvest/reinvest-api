@@ -1,6 +1,6 @@
 import {IdGenerator} from "IdGenerator/IdGenerator";
-
-export type AccountType = "INDIVIDUAL" | "CORPORATE" | "TRUST"
+import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
+import {AccountType} from "LegalEntities/Domain/AccountType";
 
 type NetRange = {
     from: string,
@@ -8,7 +8,6 @@ type NetRange = {
 }
 
 type IndividualDraftAccountInput = {
-    experience?: "NO_EXPERIENCE" | "SOME_EXPERIENCE" | "VERY_EXPERIENCED" | "EXPERT",
     employmentStatus?: "EMPLOYED" | "UNEMPLOYED" | "RETIRED" | "STUDENT",
     employer?: {
         nameOfEmployer: string,
@@ -21,11 +20,24 @@ type IndividualDraftAccountInput = {
 
 export class DraftAccountsController {
     public static getClassName = (): string => "DraftAccountsController";
+    private createDraftAccountUseCase: CreateDraftAccount;
 
-    public async createDraftAccount(profileId: string, type: AccountType): Promise<{ id: string, type: AccountType }> {
-        return {
-            id: (new IdGenerator()).createUuid(),
-            type
+    constructor(createDraftAccountUseCase: CreateDraftAccount) {
+        this.createDraftAccountUseCase = createDraftAccountUseCase;
+    }
+
+    public async createDraftAccount(profileId: string, type: AccountType): Promise<{ id?: string, status: boolean, message?: string }> {
+        try {
+            const draftId = await this.createDraftAccountUseCase.execute(profileId, type);
+            return {
+                id: draftId,
+                status: true
+            }
+        } catch (error) {
+            return {
+                status: false,
+                message: `Draft account with type ${type} already exists`
+            }
         }
     }
 
@@ -38,7 +50,7 @@ export class DraftAccountsController {
 
         return {
             id: (new IdGenerator()).createUuid(),
-            type: "INDIVIDUAL",
+            type: AccountType.INDIVIDUAL,
             ...individualInput
         }
     }
