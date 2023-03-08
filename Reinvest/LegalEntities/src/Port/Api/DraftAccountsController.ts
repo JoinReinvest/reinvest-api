@@ -1,32 +1,21 @@
-import {IdGenerator} from "IdGenerator/IdGenerator";
 import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
-import {AccountType} from "LegalEntities/Domain/AccountType";
-
-type NetRange = {
-    from: string,
-    to: string
-}
-
-type IndividualDraftAccountInput = {
-    employmentStatus?: "EMPLOYED" | "UNEMPLOYED" | "RETIRED" | "STUDENT",
-    employer?: {
-        nameOfEmployer: string,
-        occupation: string,
-        industry: string
-    },
-    netWorth?: NetRange,
-    netIncome?: NetRange
-};
+import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import {CompleteDraftAccount, IndividualDraftAccountInput} from "LegalEntities/UseCases/CompleteDraftAccount";
+import {DraftAccountQuery, DraftQuery} from "LegalEntities/UseCases/DraftAccountQuery";
 
 export class DraftAccountsController {
     public static getClassName = (): string => "DraftAccountsController";
     private createDraftAccountUseCase: CreateDraftAccount;
+    private completeDraftAccount: CompleteDraftAccount;
+    private draftAccountQuery: DraftAccountQuery;
 
-    constructor(createDraftAccountUseCase: CreateDraftAccount) {
+    constructor(createDraftAccountUseCase: CreateDraftAccount, completeDraftAccount: CompleteDraftAccount, draftAccountQuery: DraftAccountQuery) {
         this.createDraftAccountUseCase = createDraftAccountUseCase;
+        this.completeDraftAccount = completeDraftAccount;
+        this.draftAccountQuery = draftAccountQuery;
     }
 
-    public async createDraftAccount(profileId: string, type: AccountType): Promise<{ id?: string, status: boolean, message?: string }> {
+    public async createDraftAccount(profileId: string, type: DraftAccountType): Promise<{ id?: string, status: boolean, message?: string }> {
         try {
             const draftId = await this.createDraftAccountUseCase.execute(profileId, type);
             return {
@@ -41,17 +30,25 @@ export class DraftAccountsController {
         }
     }
 
+    public async readDraft(profileId: string, draftId: string, accountType: DraftAccountType): Promise<DraftQuery | null> {
+        try {
+            return await this.draftAccountQuery.getDraftDetails(profileId, draftId, accountType);
+        } catch (error: any) {
+            return null;
+        }
+    }
+
     public async completeIndividualDraftAccount(
         profileId: string,
         draftAccountId: string,
         individualInput: IndividualDraftAccountInput
-    ): Promise<{ id: string, type: AccountType }> {
-
-
-        return {
-            id: (new IdGenerator()).createUuid(),
-            type: AccountType.INDIVIDUAL,
-            ...individualInput
+    ): Promise<string[]> {
+        try {
+            return await this.completeDraftAccount.completeIndividual(profileId, draftAccountId, individualInput)
+        } catch (error: any) {
+            return [
+                error.message
+            ];
         }
     }
 }

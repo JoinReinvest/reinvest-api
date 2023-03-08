@@ -1,17 +1,16 @@
 import {
-    LegalEntitiesDatabaseAdapterProvider, legalEntitiesDraftAccountTable,
-    legalEntitiesProfileTable
+    LegalEntitiesDatabaseAdapterProvider,
+    legalEntitiesDraftAccountTable,
 } from "LegalEntities/Adapter/Database/DatabaseAdapter";
-import {Profile, ProfileSchema} from "LegalEntities/Domain/Profile";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 import {
-    accountDraftFields,
-    LegalEntitiesJsonFields,
-    LegalEntitiesProfile
-} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
-import {SSN} from "LegalEntities/Domain/ValueObject/SSN";
-import {AccountType} from "LegalEntities/Domain/AccountType";
-import {DraftAccountState} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+    DraftAccount,
+    DraftAccountState,
+    DraftAccountType,
+    DraftInput
+} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import {LegalEntitiesDraftAccount} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
+import {Selectable} from "kysely";
 
 export class DraftAccountRepository {
     public static getClassName = (): string => "DraftAccountRepository";
@@ -23,66 +22,43 @@ export class DraftAccountRepository {
         this.idGenerator = uniqueGenerator;
     }
 
-    // private async createProfile(profileId: string, externalId: string | null = null, defaultLabel: string = 'Individual investor') {
-    //     externalId = externalId ?? this.idGenerator.createNumericId(9);
-    //
-    //     const profile = new Profile(profileId, externalId, defaultLabel);
-    //     await this.storeProfile(profile);
-    //
-    //     return profile;
-    // }
-    //
-    // public async findProfile(profileId: string): Promise<Profile | null> {
-    //     const data = await this.databaseAdapterProvider.provide()
-    //         .selectFrom(legalEntitiesProfileTable)
-    //         .select(['profileId', 'externalId', 'label', 'name', 'ssn', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements', 'investingExperience', 'isCompleted'])
-    //         .where('profileId', '=', profileId)
-    //         .limit(1)
-    //         .executeTakeFirst();
-    //
-    //     if (!data) {
-    //         return null;
-    //     }
-    //
-    //     return Profile.create(data as unknown as ProfileSchema);
-    // }
-
-    // async isSSNUnique(ssn: SSN, profileId: string): Promise<boolean> {
-    //     const isProfileWithTheSSNExist = await this.databaseAdapterProvider.provide()
-    //         .selectFrom(legalEntitiesProfileTable)
-    //         .select(['profileId'])
-    //         .where('ssn', '=', ssn.toObject())
-    //         .where('profileId', '!=', profileId)
-    //         .limit(1)
-    //         .executeTakeFirst();
-    //
-    //     return !isProfileWithTheSSNExist;
-    // }
-    async getActiveDraftsOfType(type: AccountType): Promise<{ id: string, type: AccountType }[]> {
+    async getActiveDraftsOfType(type: DraftAccountType, profileId: string): Promise<DraftAccount[]> {
         const data = await this.databaseAdapterProvider.provide()
             .selectFrom(legalEntitiesDraftAccountTable)
-            .select(accountDraftFields)
+            .select(['profileId', 'draftId', 'state', 'accountType', 'data'])
             .where('accountType', '=', type)
             .where('state', '=', DraftAccountState.ACTIVE)
+            .where('profileId', '=', profileId)
             .execute();
 
         if (!data) {
-            return null;
+            return [];
         }
-        return []
+
+        const drafts = data.map((draft: Selectable<LegalEntitiesDraftAccount>) => DraftAccount.create(draft as DraftInput))
+        return drafts;
     }
 
-    async createNewDraftAccount(draftId: string, profileId: string, type: AccountType): Promise<boolean> {
+    async storeDraft(draft: DraftAccount): Promise<boolean> {
+        const {draftId, profileId, accountType, state, data} = draft.toObject();
         try {
             await this.databaseAdapterProvider.provide()
                 .insertInto(legalEntitiesDraftAccountTable)
                 .values({
                     draftId,
                     profileId,
-                    accountType: type,
-                    state: DraftAccountState.ACTIVE,
-                    data: null
+                    accountType,
+                    state,
+                    data: JSON.stringify(data)
                 })
+                .onConflict((oc) => oc
+                    .column('draftId')
+                    .doUpdateSet({
+                        state,
+                        data: JSON.stringify(data)
+                    })
+                    .where(`${legalEntitiesDraftAccountTable}.profileId`, '=', profileId)
+                )
                 .returning('draftId')
                 .executeTakeFirstOrThrow();
 
@@ -91,5 +67,17 @@ export class DraftAccountRepository {
             console.error(`Cannot create draft account: ${error.message}`);
             return false;
         }
+    }
+
+    async getDraftForProfile<DraftAccountType>(profileId: string, draftAccountId: string): Promise<DraftAccountType> {
+        const draft = await this.databaseAdapterProvider.provide()
+            .selectFrom(legalEntitiesDraftAccountTable)
+            .select(['profileId', 'draftId', 'state', 'accountType', 'data'])
+            .where('profileId', '=', profileId)
+            .where('draftId', '=', draftAccountId)
+            .limit(1)
+            .executeTakeFirstOrThrow();
+
+        return DraftAccount.create(draft as DraftInput) as DraftAccountType;
     }
 }

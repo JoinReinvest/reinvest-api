@@ -37,7 +37,6 @@ export interface LegalEntitiesDraftAccount {
 };
 
 export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements', 'investingExperience'];
-export const accountDraftFields = ['profileId', 'draftId', 'state', 'accountType', 'data'];
 
 export type InsertableProfile = Insertable<LegalEntitiesProfile>;
-// export type InsertablePerson = Insertable<LegalEntitiesPerson>;
+export type InsertableDraftAccount = Insertable<LegalEntitiesDraftAccount>;

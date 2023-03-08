@@ -1,6 +1,7 @@
 import {SessionContext} from "ApiGateway/index";
 import {LegalEntities} from "LegalEntities/index";
 import {GraphQLError} from "graphql";
+import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
 
 const sharedSchema = `
     #graphql
@@ -17,11 +18,18 @@ const sharedSchema = `
         type: AccountType
     }
 
+    enum DraftAccountState {
+        ACTIVE
+        OPENED
+        CANCELED
+    }
+
     type Query {
         """
         [MOCK] List all existing draft accounts if you need come back to onboarding
         """
         listAccountDrafts: [DraftAccount]
+        getIndividualDraftAccount: IndividualDraftAccount
     }
 
     type Mutation {
@@ -42,6 +50,10 @@ const individualSchema = `
         UNEMPLOYED
         RETIRED
         STUDENT
+    }
+
+    type EmploymentStatusType {
+        status: EmploymentStatus
     }
 
     input EmploymentStatusInput {
@@ -67,13 +79,18 @@ const individualSchema = `
         netIncome: NetRangeInput
     }
 
-    type IndividualDraftAccount {
-        id: ID,
-        employmentStatus: EmploymentStatus
+    type IndividualDraftAccountDetails {
+        employmentStatus: EmploymentStatusType
         employer: Employer
         netWorth: NetRange
         netIncome: NetRange
         avatar: GetAvatarLink
+    }
+
+    type IndividualDraftAccount {
+        id: ID,
+        state: DraftAccountState
+        details: IndividualDraftAccountDetails
     }
 
     type Query {
@@ -291,18 +308,6 @@ type NetRange = {
     to: string
 }
 
-type IndividualDraftAccountInput = {
-    experience?: "NO_EXPERIENCE" | "SOME_EXPERIENCE" | "VERY_EXPERIENCED" | "EXPERT",
-    employmentStatus?: "EMPLOYED" | "UNEMPLOYED" | "RETIRED" | "STUDENT",
-    employer?: {
-        nameOfEmployer: string,
-        occupation: string,
-        industry: string
-    },
-    netWorth?: NetRange,
-    netIncome?: NetRange
-};
-
 export const DraftAccount = {
     typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
     resolvers: {
@@ -314,7 +319,11 @@ export const DraftAccount = {
             getIndividualDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
-            }: SessionContext) => (individualAccountMockResponse),
+            }: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+                return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
+            },
             getCorporateDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
@@ -341,11 +350,17 @@ export const DraftAccount = {
             removeDraftAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => true,
             completeIndividualDraftAccount: async (
                 parent: any,
-                {accountId, input}: { accountId: string, input: IndividualDraftAccountInput },
+                {accountId, input}: { accountId: string, input: any },
                 {profileId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                return individualAccountMockResponse;
+                const errors = await api.completeIndividualDraftAccount(profileId, accountId, input);
+
+                if (errors.length > 0) {
+                    throw new GraphQLError(JSON.stringify(errors));
+                }
+
+                return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
             },
             completeCorporateDraftAccount: async (parent: any, input: any, {
                 profileId,
