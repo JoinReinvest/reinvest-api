@@ -21,7 +21,6 @@ export interface LegalEntitiesProfile {
     dateOfBirth: string | null;
     address: string | null;
     idScan: string | null;
-    avatar: string | null;
     domicile: string | null;
     statements: string | null;
     investingExperience: string | null;
@@ -36,7 +35,7 @@ export interface LegalEntitiesDraftAccount {
     data: string | null;
 };
 
-export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements', 'investingExperience'];
+export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience'];
 
 export type InsertableProfile = Insertable<LegalEntitiesProfile>;
 export type InsertableDraftAccount = Insertable<LegalEntitiesDraftAccount>;

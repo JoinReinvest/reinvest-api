@@ -8,12 +8,19 @@ import {
     DraftAccountType,
     IndividualDraftAccount, IndividualDraftAccountSchema
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
-import expectThrowsAsync from "test/characterization/expectThrowsAsync";
+import expectThrowsAsync, {expectThrows} from "test/characterization/expectThrowsAsync";
 import {
     EmploymentStatus,
     EmploymentStatusEnum,
     EmploymentStatusInput
 } from "LegalEntities/Domain/DraftAccount/EmploymentStatus";
+import {Avatar, AvatarInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/Document";
+import {Employer, EmployerInput} from "Reinvest/LegalEntities/src/Domain/DraftAccount/Employer";
+import {
+    NetIncome,
+    NetRangeInput,
+    NetWorth,
+} from "Reinvest/LegalEntities/src/Domain/DraftAccount/ValueRange";
 
 context("Given an investor has completed profile", () => {
     describe("When the investor wants to create the individual account", async () => {
@@ -73,6 +80,14 @@ context("Given an investor created an individual draft account", () => {
             data: null
         }) as IndividualDraftAccount;
 
+        const verifyIndividualDraftAccount = (expectedResult: boolean) => {
+            expect(draftAccount.verifyCompletion()).to.be.equal(expectedResult);
+        }
+
+        it("Then verify the draft account and should not be completed yet", async () => {
+            verifyIndividualDraftAccount(false);
+        });
+
         it("Then the investor provides employment status", async () => {
             const input = <EmploymentStatusInput>{
                 status: EmploymentStatusEnum.EMPLOYED
@@ -92,7 +107,105 @@ context("Given an investor created an individual draft account", () => {
             await expectThrowsAsync(
                 () => draftAccount.setEmploymentStatus(EmploymentStatus.create(input)),
                 "WRONG_EMPLOYMENT_STATUS_TYPE"
-            )
+            );
+        });
+
+        const avatarId = '427aa662-a4da-48ee-a44f-780bd8743c93';
+        const path = 'e78cd92b-cb1b-4e20-83eb-1c2d421cee34';
+        it("Then add an avatar", async () => {
+            const input = {id: avatarId, path};
+            draftAccount.setAvatarDocument(Avatar.create(input))
+            const {data} = draftAccount.toObject();
+            const avatar = data?.avatar as AvatarInput;
+
+            expect(avatar.id).to.be.equal(avatarId);
+            expect(avatar.path).to.be.equal(path);
+        });
+
+        it("Or add an avatar without details Then expects validation error", async () => {
+            const input = <AvatarInput>{path};
+
+            expectThrows(
+                () => draftAccount.setAvatarDocument(Avatar.create(input)),
+                "MISSING_AVATAR_ID"
+            );
+        });
+
+        it("Then add an employer", async () => {
+            const input = {
+                nameOfEmployer: "Housekeeping Ltd.",
+                title: "Housekeeper",
+                industry: "Housekeeping"
+            };
+            draftAccount.setEmployer(Employer.create(input))
+            const {data} = draftAccount.toObject();
+            const employer = data?.employer as EmployerInput;
+
+            expect(employer.nameOfEmployer).to.be.equal(employer.nameOfEmployer);
+            expect(employer.title).to.be.equal(employer.title);
+            expect(employer.industry).to.be.equal(employer.industry);
+        });
+
+        it("Or add an employer without details Then expects validation error", async () => {
+            const input = <EmployerInput>{
+                title: "Housekeeper",
+            };
+
+            expectThrows(
+                () => draftAccount.setEmployer(Employer.create(input)),
+                "WRONG_EMPLOYER_TYPE"
+            );
+        });
+
+
+        it("Then add an Net Worth", async () => {
+            const range = "$10000-$1000000";
+            const input = {
+                range,
+            };
+            draftAccount.setNetWorth(NetWorth.create(input))
+            const {data} = draftAccount.toObject();
+            const netWorth = data?.netWorth as NetRangeInput;
+
+            expect(netWorth.range).to.be.equal(range);
+        });
+
+        it("Or add an Net Worth without details Then expects validation error", async () => {
+            const input = <NetRangeInput>{};
+
+            expectThrows(
+                () => draftAccount.setNetWorth(NetWorth.create(input)),
+                "WRONG_NET_RANGE_TYPE"
+            );
+        });
+
+        it("Then verify the draft account and should not be completed yet", async () => {
+            verifyIndividualDraftAccount(false);
+        });
+
+        it("Then add an Net Income", async () => {
+            const range = "$10000-$1000000";
+            const input = {
+                range,
+            };
+            draftAccount.setNetIncome(NetIncome.create(input))
+            const {data} = draftAccount.toObject();
+            const netWorth = data?.netWorth as NetRangeInput;
+
+            expect(netWorth.range).to.be.equal(range);
+        });
+
+        it("Or add an Net Income without details Then expects validation error", async () => {
+            const input = <NetRangeInput>{};
+
+            expectThrows(
+                () => draftAccount.setNetIncome(NetIncome.create(input)),
+                "WRONG_NET_RANGE_TYPE"
+            );
+        });
+
+        it("Then verify the draft account and it should be completed", async () => {
+            verifyIndividualDraftAccount(true);
         });
 
     });

@@ -67,7 +67,7 @@ export class Avatar implements ToObject {
 
             return new Avatar(new Id(id), new Path(path));
         } catch (error: any) {
-            throw new ValidationError("Missing some mandatory avatar fields");
+            throw new ValidationError("MISSING_AVATAR_ID");
         }
     }
 

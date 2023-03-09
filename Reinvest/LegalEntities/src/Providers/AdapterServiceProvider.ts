@@ -37,7 +37,7 @@ export class AdapterServiceProvider {
         container
             .addClass(CreateDraftAccount, [DraftAccountRepository])
             .addClass(CompleteDraftAccount, [DraftAccountRepository])
-            .addClass(DraftAccountQuery, [DraftAccountRepository])
+            .addClass(DraftAccountQuery, [DraftAccountRepository, DocumentsService])
         ;
     }
 }

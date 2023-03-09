@@ -73,10 +73,13 @@ const individualSchema = `
     }
 
     input IndividualAccountInput {
-        employmentStatus: EmploymentStatusInput,
-        employer: EmployerInput,
-        netWorth: NetRangeInput,
+        employmentStatus: EmploymentStatusInput
+        employer: EmployerInput
+        netWorth: NetRangeInput
         netIncome: NetRangeInput
+        avatar: FileLinkInput
+        "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
+        verifyAndFinish: Boolean
     }
 
     type IndividualDraftAccountDetails {
@@ -84,12 +87,13 @@ const individualSchema = `
         employer: Employer
         netWorth: NetRange
         netIncome: NetRange
-        avatar: GetAvatarLink
     }
 
     type IndividualDraftAccount {
         id: ID,
         state: DraftAccountState
+        avatar: GetAvatarLink
+        isCompleted: Boolean
         details: IndividualDraftAccountDetails
     }
 

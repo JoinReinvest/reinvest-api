@@ -1,18 +1,17 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {IndividualDraftAccount} from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/DraftAccount/EmploymentStatus";
+import {Avatar} from "LegalEntities/Domain/ValueObject/Document";
+import {Employer, EmployerInput} from "LegalEntities/Domain/DraftAccount/Employer";
+import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/DraftAccount/ValueRange";
 
 export type IndividualDraftAccountInput = {
     employmentStatus?: EmploymentStatusInput
-    employer?: {
-        nameOfEmployer: string,
-        occupation: string,
-        industry: string
-    },
-    netWorth?: { range: string },
-    netIncome?: { range: string },
+    employer?: EmployerInput,
+    netWorth?: NetRangeInput,
+    netIncome?: NetRangeInput,
     avatar?: { id: string },
-    verify?: boolean
+    verifyAndFinish?: boolean
 };
 
 export class CompleteDraftAccount {
@@ -44,7 +43,20 @@ export class CompleteDraftAccount {
                         case 'employmentStatus':
                             draft.setEmploymentStatus(EmploymentStatus.create(data));
                             break;
-                        case 'verify':
+                        case 'avatar':
+                            const {id} = data;
+                            draft.setAvatarDocument(Avatar.create({id, path: profileId}));
+                            break;
+                        case 'employer':
+                            draft.setEmployer(Employer.create(data))
+                            break;
+                        case 'netWorth':
+                            draft.setNetWorth(NetWorth.create(data))
+                            break;
+                        case 'netIncome':
+                            draft.setNetIncome(NetIncome.create(data))
+                            break;
+                        case 'verifyAndFinish':
                             break;
                         default:
                             console.error(`Unknown step: ${step}`);
@@ -57,12 +69,13 @@ export class CompleteDraftAccount {
                 }
             }
 
-            // if (errors.length === 0 && individualInput.verify) {
-            //     if (!draft.verifyCompletion()) {
-            //
-            //         errors.push('Draft account completion verification failed');
-            //     }
-            // }
+            if (errors.length === 0 && individualInput.verifyAndFinish) {
+                if (draft.verifyCompletion()) {
+                    draft.setAsCompleted();
+                } else {
+                    errors.push('Draft account completion verification failed');
+                }
+            }
 
             await this.draftAccountRepository.storeDraft(draft);
         } catch (error: any) {

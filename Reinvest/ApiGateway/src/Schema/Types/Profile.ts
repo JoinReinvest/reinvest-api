@@ -39,7 +39,6 @@ const schema = `
         externalId: String
         "The name/label of the user"
         label: String
-        avatar: GetAvatarLink
         isCompleted: Boolean
         details: ProfileDetails
     }
@@ -60,8 +59,6 @@ const schema = `
         Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
         """
         idScan: [FileLinkInput]
-        "Previously uploaded avatar. Please provide the id returned in @createAvatarFileLink mutation"
-        avatar: FileLinkInput
         "FINRA, Politician, Trading company stakeholder, accredited investor statements"
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"

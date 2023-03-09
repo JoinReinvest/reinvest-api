@@ -1,5 +1,8 @@
 import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/DraftAccount/EmploymentStatus";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
+import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
+import {Employer, EmployerInput} from "LegalEntities/Domain/DraftAccount/Employer";
+import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/DraftAccount/ValueRange";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -14,16 +17,12 @@ export enum DraftAccountType {
 }
 
 export type IndividualDraftAccountSchema = {
-    employmentStatus: EmploymentStatusInput | null
-    // employer?: {
-    //     nameOfEmployer: string,
-    //     occupation: string,
-    //     industry: string
-    // },
-    // netWorth?: { range: string },
-    // netIncome?: { range: string },
-    // avatar?: { id: string },
-    // isCompleted: boolean
+    employmentStatus: EmploymentStatusInput | null,
+    avatar: AvatarInput | null,
+    employer: EmployerInput | null,
+    netWorth: NetRangeInput | null,
+    netIncome: NetRangeInput | null,
+    isCompleted: boolean
 }
 
 export type DraftInput = {
@@ -101,6 +100,11 @@ export abstract class DraftAccount {
 
 export class IndividualDraftAccount extends DraftAccount {
     private employmentStatus: EmploymentStatus | null = null;
+    private avatar: Avatar | null = null;
+    private employer: Employer | null = null;
+    private netWorth: NetWorth | null = null;
+    private netIncome: NetIncome | null = null;
+    private isCompleted: boolean = false;
 
     constructor(profileId: string, draftId: string, state: DraftAccountState) {
         super(profileId, draftId, state, DraftAccountType.INDIVIDUAL);
@@ -120,6 +124,26 @@ export class IndividualDraftAccount extends DraftAccount {
             draftAccount.setEmploymentStatus(EmploymentStatus.create(data.employmentStatus));
         }
 
+        if (data.avatar) {
+            draftAccount.setAvatarDocument(Avatar.create(data.avatar));
+        }
+
+        if (data.employer) {
+            draftAccount.setEmployer(Employer.create(data.employer));
+        }
+
+        if (data.netWorth) {
+            draftAccount.setNetWorth(NetWorth.create(data.netWorth));
+        }
+
+        if (data.netIncome) {
+            draftAccount.setNetIncome(NetIncome.create(data.netIncome));
+        }
+
+        if (data.isCompleted) {
+            draftAccount.setAsCompleted();
+        }
+
         return draftAccount;
     }
 
@@ -127,12 +151,47 @@ export class IndividualDraftAccount extends DraftAccount {
         return {
             ...super.toObject(),
             data: {
-                employmentStatus: this.get(this.employmentStatus)
+                employmentStatus: this.get(this.employmentStatus),
+                employer: this.get(this.employer),
+                netWorth: this.get(this.netWorth),
+                netIncome: this.get(this.netIncome),
+                avatar: this.get(this.avatar),
+                isCompleted: this.isCompleted
             }
         }
     }
 
     verifyCompletion() {
-        return false;
+        const isAnyNull =
+            this.employmentStatus === null ||
+            this.employer === null ||
+            this.netWorth === null ||
+            this.netIncome === null;
+
+        if (isAnyNull) {
+            return false;
+        }
+
+        return true;
+    }
+
+    setAvatarDocument(avatar: Avatar) {
+        this.avatar = avatar;
+    }
+
+    setEmployer(employer: Employer) {
+        this.employer = employer;
+    }
+
+    setNetWorth(netWorth: NetWorth) {
+        this.netWorth = netWorth;
+    }
+
+    setNetIncome(netIncome: NetIncome) {
+        this.netIncome = netIncome;
+    }
+
+    setAsCompleted() {
+        this.isCompleted = true;
     }
 }
