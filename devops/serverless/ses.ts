@@ -1,7 +1,7 @@
 import {WelcomeTemplate} from "./emailTemplates/welcome";
 
 export const SesResources = {
-    EmailIdentity: {
+    SendFromEmail: {
         Type: "AWS::SES::EmailIdentity",
         Properties: {
             EmailIdentity: "${env:EMAIL_SEND_FROM}",
