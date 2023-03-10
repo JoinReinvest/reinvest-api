@@ -2,6 +2,7 @@ import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepositor
 import {ProfileService} from "Identity/Adapter/Profile/ProfileService";
 import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
+import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
 
 export class UserRegistrationService {
     public static getClassName = (): string => "UserRegistrationService";
@@ -9,17 +10,20 @@ export class UserRegistrationService {
     private profileService: ProfileService;
     private cognitoService: CognitoService;
     private idGenerator: IdGeneratorInterface;
+    private incentiveTokenRepository: IncentiveTokenRepository;
 
     constructor(
         userRepository: UserRepository,
         profileService: ProfileService,
         cognitoService: CognitoService,
-        idGenerator: IdGeneratorInterface
+        idGenerator: IdGeneratorInterface,
+        incentiveTokenRepository: IncentiveTokenRepository
     ) {
         this.userRepository = userRepository;
         this.profileService = profileService;
         this.cognitoService = cognitoService;
         this.idGenerator = idGenerator;
+        this.incentiveTokenRepository = incentiveTokenRepository;
     }
 
     async registerUser(userId: string, email: string, incentiveToken: string | null): Promise<boolean> {
@@ -31,7 +35,7 @@ export class UserRegistrationService {
                 console.log(`Creating user: ${userId}`);
                 profileId = this.idGenerator.createUuid();
                 const id = this.idGenerator.createUuid();
-                const userIncentiveToken = await this.userRepository.generateUniqueIncentiveToken();
+                const userIncentiveToken = await this.incentiveTokenRepository.generateUniqueIncentiveToken();
                 await this.userRepository.registerUser(id, profileId, userIncentiveToken, userId, email, incentiveToken);
                 console.log(`User created: ${userId} with profile id ${profileId}`);
             } else {
@@ -41,13 +45,6 @@ export class UserRegistrationService {
             console.log(`Creating profile id ${profileId}`);
             await this.profileService.createProfile(profileId);
 
-            // try {
-            //     console.log(`Registering profile ${profileId} in Cognito for user ${userId}`);
-            //     await this.cognitoService.setProfileAttribute(userId, profileId);
-            //     console.log(`Profile ${profileId} for user ${userId} registered in Cognito`);
-            // } catch (error: any) {
-            //     console.log(`Cannot register profile ${profileId} for user ${userId} in Cognito: ${error.message}`);
-            // }
             return true;
         } catch (error: any) {
             console.log(`[UserRegistrationService/registerUser] ${error.message}`);

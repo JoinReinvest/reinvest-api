@@ -6,6 +6,8 @@ import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepositor
 import {UserRegistrationService} from "Identity/Service/UserRegistrationService";
 import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationService";
 import {ProfileController} from "Identity/Port/Api/ProfileController";
+import {IncentiveTokenVerificationController} from "Identity/Port/Api/IncentiveTokenVerificationController";
+import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
 
 export class PortsProvider {
     private config: Identity.Config;
@@ -20,6 +22,7 @@ export class PortsProvider {
             .addClass(ProfileController, [UserRepository])
             .addClass(PhoneController, [PhoneRegistrationService])
             .addClass(UserRegistrationController, [UserRegistrationService])
+            .addClass(IncentiveTokenVerificationController, [IncentiveTokenRepository])
         ;
     }
 }

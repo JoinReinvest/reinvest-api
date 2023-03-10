@@ -1,22 +1,17 @@
 import {IdentityDatabaseAdapterProvider, userTable} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 import {InsertableUser} from "Identity/Adapter/Database/IdentitySchema";
 import {USER_EXCEPTION_CODES, UserException} from "Identity/Adapter/Database/UserException";
-import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
-import {UniqueTokenGenerator, UniqueTokenGeneratorInterface} from "IdGenerator/UniqueTokenGenerator";
-
-const INCENTIVE_TOKEN_SIZE = 8;
+import {IncentiveToken} from "Identity/Domain/IncentiveToken";
 
 export class UserRepository {
     public static getClassName = (): string => "UserRepository";
     private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
-    private uniqueTokenGenerator: UniqueTokenGeneratorInterface;
 
-    constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider, uniqueTokenGenerator: UniqueTokenGeneratorInterface) {
+    constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider) {
         this.databaseAdapterProvider = databaseAdapterProvider;
-        this.uniqueTokenGenerator = uniqueTokenGenerator;
     }
 
-    async registerUser(id: string, profileId: string, userIncentiveToken: string, cognitoUserId: string, email: string, invitedByIncentiveToken: string | null): Promise<void | never> {
+    async registerUser(id: string, profileId: string, userIncentiveToken: IncentiveToken, cognitoUserId: string, email: string, invitedByIncentiveToken: string | null): Promise<void | never> {
         try {
             await this.databaseAdapterProvider.provide().insertInto(userTable).values(<InsertableUser>{
                 id,
@@ -24,37 +19,11 @@ export class UserRepository {
                 profileId,
                 email,
                 invitedByIncentiveToken,
-                userIncentiveToken
+                userIncentiveToken: userIncentiveToken.get()
             }).execute();
         } catch (error: any) {
             throw new UserException(USER_EXCEPTION_CODES.USER_ALREADY_EXISTS, `User already exists: ${cognitoUserId}`);
         }
-    }
-
-    public async generateUniqueIncentiveToken(tries: number = 1): Promise<string> {
-        const userIncentiveToken = this.uniqueTokenGenerator.generateRandomString(INCENTIVE_TOKEN_SIZE);
-        const doesTokenExist = await this.verifyIncentiveTokenUniqueness(userIncentiveToken);
-
-        if (doesTokenExist) {
-            if (tries >= 10) {
-                throw new UserException(USER_EXCEPTION_CODES.CANNOT_GENERATE_UNIQUE_TOKEN, "Cannot generate unique incentive token");
-            }
-
-            return this.generateUniqueIncentiveToken(tries + 1);
-        }
-
-        return userIncentiveToken;
-    }
-
-    private async verifyIncentiveTokenUniqueness(userIncentiveToken: string): Promise<boolean> {
-        const doesTokenExist = await this.databaseAdapterProvider.provide()
-            .selectFrom(userTable)
-            .select('cognitoUserId')
-            .where('userIncentiveToken', '=', userIncentiveToken)
-            .limit(1)
-            .executeTakeFirst();
-
-        return !!doesTokenExist;
     }
 
     public async getUserProfileId(cognitoUserId: string): Promise<string | null> {
