@@ -46,6 +46,7 @@ jobs:
           POSTGRESQL_AWS_DB_INSTANCE: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_INSTANCE', env.ENVIRONMENT)] }}
           POSTGRESQL_AWS_DB_RETENTION_POLICY: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_RETENTION_POLICY', env.ENVIRONMENT)] }}
           POSTGRESQL_AWS_DB_STORAGE_GB: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_STORAGE_GB', env.ENVIRONMENT)] }}
+          EMAIL_SEND_FROM: ${{ secrets[format('{0}_EMAIL_SEND_FROM', env.ENVIRONMENT)] }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:saas"

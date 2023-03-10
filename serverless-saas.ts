@@ -5,6 +5,7 @@ import {RdsOutputs, RdsResources} from "./devops/serverless/rds";
 import {S3Outputs, S3Resources} from "./devops/serverless/s3";
 import {BastionOutputs, BastionResources} from "./devops/serverless/bastion";
 import {ProviderConfiguration, ProviderEnvironment} from "./devops/serverless/serverless-common";
+import {SesResources} from "./devops/serverless/ses";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest",
@@ -25,6 +26,7 @@ const serverlessConfiguration: AWS = {
             POSTGRESQL_AWS_DB_STORAGE_GB: "${env:POSTGRESQL_AWS_DB_STORAGE_GB}",
             POSTGRESQL_MAIN_USER: "${env:POSTGRESQL_MAIN_USER}",
             POSTGRESQL_MAIN_PASSWORD: "${env:POSTGRESQL_MAIN_PASSWORD}",
+            EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
         }
     },
     resources: {
@@ -35,6 +37,7 @@ const serverlessConfiguration: AWS = {
             ...RdsResources,
             ...S3Resources,
             ...BastionResources,
+            ...SesResources,
         },
         Outputs: {
             ...CognitoOutputs,
