@@ -4,8 +4,6 @@ import {PersonalName, PersonalNameInput} from "Reinvest/LegalEntities/src/Domain
 import {DateOfBirth, DateOfBirthInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/DateOfBirth";
 import {Address, AddressInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/Address";
 import {
-    Avatar,
-    AvatarInput,
     IdentityDocument,
     IdScanInput
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Document";
@@ -185,26 +183,6 @@ context("Given the user wants to complete the profile", () => {
             const input = {ids: []} as unknown as IdScanInput;
             try {
                 profile.setIdentityDocument(IdentityDocument.create(input))
-            } catch (error: any) {
-                expect(error).to.exist;
-            }
-        });
-
-        const avatarId = '427aa662-a4da-48ee-a44f-780bd8743c93';
-        it("Then add an avatar", async () => {
-            const input = {id: avatarId, path};
-            profile.setAvatarDocument(Avatar.create(input))
-            const profileOutput = profile.toObject();
-            const avatar = profileOutput.avatar as AvatarInput;
-
-            expect(avatar.id).to.be.equal(avatarId);
-            expect(avatar.path).to.be.equal(path);
-        });
-
-        it("Or add an avatar without details Then expects validation error", async () => {
-            const input = <AvatarInput>{path};
-            try {
-                profile.setAvatarDocument(Avatar.create(input))
             } catch (error: any) {
                 expect(error).to.exist;
             }

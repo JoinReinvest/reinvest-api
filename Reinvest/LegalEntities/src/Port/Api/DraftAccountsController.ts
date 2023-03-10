@@ -1,31 +1,40 @@
-import {IdGenerator} from "IdGenerator/IdGenerator";
-
-export type AccountType = "INDIVIDUAL" | "CORPORATE" | "TRUST"
-
-type NetRange = {
-    from: string,
-    to: string
-}
-
-type IndividualDraftAccountInput = {
-    experience?: "NO_EXPERIENCE" | "SOME_EXPERIENCE" | "VERY_EXPERIENCED" | "EXPERT",
-    employmentStatus?: "EMPLOYED" | "UNEMPLOYED" | "RETIRED" | "STUDENT",
-    employer?: {
-        nameOfEmployer: string,
-        occupation: string,
-        industry: string
-    },
-    netWorth?: NetRange,
-    netIncome?: NetRange
-};
+import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
+import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import {CompleteDraftAccount, IndividualDraftAccountInput} from "LegalEntities/UseCases/CompleteDraftAccount";
+import {DraftAccountQuery, DraftQuery} from "LegalEntities/UseCases/DraftAccountQuery";
 
 export class DraftAccountsController {
     public static getClassName = (): string => "DraftAccountsController";
+    private createDraftAccountUseCase: CreateDraftAccount;
+    private completeDraftAccount: CompleteDraftAccount;
+    private draftAccountQuery: DraftAccountQuery;
 
-    public async createDraftAccount(profileId: string, type: AccountType): Promise<{ id: string, type: AccountType }> {
-        return {
-            id: (new IdGenerator()).createUuid(),
-            type
+    constructor(createDraftAccountUseCase: CreateDraftAccount, completeDraftAccount: CompleteDraftAccount, draftAccountQuery: DraftAccountQuery) {
+        this.createDraftAccountUseCase = createDraftAccountUseCase;
+        this.completeDraftAccount = completeDraftAccount;
+        this.draftAccountQuery = draftAccountQuery;
+    }
+
+    public async createDraftAccount(profileId: string, type: DraftAccountType): Promise<{ id?: string, status: boolean, message?: string }> {
+        try {
+            const draftId = await this.createDraftAccountUseCase.execute(profileId, type);
+            return {
+                id: draftId,
+                status: true
+            }
+        } catch (error) {
+            return {
+                status: false,
+                message: `Draft account with type ${type} already exists`
+            }
+        }
+    }
+
+    public async readDraft(profileId: string, draftId: string, accountType: DraftAccountType): Promise<DraftQuery | null> {
+        try {
+            return await this.draftAccountQuery.getDraftDetails(profileId, draftId, accountType);
+        } catch (error: any) {
+            return null;
         }
     }
 
@@ -33,13 +42,13 @@ export class DraftAccountsController {
         profileId: string,
         draftAccountId: string,
         individualInput: IndividualDraftAccountInput
-    ): Promise<{ id: string, type: AccountType }> {
-
-
-        return {
-            id: (new IdGenerator()).createUuid(),
-            type: "INDIVIDUAL",
-            ...individualInput
+    ): Promise<string[]> {
+        try {
+            return await this.completeDraftAccount.completeIndividual(profileId, draftAccountId, individualInput)
+        } catch (error: any) {
+            return [
+                error.message
+            ];
         }
     }
 }

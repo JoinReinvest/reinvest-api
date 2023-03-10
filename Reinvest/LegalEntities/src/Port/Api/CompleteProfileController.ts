@@ -2,7 +2,7 @@ import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/Profi
 import {PersonalName, PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
 import {DateOfBirth, DateOfBirthInput} from "LegalEntities/Domain/ValueObject/DateOfBirth";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {Avatar, IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
+import {IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
 import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
 import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
@@ -13,7 +13,6 @@ export type CompleteProfileInput = {
     dateOfBirth?: DateOfBirthInput,
     address?: AddressInput,
     idScan?: { id: string }[],
-    avatar?: { id: string },
     SSN?: { ssn: SSNInput },
     domicile?: DomicileInput,
     investingExperience?: InvestingExperienceInput,
@@ -58,10 +57,6 @@ export class CompleteProfileController {
                     case 'idScan':
                         const ids = data.map((idObject: { id: string }) => idObject.id);
                         profile.setIdentityDocument(IdentityDocument.create({ids, path: profileId}));
-                        break;
-                    case 'avatar':
-                        const {id} = data;
-                        profile.setAvatarDocument(Avatar.create({id, path: profileId}));
                         break;
                     case 'domicile':
                         profile.setDomicile(Domicile.create(data));

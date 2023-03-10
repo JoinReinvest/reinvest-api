@@ -1,7 +1,6 @@
 import {PersonalName, PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
 import {DateOfBirth, DateOfBirthInput} from "LegalEntities/Domain/ValueObject/DateOfBirth";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {Avatar, AvatarInput, IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
 import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
 import {
     PersonalStatement,
@@ -12,6 +11,7 @@ import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
 import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
+import {IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
 
 export type ProfileSchema = {
     profileId: string,
@@ -22,7 +22,6 @@ export type ProfileSchema = {
     dateOfBirth: DateOfBirthInput | null,
     address: AddressInput | null,
     idScan: IdScanInput | null,
-    avatar: AvatarInput | null,
     domicile: DomicileInput | null,
     investingExperience: InvestingExperienceInput | null,
     statements: PersonalStatementInput[],
@@ -38,7 +37,6 @@ export class Profile {
     private dateOfBirth: DateOfBirth | null = null;
     private address: Address | null = null;
     private idScan: IdentityDocument | null = null;
-    private avatar: Avatar | null = null;
     private domicile: Domicile | null = null;
     private investingExperience: InvestingExperience | null = null;
     private statements: PersonalStatement[] = [];
@@ -69,10 +67,6 @@ export class Profile {
 
     setIdentityDocument(idScan: IdentityDocument) {
         this.idScan = idScan;
-    }
-
-    setAvatarDocument(avatar: Avatar) {
-        this.avatar = avatar;
     }
 
     setDomicile(domicile: Domicile) {
@@ -110,7 +104,7 @@ export class Profile {
         try {
             const {
                 profileId, externalId, label, name,
-                dateOfBirth, address, idScan, avatar, domicile,
+                dateOfBirth, address, idScan, domicile,
                 ssn, investingExperience, statements, isCompleted
             } = data;
             const profile = new Profile(profileId, externalId, label);
@@ -129,10 +123,6 @@ export class Profile {
 
             if (idScan) {
                 profile.setIdentityDocument(IdentityDocument.create(idScan));
-            }
-
-            if (avatar) {
-                profile.setAvatarDocument(Avatar.create(avatar));
             }
 
             if (domicile) {
@@ -175,7 +165,6 @@ export class Profile {
             dateOfBirth: this.get(this.dateOfBirth),
             address: this.get(this.address),
             idScan: this.get(this.idScan),
-            avatar: this.get(this.avatar),
             domicile: this.get(this.domicile),
             investingExperience: this.get(this.investingExperience),
             statements: this.statements.map(statement => statement.toObject()),
