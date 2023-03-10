@@ -39,6 +39,8 @@ const serverlessConfiguration: AWS = {
             CognitoUserPoolID: importOutput('CognitoUserPoolID'),
             S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
             S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
+            EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
+            EMAIL_REPLY_TO: "${env:EMAIL_REPLY_TO}",
             INFRASTRUCTURE_AWS_REGION: "${aws:region}",
             POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
             POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}"
