@@ -8,33 +8,13 @@ export const S3PoliciesWithImport = [
     {
         Effect: "Allow",
         Action: [
-            "s3:PutObject",
-            "s3:GetObject",
-            "s3:DeleteObject",
-            "s3:ListBucket",
+            "s3:*"
         ],
-        Resource: joinAttributes("/", [importDocumentsArn(), "*"]),
-    },
-    {
-        Effect: "Allow",
-        Action: [
-            "s3:PutObject",
-            "s3:GetObject",
-            "s3:DeleteObject",
-            "s3:ListBucket",
+        Resource: [
+            joinAttributes("/", [importDocumentsArn(), "*"]),
+            joinAttributes("/", [importAvatarsArn(), "*"]),
+            joinAttributes("/", [importPortfolioArn(), "*"])
         ],
-        Resource: joinAttributes("/", [importAvatarsArn(), "*"]),
-    },
-    {
-        Effect: "Allow",
-        Action: [
-            "s3:PutObject",
-            "s3:GetObject",
-            "s3:DeleteObject",
-            "s3:ListBucket",
-            "s3:PutObjectAcl",
-        ],
-        Resource: joinAttributes("/", [importPortfolioArn(), "*"]),
     },
 ];
 
