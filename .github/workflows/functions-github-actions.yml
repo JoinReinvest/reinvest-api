@@ -42,8 +42,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
           POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
-          EMAIL_SEND_FROM: ${{ secrets[format('{0}_EMAIL_SEND_FROM', env.ENVIRONMENT)] }}
-          EMAIL_REPLY_TO: ${{ secrets[format('{0}_EMAIL_REPLY_TO', env.ENVIRONMENT)] }}
+          EMAIL_SEND_FROM: ${{ secrets.EMAIL_SEND_FROM }}
+          EMAIL_REPLY_TO: ${{ secrets.EMAIL_REPLY_TO }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:functions"
