@@ -35,8 +35,7 @@ export class DraftAccountRepository {
             return [];
         }
 
-        const drafts = data.map((draft: Selectable<LegalEntitiesDraftAccount>) => DraftAccount.create(draft as DraftInput))
-        return drafts;
+        return data.map((draft: Selectable<LegalEntitiesDraftAccount>) => DraftAccount.create(draft as DraftInput))
     }
 
     async storeDraft(draft: DraftAccount): Promise<boolean> {

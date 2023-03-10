@@ -162,17 +162,10 @@ export class IndividualDraftAccount extends DraftAccount {
     }
 
     verifyCompletion() {
-        const isAnyNull =
-            this.employmentStatus === null ||
+        return !(this.employmentStatus === null ||
             this.employer === null ||
             this.netWorth === null ||
-            this.netIncome === null;
-
-        if (isAnyNull) {
-            return false;
-        }
-
-        return true;
+            this.netIncome === null);
     }
 
     setAvatarDocument(avatar: Avatar) {
