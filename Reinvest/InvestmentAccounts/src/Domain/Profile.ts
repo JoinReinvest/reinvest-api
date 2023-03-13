@@ -1,7 +1,11 @@
 import {SimpleAggregate} from "SimpleAggregator/SimpleAggregate";
 import {AggregateState} from "SimpleAggregator/Types";
 
-import {ProfileCreated} from "InvestmentAccounts/Domain/ProfileEvents";
+import {IndividualAccountOpened, ProfileCreated} from "InvestmentAccounts/Domain/ProfileEvents";
+import {ProfileException} from "InvestmentAccounts/Domain/ProfileException";
+
+const MAX_NUMBER_OF_TRUSTS = 3;
+const MAX_NUMBER_OF_CORPORATES = 3;
 
 export const ProfileAggregateName = 'Profile';
 export type ProfileState = AggregateState & {
@@ -37,23 +41,23 @@ class Profile extends SimpleAggregate {
         return this.apply(profileCreated);
     }
 
-    // command handler
-    // public attachIndividual(individualId: string): IndividualAttachedToProfile {
-    //     const currentIndividual = this.getState("individualId");
-    //
-    //     if (currentIndividual) {
-    //         ProfileException.throw("Individual already attached to the profile");
-    //     }
-    //
-    //     const event = <IndividualAttachedToProfile>{
-    //         id: this.getId(),
-    //         kind: "IndividualAttachedToProfile",
-    //         data: {individualId}
-    //     };
-    //
-    //
-    //     return this.apply(event);
-    // }
+    public openIndividualAccount(accountId: string) {
+        const individualAccountId = this.getState("individualAccountId");
+
+        if (individualAccountId !== null) {
+            ProfileException.throw(individualAccountId === accountId ? "THE_ACCOUNT_ALREADY_OPENED" : "CANNOT_OPEN_ACCOUNT");
+        }
+
+        const event = <IndividualAccountOpened>{
+            id: this.getId(),
+            kind: "IndividualAccountOpened",
+            data: {
+                individualAccountId: accountId
+            }
+        };
+
+        return this.apply(event);
+    }
 }
 
 export default Profile;

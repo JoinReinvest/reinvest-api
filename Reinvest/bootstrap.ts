@@ -54,7 +54,8 @@ export function boot(): Modules {
         LegalEntities.create({
             database: databaseConfig,
         } as LegalEntities.Config, {
-            documents: modules.get(Documents.moduleName) as Documents.Main
+            documents: modules.get(Documents.moduleName) as Documents.Main,
+            investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main
         })
     );
 

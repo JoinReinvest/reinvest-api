@@ -8,7 +8,7 @@ export interface EventHandler<Event extends DomainEvent> {
 export interface EventBus {
     publish(event: DomainEvent): this;
 
-    publishMany(events: [DomainEvent]): this;
+    publishMany(events: DomainEvent[]): this;
 
     subscribe(forKind: string, handler: string): this;
 

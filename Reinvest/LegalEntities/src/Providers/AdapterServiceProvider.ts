@@ -11,6 +11,7 @@ import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/
 import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
 import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount";
 import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
+import {InvestmentAccountsService} from "LegalEntities/Adapter/Modules/InvestmentAccountsService";
 
 export class AdapterServiceProvider {
     private config: LegalEntities.Config;
@@ -24,7 +25,9 @@ export class AdapterServiceProvider {
             .addClass(IdGenerator)
 
         container
-            .addClass(DocumentsService, ['Documents']);
+            .addClass(DocumentsService, ['Documents'])
+            .addClass(InvestmentAccountsService, ['InvestmentAccounts'])
+        ;
 
         // database
         container

@@ -23,7 +23,7 @@ export class ProfileRepository {
         this.eventBus = eventBus;
     }
 
-    public async storeAndPublish(events: [DomainEvent], snapshot: AggregateState): Promise<void> {
+    public async storeAndPublish(events: DomainEvent[], snapshot: AggregateState): Promise<void> {
         await this.transactionalAdapter.transaction(
             `Store and publish aggregate state: ${this.tableName}/${snapshot.aggregateId}`,
             async () => {
