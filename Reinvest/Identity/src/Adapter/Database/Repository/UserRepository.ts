@@ -11,14 +11,14 @@ export class UserRepository {
         this.databaseAdapterProvider = databaseAdapterProvider;
     }
 
-    async registerUser(id: string, profileId: string, userIncentiveToken: IncentiveToken, cognitoUserId: string, email: string, invitedByIncentiveToken: string | null): Promise<void | never> {
+    async registerUser(id: string, profileId: string, userIncentiveToken: IncentiveToken, cognitoUserId: string, email: string, invitedByIncentiveToken: IncentiveToken | null): Promise<void | never> {
         try {
             await this.databaseAdapterProvider.provide().insertInto(userTable).values(<InsertableUser>{
                 id,
                 cognitoUserId,
                 profileId,
                 email,
-                invitedByIncentiveToken,
+                invitedByIncentiveToken: invitedByIncentiveToken === null ? null : invitedByIncentiveToken.get(),
                 userIncentiveToken: userIncentiveToken.get()
             }).execute();
         } catch (error: any) {

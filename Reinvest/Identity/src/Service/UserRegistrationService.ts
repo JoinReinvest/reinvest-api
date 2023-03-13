@@ -3,6 +3,7 @@ import {ProfileService} from "Identity/Adapter/Profile/ProfileService";
 import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
+import {IncentiveToken} from "Identity/Domain/IncentiveToken";
 
 export class UserRegistrationService {
     public static getClassName = (): string => "UserRegistrationService";
@@ -26,7 +27,7 @@ export class UserRegistrationService {
         this.incentiveTokenRepository = incentiveTokenRepository;
     }
 
-    async registerUser(userId: string, email: string, incentiveToken: string | null): Promise<boolean> {
+    async registerUser(userId: string, email: string, incentiveToken: IncentiveToken | null): Promise<boolean> {
         try {
             // check if user already exists
             let profileId = await this.userRepository.getUserProfileId(userId);

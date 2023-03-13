@@ -8,7 +8,7 @@ export class IncentiveToken {
             throw new Error('Invalid incentive token');
         }
 
-        this.incentiveToken = incentiveToken;
+        this.incentiveToken = incentiveToken.toLowerCase();
     }
 
     get() {
