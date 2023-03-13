@@ -21,7 +21,7 @@ export const UnauthorizedEndpointsFunction = {
 };
 
 export const UnauthorizedEndpointsLambdaResources = {
-    LocalSignUpLambdaRole: {
+    UnauthorizedEndpointsLambdaRole: {
         Type: "AWS::IAM::Role",
         Properties: {
             RoleName: getResourceName("UnauthorizedEndpointsLambdaRole"),
