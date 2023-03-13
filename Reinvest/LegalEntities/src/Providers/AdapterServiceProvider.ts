@@ -12,6 +12,7 @@ import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
 import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount";
 import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
 import {InvestmentAccountsService} from "LegalEntities/Adapter/Modules/InvestmentAccountsService";
+import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 
 export class AdapterServiceProvider {
     private config: LegalEntities.Config;
@@ -41,6 +42,7 @@ export class AdapterServiceProvider {
             .addClass(CreateDraftAccount, [DraftAccountRepository])
             .addClass(CompleteDraftAccount, [DraftAccountRepository])
             .addClass(DraftAccountQuery, [DraftAccountRepository, DocumentsService])
+            .addClass(TransformDraftAccountIntoRegularAccount, [DraftAccountRepository, InvestmentAccountsService])
         ;
     }
 }

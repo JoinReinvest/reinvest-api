@@ -43,7 +43,9 @@ export class ProfileRepository {
 
     public async restore(profileId: string): Promise<Profile | null> {
         try {
-            return await this.aggregateRepository.restore<Profile>(this.tableName, profileId);
+            const aggregateState = await this.aggregateRepository.getAggregateState(this.tableName, profileId);
+
+            return new Profile(aggregateState);
         } catch (error: any) {
             console.log(`Aggregate restoration info: aggregate ${profileId} not exists`);
             return null;

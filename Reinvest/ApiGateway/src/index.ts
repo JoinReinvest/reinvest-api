@@ -40,6 +40,8 @@ export const app = (modules: Modules) => {
                     throw new GraphQLError('Profile not exist');
                 }
 
+                console.log({userId});
+
                 return <SessionContext>{
                     userId,
                     profileId,

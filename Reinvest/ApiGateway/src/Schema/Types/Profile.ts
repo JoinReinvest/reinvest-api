@@ -3,6 +3,7 @@ import {SessionContext} from "ApiGateway/index";
 import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileController";
 import {ApolloError} from "apollo-server-errors";
 import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
+import {GraphQLError} from "graphql";
 
 const schema = `
     #graphql
@@ -128,6 +129,12 @@ export const Profile = {
                                 {draftAccountId}: any,
                                 {profileId, modules}: SessionContext
             ) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                const errors = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
+                if (errors.length > 0) {
+                    throw new GraphQLError(JSON.stringify(errors));
+                }
+
                 return true;
             },
         },

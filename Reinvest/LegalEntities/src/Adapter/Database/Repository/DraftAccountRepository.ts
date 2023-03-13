@@ -11,6 +11,7 @@ import {
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {LegalEntitiesDraftAccount} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 import {Selectable} from "kysely";
+import {DraftsList} from "LegalEntities/UseCases/DraftAccountQuery";
 
 export class DraftAccountRepository {
     public static getClassName = (): string => "DraftAccountRepository";
@@ -36,6 +37,24 @@ export class DraftAccountRepository {
         }
 
         return data.map((draft: Selectable<LegalEntitiesDraftAccount>) => DraftAccount.create(draft as DraftInput))
+    }
+
+    async getAllActiveDraftsIds(profileId: string): Promise<DraftsList> {
+        const data = await this.databaseAdapterProvider.provide()
+            .selectFrom(legalEntitiesDraftAccountTable)
+            .select(['draftId', 'accountType'])
+            .where('state', '=', DraftAccountState.ACTIVE)
+            .where('profileId', '=', profileId)
+            .execute();
+
+        if (!data) {
+            return [];
+        }
+
+        return data.map((draft) => ({
+            id: draft.draftId,
+            type: draft.accountType as DraftAccountType
+        }));
     }
 
     async storeDraft(draft: DraftAccount): Promise<boolean> {

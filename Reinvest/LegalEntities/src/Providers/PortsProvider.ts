@@ -8,6 +8,7 @@ import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
 import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
 import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount";
 import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
+import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 
 export class PortsProvider {
     private config: LegalEntities.Config;
@@ -21,7 +22,7 @@ export class PortsProvider {
         container
             .addClass(CompleteProfileController, [ProfileRepository])
             .addClass(GetProfileController, [ProfileRepository, DocumentsService])
-            .addClass(DraftAccountsController, [CreateDraftAccount, CompleteDraftAccount, DraftAccountQuery])
+            .addClass(DraftAccountsController, [CreateDraftAccount, CompleteDraftAccount, DraftAccountQuery, TransformDraftAccountIntoRegularAccount])
         ;
     }
 }

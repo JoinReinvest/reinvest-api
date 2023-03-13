@@ -16,7 +16,7 @@ export class OpenAccount {
         if (profile === null) {
             throw new ProfileException(`Profile ${profileId} not exist`);
         }
-
+        console.log({profile});
         const events = [];
 
         switch (accountType) {

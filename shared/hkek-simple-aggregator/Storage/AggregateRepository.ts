@@ -1,5 +1,4 @@
 import {DatabaseProvider} from "PostgreSQL/DatabaseProvider";
-import {SimpleAggregate} from "SimpleAggregator/SimpleAggregate";
 import {AggregateState} from "SimpleAggregator/Types";
 import {AggregateException} from "SimpleAggregator/AggregateException";
 
@@ -47,7 +46,7 @@ export class AggregateRepository<DatabaseProviderType extends DatabaseProvider<a
     }
 
 
-    public async restore<Aggregate>(tableName: string, aggregateId: string): Promise<Aggregate | never> {
+    public async getAggregateState(tableName: string, aggregateId: string): Promise<AggregateState | never> {
         const data = await this.databaseProvider.provide()
             .selectFrom(tableName)
             .select(['kind', 'dateCreated', 'dateUpdated', 'aggregateId', 'currentVersion', 'previousVersion', 'state'])
@@ -59,6 +58,6 @@ export class AggregateRepository<DatabaseProviderType extends DatabaseProvider<a
             throw new AggregateException(`Aggregate "${aggregateId} not exist`);
         }
 
-        return SimpleAggregate.restoreAggregate(<AggregateState>data) as Aggregate;
+        return <AggregateState>data;
     }
 }

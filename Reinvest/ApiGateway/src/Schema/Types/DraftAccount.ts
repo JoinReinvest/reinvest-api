@@ -316,10 +316,11 @@ export const DraftAccount = {
     typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
     resolvers: {
         Query: {
-            listAccountDrafts: async (parent: any, input: any, {profileId, modules}: SessionContext) => ([{
-                id: 'test',
-                type: "INDIVIDUAL"
-            }]),
+            listAccountDrafts: async (parent: any, input: any, {profileId, modules}: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+                return api.listDrafts(profileId);
+            },
             getIndividualDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
