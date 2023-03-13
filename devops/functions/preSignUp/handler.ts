@@ -1,8 +1,10 @@
 import {PostAuthenticationTriggerHandler} from 'aws-lambda';
+import {boot} from "Reinvest/bootstrap";
+import {IdentityApiType} from "Reinvest/Identity/src/Port/Api/IdentityApi";
+import {Identity} from "Reinvest/Identity/src";
 
 export const main: PostAuthenticationTriggerHandler = async (event, context, callback) => {
     const {request: {userAttributes}} = event;
-    console.log({userAttributes});
     if (!userAttributes) {
         callback('MISSING_USER_ATTRIBUTES', event);
         return;
@@ -10,7 +12,10 @@ export const main: PostAuthenticationTriggerHandler = async (event, context, cal
 
     const {"custom:incentive_token": token} = userAttributes;
     if (token && token !== "") {
-        if (token !== "123456") { // mock
+        const modules = boot();
+        const identityModule = modules.getApi<IdentityApiType>(Identity);
+        const status = await identityModule.isIncentiveTokenValid(token);
+        if (!status) {
             callback('WRONG_REFERRAL_CODE', event);
             return;
         }

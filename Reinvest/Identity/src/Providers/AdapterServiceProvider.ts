@@ -12,6 +12,7 @@ import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 import {UniqueTokenGenerator} from "IdGenerator/UniqueTokenGenerator";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import {SmsService} from "Identity/Adapter/AWS/SmsService";
+import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
 
 export class AdapterServiceProvider {
     private config: Identity.Config;
@@ -41,7 +42,8 @@ export class AdapterServiceProvider {
             .addAsValue(DatabaseAdapterProvider, createIdentityDatabaseAdapterProvider(this.config.database))
             .addClassOfType<IdentityDatabase>(TransactionalAdapter, [DatabaseAdapterProvider])
             .addClass(PhoneRepository, [DatabaseAdapterProvider, TransactionalAdapter, SmsService, CognitoService])
-            .addClass(UserRepository, [DatabaseAdapterProvider, UniqueTokenGenerator])
+            .addClass(IncentiveTokenRepository, [DatabaseAdapterProvider, UniqueTokenGenerator])
+            .addClass(UserRepository, [DatabaseAdapterProvider])
         ;
         container
             .addClass(ProfileService, ["InvestmentAccounts"])
