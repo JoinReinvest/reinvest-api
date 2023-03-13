@@ -6,7 +6,7 @@ import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepositor
 import {UserRegistrationService} from "Identity/Service/UserRegistrationService";
 import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationService";
 import {ProfileController} from "Identity/Port/Api/ProfileController";
-import {IncentiveTokenVerificationController} from "Identity/Port/Api/IncentiveTokenVerificationController";
+import {IncentiveTokenController} from "Identity/Port/Api/IncentiveTokenController";
 import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
 
 export class PortsProvider {
@@ -17,12 +17,13 @@ export class PortsProvider {
     }
 
     public boot(container: ContainerInterface) {
+        container.addAsValue('webAppUrl', this.config.webAppUrl);
         //controllers
         container
             .addClass(ProfileController, [UserRepository])
             .addClass(PhoneController, [PhoneRegistrationService])
             .addClass(UserRegistrationController, [UserRegistrationService])
-            .addClass(IncentiveTokenVerificationController, [IncentiveTokenRepository])
+            .addClass(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl'])
         ;
     }
 }

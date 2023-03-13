@@ -16,6 +16,8 @@ export const VERTALO_CONFIG = {
     SECURITY_ID: process.env.VERTALO_SECURITY_ID as string,
 };
 
+export const WEB_APP_URL = process.env.WEB_APP_URL?.replace(/\/*$/, '') as string;
+
 export const DATABASE_CONFIG = {
     host: process.env.POSTGRESQL_HOST as string,
     user: process.env.POSTGRESQL_USER as string,

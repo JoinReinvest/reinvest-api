@@ -40,4 +40,19 @@ export class IncentiveTokenRepository {
 
         return !!doesTokenExist;
     }
+
+    async getUserIncentiveToken(userId: string): Promise<IncentiveToken | null> {
+        const data = await this.databaseAdapterProvider.provide()
+            .selectFrom(userTable)
+            .select('userIncentiveToken')
+            .where('cognitoUserId', '=', userId)
+            .limit(1)
+            .executeTakeFirst();
+
+        if (!data) {
+            return null;
+        }
+
+        return new IncentiveToken(data.userIncentiveToken);
+    }
 }
