@@ -20,7 +20,7 @@ import {importOutput} from "./devops/serverless/utils";
 import {
     UnauthorizedEndpointsFunction,
     UnauthorizedEndpointsLambdaResources
-} from "devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
+} from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
