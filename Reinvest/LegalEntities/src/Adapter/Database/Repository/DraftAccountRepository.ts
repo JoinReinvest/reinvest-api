@@ -87,15 +87,34 @@ export class DraftAccountRepository {
         }
     }
 
-    async getDraftForProfile<DraftAccountType>(profileId: string, draftAccountId: string): Promise<DraftAccountType> {
-        const draft = await this.databaseAdapterProvider.provide()
-            .selectFrom(legalEntitiesDraftAccountTable)
-            .select(['profileId', 'draftId', 'state', 'accountType', 'data'])
-            .where('profileId', '=', profileId)
-            .where('draftId', '=', draftAccountId)
-            .limit(1)
-            .executeTakeFirstOrThrow();
+    async getDraftForProfile<DraftAccountType extends DraftAccount>(profileId: string, draftAccountId: string): Promise<DraftAccountType | never> {
+        try {
+            const draft = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesDraftAccountTable)
+                .select(['profileId', 'draftId', 'state', 'accountType', 'data'])
+                .where('profileId', '=', profileId)
+                .where('draftId', '=', draftAccountId)
+                .limit(1)
+                .executeTakeFirstOrThrow();
 
-        return DraftAccount.create(draft as DraftInput) as DraftAccountType;
+            return DraftAccount.create(draft as DraftInput) as DraftAccountType;
+        } catch (error: any) {
+            throw new Error('DRAFT_NOT_EXIST');
+        }
+    }
+
+    async removeDraft(profileId: string, draftId: string): Promise<boolean> {
+        try {
+            await this.databaseAdapterProvider.provide()
+                .deleteFrom(legalEntitiesDraftAccountTable)
+                .where('profileId', '=', profileId)
+                .where('draftId', '=', draftId)
+                .execute();
+
+            return true;
+        } catch (error: any) {
+            console.log(error);
+            return false;
+        }
     }
 }

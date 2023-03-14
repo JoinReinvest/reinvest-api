@@ -3,7 +3,7 @@ import {ContainerInterface} from "Container/Container";
 import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/ProfileRepository";
 import {
     LegalEntitiesDatabaseAdapterInstanceProvider,
-    createLegalEntitiesDatabaseAdapterProvider
+    createLegalEntitiesDatabaseAdapterProvider, LegalEntitiesDatabase
 } from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {IdGenerator} from "IdGenerator/IdGenerator";
 import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
@@ -13,6 +13,9 @@ import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount"
 import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
 import {InvestmentAccountsService} from "LegalEntities/Adapter/Modules/InvestmentAccountsService";
 import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
+import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
+import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
+import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
 
 export class AdapterServiceProvider {
     private config: LegalEntities.Config;
@@ -35,6 +38,8 @@ export class AdapterServiceProvider {
             .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
             .addClass(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
             .addClass(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+            .addClass(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
+            .addClassOfType<LegalEntitiesDatabase>(TransactionalAdapter, [LegalEntitiesDatabaseAdapterInstanceProvider])
         ;
 
         // use cases
@@ -42,7 +47,8 @@ export class AdapterServiceProvider {
             .addClass(CreateDraftAccount, [DraftAccountRepository])
             .addClass(CompleteDraftAccount, [DraftAccountRepository])
             .addClass(DraftAccountQuery, [DraftAccountRepository, DocumentsService])
-            .addClass(TransformDraftAccountIntoRegularAccount, [DraftAccountRepository, InvestmentAccountsService])
+            .addClass(RemoveDraftAccount, [DraftAccountRepository])
+            .addClass(TransformDraftAccountIntoRegularAccount, [DraftAccountRepository, InvestmentAccountsService, AccountRepository, TransactionalAdapter])
         ;
     }
 }

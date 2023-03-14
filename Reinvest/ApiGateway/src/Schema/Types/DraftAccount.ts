@@ -26,7 +26,7 @@ const sharedSchema = `
 
     type Query {
         """
-        [MOCK] List all existing draft accounts if you need come back to onboarding
+        List all existing draft accounts if you need come back to onboarding
         """
         listAccountDrafts: [DraftAccount]
         getIndividualDraftAccount: IndividualDraftAccount
@@ -34,12 +34,12 @@ const sharedSchema = `
 
     type Mutation {
         """
-        [MOCK] Create draft of an account to fulfill with data before open it.
+        Create draft of an account to fulfill with data before open it.
         You can have only one draft account created of a specific type in the same time.
         """
         createDraftAccount(type: AccountType): DraftAccount
-        "[MOCK] Remove draft account"
-        removeDraftAccount(id: ID): Boolean
+        "Remove draft account"
+        removeDraftAccount(draftAccountId: ID): Boolean
     }
 
 `;
@@ -98,12 +98,12 @@ const individualSchema = `
     }
 
     type Query {
-        "[MOCK] Individual draft account"
+        "Individual draft account"
         getIndividualDraftAccount(accountId: ID): IndividualDraftAccount
     }
 
     type Mutation {
-        "[MOCK] Complete individual draft account"
+        "Complete individual draft account"
         completeIndividualDraftAccount(accountId: ID, input: IndividualAccountInput): IndividualDraftAccount
     }
 `;
@@ -350,9 +350,17 @@ export const DraftAccount = {
                     id,
                     type
                 }
-            }
-            ,
-            removeDraftAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => true,
+            },
+            removeDraftAccount: async (parent: any, {draftAccountId}, {profileId, modules}: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                const errors = await api.removeDraft(profileId, draftAccountId);
+
+                if (errors.length > 0) {
+                    throw new GraphQLError(JSON.stringify(errors));
+                }
+
+                return true;
+            },
             completeIndividualDraftAccount: async (
                 parent: any,
                 {accountId, input}: { accountId: string, input: any },

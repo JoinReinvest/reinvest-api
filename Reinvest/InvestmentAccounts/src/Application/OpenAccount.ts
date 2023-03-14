@@ -1,6 +1,7 @@
 import {ProfileRepository} from "InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository";
 import {ProfileException} from "InvestmentAccounts/Domain/ProfileException";
 import {AccountType} from "InvestmentAccounts/Domain/AccountType";
+import Profile from "InvestmentAccounts/Domain/Profile";
 
 export class OpenAccount {
     static getClassName = (): string => "OpenAccount";
@@ -16,7 +17,6 @@ export class OpenAccount {
         if (profile === null) {
             throw new ProfileException(`Profile ${profileId} not exist`);
         }
-        console.log({profile});
         const events = [];
 
         switch (accountType) {
