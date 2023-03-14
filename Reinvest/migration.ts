@@ -37,4 +37,6 @@ export async function migrate(command: 'migrateLatest' | 'migrateUp' | 'migrateD
         default:
             console.error(`Wrong CLI command: ${command}`);
     }
+
+    await modules.close();
 }

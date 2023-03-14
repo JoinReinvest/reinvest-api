@@ -15,6 +15,7 @@ export const main: PostAuthenticationTriggerHandler = async (event, context, cal
         const modules = boot();
         const identityModule = modules.getApi<IdentityApiType>(Identity);
         const status = await identityModule.isIncentiveTokenValid(token);
+        await modules.close();
         if (!status) {
             callback('WRONG_REFERRAL_CODE', event);
             return;
