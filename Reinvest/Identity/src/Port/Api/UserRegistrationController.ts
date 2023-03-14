@@ -1,4 +1,5 @@
 import {UserRegistrationService} from "Identity/Service/UserRegistrationService";
+import {IncentiveToken} from "Identity/Domain/IncentiveToken";
 
 export class UserRegistrationController {
     public static getClassName = (): string => "UserRegistrationController";
@@ -10,12 +11,22 @@ export class UserRegistrationController {
 
     async registerUser(userId: string, email: string, incentiveToken: string | null): Promise<boolean> {
         try {
-            await this.registrationService.registerUser(userId, email, incentiveToken);
+            const inviterIncentiveToken = this.getIncentiveToken(userId, incentiveToken);
+            await this.registrationService.registerUser(userId, email, inviterIncentiveToken);
 
             return true;
         } catch (error: any) {
             console.log(error.message);
             return false;
+        }
+    }
+
+    private getIncentiveToken(userId: string, incentiveToken: string | null): IncentiveToken | null {
+        try {
+            return incentiveToken === null ? null : new IncentiveToken(incentiveToken);
+        } catch (error: any) {
+            console.error(`Wrong format of incentive token. Incentive token skipped: ${incentiveToken} for user id: ${userId}`);
+            return null;
         }
     }
 }

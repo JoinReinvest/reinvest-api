@@ -3,7 +3,7 @@ import Modules from "Reinvest/Modules";
 import {Identity} from "Reinvest/Identity/src";
 import {LegalEntities} from "LegalEntities/index";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {COGNITO_CONFIG, DATABASE_CONFIG, S3_CONFIG, SNS_CONFIG} from "Reinvest/config";
+import {COGNITO_CONFIG, DATABASE_CONFIG, S3_CONFIG, SNS_CONFIG, WEB_APP_URL} from "Reinvest/config";
 import {Documents} from "Documents/index";
 import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
 import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
@@ -42,6 +42,7 @@ export function boot(): Modules {
                 database: databaseConfig,
                 SNS: snsConfig,
                 Cognito: cognitoConfig,
+                webAppUrl: WEB_APP_URL,
             } as Identity.Config,
             {
                 investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main
