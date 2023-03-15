@@ -56,7 +56,7 @@ export class SSN implements ToObject {
     }
 
     private static validate(ssn: string) {
-        const ssnRegExp = new RegExp("")
+        const ssnRegExp = new RegExp("^[0-9]{3}-[0-9]{2}-[0-9]{4}$")
         if (!ssnRegExp.test(ssn)) {
             throw new ValidationError('Invalid SSN format');
         }
