@@ -68,7 +68,7 @@ export class GetProfileController {
                     visaType: profileObject.domicile?.forVisa?.visaType
                 },
                 address: profileObject.address,
-                ssn: profileObject.ssn,
+                ssn: profileObject.ssnObject !== null ? profileObject.ssnObject.anonymized : null,
                 idScan: profileObject.idScan?.ids.map((id) => ({id})),
                 statements: profile.getStatements().map((statement: PersonalStatement) => ({
                     type: statement.getType(),

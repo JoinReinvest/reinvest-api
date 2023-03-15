@@ -49,7 +49,8 @@ const schema = `
     }
 
     input SSNInput {
-        ssn: String!
+        "The valid SSN is 9 digits in format 'XXX-XX-XXXX'"
+        ssn: String! @constraint(pattern: "^[0-9]{3}-[0-9]{2}-[0-9]{4}$")
     }
 
     input EINInput {

@@ -3,3 +3,4 @@ export * as migration_20230306160000_le_investing_experience from './legal_entit
 export * as migration_20230307141600_le_create_draft_account from './legal_entities_3_create_draft_account';
 export * as migration_20230309092400_le_remove_avatar_from_profile from './legal_entities_4_remove_avatar_from_profile';
 export * as migration_20230314150000_le_create_individual_account from './legal_entities_5_create_individual_account';
+export * as migration_20230315142000_le_add_ssn_json from './legal_entities_6_add_ssn_json';
