@@ -70,7 +70,7 @@ const schema = `
     }
 
     type Query {
-        """[MOCK]"""
+        """Get user profile"""
         getProfile: Profile
         """[MOCK]"""
         canOpenAccount(accountType: AccountType): Boolean
@@ -85,7 +85,10 @@ const schema = `
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
 
-        """[MOCK]"""
+        """
+        Open REINVEST Account based on draft.
+        Currently supported: Individual Account
+        """
         openAccount(draftAccountId: String): Boolean
     }
 `;

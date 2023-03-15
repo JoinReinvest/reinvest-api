@@ -53,16 +53,34 @@ const schema = `
     }
 
     type Query {
+        """
+        [WIP]
+        """
         getTemplate(templateName: TemplateName): Template
     }
 
     type Mutation {
+        """
+        Create file links for documents.
+        In the response, it returns the "id" and "url".
+        Use "url" for PUT request to upload the file directly to AWS S3. The url has expiration date!
+        Use "id" wherever system needs the reference to uploaded file.
+        """
         createDocumentsFileLinks(
             numberOfLinks: Int! @constraint(min:1, max: 10)
         ): [PutFileLink]
 
+        """
+        Create file links for avatar.
+        In the response, it returns the "id" and "url".
+        Use "url" for PUT request to upload the avatar directly to AWS S3. The url has expiration date!
+        Use "id" wherever system needs the reference to the avatar file.
+        """
         createAvatarFileLink: PutFileLink
 
+        """
+        [WIP]
+        """
         signDocumentFromTemplate(
             templateId: TemplateName!,
             fields: [GenericFieldInput]!

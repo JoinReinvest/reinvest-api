@@ -10,10 +10,25 @@ const schema = `
     }
 
     type Query {
+        """
+        Returns invitation link with a valid referral code (incentive token)
+        """
         userInvitationLink: UserInvitationLink
+
+        """
+        [MOCK] Returns information if user already assigned and verified phone number
+        """
+        phoneCompleted: Boolean
     }
     type Mutation {
+        """
+        Add phone number. The system will send the verification code to the provided phone number via sms.
+        """
         setPhoneNumber(countryCode: String, phoneNumber: String): Boolean
+        """
+        Verify phone number with received verification code on sms.
+        This action will set the phone number in the user Cognito profile and allow to use 2FA with phone number
+        """
         verifyPhoneNumber(countryCode: String, phoneNumber: String, authCode: String): Boolean
     }
 `;
@@ -23,6 +38,10 @@ export const PhoneNumberVerification = {
     typeDefs: schema,
     resolvers: {
         Query: {
+            phoneCompleted: async (parent: any,
+                                   input: undefined,
+                                   {profileId, modules}: SessionContext
+            ) => true,
             userInvitationLink: async (parent: any,
                                        data: any,
                                        {userId, modules}: SessionContext

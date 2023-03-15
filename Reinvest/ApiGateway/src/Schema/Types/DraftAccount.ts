@@ -29,7 +29,6 @@ const sharedSchema = `
         List all existing draft accounts if you need come back to onboarding
         """
         listAccountDrafts: [DraftAccount]
-        getIndividualDraftAccount: IndividualDraftAccount
     }
 
     type Mutation {
@@ -98,7 +97,9 @@ const individualSchema = `
     }
 
     type Query {
-        "Individual draft account"
+        """
+        Get details of individual draft account
+        """
         getIndividualDraftAccount(accountId: ID): IndividualDraftAccount
     }
 
@@ -351,15 +352,12 @@ export const DraftAccount = {
                     type
                 }
             },
-            removeDraftAccount: async (parent: any, {draftAccountId}, {profileId, modules}: SessionContext) => {
+            removeDraftAccount: async (parent: any, {draftAccountId}: { draftAccountId: string }, {
+                profileId,
+                modules
+            }: SessionContext) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.removeDraft(profileId, draftAccountId);
-
-                if (errors.length > 0) {
-                    throw new GraphQLError(JSON.stringify(errors));
-                }
-
-                return true;
+                return await api.removeDraft(profileId, draftAccountId);
             },
             completeIndividualDraftAccount: async (
                 parent: any,
