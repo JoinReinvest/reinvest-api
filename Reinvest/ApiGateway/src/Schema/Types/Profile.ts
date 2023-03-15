@@ -16,6 +16,18 @@ const schema = `
         ssn: String
         idScan: [FileLinkId]
         statements: [Statement]
+        experience: Experience
+    }
+
+    enum Experience {
+        NO_EXPERIENCE
+        SOME_EXPERIENCE
+        VERY_EXPERIENCED
+        EXPERT
+    }
+
+    input ExperienceInput {
+        experience: Experience
     }
 
     """
@@ -27,7 +39,6 @@ const schema = `
         externalId: String
         "The name/label of the user"
         label: String
-        avatar: GetAvatarLink
         isCompleted: Boolean
         details: ProfileDetails
     }
@@ -48,12 +59,11 @@ const schema = `
         Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
         """
         idScan: [FileLinkInput]
-        "Previously uploaded avatar. Please provide the id returned in @createAvatarFileLink mutation"
-        avatar: FileLinkInput
         "FINRA, Politician, Trading company stakeholder, accredited investor statements"
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"
         removeStatements: [StatementInput]
+        investingExperience: ExperienceInput
         "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
         verifyAndFinish: Boolean
     }

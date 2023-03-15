@@ -24,6 +24,7 @@ export namespace Identity {
         database: PostgreSQLConfig;
         SNS: SNSConfig,
         Cognito: CognitoConfig,
+        webAppUrl: string
     };
 
     export type ModulesDependencies = {

@@ -1,5 +1,7 @@
 import {SessionContext} from "ApiGateway/index";
 import {LegalEntities} from "LegalEntities/index";
+import {GraphQLError} from "graphql";
+import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
 
 const sharedSchema = `
     #graphql
@@ -16,11 +18,18 @@ const sharedSchema = `
         type: AccountType
     }
 
+    enum DraftAccountState {
+        ACTIVE
+        OPENED
+        CANCELED
+    }
+
     type Query {
         """
         [MOCK] List all existing draft accounts if you need come back to onboarding
         """
         listAccountDrafts: [DraftAccount]
+        getIndividualDraftAccount: IndividualDraftAccount
     }
 
     type Mutation {
@@ -36,19 +45,15 @@ const sharedSchema = `
 `;
 const individualSchema = `
     #graphql
-    # TODO Move it to profile completion
-    enum Experience {
-        NO_EXPERIENCE
-        SOME_EXPERIENCE
-        VERY_EXPERIENCED
-        EXPERT
-    }
-
     enum EmploymentStatus {
         EMPLOYED
         UNEMPLOYED
         RETIRED
         STUDENT
+    }
+
+    type EmploymentStatusType {
+        status: EmploymentStatus
     }
 
     input EmploymentStatusInput {
@@ -68,19 +73,28 @@ const individualSchema = `
     }
 
     input IndividualAccountInput {
-        employmentStatus: EmploymentStatusInput,
-        employer: EmployerInput,
-        netWorth: NetRangeInput,
+        employmentStatus: EmploymentStatusInput
+        employer: EmployerInput
+        netWorth: NetRangeInput
         netIncome: NetRangeInput
+        avatar: FileLinkInput
+        "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
+        verifyAndFinish: Boolean
+    }
+
+    type IndividualDraftAccountDetails {
+        employmentStatus: EmploymentStatusType
+        employer: Employer
+        netWorth: NetRange
+        netIncome: NetRange
     }
 
     type IndividualDraftAccount {
         id: ID,
-        employmentStatus: EmploymentStatus
-        employer: Employer
-        netWorth: NetRange
-        netIncome: NetRange
+        state: DraftAccountState
         avatar: GetAvatarLink
+        isCompleted: Boolean
+        details: IndividualDraftAccountDetails
     }
 
     type Query {
@@ -113,6 +127,7 @@ const corporateTrustSchema = `
         ein: String
         annualRevenue: String
         numberOfEmployees: String
+        industry: String
         companyDocuments: [FileLinkId]
         avatar: GetAvatarLink
         stakeholders: [Stakeholder]
@@ -126,6 +141,7 @@ const corporateTrustSchema = `
         ein: String
         annualRevenue: String
         numberOfEmployees: String
+        industry: String
         companyDocuments: [FileLinkId]
         avatar: GetAvatarLink
         stakeholders: [Stakeholder]
@@ -142,6 +158,10 @@ const corporateTrustSchema = `
 
     input NumberOfEmployeesInput {
         numberOfEmployees: String!
+    }
+
+    input IndustryInput {
+        industry: String!
     }
 
     enum CorporateCompanyType {
@@ -179,6 +199,7 @@ const corporateTrustSchema = `
         ein: EINInput
         annualRevenue: AnnualRevenueInput
         numberOfEmployees: NumberOfEmployeesInput
+        industry: IndustryInput
         companyDocuments: [FileLinkInput]
         removeDocuments: [FileLinkInput]
         avatar: FileLinkInput
@@ -193,6 +214,7 @@ const corporateTrustSchema = `
         ein: EINInput
         annualRevenue: AnnualRevenueInput
         numberOfEmployees: NumberOfEmployeesInput
+        industry: IndustryInput
         companyDocuments: [FileLinkInput]
         removeDocuments: [FileLinkInput]
         avatar: FileLinkInput
@@ -247,6 +269,7 @@ const corporateTrustMockResponse = (isTrust: boolean = false) => ({
     ein: "12-3456789",
     annualRevenue: "$100000-$5000000",
     numberOfEmployees: "<10",
+    industry: "Housekeeping",
     companyDocuments: [{
         id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
     }, {
@@ -289,18 +312,6 @@ type NetRange = {
     to: string
 }
 
-type IndividualDraftAccountInput = {
-    experience?: "NO_EXPERIENCE" | "SOME_EXPERIENCE" | "VERY_EXPERIENCED" | "EXPERT",
-    employmentStatus?: "EMPLOYED" | "UNEMPLOYED" | "RETIRED" | "STUDENT",
-    employer?: {
-        nameOfEmployer: string,
-        occupation: string,
-        industry: string
-    },
-    netWorth?: NetRange,
-    netIncome?: NetRange
-};
-
 export const DraftAccount = {
     typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
     resolvers: {
@@ -312,7 +323,11 @@ export const DraftAccount = {
             getIndividualDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
-            }: SessionContext) => (individualAccountMockResponse),
+            }: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+                return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
+            },
             getCorporateDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
@@ -325,16 +340,31 @@ export const DraftAccount = {
         Mutation: {
             createDraftAccount: async (parent: any, {type}: any, {profileId, modules}: SessionContext) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                return api.createDraftAccount(profileId, type);
-            },
+                const {status, id, message} = await api.createDraftAccount(profileId, type);
+                if (!status) {
+                    throw new GraphQLError(message as string);
+                }
+
+                return {
+                    id,
+                    type
+                }
+            }
+            ,
             removeDraftAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => true,
             completeIndividualDraftAccount: async (
                 parent: any,
-                {accountId, input}: { accountId: string, input: IndividualDraftAccountInput },
+                {accountId, input}: { accountId: string, input: any },
                 {profileId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                return individualAccountMockResponse;
+                const errors = await api.completeIndividualDraftAccount(profileId, accountId, input);
+
+                if (errors.length > 0) {
+                    throw new GraphQLError(JSON.stringify(errors));
+                }
+
+                return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
             },
             completeCorporateDraftAccount: async (parent: any, input: any, {
                 profileId,

@@ -4,8 +4,6 @@ import {PersonalName, PersonalNameInput} from "Reinvest/LegalEntities/src/Domain
 import {DateOfBirth, DateOfBirthInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/DateOfBirth";
 import {Address, AddressInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/Address";
 import {
-    Avatar,
-    AvatarInput,
     IdentityDocument,
     IdScanInput
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Document";
@@ -26,6 +24,10 @@ import {
     PersonalStatementInput,
     PersonalStatementType
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/PersonalStatements";
+import {
+    InvestingExperience, InvestingExperienceInput,
+    InvestingExperienceType
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/InvestingExperience";
 
 context("Given the user wants to complete the profile", () => {
 
@@ -186,26 +188,6 @@ context("Given the user wants to complete the profile", () => {
             }
         });
 
-        const avatarId = '427aa662-a4da-48ee-a44f-780bd8743c93';
-        it("Then add an avatar", async () => {
-            const input = {id: avatarId, path};
-            profile.setAvatarDocument(Avatar.create(input))
-            const profileOutput = profile.toObject();
-            const avatar = profileOutput.avatar as AvatarInput;
-
-            expect(avatar.id).to.be.equal(avatarId);
-            expect(avatar.path).to.be.equal(path);
-        });
-
-        it("Or add an avatar without details Then expects validation error", async () => {
-            const input = <AvatarInput>{path};
-            try {
-                profile.setAvatarDocument(Avatar.create(input))
-            } catch (error: any) {
-                expect(error).to.exist;
-            }
-        });
-
         it("Then complete the US Citizen Domicile", async () => {
             const input = <DomicileInput>{
                 type: DomicileType.CITIZEN
@@ -300,6 +282,40 @@ context("Given the user wants to complete the profile", () => {
 
             try {
                 profile.setSSN(SSN.create(input))
+            } catch (error: any) {
+                expect(error).to.exist;
+            }
+        });
+
+        it("Then complete the investing experience", async () => {
+            const input = {
+                experience: InvestingExperienceType.EXPERT
+            }
+            profile.setInvestingExperience(InvestingExperience.create(input))
+
+            const profileOutput = profile.toObject();
+            const experience = profileOutput.investingExperience as InvestingExperienceInput;
+
+            expect(experience.experience).to.be.equal(input.experience);
+        });
+
+        it("Or complete the investing experience with wrong data, Then expects validation error", async () => {
+            const input = {
+                experience: 'WRONG_VALUE'
+            } as unknown as InvestingExperienceInput;
+
+            try {
+                profile.setInvestingExperience(InvestingExperience.create(input))
+            } catch (error: any) {
+                expect(error).to.exist;
+            }
+        });
+
+        it("Or complete the investing experience without details Then expects validation error", async () => {
+            const input = <InvestingExperienceInput>{}
+
+            try {
+                profile.setInvestingExperience(InvestingExperience.create(input))
             } catch (error: any) {
                 expect(error).to.exist;
             }

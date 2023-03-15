@@ -48,6 +48,9 @@ export class Uuid {
     protected uuid: string;
 
     constructor(uuid: string) {
+        if (!uuid) {
+            throw new ValidationError('Uuid can not be empty');
+        }
         this.uuid = uuid;
     }
 

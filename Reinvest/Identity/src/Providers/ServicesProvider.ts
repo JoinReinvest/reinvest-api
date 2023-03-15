@@ -8,6 +8,7 @@ import {IdGenerator} from "IdGenerator/IdGenerator";
 import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationService";
 import {PhoneRepository} from "Identity/Adapter/Database/Repository/PhoneRepository";
 import {UniqueTokenGenerator} from "IdGenerator/UniqueTokenGenerator";
+import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
 
 export class ServicesProvider {
     private config: Identity.Config;
@@ -18,7 +19,7 @@ export class ServicesProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(UserRegistrationService, [UserRepository, ProfileService, CognitoService, IdGenerator])
+            .addClass(UserRegistrationService, [UserRepository, ProfileService, CognitoService, IdGenerator, IncentiveTokenRepository])
             .addClass(PhoneRegistrationService, [UserRepository, PhoneRepository, UniqueTokenGenerator])
         ;
     }

@@ -17,6 +17,10 @@ import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/fu
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
 import {importOutput} from "./devops/serverless/utils";
+import {
+    UnauthorizedEndpointsFunction,
+    UnauthorizedEndpointsLambdaResources
+} from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -39,6 +43,9 @@ const serverlessConfiguration: AWS = {
             CognitoUserPoolID: importOutput('CognitoUserPoolID'),
             S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
             S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
+            EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
+            EMAIL_REPLY_TO: "${env:EMAIL_REPLY_TO}",
+            WEB_APP_URL: "${env:WEB_APP_URL}",
             INFRASTRUCTURE_AWS_REGION: "${aws:region}",
             POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
             POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}"
@@ -63,6 +70,7 @@ const serverlessConfiguration: AWS = {
         api: ApiLambdaFunction,
         explorer: ExplorerLambdaFunction,
         migration: MigrationLambdaFunction,
+        unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         // queue: QueueFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
@@ -76,6 +84,7 @@ const serverlessConfiguration: AWS = {
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,
             ...MigrationLambdaResources,
+            ...UnauthorizedEndpointsLambdaResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,

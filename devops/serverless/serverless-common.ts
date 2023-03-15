@@ -9,7 +9,6 @@ export const ProviderEnvironment = {
     NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
     SERVERLESS_SERVICE: "reinvest",
     SERVERLESS_ACCOUNT_ID: "${aws:accountId}",
-    SERVERLESS_STAGE: "${sls:stage}",
     SERVERLESS_REGION: "${aws:region}"
 }
 

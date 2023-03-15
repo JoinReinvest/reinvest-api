@@ -21,13 +21,21 @@ export interface LegalEntitiesProfile {
     dateOfBirth: string | null;
     address: string | null;
     idScan: string | null;
-    avatar: string | null;
     domicile: string | null;
     statements: string | null;
+    investingExperience: string | null;
     isCompleted: boolean;
-}
+};
 
-export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'avatar', 'domicile', 'statements'];
+export interface LegalEntitiesDraftAccount {
+    draftId: string;
+    profileId: string;
+    state: string;
+    accountType: string;
+    data: string | null;
+};
+
+export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience'];
 
 export type InsertableProfile = Insertable<LegalEntitiesProfile>;
-// export type InsertablePerson = Insertable<LegalEntitiesPerson>;
+export type InsertableDraftAccount = Insertable<LegalEntitiesDraftAccount>;

@@ -5,20 +5,19 @@ import {AddressInput} from "LegalEntities/Domain/ValueObject/Address";
 import {FileLink} from "Documents/Adapter/S3/FileLinkService";
 import {
     PersonalStatement,
-    PersonalStatementInput,
     PersonalStatementType
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
 
 export type ProfileResponse = {
     externalId: string,
     label: string
-    avatar: FileLink | null,
     isCompleted: boolean,
     details: {
         firstName?: string,
         middleName?: string,
         lastName?: string,
         dateOfBirth: string | null,
+        experience: string | null,
         domicile: {
             type?: DomicileType,
             birthCountry?: String,
@@ -55,12 +54,12 @@ export class GetProfileController {
         return {
             externalId: profileObject.externalId,
             label: profileObject.label,
-            avatar: await this.documents.getAvatarFileLink(profileObject.avatar),
             isCompleted: profileObject.isCompleted,
             details: {
                 firstName: profileObject.name?.firstName,
                 middleName: profileObject.name?.middleName,
                 lastName: profileObject.name?.lastName,
+                experience: profileObject.investingExperience ? profileObject.investingExperience?.experience : null,
                 dateOfBirth: profileObject.dateOfBirth,
                 domicile: {
                     type: profileObject.domicile?.type,

@@ -2,19 +2,20 @@ import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/Profi
 import {PersonalName, PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
 import {DateOfBirth, DateOfBirthInput} from "LegalEntities/Domain/ValueObject/DateOfBirth";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {Avatar, IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
+import {IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
 import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
 import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
+import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
 
 export type CompleteProfileInput = {
     name?: PersonalNameInput,
     dateOfBirth?: DateOfBirthInput,
     address?: AddressInput,
     idScan?: { id: string }[],
-    avatar?: { id: string },
     SSN?: { ssn: SSNInput },
     domicile?: DomicileInput,
+    investingExperience?: InvestingExperienceInput,
     statements?: PersonalStatementInput[],
     removeStatements?: PersonalStatementInput[],
     verifyAndFinish: boolean
@@ -30,7 +31,6 @@ export class CompleteProfileController {
     }
 
     public async completeProfile(input: CompleteProfileInput, profileId: string): Promise<string[]> {
-        console.log({input})
         let profile = await this.profileRepository.findOrCreateProfile(profileId);
 
         const errors = []
@@ -58,12 +58,11 @@ export class CompleteProfileController {
                         const ids = data.map((idObject: { id: string }) => idObject.id);
                         profile.setIdentityDocument(IdentityDocument.create({ids, path: profileId}));
                         break;
-                    case 'avatar':
-                        const {id} = data;
-                        profile.setAvatarDocument(Avatar.create({id, path: profileId}));
-                        break;
                     case 'domicile':
                         profile.setDomicile(Domicile.create(data));
+                        break;
+                    case 'investingExperience':
+                        profile.setInvestingExperience(InvestingExperience.create(data));
                         break;
                     case 'ssn':
                         const {ssn: ssnValue} = data;
@@ -76,7 +75,6 @@ export class CompleteProfileController {
                         break;
                     case 'statements':
                         for (const rawStatement of data) {
-                            console.log(rawStatement);
                             const statement = PersonalStatement.create(rawStatement);
                             profile.addStatement(statement);
                         }
