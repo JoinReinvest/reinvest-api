@@ -11,6 +11,10 @@ import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {Documents} from "Documents/index";
+import {
+    DatabaseAdapterProvider,
+    IdentityDatabaseAdapterProvider
+} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
@@ -72,6 +76,9 @@ export namespace LegalEntities {
         }
 
         async close(): Promise<void> {
+            // if (this.booted) {
+            //     await this.container.getValue<IdentityDatabaseAdapterProvider>(DatabaseAdapterProvider).close();
+            // }
         }
 
     }

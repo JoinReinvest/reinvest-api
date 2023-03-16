@@ -1,5 +1,7 @@
 # REINVEST API CHANGELOG
 
+## 1.0.3 - current
+
 ## 1.0.2 - 03/16/2023
 
 * added/implemented queries
@@ -20,6 +22,8 @@
 ## 1.0.1 - 03/13/2023
 
 * AWS Simple Email Service basic integration
+* Added verification of referral code by unauthorized `POST /incentive-token` endpoint
+* Added proper verification of a referral code on sign up
 * Provide invitation links
     * Query: `userInvitationLink: UserInvitationLink`
 * Complete individual draft account

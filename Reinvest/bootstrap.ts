@@ -3,8 +3,16 @@ import Modules from "Reinvest/Modules";
 import {Identity} from "Reinvest/Identity/src";
 import {LegalEntities} from "LegalEntities/index";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {COGNITO_CONFIG, DATABASE_CONFIG, S3_CONFIG, SNS_CONFIG, WEB_APP_URL} from "Reinvest/config";
+import {
+    COGNITO_CONFIG,
+    DATABASE_CONFIG,
+    NORTH_CAPITAL_CONFIG,
+    S3_CONFIG,
+    SNS_CONFIG,
+    WEB_APP_URL
+} from "Reinvest/config";
 import {Documents} from "Documents/index";
+import {Registration} from "Reinvest/Registration/src";
 import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
 import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
 
@@ -56,6 +64,16 @@ export function boot(): Modules {
         } as LegalEntities.Config, {
             documents: modules.get(Documents.moduleName) as Documents.Main,
             investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main
+        })
+    );
+
+    modules.register(
+        Registration.moduleName,
+        Registration.create({
+            database: databaseConfig,
+            northCapital: NORTH_CAPITAL_CONFIG,
+        } as Registration.Config, {
+            legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
         })
     );
 

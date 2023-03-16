@@ -18,7 +18,8 @@
       "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],
       "LegalEntities/*": ["./Reinvest/LegalEntities/src/*"],
       "Documents/*": ["./Reinvest/Documents/src/*"],
-      "Identity/*": ["./Reinvest/Identity/src/*"]
+      "Identity/*": ["./Reinvest/Identity/src/*"],
+      "Registration/*": ["./Reinvest/Registration/src/*"],
     },
     "typeRoots": [
       "./node_modules/@types",
