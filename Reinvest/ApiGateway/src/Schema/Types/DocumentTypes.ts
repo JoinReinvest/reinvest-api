@@ -18,6 +18,7 @@ const schema = `
     type GetAvatarLink {
         id: String
         url: String
+        initials: String
     }
 
     "Link id + url to read the document"

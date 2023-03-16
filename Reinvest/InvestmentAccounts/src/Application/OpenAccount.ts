@@ -31,4 +31,13 @@ export class OpenAccount {
 
         await this.profileRepository.storeAndPublish(events, profile.getSnapshot());
     }
+
+    async listAccountTypesUserCanOpen(profileId: string): Promise<AccountType[]> {
+        const profile = await this.profileRepository.restore(profileId);
+        if (profile === null) {
+            throw new ProfileException(`Profile ${profileId} not exist`);
+        }
+
+        return profile.listAccountTypesUserCanOpen();
+    }
 }

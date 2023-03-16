@@ -18,4 +18,8 @@ export class AccountManagementController {
         }
         return true;
     }
+
+    async listAccountTypesUserCanOpen(profileId: string): Promise<AccountType[]> {
+        return await this.openAccountUseCase.listAccountTypesUserCanOpen(profileId);
+    }
 }

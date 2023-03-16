@@ -85,10 +85,17 @@ const schema = `
         display: String
     }
 
+    enum DraftAccountType {
+        INDIVIDUAL
+        CORPORATE
+        TRUST
+    }
+
     enum AccountType {
         INDIVIDUAL
         CORPORATE
         TRUST
+        BENEFICIARY
     }
 
     enum StatementType {

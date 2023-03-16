@@ -37,11 +37,9 @@ export type ProfileResponse = {
 export class GetProfileController {
     public static getClassName = (): string => "GetProfileController";
     private profileRepository: ProfileRepository;
-    private documents: DocumentsService;
 
-    constructor(profileRepository: ProfileRepository, documents: DocumentsService) {
+    constructor(profileRepository: ProfileRepository) {
         this.profileRepository = profileRepository;
-        this.documents = documents;
     }
 
     public async getProfile(profileId: string): Promise<ProfileResponse> {
