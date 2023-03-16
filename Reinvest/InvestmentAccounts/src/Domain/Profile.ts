@@ -3,9 +3,11 @@ import {AggregateState} from "SimpleAggregator/Types";
 
 import {IndividualAccountOpened, ProfileCreated} from "InvestmentAccounts/Domain/ProfileEvents";
 import {ProfileException} from "InvestmentAccounts/Domain/ProfileException";
+import {AccountType} from "InvestmentAccounts/Domain/AccountType";
 
 const MAX_NUMBER_OF_TRUSTS = 3;
 const MAX_NUMBER_OF_CORPORATES = 3;
+const MAX_NUMBER_OF_BENEFICIARIES = 3;
 
 export const ProfileAggregateName = 'Profile';
 export type ProfileState = AggregateState & {
@@ -42,9 +44,8 @@ class Profile extends SimpleAggregate {
     }
 
     public openIndividualAccount(accountId: string) {
-        const individualAccountId = this.getState("individualAccountId");
-
-        if (individualAccountId !== null) {
+        if (!this.canOpenIndividualAccount()) {
+            const individualAccountId = this.getState("individualAccountId");
             ProfileException.throw(individualAccountId === accountId ? "THE_ACCOUNT_ALREADY_OPENED" : "CANNOT_OPEN_ACCOUNT");
         }
 
@@ -57,6 +58,51 @@ class Profile extends SimpleAggregate {
         };
 
         return this.apply(event);
+    }
+
+    listAccountTypesUserCanOpen(): AccountType[] {
+        const availableAccountTypes = [];
+        if (this.canOpenIndividualAccount()) {
+            availableAccountTypes.push(AccountType.INDIVIDUAL);
+        }
+        if (this.canOpenBeneficiaryAccount()) {
+            availableAccountTypes.push(AccountType.BENEFICIARY);
+        }
+        if (this.canOpenCorporateAccount()) {
+            availableAccountTypes.push(AccountType.CORPORATE);
+        }
+        if (this.canOpenTrustAccount()) {
+            availableAccountTypes.push(AccountType.TRUST);
+        }
+        return availableAccountTypes;
+    }
+
+    private canOpenIndividualAccount(): boolean {
+        const individualAccountId = this.getState("individualAccountId");
+
+        return individualAccountId === null;
+    }
+
+    private canOpenBeneficiaryAccount(): boolean {
+        if (this.canOpenIndividualAccount()) { // Individual account is required to open beneficiary account
+            return false;
+        }
+
+        const beneficiaryAccountIds = this.getState("beneficiaryAccountIds");
+
+        return beneficiaryAccountIds.length < MAX_NUMBER_OF_BENEFICIARIES;
+    }
+
+    private canOpenCorporateAccount(): boolean {
+        const corporateAccountIds = this.getState("corporateAccountIds");
+
+        return corporateAccountIds.length < MAX_NUMBER_OF_CORPORATES;
+    }
+
+    private canOpenTrustAccount(): boolean {
+        const trustAccountIds = this.getState("trustAccountIds");
+
+        return trustAccountIds.length < MAX_NUMBER_OF_TRUSTS;
     }
 }
 

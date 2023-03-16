@@ -7,11 +7,11 @@ import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObje
 export type IndividualSchema = {
     accountId: string,
     profileId: string,
-    employmentStatus: EmploymentStatusInput | object | null,
-    employer: EmployerInput | object | null,
-    netWorth: NetRangeInput | object | null,
-    netIncome: NetRangeInput | object | null,
-    avatar: AvatarInput | object | null,
+    employmentStatus: EmploymentStatusInput | null,
+    employer: EmployerInput | null,
+    netWorth: NetRangeInput | null,
+    netIncome: NetRangeInput | null,
+    avatar: AvatarInput | null,
 }
 
 export class IndividualAccount {
@@ -54,23 +54,23 @@ export class IndividualAccount {
         const account = new IndividualAccount(profileId, accountId);
 
         if (employmentStatus) {
-            account.setEmploymentStatus(EmploymentStatus.create(employmentStatus));
+            account.setEmploymentStatus(EmploymentStatus.create(employmentStatus as EmploymentStatusInput));
         }
 
         if (avatar) {
-            account.setAvatarDocument(Avatar.create(avatar));
+            account.setAvatarDocument(Avatar.create(avatar as AvatarInput));
         }
 
         if (employer) {
-            account.setEmployer(Employer.create(employer));
+            account.setEmployer(Employer.create(employer as EmployerInput));
         }
 
         if (netWorth) {
-            account.setNetWorth(NetWorth.create(netWorth));
+            account.setNetWorth(NetWorth.create(netWorth as NetRangeInput));
         }
 
         if (netIncome) {
-            account.setNetIncome(NetIncome.create(netIncome));
+            account.setNetIncome(NetIncome.create(netIncome as NetRangeInput));
         }
 
         return account;
@@ -96,4 +96,7 @@ export class IndividualAccount {
         this.netIncome = netIncome;
     }
 
+    getInitials(): string {
+        return "I";
+    }
 }

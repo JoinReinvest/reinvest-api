@@ -16,8 +16,13 @@ export class PhoneController {
     }
 
     async setPhoneNumber(userId: string, countryCode: string, phoneNumber: string): Promise<boolean> {
-        const phone = new PhoneNumber(countryCode, phoneNumber);
-        return this.phoneRegistrationService.registerUnverifiedPhoneNumber(userId, phone);
+        try {
+            const phone = new PhoneNumber(countryCode, phoneNumber);
+            return this.phoneRegistrationService.registerUnverifiedPhoneNumber(userId, phone);
+        } catch (error: any) {
+            console.error(error);
+            return false;
+        }
     }
 
     async verifyPhoneNumber(userId: string, countryCode: string, phoneNumber: string, TOPTToken: string): Promise<boolean> {

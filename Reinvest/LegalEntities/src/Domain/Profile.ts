@@ -8,7 +8,7 @@ import {
     PersonalStatementType
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
+import {SSN, SSNSchema} from "LegalEntities/Domain/ValueObject/SSN";
 import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
 import {IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
@@ -18,7 +18,8 @@ export type ProfileSchema = {
     externalId: string,
     label: string,
     name: PersonalNameInput | null,
-    ssn: SSNInput | null,
+    ssnObject: SSNSchema | null,
+    ssn: string | null,
     dateOfBirth: DateOfBirthInput | null,
     address: AddressInput | null,
     idScan: IdScanInput | null,
@@ -105,7 +106,7 @@ export class Profile {
             const {
                 profileId, externalId, label, name,
                 dateOfBirth, address, idScan, domicile,
-                ssn, investingExperience, statements, isCompleted
+                ssnObject, investingExperience, statements, isCompleted
             } = data;
             const profile = new Profile(profileId, externalId, label);
 
@@ -129,8 +130,8 @@ export class Profile {
                 profile.setDomicile(Domicile.create(domicile));
             }
 
-            if (ssn) {
-                profile.setSSN(SSN.create(ssn));
+            if (ssnObject) {
+                profile.setSSN(SSN.create(ssnObject));
             }
 
             if (investingExperience) {
@@ -160,7 +161,8 @@ export class Profile {
             profileId: this.profileId,
             externalId: this.externalId,
             label: this.label,
-            ssn: this.get(this.ssn),
+            ssnObject: this.get(this.ssn),
+            ssn: this.ssn !== null ? this.ssn.getHash() : null,
             name: this.get(this.name),
             dateOfBirth: this.get(this.dateOfBirth),
             address: this.get(this.address),

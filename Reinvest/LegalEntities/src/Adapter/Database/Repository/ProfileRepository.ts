@@ -32,7 +32,7 @@ export class ProfileRepository {
     public async findProfile(profileId: string): Promise<Profile | null> {
         const data = await this.databaseAdapterProvider.provide()
             .selectFrom(legalEntitiesProfileTable)
-            .select(['profileId', 'externalId', 'label', 'name', 'ssn', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'isCompleted'])
+            .select(['profileId', 'externalId', 'label', 'name', 'ssn', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'isCompleted', 'ssnObject'])
             .where('profileId', '=', profileId)
             .limit(1)
             .executeTakeFirst();
@@ -92,7 +92,7 @@ export class ProfileRepository {
         const isProfileWithTheSSNExist = await this.databaseAdapterProvider.provide()
             .selectFrom(legalEntitiesProfileTable)
             .select(['profileId'])
-            .where('ssn', '=', ssn.toObject())
+            .where('ssn', '=', ssn.getHash())
             .where('profileId', '!=', profileId)
             .limit(1)
             .executeTakeFirst();

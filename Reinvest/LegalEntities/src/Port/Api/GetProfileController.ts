@@ -37,11 +37,9 @@ export type ProfileResponse = {
 export class GetProfileController {
     public static getClassName = (): string => "GetProfileController";
     private profileRepository: ProfileRepository;
-    private documents: DocumentsService;
 
-    constructor(profileRepository: ProfileRepository, documents: DocumentsService) {
+    constructor(profileRepository: ProfileRepository) {
         this.profileRepository = profileRepository;
-        this.documents = documents;
     }
 
     public async getProfile(profileId: string): Promise<ProfileResponse> {
@@ -68,7 +66,7 @@ export class GetProfileController {
                     visaType: profileObject.domicile?.forVisa?.visaType
                 },
                 address: profileObject.address,
-                ssn: profileObject.ssn,
+                ssn: profileObject.ssnObject !== null ? profileObject.ssnObject.anonymized : null,
                 idScan: profileObject.idScan?.ids.map((id) => ({id})),
                 statements: profile.getStatements().map((statement: PersonalStatement) => ({
                     type: statement.getType(),
