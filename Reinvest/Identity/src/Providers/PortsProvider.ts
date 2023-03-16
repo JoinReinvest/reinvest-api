@@ -20,10 +20,10 @@ export class PortsProvider {
         container.addAsValue('webAppUrl', this.config.webAppUrl);
         //controllers
         container
-            .addClass(ProfileController, [UserRepository])
-            .addClass(PhoneController, [PhoneRegistrationService])
-            .addClass(UserRegistrationController, [UserRegistrationService])
-            .addClass(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl'])
+            .addSingleton(ProfileController, [UserRepository])
+            .addSingleton(PhoneController, [PhoneRegistrationService])
+            .addSingleton(UserRegistrationController, [UserRegistrationService])
+            .addSingleton(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl'])
         ;
     }
 }

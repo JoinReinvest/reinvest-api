@@ -5,6 +5,7 @@ import CreateProfile from "InvestmentAccounts/Application/CreateProfile";
 import {ProfileRepository} from "InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository";
 import {OpenAccount} from "InvestmentAccounts/Application/OpenAccount";
 
+
 export default class UseCaseProviders {
     private config: InvestmentAccounts.Config;
 
@@ -14,8 +15,8 @@ export default class UseCaseProviders {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(OpenAccount, [ProfileRepository])
-            .addClass(CreateProfile, [ProfileRepository])
+            .addSingleton(OpenAccount, [ProfileRepository])
+            .addSingleton(CreateProfile, [ProfileRepository])
         ;
     }
 }

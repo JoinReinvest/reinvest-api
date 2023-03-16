@@ -14,7 +14,7 @@ export class AdapterServiceProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(IdGenerator)
+            .addSingleton(IdGenerator)
 
         // database
         container
@@ -23,7 +23,7 @@ export class AdapterServiceProvider {
         // s3
         container
             .addAsValue('S3Config', this.config.s3)
-            .addClass(S3Adapter, ['S3Config'])
-            .addClass(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()])
+            .addSingleton(S3Adapter, ['S3Config'])
+            .addSingleton(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()])
     }
 }

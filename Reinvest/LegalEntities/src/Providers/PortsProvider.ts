@@ -8,10 +8,11 @@ import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
 import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
 import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount";
 import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
-import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
-import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
-import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
 import {ReadAccountController} from "LegalEntities/Port/Api/ReadAccountController";
+import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
+import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
+import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
+
 
 export class PortsProvider {
     private config: LegalEntities.Config;
@@ -23,10 +24,10 @@ export class PortsProvider {
     public boot(container: ContainerInterface) {
         //controllers
         container
-            .addClass(CompleteProfileController, [ProfileRepository])
-            .addClass(GetProfileController, [ProfileRepository])
-            .addClass(ReadAccountController, [AccountRepository, DocumentsService])
-            .addClass(DraftAccountsController, [CreateDraftAccount, CompleteDraftAccount, DraftAccountQuery, TransformDraftAccountIntoRegularAccount, RemoveDraftAccount])
+            .addSingleton(CompleteProfileController, [ProfileRepository])
+            .addSingleton(GetProfileController, [ProfileRepository])
+            .addSingleton(ReadAccountController, [AccountRepository, DocumentsService])
+            .addSingleton(DraftAccountsController, [CreateDraftAccount, CompleteDraftAccount, DraftAccountQuery, TransformDraftAccountIntoRegularAccount, RemoveDraftAccount])
         ;
     }
 }

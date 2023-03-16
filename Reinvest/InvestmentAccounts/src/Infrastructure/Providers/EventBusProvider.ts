@@ -13,7 +13,7 @@ export default class EventBusProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(ProfileQueryEventHandler, [ProfileQuery])
+            .addSingleton(ProfileQueryEventHandler, [ProfileQuery])
 
 
         const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;

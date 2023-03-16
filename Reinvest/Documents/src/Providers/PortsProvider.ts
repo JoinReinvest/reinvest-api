@@ -15,9 +15,9 @@ export class PortsProvider {
     public boot(container: ContainerInterface) {
         //controllers
         container
-            .addClass(FileLinksController, [FileLinkService])
-            .addClass(TemplatesController)
-            .addClass(SigningController)
+            .addSingleton(FileLinksController, [FileLinkService])
+            .addSingleton(TemplatesController)
+            .addSingleton(SigningController)
         ;
     }
 }
