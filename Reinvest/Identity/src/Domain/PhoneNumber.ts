@@ -3,6 +3,9 @@ export class PhoneNumber {
     private countryCode: string;
 
     constructor(countryCode: string, phoneNumber: string) {
+        if (!countryCode || !phoneNumber) {
+            throw new Error('Country code and phone number are required');
+        }
         this.countryCode = this.trim(countryCode);
         this.phoneNumber = this.trim(phoneNumber);
     }
