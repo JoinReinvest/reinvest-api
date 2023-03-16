@@ -3,6 +3,7 @@ import {makeExecutableSchema} from "@graphql-tools/schema";
 const schema = `
     #graphql
     type Query {
+        """ Just say hello """
         hello: Boolean
     }
 `;

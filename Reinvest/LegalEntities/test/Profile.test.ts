@@ -14,7 +14,7 @@ import {
     GreenCardInput,
     VisaInput
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Domicile";
-import {SSN, SSNInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
+import {SSN, SSNInput, SSNSchema} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
 import {
     AccreditedInvestorStatements, ForAccreditedInvestor,
     ForFINRA,
@@ -268,20 +268,45 @@ context("Given the user wants to complete the profile", () => {
         });
 
         it("Then complete the SSN", async () => {
-            const input = 'AAA-GG-SSSS'
-            profile.setSSN(SSN.create(input))
+            const input = '111-22-3333'
+            const ssnValueObject = SSN.createFromRawSSN(input);
+            profile.setSSN(ssnValueObject);
 
             const profileOutput = profile.toObject();
-            const ssn = profileOutput.ssn as unknown as SSNInput;
+            const ssn = profileOutput.ssnObject as unknown as SSNSchema;
 
-            expect(ssn).to.be.equal(input);
+            expect(ssn.anonymized).to.be.equal("***-**-3333");
+            expect(ssnValueObject.decrypt()).to.be.equal(input);
+        });
+
+        it("And Then the SSN object output should be a valid input for regular SSN", async () => {
+            const input = '111-22-3333'
+
+            const ssnValueObject = SSN.createFromRawSSN(input);
+            const rawObject = ssnValueObject.toObject();
+
+            const restoredSsnValueObject = SSN.create(rawObject);
+            const restoredRawObject = restoredSsnValueObject.toObject();
+
+            expect(restoredRawObject.anonymized).to.be.equal("***-**-3333");
+            expect(restoredSsnValueObject.decrypt()).to.be.equal(input);
         });
 
         it("Or complete the SSN without details Then expects validation error", async () => {
-            const input = <SSNInput>{};
+            const input = "";
 
             try {
-                profile.setSSN(SSN.create(input))
+                profile.setSSN(SSN.createFromRawSSN(input))
+            } catch (error: any) {
+                expect(error).to.exist;
+            }
+        });
+
+        it("Or complete the SSN with wrong value Then expects validation error", async () => {
+            const input = 'AAA-BB-1234'
+
+            try {
+                profile.setSSN(SSN.createFromRawSSN(input))
             } catch (error: any) {
                 expect(error).to.exist;
             }

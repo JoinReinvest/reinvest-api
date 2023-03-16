@@ -1,9 +1,9 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {IndividualDraftAccount} from "LegalEntities/Domain/DraftAccount/DraftAccount";
-import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/DraftAccount/EmploymentStatus";
+import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
 import {Avatar} from "LegalEntities/Domain/ValueObject/Document";
-import {Employer, EmployerInput} from "LegalEntities/Domain/DraftAccount/Employer";
-import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/DraftAccount/ValueRange";
+import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
+import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
 
 export type IndividualDraftAccountInput = {
     employmentStatus?: EmploymentStatusInput

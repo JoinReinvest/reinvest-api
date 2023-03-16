@@ -66,7 +66,7 @@ export class CompleteProfileController {
                         break;
                     case 'ssn':
                         const {ssn: ssnValue} = data;
-                        const ssn = SSN.create(ssnValue);
+                        const ssn = SSN.createFromRawSSN(ssnValue);
                         if (await this.profileRepository.isSSNUnique(ssn, profileId)) {
                             profile.setSSN(ssn);
                         } else {

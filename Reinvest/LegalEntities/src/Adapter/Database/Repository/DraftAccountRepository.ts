@@ -11,6 +11,7 @@ import {
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {LegalEntitiesDraftAccount} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 import {Selectable} from "kysely";
+import {DraftsList} from "LegalEntities/UseCases/DraftAccountQuery";
 
 export class DraftAccountRepository {
     public static getClassName = (): string => "DraftAccountRepository";
@@ -36,6 +37,24 @@ export class DraftAccountRepository {
         }
 
         return data.map((draft: Selectable<LegalEntitiesDraftAccount>) => DraftAccount.create(draft as DraftInput))
+    }
+
+    async getAllActiveDraftsIds(profileId: string): Promise<DraftsList> {
+        const data = await this.databaseAdapterProvider.provide()
+            .selectFrom(legalEntitiesDraftAccountTable)
+            .select(['draftId', 'accountType'])
+            .where('state', '=', DraftAccountState.ACTIVE)
+            .where('profileId', '=', profileId)
+            .execute();
+
+        if (!data) {
+            return [];
+        }
+
+        return data.map((draft) => ({
+            id: draft.draftId,
+            type: draft.accountType as DraftAccountType
+        }));
     }
 
     async storeDraft(draft: DraftAccount): Promise<boolean> {
@@ -68,15 +87,34 @@ export class DraftAccountRepository {
         }
     }
 
-    async getDraftForProfile<DraftAccountType>(profileId: string, draftAccountId: string): Promise<DraftAccountType> {
-        const draft = await this.databaseAdapterProvider.provide()
-            .selectFrom(legalEntitiesDraftAccountTable)
-            .select(['profileId', 'draftId', 'state', 'accountType', 'data'])
-            .where('profileId', '=', profileId)
-            .where('draftId', '=', draftAccountId)
-            .limit(1)
-            .executeTakeFirstOrThrow();
+    async getDraftForProfile<DraftAccountType extends DraftAccount>(profileId: string, draftAccountId: string): Promise<DraftAccountType | never> {
+        try {
+            const draft = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesDraftAccountTable)
+                .select(['profileId', 'draftId', 'state', 'accountType', 'data'])
+                .where('profileId', '=', profileId)
+                .where('draftId', '=', draftAccountId)
+                .limit(1)
+                .executeTakeFirstOrThrow();
 
-        return DraftAccount.create(draft as DraftInput) as DraftAccountType;
+            return DraftAccount.create(draft as DraftInput) as DraftAccountType;
+        } catch (error: any) {
+            throw new Error('DRAFT_NOT_EXIST');
+        }
+    }
+
+    async removeDraft(profileId: string, draftId: string): Promise<boolean> {
+        try {
+            await this.databaseAdapterProvider.provide()
+                .deleteFrom(legalEntitiesDraftAccountTable)
+                .where('profileId', '=', profileId)
+                .where('draftId', '=', draftId)
+                .execute();
+
+            return true;
+        } catch (error: any) {
+            console.log(error);
+            return false;
+        }
     }
 }

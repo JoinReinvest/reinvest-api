@@ -21,10 +21,6 @@ export class SimpleAggregate implements Aggregate {
         return (new this(aggregateState)) as InstanceType<T>;
     }
 
-    public static restoreAggregate<T extends typeof SimpleAggregate>(this: T, state: AggregateState): InstanceType<T> {
-        return (new this(state)) as InstanceType<T>;
-    }
-
     protected getState(key: string) {
         return key in this.aggregate.state ? this.aggregate.state[key] : null;
     }
