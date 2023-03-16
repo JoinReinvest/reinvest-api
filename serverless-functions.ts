@@ -21,6 +21,7 @@ import {
     UnauthorizedEndpointsFunction,
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
+import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -74,6 +75,7 @@ const serverlessConfiguration: AWS = {
         // queue: QueueFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
+        tests: TestsFunction,
     },
     resources: {
         Description: "REINVEST ${sls:stage} API functions",
@@ -85,6 +87,7 @@ const serverlessConfiguration: AWS = {
             ...ExplorerLambdaResources,
             ...MigrationLambdaResources,
             ...UnauthorizedEndpointsLambdaResources,
+            ...TestsLambdaResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,

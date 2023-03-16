@@ -28,6 +28,7 @@ import {
     UnauthorizedEndpointsFunction,
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
+import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-local",
@@ -78,7 +79,8 @@ const serverlessConfiguration: AWS = {
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         localSignUp: LocalSignUpLambdaFunction,
-        unauthorizedEndpoints: UnauthorizedEndpointsFunction
+        unauthorizedEndpoints: UnauthorizedEndpointsFunction,
+        tests: TestsFunction,
     },
     resources: {
         Resources: {
@@ -95,6 +97,7 @@ const serverlessConfiguration: AWS = {
             ...QueueResources,
             ...LocalSignUpLambdaResources,
             ...SesResources,
+            ...TestsLambdaResources,
         },
         Outputs: {
             ...CognitoOutputs,
