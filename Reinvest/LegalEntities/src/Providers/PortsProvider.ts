@@ -10,6 +10,8 @@ import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount"
 import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
 import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
+import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
+import {ReadAccountController} from "LegalEntities/Port/Api/ReadAccountController";
 
 export class PortsProvider {
     private config: LegalEntities.Config;
@@ -22,7 +24,8 @@ export class PortsProvider {
         //controllers
         container
             .addClass(CompleteProfileController, [ProfileRepository])
-            .addClass(GetProfileController, [ProfileRepository, DocumentsService])
+            .addClass(GetProfileController, [ProfileRepository])
+            .addClass(ReadAccountController, [AccountRepository, DocumentsService])
             .addClass(DraftAccountsController, [CreateDraftAccount, CompleteDraftAccount, DraftAccountQuery, TransformDraftAccountIntoRegularAccount, RemoveDraftAccount])
         ;
     }

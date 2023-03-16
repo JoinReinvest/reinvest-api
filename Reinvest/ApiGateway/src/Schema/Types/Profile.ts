@@ -4,6 +4,7 @@ import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileContro
 import {ApolloError} from "apollo-server-errors";
 import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
 import {GraphQLError} from "graphql";
+import {InvestmentAccounts} from "InvestmentAccounts/index";
 
 const schema = `
     #graphql
@@ -72,8 +73,8 @@ const schema = `
     type Query {
         """Get user profile"""
         getProfile: Profile
-        """[MOCK]"""
-        canOpenAccount(accountType: AccountType): Boolean
+        """Returns list of account types that user can open"""
+        listAccountTypesUserCanOpen: [AccountType]
     }
 
     type Mutation {
@@ -108,10 +109,13 @@ export const Profile = {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 return api.getProfile(profileId);
             },
-            canOpenAccount: async (parent: any,
-                                   data: undefined,
-                                   {profileId, modules}: SessionContext
-            ) => true
+            listAccountTypesUserCanOpen: async (parent: any,
+                                                data: undefined,
+                                                {profileId, modules}: SessionContext
+            ) => {
+                const api = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
+                return api.listAccountTypesUserCanOpen(profileId);
+            },
         },
         Mutation: {
             completeProfileDetails: async (parent: any,

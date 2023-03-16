@@ -15,7 +15,7 @@ const sharedSchema = `
 
     type DraftAccount {
         id: ID
-        type: AccountType
+        type: DraftAccountType
     }
 
     enum DraftAccountState {
@@ -36,7 +36,7 @@ const sharedSchema = `
         Create draft of an account to fulfill with data before open it.
         You can have only one draft account created of a specific type in the same time.
         """
-        createDraftAccount(type: AccountType): DraftAccount
+        createDraftAccount(type: DraftAccountType): DraftAccount
         "Remove draft account"
         removeDraftAccount(draftAccountId: ID): Boolean
     }
