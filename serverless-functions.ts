@@ -50,7 +50,8 @@ const serverlessConfiguration: AWS = {
             WEB_APP_URL: "${env:WEB_APP_URL}",
             INFRASTRUCTURE_AWS_REGION: "${aws:region}",
             POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
-            POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}"
+            POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}",
+            EMAIL_DOMAIN: "devkick.pl", // todo change to env
         },
         apiGateway: {
             minimumCompressionSize: 1024,

@@ -5,7 +5,7 @@ import {LegalEntities} from "LegalEntities/index";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {
     COGNITO_CONFIG,
-    DATABASE_CONFIG,
+    DATABASE_CONFIG, EMAIL_DOMAIN,
     NORTH_CAPITAL_CONFIG,
     S3_CONFIG,
     SNS_CONFIG, SQS_CONFIG,
@@ -75,6 +75,7 @@ export function boot(): Modules {
         Registration.create({
             database: databaseConfig,
             northCapital: NORTH_CAPITAL_CONFIG,
+            emailDomain: EMAIL_DOMAIN,
         } as Registration.Config, {
             legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
         })

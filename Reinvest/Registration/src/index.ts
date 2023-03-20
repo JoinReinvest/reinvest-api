@@ -1,5 +1,6 @@
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import Container, {ContainerInterface} from "Container/Container";
+import * as RegistrationMigrations from "../migrations";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {registrationApi, RegistrationApiType} from "Registration/Port/Api/RegistrationApiType";
 import {
@@ -15,6 +16,7 @@ export namespace Registration {
     export const moduleName = "Registration";
     export type Config = {
         database: PostgreSQLConfig;
+        emailDomain: string;
         northCapital: {
             CLIENT_ID: string,
             DEVELOPER_API_KEY: string,
@@ -71,7 +73,7 @@ export namespace Registration {
         }
 
         migration(): any {
-            throw new Error('not implemented');
+            return RegistrationMigrations;
         }
 
         async close(): Promise<void> {

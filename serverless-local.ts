@@ -29,6 +29,7 @@ import {
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
 import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
+import {EMAIL_DOMAIN} from "Reinvest/config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-local",

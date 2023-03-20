@@ -1,6 +1,7 @@
 import {ContainerInterface} from "Container/Container";
 import {Registration} from "Registration/index";
 import {ProfileCompletedEventHandler} from "Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler";
+import {MappingRegistryRepository} from "Registration/Adapter/Database/Repository/MappingRegistryRepository";
 
 
 export class PortsProvider {
@@ -12,7 +13,7 @@ export class PortsProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addSingleton(ProfileCompletedEventHandler)
+            .addSingleton(ProfileCompletedEventHandler, [MappingRegistryRepository])
         ;
     }
 }
