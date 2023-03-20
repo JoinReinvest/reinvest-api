@@ -12,6 +12,7 @@ import {
     importVpcRef,
 } from "../../serverless/vpc";
 import {SMSPolicy} from "../../serverless/sns";
+import {SQSSendPolicy} from "../queue/queue-config";
 
 export const ApiLambdaFunction = {
     handler: `devops/functions/api/handler.main`,
@@ -59,6 +60,7 @@ export const ApiLambdaResources = {
                             ...EniPolicies,
                             ...S3PoliciesWithImport,
                             ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
+                            ...SQSSendPolicy,
                             SMSPolicy
                         ],
                     },

@@ -8,13 +8,14 @@ import {
     DATABASE_CONFIG,
     NORTH_CAPITAL_CONFIG,
     S3_CONFIG,
-    SNS_CONFIG,
+    SNS_CONFIG, SQS_CONFIG,
     WEB_APP_URL
 } from "Reinvest/config";
 import {Documents} from "Documents/index";
 import {Registration} from "Reinvest/Registration/src";
 import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
 import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
+import {QueueConfig} from "shared/hkek-sqs/QueueSender";
 
 export function boot(): Modules {
     const modules = new Modules();
@@ -23,6 +24,7 @@ export function boot(): Modules {
     const s3Config = S3_CONFIG;
     const snsConfig = SNS_CONFIG as SNSConfig;
     const cognitoConfig = COGNITO_CONFIG as CognitoConfig;
+    const queueConfig = SQS_CONFIG as QueueConfig;
     // Investments.boot({
     //   database: {
     //     connectionString: "connection-string-test",
@@ -61,6 +63,7 @@ export function boot(): Modules {
         LegalEntities.moduleName,
         LegalEntities.create({
             database: databaseConfig,
+            queue: queueConfig,
         } as LegalEntities.Config, {
             documents: modules.get(Documents.moduleName) as Documents.Main,
             investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main

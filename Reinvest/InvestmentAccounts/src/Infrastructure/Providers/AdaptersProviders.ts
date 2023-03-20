@@ -10,8 +10,6 @@ import {AggregateRepository} from "SimpleAggregator/Storage/AggregateRepository"
 import {ProfileRepository} from "InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
-import {DatabaseProvider} from "PostgreSQL/DatabaseProvider";
-import {DatabaseAdapterProvider, IdentityDatabase} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 
 export default class AdaptersProviders {
     private config: InvestmentAccounts.Config;

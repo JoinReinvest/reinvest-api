@@ -1,12 +1,11 @@
 import {ContainerInterface} from "Container/Container";
+import {ProfileCompletedEventHandler} from "Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler";
 
 export type RegistrationTechnicalHandlerType = {
-    ProfileCreated: () => void,
+    LegalProfileCompleted: () => ProfileCompletedEventHandler['handle'],
 }
 
 
 export const registrationTechnicalHandler = (container: ContainerInterface): RegistrationTechnicalHandlerType => ({
-    ProfileCreated: (): void => {
-        console.log('profile created testss - identity')
-    }
+    LegalProfileCompleted: container.delegateTo(ProfileCompletedEventHandler, 'handle')
 })

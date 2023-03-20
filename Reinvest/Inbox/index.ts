@@ -13,7 +13,7 @@ export class Inbox {
             const messageId = record.messageId;
             const message = JSON.parse(record.body);
             const kind = message.kind;
-            // console.log({kind, message, messageId});
+            console.log({kind, message, messageId});
             for (let module of this.modules.iterate()) {
                 if (module.isHandleEvent(kind)) {
                     module.technicalEventHandler()[kind](message);

@@ -12,11 +12,11 @@ import {
 } from "./devops/serverless/serverless-common";
 import {ApiLambdaFunction, ApiLambdaResources} from "./devops/functions/api/api-config";
 import {ExplorerLambdaFunction, ExplorerLambdaResources} from "./devops/functions/explorer/explorer-config";
-import {QueueFunction} from "./devops/functions/queue/queue-config";
+import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
-import {importOutput} from "./devops/serverless/utils";
+import {getAttribute, importOutput} from "./devops/serverless/utils";
 import {
     UnauthorizedEndpointsFunction,
     UnauthorizedEndpointsLambdaResources
@@ -44,6 +44,7 @@ const serverlessConfiguration: AWS = {
             CognitoUserPoolID: importOutput('CognitoUserPoolID'),
             S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
             S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
+            SQS_QUEUE_URL: getAttribute("SQSNotification", "QueueUrl"),
             EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
             EMAIL_REPLY_TO: "${env:EMAIL_REPLY_TO}",
             WEB_APP_URL: "${env:WEB_APP_URL}",
@@ -72,7 +73,7 @@ const serverlessConfiguration: AWS = {
         explorer: ExplorerLambdaFunction,
         migration: MigrationLambdaFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
-        // queue: QueueFunction,
+        queue: QueueFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         tests: TestsFunction,
@@ -86,6 +87,7 @@ const serverlessConfiguration: AWS = {
             ...ApiLambdaResources,
             ...ExplorerLambdaResources,
             ...MigrationLambdaResources,
+            ...QueueResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...TestsLambdaResources,
         },
@@ -120,6 +122,7 @@ const serverlessConfiguration: AWS = {
                 LocalCognitoClientId: "LocalCognitoClientId",
                 LocalHostedUiUrl: "LocalHostedUiUrl",
                 WebsiteHostedUiUrl: "WebsiteHostedUiUrl",
+                SQS_QUEUE_URL: "SQSQueueUrl",
             }
         },
     },

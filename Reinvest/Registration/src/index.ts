@@ -1,12 +1,15 @@
 import {Api, EventHandler, Module} from "Reinvest/Modules";
 import Container, {ContainerInterface} from "Container/Container";
-import {LegalEntities} from "LegalEntities/index";
 import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {registrationApi, RegistrationApiType} from "Reinvest/Registration/src/Port/Api/RegistrationApiType";
+import {registrationApi, RegistrationApiType} from "Registration/Port/Api/RegistrationApiType";
 import {
     registrationTechnicalHandler,
     RegistrationTechnicalHandlerType
-} from "Reinvest/Registration/src/Port/Queue/RegistrationTechnicalHandlerType";
+} from "Registration/Port/Queue/RegistrationTechnicalHandlerType";
+import EventBusProvider from "Registration/Providers/EventBusProvider";
+import {LegalEntities} from "LegalEntities/index";
+import {AdapterServiceProvider} from "Registration/Providers/AdapterServiceProvider";
+import {PortsProvider} from "Registration/Providers/PortsProvider";
 
 export namespace Registration {
     export const moduleName = "Registration";
@@ -45,9 +48,9 @@ export namespace Registration {
             }
 
             this.container.addAsValue('LegalEntities', this.modules.legalEntities);
-            // new AdapterServiceProvider(this.config).boot(this.container);
-            // new ServicesProvider(this.config).boot(this.container);
-            // new PortsProvider(this.config).boot(this.container);
+            new AdapterServiceProvider(this.config).boot(this.container);
+            new EventBusProvider(this.config).boot(this.container);
+            new PortsProvider(this.config).boot(this.container);
 
             this.booted = true;
         }

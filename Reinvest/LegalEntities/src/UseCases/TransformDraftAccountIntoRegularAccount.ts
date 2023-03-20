@@ -47,7 +47,7 @@ export class TransformDraftAccountIntoRegularAccount {
         }
     }
 
-    private async openIndividualAccount(draftAccount: IndividualDraftAccount): Promise<boolean> {
+    private async openIndividualAccount(draftAccount: IndividualDraftAccount): Promise<void> {
         const {profileId, draftId} = draftAccount.toObject();
         const accountOpened = await this.investmentAccountService.openAccount(profileId, draftId, AccountType.INDIVIDUAL);
         if (!accountOpened) {
