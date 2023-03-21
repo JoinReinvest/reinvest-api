@@ -35,7 +35,7 @@ const CorsConfiguration = {
         CorsRules: [
             {
                 AllowedHeaders: ["*"],
-                AllowedMethods: ["GET", "HEAD"],
+                AllowedMethods: ["GET", "PUT", "HEAD"],
                 AllowedOrigins: ["*"],
             },
         ],
