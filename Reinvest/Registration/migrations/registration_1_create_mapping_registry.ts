@@ -16,6 +16,7 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
         .addColumn('createdDate', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
         .addColumn('updatedDate', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
         .addColumn('lockedUntil', 'timestamp', col => col.defaultTo(null))
+        .addUniqueConstraint('profile_external_ids_unique', ['profileId', 'externalId'])
         .execute();
 
     await db.schema.createIndex('registration_index').on(RegistrationMappingRegistryTable).columns(['profileId', 'externalId']).execute();

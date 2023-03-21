@@ -5,6 +5,10 @@ import {
 } from "Registration/Adapter/Database/DatabaseAdapter";
 import {MappedType} from "Registration/Common/MappedType";
 import {EmailCreator} from "Registration/Common/EmailCreator";
+import {
+    InsertableMappingRegistry,
+    MappingRegistryInsert
+} from "Registration/Adapter/Database/RegistrationSchema";
 
 export class MappingRegistryRepository {
     public static getClassName = (): string => "MappingRegistryRepository";
@@ -25,13 +29,17 @@ export class MappingRegistryRepository {
         // close connection
         await this.databaseAdapterProvider.provide()
             .insertInto(RegistrationMappingRegistryTable)
-            .values({
+            .values(<InsertableMappingRegistry>{
                 recordId: this.idGenerator.createUuid(),
                 profileId,
                 externalId,
                 mappedType,
-                email
+                email,
             })
+            .onConflict((oc) => oc
+                .constraint('profile_external_ids_unique')
+                .doNothing()
+            )
             .execute()
         ;
 
