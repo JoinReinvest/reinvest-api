@@ -11,18 +11,15 @@ import EventBusProvider from "Registration/Providers/EventBusProvider";
 import {LegalEntities} from "LegalEntities/index";
 import {AdapterServiceProvider} from "Registration/Providers/AdapterServiceProvider";
 import {PortsProvider} from "Registration/Providers/PortsProvider";
+import {IntegrationServiceProvider} from "Registration/Providers/IntegrationServiceProvider";
+import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
 
 export namespace Registration {
     export const moduleName = "Registration";
     export type Config = {
         database: PostgreSQLConfig;
         emailDomain: string;
-        northCapital: {
-            CLIENT_ID: string,
-            DEVELOPER_API_KEY: string,
-            API_URL: string,
-            OFFERING_ID: string,
-        }
+        northCapital: NorthCapitalConfig;
     };
 
     export type ModulesDependencies = {
@@ -51,6 +48,7 @@ export namespace Registration {
 
             this.container.addAsValue('LegalEntities', this.modules.legalEntities);
             new AdapterServiceProvider(this.config).boot(this.container);
+            new IntegrationServiceProvider(this.config).boot(this.container);
             new EventBusProvider(this.config).boot(this.container);
             new PortsProvider(this.config).boot(this.container);
 

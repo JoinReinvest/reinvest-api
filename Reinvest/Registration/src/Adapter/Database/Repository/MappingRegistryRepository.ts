@@ -1,14 +1,17 @@
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 import {
     RegistrationDatabaseAdapterProvider,
-    RegistrationMappingRegistryTable
+    registrationMappingRegistryTable
 } from "Registration/Adapter/Database/DatabaseAdapter";
-import {MappedType} from "Registration/Common/MappedType";
-import {EmailCreator} from "Registration/Common/EmailCreator";
 import {
     InsertableMappingRegistry,
-    MappingRegistryInsert
+    SelectableMappedRecord
 } from "Registration/Adapter/Database/RegistrationSchema";
+import {MappedRecordStatus, MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+import {EmailCreator} from "Registration/Domain/EmailCreator";
+import {MappedRecord, MappedRecordType} from "Registration/Domain/Model/Mapping/MappedRecord";
+
+const LOCK_TIME_SECONDS = 30;
 
 export class MappingRegistryRepository {
     public static getClassName = (): string => "MappingRegistryRepository";
@@ -23,14 +26,15 @@ export class MappingRegistryRepository {
         this.emailCreator = emailCreator;
     }
 
-    async addRecord(profileId: string, externalId: string, mappedType: MappedType): Promise<void> {
+    async addRecord(profileId: string, externalId: string, mappedType: MappedType): Promise<MappedRecord> {
         const email = this.emailCreator.create(profileId, externalId, mappedType);
-        // overload the method
         // close connection
+        let recordId = this.idGenerator.createUuid();
+
         await this.databaseAdapterProvider.provide()
-            .insertInto(RegistrationMappingRegistryTable)
+            .insertInto(registrationMappingRegistryTable)
             .values(<InsertableMappingRegistry>{
-                recordId: this.idGenerator.createUuid(),
+                recordId,
                 profileId,
                 externalId,
                 mappedType,
@@ -43,6 +47,93 @@ export class MappingRegistryRepository {
             .execute()
         ;
 
+        return this.getRecordByProfileAndExternalId(profileId, externalId);
     }
 
+    async getRecordByProfileAndExternalId(profileId: string, externalId: string): Promise<MappedRecord> {
+        const data = await this.databaseAdapterProvider.provide()
+            .selectFrom(registrationMappingRegistryTable)
+            .select(['recordId', 'profileId', 'externalId', 'mappedType', 'email', 'status', 'version'])
+            .where('profileId', '=', profileId)
+            .where('externalId', '=', externalId)
+            .limit(1)
+            .executeTakeFirstOrThrow() as SelectableMappedRecord as MappedRecordType;
+
+        return MappedRecord.create(data);
+    }
+
+    async lockRecord(record: MappedRecord) {
+        const lockedUntil = new Date();
+        lockedUntil.setSeconds(lockedUntil.getSeconds() + LOCK_TIME_SECONDS);
+        const currentVersion = record.getVersion();
+        try {
+            await this.databaseAdapterProvider.provide()
+                .updateTable(registrationMappingRegistryTable)
+                .set({lockedUntil})
+                .where('recordId', '=', record.getRecordId())
+                .where('version', '=', currentVersion)
+                .where(qb => qb
+                    .where('lockedUntil', '<=', new Date())
+                    .orWhere('lockedUntil', 'is', null)
+                )
+                .returning(['lockedUntil'])
+                .executeTakeFirstOrThrow();
+            return true;
+        } catch (error: any) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    async setClean(record: MappedRecord) {
+        const updatedDate = new Date();
+        const currentVersion = record.getVersion();
+        const nextVersion = record.getNextVersion();
+
+        try {
+            await this.databaseAdapterProvider.provide()
+                .updateTable(registrationMappingRegistryTable)
+                .set({
+                    status: MappedRecordStatus.CLEAN,
+                    version: nextVersion,
+                    updatedDate,
+                    lockedUntil: null
+                })
+                .where('recordId', '=', record.getRecordId())
+                .where('version', '=', currentVersion)
+                .returning(['version'])
+                .executeTakeFirstOrThrow();
+            return true;
+        } catch (error: any) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    /**
+     * Set dirty and clear lock - it expropriates all other operations on this record
+     * @param record
+     */
+    async setDirty(record: MappedRecord) {
+        const updatedDate = new Date();
+        const nextVersion = record.getNextVersion();
+
+        try {
+            await this.databaseAdapterProvider.provide()
+                .updateTable(registrationMappingRegistryTable)
+                .set({
+                    status: MappedRecordStatus.DIRTY,
+                    version: nextVersion,
+                    lockedUntil: null,
+                    updatedDate
+                })
+                .where('recordId', '=', record.getRecordId())
+                .returning(['version'])
+                .executeTakeFirstOrThrow();
+            return true;
+        } catch (error: any) {
+            console.log(error);
+            return false;
+        }
+    }
 }

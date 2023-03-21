@@ -2,10 +2,10 @@ import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {Kysely} from "kysely";
 import {MappingRegistryTable} from "Registration/Adapter/Database/RegistrationSchema";
 
-export const RegistrationMappingRegistryTable = "registration_mapping_registry";
+export const registrationMappingRegistryTable = "registration_mapping_registry";
 
 export interface RegistrationDatabase {
-    [RegistrationMappingRegistryTable]: MappingRegistryTable,
+    [registrationMappingRegistryTable]: MappingRegistryTable,
 }
 
 export const RegistrationDatabaseAdapterInstanceProvider = "RegistrationDatabaseAdapterProvider";

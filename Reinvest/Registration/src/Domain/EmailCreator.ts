@@ -1,4 +1,4 @@
-import {MappedType} from "Registration/Common/MappedType";
+import {MappedType} from "Registration/Common/Model/Mapping/MappedType";
 
 export class EmailCreator {
     static getClassName = (): string => "EmailCreator";

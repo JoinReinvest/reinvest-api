@@ -6,6 +6,7 @@ import {ReadAccountController} from "LegalEntities/Port/Api/ReadAccountControlle
 
 export type LegalEntitiesApiType = {
     getProfile: GetProfileController["getProfile"],
+    getProfileForSynchronization: GetProfileController["getProfileForSynchronization"],
     completeProfile: CompleteProfileController["completeProfile"],
 
     createDraftAccount: DraftAccountsController["createDraftAccount"],
@@ -21,6 +22,7 @@ export type LegalEntitiesApiType = {
 
 export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesApiType => ({
     getProfile: container.delegateTo(GetProfileController, 'getProfile'),
+    getProfileForSynchronization: container.delegateTo(GetProfileController, 'getProfileForSynchronization'),
     completeProfile: container.delegateTo(CompleteProfileController, 'completeProfile'),
 
     listDrafts: container.delegateTo(DraftAccountsController, 'listDrafts'),

@@ -16,6 +16,7 @@ import {Registration} from "Reinvest/Registration/src";
 import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
 import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
 import {QueueConfig} from "shared/hkek-sqs/QueueSender";
+import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
 
 export function boot(): Modules {
     const modules = new Modules();
@@ -25,6 +26,7 @@ export function boot(): Modules {
     const snsConfig = SNS_CONFIG as SNSConfig;
     const cognitoConfig = COGNITO_CONFIG as CognitoConfig;
     const queueConfig = SQS_CONFIG as QueueConfig;
+    const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
     // Investments.boot({
     //   database: {
     //     connectionString: "connection-string-test",
@@ -74,7 +76,7 @@ export function boot(): Modules {
         Registration.moduleName,
         Registration.create({
             database: databaseConfig,
-            northCapital: NORTH_CAPITAL_CONFIG,
+            northCapital: northCapitalConfig,
             emailDomain: EMAIL_DOMAIN,
         } as Registration.Config, {
             legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,

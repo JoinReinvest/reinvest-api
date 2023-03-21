@@ -1,10 +1,10 @@
 import {Kysely, sql} from 'kysely';
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
-import {RegistrationMappingRegistryTable} from "Registration/Adapter/Database/DatabaseAdapter";
+import {registrationMappingRegistryTable} from "Registration/Adapter/Database/DatabaseAdapter";
 
 export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
     await db.schema
-        .createTable(RegistrationMappingRegistryTable)
+        .createTable(registrationMappingRegistryTable)
         .addColumn('recordId', 'uuid', col => col.primaryKey().notNull().unique())
         .addColumn('profileId', 'uuid', col => col.notNull())
         .addColumn('externalId', 'uuid', col => col.notNull().unique())
@@ -19,10 +19,10 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
         .addUniqueConstraint('profile_external_ids_unique', ['profileId', 'externalId'])
         .execute();
 
-    await db.schema.createIndex('registration_index').on(RegistrationMappingRegistryTable).columns(['profileId', 'externalId']).execute();
+    await db.schema.createIndex('registration_index').on(registrationMappingRegistryTable).columns(['profileId', 'externalId']).execute();
 }
 
 export async function down(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
     await db.schema.dropIndex('registration_index').execute();
-    await db.schema.dropTable(RegistrationMappingRegistryTable).execute();
+    await db.schema.dropTable(registrationMappingRegistryTable).execute();
 }
