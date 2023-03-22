@@ -1,5 +1,6 @@
 export enum MappedType {
-    PROFILE = "PROFILE"
+    PROFILE = "PROFILE",
+    INDIVIDUAL_ACCOUNT = "INDIVIDUAL_ACCOUNT"
 }
 
 export enum MappedRecordStatus {

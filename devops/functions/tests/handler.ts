@@ -61,6 +61,10 @@ router.post("/events", async (req: any, res: any) => {
             case "LegalProfileCompleted":
                 await sendMessage(kind, id, {});
                 break;
+            case "IndividualAccountOpened":
+                const {individualAccountId} = req.body;
+                await sendMessage(kind, id, {individualAccountId});
+                break;
             default:
                 throw new Error("Unknown event");
         }

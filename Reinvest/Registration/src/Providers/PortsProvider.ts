@@ -3,6 +3,10 @@ import {Registration} from "Registration/index";
 import {ProfileCompletedEventHandler} from "Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler";
 import {MappingRegistryRepository} from "Registration/Adapter/Database/Repository/MappingRegistryRepository";
 import {SynchronizeProfile} from "Registration/IntegrationLogic/UseCase/SynchronizeProfile";
+import {
+    IndividualAccountOpenedEventHandler
+} from "Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler";
+import {SynchronizeIndividualAccount} from "Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount";
 
 
 export class PortsProvider {
@@ -15,6 +19,7 @@ export class PortsProvider {
     public boot(container: ContainerInterface) {
         container
             .addSingleton(ProfileCompletedEventHandler, [MappingRegistryRepository, SynchronizeProfile])
+            .addSingleton(IndividualAccountOpenedEventHandler, [MappingRegistryRepository, SynchronizeIndividualAccount])
         ;
     }
 }

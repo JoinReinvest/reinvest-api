@@ -1,6 +1,6 @@
 import {ProfileRepository} from "InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository";
-import Profile from "InvestmentAccounts/Domain/Profile";
-import {ProfileException} from "InvestmentAccounts/Domain/ProfileException";
+import Profile from "InvestmentAccounts/Domain/ProfileAggregate/Profile";
+import {ProfileException} from "InvestmentAccounts/Domain/ProfileAggregate/ProfileException";
 
 class CreateProfile {
     static getClassName = (): string => "CreateProfile";

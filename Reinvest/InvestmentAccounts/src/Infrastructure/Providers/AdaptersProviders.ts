@@ -10,6 +10,8 @@ import {AggregateRepository} from "SimpleAggregator/Storage/AggregateRepository"
 import {ProfileRepository} from "InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
+import {QueueSender} from "shared/hkek-sqs/QueueSender";
+import {SendToQueueEventHandler} from "SimpleAggregator/EventBus/SendToQueueEventHandler";
 
 export default class AdaptersProviders {
     private config: InvestmentAccounts.Config;
@@ -19,7 +21,10 @@ export default class AdaptersProviders {
     }
 
     public boot(container: ContainerInterface) {
-        container.addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container));
+        container
+            .addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container))
+            .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
+            .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
 
         container
             .addAsValue(investmentAccountsDatabaseProviderName, createInvestmentAccountsDatabaseAdapterProvider(this.config.database))

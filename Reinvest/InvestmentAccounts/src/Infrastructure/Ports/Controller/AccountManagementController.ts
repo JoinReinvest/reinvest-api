@@ -1,4 +1,4 @@
-import {AccountType} from "InvestmentAccounts/Domain/AccountType";
+import {AccountType} from "InvestmentAccounts/Domain/ProfileAggregate/AccountType";
 import {OpenAccount} from "InvestmentAccounts/Application/OpenAccount";
 
 export class AccountManagementController {

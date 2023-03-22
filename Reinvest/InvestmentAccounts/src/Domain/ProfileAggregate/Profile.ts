@@ -1,9 +1,9 @@
 import {SimpleAggregate} from "SimpleAggregator/SimpleAggregate";
 import {AggregateState} from "SimpleAggregator/Types";
 
-import {IndividualAccountOpened, ProfileCreated} from "InvestmentAccounts/Domain/ProfileEvents";
-import {ProfileException} from "InvestmentAccounts/Domain/ProfileException";
-import {AccountType} from "InvestmentAccounts/Domain/AccountType";
+import {IndividualAccountOpened, ProfileCreated} from "InvestmentAccounts/Domain/ProfileAggregate/ProfileEvents";
+import {ProfileException} from "InvestmentAccounts/Domain/ProfileAggregate/ProfileException";
+import {AccountType} from "InvestmentAccounts/Domain/ProfileAggregate/AccountType";
 
 const MAX_NUMBER_OF_TRUSTS = 3;
 const MAX_NUMBER_OF_CORPORATES = 3;

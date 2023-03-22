@@ -2,7 +2,7 @@ import {AggregateRepository} from "SimpleAggregator/Storage/AggregateRepository"
 import {AggregateState, DomainEvent} from "SimpleAggregator/Types";
 import {InvestmentAccountDbProvider,} from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
-import Profile from "InvestmentAccounts/Domain/Profile";
+import Profile from "InvestmentAccounts/Domain/ProfileAggregate/Profile";
 import {ProfileSnapshotChanged} from "InvestmentAccounts/Infrastructure/Storage/Queries/Events/ProfileSnapshotChanged";
 import {EventBus} from "SimpleAggregator/EventBus/EventBus";
 

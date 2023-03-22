@@ -1,7 +1,7 @@
 import {ProfileRepository} from "InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository";
-import {ProfileException} from "InvestmentAccounts/Domain/ProfileException";
-import {AccountType} from "InvestmentAccounts/Domain/AccountType";
-import Profile from "InvestmentAccounts/Domain/Profile";
+import {ProfileException} from "InvestmentAccounts/Domain/ProfileAggregate/ProfileException";
+import {AccountType} from "InvestmentAccounts/Domain/ProfileAggregate/AccountType";
+import Profile from "InvestmentAccounts/Domain/ProfileAggregate/Profile";
 
 export class OpenAccount {
     static getClassName = (): string => "OpenAccount";

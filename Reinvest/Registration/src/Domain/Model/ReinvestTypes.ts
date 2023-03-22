@@ -4,6 +4,13 @@ export enum DomicileType {
     VISA = "VISA",
 }
 
+export enum EmploymentStatusType {
+    EMPLOYED = "EMPLOYED",
+    UNEMPLOYED = "UNEMPLOYED",
+    RETIRED = "RETIRED",
+    STUDENT = "STUDENT",
+}
+
 export type Address = {
     addressLine1: string
     addressLine2?: string
