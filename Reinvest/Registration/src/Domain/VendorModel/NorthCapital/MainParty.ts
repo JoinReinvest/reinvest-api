@@ -2,6 +2,7 @@ import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
 import {CrcService} from "Registration/IntegrationLogic/Service/CrcService";
 import {DomicileMapper} from "Registration/Domain/VendorModel/NorthCapital/DomicileMapper";
 import {MainPartyType} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
+import DateTime from "date-and-time";
 
 export class MainParty {
     private data: MainPartyType;
@@ -18,11 +19,11 @@ export class MainParty {
         }
 
         return new MainParty({
-            domicile: DomicileMapper.mapDomicile(data.domicile),
             firstName: data.firstName,
             middleInitial: data?.middleName,
             lastName: data.lastName,
-            dob: data.dateOfBirth,
+            domicile: DomicileMapper.mapDomicile(data.domicile),
+            dob: DateTime.format(DateTime.parse(data.dateOfBirth, 'YYYY-MM-DD'), "MM-DD-YYYY"),
             primAddress1: data.address.addressLine1,
             primAddress2: data.address?.addressLine2,
             primCity: data.address.city,
@@ -30,9 +31,13 @@ export class MainParty {
             primZip: data.address.zip,
             primCountry: data.address.country,
             emailAddress: email,
-            socialSecurityNumber: data.ssn ?? "",
+            socialSecurityNumber: data.ssn ?? null,
             documents: data.idScan,
         });
+    }
+
+    getData(): MainPartyType {
+        return this.data;
     }
 
     private generateCrc(data: MainPartyType): string {
@@ -40,7 +45,6 @@ export class MainParty {
             data.domicile,
             data.firstName,
             `${data.middleInitial}`,
-            data.socialSecurityNumber,
             data.lastName,
             data.dob,
             data.primAddress1,
@@ -54,5 +58,17 @@ export class MainParty {
         ];
 
         return CrcService.generateCrc(values);
+    }
+
+    getEmail(): string {
+        return this.data.emailAddress;
+    }
+
+    getLastName() {
+        return this.data.lastName;
+    }
+
+    getCrc(): string {
+        return this.crc;
     }
 }

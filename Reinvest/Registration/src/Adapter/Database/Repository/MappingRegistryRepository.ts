@@ -136,4 +136,22 @@ export class MappingRegistryRepository {
             return false;
         }
     }
+
+    async unlockRecord(record: MappedRecord) {
+        try {
+            await this.databaseAdapterProvider.provide()
+                .updateTable(registrationMappingRegistryTable)
+                .set({
+                    lockedUntil: null,
+                })
+                .where('recordId', '=', record.getRecordId())
+                .where('version', '=', record.getVersion())
+                .returning(['version'])
+                .executeTakeFirstOrThrow();
+            return true;
+        } catch (error: any) {
+            console.log(error);
+            return false;
+        }
+    }
 }

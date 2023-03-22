@@ -12,7 +12,7 @@
       "SimpleAggregator/*": ["./shared/hkek-simple-aggregator/*"],
       "Container/*": ["./shared/hkek-container/*"],
       "IdGenerator/*": ["./shared/hkek-id-generator/*"],
-      "TechnicalEvents/*": ["./shared/hkek-technical-events/*"],
+      "HKEKTypes/*": ["./shared/hkek-types/*"],
 
       "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
       "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],

@@ -10,6 +10,9 @@ import {LegalEntitiesService} from "Registration/Adapter/Modules/LegalEntitiesSe
 import {EmailCreator} from "Registration/Domain/EmailCreator";
 import {NorthCapitalAdapter} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
 import {NorthCapitalSynchronizer} from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizer";
+import {
+    NorthCapitalSynchronizationRepository
+} from "Registration/Adapter/Database/Repository/NorthCapitalSynchronizationRepository";
 
 export class AdapterServiceProvider {
     private config: Registration.Config;
@@ -27,6 +30,7 @@ export class AdapterServiceProvider {
         container
             .addAsValue(RegistrationDatabaseAdapterInstanceProvider, createRegistrationDatabaseAdapterProvider(this.config.database))
             .addSingleton(MappingRegistryRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator, EmailCreator])
+            .addSingleton(NorthCapitalSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
         ;
 
         container
@@ -36,7 +40,7 @@ export class AdapterServiceProvider {
         container
             .addAsValue("NorthCapitalConfig", this.config.northCapital)
             .addSingleton(NorthCapitalAdapter, ["NorthCapitalConfig"])
-            .addSingleton(NorthCapitalSynchronizer, [NorthCapitalAdapter])
+            .addSingleton(NorthCapitalSynchronizer, [NorthCapitalAdapter, NorthCapitalSynchronizationRepository])
         ;
 
     }

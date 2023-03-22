@@ -1,6 +1,5 @@
-import {ProfileForSynchronization} from "Registration/Common/Model/SharedTypes";
 import {LegalEntities} from "LegalEntities/index";
-
+import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
 
 /**
  * Legal Entities Module ACL
@@ -13,9 +12,9 @@ export class LegalEntitiesService {
         this.legalEntitiesModule = legalEntitiesModule;
     }
 
-    async getProfile(profileId: string): Promise<ProfileForSynchronization> {
+    async getProfile(profileId: string): Promise<ProfileForSynchronization | null> {
         const api = this.legalEntitiesModule.api();
 
-        return await api.getProfileForSynchronization(profileId) as ProfileForSynchronization;
+        return await api.getProfileForSynchronization(profileId) as ProfileForSynchronization | null
     }
 }

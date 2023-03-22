@@ -25,15 +25,17 @@ export class SynchronizeProfile extends AbstractSynchronize {
             return;
         }
 
-        console.log(`Synchronization of recordId: ${record.getRecordId()}`);
+        console.log(`Synchronization of the recordId: ${record.getRecordId()}`);
         const profile = await this.legalEntitiesService.getProfile(record.getProfileId());
+        if (profile === null) {
+            console.error(`Profile not found: ${record.getProfileId()}`);
+            await this.unlockExecution(record);
+            return;
+        }
+
         const northCapitalMainParty = NorthCapitalMapper.mapProfile(profile, record.getEmail());
-        await this.northCapitalSynchronizer.synchronizeMainParty(northCapitalMainParty);
+        await this.northCapitalSynchronizer.synchronizeMainParty(record.getRecordId(), northCapitalMainParty);
 
-
-        // compare and store crc in the db
-        // synchronize party with North Capital
-
-        await this.unlockExecution(record)
+        await this.setCleanAndUnlockExecution(record)
     }
 }

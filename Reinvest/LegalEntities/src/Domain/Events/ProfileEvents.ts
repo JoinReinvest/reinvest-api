@@ -4,9 +4,6 @@ import {
 
 export type LegalProfileCompleted = DomainEvent & {
     kind: "LegalProfileCompleted",
-    data: {
-        profileId: string
-    }
 }
 
 

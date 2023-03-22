@@ -17,6 +17,6 @@ export type MainPartyType = {
     primZip: string,
     primCountry: string,
     emailAddress: string,
-    socialSecurityNumber: string,
+    socialSecurityNumber: string | null,
     documents?: { id: string }[],
 }

@@ -35,11 +35,11 @@ export class CompleteProfile {
         let profile = await this.profileRepository.findOrCreateProfile(profileId);
         const events = [];
         const errors = [];
-        // if (profile.isCompleted()) {
-        //     errors.push("PROFILE_ALREADY_COMPLETED");
-        //
-        //     return errors;
-        // }
+        if (profile.isCompleted()) {
+            errors.push("PROFILE_ALREADY_COMPLETED");
+
+            return errors;
+        }
 
         for (const step of Object.keys(input)) {
             try {
@@ -103,10 +103,8 @@ export class CompleteProfile {
             if (profile.verifyCompletion()) {
                 profile.setAsCompleted();
                 events.push(<LegalProfileCompleted>{
+                    id: profileId,
                     kind: "LegalProfileCompleted",
-                    data: {
-                        profileId: profileId
-                    }
                 });
             } else {
                 errors.push('Profile completion verification failed');

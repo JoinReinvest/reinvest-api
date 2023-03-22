@@ -10,16 +10,25 @@ export abstract class AbstractSynchronize {
 
     protected async lockExecution(record: MappedRecord): Promise<boolean> {
         if (!await this.mappingRegistryRepository.lockRecord(record)) {
-            console.log(`Record ${record.getRecordId()} is locked1`);
+            console.warn(`Record ${record.getRecordId()} is locked`);
             return false;
         }
-        console.log(`Record ${record.getRecordId()} is locked2`);
+
+        return true;
+    }
+
+    protected async setCleanAndUnlockExecution(record: MappedRecord): Promise<boolean> {
+        if (!await this.mappingRegistryRepository.setClean(record)) {
+            console.warn(`Failed to set clean: ${record.getRecordId()}`);
+            return false;
+        }
+
         return true;
     }
 
     protected async unlockExecution(record: MappedRecord): Promise<boolean> {
-        if (!await this.mappingRegistryRepository.setClean(record)) {
-            console.log('Failed to set clean');
+        if (!await this.mappingRegistryRepository.unlockRecord(record)) {
+            console.warn(`Failed to unlock record: ${record.getRecordId()}`);
             return false;
         }
 
