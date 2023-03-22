@@ -1,6 +1,13 @@
 # REINVEST API CHANGELOG
 
-## 1.0.3 - current
+## 1.0.3 - 03/22/2023
+
+* Handling `LegalProfileCompleted` event
+* North Capital Main Party synchronization
+    - synchronization locking
+    - calculating checksum of changes
+    - North Capital Main party create
+    - North Capital Main party update
 
 ## 1.0.2 - 03/16/2023
 
