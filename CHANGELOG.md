@@ -8,6 +8,9 @@
     - calculating checksum of changes
     - North Capital Main party create
     - North Capital Main party update
+* [TEST] Tests endpoints:
+    - trigger `LegalProfileCompleted` event by `POST /tests/events`
+    - return SMS TOPT token by `POST /tests/get-sms-topt`
 
 ## 1.0.2 - 03/16/2023
 
