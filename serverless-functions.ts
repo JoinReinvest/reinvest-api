@@ -51,7 +51,11 @@ const serverlessConfiguration: AWS = {
             INFRASTRUCTURE_AWS_REGION: "${aws:region}",
             POSTGRESQL_USER: "${env:POSTGRESQL_USER}",
             POSTGRESQL_PASSWORD: "${env:POSTGRESQL_PASSWORD}",
-            EMAIL_DOMAIN: "devkick.pl", // todo change to env
+            EMAIL_DOMAIN: "${env:EMAIL_DOMAIN}",
+            NORTH_CAPITAL_CLIENT_ID: "${env:NORTH_CAPITAL_CLIENT_ID}",
+            NORTH_CAPITAL_DEVELOPER_API_KEY: "${env:NORTH_CAPITAL_DEVELOPER_API_KEY}",
+            NORTH_CAPITAL_API_URL: "${env:NORTH_CAPITAL_API_URL}",
+            NORTH_CAPITAL_OFFERING_ID: "${env:NORTH_CAPITAL_OFFERING_ID}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,
