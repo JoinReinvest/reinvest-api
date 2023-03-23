@@ -156,6 +156,14 @@ export class Profile {
 
     }
 
+    exposeSSN(): string | null {
+        try {
+            return this.ssn ? this.ssn.decrypt() : null;
+        } catch (error: any) {
+            return null
+        }
+    }
+
     toObject(): ProfileSchema {
         return {
             profileId: this.profileId,

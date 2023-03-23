@@ -1,5 +1,26 @@
 # REINVEST API CHANGELOG
 
+## 1.0.4 - 03/23/2023
+
+* Handling `IndividualAccountOpened` event
+* North Capital Individual Account synchronization
+* Linking North Capital Account and the Main Party
+* Extending Main Party with extra investment information (net worth, income, employer, etc.)
+* [TEST] Tests endpoints:
+    - trigger `IndividualAccountOpened` event by `POST /tests/events`
+  
+## 1.0.3 - 03/22/2023
+
+* Handling `LegalProfileCompleted` event
+* North Capital Main Party synchronization
+    - synchronization locking
+    - calculating checksum of changes
+    - North Capital Main party create
+    - North Capital Main party update
+* [TEST] Tests endpoints:
+    - trigger `LegalProfileCompleted` event by `POST /tests/events`
+    - return SMS TOPT token by `POST /tests/get-sms-topt`
+
 ## 1.0.2 - 03/16/2023
 
 * added/implemented queries
@@ -20,6 +41,8 @@
 ## 1.0.1 - 03/13/2023
 
 * AWS Simple Email Service basic integration
+* Added verification of referral code by unauthorized `POST /incentive-token` endpoint
+* Added proper verification of a referral code on sign up
 * Provide invitation links
     * Query: `userInvitationLink: UserInvitationLink`
 * Complete individual draft account

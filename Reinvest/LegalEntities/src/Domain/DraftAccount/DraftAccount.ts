@@ -31,7 +31,7 @@ export type DraftInput = {
     draftId: string,
     state: DraftAccountState,
     accountType: DraftAccountType,
-    data: null | IndividualDraftAccountSchema
+    data: IndividualDraftAccountSchema
 }
 
 
@@ -73,7 +73,7 @@ export abstract class DraftAccount {
             draftId: this.draftId,
             state: this.state,
             accountType: this.accountType,
-            data: null
+            data: {} as IndividualDraftAccountSchema
         };
     }
 

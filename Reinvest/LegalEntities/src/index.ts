@@ -11,11 +11,14 @@ import {PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {AdapterServiceProvider} from "LegalEntities/Providers/AdapterServiceProvider";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {Documents} from "Documents/index";
+import {QueueConfig} from "shared/hkek-sqs/QueueSender";
+import EventBusProvider from "LegalEntities/Providers/EventBusProvider";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
     export type Config = {
-        database: PostgreSQLConfig
+        database: PostgreSQLConfig,
+        queue: QueueConfig,
     };
 
     export type ModulesDependencies = {
@@ -48,6 +51,7 @@ export namespace LegalEntities {
 
             new AdapterServiceProvider(this.config).boot(this.container);
             new PortsProvider(this.config).boot(this.container);
+            new EventBusProvider(this.config).boot(this.container);
 
             this.booted = true;
         }
@@ -72,6 +76,9 @@ export namespace LegalEntities {
         }
 
         async close(): Promise<void> {
+            // if (this.booted) {
+            //     await this.container.getValue<IdentityDatabaseAdapterProvider>(DatabaseAdapterProvider).close();
+            // }
         }
 
     }

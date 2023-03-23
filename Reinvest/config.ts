@@ -39,3 +39,11 @@ export const COGNITO_CONFIG = {
 export const SNS_CONFIG = {
     region: process.env.INFRASTRUCTURE_AWS_REGION as string,
 }
+export const SQS_CONFIG = {
+    region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+    queueUrl: process.env.SQS_QUEUE_URL as string,
+    isLocal: process.env.IT_IS_LOCAL === 'true',
+}
+
+export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
+

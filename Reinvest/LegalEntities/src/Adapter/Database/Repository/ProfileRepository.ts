@@ -9,15 +9,19 @@ import {
     LegalEntitiesProfile
 } from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 import {SSN} from "LegalEntities/Domain/ValueObject/SSN";
+import {DomainEvent} from "SimpleAggregator/Types";
+import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
 
 export class ProfileRepository {
     public static getClassName = (): string => "ProfileRepository";
     private databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider;
     private idGenerator: IdGeneratorInterface;
+    private eventsPublisher: SimpleEventBus;
 
-    constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, uniqueGenerator: IdGeneratorInterface) {
+    constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, uniqueGenerator: IdGeneratorInterface, eventsPublisher: SimpleEventBus) {
         this.databaseAdapterProvider = databaseAdapterProvider;
         this.idGenerator = uniqueGenerator;
+        this.eventsPublisher = eventsPublisher;
     }
 
     private async createProfile(profileId: string, externalId: string | null = null, defaultLabel: string = 'Individual investor') {
@@ -50,7 +54,7 @@ export class ProfileRepository {
         return profile ?? await this.createProfile(profileId);
     }
 
-    async storeProfile(profile: Profile): Promise<void> {
+    async storeProfile(profile: Profile, events: DomainEvent[] = []): Promise<void> {
         const rawProfile = this.prepareProfileForStoring(profile);
 
         await this.databaseAdapterProvider.provide()
@@ -62,6 +66,8 @@ export class ProfileRepository {
             )
             .execute()
         ;
+
+        await this.publishEvents(events);
     }
 
     private prepareProfileForStoring(profile: Profile): LegalEntitiesProfile {
@@ -98,5 +104,13 @@ export class ProfileRepository {
             .executeTakeFirst();
 
         return !isProfileWithTheSSNExist;
+    }
+
+    async publishEvents(events: DomainEvent[] = []): Promise<void> {
+        if (events.length === 0) {
+            return;
+        }
+
+        this.eventsPublisher.publishMany(events);
     }
 }

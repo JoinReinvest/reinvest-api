@@ -12,6 +12,8 @@ import {ReadAccountController} from "LegalEntities/Port/Api/ReadAccountControlle
 import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
 import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
+import {CompleteProfile} from "LegalEntities/UseCases/CompleteProfile";
+import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
 
 
 export class PortsProvider {
@@ -24,7 +26,7 @@ export class PortsProvider {
     public boot(container: ContainerInterface) {
         //controllers
         container
-            .addSingleton(CompleteProfileController, [ProfileRepository])
+            .addSingleton(CompleteProfileController, [CompleteProfile])
             .addSingleton(GetProfileController, [ProfileRepository])
             .addSingleton(ReadAccountController, [AccountRepository, DocumentsService])
             .addSingleton(DraftAccountsController, [CreateDraftAccount, CompleteDraftAccount, DraftAccountQuery, TransformDraftAccountIntoRegularAccount, RemoveDraftAccount])

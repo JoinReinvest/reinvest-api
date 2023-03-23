@@ -6,6 +6,7 @@ import {ReadAccountController} from "LegalEntities/Port/Api/ReadAccountControlle
 
 export type LegalEntitiesApiType = {
     getProfile: GetProfileController["getProfile"],
+    getProfileForSynchronization: GetProfileController["getProfileForSynchronization"],
     completeProfile: CompleteProfileController["completeProfile"],
 
     createDraftAccount: DraftAccountsController["createDraftAccount"],
@@ -16,11 +17,13 @@ export type LegalEntitiesApiType = {
     transformDraftAccountIntoRegularAccount: DraftAccountsController["transformDraftAccountIntoRegularAccount"],
 
     getIndividualAccount: ReadAccountController["getIndividualAccount"],
+    getIndividualAccountForSynchronization: ReadAccountController["getIndividualAccountForSynchronization"],
     getAccountsOverview: ReadAccountController["getAccountsOverview"],
 };
 
 export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesApiType => ({
     getProfile: container.delegateTo(GetProfileController, 'getProfile'),
+    getProfileForSynchronization: container.delegateTo(GetProfileController, 'getProfileForSynchronization'),
     completeProfile: container.delegateTo(CompleteProfileController, 'completeProfile'),
 
     listDrafts: container.delegateTo(DraftAccountsController, 'listDrafts'),
@@ -31,5 +34,6 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
     transformDraftAccountIntoRegularAccount: container.delegateTo(DraftAccountsController, 'transformDraftAccountIntoRegularAccount'),
 
     getIndividualAccount: container.delegateTo(ReadAccountController, 'getIndividualAccount'),
+    getIndividualAccountForSynchronization: container.delegateTo(ReadAccountController, 'getIndividualAccountForSynchronization'),
     getAccountsOverview: container.delegateTo(ReadAccountController, 'getAccountsOverview'),
 });

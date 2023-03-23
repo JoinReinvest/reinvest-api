@@ -36,7 +36,7 @@ export class DraftAccountRepository {
             return [];
         }
 
-        return data.map((draft: Selectable<LegalEntitiesDraftAccount>) => DraftAccount.create(draft as DraftInput))
+        return data.map((draft: Selectable<LegalEntitiesDraftAccount>) => DraftAccount.create(draft as unknown as DraftInput))
     }
 
     async getAllActiveDraftsIds(profileId: string): Promise<DraftsList> {
@@ -97,7 +97,7 @@ export class DraftAccountRepository {
                 .limit(1)
                 .executeTakeFirstOrThrow();
 
-            return DraftAccount.create(draft as DraftInput) as DraftAccountType;
+            return DraftAccount.create(draft as unknown as DraftInput) as DraftAccountType;
         } catch (error: any) {
             throw new Error('DRAFT_NOT_EXIST');
         }

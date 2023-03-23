@@ -1,11 +1,24 @@
 import {
     LegalEntitiesDatabaseAdapterProvider,
-    legalEntitiesIndividualAccountTable,
+    legalEntitiesIndividualAccountTable, legalEntitiesProfileTable,
 } from "LegalEntities/Adapter/Database/DatabaseAdapter";
 
 import {IndividualAccount, IndividualSchema} from "LegalEntities/Domain/Accounts/IndividualAccount";
-import {AccountsOverviewResponse} from "LegalEntities/Port/Api/ReadAccountController";
-import {AccountType} from "LegalEntities/Domain/AccountType";
+import {PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
+import {AddressInput} from "LegalEntities/Domain/ValueObject/Address";
+
+export type IndividualAccountForSynchronization = {
+    accountId: string,
+    profileId: string,
+    name: PersonalNameInput,
+    address: AddressInput,
+    employmentStatus?: string | null,
+    nameOfEmployer?: string | null,
+    title?: string | null,
+    industry?: string | null,
+    netWorth?: string | null,
+    netIncome?: string | null,
+}
 
 export class AccountRepository {
     public static getClassName = (): string => "AccountRepository";
@@ -68,5 +81,51 @@ export class AccountRepository {
             console.error(`Cannot find individual account: ${error.message}`);
             return [];
         }
+    }
+
+    async getIndividualAccountForSynchronization(profileId: string, accountId: string): Promise<IndividualAccountForSynchronization | null> {
+        try {
+            const account = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesIndividualAccountTable)
+                .fullJoin(legalEntitiesProfileTable, `${legalEntitiesProfileTable}.profileId`, `${legalEntitiesIndividualAccountTable}.profileId`)
+                .select([
+                    `${legalEntitiesIndividualAccountTable}.accountId`,
+                    `${legalEntitiesIndividualAccountTable}.profileId`,
+                    `${legalEntitiesIndividualAccountTable}.employmentStatus`,
+                    `${legalEntitiesIndividualAccountTable}.employer`,
+                    `${legalEntitiesIndividualAccountTable}.netWorth`,
+                    `${legalEntitiesIndividualAccountTable}.netIncome`,
+                ])
+                .select([
+                    `${legalEntitiesProfileTable}.name`,
+                    `${legalEntitiesProfileTable}.address`,
+                ])
+                .where(`${legalEntitiesIndividualAccountTable}.accountId`, '=', accountId)
+                .where(`${legalEntitiesIndividualAccountTable}.profileId`, '=', profileId)
+                .limit(1)
+                .executeTakeFirstOrThrow();
+
+            return {
+                accountId: account.accountId as string,
+                profileId: account.profileId as string,
+                name: account.name as unknown as PersonalNameInput,
+                address: account.address as unknown as AddressInput,
+                //@ts-ignore
+                employmentStatus: account.employmentStatus?.status,
+                //@ts-ignore
+                nameOfEmployer: account.employer?.nameOfEmployer,
+                //@ts-ignore
+                title: account.employer?.title,
+                //@ts-ignore
+                industry: account.employer?.industry,
+                //@ts-ignore
+                netWorth: account.netWorth?.range,
+                //@ts-ignore
+                netIncome: account.netIncome?.range,
+            }
+        } catch (error: any) {
+            return null;
+        }
+
     }
 }
