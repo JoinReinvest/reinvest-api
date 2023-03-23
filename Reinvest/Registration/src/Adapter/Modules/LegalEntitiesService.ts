@@ -13,15 +13,24 @@ export class LegalEntitiesService {
         this.legalEntitiesModule = legalEntitiesModule;
     }
 
-    async getProfile(profileId: string): Promise<ProfileForSynchronization | null> {
+    async getProfile(profileId: string): Promise<ProfileForSynchronization | never> {
         const api = this.legalEntitiesModule.api();
 
-        return await api.getProfileForSynchronization(profileId) as ProfileForSynchronization | null
+        const profile = await api.getProfileForSynchronization(profileId) as ProfileForSynchronization | null;
+        if (profile === null) {
+            throw new Error(`Profile not found, profileId: ${profileId}`);
+        }
+
+        return profile;
     }
 
-    async getIndividualAccount(profileId: string, accountId: string) {
+    async getIndividualAccount(profileId: string, accountId: string): Promise<IndividualAccountForSynchronization | never> {
         const api = this.legalEntitiesModule.api();
+        const individualAccount = await api.getIndividualAccountForSynchronization(profileId, accountId) as IndividualAccountForSynchronization | null;
+        if (individualAccount === null) {
+            throw new Error(`Individual account not found, profileId: ${profileId}, accountId: ${accountId}`);
+        }
 
-        return await api.getIndividualAccountForSynchronization(profileId, accountId) as IndividualAccountForSynchronization | null
+        return individualAccount;
     }
 }

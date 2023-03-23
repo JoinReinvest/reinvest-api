@@ -1,3 +1,5 @@
+import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+
 export enum NorthCapitalDomicile {
     "CITIZEN" = "U.S. Citizen",
     "RESIDENT" = "U.S. Resident",
@@ -28,24 +30,50 @@ export type MainPartyType = {
     documents?: { id: string }[],
 }
 
+export type IndividualExtendedMainPartyType = {
+    occupation: string | null,
+    empName: string | null,
+    empStatus: NorthCapitalEmploymentStatus | null,
+    householdNetworth: string | null,
+    currentHouseholdIncome: string | null,
+}
+
+export type NorthCapitalIndividualAccountType = {
+    accountRegistration: string,
+    type: "Individual",
+    streetAddress1: string,
+    streetAddress2?: string,
+    city: string,
+    state: string,
+    zip: string,
+    country: string,
+}
+
+export type NorthCapitalLinkMappingConfiguration = {
+    type: MappedType,
+    profileId: string,
+    externalId: string,
+}
+
+export type NorthCapitalSynchronizationMapping = {
+    mapping: NorthCapitalLinkMappingConfiguration,
+    northCapitalId: string,
+}
+
+export type NorthCapitalLinkConfiguration = {
+    relatedEntryType: "Account" | "IndivACParty" | "EntityACParty",
+    linkType: "owner" | "manager" | "member" | "officer" | "director" | "spouse" | "beneficiary" | "trustee" | "custodian" | "parentco" | "subsidiary" | "other" | "acgroup" | "advisor" | "attorney" | "proxy"
+    primary_value: 0 | 1, // is a main party
+}
+
+export type NorthCapitalLink = {
+    mappingConfiguration: NorthCapitalLinkMappingConfiguration,
+    linkConfiguration: NorthCapitalLinkConfiguration,
+}
+
 export type IndividualAccountType = {
     profileId: string,
-    extendedParty: {
-        occupation: string | null,
-        empName: string | null,
-        empStatus: NorthCapitalEmploymentStatus | null,
-        householdNetworth: string | null,
-        currentHouseholdIncome: string | null,
-    },
-    account: {
-        accountRegistration: string,
-        type: "Individual",
-        domesticYN: "domestic_account",
-        streetAddress1: string,
-        streetAddress2?: string,
-        city: string,
-        state: string,
-        zip: string,
-        country: string,
-    },
+    extendedParty: IndividualExtendedMainPartyType,
+    account: NorthCapitalIndividualAccountType,
+    links: NorthCapitalLink[]
 }

@@ -25,19 +25,20 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
             return;
         }
 
-        console.log(`[START] Individual account synchronization, recordId: ${record.getRecordId()}`);
-        const individualAccount = await this.legalEntitiesService.getIndividualAccount(record.getProfileId(), record.getExternalId());
-        if (individualAccount === null) {
-            console.error(`Individual account not found: ${record.getProfileId()}/${record.getExternalId()}`);
+        try {
+            console.log(`[START] Individual account synchronization, recordId: ${record.getRecordId()}`);
+            const individualAccount = await this.legalEntitiesService.getIndividualAccount(record.getProfileId(), record.getExternalId());
+
+            const northCapitalIndividualAccount = NorthCapitalMapper.mapIndividualAccount(individualAccount);
+            await this.northCapitalSynchronizer.synchronizeIndividualAccount(record.getRecordId(), northCapitalIndividualAccount);
+            await this.northCapitalSynchronizer.synchronizeLinks(record.getRecordId(), northCapitalIndividualAccount.getLinksConfiguration());
+
+            await this.setCleanAndUnlockExecution(record)
+            console.log(`[FINISHED] Individual account synchronization, recordId: ${record.getRecordId()}`);
+        } catch (error: any) {
+            console.error(`[FAILED] Individual account synchronization, recordId: ${record.getRecordId()}: ${error.message}`);
             await this.unlockExecution(record);
-            return;
         }
 
-        const northCapitalIndividualAccount = NorthCapitalMapper.mapIndividualAccount(individualAccount);
-        // await this.northCapitalSynchronizer.synchronizeMainParty(record.getRecordId(), northCapitalMainParty);
-
-        await this.setCleanAndUnlockExecution(record)
-
-        console.log(`[FINISHED] Individual account synchronization, recordId: ${record.getRecordId()}`);
     }
 }

@@ -1,5 +1,14 @@
 # REINVEST API CHANGELOG
 
+## 1.0.4 - 03/23/2023
+
+* Handling `IndividualAccountOpened` event
+* North Capital Individual Account synchronization
+* Linking North Capital Account and the Main Party
+* Extending Main Party with extra investment information (net worth, income, employer, etc.)
+* [TEST] Tests endpoints:
+    - trigger `IndividualAccountOpened` event by `POST /tests/events`
+  
 ## 1.0.3 - 03/22/2023
 
 * Handling `LegalProfileCompleted` event

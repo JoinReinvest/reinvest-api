@@ -25,19 +25,18 @@ export class SynchronizeProfile extends AbstractSynchronize {
             return;
         }
 
-        console.log(`[START] Profile synchronization, recordId: ${record.getRecordId()}`);
-        const profile = await this.legalEntitiesService.getProfile(record.getProfileId());
-        if (profile === null) {
-            console.error(`Profile not found: ${record.getProfileId()}`);
+        try {
+            console.log(`[START] Profile synchronization, recordId: ${record.getRecordId()}`);
+            const profile = await this.legalEntitiesService.getProfile(record.getProfileId());
+
+            const northCapitalMainParty = NorthCapitalMapper.mapProfile(profile, record.getEmail());
+            await this.northCapitalSynchronizer.synchronizeMainParty(record.getRecordId(), northCapitalMainParty);
+
+            await this.setCleanAndUnlockExecution(record);
+            console.log(`[FINISHED] Profile synchronization, recordId: ${record.getRecordId()}`);
+        } catch (error: any) {
+            console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}: ${error.message}`);
             await this.unlockExecution(record);
-            return;
         }
-
-        const northCapitalMainParty = NorthCapitalMapper.mapProfile(profile, record.getEmail());
-        await this.northCapitalSynchronizer.synchronizeMainParty(record.getRecordId(), northCapitalMainParty);
-
-        await this.setCleanAndUnlockExecution(record)
-
-        console.log(`[FINISHED] Profile synchronization, recordId: ${record.getRecordId()}`);
     }
 }
