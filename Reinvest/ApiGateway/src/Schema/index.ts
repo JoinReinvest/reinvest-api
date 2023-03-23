@@ -5,7 +5,6 @@ import {Hello} from "ApiGateway/Schema/Types/Hello";
 import {Profile} from "ApiGateway/Schema/Types/Profile";
 import {ProfileStitcher} from "ApiGateway/Schema/Stitching/ProfileStitcher";
 import {Account} from "ApiGateway/Schema/Types/Account";
-import {ProfileCompletionStatus} from "ApiGateway/Schema/Types/ProfileCompletionStatus";
 import {PhoneNumberVerification} from "ApiGateway/Schema/Types/Identity";
 import {constraintDirective, constraintDirectiveTypeDefs} from "graphql-constraint-directive";
 import {DateScalar} from "ApiGateway/Schema/Scalars/DateScalar";
@@ -24,7 +23,6 @@ const nonExecutableTypeDefs = mergeTypeDefs([
     Shared.typeDefs,
     Account.typeDefs,
     ...DraftAccount.typeDefs,
-    ProfileCompletionStatus.typeDefs,
     Profile.typeDefs,
     PhoneNumberVerification.typeDefs,
     DocumentTypes.typeDefs,
@@ -33,7 +31,6 @@ const nonExecutableTypeDefs = mergeTypeDefs([
 const nonExecutableResolvers = mergeResolvers([
     Account.resolvers,
     DraftAccount.resolvers,
-    ProfileCompletionStatus.resolvers,
     Profile.resolvers,
     PhoneNumberVerification.resolvers,
     DocumentTypes.resolvers,

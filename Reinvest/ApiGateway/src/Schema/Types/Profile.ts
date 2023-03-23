@@ -3,6 +3,8 @@ import {SessionContext} from "ApiGateway/index";
 import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileController";
 import {ApolloError} from "apollo-server-errors";
 import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
+import {GraphQLError} from "graphql";
+import {InvestmentAccounts} from "InvestmentAccounts/index";
 
 const schema = `
     #graphql
@@ -69,10 +71,10 @@ const schema = `
     }
 
     type Query {
-        """[MOCK]"""
+        """Get user profile"""
         getProfile: Profile
-        """[MOCK]"""
-        canOpenAccount(accountType: AccountType): Boolean
+        """Returns list of account types that user can open"""
+        listAccountTypesUserCanOpen: [AccountType]
     }
 
     type Mutation {
@@ -84,7 +86,10 @@ const schema = `
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
 
-        """[MOCK]"""
+        """
+        Open REINVEST Account based on draft.
+        Currently supported: Individual Account
+        """
         openAccount(draftAccountId: String): Boolean
     }
 `;
@@ -104,10 +109,13 @@ export const Profile = {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 return api.getProfile(profileId);
             },
-            canOpenAccount: async (parent: any,
-                                   data: undefined,
-                                   {profileId, modules}: SessionContext
-            ) => true
+            listAccountTypesUserCanOpen: async (parent: any,
+                                                data: undefined,
+                                                {profileId, modules}: SessionContext
+            ) => {
+                const api = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
+                return api.listAccountTypesUserCanOpen(profileId);
+            },
         },
         Mutation: {
             completeProfileDetails: async (parent: any,
@@ -128,6 +136,12 @@ export const Profile = {
                                 {draftAccountId}: any,
                                 {profileId, modules}: SessionContext
             ) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                const errors = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
+                if (errors.length > 0) {
+                    throw new GraphQLError(JSON.stringify(errors));
+                }
+
                 return true;
             },
         },

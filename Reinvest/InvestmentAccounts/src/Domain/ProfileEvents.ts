@@ -11,10 +11,10 @@ export type ProfileCreated = DomainEvent & {
     }
 }
 
-export type IndividualAttachedToProfile = DomainEvent & {
-    kind: "IndividualAttachedToProfile",
+export type IndividualAccountOpened = DomainEvent & {
+    kind: "IndividualAccountOpened",
     data: {
-        individualId: string
+        individualAccountId: string
     }
 }
 

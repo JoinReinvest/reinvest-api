@@ -19,7 +19,8 @@ export namespace LegalEntities {
     };
 
     export type ModulesDependencies = {
-        documents: Documents.Main
+        documents: Documents.Main,
+        investmentAccounts: InvestmentAccounts.Main
     }
 
     export type ApiType = LegalEntitiesApiType & Api;
@@ -43,6 +44,8 @@ export namespace LegalEntities {
             }
 
             this.container.addAsValue('Documents', this.modules.documents);
+            this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
+
             new AdapterServiceProvider(this.config).boot(this.container);
             new PortsProvider(this.config).boot(this.container);
 

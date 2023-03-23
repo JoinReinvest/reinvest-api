@@ -3,7 +3,7 @@ import {ContainerInterface} from "Container/Container";
 import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/ProfileRepository";
 import {
     LegalEntitiesDatabaseAdapterInstanceProvider,
-    createLegalEntitiesDatabaseAdapterProvider
+    createLegalEntitiesDatabaseAdapterProvider, LegalEntitiesDatabase, LegalEntitiesDatabaseAdapterProvider
 } from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {IdGenerator} from "IdGenerator/IdGenerator";
 import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
@@ -11,6 +11,11 @@ import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/
 import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
 import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount";
 import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
+import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
+import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
+import {InvestmentAccountsService} from "LegalEntities/Adapter/Modules/InvestmentAccountsService";
+import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
+import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
 
 export class AdapterServiceProvider {
     private config: LegalEntities.Config;
@@ -21,23 +26,33 @@ export class AdapterServiceProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(IdGenerator)
+            .addSingleton(IdGenerator)
 
         container
-            .addClass(DocumentsService, ['Documents']);
+            .addSingleton(DocumentsService, ['Documents'])
+            .addSingleton(InvestmentAccountsService, ['InvestmentAccounts'])
+        ;
 
         // database
         container
             .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
-            .addClass(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
-            .addClass(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+            .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+            .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+            .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
+            .addObjectFactory("LegalEntitiesTransactionalAdapter",
+                (databaseProvider: LegalEntitiesDatabaseAdapterProvider) =>
+                    new TransactionalAdapter<LegalEntitiesDatabase>(databaseProvider),
+                [LegalEntitiesDatabaseAdapterInstanceProvider]
+            )
         ;
 
         // use cases
         container
-            .addClass(CreateDraftAccount, [DraftAccountRepository])
-            .addClass(CompleteDraftAccount, [DraftAccountRepository])
-            .addClass(DraftAccountQuery, [DraftAccountRepository, DocumentsService])
+            .addSingleton(CreateDraftAccount, [DraftAccountRepository])
+            .addSingleton(CompleteDraftAccount, [DraftAccountRepository])
+            .addSingleton(DraftAccountQuery, [DraftAccountRepository, DocumentsService])
+            .addSingleton(RemoveDraftAccount, [DraftAccountRepository])
+            .addSingleton(TransformDraftAccountIntoRegularAccount, [DraftAccountRepository, InvestmentAccountsService, AccountRepository, "LegalEntitiesTransactionalAdapter"])
         ;
     }
 }

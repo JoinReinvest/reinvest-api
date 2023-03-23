@@ -1,7 +1,6 @@
 import {Identity} from "Identity/index";
 import {ContainerInterface} from "Container/Container";
 import {
-    IdentityDatabaseAdapterProvider,
     createIdentityDatabaseAdapterProvider, DatabaseAdapterProvider, IdentityDatabase
 } from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 import {IdGenerator} from "IdGenerator/IdGenerator";
@@ -13,6 +12,7 @@ import {UniqueTokenGenerator} from "IdGenerator/UniqueTokenGenerator";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import {SmsService} from "Identity/Adapter/AWS/SmsService";
 import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
+import {DatabaseProvider} from "PostgreSQL/DatabaseProvider";
 
 export class AdapterServiceProvider {
     private config: Identity.Config;
@@ -23,8 +23,8 @@ export class AdapterServiceProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(IdGenerator)
-            .addClass(UniqueTokenGenerator)
+            .addSingleton(IdGenerator)
+            .addSingleton(UniqueTokenGenerator)
         ;
 
         container
@@ -33,20 +33,24 @@ export class AdapterServiceProvider {
         ;
 
         container
-            .addClass(SmsService, ['SNSConfig'])
-            .addClass(CognitoService, ['CognitoConfig'])
+            .addSingleton(SmsService, ['SNSConfig'])
+            .addSingleton(CognitoService, ['CognitoConfig'])
         ;
 
         // database
         container
             .addAsValue(DatabaseAdapterProvider, createIdentityDatabaseAdapterProvider(this.config.database))
-            .addClassOfType<IdentityDatabase>(TransactionalAdapter, [DatabaseAdapterProvider])
-            .addClass(PhoneRepository, [DatabaseAdapterProvider, TransactionalAdapter, SmsService, CognitoService])
-            .addClass(IncentiveTokenRepository, [DatabaseAdapterProvider, UniqueTokenGenerator])
-            .addClass(UserRepository, [DatabaseAdapterProvider])
+            .addObjectFactory(TransactionalAdapter,
+                (databaseProvider: DatabaseProvider<IdentityDatabase>) =>
+                    new TransactionalAdapter<IdentityDatabase>(databaseProvider),
+                [DatabaseAdapterProvider]
+            )
+            .addSingleton(PhoneRepository, [DatabaseAdapterProvider, TransactionalAdapter, SmsService, CognitoService])
+            .addSingleton(IncentiveTokenRepository, [DatabaseAdapterProvider, UniqueTokenGenerator])
+            .addSingleton(UserRepository, [DatabaseAdapterProvider])
         ;
         container
-            .addClass(ProfileService, ["InvestmentAccounts"])
+            .addSingleton(ProfileService, ["InvestmentAccounts"])
         ;
     }
 }

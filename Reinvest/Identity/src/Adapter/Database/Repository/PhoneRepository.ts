@@ -1,4 +1,5 @@
 import {
+    IdentityDatabase,
     IdentityDatabaseAdapterProvider, PhoneCodeRow, phoneVerificationTable, UpdateablePhoneCodeRow
 } from "Identity/Adapter/Database/IdentityDatabaseAdapter";
 import {InsertableOneTimeToken} from "Identity/Adapter/Database/IdentitySchema";
@@ -13,13 +14,13 @@ import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 export class PhoneRepository {
     public static getClassName = (): string => "PhoneRepository";
     private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
-    private transactionalAdapter: TransactionalAdapter<any>;
+    private transactionalAdapter: TransactionalAdapter<IdentityDatabase>;
     private cognitoService: CognitoService;
     private smsService: SmsService;
 
     constructor(
         databaseAdapterProvider: IdentityDatabaseAdapterProvider,
-        transactionalAdapter: TransactionalAdapter<any>,
+        transactionalAdapter: TransactionalAdapter<IdentityDatabase>,
         smsService: SmsService,
         cognitoService: CognitoService
     ) {

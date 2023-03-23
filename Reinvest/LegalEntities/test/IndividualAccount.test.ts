@@ -13,14 +13,14 @@ import {
     EmploymentStatus,
     EmploymentStatusEnum,
     EmploymentStatusInput
-} from "LegalEntities/Domain/DraftAccount/EmploymentStatus";
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/EmploymentStatus";
 import {Avatar, AvatarInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/Document";
-import {Employer, EmployerInput} from "Reinvest/LegalEntities/src/Domain/DraftAccount/Employer";
+import {Employer, EmployerInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/Employer";
 import {
     NetIncome,
     NetRangeInput,
     NetWorth,
-} from "Reinvest/LegalEntities/src/Domain/DraftAccount/ValueRange";
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/ValueRange";
 
 context("Given an investor has completed profile", () => {
     describe("When the investor wants to create the individual account", async () => {
