@@ -45,6 +45,7 @@ export function boot(): Modules {
         InvestmentAccounts.moduleName,
         InvestmentAccounts.create({
             database: databaseConfig,
+            queue: queueConfig,
         } as InvestmentAccounts.Config)
     );
 

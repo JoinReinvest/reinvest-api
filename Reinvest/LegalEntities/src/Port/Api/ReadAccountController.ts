@@ -1,5 +1,8 @@
 import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
-import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
+import {
+    AccountRepository,
+    IndividualAccountForSynchronization
+} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
 import {AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
 import {AccountType} from "LegalEntities/Domain/AccountType";
 import {IndividualAccount} from "LegalEntities/Domain/Accounts/IndividualAccount";
@@ -82,6 +85,10 @@ export class ReadAccountController {
             },
 
         }
+    }
+
+    public async getIndividualAccountForSynchronization(profileId: string, accountId: string): Promise<IndividualAccountForSynchronization | null> {
+        return this.accountRepository.getIndividualAccountForSynchronization(profileId, accountId);
     }
 
     public async getAccountsOverview(profileId: string): Promise<AccountsOverviewResponse[]> {

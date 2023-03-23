@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import Profile from "Reinvest/InvestmentAccounts/src/Domain/Profile";
+import Profile from "Reinvest/InvestmentAccounts/src/Domain/ProfileAggregate/Profile";
 import {expectThrows} from "test/characterization/expectThrowsAsync";
 
 context("Given an investor has investment profile", () => {

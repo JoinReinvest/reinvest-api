@@ -11,8 +11,4 @@ export class CrcService {
             .update(singleString)
             .digest('hex')
     }
-
-    static verifyCrc(data: string[], crc: string): boolean {
-        return CrcService.generateCrc(data) === crc;
-    }
 }

@@ -3,6 +3,11 @@ import FormData from "form-data";
 import NorthCapitalException from "Registration/Adapter/NorthCapital/NorthCapitalException";
 import {MainParty} from "../../Domain/VendorModel/NorthCapital/MainParty";
 import {DictionaryType} from "HKEKTypes/Generics";
+import {
+    IndividualExtendedMainPartyType,
+    NorthCapitalIndividualAccountType, NorthCapitalLinkConfiguration
+} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
+import {ExecutionNorthCapitalAdapter} from "Registration/Adapter/NorthCapital/ExecutionNorthCapitalAdapter";
 
 export type NorthCapitalConfig = {
     CLIENT_ID: string,
@@ -11,125 +16,119 @@ export type NorthCapitalConfig = {
     OFFERING_ID: string,
 }
 
-export class NorthCapitalAdapter {
+export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     static getClassName = () => 'NorthCapitalAdapter';
-    clientId: string;
-    developerAPIKey: string;
-    url: string;
 
-    constructor({CLIENT_ID: clientId, DEVELOPER_API_KEY: developerAPIKey, API_URL: url}: NorthCapitalConfig) {
-        this.clientId = clientId;
-        this.developerAPIKey = developerAPIKey;
-        this.url = url
-    }
-
-    private async putRequest(endpoint: string, data: any): Promise<any> {
-        try {
-            const putData = this.extendWithCredentials(data);
-            const response: AxiosResponse = await axios
-                .put(`${this.url}/${endpoint}`, putData);
-
-            return response.data;
-        } catch (error) {
-            // @ts-ignore
-            const {response: {data: {statusCode, statusDesc}}} = error;
-            throw new NorthCapitalException(statusCode, statusDesc);
-        }
-    }
-
-    private async postRequest(endpoint: string, data: any): Promise<any> {
-        try {
-            const formData = this.transformToFormData(data);
-            const response: AxiosResponse = await axios
-                .post(`${this.url}/${endpoint}`, formData);
-
-            return response.data;
-        } catch (error) {
-            // @ts-ignore
-            const {response: {data: {statusCode, statusDesc}}} = error;
-            throw new NorthCapitalException(statusCode, statusDesc);
-        }
-    }
-
-    private transformToFormData(data: any): FormData {
-        const extendedData = this.extendWithCredentials(data);
-        const formData = new FormData();
-
-        for (const key of Object.keys(extendedData)) {
-            formData.append(key, extendedData[key]);
-        }
-
-        return formData;
-    }
-
-    private extendWithCredentials(data: any): any {
-        return {
-            clientID: this.clientId,
-            developerAPIKey: this.developerAPIKey,
-            ...data
-        };
-    }
-
-
-    async createParty(mainParty: MainParty): Promise<string> {
+    async createParty(toCreate: DictionaryType): Promise<string | never> {
         const endpoint = 'tapiv3/index.php/v3/createParty';
-        const data = this.getPartyData(mainParty);
-        const response = await this.putRequest(endpoint, data);
+
+        const response = await this.putRequest(endpoint, toCreate);
         const {statusCode, statusDesc, partyDetails: [status, [{partyId}]]} = response;
         console.log({action: "Create north capital party", partyId, statusCode, statusDesc});
 
         return partyId;
     }
 
-    private getPartyData(mainParty: MainParty): DictionaryType {
-        const rawData = mainParty.getData() as DictionaryType;
-        const data = {} as DictionaryType
-        for (const key of Object.keys(rawData)) {
-            switch (key) {
-                case 'middleInitial':
-                case 'socialSecurityNumber':
-                    if (rawData[key] && rawData[key].length > 0) {
-                        data[key] = rawData[key];
-                    }
-                    break;
-                case 'documents':
-                    break;
-                default:
-                    data[key] = rawData[key];
-                    break;
-            }
-        }
-
-        return data;
-    }
-
-    async findParty(bySurname: string, andEmail: string): Promise<string | null> {
-        const endpoint = 'tapiv3/index.php/v3/searchParty';
-        const data = {
-            searchKeyword: andEmail
-        };
-
-        try {
-            const response = await this.postRequest(endpoint, data);
-            const {statusCode, statusDesc, partyDetails} = response;
-            const {partyId} = partyDetails.find(({emailAddress}: { emailAddress: string }) => emailAddress === andEmail);
-            console.log({statusCode, statusDesc, partyId});
-            return partyId ?? null;
-        } catch (error: any) {
-            console.log(`[NC] ${error.message} by surname ${bySurname} and email ${andEmail}`);
-            return null;
-        }
-    }
-
-    async updateParty(northCapitalId: string, mainParty: MainParty): Promise<void> {
+    async updateParty(northCapitalId: string, toUpdate: DictionaryType): Promise<void | never> {
         const endpoint = 'tapiv3/index.php/v3/updateParty';
         const data = {
             partyId: northCapitalId,
-            ...this.getPartyData(mainParty)
+            ...toUpdate,
         };
 
         const response = await this.postRequest(endpoint, data);
         const {statusCode, statusDesc, partyDetails: [status]} = response;
         console.log({action: "Update north capital party", northCapitalId, statusCode, statusDesc, status});
+    }
+
+    async createAccount(toCreate: DictionaryType): Promise<string | never> {
+        const endpoint = 'tapiv3/index.php/v3/createAccount';
+        const data = {
+            domesticYN: "domestic_account",
+            KYCstatus: "Pending",
+            AMLstatus: "Pending",
+            AccreditedStatus: "Pending",
+            approvalStatus: "Pending",
+            ...toCreate,
+        }
+
+        const response = await this.putRequest(endpoint, data);
+        const {statusCode, statusDesc, accountDetails: [{accountId}]} = response;
+
+        console.log({action: "Create north capital individual account", accountId, statusCode, statusDesc});
+        return accountId;
+    }
+
+
+    async updateAccount(northCapitalAccountId: string, accountData: DictionaryType): Promise<void | never> {
+        const endpoint = 'tapiv3/index.php/v3/updateAccount';
+        const data = {
+            accountId: northCapitalAccountId,
+            domesticYN: "domestic_account",
+            approvalStatus: "Pending",
+            ...accountData,
+        }
+
+        const response = await this.putRequest(endpoint, data);
+        const {statusCode, statusDesc, accountDetails} = response;
+
+        console.log({
+            action: "Update north capital individual account",
+            northCapitalAccountId,
+            statusCode,
+            statusDesc,
+            accountDetails
+        });
+    }
+
+    async linkEntityToAccount(entityId: string, accountId: string, linkConfiguration: NorthCapitalLinkConfiguration): Promise<string | never> {
+        const endpoint = 'tapiv3/index.php/v3/createLink';
+        const data = {
+            firstEntryType: "Account",
+            firstEntry: accountId,
+            relatedEntry: entityId,
+            ...linkConfiguration,
+        }
+
+        try {
+            const response = await this.putRequest(endpoint, data);
+            const {statusCode, statusDesc, linkDetails: [status, [{id: linkId}]]} = response;
+
+            return linkId;
+        } catch (error: any) {
+            if (error.statusCode && error.statusCode == 206) {
+                const existingLinks = await this.getAccountLinks(accountId);
+                const existingLink = existingLinks.find(link => link.relatedEntry == entityId);
+                if (!existingLink) {
+                    throw new Error(error.message);
+                }
+
+                return existingLink.linkId;
+            } else {
+                throw new Error(error.message);
+            }
+        }
+    }
+
+    async getAccountLinks(northCapitalAccountId: string): Promise<{ linkId: string, relatedEntry: string }[]> {
+        const endpoint = 'tapiv3/index.php/v3/getAllLinks';
+        const data = {
+            accountId: northCapitalAccountId,
+        }
+
+        try {
+            const response = await this.postRequest(endpoint, data);
+            const {linkDetails} = response;
+
+            return linkDetails.map((link: any) => {
+                return {
+                    linkId: link.id,
+                    relatedEntry: link.relatedEntry,
+                }
+            });
+        } catch (error: any) {
+            console.error(`Retrieve all links for North Capital account ${northCapitalAccountId} failed: ${error.message}`);
+            return [];
+        }
     }
 }

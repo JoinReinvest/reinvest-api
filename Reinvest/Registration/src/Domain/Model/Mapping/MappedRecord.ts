@@ -56,4 +56,12 @@ export class MappedRecord {
     getEmail(): string {
         return this.email;
     }
+
+    isIndividualAccount() {
+        return this.mappedType === MappedType.INDIVIDUAL_ACCOUNT;
+    }
+
+    getExternalId() {
+        return this.externalId;
+    }
 }

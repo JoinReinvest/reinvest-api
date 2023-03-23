@@ -1,8 +1,9 @@
 import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
-import {CrcService} from "Registration/IntegrationLogic/Service/CrcService";
-import {DomicileMapper} from "Registration/Domain/VendorModel/NorthCapital/DomicileMapper";
+import {CrcService} from "Registration/Domain/CrcService";
 import {MainPartyType} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 import DateTime from "date-and-time";
+import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
+import {DictionaryType} from "HKEKTypes/Generics";
 
 export class MainParty {
     private data: MainPartyType;
@@ -22,7 +23,7 @@ export class MainParty {
             firstName: data.firstName,
             middleInitial: data?.middleName,
             lastName: data.lastName,
-            domicile: DomicileMapper.mapDomicile(data.domicile),
+            domicile: NorthCapitalMapper.mapDomicile(data.domicile),
             dob: DateTime.format(DateTime.parse(data.dateOfBirth, 'YYYY-MM-DD'), "MM-DD-YYYY"),
             primAddress1: data.address.addressLine1,
             primAddress2: data.address?.addressLine2,
@@ -36,19 +37,15 @@ export class MainParty {
         });
     }
 
-    getData(): MainPartyType {
-        return this.data;
-    }
-
     private generateCrc(data: MainPartyType): string {
         const values = [
-            data.domicile,
+            data.domicile ?? "",
             data.firstName,
-            `${data.middleInitial}`,
+            data.middleInitial ?? "",
             data.lastName,
             data.dob,
             data.primAddress1,
-            `${data.primAddress2}`,
+            data.primAddress2 ?? "",
             data.primCity,
             data.primState,
             data.primZip,
@@ -60,15 +57,29 @@ export class MainParty {
         return CrcService.generateCrc(values);
     }
 
-    getEmail(): string {
-        return this.data.emailAddress;
-    }
-
-    getLastName() {
-        return this.data.lastName;
-    }
-
     getCrc(): string {
         return this.crc;
+    }
+
+    getPartyData(): DictionaryType {
+        const rawData = this.data as DictionaryType;
+        const data = {} as DictionaryType
+        for (const key of Object.keys(rawData)) {
+            switch (key) {
+                case 'middleInitial':
+                case 'socialSecurityNumber':
+                    if (rawData[key] && rawData[key].length > 0) {
+                        data[key] = rawData[key];
+                    }
+                    break;
+                case 'documents':
+                    break;
+                default:
+                    data[key] = rawData[key];
+                    break;
+            }
+        }
+
+        return data;
     }
 }

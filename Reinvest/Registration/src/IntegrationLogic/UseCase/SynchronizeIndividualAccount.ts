@@ -5,8 +5,8 @@ import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/N
 import {MappedRecord} from "Registration/Domain/Model/Mapping/MappedRecord";
 import {NorthCapitalSynchronizer} from "../../Adapter/NorthCapital/NorthCapitalSynchronizer";
 
-export class SynchronizeProfile extends AbstractSynchronize {
-    static getClassName = () => 'SynchronizeProfile';
+export class SynchronizeIndividualAccount extends AbstractSynchronize {
+    static getClassName = () => 'SynchronizeIndividualAccount';
     private legalEntitiesService: LegalEntitiesService;
     private northCapitalSynchronizer: NorthCapitalSynchronizer;
 
@@ -21,22 +21,24 @@ export class SynchronizeProfile extends AbstractSynchronize {
     }
 
     async execute(record: MappedRecord): Promise<void> {
-        if (!record.isProfile() || !await this.lockExecution(record)) {
+        if (!record.isIndividualAccount() || !await this.lockExecution(record)) {
             return;
         }
 
         try {
-            console.log(`[START] Profile synchronization, recordId: ${record.getRecordId()}`);
-            const profile = await this.legalEntitiesService.getProfile(record.getProfileId());
+            console.log(`[START] Individual account synchronization, recordId: ${record.getRecordId()}`);
+            const individualAccount = await this.legalEntitiesService.getIndividualAccount(record.getProfileId(), record.getExternalId());
 
-            const northCapitalMainParty = NorthCapitalMapper.mapProfile(profile, record.getEmail());
-            await this.northCapitalSynchronizer.synchronizeMainParty(record.getRecordId(), northCapitalMainParty);
+            const northCapitalIndividualAccount = NorthCapitalMapper.mapIndividualAccount(individualAccount);
+            await this.northCapitalSynchronizer.synchronizeIndividualAccount(record.getRecordId(), northCapitalIndividualAccount);
+            await this.northCapitalSynchronizer.synchronizeLinks(record.getRecordId(), northCapitalIndividualAccount.getLinksConfiguration());
 
-            await this.setCleanAndUnlockExecution(record);
-            console.log(`[FINISHED] Profile synchronization, recordId: ${record.getRecordId()}`);
+            await this.setCleanAndUnlockExecution(record)
+            console.log(`[FINISHED] Individual account synchronization, recordId: ${record.getRecordId()}`);
         } catch (error: any) {
-            console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[FAILED] Individual account synchronization, recordId: ${record.getRecordId()}: ${error.message}`);
             await this.unlockExecution(record);
         }
+
     }
 }
