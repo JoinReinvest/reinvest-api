@@ -13,6 +13,7 @@ import {AdapterServiceProvider} from "Registration/Providers/AdapterServiceProvi
 import {PortsProvider} from "Registration/Providers/PortsProvider";
 import {IntegrationServiceProvider} from "Registration/Providers/IntegrationServiceProvider";
 import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
+import {VertaloConfig} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapter";
 
 export namespace Registration {
     export const moduleName = "Registration";
@@ -20,6 +21,7 @@ export namespace Registration {
         database: PostgreSQLConfig;
         emailDomain: string;
         northCapital: NorthCapitalConfig;
+        vertalo: VertaloConfig;
     };
 
     export type ModulesDependencies = {

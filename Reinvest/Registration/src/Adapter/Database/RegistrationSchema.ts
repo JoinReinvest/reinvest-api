@@ -30,6 +30,17 @@ export interface NorthCapitalSynchronizationTable {
     links: object | string;
 }
 
+export interface VertaloSynchronizationTable {
+    recordId: string;
+    vertaloId: string;
+    type: "ACCOUNT";
+    crc: string;
+    documents: string | null;
+    version: number;
+    createdDate: Date;
+    updatedDate: Date;
+}
+
 export type InsertableMappingRegistry = Insertable<MappingRegistryTable>;
 export type SelectableMappedRecord = Pick<MappingRegistryTable, keyof MappedRecordType>;
 
