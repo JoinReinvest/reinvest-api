@@ -13,7 +13,6 @@ export const VERTALO_CONFIG = {
     CLIENT_ID: process.env.VERTALO_CLIENT_ID as string,
     CLIENT_SECRET: process.env.VERTALO_CLIENT_SECRET as string,
     API_URL: process.env.VERTALO_API_URL as string,
-    SECURITY_ID: process.env.VERTALO_SECURITY_ID as string,
 };
 
 export const WEB_APP_URL = process.env.WEB_APP_URL?.replace(/\/*$/, '') as string;

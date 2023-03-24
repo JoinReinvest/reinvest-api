@@ -4,8 +4,8 @@ import NorthCapitalException from "Registration/Adapter/NorthCapital/NorthCapita
 import {MainParty} from "../../Domain/VendorModel/NorthCapital/MainParty";
 import {DictionaryType} from "HKEKTypes/Generics";
 import {
-    IndividualExtendedMainPartyType,
-    NorthCapitalIndividualAccountType, NorthCapitalLinkConfiguration
+    NorthCapitalIndividualExtendedMainPartyType,
+    NorthCapitalIndividualAccountStructure, NorthCapitalLinkConfiguration
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 import {ExecutionNorthCapitalAdapter} from "Registration/Adapter/NorthCapital/ExecutionNorthCapitalAdapter";
 

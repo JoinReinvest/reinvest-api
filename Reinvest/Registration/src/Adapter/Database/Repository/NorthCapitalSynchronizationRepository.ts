@@ -10,7 +10,7 @@ import {
 } from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord";
 import {
     InsertableNorthCapitalSynchronization, SelectablePartyId,
-    SelectableSynchronizationRecord
+    SelectableNorthCapitalSynchronizationRecord
 } from "Registration/Adapter/Database/RegistrationSchema";
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {NorthCapitalSynchronizationMapping} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
@@ -33,7 +33,7 @@ export class NorthCapitalSynchronizationRepository {
                 .select(['recordId', 'northCapitalId', 'type', 'crc', 'documents', 'version', 'links'])
                 .where('recordId', '=', recordId)
                 .limit(1)
-                .executeTakeFirstOrThrow() as SelectableSynchronizationRecord as NorthCapitalSynchronizationRecordType;
+                .executeTakeFirstOrThrow() as SelectableNorthCapitalSynchronizationRecord as NorthCapitalSynchronizationRecordType;
 
             return NorthCapitalSynchronizationRecord.create(data);
         } catch (error: any) {

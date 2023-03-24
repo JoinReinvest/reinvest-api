@@ -56,6 +56,9 @@ const serverlessConfiguration: AWS = {
             NORTH_CAPITAL_DEVELOPER_API_KEY: "${env:NORTH_CAPITAL_DEVELOPER_API_KEY}",
             NORTH_CAPITAL_API_URL: "${env:NORTH_CAPITAL_API_URL}",
             NORTH_CAPITAL_OFFERING_ID: "${env:NORTH_CAPITAL_OFFERING_ID}",
+            VERTALO_API_URL: "${env:VERTALO_API_URL}",
+            VERTALO_CLIENT_ID: "${env:VERTALO_CLIENT_ID}",
+            VERTALO_CLIENT_SECRET: "${env:VERTALO_CLIENT_SECRET}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,

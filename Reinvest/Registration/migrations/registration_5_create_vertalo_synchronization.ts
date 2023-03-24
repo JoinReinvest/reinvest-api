@@ -9,7 +9,7 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
     await db.schema
         .createTable(vertaloSynchronizationTable)
         .addColumn('recordId', 'uuid', col => col.primaryKey().notNull().unique())
-        .addColumn('vertaloId', 'varchar(255)', col => col.notNull())
+        .addColumn('vertaloIds', 'json', col => col.notNull())
         .addColumn('type', 'varchar(10)', col => col.notNull())
         .addColumn('crc', 'varchar(255)', col => col.notNull())
         .addColumn('documents', 'json', col => col.defaultTo(null))
