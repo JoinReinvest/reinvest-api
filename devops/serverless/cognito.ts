@@ -225,7 +225,7 @@ export const CognitoClientResources = {
             AllowedOAuthFlows: ["implicit"],
             AllowedOAuthScopes: ["profile", "openid"],
             CallbackURLs: [margeWithApiGatewayUrl("/set-header")],
-            ClientName: "Website & Mobile Cognito Client",
+            ClientName: "Website and Mobile Cognito Client",
             EnableTokenRevocation: true,
             PreventUserExistenceErrors: "ENABLED",
             ExplicitAuthFlows: [
