@@ -41,6 +41,20 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
         console.log({action: "Update north capital party", northCapitalId, statusCode, statusDesc, status});
     }
 
+    async getParty(partyId: string): Promise<object | never> {
+        const endpoint = 'tapiv3/index.php/v3/getParty';
+
+        const data = {
+            partyId,
+        }
+
+        const response = await this.postRequest(endpoint, data);
+        const {statusCode, statusDesc, partyDetails: [party]} = response;
+
+        console.log({action: "Get north capital party", partyId, statusCode, statusDesc});
+        return party;
+    }
+
     async createAccount(toCreate: DictionaryType): Promise<string | never> {
         const endpoint = 'tapiv3/index.php/v3/createAccount';
         const data = {
@@ -130,5 +144,20 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
             console.error(`Retrieve all links for North Capital account ${northCapitalAccountId} failed: ${error.message}`);
             return [];
         }
+    }
+
+    async getAccount(accountId: string) {
+        const endpoint = 'tapiv3/index.php/v3/getAccount';
+
+        const data = {
+            accountId,
+        }
+
+        const response = await this.postRequest(endpoint, data);
+        const {statusCode, statusDesc, accountDetails: account} = response;
+
+        console.log({action: "Get north capital account", accountId, statusCode, statusDesc});
+
+        return account;
     }
 }
