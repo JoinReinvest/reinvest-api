@@ -225,7 +225,7 @@ export const CognitoClientResources = {
             AllowedOAuthFlows: ["implicit"],
             AllowedOAuthScopes: ["profile", "openid"],
             CallbackURLs: [margeWithApiGatewayUrl("/set-header")],
-            ClientName: "Postman Test Client",
+            ClientName: "Website and Mobile Cognito Client",
             EnableTokenRevocation: true,
             PreventUserExistenceErrors: "ENABLED",
             ExplicitAuthFlows: [
@@ -258,6 +258,7 @@ export const CognitoClientResources = {
             ExplicitAuthFlows: [
                 "ALLOW_USER_SRP_AUTH",
                 "ALLOW_REFRESH_TOKEN_AUTH",
+                "ALLOW_USER_PASSWORD_AUTH"
             ],
             GenerateSecret: false,
             SupportedIdentityProviders: ["COGNITO"],
@@ -266,6 +267,7 @@ export const CognitoClientResources = {
         },
     },
 }
+
 export const CognitoClientsOutputs = {
     WebsiteCognitoClientId: {
         Value: {Ref: "WebsiteCognito"},
