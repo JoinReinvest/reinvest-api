@@ -13,10 +13,9 @@ import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
 import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
 import {
     DatabaseAdapterProvider,
-    IdentityDatabase,
     IdentityDatabaseAdapterProvider
 } from "Identity/Adapter/Database/IdentityDatabaseAdapter";
-import {DatabaseAdapter} from "Documents/Adapter/Database/DatabaseAdapter";
+
 
 export namespace Identity {
     export const moduleName = "Identity";

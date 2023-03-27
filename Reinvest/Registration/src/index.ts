@@ -13,6 +13,10 @@ import {AdapterServiceProvider} from "Registration/Providers/AdapterServiceProvi
 import {PortsProvider} from "Registration/Providers/PortsProvider";
 import {IntegrationServiceProvider} from "Registration/Providers/IntegrationServiceProvider";
 import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
+import {
+    RegistrationDatabaseAdapterInstanceProvider,
+    RegistrationDatabaseAdapterProvider
+} from "Registration/Adapter/Database/DatabaseAdapter";
 import {VertaloConfig} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapter";
 
 export namespace Registration {
@@ -78,7 +82,7 @@ export namespace Registration {
 
         async close(): Promise<void> {
             if (this.booted) {
-                // await this.container.get<RegistrationDatabaseAdapterProvider>(RegistrationDatabaseAdapterProvider).close();
+                await this.container.getValue<RegistrationDatabaseAdapterProvider>(RegistrationDatabaseAdapterInstanceProvider).close();
             }
         }
     }

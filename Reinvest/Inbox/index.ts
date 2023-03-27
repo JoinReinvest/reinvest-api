@@ -8,7 +8,7 @@ export class Inbox {
         this.modules = modules;
     }
 
-    process(record: SQSRecord) {
+    async process(record: SQSRecord) {
         try {
             const messageId = record.messageId;
             const message = JSON.parse(record.body);
@@ -16,14 +16,18 @@ export class Inbox {
             console.log({kind, message, messageId});
             for (let module of this.modules.iterate()) {
                 if (module.isHandleEvent(kind)) {
-                    module.technicalEventHandler()[kind](message);
+                    const handlers = module.technicalEventHandler();
+                    await handlers[kind](message);
                 } else if (module.isHandleEvent('all')) { // wildcard
-                    module.technicalEventHandler().all(message);
+                    const handlers = module.technicalEventHandler();
+                    await handlers.all(message);
                 }
 
             }
         } catch (error: any) {
             console.log(error);
+        } finally {
+            await this.modules.close();
         }
     }
 }
