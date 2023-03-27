@@ -44,6 +44,7 @@ const serverlessConfiguration: AWS = {
             CognitoUserPoolID: importOutput('CognitoUserPoolID'),
             S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
             S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
+            LocalCognitoClientId: {Ref: "LocalCognito"},
             SQS_QUEUE_URL: getAttribute("SQSNotification", "QueueUrl"),
             EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
             EMAIL_REPLY_TO: "${env:EMAIL_REPLY_TO}",
@@ -130,6 +131,7 @@ const serverlessConfiguration: AWS = {
                 LocalCognitoClientId: "LocalCognitoClientId",
                 LocalHostedUiUrl: "LocalHostedUiUrl",
                 WebsiteHostedUiUrl: "WebsiteHostedUiUrl",
+                WebsiteCognitoClientId: "WebsiteCognitoClientId",
                 SQS_QUEUE_URL: "SQSQueueUrl",
             }
         },
