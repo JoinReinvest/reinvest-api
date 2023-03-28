@@ -3,6 +3,9 @@ import {
     EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules,
 } from "../../serverless/vpc";
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
+import {S3PoliciesWithImport} from "devops/serverless/s3";
+import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "devops/serverless/cognito";
+import {SMSPolicy} from "devops/serverless/sns";
 
 export const QueueFunction = {
     handler: `devops/functions/queue/handler.main`,
@@ -59,6 +62,11 @@ export const QueueResources = {
                         Statement: [
                             ...CloudwatchPolicies,
                             ...EniPolicies,
+                            ...CloudwatchPolicies,
+                            ...EniPolicies,
+                            ...S3PoliciesWithImport,
+                            ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
+                            SMSPolicy,
                             {
                                 Effect: 'Allow',
                                 Action: ['sqs:ReceiveMessage', 'sqs:DeleteMessage', 'sqs:GetQueueAttributes', 'sqs:SendMessage', 'sqs:SendMessageBatch'],
