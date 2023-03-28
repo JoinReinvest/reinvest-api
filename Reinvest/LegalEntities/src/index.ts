@@ -13,6 +13,14 @@ import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {Documents} from "Documents/index";
 import {QueueConfig} from "shared/hkek-sqs/QueueSender";
 import EventBusProvider from "LegalEntities/Providers/EventBusProvider";
+import {
+    InvestmentAccountDbProvider,
+    investmentAccountsDatabaseProviderName
+} from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
+import {
+    LegalEntitiesDatabaseAdapterInstanceProvider,
+    LegalEntitiesDatabaseAdapterProvider
+} from "LegalEntities/Adapter/Database/DatabaseAdapter";
 
 export namespace LegalEntities {
     export const moduleName = "LegalEntities";
@@ -76,9 +84,9 @@ export namespace LegalEntities {
         }
 
         async close(): Promise<void> {
-            // if (this.booted) {
-            //     await this.container.getValue<IdentityDatabaseAdapterProvider>(DatabaseAdapterProvider).close();
-            // }
+            if (this.booted) {
+                await this.container.getValue<LegalEntitiesDatabaseAdapterProvider>(LegalEntitiesDatabaseAdapterInstanceProvider).close();
+            }
         }
 
     }
