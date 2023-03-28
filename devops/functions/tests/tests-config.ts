@@ -59,7 +59,7 @@ export const TestsLambdaResources = {
                             {
                                 Effect: "Allow",
                                 Action: [
-                                    "cognito-idp:AdminCreateUser",
+                                    "cognito-idp:*",
                                 ],
                                 Resource: importOutput('CognitoUserPoolArn'),
                             },
