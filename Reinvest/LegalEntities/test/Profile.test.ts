@@ -84,9 +84,9 @@ context("Given the user wants to complete the profile", () => {
 
         it("Then complete the date of birth in ISO format", async () => {
             const date = "2000-12-24";
-            profile.setDateOfBirth(DateOfBirth.create(date))
+            profile.setDateOfBirth(DateOfBirth.create({dateOfBirth: date}))
             const profileOutput = profile.toObject();
-            const dob = profileOutput.dateOfBirth as DateOfBirthInput;
+            const dob = profileOutput.dateOfBirth;
 
             expect(dob).to.be.equal(date);
         });
@@ -94,7 +94,7 @@ context("Given the user wants to complete the profile", () => {
         it("Or if provided wrong date of birth, Then expects a validation error", async () => {
             const date = "12/24/2000";
             try {
-                profile.setDateOfBirth(DateOfBirth.create(date))
+                profile.setDateOfBirth(DateOfBirth.create({dateOfBirth: date}))
             } catch (error: any) {
                 expect(error).to.exist;
             }
