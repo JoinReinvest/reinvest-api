@@ -16,10 +16,6 @@ import {S3Resources} from "./devops/serverless/s3";
 import {VpcResources} from "./devops/serverless/vpc";
 import {QueueFunction, QueueOutputs, QueueResources} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
-import {
-    LocalSignUpLambdaFunction,
-    LocalSignUpLambdaResources
-} from "./devops/functions/localSignUp/local-sign-up-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {ProviderEnvironment} from "./devops/serverless/serverless-common";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
@@ -80,7 +76,6 @@ const serverlessConfiguration: AWS = {
         queue: QueueFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
-        localSignUp: LocalSignUpLambdaFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         tests: TestsFunction,
     },
@@ -97,7 +92,6 @@ const serverlessConfiguration: AWS = {
             ...MigrationLambdaResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...QueueResources,
-            ...LocalSignUpLambdaResources,
             ...SesResources,
             ...TestsLambdaResources,
         },

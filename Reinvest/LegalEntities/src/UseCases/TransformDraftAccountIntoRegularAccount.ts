@@ -53,10 +53,14 @@ export class TransformDraftAccountIntoRegularAccount {
         if (!accountOpened) {
             throw new Error('CANNOT_OPEN_ANOTHER_INDIVIDUAL_ACCOUNT');
         }
-        await this.transactionAdapter.transaction(`Open individual account "${draftId}" for profile ${profileId}`, async () => {
+        const status = await this.transactionAdapter.transaction(`Open individual account "${draftId}" for profile ${profileId}`, async () => {
             const account = draftAccount.transformIntoAccount();
             await this.accountRepository.createIndividualAccount(account);
             await this.draftAccountRepository.removeDraft(profileId, draftId);
         });
+
+        if (!status) {
+            throw new Error('ACCOUNT_TRANSFORMATION_FAILED');
+        }
     }
 }

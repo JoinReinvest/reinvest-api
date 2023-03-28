@@ -50,10 +50,4 @@ export const MigrationLambdaResources = {
             VpcId: importVpcRef()
         },
     },
-    // MigrationInvoker: {
-    //     Type: "AWS::CloudFormation::CustomResource",
-    //     Properties: {
-    //         ServiceToken: getAttribute('MigrationLambdaFunction', 'Arn'),
-    //     }
-    // }
 };

@@ -6,7 +6,7 @@ import {
 import {
     NorthCapitalEntityType, NorthCapitalLinkMapping
 } from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord";
-import {IndividualAccount} from "Registration/Domain/VendorModel/NorthCapital/IndividualAccount";
+import {NorthCapitalIndividualAccount} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalIndividualAccount";
 import {
     NorthCapitalLink,
     NorthCapitalSynchronizationMapping
@@ -36,7 +36,7 @@ export class NorthCapitalSynchronizer {
         }
     }
 
-    async synchronizeIndividualAccount(recordId: string, northCapitalIndividualAccount: IndividualAccount) {
+    async synchronizeIndividualAccount(recordId: string, northCapitalIndividualAccount: NorthCapitalIndividualAccount) {
         try {
             const mainPartyId = await this.northCapitalSynchronizationRepository.getMainPartyIdByProfile(northCapitalIndividualAccount.getProfileId());
             let synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);

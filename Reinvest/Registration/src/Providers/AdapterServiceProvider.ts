@@ -13,6 +13,11 @@ import {NorthCapitalSynchronizer} from "Registration/Adapter/NorthCapital/NorthC
 import {
     NorthCapitalSynchronizationRepository
 } from "Registration/Adapter/Database/Repository/NorthCapitalSynchronizationRepository";
+import {VertaloAdapter} from "Registration/Adapter/Vertalo/VertaloAdapter";
+import {
+    VertaloSynchronizationRepository
+} from "Registration/Adapter/Database/Repository/VertaloSynchronizationRepository";
+import {VertaloSynchronizer} from "Registration/Adapter/Vertalo/VertaloSynchronizer";
 
 export class AdapterServiceProvider {
     private config: Registration.Config;
@@ -31,6 +36,7 @@ export class AdapterServiceProvider {
             .addAsValue(RegistrationDatabaseAdapterInstanceProvider, createRegistrationDatabaseAdapterProvider(this.config.database))
             .addSingleton(MappingRegistryRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator, EmailCreator])
             .addSingleton(NorthCapitalSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
+            .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
         ;
 
         container
@@ -41,6 +47,12 @@ export class AdapterServiceProvider {
             .addAsValue("NorthCapitalConfig", this.config.northCapital)
             .addSingleton(NorthCapitalAdapter, ["NorthCapitalConfig"])
             .addSingleton(NorthCapitalSynchronizer, [NorthCapitalAdapter, NorthCapitalSynchronizationRepository])
+        ;
+
+        container
+            .addAsValue("VertaloConfig", this.config.vertalo)
+            .addSingleton(VertaloAdapter, ["VertaloConfig"])
+            .addSingleton(VertaloSynchronizer, [VertaloAdapter, VertaloSynchronizationRepository])
         ;
 
     }

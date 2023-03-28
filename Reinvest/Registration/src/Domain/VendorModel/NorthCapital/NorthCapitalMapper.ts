@@ -1,7 +1,7 @@
 import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
 import {MainParty} from "Registration/Domain/VendorModel/NorthCapital/MainParty";
 import {IndividualAccountForSynchronization} from "Registration/Domain/Model/Account";
-import {IndividualAccount} from "Registration/Domain/VendorModel/NorthCapital/IndividualAccount";
+import {NorthCapitalIndividualAccount} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalIndividualAccount";
 import {
     NorthCapitalDomicile,
     NorthCapitalEmploymentStatus
@@ -14,7 +14,7 @@ export class NorthCapitalMapper {
     }
 
     static mapIndividualAccount(individualAccount: IndividualAccountForSynchronization) {
-        return IndividualAccount.createFromIndividualAccountForSynchronization(individualAccount);
+        return NorthCapitalIndividualAccount.createFromIndividualAccountForSynchronization(individualAccount);
     }
 
     static mapDomicile(domicile: DomicileType): NorthCapitalDomicile | null {

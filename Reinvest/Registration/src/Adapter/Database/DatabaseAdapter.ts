@@ -1,13 +1,19 @@
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {Kysely} from "kysely";
-import {MappingRegistryTable, NorthCapitalSynchronizationTable} from "Registration/Adapter/Database/RegistrationSchema";
+import {
+    MappingRegistryTable,
+    NorthCapitalSynchronizationTable,
+    VertaloSynchronizationTable
+} from "Registration/Adapter/Database/RegistrationSchema";
 
 export const registrationMappingRegistryTable = "registration_mapping_registry";
 export const northCapitalSynchronizationTable = "registration_north_capital_synchronization";
+export const vertaloSynchronizationTable = "registration_vertalo_synchronization";
 
 export interface RegistrationDatabase {
     [registrationMappingRegistryTable]: MappingRegistryTable,
     [northCapitalSynchronizationTable]: NorthCapitalSynchronizationTable,
+    [vertaloSynchronizationTable]: VertaloSynchronizationTable,
 }
 
 export const RegistrationDatabaseAdapterInstanceProvider = "RegistrationDatabaseAdapterProvider";

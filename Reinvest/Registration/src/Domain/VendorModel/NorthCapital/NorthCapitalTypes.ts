@@ -13,7 +13,7 @@ export enum NorthCapitalEmploymentStatus {
     STUDENT = "Student",
 }
 
-export type MainPartyType = {
+export type NorthCapitalMainPartyType = {
     domicile: NorthCapitalDomicile | null,
     firstName: string,
     middleInitial?: string,
@@ -30,7 +30,7 @@ export type MainPartyType = {
     documents?: { id: string }[],
 }
 
-export type IndividualExtendedMainPartyType = {
+export type NorthCapitalIndividualExtendedMainPartyType = {
     occupation: string | null,
     empName: string | null,
     empStatus: NorthCapitalEmploymentStatus | null,
@@ -38,7 +38,7 @@ export type IndividualExtendedMainPartyType = {
     currentHouseholdIncome: string | null,
 }
 
-export type NorthCapitalIndividualAccountType = {
+export type NorthCapitalIndividualAccountStructure = {
     accountRegistration: string,
     type: "Individual",
     streetAddress1: string,
@@ -71,9 +71,9 @@ export type NorthCapitalLink = {
     linkConfiguration: NorthCapitalLinkConfiguration,
 }
 
-export type IndividualAccountType = {
+export type NorthCapitalIndividualAccountType = {
     profileId: string,
-    extendedParty: IndividualExtendedMainPartyType,
-    account: NorthCapitalIndividualAccountType,
+    extendedParty: NorthCapitalIndividualExtendedMainPartyType,
+    account: NorthCapitalIndividualAccountStructure,
     links: NorthCapitalLink[]
 }
