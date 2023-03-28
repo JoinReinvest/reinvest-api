@@ -1,5 +1,25 @@
 # REINVEST API CHANGELOG
 
+## 1.6.0 - 03/28/2023
+
+* Updated `completeProfileDetails` mutation schema for dateOfBirth field (string to object)
+* Test users endpoints. These endpoints are only available in `test` environment.
+    * [TEST] endpoint: `POST /tests/user/create-and-login` - create user and login
+    * [TEST] endpoint: `POST /tests/user/login` - login user
+    * [TEST] endpoint: `POST /tests/user/remove` - remove user
+    * all user endpoints require only incremental number as a parameter
+* Test synchronization endpoints:
+    * [TEST] endpoint: `POST /tests/north-capital/get-profile` - get North Capital profile
+    * [TEST] endpoint: `POST /tests/north-capital/get-account` - get North Capital account
+    * [TEST] endpoint: `POST /tests/vertalo/get-account` - get Vertalo account
+* North Capital and Vertalo use REINVEST "fake" emails.
+    * Email identifies REINVEST user in North Capital and Vertalo.
+    * It includes <type>_<profileId>_<externalId>@<tld> where:
+        * <type> - type of the account (profile/stakeholder or individual/corporate/trust/beneficiary account)
+        * <profileId> - REINVEST profile id
+        * <externalId> - REINVEST profile/stakeholder/account id
+        * <tld> - REINVEST tld domain.
+
 ## 1.5.0 - 03/24/2023
 
 * Vertalo Individual Account synchronization
