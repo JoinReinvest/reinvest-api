@@ -13,7 +13,7 @@ export type CompleteProfileInput = {
     name?: PersonalNameInput,
     dateOfBirth?: DateOfBirthInput,
     address?: AddressInput,
-    idScan?: { id: string }[],
+    idScan?: { id: string, fileName: string }[],
     SSN?: { ssn: SSNInput },
     domicile?: DomicileInput,
     investingExperience?: InvestingExperienceInput,
@@ -56,8 +56,12 @@ export class CompleteProfile {
                         profile.setAddress(Address.create(data));
                         break;
                     case 'idScan':
-                        const ids = data.map((idObject: { id: string }) => idObject.id);
-                        profile.setIdentityDocument(IdentityDocument.create({ids, path: profileId}));
+                        const documents = data.map((document: { id: string, fileName: string }) => ({
+                            id: document.id,
+                            fileName: document.fileName,
+                            path: profileId
+                        }));
+                        profile.setIdentityDocument(IdentityDocument.create(documents));
                         break;
                     case 'domicile':
                         profile.setDomicile(Domicile.create(data));

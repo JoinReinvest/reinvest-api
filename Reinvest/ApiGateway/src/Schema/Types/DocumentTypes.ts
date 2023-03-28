@@ -3,15 +3,23 @@ import {Documents} from "Documents/index";
 
 const schema = `
     #graphql
-    "Link id input"
-    input FileLinkInput {
+    "Avatar link id input"
+    input DocumentFileLinkInput {
+        "This is @PutFileLink.id"
+        id: String!
+        fileName: String!
+    }
+
+    "Avatar link id input"
+    input AvatarFileLinkInput {
         "This is @PutFileLink.id"
         id: String!
     }
 
     "Link id"
-    type FileLinkId {
+    type DocumentFileLinkId {
         id: String
+        fileName: String
     }
 
     "Link id + url to read the avatar"
@@ -25,6 +33,7 @@ const schema = `
     type GetDocumentLink {
         id: String
         url: String
+        fileName: String
     }
 
     "Link id + PUT url to store resource in the storage"

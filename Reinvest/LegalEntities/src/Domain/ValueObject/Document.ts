@@ -8,6 +8,12 @@ export class Path extends NonEmptyString {
     }
 }
 
+export class FileName extends NonEmptyString {
+    constructor(value: string) {
+        super(value, "fileName");
+    }
+}
+
 export type FileInput = {
     id: string,
     path: string
@@ -15,40 +21,59 @@ export type FileInput = {
 
 export type AvatarInput = FileInput
 
-export type IdScanInput = {
-    ids: string[],
-    path: string
+export type IdScanInput = DocumentSchema[];
+
+export type DocumentSchema = {
+    id: string,
+    path: string,
+    fileName: string,
+}
+
+export class Document implements ToObject {
+    private id: Id;
+    private path: Path;
+    private fileName: FileName;
+
+    constructor(document: DocumentSchema) {
+        this.id = new Id(document.id);
+        this.path = new Path(document.path);
+        this.fileName = new FileName(document.fileName);
+    }
+
+    toObject(): DocumentSchema {
+        return {
+            id: this.id.toString(),
+            path: this.path.toString(),
+            fileName: this.fileName.toString(),
+        };
+    }
+
 }
 
 
 export class IdentityDocument implements ToObject {
-    private ids: Id[];
-    private path: Path;
+    private documents: Document[];
 
-    constructor(ids: Id[], path: Path) {
-        if (ids.length === 0) {
+    constructor(documents: Document[]) {
+        if (documents.length === 0) {
             throw new ValidationError("List ID scans can not be empty");
         }
-        this.ids = ids;
-        this.path = path;
+
+        this.documents = documents;
     }
 
     static create(data: IdScanInput): IdentityDocument {
         try {
-            const {ids, path} = data;
-            const identifiers = ids.map((id: string) => new Id(id));
+            const documents = data.map((document: DocumentSchema) => new Document(document));
 
-            return new IdentityDocument(identifiers, new Path(path));
+            return new IdentityDocument(documents);
         } catch (error: any) {
             throw new ValidationError("Missing some mandatory Id Scan fields");
         }
     }
 
-    toObject(): IdScanInput {
-        return {
-            ids: this.ids.map((id) => id.toString()),
-            path: this.path.toString(),
-        }
+    toObject(): DocumentSchema[] {
+        return this.documents.map((document: Document) => document.toObject());
     }
 }
 

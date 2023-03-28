@@ -15,7 +15,7 @@ const schema = `
         domicile: Domicile
         address: Address
         ssn: String
-        idScan: [FileLinkId]
+        idScan: [DocumentFileLinkId]
         statements: [Statement]
         experience: Experience
     }
@@ -59,7 +59,7 @@ const schema = `
         ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
         Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
         """
-        idScan: [FileLinkInput]
+        idScan: [DocumentFileLinkInput]
         "FINRA, Politician, Trading company stakeholder, accredited investor statements"
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"
