@@ -16,6 +16,10 @@ import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/Tr
 import {InvestmentAccountsService} from "LegalEntities/Adapter/Modules/InvestmentAccountsService";
 import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
 import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
+import {CompleteProfile} from "LegalEntities/UseCases/CompleteProfile";
+import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
+import {QueueSender} from "shared/hkek-sqs/QueueSender";
+import {SendToQueueEventHandler} from "SimpleAggregator/EventBus/SendToQueueEventHandler";
 
 export class AdapterServiceProvider {
     private config: LegalEntities.Config;
@@ -25,6 +29,12 @@ export class AdapterServiceProvider {
     }
 
     public boot(container: ContainerInterface) {
+        // event bus + events queue sender
+        container
+            .addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container))
+            .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
+            .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
+
         container
             .addSingleton(IdGenerator)
 
@@ -36,7 +46,7 @@ export class AdapterServiceProvider {
         // database
         container
             .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
-            .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+            .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
             .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
             .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
             .addObjectFactory("LegalEntitiesTransactionalAdapter",
@@ -48,6 +58,7 @@ export class AdapterServiceProvider {
 
         // use cases
         container
+            .addSingleton(CompleteProfile, [ProfileRepository])
             .addSingleton(CreateDraftAccount, [DraftAccountRepository])
             .addSingleton(CompleteDraftAccount, [DraftAccountRepository])
             .addSingleton(DraftAccountQuery, [DraftAccountRepository, DocumentsService])

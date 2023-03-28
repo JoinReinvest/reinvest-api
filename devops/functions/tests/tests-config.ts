@@ -1,6 +1,15 @@
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
-import {getAttribute, getResourceName} from "../../serverless/utils";
-import {EniPolicies, importPrivateSubnetRefs, importVpcRef} from "../../serverless/vpc";
+import {getAttribute, getResourceName, importOutput} from "../../serverless/utils";
+import {
+    EniPolicies,
+    importPrivateSubnetRefs,
+    importVpcRef,
+    SecurityGroupEgressRules, SecurityGroupIngressRules
+} from "../../serverless/vpc";
+import {SQSSendPolicy} from "../queue/queue-config";
+import {S3PoliciesWithImport} from "../../serverless/s3";
+import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "../../serverless/cognito";
+import {SMSPolicy} from "../../serverless/sns";
 
 export const TestsFunction = {
     handler: `devops/functions/tests/handler.main`,
@@ -43,6 +52,17 @@ export const TestsLambdaResources = {
                         Statement: [
                             ...CloudwatchPolicies,
                             ...EniPolicies,
+                            ...S3PoliciesWithImport,
+                            ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
+                            ...SQSSendPolicy,
+                            SMSPolicy,
+                            {
+                                Effect: "Allow",
+                                Action: [
+                                    "cognito-idp:*",
+                                ],
+                                Resource: importOutput('CognitoUserPoolArn'),
+                            },
                         ],
                     },
                 },
@@ -54,20 +74,8 @@ export const TestsLambdaResources = {
         Properties: {
             GroupName: getResourceName("sg-tests-lambda"),
             GroupDescription: getResourceName("sg-tests-lambda"),
-            SecurityGroupEgress: [
-                {
-                    IpProtocol: "TCP",
-                    CidrIp: "0.0.0.0/0",
-                    ToPort: 443,
-                    FromPort: 443,
-                },
-                {
-                    IpProtocol: "TCP",
-                    CidrIp: "0.0.0.0/0",
-                    ToPort: 5432,
-                    FromPort: 5432,
-                },
-            ],
+            SecurityGroupIngress: SecurityGroupIngressRules,
+            SecurityGroupEgress: SecurityGroupEgressRules,
             VpcId: importVpcRef()
         },
     },

@@ -1,6 +1,5 @@
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
 import {
-    CognitoAuthorizer,
     CognitoAuthorizerName,
     CognitoUpdateAttributesPolicyBasedOnOutputArn
 } from "../../serverless/cognito";
@@ -9,9 +8,10 @@ import {getAttribute, getResourceName} from "../../serverless/utils";
 import {
     EniPolicies,
     importPrivateSubnetRefs,
-    importVpcRef,
+    importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules,
 } from "../../serverless/vpc";
 import {SMSPolicy} from "../../serverless/sns";
+import {SQSSendPolicy} from "../queue/queue-config";
 
 export const ApiLambdaFunction = {
     handler: `devops/functions/api/handler.main`,
@@ -59,6 +59,7 @@ export const ApiLambdaResources = {
                             ...EniPolicies,
                             ...S3PoliciesWithImport,
                             ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
+                            ...SQSSendPolicy,
                             SMSPolicy
                         ],
                     },
@@ -71,20 +72,8 @@ export const ApiLambdaResources = {
         Properties: {
             GroupName: getResourceName("sg-api-lambda"),
             GroupDescription: getResourceName("sg-api-lambda"),
-            SecurityGroupEgress: [
-                {
-                    IpProtocol: "TCP",
-                    CidrIp: "0.0.0.0/0",
-                    ToPort: 443,
-                    FromPort: 443,
-                },
-                {
-                    IpProtocol: "TCP",
-                    CidrIp: "0.0.0.0/0",
-                    ToPort: 5432,
-                    FromPort: 5432,
-                },
-            ],
+            SecurityGroupIngress: SecurityGroupIngressRules,
+            SecurityGroupEgress: SecurityGroupEgressRules,
             VpcId: importVpcRef()
         },
     },

@@ -14,12 +14,8 @@ import {
 } from "./devops/serverless/cognito";
 import {S3Resources} from "./devops/serverless/s3";
 import {VpcResources} from "./devops/serverless/vpc";
-import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-config";
+import {QueueFunction, QueueOutputs, QueueResources} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
-import {
-    LocalSignUpLambdaFunction,
-    LocalSignUpLambdaResources
-} from "./devops/functions/localSignUp/local-sign-up-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {ProviderEnvironment} from "./devops/serverless/serverless-common";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
@@ -53,7 +49,9 @@ const serverlessConfiguration: AWS = {
             ...ProviderEnvironment,
             // @ts-ignore
             ExplorerHostedUI: "${env:LocalHostedUiUrl}",
-            ApiUrl: "http://localhost:3000/api"
+            ApiUrl: "http://localhost:3000/api",
+            SQS_QUEUE_URL: "http://localhost:9324/000000000000/development-sqs-notification",
+            IT_IS_LOCAL: "true",
         },
         logs: {
             httpApi: true, // turn on Api Gateway logs
@@ -78,7 +76,6 @@ const serverlessConfiguration: AWS = {
         queue: QueueFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
-        localSignUp: LocalSignUpLambdaFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         tests: TestsFunction,
     },
@@ -95,7 +92,6 @@ const serverlessConfiguration: AWS = {
             ...MigrationLambdaResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...QueueResources,
-            ...LocalSignUpLambdaResources,
             ...SesResources,
             ...TestsLambdaResources,
         },
@@ -120,8 +116,8 @@ const serverlessConfiguration: AWS = {
         'serverless-offline-sqs': {
             autoCreate: true,
             apiVersion: '2012-11-05',
-            region: '${aws:region}',
-            endpoint: 'http://0.0.0.0:9324',
+            region: 'us-east-1',
+            endpoint: 'http://0.0.0.0:9324'
         },
         bundle: {
             ignorePackages: ['pg-native'],

@@ -34,6 +34,18 @@ export type ProfileResponse = {
     }
 }
 
+export type ProfileForSynchronization = {
+    firstName?: string,
+    middleName?: string,
+    lastName?: string,
+    dateOfBirth: string | null,
+    experience: string | null,
+    domicileType: DomicileType | null,
+    ssn: string | null,
+    address: AddressInput | null,
+    idScan?: { id: string }[],
+}
+
 export class GetProfileController {
     public static getClassName = (): string => "GetProfileController";
     private profileRepository: ProfileRepository;
@@ -73,6 +85,27 @@ export class GetProfileController {
                     details: statement.getDetails()
                 }))
             }
+        };
+    }
+
+    public async getProfileForSynchronization(profileId: string): Promise<ProfileForSynchronization | null> {
+        const profile = await this.profileRepository.findProfile(profileId);
+        if (profile === null) {
+            return null;
+        }
+
+        const profileObject = profile.toObject();
+        return {
+            firstName: profileObject.name?.firstName,
+            middleName: profileObject.name?.middleName,
+            lastName: profileObject.name?.lastName,
+            experience: profileObject.investingExperience ? profileObject.investingExperience?.experience : null,
+            dateOfBirth: profileObject.dateOfBirth,
+            // @ts-ignore
+            domicile: profileObject.domicile ? profileObject.domicile.type : null,
+            address: profileObject.address,
+            ssn: profile.exposeSSN(),
+            idScan: profileObject.idScan?.ids.map((id) => ({id})),
         };
     }
 }

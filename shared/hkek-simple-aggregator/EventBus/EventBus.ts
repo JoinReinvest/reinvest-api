@@ -41,7 +41,7 @@ export class SimpleEventBus implements EventBus {
         return this;
     }
 
-    public publishMany(events: [DomainEvent]): this {
+    public publishMany(events: DomainEvent[]): this {
         for (const event of events) {
             this.publish(event);
         }

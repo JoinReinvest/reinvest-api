@@ -6,6 +6,10 @@ const schema = `
         lastName: String! @constraint(minLength: 1)
     }
 
+    input DateOfBirthInput {
+        dateOfBirth: ISODate!
+    }
+
     input EmailInput {
         email: EmailAddress!
     }
