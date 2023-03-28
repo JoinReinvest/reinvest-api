@@ -1,6 +1,12 @@
 import {LambdaConfigType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import {getAttribute, getResourceName} from "../..//serverless/utils";
-import {EniPolicies, importPrivateSubnetRefs, importVpcRef} from "../..//serverless/vpc";
+import {
+    EniPolicies,
+    importPrivateSubnetRefs,
+    importVpcRef,
+    SecurityGroupEgressRules,
+    SecurityGroupIngressRules
+} from "../..//serverless/vpc";
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
 
 const trigger: keyof LambdaConfigType = 'PreSignUp';
@@ -53,6 +59,8 @@ export const CognitoPreSignUpResources = {
         Properties: {
             GroupName: getResourceName("sg-presignup-lambda"),
             GroupDescription: getResourceName("sg-presignup-lambda"),
+            SecurityGroupIngress: SecurityGroupIngressRules,
+            SecurityGroupEgress: SecurityGroupEgressRules,
             VpcId: importVpcRef(),
         },
     },

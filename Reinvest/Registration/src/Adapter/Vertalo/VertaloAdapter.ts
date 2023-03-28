@@ -45,4 +45,22 @@ export class VertaloAdapter extends ExecutionVertaloAdapter {
 
         await this.sendRequest(mutationQuery);
     }
+
+    async getAccount(customerId: string): Promise<object | never> {
+        const query = `
+            query {
+              customerById (id: "${customerId}") {
+                name
+                status
+                id
+                formationDate
+                investorType
+              }
+            }
+        `
+
+        const customer = await this.sendRequest(query);
+
+        return customer;
+    }
 }

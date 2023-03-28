@@ -33,6 +33,8 @@ export const S3_CONFIG = {
 export const COGNITO_CONFIG = {
     region: process.env.INFRASTRUCTURE_AWS_REGION as string,
     userPoolID: process.env.CognitoUserPoolID as string,
+    localClientId: process.env.LocalCognitoClientId as string,
+    isLocal: process.env.IT_IS_LOCAL === 'true',
 }
 
 export const SNS_CONFIG = {
