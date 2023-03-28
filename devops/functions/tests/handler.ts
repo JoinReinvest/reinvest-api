@@ -136,20 +136,21 @@ const userRouter = () => {
             });
             const createUserResult = await client.send(createUserCommand);
 
-            if (COGNITO_CONFIG.isLocal) {
-                await postSignUp({
-                    request: {
-                        userAttributes: {
-                            sub: createUserResult.User.Username,
-                            email_verified: true,
-                            email,
-                            'custom:incentive_token': incentiveToken,
-                        }
+            let postSignUpResult = false;
+            await postSignUp({
+                request: {
+                    userAttributes: {
+                        sub: createUserResult.User.Username,
+                        email_verified: true,
+                        email,
+                        'custom:incentive_token': incentiveToken,
                     }
-                }, {}, (message) => {
-                    console.log(`postSignUp: ${message}`);
-                })
-            }
+                }
+            }, {}, (message) => {
+                console.log(`postSignUp: ${message}`);
+                postSignUpResult = message;
+            });
+
 
             const changePasswordCommand = new AdminSetUserPasswordCommand({
                 Password: password,
@@ -172,6 +173,7 @@ const userRouter = () => {
             res.status(200).json({
                 status: true,
                 createUserResult,
+                postSignUpResult,
                 changePasswordResult,
                 signInResult,
             });
