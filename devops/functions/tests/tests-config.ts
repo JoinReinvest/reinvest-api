@@ -7,9 +7,9 @@ import {
     SecurityGroupEgressRules, SecurityGroupIngressRules
 } from "../../serverless/vpc";
 import {SQSSendPolicy} from "../queue/queue-config";
-import {S3PoliciesWithImport} from "devops/serverless/s3";
-import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "devops/serverless/cognito";
-import {SMSPolicy} from "devops/serverless/sns";
+import {S3PoliciesWithImport} from "../../serverless/s3";
+import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "../../serverless/cognito";
+import {SMSPolicy} from "../../serverless/sns";
 
 export const TestsFunction = {
     handler: `devops/functions/tests/handler.main`,

@@ -7,7 +7,6 @@ import {
     SecurityGroupEgressRules,
     SecurityGroupIngressRules
 } from "../../serverless/vpc";
-import {SQSSendPolicy} from "../queue/queue-config";
 
 export const UnauthorizedEndpointsFunction = {
     handler: `devops/functions/unauthorizedEndpoints/handler.main`,

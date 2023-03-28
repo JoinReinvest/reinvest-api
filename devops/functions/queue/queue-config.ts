@@ -1,11 +1,11 @@
-import {exportOutput, getAttribute, getResourceName, joinAttributes} from "../../serverless/utils";
+import {exportOutput, getAttribute, getResourceName} from "../../serverless/utils";
 import {
     EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules,
 } from "../../serverless/vpc";
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
-import {S3PoliciesWithImport} from "devops/serverless/s3";
-import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "devops/serverless/cognito";
-import {SMSPolicy} from "devops/serverless/sns";
+import {S3PoliciesWithImport} from "../../serverless/s3";
+import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "../../serverless/cognito";
+import {SMSPolicy} from "../../serverless/sns";
 
 export const QueueFunction = {
     handler: `devops/functions/queue/handler.main`,
