@@ -195,7 +195,7 @@ export const CognitoAuthorizer = {
         name: getResourceName("cognito-authorizer"),
         identitySource: "$request.header.Authorization",
         issuerUrl: importOutput('CognitoIssuerUrl'),
-        audience: [{Ref: "WebsiteCognito"}],
+        audience: [{Ref: "WebsiteCognito"}, {Ref: "LocalCognito"}],
     },
 };
 
