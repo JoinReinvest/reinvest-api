@@ -20,7 +20,7 @@ export type ProfileSchema = {
     name: PersonalNameInput | null,
     ssnObject: SSNSchema | null,
     ssn: string | null,
-    dateOfBirth: DateOfBirthInput | null,
+    dateOfBirth: string | null,
     address: AddressInput | null,
     idScan: IdScanInput | null,
     domicile: DomicileInput | null,
@@ -115,7 +115,8 @@ export class Profile {
             }
 
             if (dateOfBirth) {
-                profile.setDateOfBirth(DateOfBirth.create(dateOfBirth));
+                const date = {dateOfBirth} as DateOfBirthInput;
+                profile.setDateOfBirth(DateOfBirth.create(date));
             }
 
             if (address) {

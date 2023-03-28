@@ -38,7 +38,7 @@ export class Money {
 
 export class IsoDate {
     constructor(date: string) {
-        if (!DateTime.isValid(date, 'YYYY-MM-DD')) {
+        if (!date || !DateTime.isValid(date, 'YYYY-MM-DD')) {
             throw new ValidationError("The value format must be YYYY-MM-DD");
         }
     }

@@ -48,7 +48,7 @@ const schema = `
         "An investor name"
         name: PersonName
         "Date of Birth in format YYYY-MM-DD"
-        dateOfBirth: ISODate
+        dateOfBirth: DateOfBirthInput
         "Is the investor US. Citizen or US. Resident with Green Card or Visa"
         domicile: DomicileInput
         "A valid SSN number"
