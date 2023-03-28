@@ -1,10 +1,9 @@
 import {LegalEntities} from "LegalEntities/index";
 import {SessionContext} from "ApiGateway/index";
-import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileController";
-import {ApolloError} from "apollo-server-errors";
 import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
 import {GraphQLError} from "graphql";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
+import {CompleteProfileInput} from "LegalEntities/UseCases/CompleteProfile";
 
 const schema = `
     #graphql
@@ -126,7 +125,7 @@ export const Profile = {
                 const {input} = data;
                 const errors = await api.completeProfile(input, profileId);
                 if (errors.length > 0) {
-                    throw new ApolloError(JSON.stringify(errors));
+                    throw new GraphQLError(JSON.stringify(errors));
                 }
 
                 return api.getProfile(profileId);
