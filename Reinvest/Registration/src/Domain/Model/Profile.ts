@@ -1,4 +1,4 @@
-import {Address, DomicileType} from "Registration/Domain/Model/SharedTypes";
+import {Address, DocumentSchema, DomicileType} from "Registration/Domain/Model/ReinvestTypes";
 
 export type ProfileForSynchronization = {
     firstName: string,
@@ -9,5 +9,5 @@ export type ProfileForSynchronization = {
     domicile: DomicileType,
     ssn: string | null,
     address: Address,
-    idScan?: { id: string }[],
+    idScan: DocumentSchema[]
 }

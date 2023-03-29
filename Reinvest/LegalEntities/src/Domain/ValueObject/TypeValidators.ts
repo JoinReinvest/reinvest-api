@@ -51,6 +51,9 @@ export class Uuid {
         if (!uuid) {
             throw new ValidationError('Uuid can not be empty');
         }
+        if (uuid.length !== 36) {
+            throw new ValidationError('Invalid UUID string');
+        }
         this.uuid = uuid;
     }
 

@@ -1,4 +1,5 @@
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 
 export enum NorthCapitalDomicile {
     "CITIZEN" = "U.S. Citizen",
@@ -11,6 +12,12 @@ export enum NorthCapitalEmploymentStatus {
     UNEMPLOYED = "Not Employed",
     RETIRED = "Retired",
     STUDENT = "Student",
+}
+
+export enum NorthCapitalObjectType {
+    ACCOUNT = "ACCOUNT",
+    PARTY = "PARTY",
+    ENTITY = "ENTITY",
 }
 
 export type NorthCapitalMainPartyType = {
@@ -27,7 +34,7 @@ export type NorthCapitalMainPartyType = {
     primCountry: string,
     emailAddress: string,
     socialSecurityNumber: string | null,
-    documents?: { id: string }[],
+    documents: DocumentSchema[],
 }
 
 export type NorthCapitalIndividualExtendedMainPartyType = {

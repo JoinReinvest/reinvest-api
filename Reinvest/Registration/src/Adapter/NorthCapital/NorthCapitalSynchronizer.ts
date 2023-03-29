@@ -4,36 +4,60 @@ import {
     NorthCapitalSynchronizationRepository
 } from "Registration/Adapter/Database/Repository/NorthCapitalSynchronizationRepository";
 import {
-    NorthCapitalEntityType, NorthCapitalLinkMapping
+    NorthCapitalEntityType,
+    NorthCapitalLinkMapping
 } from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord";
-import {NorthCapitalIndividualAccount} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalIndividualAccount";
+import {
+    NorthCapitalIndividualAccount
+} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalIndividualAccount";
 import {
     NorthCapitalLink,
+    NorthCapitalObjectType,
     NorthCapitalSynchronizationMapping
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
+import {
+    NorthCapitalDocumentsSynchronizationRepository
+} from "Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository";
+import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 
 export class NorthCapitalSynchronizer {
     static getClassName = () => 'NorthCapitalSynchronizer';
     private northCapitalAdapter: NorthCapitalAdapter;
     private northCapitalSynchronizationRepository: NorthCapitalSynchronizationRepository;
+    private northCapitalDocumentSynchronizationRepository: NorthCapitalDocumentsSynchronizationRepository;
 
-    constructor(northCapitalAdapter: NorthCapitalAdapter, northCapitalSynchronizationRepository: NorthCapitalSynchronizationRepository) {
+    constructor(
+        northCapitalAdapter: NorthCapitalAdapter,
+        northCapitalSynchronizationRepository: NorthCapitalSynchronizationRepository,
+        northCapitalDocumentSynchronizationRepository: NorthCapitalDocumentsSynchronizationRepository,
+    ) {
         this.northCapitalAdapter = northCapitalAdapter;
         this.northCapitalSynchronizationRepository = northCapitalSynchronizationRepository;
+        this.northCapitalDocumentSynchronizationRepository = northCapitalDocumentSynchronizationRepository;
     }
 
     async synchronizeMainParty(recordId: string, mainParty: MainParty): Promise<void> {
         const synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
+        const documents = mainParty.getDocuments();
 
         if (synchronizationRecord === null) {
             const partyId = await this.northCapitalAdapter.createParty(mainParty.getPartyData());
             await this.northCapitalSynchronizationRepository.createSynchronizationRecord(recordId, partyId, mainParty.getCrc(), NorthCapitalEntityType.PARTY);
-
+            await this.addDocuments(recordId, partyId, NorthCapitalObjectType.PARTY, documents);
         } else if (synchronizationRecord.isOutdated(mainParty.getCrc())) {
             await this.northCapitalAdapter.updateParty(synchronizationRecord.getNorthCapitalId(), mainParty.getPartyData());
             synchronizationRecord.setCrc(mainParty.getCrc());
             await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
+            await this.addDocuments(recordId, synchronizationRecord.getNorthCapitalId(), NorthCapitalObjectType.PARTY, documents);
         }
+    }
+
+    private async addDocuments(recordId: string, partyId: string, northCapitalObjectType: NorthCapitalObjectType, documents: DocumentSchema[]) {
+        if (documents.length === 0) {
+            return;
+        }
+
+        await this.northCapitalDocumentSynchronizationRepository.addDocuments(recordId, partyId, northCapitalObjectType, documents)
     }
 
     async synchronizeIndividualAccount(recordId: string, northCapitalIndividualAccount: NorthCapitalIndividualAccount) {
@@ -44,7 +68,6 @@ export class NorthCapitalSynchronizer {
             if (synchronizationRecord === null) {
                 const individualAccountId = await this.northCapitalAdapter.createAccount(northCapitalIndividualAccount.getAccountData());
                 await this.northCapitalAdapter.updateParty(mainPartyId, northCapitalIndividualAccount.getPartyData());
-
                 await this.northCapitalSynchronizationRepository.createSynchronizationRecord(recordId, individualAccountId, northCapitalIndividualAccount.getCrc(), NorthCapitalEntityType.ACCOUNT);
             } else if (synchronizationRecord.isOutdated(northCapitalIndividualAccount.getCrc())) {
 
