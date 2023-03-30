@@ -32,7 +32,6 @@ export interface NorthCapitalSynchronizationTable {
     northCapitalId: string;
     type: NorthCapitalEntityType,
     crc: string;
-    documents: string | null;
     version: number;
     createdDate: Date;
     updatedDate: Date;

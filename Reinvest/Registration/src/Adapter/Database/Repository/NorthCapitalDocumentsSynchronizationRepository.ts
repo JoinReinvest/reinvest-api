@@ -68,14 +68,19 @@ export class NorthCapitalDocumentsSynchronizationRepository {
 
     }
 
-    async getDocumentToSync(documentId: string): Promise<NorthCapitalDocumentToSync | never> {
-        return await this.databaseAdapterProvider.provide()
-            .selectFrom(northCapitalDocumentsSynchronizationTable)
-            .select(['recordId', 'northCapitalId', 'northCapitalType', 'documentId', 'documentPath', 'documentFilename', 'version', 'state', 'createdDate', 'updatedDate'])
-            .where('documentId', '=', documentId)
-            .limit(1)
-            .castTo<NorthCapitalDocumentToSync>()
-            .executeTakeFirstOrThrow();
+    async getDocumentToSync(documentId: string): Promise<NorthCapitalDocumentToSync | null> {
+        try {
+            return await this.databaseAdapterProvider.provide()
+                .selectFrom(northCapitalDocumentsSynchronizationTable)
+                .select(['recordId', 'northCapitalId', 'northCapitalType', 'documentId', 'documentPath', 'documentFilename', 'version', 'state', 'createdDate', 'updatedDate'])
+                .where('documentId', '=', documentId)
+                .limit(1)
+                .castTo<NorthCapitalDocumentToSync>()
+                .executeTakeFirstOrThrow();
+        } catch (error: any) {
+            console.error(error.message);
+            return null;
+        }
     }
 
     async setClean(document: NorthCapitalDocumentToSync): Promise<boolean> {

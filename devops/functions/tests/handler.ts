@@ -306,7 +306,7 @@ const northCapitalRouter = () => {
 
             const ncSyncRecord = await databaseProvider.provide()
                 .selectFrom("registration_north_capital_synchronization")
-                .select(['northCapitalId', 'recordId', 'type', 'crc', 'documents', 'links', 'version', 'createdDate', 'updatedDate'])
+                .select(['northCapitalId', 'recordId', 'type', 'crc', 'links', 'version', 'createdDate', 'updatedDate'])
                 .where('recordId', '=', mappedRecord.recordId)
                 .limit(1)
                 .executeTakeFirstOrThrow();

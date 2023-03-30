@@ -137,9 +137,12 @@ export class NorthCapitalSynchronizer {
     }
 
     async synchronizeDocument(documentId: string): Promise<boolean> {
-        let document = null;
+        let document = await this.northCapitalDocumentSynchronizationRepository.getDocumentToSync(documentId);
+        if (document === null) {
+            return false;
+        }
+
         try {
-            const document = await this.northCapitalDocumentSynchronizationRepository.getDocumentToSync(documentId);
             const {documentPath, northCapitalType, northCapitalId, documentFilename} = document;
 
             if (await this.checkIfFileExistsInNorthCapital(northCapitalId, documentId)) {

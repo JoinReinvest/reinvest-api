@@ -6,6 +6,7 @@
     * separate `DocumentFileLinkInput` and `AvatarFileLinkInput`
     * `DocumentFileLinkInput` requires `fileName` field
     * `DocumentFileLinkId` and `GetDocumentLink` returns `fileName` field
+    * limit fileName only to `jpeg`, `jpg`, `png` and `pdf` extensions
 * Synchronization profile documents with North Capital
     * Add `cronDocumentSync` lambda function triggered every 1 hour that synchronize up to 20 documents
 * [TEST] endpoints:

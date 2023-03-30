@@ -201,10 +201,13 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
         const data = {
             partyId: northCapitalId,
         }
+        try {
 
-        const response = await this.postRequest(endpoint, data);
-        const {statusCode, statusDesc, partyDocumentDetails: details} = response;
-
-        return details ?? [];
+            const response = await this.postRequest(endpoint, data);
+            const {statusCode, statusDesc, partyDocumentDetails: details} = response;
+            return details ?? [];
+        } catch (error: any) {
+            return [];
+        }
     }
 }
