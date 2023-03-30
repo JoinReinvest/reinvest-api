@@ -19,6 +19,7 @@ import {NorthCapitalAdapter} from "Reinvest/Registration/src/Adapter/NorthCapita
 import {VertaloAdapter} from "Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter";
 import {boot} from "Reinvest/bootstrap";
 import {Registration} from "Reinvest/Registration/src";
+import {PhoneNumber} from "Identity/Domain/PhoneNumber";
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -51,13 +52,22 @@ const getProfileIdFromAccessToken = async (token) => {
     return profileId;
 }
 
+const getUserIdFromAccessToken = async (token) => {
+    const {sub} = decodeJwt(token);
+
+    return sub;
+}
+
 router.post("/get-sms-topt", async (req: any, res: any) => {
     try {
         const {phoneNumber} = req.body;
+        const phoneNumberVO = new PhoneNumber("+1", phoneNumber);
+        const userId = await getUserIdFromAccessToken(req.headers.authorization);
         const data = await databaseProvider.provide()
             .selectFrom("identity_phone_verification")
             .select(['topt'])
-            .where('phoneNumber', '=', phoneNumber)
+            .where('phoneNumber', '=', phoneNumberVO.getPhoneNumber())
+            .where('userId', '=', userId)
             .limit(1)
             .executeTakeFirstOrThrow();
 

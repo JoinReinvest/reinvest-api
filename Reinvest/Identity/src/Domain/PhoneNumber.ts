@@ -6,14 +6,15 @@ export class PhoneNumber {
         if (!countryCode || !phoneNumber) {
             throw new Error('Country code and phone number are required');
         }
-        this.countryCode = this.trim(countryCode);
+        this.countryCode = `+${this.trim(countryCode)}`;
         this.phoneNumber = this.trim(phoneNumber);
     }
 
     private trim(value: string): string {
         return value
-            .replace('-', '')
-            .replace(' ', '');
+            .replace(/\+/g, '')
+            .replace(/-/g, '')
+            .replace(/\s+/g, '');
     }
 
     public getFullPhoneNumber() {
