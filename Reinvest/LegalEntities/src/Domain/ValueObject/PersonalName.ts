@@ -1,4 +1,9 @@
-import {AnyString, NonEmptyString, ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {
+    AnyString,
+    NonEmptyString,
+    ValidationError,
+    ValidationErrorEnum
+} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 
 export class FirstName extends NonEmptyString {
@@ -54,7 +59,7 @@ export class PersonalName implements ToObject {
                 new MiddleName(middleName)
             );
         } catch (error: any) {
-            throw new ValidationError("Missing personal name fields");
+            throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, 'name');
         }
     }
 

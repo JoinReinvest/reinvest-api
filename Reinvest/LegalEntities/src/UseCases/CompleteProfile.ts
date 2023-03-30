@@ -8,6 +8,7 @@ import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domai
 import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
 import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {LegalProfileCompleted} from "LegalEntities/Domain/Events/ProfileEvents";
+import {ValidationErrorEnum, ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export type CompleteProfileInput = {
     name?: PersonalNameInput,
@@ -22,7 +23,6 @@ export type CompleteProfileInput = {
     verifyAndFinish: boolean
 }
 
-
 export class CompleteProfile {
     public static getClassName = (): string => "CompleteProfile";
     private profileRepository: ProfileRepository;
@@ -31,12 +31,15 @@ export class CompleteProfile {
         this.profileRepository = profileRepository;
     }
 
-    public async execute(input: CompleteProfileInput, profileId: string): Promise<string[]> {
+    public async execute(input: CompleteProfileInput, profileId: string): Promise<ValidationErrorType[]> {
         let profile = await this.profileRepository.findOrCreateProfile(profileId);
         const events = [];
         const errors = [];
         if (profile.isCompleted()) {
-            errors.push("PROFILE_ALREADY_COMPLETED");
+            errors.push(<ValidationErrorType>{
+                type: ValidationErrorEnum.ALREADY_COMPLETED,
+                field: "profile",
+            });
 
             return errors;
         }
@@ -45,6 +48,14 @@ export class CompleteProfile {
             try {
                 // @ts-ignore
                 const data = input[step];
+                if (data === null) {
+                    errors.push(<ValidationErrorType>{
+                        type: ValidationErrorEnum.EMPTY_VALUE,
+                        field: step,
+                    });
+                    continue;
+                }
+
                 switch (step) {
                     case 'name':
                         profile.setName(PersonalName.create(data));
@@ -75,7 +86,10 @@ export class CompleteProfile {
                         if (await this.profileRepository.isSSNUnique(ssn, profileId)) {
                             profile.setSSN(ssn);
                         } else {
-                            errors.push('SSN_IS_NOT_UNIQUE');
+                            errors.push(<ValidationErrorType>{
+                                type: ValidationErrorEnum.NOT_UNIQUE,
+                                field: "ssn",
+                            });
                         }
                         break;
                     case 'statements':
@@ -93,13 +107,22 @@ export class CompleteProfile {
                     case 'verifyAndFinish':
                         break;
                     default:
-                        console.error(`Unknown step: ${step}`);
-
-                        errors.push(`UNKNOWN_STEP`);
+                        errors.push(<ValidationErrorType>{
+                            type: ValidationErrorEnum.UNKNOWN_ERROR,
+                            field: step,
+                        });
                         break;
                 }
             } catch (error: any) {
-                errors.push(error.message);
+                if ('getValidationError' in error) {
+                    errors.push(error.getValidationError());
+                } else {
+                    console.error(error.message);
+                    errors.push(<ValidationErrorType>{
+                        type: ValidationErrorEnum.UNKNOWN_ERROR,
+                        field: step,
+                    });
+                }
             }
         }
 
@@ -111,7 +134,10 @@ export class CompleteProfile {
                     kind: "LegalProfileCompleted",
                 });
             } else {
-                errors.push('Profile completion verification failed');
+                errors.push(<ValidationErrorType>{
+                    type: ValidationErrorEnum.FAILED,
+                    field: "verifyAndFinish",
+                });
             }
         }
 

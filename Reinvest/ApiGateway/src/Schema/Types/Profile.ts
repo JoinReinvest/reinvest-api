@@ -1,5 +1,5 @@
 import {LegalEntities} from "LegalEntities/index";
-import {SessionContext} from "ApiGateway/index";
+import {JsonGraphQLError, SessionContext} from "ApiGateway/index";
 import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
 import {GraphQLError} from "graphql";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
@@ -125,7 +125,7 @@ export const Profile = {
                 const {input} = data;
                 const errors = await api.completeProfile(input, profileId);
                 if (errors.length > 0) {
-                    throw new GraphQLError(JSON.stringify(errors));
+                    throw new JsonGraphQLError(errors);
                 }
 
                 return api.getProfile(profileId);
@@ -136,9 +136,9 @@ export const Profile = {
                                 {profileId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
-                if (errors.length > 0) {
-                    throw new GraphQLError(JSON.stringify(errors));
+                const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
+                if (error !== null) {
+                    throw new GraphQLError(error);
                 }
 
                 return true;

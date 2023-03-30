@@ -77,7 +77,7 @@ context("Given an investor created an individual draft account", () => {
             draftId,
             accountType: DraftAccountType.INDIVIDUAL,
             state: DraftAccountState.ACTIVE,
-            data: null
+            data: {} as IndividualDraftAccountSchema
         }) as IndividualDraftAccount;
 
         const verifyIndividualDraftAccount = (expectedResult: boolean) => {
@@ -106,7 +106,7 @@ context("Given an investor created an individual draft account", () => {
 
             await expectThrowsAsync(
                 () => draftAccount.setEmploymentStatus(EmploymentStatus.create(input)),
-                "WRONG_EMPLOYMENT_STATUS_TYPE"
+                "employmentStatus:MISSING_MANDATORY_FIELDS"
             );
         });
 
@@ -127,7 +127,7 @@ context("Given an investor created an individual draft account", () => {
 
             expectThrows(
                 () => draftAccount.setAvatarDocument(Avatar.create(input)),
-                "MISSING_AVATAR_ID"
+                "avatar:MISSING_MANDATORY_FIELDS"
             );
         });
 
@@ -153,7 +153,7 @@ context("Given an investor created an individual draft account", () => {
 
             expectThrows(
                 () => draftAccount.setEmployer(Employer.create(input)),
-                "WRONG_EMPLOYER_TYPE"
+                "employer:MISSING_MANDATORY_FIELDS"
             );
         });
 
@@ -175,7 +175,7 @@ context("Given an investor created an individual draft account", () => {
 
             expectThrows(
                 () => draftAccount.setNetWorth(NetWorth.create(input)),
-                "WRONG_NET_RANGE_TYPE"
+                "netWorth:MISSING_MANDATORY_FIELDS"
             );
         });
 
@@ -200,7 +200,7 @@ context("Given an investor created an individual draft account", () => {
 
             expectThrows(
                 () => draftAccount.setNetIncome(NetIncome.create(input)),
-                "WRONG_NET_RANGE_TYPE"
+                "netIncome:MISSING_MANDATORY_FIELDS"
             );
         });
 

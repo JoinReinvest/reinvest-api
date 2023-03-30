@@ -79,13 +79,12 @@ export class DraftAccountsController {
     public async transformDraftAccountIntoRegularAccount(
         profileId: string,
         draftAccountId: string
-    ): Promise<string[]> {
+    ): Promise<string | null> {
         try {
             return await this.transformDraftIntoAccount.execute(profileId, draftAccountId)
         } catch (error: any) {
-            return [
-                error.message
-            ];
+            return error.message;
+
         }
     }
 }

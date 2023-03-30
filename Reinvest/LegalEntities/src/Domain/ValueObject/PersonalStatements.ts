@@ -1,5 +1,5 @@
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export enum PersonalStatementType {
     FINRAMember = "FINRAMember",
@@ -60,10 +60,10 @@ export abstract class PersonalStatement implements ToObject {
                     const {statement} = forAccreditedInvestor as ForAccreditedInvestor;
                     return new AccreditedInvestorStatement(statement);
                 default:
-                    throw new ValidationError("Wrong domicile type");
+                    throw new ValidationError(ValidationErrorEnum.INVALID_TYPE, type);
             }
         } catch (error: any) {
-            throw new ValidationError('Missing statement details');
+            throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, "statement", error.message);
         }
     }
 
