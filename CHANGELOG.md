@@ -1,5 +1,20 @@
 # REINVEST API CHANGELOG
 
+## 1.7.1 - 03/30/2023
+
+* Make consistent error response for mutation
+    * `completeProfileDetails`
+    * `completeIndividualDraftAccount`
+* Details of errors are provided in the `errors.extensions.details` field
+    * single error contains 3 fields:
+        * `field` - step name
+        * `type` - one of: UNKNOWN_ERROR, EMPTY_VALUE, FAILED, INVALID_DATE_FORMAT,
+          INVALID_ID_FORMAT, INVALID_FORMAT, INVALID_TYPE, MISSING_MANDATORY_FIELDS, ALREADY_COMPLETED, NOT_UNIQUE,
+          NOT_ACTIVE, NOT_INDIVIDUAL
+        * `details` - additional details about the error
+* fixes:
+    * properly formatted phone number in `setPhoneNumber`/`verifyPhoneNumber` mutations
+
 ## 1.7.0 - 03/30/2023
 
 * Change FileLink types and inputs for GraphQL
