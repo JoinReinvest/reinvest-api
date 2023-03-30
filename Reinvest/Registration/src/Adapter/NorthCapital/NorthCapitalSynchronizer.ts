@@ -160,8 +160,10 @@ export class NorthCapitalSynchronizer {
                 await this.northCapitalDocumentSynchronizationRepository.setFailed(document);
             } else {
                 console.error(`Document ${documentId} synchronization failed`, error.message);
+                if (document) {
+                    await this.northCapitalDocumentSynchronizationRepository.moveToTheEndOfQueue(document);
+                }
             }
-
             return false;
         }
     }

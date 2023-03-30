@@ -128,4 +128,24 @@ export class NorthCapitalDocumentsSynchronizationRepository {
             console.error('Failed to set document as failed - probably race conditioning', error.message);
         }
     }
+
+    async moveToTheEndOfQueue(document: NorthCapitalDocumentToSync): Promise<void> {
+        const updatedDate = new Date();
+        const currentVersion = document.version;
+
+        try {
+            await this.databaseAdapterProvider.provide()
+                .updateTable(northCapitalDocumentsSynchronizationTable)
+                .set({
+                    updatedDate,
+                })
+                .where('documentId', '=', document.documentId)
+                .where('version', '=', currentVersion)
+                .returning(['version'])
+                .executeTakeFirstOrThrow();
+
+        } catch (error: any) {
+            console.error('Failed to set document move to the end of queue - probably race conditioning', error.message);
+        }
+    }
 }
