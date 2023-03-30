@@ -18,6 +18,7 @@ import {
     RegistrationDatabaseAdapterProvider
 } from "Registration/Adapter/Database/DatabaseAdapter";
 import {VertaloConfig} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapter";
+import {Documents} from "Documents/index";
 
 export namespace Registration {
     export const moduleName = "Registration";
@@ -29,7 +30,8 @@ export namespace Registration {
     };
 
     export type ModulesDependencies = {
-        legalEntities: LegalEntities.Main
+        legalEntities: LegalEntities.Main,
+        documents: Documents.Main,
     }
 
     export type ApiType = RegistrationApiType & Api
@@ -53,6 +55,7 @@ export namespace Registration {
             }
 
             this.container.addAsValue('LegalEntities', this.modules.legalEntities);
+            this.container.addAsValue('Documents', this.modules.documents);
             new AdapterServiceProvider(this.config).boot(this.container);
             new IntegrationServiceProvider(this.config).boot(this.container);
             new EventBusProvider(this.config).boot(this.container);

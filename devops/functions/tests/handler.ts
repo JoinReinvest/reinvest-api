@@ -17,6 +17,8 @@ import {
 import {main as postSignUp} from "../postSignUp/handler";
 import {NorthCapitalAdapter} from "Reinvest/Registration/src/Adapter/NorthCapital/NorthCapitalAdapter";
 import {VertaloAdapter} from "Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter";
+import {boot} from "Reinvest/bootstrap";
+import {Registration} from "Reinvest/Registration/src";
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -311,12 +313,14 @@ const northCapitalRouter = () => {
 
             const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
             const party = await ncAdapter.getParty(ncSyncRecord.northCapitalId);
+            const partyDocuments = await ncAdapter.getUploadedDocuments(ncSyncRecord.northCapitalId);
 
             res.status(200).json({
                 status: true,
                 mappedRecord,
                 ncSyncRecord,
                 party,
+                partyDocuments,
             });
         } catch (e: any) {
             console.log(e);
@@ -362,6 +366,40 @@ const northCapitalRouter = () => {
             });
         }
     });
+    router.post("/sync-documents", async (req: any, res: any) => {
+        try {
+            const modules = boot();
+            const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+            const documentIds = await registrationApi.listDocumentsToSynchronize();
+            if (documentIds.length === 0) {
+                res.status(404).json({
+                    status: false,
+                    message: "No documents to synchronize",
+                });
+
+                return;
+            }
+            const statuses = [];
+            for (const documentId of documentIds) {
+                const syncStatus = await registrationApi.synchronizeDocument(documentId);
+                statuses.push({
+                    documentId,
+                    status: syncStatus,
+                });
+            }
+
+            res.status(200).json({
+                statuses,
+            });
+        } catch (e: any) {
+            console.log(e);
+            res.status(500).json({
+                status: false,
+                message: e.message,
+            });
+        }
+    });
+
     return router;
 }
 const vertaloRouter = () => {

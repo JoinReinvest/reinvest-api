@@ -1,5 +1,17 @@
 # REINVEST API CHANGELOG
 
+## 1.7.0 - 03/30/2023
+
+* Change FileLink types and inputs for GraphQL
+    * separate `DocumentFileLinkInput` and `AvatarFileLinkInput`
+    * `DocumentFileLinkInput` requires `fileName` field
+    * `DocumentFileLinkId` and `GetDocumentLink` returns `fileName` field
+* Synchronization profile documents with North Capital
+    * Add `cronDocumentSync` lambda function triggered every 1 hour that synchronize up to 20 documents
+* [TEST] endpoints:
+    * `POST /tests/north-capital/get-profile` - returns also `partyDocuments` fields
+    * `POST /tests/north-capital/sync-documents` - immediately synchronize up to 20 documents with North Capital
+
 ## 1.6.0 - 03/28/2023
 
 * Updated `completeProfileDetails` mutation schema for dateOfBirth field (string to object)

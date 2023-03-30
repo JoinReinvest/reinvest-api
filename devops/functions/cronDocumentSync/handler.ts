@@ -3,22 +3,22 @@ import {InvokeCommand, LambdaClient} from "@aws-sdk/client-lambda";
 import {LAMBDA_CONFIG} from "Reinvest/config";
 import {Registration} from "Reinvest/Registration/src";
 
-export const main = async (event: any, context: any) => {
+export const main = async (event: any, context: any, callback: Function) => {
     if (event.syncDocumentId) {
         await synchronizeDocument(event.syncDocumentId);
     } else {
         await invokeSynchronization(context.functionName)
     }
+
+    callback(null, event);
 };
 
 async function synchronizeDocument(documentId: string) {
     console.log(`[START] Syncing document with North Capital ${documentId}`);
     const modules = boot();
     const registrationApi = modules.getApi<Registration.ApiType>(Registration);
-    // const
-    // const document = await modules.documentRepository.get(documentId);
-    // const sync = new DocumentSync(modules);
-    // await sync.sync(document);
+    const documentSynchronizationStatus = await registrationApi.synchronizeDocument(documentId);
+    console.log(`[END] Syncing document with North Capital ${documentId} - ${documentSynchronizationStatus}`);
 }
 
 async function invokeSynchronization(functionName: string) {

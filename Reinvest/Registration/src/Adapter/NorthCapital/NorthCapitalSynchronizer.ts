@@ -19,21 +19,25 @@ import {
     NorthCapitalDocumentsSynchronizationRepository
 } from "Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository";
 import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
+import {RegistrationDocumentsService} from "Registration/Adapter/Modules/RegistrationDocumentsService";
 
 export class NorthCapitalSynchronizer {
     static getClassName = () => 'NorthCapitalSynchronizer';
     private northCapitalAdapter: NorthCapitalAdapter;
     private northCapitalSynchronizationRepository: NorthCapitalSynchronizationRepository;
     private northCapitalDocumentSynchronizationRepository: NorthCapitalDocumentsSynchronizationRepository;
+    private documentService: RegistrationDocumentsService;
 
     constructor(
         northCapitalAdapter: NorthCapitalAdapter,
         northCapitalSynchronizationRepository: NorthCapitalSynchronizationRepository,
         northCapitalDocumentSynchronizationRepository: NorthCapitalDocumentsSynchronizationRepository,
+        documentService: RegistrationDocumentsService,
     ) {
         this.northCapitalAdapter = northCapitalAdapter;
         this.northCapitalSynchronizationRepository = northCapitalSynchronizationRepository;
         this.northCapitalDocumentSynchronizationRepository = northCapitalDocumentSynchronizationRepository;
+        this.documentService = documentService;
     }
 
     async synchronizeMainParty(recordId: string, mainParty: MainParty): Promise<void> {
@@ -130,5 +134,45 @@ export class NorthCapitalSynchronizer {
         }
 
         await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
+    }
+
+    async synchronizeDocument(documentId: string): Promise<boolean> {
+        let document = null;
+        try {
+            const document = await this.northCapitalDocumentSynchronizationRepository.getDocumentToSync(documentId);
+            const {documentPath, northCapitalType, northCapitalId, documentFilename} = document;
+
+            if (await this.checkIfFileExistsInNorthCapital(northCapitalId, documentId)) {
+                console.log(`Document ${documentId} already exists in North Capital for ${northCapitalType} ${northCapitalId}`);
+            } else if (northCapitalType === NorthCapitalObjectType.PARTY) {
+                const {url} = await this.documentService.getDocumentFileLink(documentId, documentPath);
+                await this.northCapitalAdapter.uploadPartyDocument(northCapitalId, url, documentFilename, documentId);
+            }
+
+            return await this.northCapitalDocumentSynchronizationRepository.setClean(document);
+        } catch (error: any) {
+            const {reason} = error;
+            if (document && reason === 'FILE_NOT_FOUND') {
+                console.error(`Document ${documentId} not found in document service`, error.message);
+                await this.northCapitalDocumentSynchronizationRepository.setFailed(document);
+            } else {
+                console.error(`Document ${documentId} synchronization failed`, error.message);
+            }
+
+            return false;
+        }
+    }
+
+    private async checkIfFileExistsInNorthCapital(northCapitalId: string, documentId: string): Promise<boolean> {
+        const uploadedDocuments = await this.northCapitalAdapter.getUploadedDocuments(northCapitalId);
+        const documentIdRegex = new RegExp(`.*(${documentId}).*`);
+        for (const document of uploadedDocuments) {
+            const {documentTitle} = document;
+            if (documentIdRegex.test(documentTitle)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

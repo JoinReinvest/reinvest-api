@@ -84,3 +84,33 @@ export type NorthCapitalIndividualAccountType = {
     account: NorthCapitalIndividualAccountStructure,
     links: NorthCapitalLink[]
 }
+
+
+export enum DocumentSyncState {
+    DIRTY = 'DIRTY',
+    CLEAN = 'CLEAN',
+    FAILED = 'FAILED',
+    TO_BE_DELETED = 'TO_BE_DELETED'
+}
+
+export type NorthCapitalDocumentToSync = {
+    recordId: string;
+    northCapitalId: string;
+    northCapitalType: NorthCapitalObjectType
+    documentId: string;
+    documentPath: string;
+    documentFilename: string;
+    version: number;
+    state: DocumentSyncState;
+    createdDate: Date;
+    updatedDate: Date;
+}
+
+export type NorthCapitalUploadedDocument = {
+    documentTitle: string;
+    documentId: string;
+    documentFileReferenceCode: string;
+    documentName: string;
+    createdDate: string;
+    url: string;
+}

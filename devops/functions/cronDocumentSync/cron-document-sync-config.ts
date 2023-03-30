@@ -15,7 +15,7 @@ export const CronDocumentSyncFunction = {
     },
     events: [
         {
-            schedule: "rate(1 minute)"
+            schedule: "rate(1 hour)",
         },
     ],
 };

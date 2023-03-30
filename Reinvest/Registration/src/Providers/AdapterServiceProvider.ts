@@ -21,6 +21,7 @@ import {VertaloSynchronizer} from "Registration/Adapter/Vertalo/VertaloSynchroni
 import {
     NorthCapitalDocumentsSynchronizationRepository
 } from "Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository";
+import {RegistrationDocumentsService} from "Registration/Adapter/Modules/RegistrationDocumentsService";
 
 export class AdapterServiceProvider {
     private config: Registration.Config;
@@ -35,6 +36,7 @@ export class AdapterServiceProvider {
             .addObjectFactory(EmailCreator, () => new EmailCreator(this.config.emailDomain), [])
         ;
 
+        // db
         container
             .addAsValue(RegistrationDatabaseAdapterInstanceProvider, createRegistrationDatabaseAdapterProvider(this.config.database))
             .addSingleton(MappingRegistryRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator, EmailCreator])
@@ -43,21 +45,29 @@ export class AdapterServiceProvider {
             .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
         ;
 
+        // modules
         container
             .addSingleton(LegalEntitiesService, ['LegalEntities'])
+            .addSingleton(RegistrationDocumentsService, ['Documents']);
         ;
 
+        // north capital
         container
             .addAsValue("NorthCapitalConfig", this.config.northCapital)
             .addSingleton(NorthCapitalAdapter, ["NorthCapitalConfig"])
-            .addSingleton(NorthCapitalSynchronizer, [NorthCapitalAdapter, NorthCapitalSynchronizationRepository, NorthCapitalDocumentsSynchronizationRepository])
+            .addSingleton(NorthCapitalSynchronizer, [
+                NorthCapitalAdapter,
+                NorthCapitalSynchronizationRepository,
+                NorthCapitalDocumentsSynchronizationRepository,
+                RegistrationDocumentsService
+            ])
         ;
 
+        // vertalo
         container
             .addAsValue("VertaloConfig", this.config.vertalo)
             .addSingleton(VertaloAdapter, ["VertaloConfig"])
             .addSingleton(VertaloSynchronizer, [VertaloAdapter, VertaloSynchronizationRepository])
         ;
-
     }
 }

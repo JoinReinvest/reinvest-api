@@ -2,6 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import FormData from "form-data";
 import NorthCapitalException from "Registration/Adapter/NorthCapital/NorthCapitalException";
 import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
+import * as https from "https";
 
 export abstract class ExecutionNorthCapitalAdapter {
     clientId: string;
@@ -40,6 +41,33 @@ export abstract class ExecutionNorthCapitalAdapter {
             const {response: {data: {statusCode, statusDesc}}} = error;
             throw new NorthCapitalException(statusCode, statusDesc);
         }
+    }
+
+    protected async sendFilePostRequest(endpoint: string, data: any, fileKey: string, fileUrl: string, fileName: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            try {
+                const formData = this.transformToFormData(data);
+                https.get(fileUrl, async (stream: any) => {
+                    try {
+                        formData.append(fileKey, stream, fileName);
+
+                        const response: AxiosResponse = await axios
+                            .post(`${this.url}/${endpoint}`, formData);
+
+                        resolve(response.data);
+                    } catch (error: any) {
+                        const {response: {status}} = error;
+                        if (status === 404) {
+                            reject("FILE_NOT_FOUND");
+                        } else {
+                            reject(error);
+                        }
+                    }
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     private transformToFormData(data: any): FormData {

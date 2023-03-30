@@ -9,7 +9,10 @@ import {
     VertaloEntityType, VertaloIds,
     VertaloSynchronizationRecordType
 } from "Registration/Domain/VendorModel/Vertalo/VertaloTypes";
-import {NorthCapitalObjectType} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
+import {
+    DocumentSyncState,
+    NorthCapitalObjectType
+} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
 export interface MappingRegistryTable {
     recordId: string;
@@ -37,7 +40,6 @@ export interface NorthCapitalSynchronizationTable {
 }
 
 export interface NorthCapitalDocumentsSynchronizationTable {
-    id: string;
     recordId: string;
     northCapitalId: string;
     northCapitalType: NorthCapitalObjectType
@@ -45,7 +47,7 @@ export interface NorthCapitalDocumentsSynchronizationTable {
     documentPath: string;
     documentFilename: string;
     version: number;
-    state: "DIRTY" | "CLEAN" | "TO_BE_DELETED";
+    state: DocumentSyncState;
     createdDate: Date;
     updatedDate: Date;
 }
