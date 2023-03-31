@@ -19,7 +19,7 @@ export class QueueSender {
         }
 
         if (isLocal) {
-            // @ts-ignore
+            
             SQSConfig.endpoint = 'http://localhost:9324';
         }
         this.sqs = new SQSClient(SQSConfig);

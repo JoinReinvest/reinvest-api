@@ -32,7 +32,7 @@ const serverlessConfiguration: AWS = {
         "serverless-stack-termination-protection",
         "serverless-esbuild",
     ],
-    // @ts-ignore
+    
     provider: {
         ...ProviderConfiguration,
         environment: {

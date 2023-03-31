@@ -21,7 +21,7 @@ export type ProfileState = AggregateState & {
 };
 
 class Profile extends SimpleAggregate {
-    // @ts-ignore
+    
     protected aggregate: ProfileState;
 
     public static create(profileId: string) {

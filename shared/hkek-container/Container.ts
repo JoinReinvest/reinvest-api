@@ -30,7 +30,7 @@ class Container implements ContainerInterface {
     }
 
     getValue(token: string) {
-        // @ts-ignore
+        
         return this.container.resolve(token);
     }
 
@@ -49,9 +49,9 @@ class Container implements ContainerInterface {
      */
     addSingleton(singletonClass: NameProvider, injectDependencies: (string | NameProvider)[] = []): this {
         const token = singletonClass.getClassName();
-        // @ts-ignore
+        
         singletonClass.inject = this.getTokensToInject(injectDependencies);
-        // @ts-ignore
+        
         this.container = this.container.provideClass(token, singletonClass);
 
         return this;
@@ -66,9 +66,9 @@ class Container implements ContainerInterface {
      */
     addObjectFactory(classObject: (string | NameProvider), factory: Function, injectDependencies: (string | NameProvider)[] = []): this {
         const token = typeof classObject === "string" ? classObject : classObject.getClassName();
-        // @ts-ignore
+        
         factory.inject = this.getTokensToInject(injectDependencies);
-        // @ts-ignore
+        
         this.container = this.container.provideFactory(token, factory);
 
         return this;
@@ -91,7 +91,7 @@ class Container implements ContainerInterface {
         const containerSelf = this;
         return async function () {
             const controller = containerSelf.getValue(tokenizedClass.getClassName()) as Object;
-            // @ts-ignore
+            
             return controller[methodName](...arguments);
         }
     }

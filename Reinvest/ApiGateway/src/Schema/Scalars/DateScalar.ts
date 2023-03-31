@@ -17,16 +17,16 @@ const DateResolver = new GraphQLScalarType({
     name: 'ISODate',
     description: 'Date in format YYYY-MM-DD',
 
-    // @ts-ignore
+    
     serialize(date: string): string { // BE -> FE
         return date;
     },
-    // @ts-ignore
+    
     parseValue(value: string): string { // FE (variable) -> BE
         isValidISODate(value);
         return value;
     },
-    // @ts-ignore
+    
     parseLiteral(ast): string | never { // FE (hardcoded) -> BE
         if (ast.kind !== Kind.STRING) {
             throw new GraphQLError("The value must be string");

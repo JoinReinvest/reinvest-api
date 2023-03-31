@@ -22,7 +22,7 @@ export default class NorthCapitalRequester {
 
             return response.data;
         } catch (error) {
-            // @ts-ignore
+            
             const {response: {data: {statusCode, statusDesc}}} = error;
             throw new NorthCapitalException(statusCode, statusDesc);
         }
@@ -36,7 +36,7 @@ export default class NorthCapitalRequester {
 
             return response.data;
         } catch (error) {
-            // @ts-ignore
+            
             const {response: {data: {statusCode, statusDesc}}} = error;
             throw new NorthCapitalException(statusCode, statusDesc);
         }

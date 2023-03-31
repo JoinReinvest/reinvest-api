@@ -37,7 +37,7 @@ export class CompleteDraftAccount {
 
             for (const step of Object.keys(individualInput)) {
                 try {
-                    // @ts-ignore
+                    
                     const data = individualInput[step];
                     switch (step) {
                         case 'employmentStatus':

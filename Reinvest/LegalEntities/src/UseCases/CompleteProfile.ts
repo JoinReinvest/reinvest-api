@@ -43,7 +43,7 @@ export class CompleteProfile {
 
         for (const step of Object.keys(input)) {
             try {
-                // @ts-ignore
+                
                 const data = input[step];
                 switch (step) {
                     case 'name':

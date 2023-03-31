@@ -19,10 +19,10 @@ export type SessionContext = { modules: Modules, profileId: string, userId: stri
 
 export const app = (modules: Modules) => {
     return startServerAndCreateLambdaHandler(server, {
-        // @ts-ignore
+
         context: async ({event, context}) => {
             try {
-                // @ts-ignore
+
                 const {authorizer} = event.requestContext;
                 if (!authorizer || !authorizer.jwt.claims.sub) {
                     throw new GraphQLError('User is not authenticated', {

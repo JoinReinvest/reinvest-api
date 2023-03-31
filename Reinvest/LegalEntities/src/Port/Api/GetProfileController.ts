@@ -101,7 +101,7 @@ export class GetProfileController {
             lastName: profileObject.name?.lastName,
             experience: profileObject.investingExperience ? profileObject.investingExperience?.experience : null,
             dateOfBirth: profileObject.dateOfBirth,
-            // @ts-ignore
+            
             domicile: profileObject.domicile ? profileObject.domicile.type : null,
             address: profileObject.address,
             ssn: profile.exposeSSN(),

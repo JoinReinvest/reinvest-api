@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import * as dotenv from 'dotenv'
 
 dotenv.config({path: 'test/.env.characterization'});

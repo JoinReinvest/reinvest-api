@@ -76,18 +76,18 @@ export class ProfileRepository {
         for (const key of Object.keys(profileOutput)) {
             const value = profileOutput[key as keyof ProfileSchema];
             if (!LegalEntitiesJsonFields.includes(key)) {
-                // @ts-ignore
+                
                 rawProfile[key] = value;
                 continue;
             }
 
             if (value === null) {
-                // @ts-ignore
+                
                 rawProfile[key] = null;
                 continue;
             }
 
-            // @ts-ignore
+            
             rawProfile[key] = JSON.stringify(value);
         }
 

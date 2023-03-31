@@ -2,11 +2,9 @@ import NorthCapitalRequester from "./NorthCapitalRequester";
 import expectThrowsAsync from "../expectThrowsAsync";
 import {NORTH_CAPITAL_CONFIG} from "../../config";
 
-const {CLIENT_ID, DEVELOPER_API_KEY, API_URL} = NORTH_CAPITAL_CONFIG;
+const {CLIENT_ID, API_URL} = NORTH_CAPITAL_CONFIG;
 
 context('Given I am a developer', () => {
-    const requester = new NorthCapitalRequester(CLIENT_ID, DEVELOPER_API_KEY, API_URL)
-
     describe('When I do not have a valid API developer key', () => {
 
         it('Then I should not be able to use the North Capital API', async () => {

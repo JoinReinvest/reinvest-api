@@ -35,7 +35,7 @@ export class ProfileQuery {
             .select(['userId', 'data']);
 
         for (let filter in filters) {
-            // @ts-ignore
+            
             profileQuery = profileQuery.where(filter, '=', filters[filter])
         }
 
