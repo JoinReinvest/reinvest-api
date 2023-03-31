@@ -1,5 +1,11 @@
 # REINVEST API CHANGELOG
 
+## 1.7.2 - 03/31/2023
+
+* Add optional `isSmsAllowed` field for `setPhoneNumber` mutation
+    * If `isSmsAllowed` is set to `false` then SMS TOPT will not be sent
+    * On default `isSmsAllowed` is set to `true`
+
 ## 1.7.1 - 03/30/2023
 
 * Make consistent error response for mutation

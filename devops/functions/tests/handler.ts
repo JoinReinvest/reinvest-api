@@ -142,6 +142,7 @@ const userRouter = () => {
             const createUserCommand = new AdminCreateUserCommand({
                 UserPoolId: COGNITO_CONFIG.userPoolID,
                 Username: email,
+                MessageAction: "SUPPRESS",
                 DesiredDeliveryMediums: ["EMAIL"],
                 TemporaryPassword: "thisIsATemporaryPassword123!ImustProvide",
                 UserAttributes: userAttributes,

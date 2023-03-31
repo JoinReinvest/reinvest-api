@@ -94,4 +94,8 @@ export class OneTimeToken {
     private normalize(token: string): string {
         return token.toUpperCase();
     }
+
+    shouldSendViaSms() {
+        return this.phoneNumber.isSmsAllowed();
+    }
 }
