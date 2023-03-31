@@ -1,4 +1,5 @@
 import {
+    AdminGetUserCommand,
     AdminUpdateUserAttributesCommand, AttributeType,
     CognitoIdentityProviderClient
 } from "@aws-sdk/client-cognito-identity-provider";
@@ -8,6 +9,12 @@ export type CognitoConfig = {
     userPoolID: string
 }
 
+type CognitoUserType = {
+    UserAttributes: AttributeType[];
+    Enabled: boolean;
+    UserStatus: string;
+    Username: string;
+}
 
 export class CognitoService {
     public static getClassName = (): string => "CognitoService";
@@ -19,21 +26,6 @@ export class CognitoService {
 
     private getClient(): CognitoIdentityProviderClient {
         return new CognitoIdentityProviderClient({region: this.config.region});
-    }
-
-    async setProfileAttribute(userId: string, profileId: string) {
-        const setProfileCommand = new AdminUpdateUserAttributesCommand({
-            Username: userId,
-            UserPoolId: this.config.userPoolID,
-            UserAttributes: [
-                {
-                    Name: 'custom:profile_uuid',
-                    Value: profileId
-                } as AttributeType
-            ]
-        });
-
-        return this.sendAttributeUpdateCommand(setProfileCommand);
     }
 
     async addVerifiedPhoneNumber(userId: string, phoneNumber: string): Promise<boolean> {
@@ -55,10 +47,35 @@ export class CognitoService {
         return this.sendAttributeUpdateCommand(setPhoneNumberCommand);
     }
 
+    async isPhoneNumberCompleted(userId: string): Promise<boolean> {
+        try {
+            const user = await this.getUserAttributes(userId);
+            if (user === null) {
+                return false;
+            }
+            const phoneNumberVerified = user.UserAttributes.find((attribute: AttributeType) => attribute.Name === 'phone_number_verified');
+
+            return !!phoneNumberVerified && phoneNumberVerified.Value === 'true';
+        } catch (error: any) {
+            console.error(error);
+            return false;
+        }
+    }
+
     private async sendAttributeUpdateCommand(command: AdminUpdateUserAttributesCommand): Promise<boolean> {
         const client = this.getClient();
         await client.send(command);
 
         return true;
+    }
+
+    private async getUserAttributes(userId: string): Promise<CognitoUserType | null> {
+        const client = this.getClient();
+        const user = await client.send(new AdminGetUserCommand({
+            Username: userId,
+            UserPoolId: this.config.userPoolID
+        })) as CognitoUserType;
+
+        return user ?? null;
     }
 }

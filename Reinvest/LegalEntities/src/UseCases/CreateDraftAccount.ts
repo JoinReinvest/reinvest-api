@@ -1,6 +1,11 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {IdGenerator} from "IdGenerator/IdGenerator";
-import {DraftAccount, DraftAccountState, DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import {
+    DraftAccount,
+    DraftAccountState,
+    DraftAccountType,
+    IndividualDraftAccountSchema
+} from "LegalEntities/Domain/DraftAccount/DraftAccount";
 
 export class CreateDraftAccount {
     public static getClassName = (): string => "CreateDraftAccount";
@@ -22,7 +27,7 @@ export class CreateDraftAccount {
             draftId,
             state: DraftAccountState.ACTIVE,
             accountType: type,
-            data: null
+            data: {} as IndividualDraftAccountSchema
         });
         const status = await this.draftAccountRepository.storeDraft(draft);
 

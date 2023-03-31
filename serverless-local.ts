@@ -16,10 +16,6 @@ import {S3Resources} from "./devops/serverless/s3";
 import {VpcResources} from "./devops/serverless/vpc";
 import {QueueFunction, QueueOutputs, QueueResources} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
-import {
-    LocalSignUpLambdaFunction,
-    LocalSignUpLambdaResources
-} from "./devops/functions/localSignUp/local-sign-up-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {ProviderEnvironment} from "./devops/serverless/serverless-common";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
@@ -29,6 +25,10 @@ import {
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
 import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
+import {
+    CronDocumentSyncFunction,
+    CronDocumentSyncResources
+} from "./devops/functions/cronDocumentSync/cron-document-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-local",
@@ -78,9 +78,9 @@ const serverlessConfiguration: AWS = {
         explorer: ExplorerLambdaFunction,
         migration: MigrationLambdaFunction,
         queue: QueueFunction,
+        cronDocumentsSync: CronDocumentSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
-        localSignUp: LocalSignUpLambdaFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         tests: TestsFunction,
     },
@@ -97,9 +97,9 @@ const serverlessConfiguration: AWS = {
             ...MigrationLambdaResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...QueueResources,
-            ...LocalSignUpLambdaResources,
             ...SesResources,
             ...TestsLambdaResources,
+            ...CronDocumentSyncResources,
         },
         Outputs: {
             ...CognitoOutputs,

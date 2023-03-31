@@ -25,7 +25,7 @@ export class TransformDraftAccountIntoRegularAccount {
         this.transactionAdapter = transactionAdapter;
     }
 
-    async execute(profileId: string, draftAccountId: string): Promise<string[]> {
+    async execute(profileId: string, draftAccountId: string): Promise<string | null> {
         try {
             const draftAccount = await this.draftAccountRepository.getDraftForProfile<IndividualDraftAccount>(profileId, draftAccountId);
             if (!draftAccount.isAccountCompleted()) {
@@ -37,13 +37,13 @@ export class TransformDraftAccountIntoRegularAccount {
                     await this.openIndividualAccount(draftAccount);
                     break;
                 default:
-                    throw new Error('Draft account has unknown type');
+                    throw new Error('DRAFT_UNKNOWN_TYPE');
             }
 
-            return [];
+            return null;
         } catch (error: any) {
             console.error(error.message);
-            return [error.message];
+            return error.message;
         }
     }
 
@@ -53,10 +53,14 @@ export class TransformDraftAccountIntoRegularAccount {
         if (!accountOpened) {
             throw new Error('CANNOT_OPEN_ANOTHER_INDIVIDUAL_ACCOUNT');
         }
-        await this.transactionAdapter.transaction(`Open individual account "${draftId}" for profile ${profileId}`, async () => {
+        const status = await this.transactionAdapter.transaction(`Open individual account "${draftId}" for profile ${profileId}`, async () => {
             const account = draftAccount.transformIntoAccount();
             await this.accountRepository.createIndividualAccount(account);
             await this.draftAccountRepository.removeDraft(profileId, draftId);
         });
+
+        if (!status) {
+            throw new Error('ACCOUNT_TRANSFORMATION_FAILED');
+        }
     }
 }

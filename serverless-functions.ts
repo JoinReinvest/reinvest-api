@@ -22,6 +22,10 @@ import {
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
 import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
+import {
+    CronDocumentSyncFunction,
+    CronDocumentSyncResources
+} from "./devops/functions/cronDocumentSync/cron-document-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -44,6 +48,7 @@ const serverlessConfiguration: AWS = {
             CognitoUserPoolID: importOutput('CognitoUserPoolID'),
             S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
             S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
+            LocalCognitoClientId: {Ref: "LocalCognito"},
             SQS_QUEUE_URL: getAttribute("SQSNotification", "QueueUrl"),
             EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
             EMAIL_REPLY_TO: "${env:EMAIL_REPLY_TO}",
@@ -56,6 +61,9 @@ const serverlessConfiguration: AWS = {
             NORTH_CAPITAL_DEVELOPER_API_KEY: "${env:NORTH_CAPITAL_DEVELOPER_API_KEY}",
             NORTH_CAPITAL_API_URL: "${env:NORTH_CAPITAL_API_URL}",
             NORTH_CAPITAL_OFFERING_ID: "${env:NORTH_CAPITAL_OFFERING_ID}",
+            VERTALO_API_URL: "${env:VERTALO_API_URL}",
+            VERTALO_CLIENT_ID: "${env:VERTALO_CLIENT_ID}",
+            VERTALO_CLIENT_SECRET: "${env:VERTALO_CLIENT_SECRET}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,
@@ -79,6 +87,7 @@ const serverlessConfiguration: AWS = {
         migration: MigrationLambdaFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         queue: QueueFunction,
+        cronDocumentsSync: CronDocumentSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         tests: TestsFunction,
@@ -95,6 +104,7 @@ const serverlessConfiguration: AWS = {
             ...QueueResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...TestsLambdaResources,
+            ...CronDocumentSyncResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,
@@ -127,6 +137,7 @@ const serverlessConfiguration: AWS = {
                 LocalCognitoClientId: "LocalCognitoClientId",
                 LocalHostedUiUrl: "LocalHostedUiUrl",
                 WebsiteHostedUiUrl: "WebsiteHostedUiUrl",
+                WebsiteCognitoClientId: "WebsiteCognitoClientId",
                 SQS_QUEUE_URL: "SQSQueueUrl",
             }
         },

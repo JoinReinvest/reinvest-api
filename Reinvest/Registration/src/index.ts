@@ -13,6 +13,12 @@ import {AdapterServiceProvider} from "Registration/Providers/AdapterServiceProvi
 import {PortsProvider} from "Registration/Providers/PortsProvider";
 import {IntegrationServiceProvider} from "Registration/Providers/IntegrationServiceProvider";
 import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
+import {
+    RegistrationDatabaseAdapterInstanceProvider,
+    RegistrationDatabaseAdapterProvider
+} from "Registration/Adapter/Database/DatabaseAdapter";
+import {VertaloConfig} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapter";
+import {Documents} from "Documents/index";
 
 export namespace Registration {
     export const moduleName = "Registration";
@@ -20,10 +26,12 @@ export namespace Registration {
         database: PostgreSQLConfig;
         emailDomain: string;
         northCapital: NorthCapitalConfig;
+        vertalo: VertaloConfig;
     };
 
     export type ModulesDependencies = {
-        legalEntities: LegalEntities.Main
+        legalEntities: LegalEntities.Main,
+        documents: Documents.Main,
     }
 
     export type ApiType = RegistrationApiType & Api
@@ -47,6 +55,7 @@ export namespace Registration {
             }
 
             this.container.addAsValue('LegalEntities', this.modules.legalEntities);
+            this.container.addAsValue('Documents', this.modules.documents);
             new AdapterServiceProvider(this.config).boot(this.container);
             new IntegrationServiceProvider(this.config).boot(this.container);
             new EventBusProvider(this.config).boot(this.container);
@@ -76,7 +85,7 @@ export namespace Registration {
 
         async close(): Promise<void> {
             if (this.booted) {
-                // await this.container.get<RegistrationDatabaseAdapterProvider>(RegistrationDatabaseAdapterProvider).close();
+                await this.container.getValue<RegistrationDatabaseAdapterProvider>(RegistrationDatabaseAdapterInstanceProvider).close();
             }
         }
     }

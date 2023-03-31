@@ -10,7 +10,7 @@ import {
 } from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord";
 import {
     InsertableNorthCapitalSynchronization, SelectablePartyId,
-    SelectableSynchronizationRecord
+    SelectableNorthCapitalSynchronizationRecord
 } from "Registration/Adapter/Database/RegistrationSchema";
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {NorthCapitalSynchronizationMapping} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
@@ -30,10 +30,10 @@ export class NorthCapitalSynchronizationRepository {
         try {
             const data = await this.databaseAdapterProvider.provide()
                 .selectFrom(northCapitalSynchronizationTable)
-                .select(['recordId', 'northCapitalId', 'type', 'crc', 'documents', 'version', 'links'])
+                .select(['recordId', 'northCapitalId', 'type', 'crc', 'version', 'links'])
                 .where('recordId', '=', recordId)
                 .limit(1)
-                .executeTakeFirstOrThrow() as SelectableSynchronizationRecord as NorthCapitalSynchronizationRecordType;
+                .executeTakeFirstOrThrow() as SelectableNorthCapitalSynchronizationRecord as NorthCapitalSynchronizationRecordType;
 
             return NorthCapitalSynchronizationRecord.create(data);
         } catch (error: any) {
@@ -49,7 +49,6 @@ export class NorthCapitalSynchronizationRepository {
                 northCapitalId,
                 crc,
                 type: entityType,
-                documents: JSON.stringify([]),
                 version: 0,
                 links: JSON.stringify([]),
             })

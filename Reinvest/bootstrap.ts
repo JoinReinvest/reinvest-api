@@ -7,6 +7,7 @@ import {
     COGNITO_CONFIG,
     DATABASE_CONFIG, EMAIL_DOMAIN,
     NORTH_CAPITAL_CONFIG,
+    VERTALO_CONFIG,
     S3_CONFIG,
     SNS_CONFIG, SQS_CONFIG,
     WEB_APP_URL
@@ -17,6 +18,7 @@ import {SNSConfig} from "Identity/Adapter/AWS/SmsService";
 import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
 import {QueueConfig} from "shared/hkek-sqs/QueueSender";
 import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
+import {VertaloConfig} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapter";
 
 export function boot(): Modules {
     const modules = new Modules();
@@ -27,6 +29,7 @@ export function boot(): Modules {
     const cognitoConfig = COGNITO_CONFIG as CognitoConfig;
     const queueConfig = SQS_CONFIG as QueueConfig;
     const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
+    const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
     // Investments.boot({
     //   database: {
     //     connectionString: "connection-string-test",
@@ -78,9 +81,11 @@ export function boot(): Modules {
         Registration.create({
             database: databaseConfig,
             northCapital: northCapitalConfig,
+            vertalo: vertaloConfig,
             emailDomain: EMAIL_DOMAIN,
         } as Registration.Config, {
             legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
+            documents: modules.get(Documents.moduleName) as Documents.Main,
         })
     );
 

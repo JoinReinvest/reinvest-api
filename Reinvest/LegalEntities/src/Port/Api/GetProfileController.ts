@@ -7,6 +7,7 @@ import {
     PersonalStatement,
     PersonalStatementType
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
+import {DocumentSchema, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
 
 export type ProfileResponse = {
     externalId: string,
@@ -26,7 +27,7 @@ export type ProfileResponse = {
         },
         ssn: string | null,
         address: AddressInput | null,
-        idScan?: { id: string }[],
+        idScan?: { id: string, fileName: string }[],
         statements: {
             type: PersonalStatementType,
             details: string[]
@@ -43,7 +44,7 @@ export type ProfileForSynchronization = {
     domicileType: DomicileType | null,
     ssn: string | null,
     address: AddressInput | null,
-    idScan?: { id: string }[],
+    idScan: IdScanInput,
 }
 
 export class GetProfileController {
@@ -79,7 +80,10 @@ export class GetProfileController {
                 },
                 address: profileObject.address,
                 ssn: profileObject.ssnObject !== null ? profileObject.ssnObject.anonymized : null,
-                idScan: profileObject.idScan?.ids.map((id) => ({id})),
+                idScan: profileObject.idScan?.map((document: DocumentSchema) => ({
+                    id: document.id,
+                    fileName: document.fileName
+                })),
                 statements: profile.getStatements().map((statement: PersonalStatement) => ({
                     type: statement.getType(),
                     details: statement.getDetails()
@@ -105,7 +109,7 @@ export class GetProfileController {
             domicile: profileObject.domicile ? profileObject.domicile.type : null,
             address: profileObject.address,
             ssn: profile.exposeSSN(),
-            idScan: profileObject.idScan?.ids.map((id) => ({id})),
+            idScan: profileObject.idScan ?? [],
         };
     }
 }

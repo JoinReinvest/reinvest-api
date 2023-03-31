@@ -17,7 +17,6 @@ export type NorthCapitalSynchronizationRecordType = {
     northCapitalId: string;
     type: NorthCapitalEntityType;
     crc: string;
-    documents: string | null;
     version: number;
     links: NorthCapitalLinkMapping[];
 }

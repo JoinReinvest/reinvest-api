@@ -1,10 +1,9 @@
 import {LegalEntities} from "LegalEntities/index";
-import {SessionContext} from "ApiGateway/index";
-import {CompleteProfileInput} from "LegalEntities/Port/Api/CompleteProfileController";
-import {ApolloError} from "apollo-server-errors";
+import {JsonGraphQLError, SessionContext} from "ApiGateway/index";
 import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
 import {GraphQLError} from "graphql";
 import {InvestmentAccounts} from "InvestmentAccounts/index";
+import {CompleteProfileInput} from "LegalEntities/UseCases/CompleteProfile";
 
 const schema = `
     #graphql
@@ -16,7 +15,7 @@ const schema = `
         domicile: Domicile
         address: Address
         ssn: String
-        idScan: [FileLinkId]
+        idScan: [DocumentFileLinkId]
         statements: [Statement]
         experience: Experience
     }
@@ -49,7 +48,7 @@ const schema = `
         "An investor name"
         name: PersonName
         "Date of Birth in format YYYY-MM-DD"
-        dateOfBirth: ISODate
+        dateOfBirth: DateOfBirthInput
         "Is the investor US. Citizen or US. Resident with Green Card or Visa"
         domicile: DomicileInput
         "A valid SSN number"
@@ -60,7 +59,7 @@ const schema = `
         ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
         Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
         """
-        idScan: [FileLinkInput]
+        idScan: [DocumentFileLinkInput]
         "FINRA, Politician, Trading company stakeholder, accredited investor statements"
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"
@@ -126,7 +125,7 @@ export const Profile = {
                 const {input} = data;
                 const errors = await api.completeProfile(input, profileId);
                 if (errors.length > 0) {
-                    throw new ApolloError(JSON.stringify(errors));
+                    throw new JsonGraphQLError(errors);
                 }
 
                 return api.getProfile(profileId);
@@ -137,9 +136,9 @@ export const Profile = {
                                 {profileId, modules}: SessionContext
             ) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
-                if (errors.length > 0) {
-                    throw new GraphQLError(JSON.stringify(errors));
+                const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
+                if (error !== null) {
+                    throw new GraphQLError(error);
                 }
 
                 return true;

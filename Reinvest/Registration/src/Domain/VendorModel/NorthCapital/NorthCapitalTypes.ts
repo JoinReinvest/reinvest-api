@@ -1,4 +1,5 @@
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 
 export enum NorthCapitalDomicile {
     "CITIZEN" = "U.S. Citizen",
@@ -13,7 +14,13 @@ export enum NorthCapitalEmploymentStatus {
     STUDENT = "Student",
 }
 
-export type MainPartyType = {
+export enum NorthCapitalObjectType {
+    ACCOUNT = "ACCOUNT",
+    PARTY = "PARTY",
+    ENTITY = "ENTITY",
+}
+
+export type NorthCapitalMainPartyType = {
     domicile: NorthCapitalDomicile | null,
     firstName: string,
     middleInitial?: string,
@@ -27,10 +34,10 @@ export type MainPartyType = {
     primCountry: string,
     emailAddress: string,
     socialSecurityNumber: string | null,
-    documents?: { id: string }[],
+    documents: DocumentSchema[],
 }
 
-export type IndividualExtendedMainPartyType = {
+export type NorthCapitalIndividualExtendedMainPartyType = {
     occupation: string | null,
     empName: string | null,
     empStatus: NorthCapitalEmploymentStatus | null,
@@ -38,7 +45,7 @@ export type IndividualExtendedMainPartyType = {
     currentHouseholdIncome: string | null,
 }
 
-export type NorthCapitalIndividualAccountType = {
+export type NorthCapitalIndividualAccountStructure = {
     accountRegistration: string,
     type: "Individual",
     streetAddress1: string,
@@ -71,9 +78,39 @@ export type NorthCapitalLink = {
     linkConfiguration: NorthCapitalLinkConfiguration,
 }
 
-export type IndividualAccountType = {
+export type NorthCapitalIndividualAccountType = {
     profileId: string,
-    extendedParty: IndividualExtendedMainPartyType,
-    account: NorthCapitalIndividualAccountType,
+    extendedParty: NorthCapitalIndividualExtendedMainPartyType,
+    account: NorthCapitalIndividualAccountStructure,
     links: NorthCapitalLink[]
+}
+
+
+export enum DocumentSyncState {
+    DIRTY = 'DIRTY',
+    CLEAN = 'CLEAN',
+    FAILED = 'FAILED',
+    TO_BE_DELETED = 'TO_BE_DELETED'
+}
+
+export type NorthCapitalDocumentToSync = {
+    recordId: string;
+    northCapitalId: string;
+    northCapitalType: NorthCapitalObjectType
+    documentId: string;
+    documentPath: string;
+    documentFilename: string;
+    version: number;
+    state: DocumentSyncState;
+    createdDate: Date;
+    updatedDate: Date;
+}
+
+export type NorthCapitalUploadedDocument = {
+    documentTitle: string;
+    documentId: string;
+    documentFileReferenceCode: string;
+    documentName: string;
+    createdDate: string;
+    url: string;
 }

@@ -1,19 +1,19 @@
-import {CloudwatchPolicies} from "../../serverless/cloudwatch";
-import {S3PoliciesWithImport} from "../../serverless/s3";
 import {exportOutput, getAttribute, getResourceName} from "../../serverless/utils";
 import {
-    EniPolicies,
-    getPrivateSubnetRefs,
-    getVpcRef,
+    EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules,
 } from "../../serverless/vpc";
+import {CloudwatchPolicies} from "../../serverless/cloudwatch";
+import {S3PoliciesWithImport} from "../../serverless/s3";
+import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "../../serverless/cognito";
+import {SMSPolicy} from "../../serverless/sns";
 
 export const QueueFunction = {
     handler: `devops/functions/queue/handler.main`,
     role: "QueueRole",
-    // vpc: {
-    //   securityGroupIds: [getAttribute("ApiSecurityGroup", "GroupId")],
-    //   subnetIds: [...getPrivateSubnetRefs()],
-    // },
+    vpc: {
+        securityGroupIds: [getAttribute("InboxSecurityGroup", "GroupId")],
+        subnetIds: [...importPrivateSubnetRefs()],
+    },
     events: [
         {
             sqs: {
@@ -60,11 +60,13 @@ export const QueueResources = {
                     PolicyName: 'QueuePolicy',
                     PolicyDocument: {
                         Statement: [
-                            {
-                                Effect: 'Allow',
-                                Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
-                                Resource: 'arn:aws:logs:*:*:*',
-                            },
+                            ...CloudwatchPolicies,
+                            ...EniPolicies,
+                            ...CloudwatchPolicies,
+                            ...EniPolicies,
+                            ...S3PoliciesWithImport,
+                            ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
+                            SMSPolicy,
                             {
                                 Effect: 'Allow',
                                 Action: ['sqs:ReceiveMessage', 'sqs:DeleteMessage', 'sqs:GetQueueAttributes', 'sqs:SendMessage', 'sqs:SendMessageBatch'],
@@ -77,7 +79,17 @@ export const QueueResources = {
                 },
             ],
         },
-    }
+    },
+    InboxSecurityGroup: {
+        Type: "AWS::EC2::SecurityGroup",
+        Properties: {
+            GroupName: getResourceName("sg-inbox-lambda"),
+            GroupDescription: getResourceName("sg-inbox-lambda"),
+            SecurityGroupIngress: SecurityGroupIngressRules,
+            SecurityGroupEgress: SecurityGroupEgressRules,
+            VpcId: importVpcRef()
+        },
+    },
 };
 export const QueueOutputs = {
     SQSQueueUrl: {

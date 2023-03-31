@@ -19,3 +19,9 @@ export type Address = {
     country: string
     state: string
 };
+
+export type DocumentSchema = {
+    id: string,
+    path: string,
+    fileName: string,
+}

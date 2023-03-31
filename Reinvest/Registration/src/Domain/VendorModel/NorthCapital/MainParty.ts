@@ -1,15 +1,16 @@
 import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
 import {CrcService} from "Registration/Domain/CrcService";
-import {MainPartyType} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
+import {NorthCapitalMainPartyType} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 import DateTime from "date-and-time";
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {DictionaryType} from "HKEKTypes/Generics";
+import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 
 export class MainParty {
-    private data: MainPartyType;
+    private data: NorthCapitalMainPartyType;
     private crc: string;
 
-    constructor(data: MainPartyType) {
+    constructor(data: NorthCapitalMainPartyType) {
         this.data = data;
         this.crc = this.generateCrc(data);
     }
@@ -37,7 +38,7 @@ export class MainParty {
         });
     }
 
-    private generateCrc(data: MainPartyType): string {
+    private generateCrc(data: NorthCapitalMainPartyType): string {
         const values = [
             data.domicile ?? "",
             data.firstName,
@@ -51,10 +52,16 @@ export class MainParty {
             data.primZip,
             data.primCountry,
             data.emailAddress,
-            data.documents?.map((document) => document.id).join(",") ?? "",
+            data.documents
+                .map((document: DocumentSchema) => `${document.id}/${document.path}/${document.fileName}`)
+                .join(",") ?? "",
         ];
 
         return CrcService.generateCrc(values);
+    }
+
+    getDocuments(): DocumentSchema[] {
+        return this.data.documents;
     }
 
     getCrc(): string {

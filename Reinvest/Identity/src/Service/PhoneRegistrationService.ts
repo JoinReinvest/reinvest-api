@@ -37,6 +37,7 @@ export class PhoneRegistrationService {
     async verifyPhoneNumber(userId: string, phone: PhoneNumber, TOPTToken: string) {
         try {
             const oneTimeToken = await this.phoneRepository.findToken(userId, phone);
+            console.log(oneTimeToken);
             const event = oneTimeToken.verifyToken(TOPTToken);
 
             return this.phoneRepository.applyEvent(event);

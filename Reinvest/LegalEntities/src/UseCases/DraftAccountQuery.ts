@@ -42,6 +42,7 @@ export class DraftAccountQuery {
             id: draftId,
             state: state,
             isCompleted: data?.isCompleted ?? false,
+            // @ts-ignore
             avatar: await this.documents.getAvatarFileLink(data?.avatar ?? null),
             details: data
         }
