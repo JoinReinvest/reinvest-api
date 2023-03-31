@@ -4,6 +4,9 @@ import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
 import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
 import {IndividualAccount} from "LegalEntities/Domain/Accounts/IndividualAccount";
+import {AddressInput} from "LegalEntities/Domain/ValueObject/Address";
+import {PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
+import {CompanyType, CorporateType} from "LegalEntities/Domain/ValueObject/Company";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -17,6 +20,11 @@ export enum DraftAccountType {
     TRUST = "TRUST"
 }
 
+export enum CompanyDraftAccountType {
+    CORPORATE = "CORPORATE",
+    TRUST = "TRUST"
+}
+
 export type IndividualDraftAccountSchema = {
     employmentStatus: EmploymentStatusInput | null,
     avatar: AvatarInput | null,
@@ -26,12 +34,34 @@ export type IndividualDraftAccountSchema = {
     isCompleted: boolean
 }
 
+
+export type CompanyDraftAccountSchema = {
+    name: PersonalNameInput,
+    address: AddressInput,
+    ein: { ein: string },
+    annualRevenue: { revenue: string },
+    numberOfEmployees: { numberOfEmployees: string },
+    industry: { industry: string },
+    documents: { id: string, fileName: string }[],
+    avatar: AvatarInput,
+    stakeholders: { ssn: string, firstName: string, lastName: string }[],
+    companyType: CompanyType,
+}
+
 export type DraftInput = {
     profileId: string,
     draftId: string,
     state: DraftAccountState,
     accountType: DraftAccountType,
+    data: unknown
+}
+
+export type IndividualDraftInput = DraftInput & {
     data: IndividualDraftAccountSchema
+}
+
+export type CompanyDraftInput = DraftInput & {
+    data: CompanyDraftInput
 }
 
 
@@ -53,6 +83,10 @@ export abstract class DraftAccount {
         switch (accountType) {
             case DraftAccountType.INDIVIDUAL:
                 return IndividualDraftAccount.createIndividual(profileId, draftId, state, data as IndividualDraftAccountSchema);
+            case DraftAccountType.CORPORATE:
+                return CorporateDraftAccount.createCorporate(profileId, draftId, state, data as CompanyDraftAccountSchema);
+            case DraftAccountType.TRUST:
+                return TrustDraftAccount.createTrust(profileId, draftId, state, data as CompanyDraftAccountSchema);
             default:
                 throw new Error('Draft type does not exist');
         }
@@ -73,7 +107,7 @@ export abstract class DraftAccount {
             draftId: this.draftId,
             state: this.state,
             accountType: this.accountType,
-            data: {} as IndividualDraftAccountSchema
+            data: {} as IndividualDraftAccountSchema | CompanyDraftAccountSchema
         };
     }
 
@@ -150,7 +184,7 @@ export class IndividualDraftAccount extends DraftAccount {
         return draftAccount;
     }
 
-    toObject(): DraftInput {
+    toObject(): IndividualDraftInput {
         return {
             ...super.toObject(),
             data: {
@@ -217,5 +251,109 @@ export class IndividualDraftAccount extends DraftAccount {
 
     setAsCompleted() {
         this.isCompleted = true;
+    }
+}
+
+export class CompanyDraftAccount extends DraftAccount {
+    private isCompleted: boolean = false;
+
+    static setCompanyData(draftAccount: CompanyDraftAccount, data: CompanyDraftAccountSchema): void {
+        if (!data) {
+            return;
+        }
+
+        // if (data.employmentStatus) {
+        //     draftAccount.setEmploymentStatus(EmploymentStatus.create(data.employmentStatus));
+        // }
+        //
+        // if (data.avatar) {
+        //     draftAccount.setAvatarDocument(Avatar.create(data.avatar));
+        // }
+        //
+        // if (data.employer) {
+        //     draftAccount.setEmployer(Employer.create(data.employer));
+        // }
+        //
+        // if (data.netWorth) {
+        //     draftAccount.setNetWorth(NetWorth.create(data.netWorth));
+        // }
+        //
+        // if (data.netIncome) {
+        //     draftAccount.setNetIncome(NetIncome.create(data.netIncome));
+        // }
+        //
+        // if (data.isCompleted) {
+        //     draftAccount.setAsCompleted();
+        // }
+
+    }
+
+    toObject(): CompanyDraftInput {
+        return {
+            ...super.toObject(),
+            data: {
+                // employmentStatus: this.get(this.employmentStatus),
+                // employer: this.get(this.employer),
+                // netWorth: this.get(this.netWorth),
+                // netIncome: this.get(this.netIncome),
+                // avatar: this.get(this.avatar),
+                // isCompleted: this.isCompleted
+            }
+        }
+    }
+
+    // transformIntoAccount(): IndividualAccount {
+    //     const {
+    //         profileId,
+    //         draftId: accountId,
+    //         data: {
+    //             employmentStatus,
+    //             employer,
+    //             netIncome,
+    //             netWorth,
+    //             avatar
+    //         }
+    //     } = this.toObject();
+    //
+    //     return IndividualAccount.create({
+    //         profileId,
+    //         accountId,
+    //         employmentStatus,
+    //         employer,
+    //         netWorth,
+    //         netIncome,
+    //         avatar
+    //     })
+    // }
+
+    isAccountCompleted(): boolean {
+        return this.isCompleted;
+    }
+
+}
+
+export class CorporateDraftAccount extends CompanyDraftAccount {
+    constructor(profileId: string, draftId: string, state: DraftAccountState) {
+        super(profileId, draftId, state, DraftAccountType.CORPORATE);
+    }
+
+    static createCorporate(profileId: string, draftId: string, state: DraftAccountState, data: CompanyDraftAccountSchema): CorporateDraftAccount {
+        const corporateDraftAccount = new CorporateDraftAccount(profileId, draftId, state);
+        super.setCompanyData(corporateDraftAccount, data);
+
+        return corporateDraftAccount;
+    }
+}
+
+export class TrustDraftAccount extends CompanyDraftAccount {
+    constructor(profileId: string, draftId: string, state: DraftAccountState) {
+        super(profileId, draftId, state, DraftAccountType.TRUST);
+    }
+
+    static createTrust(profileId: string, draftId: string, state: DraftAccountState, data: CompanyDraftAccountSchema): TrustDraftAccount {
+        const trustDraftAccount = new TrustDraftAccount(profileId, draftId, state);
+        super.setCompanyData(trustDraftAccount, data);
+
+        return trustDraftAccount;
     }
 }

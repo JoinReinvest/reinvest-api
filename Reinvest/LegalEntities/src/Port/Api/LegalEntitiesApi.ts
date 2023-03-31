@@ -11,6 +11,7 @@ export type LegalEntitiesApiType = {
 
     createDraftAccount: DraftAccountsController["createDraftAccount"],
     completeIndividualDraftAccount: DraftAccountsController["completeIndividualDraftAccount"],
+    completeCompanyDraftAccount: DraftAccountsController["completeCompanyDraftAccount"],
     readDraft: DraftAccountsController["readDraft"],
     listDrafts: DraftAccountsController["listDrafts"],
     removeDraft: DraftAccountsController["removeDraft"],
@@ -31,6 +32,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
     readDraft: container.delegateTo(DraftAccountsController, 'readDraft'),
     removeDraft: container.delegateTo(DraftAccountsController, 'removeDraft'),
     completeIndividualDraftAccount: container.delegateTo(DraftAccountsController, 'completeIndividualDraftAccount'),
+    completeCompanyDraftAccount: container.delegateTo(DraftAccountsController, 'completeCompanyDraftAccount'),
     transformDraftAccountIntoRegularAccount: container.delegateTo(DraftAccountsController, 'transformDraftAccountIntoRegularAccount'),
 
     getIndividualAccount: container.delegateTo(ReadAccountController, 'getIndividualAccount'),

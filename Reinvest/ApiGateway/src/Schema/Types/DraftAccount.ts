@@ -1,7 +1,7 @@
 import {JsonGraphQLError, SessionContext} from "ApiGateway/index";
 import {LegalEntities} from "LegalEntities/index";
 import {GraphQLError} from "graphql";
-import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import {CompanyDraftAccountType, DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
 
 const sharedSchema = `
     #graphql
@@ -120,7 +120,6 @@ const corporateTrustSchema = `
         email: EmailAddress
     }
 
-    "[MOCK]"
     type CorporateDraftAccount {
         id: ID
         name: String
@@ -134,7 +133,7 @@ const corporateTrustSchema = `
         stakeholders: [Stakeholder]
         companyType: CorporateCompanyType
     }
-    "[MOCK]"
+
     type TrustDraftAccount {
         id: ID
         name: String
@@ -185,7 +184,7 @@ const corporateTrustSchema = `
     }
 
     input StakeholderInput {
-        legalName: LegalNameInput!
+        name: PersonName!
         dateOfBirth: ISODate!
         ssn: SSNInput!
         address: AddressInput!
@@ -344,7 +343,10 @@ export const DraftAccount = {
             }: SessionContext) => (corporateTrustMockResponse(true)),
         },
         Mutation: {
-            createDraftAccount: async (parent: any, {type}: any, {profileId, modules}: SessionContext) => {
+            createDraftAccount: async (parent: any, {type}: { type: DraftAccountType }, {
+                profileId,
+                modules
+            }: SessionContext) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
                 const {status, id, message} = await api.createDraftAccount(profileId, type);
                 if (!status) {
@@ -377,14 +379,32 @@ export const DraftAccount = {
 
                 return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
             },
-            completeCorporateDraftAccount: async (parent: any, input: any, {
+            completeCorporateDraftAccount: async (parent: any, {accountId, input}: { accountId: string, input: any }, {
                 profileId,
                 modules
-            }: SessionContext) => (corporateTrustMockResponse(false)),
-            completeTrustDraftAccount: async (parent: any, input: any, {
+            }: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                const errors = await api.completeCompanyDraftAccount(profileId, accountId, CompanyDraftAccountType.CORPORATE, input);
+
+                if (errors.length > 0) {
+                    throw new JsonGraphQLError(errors);
+                }
+
+                return api.readDraft(profileId, accountId, DraftAccountType.CORPORATE);
+            },
+            completeTrustDraftAccount: async (parent: any, {accountId, input}: { accountId: string, input: any }, {
                 profileId,
                 modules
-            }: SessionContext) => (corporateTrustMockResponse(true)),
+            }: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                const errors = await api.completeCompanyDraftAccount(profileId, accountId, CompanyDraftAccountType.TRUST, input);
+
+                if (errors.length > 0) {
+                    throw new JsonGraphQLError(errors);
+                }
+
+                return api.readDraft(profileId, accountId, DraftAccountType.TRUST);
+            }
         }
     }
 }

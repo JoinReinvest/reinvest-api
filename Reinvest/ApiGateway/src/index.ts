@@ -18,7 +18,12 @@ export class JsonGraphQLError extends GraphQLError {
 
 const server = new ApolloServer({
     schema: Schema,
-    includeStacktraceInErrorResponses: false, // todo this should be debug flag
+
+    // todo this should be debug flag
+    includeStacktraceInErrorResponses: false,
+    formatError: (error) => {
+        return error;
+    }
 });
 
 export type SessionContext = { modules: Modules, profileId: string, userId: string }
