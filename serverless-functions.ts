@@ -22,6 +22,10 @@ import {
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
 import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
+import {
+    CronDocumentSyncFunction,
+    CronDocumentSyncResources
+} from "./devops/functions/cronDocumentSync/cron-document-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -83,6 +87,7 @@ const serverlessConfiguration: AWS = {
         migration: MigrationLambdaFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         queue: QueueFunction,
+        cronDocumentsSync: CronDocumentSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         tests: TestsFunction,
@@ -99,6 +104,7 @@ const serverlessConfiguration: AWS = {
             ...QueueResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...TestsLambdaResources,
+            ...CronDocumentSyncResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,
