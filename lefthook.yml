@@ -1,0 +1,11 @@
+post-merge:
+  commands:
+    update:
+      run: yarn
+pre-commit:
+  parallel: true
+  commands:
+    linter:
+      run: yarn lint
+    check_types:
+      run: yarn check-types
