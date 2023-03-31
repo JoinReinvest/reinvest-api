@@ -25,7 +25,7 @@ export class TransformDraftAccountIntoRegularAccount {
         this.transactionAdapter = transactionAdapter;
     }
 
-    async execute(profileId: string, draftAccountId: string): Promise<string[]> {
+    async execute(profileId: string, draftAccountId: string): Promise<string | null> {
         try {
             const draftAccount = await this.draftAccountRepository.getDraftForProfile<IndividualDraftAccount>(profileId, draftAccountId);
             if (!draftAccount.isAccountCompleted()) {
@@ -37,13 +37,13 @@ export class TransformDraftAccountIntoRegularAccount {
                     await this.openIndividualAccount(draftAccount);
                     break;
                 default:
-                    throw new Error('Draft account has unknown type');
+                    throw new Error('DRAFT_UNKNOWN_TYPE');
             }
 
-            return [];
+            return null;
         } catch (error: any) {
             console.error(error.message);
-            return [error.message];
+            return error.message;
         }
     }
 

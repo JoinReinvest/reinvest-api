@@ -5,7 +5,7 @@ import {MainParty} from "../../Domain/VendorModel/NorthCapital/MainParty";
 import {DictionaryType} from "HKEKTypes/Generics";
 import {
     NorthCapitalIndividualExtendedMainPartyType,
-    NorthCapitalIndividualAccountStructure, NorthCapitalLinkConfiguration
+    NorthCapitalIndividualAccountStructure, NorthCapitalLinkConfiguration, NorthCapitalUploadedDocument
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 import {ExecutionNorthCapitalAdapter} from "Registration/Adapter/NorthCapital/ExecutionNorthCapitalAdapter";
 
@@ -159,5 +159,55 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
         console.log({action: "Get north capital account", accountId, statusCode, statusDesc});
 
         return account;
+    }
+
+    async uploadPartyDocument(northCapitalId: string, url: string, documentFilename: string, documentId: string): Promise<void | never> {
+        const endpoint = 'tapiv3/index.php/v3/uploadPartyDocument';
+
+        const data = {
+            partyId: northCapitalId,
+            documentTitle: `documentTitle0=${documentFilename} [id: ${documentId}]`,
+            file_name: `filename0=${documentFilename}`,
+        }
+
+        try {
+            const response = await this.sendFilePostRequest(endpoint, data, `userfile0`, url, documentFilename);
+            const {statusCode, statusDesc, document_details: details} = response;
+
+            console.log({
+                action: "Upload North Capital file to the party",
+                northCapitalId,
+                statusCode,
+                statusDesc,
+                details
+            });
+        } catch (error: any) {
+            if (error === 'FILE_NOT_FOUND') {
+                throw new NorthCapitalException(404, error);
+            }
+
+            const {response: {data: {statusCode, statusDesc}}} = error;
+            if (statusCode && statusDesc) {
+                throw new NorthCapitalException(statusCode, statusDesc);
+            } else {
+                throw new Error(error.message);
+            }
+        }
+    }
+
+    async getUploadedDocuments(northCapitalId: string): Promise<NorthCapitalUploadedDocument[]> {
+        const endpoint = 'tapiv3/index.php/v3/getuploadPartyDocument';
+
+        const data = {
+            partyId: northCapitalId,
+        }
+        try {
+
+            const response = await this.postRequest(endpoint, data);
+            const {statusCode, statusDesc, partyDocumentDetails: details} = response;
+            return details ?? [];
+        } catch (error: any) {
+            return [];
+        }
     }
 }

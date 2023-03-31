@@ -4,6 +4,7 @@ import {NorthCapitalMainPartyType} from "Registration/Domain/VendorModel/NorthCa
 import DateTime from "date-and-time";
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {DictionaryType} from "HKEKTypes/Generics";
+import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 
 export class MainParty {
     private data: NorthCapitalMainPartyType;
@@ -51,10 +52,16 @@ export class MainParty {
             data.primZip,
             data.primCountry,
             data.emailAddress,
-            data.documents?.map((document) => document.id).join(",") ?? "",
+            data.documents
+                .map((document: DocumentSchema) => `${document.id}/${document.path}/${document.fileName}`)
+                .join(",") ?? "",
         ];
 
         return CrcService.generateCrc(values);
+    }
+
+    getDocuments(): DocumentSchema[] {
+        return this.data.documents;
     }
 
     getCrc(): string {

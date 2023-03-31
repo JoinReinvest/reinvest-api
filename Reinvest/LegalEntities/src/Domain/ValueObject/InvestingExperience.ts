@@ -1,5 +1,5 @@
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export enum InvestingExperienceType {
     NO_EXPERIENCE = "NO_EXPERIENCE",
@@ -20,16 +20,12 @@ export class InvestingExperience implements ToObject {
     }
 
     static create(rawStatement: InvestingExperienceInput): InvestingExperience {
-        try {
-            const {experience} = rawStatement;
-            if (!Object.values(InvestingExperienceType).includes(experience)) {
-                throw new Error('Wrong experience type');
-            }
-
-            return new InvestingExperience(experience);
-        } catch (error: any) {
-            throw new ValidationError('Wrong experience input');
+        const {experience} = rawStatement;
+        if (!Object.values(InvestingExperienceType).includes(experience)) {
+            throw new ValidationError(ValidationErrorEnum.INVALID_TYPE, "employmentStatus", experience);
         }
+
+        return new InvestingExperience(experience);
     }
 
     toObject(): InvestingExperienceInput {
@@ -37,5 +33,4 @@ export class InvestingExperience implements ToObject {
             experience: this.type
         }
     }
-
 }

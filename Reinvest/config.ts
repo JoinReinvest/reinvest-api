@@ -46,5 +46,10 @@ export const SQS_CONFIG = {
     isLocal: process.env.IT_IS_LOCAL === 'true',
 }
 
+export const LAMBDA_CONFIG = {
+    region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+    isLocal: process.env.IT_IS_LOCAL === 'true',
+}
+
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
 

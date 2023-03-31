@@ -17,6 +17,9 @@ import {
 import {main as postSignUp} from "../postSignUp/handler";
 import {NorthCapitalAdapter} from "Reinvest/Registration/src/Adapter/NorthCapital/NorthCapitalAdapter";
 import {VertaloAdapter} from "Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter";
+import {boot} from "Reinvest/bootstrap";
+import {Registration} from "Reinvest/Registration/src";
+import {PhoneNumber} from "Identity/Domain/PhoneNumber";
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -49,13 +52,22 @@ const getProfileIdFromAccessToken = async (token) => {
     return profileId;
 }
 
+const getUserIdFromAccessToken = async (token) => {
+    const {sub} = decodeJwt(token);
+
+    return sub;
+}
+
 router.post("/get-sms-topt", async (req: any, res: any) => {
     try {
         const {phoneNumber} = req.body;
+        const phoneNumberVO = new PhoneNumber("+1", phoneNumber);
+        const userId = await getUserIdFromAccessToken(req.headers.authorization);
         const data = await databaseProvider.provide()
             .selectFrom("identity_phone_verification")
             .select(['topt'])
-            .where('phoneNumber', '=', phoneNumber)
+            .where('phoneNumber', '=', phoneNumberVO.getPhoneNumber())
+            .where('userId', '=', userId)
             .limit(1)
             .executeTakeFirstOrThrow();
 
@@ -130,6 +142,7 @@ const userRouter = () => {
             const createUserCommand = new AdminCreateUserCommand({
                 UserPoolId: COGNITO_CONFIG.userPoolID,
                 Username: email,
+                MessageAction: "SUPPRESS",
                 DesiredDeliveryMediums: ["EMAIL"],
                 TemporaryPassword: "thisIsATemporaryPassword123!ImustProvide",
                 UserAttributes: userAttributes,
@@ -304,19 +317,21 @@ const northCapitalRouter = () => {
 
             const ncSyncRecord = await databaseProvider.provide()
                 .selectFrom("registration_north_capital_synchronization")
-                .select(['northCapitalId', 'recordId', 'type', 'crc', 'documents', 'links', 'version', 'createdDate', 'updatedDate'])
+                .select(['northCapitalId', 'recordId', 'type', 'crc', 'links', 'version', 'createdDate', 'updatedDate'])
                 .where('recordId', '=', mappedRecord.recordId)
                 .limit(1)
                 .executeTakeFirstOrThrow();
 
             const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
             const party = await ncAdapter.getParty(ncSyncRecord.northCapitalId);
+            const partyDocuments = await ncAdapter.getUploadedDocuments(ncSyncRecord.northCapitalId);
 
             res.status(200).json({
                 status: true,
                 mappedRecord,
                 ncSyncRecord,
                 party,
+                partyDocuments,
             });
         } catch (e: any) {
             console.log(e);
@@ -362,6 +377,40 @@ const northCapitalRouter = () => {
             });
         }
     });
+    router.post("/sync-documents", async (req: any, res: any) => {
+        try {
+            const modules = boot();
+            const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+            const documentIds = await registrationApi.listDocumentsToSynchronize();
+            if (documentIds.length === 0) {
+                res.status(404).json({
+                    status: false,
+                    message: "No documents to synchronize",
+                });
+
+                return;
+            }
+            const statuses = [];
+            for (const documentId of documentIds) {
+                const syncStatus = await registrationApi.synchronizeDocument(documentId);
+                statuses.push({
+                    documentId,
+                    status: syncStatus,
+                });
+            }
+
+            res.status(200).json({
+                statuses,
+            });
+        } catch (e: any) {
+            console.log(e);
+            res.status(500).json({
+                status: false,
+                message: e.message,
+            });
+        }
+    });
+
     return router;
 }
 const vertaloRouter = () => {

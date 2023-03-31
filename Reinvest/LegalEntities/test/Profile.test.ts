@@ -160,17 +160,20 @@ context("Given the user wants to complete the profile", () => {
         const ids = ['427aa662-a4da-48ee-a44f-780bd8743c93', '7ca02cbe-db35-413b-8fe3-1851643ab3b7'];
         const path = '6539e4e3-802b-4a83-9197-0a0f41832317';
         it("Then add ID scans", async () => {
-            const input = {ids, path};
+            const input = [{id: ids[0], path, fileName: 'id1.jpg'}, {id: ids[1], path, fileName: 'id2.jpg'}];
             profile.setIdentityDocument(IdentityDocument.create(input))
             const profileOutput = profile.toObject();
             const idScan = profileOutput.idScan as IdScanInput;
 
-            expect(idScan.ids).to.include.members(ids);
-            expect(idScan.path).to.be.equal(path);
+            expect(idScan.length).to.be.equal(2);
+            expect(idScan[0].id).to.be.equal(ids[0]);
+            expect(idScan[0].path).to.be.equal(path);
+            expect(idScan[1].id).to.be.equal(ids[1]);
+            expect(idScan[1].path).to.be.equal(path);
         });
 
-        it("Or if ids list is empty Then expects validation error", async () => {
-            const input = {ids: [], path};
+        it("Or if id is wrong uuid Then expects validation error", async () => {
+            const input = [{id: "wrong-uuid", path, fileName: 'id1.jpg'}];
 
             try {
                 profile.setIdentityDocument(IdentityDocument.create(input))

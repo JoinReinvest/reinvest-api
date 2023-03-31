@@ -301,6 +301,7 @@ export const CognitoUpdateAttributesPolicyBasedOnOutputArn = [
         Effect: "Allow",
         Action: [
             "cognito-idp:AdminUpdateUserAttributes",
+            "cognito-idp:AdminGetUser",
         ],
         Resource: importOutput('CognitoUserPoolArn'),
     },

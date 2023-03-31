@@ -4,6 +4,7 @@ import {CompleteDraftAccount, IndividualDraftAccountInput} from "LegalEntities/U
 import {DraftAccountQuery, DraftQuery, DraftsList} from "LegalEntities/UseCases/DraftAccountQuery";
 import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
+import {ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export class DraftAccountsController {
     public static getClassName = (): string => "DraftAccountsController";
@@ -66,7 +67,7 @@ export class DraftAccountsController {
         profileId: string,
         draftAccountId: string,
         individualInput: IndividualDraftAccountInput
-    ): Promise<string[]> {
+    ): Promise<ValidationErrorType[]> {
         try {
             return await this.completeDraftAccount.completeIndividual(profileId, draftAccountId, individualInput)
         } catch (error: any) {
@@ -79,13 +80,12 @@ export class DraftAccountsController {
     public async transformDraftAccountIntoRegularAccount(
         profileId: string,
         draftAccountId: string
-    ): Promise<string[]> {
+    ): Promise<string | null> {
         try {
             return await this.transformDraftIntoAccount.execute(profileId, draftAccountId)
         } catch (error: any) {
-            return [
-                error.message
-            ];
+            return error.message;
+
         }
     }
 }

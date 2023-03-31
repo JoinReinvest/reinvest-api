@@ -5,14 +5,20 @@ import Schema from "ApiGateway/Schema";
 import {GraphQLError} from "graphql";
 import {Identity} from "Reinvest/Identity/src";
 
+
+export class JsonGraphQLError extends GraphQLError {
+    constructor(json: any, extensions?: any) {
+        super('Invalid query/mutation', undefined, undefined, undefined, undefined, undefined, {
+            details: json,
+            ...extensions,
+
+        });
+    }
+}
+
 const server = new ApolloServer({
     schema: Schema,
     includeStacktraceInErrorResponses: false, // todo this should be debug flag
-    formatError: (err) => {
-        console.log(err);
-
-        return err;
-    },
 });
 
 export type SessionContext = { modules: Modules, profileId: string, userId: string }
