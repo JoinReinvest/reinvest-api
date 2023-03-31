@@ -7,6 +7,7 @@ import {IncentiveTokenController} from "Identity/Port/Api/IncentiveTokenControll
 export type IdentityApiType = {
     verifyPhoneNumber: PhoneController["verifyPhoneNumber"],
     setPhoneNumber: PhoneController["setPhoneNumber"],
+    isPhoneNumberCompleted: PhoneController["isPhoneNumberCompleted"],
 
     registerUser: UserRegistrationController['registerUser'],
     getProfileId: ProfileController['getProfileId'],
@@ -24,4 +25,5 @@ export const identityApi = (container: ContainerInterface): IdentityApiType => (
 
     setPhoneNumber: container.delegateTo(PhoneController, 'setPhoneNumber'),
     verifyPhoneNumber: container.delegateTo(PhoneController, 'verifyPhoneNumber'),
+    isPhoneNumberCompleted: container.delegateTo(PhoneController, 'isPhoneNumberCompleted'),
 })

@@ -1,4 +1,4 @@
-import {SessionContext} from "ApiGateway/index";
+import {JsonGraphQLError, SessionContext} from "ApiGateway/index";
 import {LegalEntities} from "LegalEntities/index";
 import {GraphQLError} from "graphql";
 import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
@@ -372,7 +372,7 @@ export const DraftAccount = {
                 const errors = await api.completeIndividualDraftAccount(profileId, accountId, input);
 
                 if (errors.length > 0) {
-                    throw new GraphQLError(JSON.stringify(errors));
+                    throw new JsonGraphQLError(errors);
                 }
 
                 return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);

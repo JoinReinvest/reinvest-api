@@ -1,4 +1,4 @@
-import {IsoDate, ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {IsoDate, ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 
 export type DateOfBirthInput = {
@@ -15,7 +15,7 @@ export class DateOfBirth extends IsoDate implements ToObject {
 
     static create(date: DateOfBirthInput): DateOfBirth {
         if (!date) {
-            throw new ValidationError('EMPTY_DATE_OF_BIRTH');
+            throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, 'dateOfBirth');
         }
         const {dateOfBirth} = date;
         return new DateOfBirth(dateOfBirth);

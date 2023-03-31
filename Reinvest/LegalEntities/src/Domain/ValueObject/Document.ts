@@ -1,5 +1,5 @@
 import {Id} from "LegalEntities/Domain/ValueObject/Id";
-import {NonEmptyString, ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {NonEmptyString, ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 
 export class Path extends NonEmptyString {
@@ -56,7 +56,7 @@ export class IdentityDocument implements ToObject {
 
     constructor(documents: Document[]) {
         if (documents.length === 0) {
-            throw new ValidationError("List ID scans can not be empty");
+            throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, "documents");
         }
 
         this.documents = documents;
@@ -68,7 +68,7 @@ export class IdentityDocument implements ToObject {
 
             return new IdentityDocument(documents);
         } catch (error: any) {
-            throw new ValidationError("Missing some mandatory Id Scan fields");
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "idScan", error.message);
         }
     }
 
@@ -92,7 +92,7 @@ export class Avatar implements ToObject {
 
             return new Avatar(new Id(id), new Path(path));
         } catch (error: any) {
-            throw new ValidationError("MISSING_AVATAR_ID");
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "avatar");
         }
     }
 

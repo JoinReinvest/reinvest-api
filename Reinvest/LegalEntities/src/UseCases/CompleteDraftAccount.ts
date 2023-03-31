@@ -4,6 +4,7 @@ import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/Valu
 import {Avatar} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
 import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
+import {ValidationErrorEnum, ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export type IndividualDraftAccountInput = {
     employmentStatus?: EmploymentStatusInput
@@ -22,23 +23,39 @@ export class CompleteDraftAccount {
         this.draftAccountRepository = draftAccountRepository;
     }
 
-    public async completeIndividual(profileId: string, draftAccountId: string, individualInput: IndividualDraftAccountInput): Promise<string[]> {
+    public async completeIndividual(profileId: string, draftAccountId: string, individualInput: IndividualDraftAccountInput): Promise<ValidationErrorType[]> {
         const errors = []
         try {
             const draft = await this.draftAccountRepository.getDraftForProfile<IndividualDraftAccount>(profileId, draftAccountId);
 
             if (!draft.isActive()) {
-                throw new Error("DRAFT_IS_NOT_ACTIVE");
+                errors.push(<ValidationErrorType>{
+                    type: ValidationErrorEnum.NOT_ACTIVE,
+                    field: "draft",
+                });
+                return errors;
             }
 
             if (!draft.isIndividual()) {
-                throw new Error("DRAFT_IS_NOT_INDIVIDUAL_TYPE");
+                errors.push(<ValidationErrorType>{
+                    type: ValidationErrorEnum.NOT_INDIVIDUAL,
+                    field: "draft",
+                });
+
+                return errors;
             }
 
             for (const step of Object.keys(individualInput)) {
                 try {
                     // @ts-ignore
                     const data = individualInput[step];
+                    if (data === null) {
+                        errors.push(<ValidationErrorType>{
+                            type: ValidationErrorEnum.EMPTY_VALUE,
+                            field: step,
+                        });
+                        continue;
+                    }
                     switch (step) {
                         case 'employmentStatus':
                             draft.setEmploymentStatus(EmploymentStatus.create(data));
@@ -59,13 +76,22 @@ export class CompleteDraftAccount {
                         case 'verifyAndFinish':
                             break;
                         default:
-                            console.error(`Unknown step: ${step}`);
-
-                            errors.push(`UNKNOWN_STEP_${step}`);
+                            errors.push(<ValidationErrorType>{
+                                type: ValidationErrorEnum.UNKNOWN_ERROR,
+                                field: step,
+                            });
                             break;
                     }
                 } catch (error: any) {
-                    errors.push(error.message);
+                    if ('getValidationError' in error) {
+                        errors.push(error.getValidationError());
+                    } else {
+                        console.error(error.message);
+                        errors.push(<ValidationErrorType>{
+                            type: ValidationErrorEnum.UNKNOWN_ERROR,
+                            field: step,
+                        });
+                    }
                 }
             }
 
@@ -73,13 +99,20 @@ export class CompleteDraftAccount {
                 if (draft.verifyCompletion()) {
                     draft.setAsCompleted();
                 } else {
-                    errors.push('Draft account completion verification failed');
+                    errors.push(<ValidationErrorType>{
+                        type: ValidationErrorEnum.FAILED,
+                        field: "verifyAndFinish",
+                    });
                 }
             }
 
             await this.draftAccountRepository.storeDraft(draft);
         } catch (error: any) {
-            errors.push(error.message);
+            console.error(error.message);
+            errors.push(<ValidationErrorType>{
+                type: ValidationErrorEnum.UNKNOWN_ERROR,
+                field: 'draft',
+            });
         }
 
         return errors;

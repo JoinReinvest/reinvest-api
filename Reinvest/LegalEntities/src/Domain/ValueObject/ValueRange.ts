@@ -1,4 +1,4 @@
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export type NetRangeInput = {
     range: string
@@ -12,13 +12,17 @@ export abstract class NetRange {
         this.range = range;
     }
 
-    static getValidRange(netRangeInput: NetRangeInput): string {
-        const {range} = netRangeInput;
-        if (!range) {
-            throw new ValidationError("WRONG_NET_RANGE_TYPE")
-        }
+    static getValidRange(netRangeInput: NetRangeInput, name: string): string {
+        try {
+            const {range} = netRangeInput;
+            if (!range) {
+                throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, name);
+            }
 
-        return range;
+            return range;
+        } catch (error: any) {
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, name);
+        }
     }
 
     toObject(): NetRangeInput {
@@ -30,14 +34,14 @@ export abstract class NetRange {
 
 export class NetWorth extends NetRange {
     static create(netRangeInput: NetRangeInput): NetWorth {
-        const range = NetRange.getValidRange(netRangeInput);
+        const range = NetRange.getValidRange(netRangeInput, 'netWorth');
         return new NetWorth(range);
     }
 }
 
 export class NetIncome extends NetRange {
     static create(netRangeInput: NetRangeInput): NetIncome {
-        const range = NetRange.getValidRange(netRangeInput);
+        const range = NetRange.getValidRange(netRangeInput, 'netIncome');
         return new NetWorth(range);
     }
 }

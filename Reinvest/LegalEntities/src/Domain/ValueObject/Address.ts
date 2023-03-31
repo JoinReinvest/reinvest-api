@@ -1,6 +1,8 @@
 import {
     AnyString,
-    NonEmptyString, ValidationError,
+    NonEmptyString,
+    ValidationError,
+    ValidationErrorEnum,
 } from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {ToObject} from "./ToObject";
 
@@ -93,7 +95,7 @@ export class Address implements ToObject {
                 new Country(country)
             );
         } catch (error: any) {
-            throw new ValidationError('Missing some mandatory address fields');
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, 'address');
         }
     }
 

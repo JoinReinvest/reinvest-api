@@ -1,4 +1,6 @@
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {Id} from "LegalEntities/Domain/ValueObject/Id";
+import {Path} from "LegalEntities/Domain/ValueObject/Document";
 
 export type EmployerInput = {
     nameOfEmployer: string,
@@ -21,12 +23,12 @@ export class Employer {
         try {
             const {nameOfEmployer, title, industry} = input;
             if (!nameOfEmployer || !title || !industry) {
-                throw new Error('Missing employer fields');
+                throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "employer");
             }
 
             return new Employer(nameOfEmployer, title, industry);
-        } catch (error) {
-            throw new ValidationError('WRONG_EMPLOYER_TYPE')
+        } catch (error: any) {
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "employer");
         }
     }
 
