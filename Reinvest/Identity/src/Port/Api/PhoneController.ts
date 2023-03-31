@@ -9,9 +9,9 @@ export class PhoneController {
         this.phoneRegistrationService = phoneRegistrationService;
     }
 
-    async setPhoneNumber(userId: string, countryCode: string, phoneNumber: string): Promise<boolean> {
+    async setPhoneNumber(userId: string, countryCode: string, phoneNumber: string, isSmsAllowed: boolean = true): Promise<boolean> {
         try {
-            const phone = new PhoneNumber(countryCode, phoneNumber);
+            const phone = new PhoneNumber(countryCode, phoneNumber, isSmsAllowed);
             return this.phoneRegistrationService.registerUnverifiedPhoneNumber(userId, phone);
         } catch (error: any) {
             console.error(error);
