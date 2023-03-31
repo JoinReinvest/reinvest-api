@@ -1,25 +1,27 @@
-import {AccountType} from "InvestmentAccounts/Domain/ProfileAggregate/AccountType";
-import {OpenAccount} from "InvestmentAccounts/Application/OpenAccount";
+import { OpenAccount } from 'InvestmentAccounts/Application/OpenAccount';
+import { AccountType } from 'InvestmentAccounts/Domain/ProfileAggregate/AccountType';
 
 export class AccountManagementController {
-    public static getClassName = (): string => "AccountManagementController";
-    private openAccountUseCase: OpenAccount;
+  public static getClassName = (): string => 'AccountManagementController';
+  private openAccountUseCase: OpenAccount;
 
-    constructor(openAccount: OpenAccount) {
-        this.openAccountUseCase = openAccount;
+  constructor(openAccount: OpenAccount) {
+    this.openAccountUseCase = openAccount;
+  }
+
+  async openAccount(profileId: string, accountId: string, accountType: AccountType): Promise<boolean> {
+    try {
+      await this.openAccountUseCase.execute(profileId, accountId, accountType);
+    } catch (error: any) {
+      console.error({ 'Opening account error': error.message });
+
+      return error.message === 'THE_ACCOUNT_ALREADY_OPENED';
     }
 
-    async openAccount(profileId: string, accountId: string, accountType: AccountType): Promise<boolean> {
-        try {
-            await this.openAccountUseCase.execute(profileId, accountId, accountType);
-        } catch (error: any) {
-            console.error({"Opening account error": error.message});
-            return error.message === "THE_ACCOUNT_ALREADY_OPENED";
-        }
-        return true;
-    }
+    return true;
+  }
 
-    async listAccountTypesUserCanOpen(profileId: string): Promise<AccountType[]> {
-        return await this.openAccountUseCase.listAccountTypesUserCanOpen(profileId);
-    }
+  async listAccountTypesUserCanOpen(profileId: string): Promise<AccountType[]> {
+    return await this.openAccountUseCase.listAccountTypesUserCanOpen(profileId);
+  }
 }

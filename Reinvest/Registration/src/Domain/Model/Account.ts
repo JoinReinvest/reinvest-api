@@ -1,18 +1,18 @@
-import {Address, EmploymentStatusType} from "Registration/Domain/Model/ReinvestTypes";
+import { Address, EmploymentStatusType } from 'Registration/Domain/Model/ReinvestTypes';
 
 export type IndividualAccountForSynchronization = {
-    accountId: string,
-    profileId: string,
-    employmentStatus?: EmploymentStatusType,
-    name: {
-        firstName: string
-        middleName?: string
-        lastName: string,
-    },
-    address: Address,
-    nameOfEmployer?: string,
-    title?: string,
-    industry?: string,
-    netWorth?: string,
-    netIncome?: string,
-}
+  accountId: string;
+  address: Address;
+  name: {
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+  };
+  profileId: string;
+  employmentStatus?: EmploymentStatusType;
+  industry?: string;
+  nameOfEmployer?: string;
+  netIncome?: string;
+  netWorth?: string;
+  title?: string;
+};

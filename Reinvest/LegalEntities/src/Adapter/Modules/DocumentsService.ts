@@ -1,24 +1,25 @@
-import {Documents} from "Documents/index";
-import {FileInput} from "LegalEntities/Domain/ValueObject/Document";
-import {FileLink} from "Documents/Adapter/S3/FileLinkService";
+import { FileLink } from 'Documents/Adapter/S3/FileLinkService';
+import { Documents } from 'Documents/index';
+import { FileInput } from 'LegalEntities/Domain/ValueObject/Document';
 
 /**
  * Documents Module ACL
  */
 export class DocumentsService {
-    public static getClassName = () => "DocumentsService";
-    private documentsModule: Documents.Main;
+  public static getClassName = () => 'DocumentsService';
+  private documentsModule: Documents.Main;
 
-    constructor(documentsModule: Documents.Main) {
-        this.documentsModule = documentsModule;
+  constructor(documentsModule: Documents.Main) {
+    this.documentsModule = documentsModule;
+  }
+
+  async getAvatarFileLink(fileInput: FileInput | null): Promise<FileLink | {}> {
+    if (fileInput === null) {
+      return {};
     }
 
-    async getAvatarFileLink(fileInput: FileInput | null): Promise<FileLink | {}> {
-        if (fileInput === null) {
-            return {};
-        }
-        const {id, path} = fileInput;
+    const { id, path } = fileInput;
 
-        return await this.documentsModule.api().getAvatarLink(id, path)
-    }
+    return await this.documentsModule.api().getAvatarLink(id, path);
+  }
 }

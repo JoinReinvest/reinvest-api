@@ -1,102 +1,101 @@
-import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
-import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
-import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
-import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
+import { Avatar, AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
+import { Employer, EmployerInput } from 'LegalEntities/Domain/ValueObject/Employer';
+import { EmploymentStatus, EmploymentStatusInput } from 'LegalEntities/Domain/ValueObject/EmploymentStatus';
+import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
+import { NetIncome, NetRangeInput, NetWorth } from 'LegalEntities/Domain/ValueObject/ValueRange';
 
 export type IndividualSchema = {
-    accountId: string,
-    profileId: string,
-    employmentStatus: EmploymentStatusInput | null,
-    employer: EmployerInput | null,
-    netWorth: NetRangeInput | null,
-    netIncome: NetRangeInput | null,
-    avatar: AvatarInput | null,
-}
+  accountId: string;
+  avatar: AvatarInput | null;
+  employer: EmployerInput | null;
+  employmentStatus: EmploymentStatusInput | null;
+  netIncome: NetRangeInput | null;
+  netWorth: NetRangeInput | null;
+  profileId: string;
+};
 
 export class IndividualAccount {
-    private profileId: string;
-    private accountId: string;
-    private employmentStatus: EmploymentStatus | null = null;
-    private employer: Employer | null = null;
-    private netWorth: NetWorth | null = null;
-    private netIncome: NetIncome | null = null;
-    private avatar: Avatar | null = null;
+  private profileId: string;
+  private accountId: string;
+  private employmentStatus: EmploymentStatus | null = null;
+  private employer: Employer | null = null;
+  private netWorth: NetWorth | null = null;
+  private netIncome: NetIncome | null = null;
+  private avatar: Avatar | null = null;
 
-    constructor(profileId: string, accountId: string) {
-        this.profileId = profileId;
-        this.accountId = accountId;
+  constructor(profileId: string, accountId: string) {
+    this.profileId = profileId;
+    this.accountId = accountId;
+  }
+
+  private get(value: ToObject | null) {
+    if (value === null) {
+      return null;
     }
 
-    private get(value: ToObject | null) {
-        if (value === null) {
-            return null;
-        }
+    return value.toObject();
+  }
 
-        return value.toObject();
+  toObject(): IndividualSchema {
+    return {
+      accountId: this.accountId,
+      profileId: this.profileId,
+      employmentStatus: this.get(this.employmentStatus),
+      employer: this.get(this.employer),
+      netWorth: this.get(this.netWorth),
+      netIncome: this.get(this.netIncome),
+      avatar: this.get(this.avatar),
+    };
+  }
+
+  static create(individualData: IndividualSchema): IndividualAccount {
+    const { profileId, accountId, employmentStatus, employer, netIncome, netWorth, avatar } = individualData;
+    const account = new IndividualAccount(profileId, accountId);
+
+    if (employmentStatus) {
+      account.setEmploymentStatus(EmploymentStatus.create(employmentStatus as EmploymentStatusInput));
     }
 
-
-    toObject(): IndividualSchema {
-        return {
-            accountId: this.accountId,
-            profileId: this.profileId,
-            employmentStatus: this.get(this.employmentStatus),
-            employer: this.get(this.employer),
-            netWorth: this.get(this.netWorth),
-            netIncome: this.get(this.netIncome),
-            avatar: this.get(this.avatar)
-        };
+    if (avatar) {
+      account.setAvatarDocument(Avatar.create(avatar as AvatarInput));
     }
 
-    static create(individualData: IndividualSchema): IndividualAccount {
-        const {profileId, accountId, employmentStatus, employer, netIncome, netWorth, avatar} = individualData;
-        const account = new IndividualAccount(profileId, accountId);
-
-        if (employmentStatus) {
-            account.setEmploymentStatus(EmploymentStatus.create(employmentStatus as EmploymentStatusInput));
-        }
-
-        if (avatar) {
-            account.setAvatarDocument(Avatar.create(avatar as AvatarInput));
-        }
-
-        if (employer) {
-            account.setEmployer(Employer.create(employer as EmployerInput));
-        }
-
-        if (netWorth) {
-            account.setNetWorth(NetWorth.create(netWorth as NetRangeInput));
-        }
-
-        if (netIncome) {
-            account.setNetIncome(NetIncome.create(netIncome as NetRangeInput));
-        }
-
-        return account;
+    if (employer) {
+      account.setEmployer(Employer.create(employer as EmployerInput));
     }
 
-    setEmploymentStatus(employmentStatus: EmploymentStatus) {
-        this.employmentStatus = employmentStatus;
+    if (netWorth) {
+      account.setNetWorth(NetWorth.create(netWorth as NetRangeInput));
     }
 
-    setAvatarDocument(avatar: Avatar) {
-        this.avatar = avatar;
+    if (netIncome) {
+      account.setNetIncome(NetIncome.create(netIncome as NetRangeInput));
     }
 
-    setEmployer(employer: Employer) {
-        this.employer = employer;
-    }
+    return account;
+  }
 
-    setNetWorth(netWorth: NetWorth) {
-        this.netWorth = netWorth;
-    }
+  setEmploymentStatus(employmentStatus: EmploymentStatus) {
+    this.employmentStatus = employmentStatus;
+  }
 
-    setNetIncome(netIncome: NetIncome) {
-        this.netIncome = netIncome;
-    }
+  setAvatarDocument(avatar: Avatar) {
+    this.avatar = avatar;
+  }
 
-    getInitials(): string {
-        return "I";
-    }
+  setEmployer(employer: Employer) {
+    this.employer = employer;
+  }
+
+  setNetWorth(netWorth: NetWorth) {
+    this.netWorth = netWorth;
+  }
+
+  setNetIncome(netIncome: NetIncome) {
+    this.netIncome = netIncome;
+  }
+
+  getInitials(): string {
+    return 'I';
+  }
 }

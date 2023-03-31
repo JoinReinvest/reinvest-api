@@ -1,5 +1,5 @@
-import {SessionContext} from "ApiGateway/index";
-import {LegalEntities} from "LegalEntities/index";
+import { SessionContext } from 'ApiGateway/index';
+import { LegalEntities } from 'LegalEntities/index';
 
 const schema = `
     #graphql
@@ -39,33 +39,29 @@ const schema = `
 `;
 
 export const Account = {
-    typeDefs: schema,
-    resolvers: {
-        Query: {
-            getIndividualAccount: async (parent: any, {accountId}: any, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const account = await api.getIndividualAccount(profileId, accountId);
-                return {
-                    ...account,
-                    positionTotal: '$5,560'
-                }
-            },
-            getAccountsOverview: async (parent: any,
-                                        input: { accountId: string },
-                                        {profileId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const accountsOverviewResponses = await api.getAccountsOverview(profileId);
-                return accountsOverviewResponses.map((account) => {
-                    return {
-                        ...account,
-                        positionTotal: '$5,560'
-                    }
-                });
-            },
-        },
-    }
-}
+  typeDefs: schema,
+  resolvers: {
+    Query: {
+      getIndividualAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const account = await api.getIndividualAccount(profileId, accountId);
+
+        return {
+          ...account,
+          positionTotal: '$5,560',
+        };
+      },
+      getAccountsOverview: async (parent: any, input: { accountId: string }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const accountsOverviewResponses = await api.getAccountsOverview(profileId);
+
+        return accountsOverviewResponses.map(account => {
+          return {
+            ...account,
+            positionTotal: '$5,560',
+          };
+        });
+      },
+    },
+  },
+};

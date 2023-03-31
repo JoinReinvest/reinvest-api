@@ -10,7 +10,7 @@
     "npm": "please-use-yarn"
   },
   "scripts": {
-    "lint": "yarn eslint ./Reinvest ./test ./shared ./devops",
+    "lint": "yarn eslint ./",
     "lint:fix": "yarn lint --fix",
     "check-types": "tsc --pretty",
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",

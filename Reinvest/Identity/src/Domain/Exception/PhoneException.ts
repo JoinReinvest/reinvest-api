@@ -1,3 +1,1 @@
-export class PhoneException extends Error {
-
-}
+export class PhoneException extends Error {}

@@ -1,4 +1,4 @@
-import { UniqueId } from "../../../Commons/UniqueId";
+import { UniqueId } from '../../../Commons/UniqueId';
 
 export class TransactionId {
   private id: string;

@@ -1,16 +1,13 @@
-import {ContainerInterface} from "Container/Container";
-import {ProfileCompletedEventHandler} from "Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler";
-import {
-    IndividualAccountOpenedEventHandler
-} from "Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler";
+import { ContainerInterface } from 'Container/Container';
+import { IndividualAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler';
+import { ProfileCompletedEventHandler } from 'Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler';
 
 export type RegistrationTechnicalHandlerType = {
-    LegalProfileCompleted: ProfileCompletedEventHandler['handle'],
-    IndividualAccountOpened: IndividualAccountOpenedEventHandler['handle'],
-}
-
+  IndividualAccountOpened: IndividualAccountOpenedEventHandler['handle'];
+  LegalProfileCompleted: ProfileCompletedEventHandler['handle'];
+};
 
 export const registrationTechnicalHandler = (container: ContainerInterface): RegistrationTechnicalHandlerType => ({
-    LegalProfileCompleted: container.delegateTo(ProfileCompletedEventHandler, 'handle'),
-    IndividualAccountOpened: container.delegateTo(IndividualAccountOpenedEventHandler, 'handle')
-})
+  LegalProfileCompleted: container.delegateTo(ProfileCompletedEventHandler, 'handle'),
+  IndividualAccountOpened: container.delegateTo(IndividualAccountOpenedEventHandler, 'handle'),
+});

@@ -1,21 +1,17 @@
-import {
-    DomainEvent
-} from "SimpleAggregator/Types";
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type ProfileCreated = DomainEvent & {
-    kind: "ProfileCreated",
-    data: {
-        individualAccountId: null,
-        corporateAccountIds: [],
-        trustAccountIds: [],
-    }
-}
+  data: {
+    corporateAccountIds: [];
+    individualAccountId: null;
+    trustAccountIds: [];
+  };
+  kind: 'ProfileCreated';
+};
 
 export type IndividualAccountOpened = DomainEvent & {
-    kind: "IndividualAccountOpened",
-    data: {
-        individualAccountId: string
-    }
-}
-
-
+  data: {
+    individualAccountId: string;
+  };
+  kind: 'IndividualAccountOpened';
+};

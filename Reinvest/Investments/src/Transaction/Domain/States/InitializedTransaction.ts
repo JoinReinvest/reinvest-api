@@ -1,16 +1,13 @@
-import { CreateTrade } from "../Command/CreateTrade";
-import { TransactionCreated } from "../Events/TransactionCreated";
-import { TransactionEvent } from "../Events/TransactionEvent";
-import { Transaction } from "../Transaction";
-import { TransactionDecision } from "../TransactionDecision";
-import { TransactionStateChange } from "../TransactionStateChange";
-import { TransactionId } from "../ValueObject/TransactionId";
-import { CommonTransaction } from "./CommonTransaction";
+import { CreateTrade } from '../Command/CreateTrade';
+import { TransactionCreated } from '../Events/TransactionCreated';
+import { TransactionEvent } from '../Events/TransactionEvent';
+import { Transaction } from '../Transaction';
+import { TransactionDecision } from '../TransactionDecision';
+import { TransactionStateChange } from '../TransactionStateChange';
+import { TransactionId } from '../ValueObject/TransactionId';
+import { CommonTransaction } from './CommonTransaction';
 
-export class InitializedTransaction
-  extends CommonTransaction
-  implements Transaction
-{
+export class InitializedTransaction extends CommonTransaction implements Transaction {
   constructor(transactionId: TransactionId) {
     super(transactionId);
   }
@@ -28,13 +25,8 @@ export class InitializedTransaction
 
   private createTrade(event: TransactionCreated): TransactionDecision {
     return new TransactionDecision(
-      CreateTrade.create(
-        this.transactionId,
-        event.portfolioId,
-        event.investorAccountId,
-        event.amountToInvest
-      ),
-      TransactionStateChange.tradeAwaiting(this.transactionId)
+      CreateTrade.create(this.transactionId, event.portfolioId, event.investorAccountId, event.amountToInvest),
+      TransactionStateChange.tradeAwaiting(this.transactionId),
     );
   }
 }

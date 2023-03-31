@@ -1,27 +1,27 @@
 export enum DomicileType {
-    CITIZEN = "CITIZEN",
-    GREEN_CARD = "GREEN_CARD",
-    VISA = "VISA",
+  CITIZEN = 'CITIZEN',
+  GREEN_CARD = 'GREEN_CARD',
+  VISA = 'VISA',
 }
 
 export enum EmploymentStatusType {
-    EMPLOYED = "EMPLOYED",
-    UNEMPLOYED = "UNEMPLOYED",
-    RETIRED = "RETIRED",
-    STUDENT = "STUDENT",
+  EMPLOYED = 'EMPLOYED',
+  UNEMPLOYED = 'UNEMPLOYED',
+  RETIRED = 'RETIRED',
+  STUDENT = 'STUDENT',
 }
 
 export type Address = {
-    addressLine1: string
-    addressLine2?: string
-    city: string
-    zip: string
-    country: string
-    state: string
+  addressLine1: string;
+  city: string;
+  country: string;
+  state: string;
+  zip: string;
+  addressLine2?: string;
 };
 
 export type DocumentSchema = {
-    id: string,
-    path: string,
-    fileName: string,
-}
+  fileName: string;
+  id: string;
+  path: string;
+};

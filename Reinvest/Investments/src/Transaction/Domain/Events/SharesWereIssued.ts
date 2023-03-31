@@ -1,6 +1,6 @@
-import { SharesId } from "../../../Commons/SharesId";
-import { TransactionId } from "../ValueObject/TransactionId";
-import { AbstractTransactionEvent } from "./TransactionEvent";
+import { SharesId } from '../../../Commons/SharesId';
+import { TransactionId } from '../ValueObject/TransactionId';
+import { AbstractTransactionEvent } from './TransactionEvent';
 
 export class SharesWereIssued extends AbstractTransactionEvent {
   private readonly _sharesId: SharesId;

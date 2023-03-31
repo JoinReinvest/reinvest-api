@@ -1,5 +1,5 @@
-import { GraphQLError, GraphQLScalarType, Kind } from "graphql";
-import {makeExecutableSchema} from "@graphql-tools/schema";
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { GraphQLError, GraphQLScalarType, Kind } from 'graphql';
 
 const EmailAddressSchema = `
     #graphql
@@ -7,13 +7,13 @@ const EmailAddressSchema = `
 `;
 
 const EmailAddressResolver = new GraphQLScalarType({
-  name: "EmailAddress",
-  description: "A valid email address",
-  serialize: (value) => value,
-  parseValue: (value) => value,
-  parseLiteral: (ast) => {
+  name: 'EmailAddress',
+  description: 'A valid email address',
+  serialize: value => value,
+  parseValue: value => value,
+  parseLiteral: ast => {
     if (ast.kind !== Kind.STRING) {
-      throw new GraphQLError("The value must be string");
+      throw new GraphQLError('The value must be string');
     }
 
     return ast.value;

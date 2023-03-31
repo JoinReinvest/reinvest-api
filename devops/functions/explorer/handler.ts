@@ -1,5 +1,5 @@
-import express, {Request} from "express";
-import serverless from "serverless-http";
+import express, { Request } from 'express';
+import serverless from 'serverless-http';
 
 const hostedUI = process.env.ExplorerHostedUI;
 const apiEndpoint = process.env.ApiUrl;
@@ -79,21 +79,23 @@ const handleToken = `
             }
     </script>
 </html>
-`
+`;
 
 const app = express();
 
-app.get("/set-header", (req: Request, res: any) => {
-    res.send(handleToken);
+app.get('/set-header', (req: Request, res: any) => {
+  res.send(handleToken);
 });
 
-app.get("/explorer", (req: any, res: any) => {
-    if (!req.query.access_token) {
-        res.redirect(hostedUI);
-        return;
-    }
-    const pageWithAuth = page.replace('<put_your_jwt_here>', req.query.access_token);
-    res.send(pageWithAuth);
+app.get('/explorer', (req: any, res: any) => {
+  if (!req.query.access_token) {
+    res.redirect(hostedUI);
+
+    return;
+  }
+
+  const pageWithAuth = page.replace('<put_your_jwt_here>', req.query.access_token);
+  res.send(pageWithAuth);
 });
 
 export const main = serverless(app);

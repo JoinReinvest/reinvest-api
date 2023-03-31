@@ -1,9 +1,9 @@
-import { Id } from "../../../Common/Domain/ValueObject/Id";
-import { AccountMember } from "./AccountMember";
+import { Id } from '../../../Common/Domain/ValueObject/Id';
+import { AccountMember } from './AccountMember';
 
 export class AccountStructure {
   getMembersId(): Id[] {
-    return [new Id("mock")];
+    return [new Id('mock')];
   }
 
   *getMembers(): Generator<AccountMember> {

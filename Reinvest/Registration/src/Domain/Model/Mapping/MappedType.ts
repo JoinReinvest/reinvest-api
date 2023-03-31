@@ -1,9 +1,9 @@
 export enum MappedType {
-    PROFILE = "PROFILE",
-    INDIVIDUAL_ACCOUNT = "INDIVIDUAL_ACCOUNT"
+  PROFILE = 'PROFILE',
+  INDIVIDUAL_ACCOUNT = 'INDIVIDUAL_ACCOUNT',
 }
 
 export enum MappedRecordStatus {
-    DIRTY = "DIRTY",
-    CLEAN = "CLEAN",
+  DIRTY = 'DIRTY',
+  CLEAN = 'CLEAN',
 }

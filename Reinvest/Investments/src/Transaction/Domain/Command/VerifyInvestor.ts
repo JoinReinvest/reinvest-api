@@ -1,5 +1,5 @@
-import { TransactionId } from "../ValueObject/TransactionId";
-import { TransactionCommand } from "./TransactionCommand";
+import { TransactionId } from '../ValueObject/TransactionId';
+import { TransactionCommand } from './TransactionCommand';
 
 export class VerifyInvestor implements TransactionCommand {
   transactionCommandGuard = true;
