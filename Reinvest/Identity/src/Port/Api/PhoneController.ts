@@ -1,12 +1,15 @@
 import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationService";
 import {PhoneNumber} from "Identity/Domain/PhoneNumber";
+import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 
 export class PhoneController {
     public static getClassName = (): string => "PhoneController";
     private phoneRegistrationService: PhoneRegistrationService;
+    private cognitoService: CognitoService;
 
-    constructor(phoneRegistrationService: PhoneRegistrationService) {
+    constructor(phoneRegistrationService: PhoneRegistrationService, cognitoService: CognitoService) {
         this.phoneRegistrationService = phoneRegistrationService;
+        this.cognitoService = cognitoService;
     }
 
     async setPhoneNumber(userId: string, countryCode: string, phoneNumber: string, isSmsAllowed: boolean = true): Promise<boolean> {
@@ -27,5 +30,9 @@ export class PhoneController {
             console.error(error);
             return false;
         }
+    }
+
+    async isPhoneNumberCompleted(userId: string): Promise<boolean> {
+        return this.cognitoService.isPhoneNumberCompleted(userId);
     }
 }

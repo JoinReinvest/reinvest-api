@@ -1,5 +1,9 @@
 # REINVEST API CHANGELOG
 
+## 1.7.3 - 03/31/2023
+
+* query `phoneCompleted` is no longer mocked and returns real phone number completion status
+
 ## 1.7.2 - 03/31/2023
 
 * Add optional `isSmsAllowed` field for `setPhoneNumber` mutation

@@ -44,8 +44,12 @@ export const PhoneNumberVerification = {
         Query: {
             phoneCompleted: async (parent: any,
                                    input: undefined,
-                                   {profileId, modules}: SessionContext
-            ) => true,
+                                   {userId, modules}: SessionContext
+            ) => {
+                const api = modules.getApi<Identity.ApiType>(Identity);
+
+                return api.isPhoneNumberCompleted(userId);
+            },
             userInvitationLink: async (parent: any,
                                        data: any,
                                        {userId, modules}: SessionContext
