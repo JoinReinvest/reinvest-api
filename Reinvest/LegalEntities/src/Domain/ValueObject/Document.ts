@@ -40,6 +40,14 @@ export class Document implements ToObject {
         this.fileName = new FileName(document.fileName);
     }
 
+    isTheSameDocument(document: Document): boolean {
+        return this.id.toString() === document.getId();
+    }
+
+    getId(): string {
+        return this.id.toString();
+    }
+
     toObject(): DocumentSchema {
         return {
             id: this.id.toString(),
@@ -74,6 +82,42 @@ export class IdentityDocument implements ToObject {
 
     toObject(): DocumentSchema[] {
         return this.documents.map((document: Document) => document.toObject());
+    }
+}
+
+export class CompanyDocuments implements ToObject {
+    private documents: Document[];
+
+    constructor(documents: Document[]) {
+        this.documents = documents;
+    }
+
+    static create(data: DocumentSchema[]): CompanyDocuments {
+        try {
+            const documents = data.map((document: DocumentSchema) => new Document(document));
+
+            return new CompanyDocuments(documents);
+        } catch (error: any) {
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "documents", error.message);
+        }
+    }
+
+    toObject(): DocumentSchema[] {
+        return this.documents.map((document: Document) => document.toObject());
+    }
+
+    addDocument(document: DocumentSchema): void {
+        const documentToAdd = new Document(document);
+
+        const documentsWithTheSameId = this.documents.filter((doc: Document) => doc.isTheSameDocument(documentToAdd));
+        if (documentsWithTheSameId.length === 0) {
+            this.documents.push(documentToAdd);
+        }
+    }
+
+    removeDocument(document: DocumentSchema): void {
+        const documentToRemove = new Document(document);
+        this.documents = this.documents.filter((doc: Document) => !doc.isTheSameDocument(documentToRemove));
     }
 }
 

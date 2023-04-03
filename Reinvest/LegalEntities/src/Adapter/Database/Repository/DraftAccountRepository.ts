@@ -4,10 +4,11 @@ import {
 } from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 import {
+    CorporateDraftAccount,
     DraftAccount,
     DraftAccountState,
     DraftAccountType,
-    DraftInput
+    DraftInput, IndividualDraftAccount, TrustDraftAccount
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {LegalEntitiesDraftAccount} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 import {Selectable} from "kysely";
@@ -87,6 +88,7 @@ export class DraftAccountRepository {
         }
     }
 
+
     async getDraftForProfile<DraftAccountType extends DraftAccount>(profileId: string, draftAccountId: string): Promise<DraftAccountType | never> {
         try {
             const draft = await this.databaseAdapterProvider.provide()
@@ -101,6 +103,18 @@ export class DraftAccountRepository {
         } catch (error: any) {
             throw new Error('DRAFT_NOT_EXIST');
         }
+    }
+
+    async getIndividualDraftForProfile(profileId: string, draftAccountId: string): Promise<IndividualDraftAccount | never> {
+        return this.getDraftForProfile<IndividualDraftAccount>(profileId, draftAccountId);
+    }
+
+    async getCorporateDraftForProfile(profileId: string, draftAccountId: string): Promise<CorporateDraftAccount | never> {
+        return this.getDraftForProfile<CorporateDraftAccount>(profileId, draftAccountId);
+    }
+
+    async getTrustDraftForProfile(profileId: string, draftAccountId: string): Promise<TrustDraftAccount | never> {
+        return this.getDraftForProfile<TrustDraftAccount>(profileId, draftAccountId);
     }
 
     async removeDraft(profileId: string, draftId: string): Promise<boolean> {

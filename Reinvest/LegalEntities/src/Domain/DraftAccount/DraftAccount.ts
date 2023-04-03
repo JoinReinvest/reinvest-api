@@ -1,12 +1,33 @@
 import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
+import {
+    Avatar,
+    AvatarInput,
+    CompanyDocuments,
+    Document,
+    DocumentSchema
+} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
-import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
+import {
+    NetIncome,
+    ValueRangeInput,
+    NetWorth,
+    AnnualRevenue,
+    NumberOfEmployees
+} from "LegalEntities/Domain/ValueObject/ValueRange";
 import {IndividualAccount} from "LegalEntities/Domain/Accounts/IndividualAccount";
-import {AddressInput} from "LegalEntities/Domain/ValueObject/Address";
+import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
 import {PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
-import {CompanyType, CorporateType} from "LegalEntities/Domain/ValueObject/Company";
+import {
+    Company,
+    CompanyName,
+    CompanyNameInput,
+    CompanyType, CompanyTypeInput,
+    CorporateType
+} from "LegalEntities/Domain/ValueObject/Company";
+import {EIN, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
+import {CompanyStakeholders, Stakeholder, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -29,23 +50,23 @@ export type IndividualDraftAccountSchema = {
     employmentStatus: EmploymentStatusInput | null,
     avatar: AvatarInput | null,
     employer: EmployerInput | null,
-    netWorth: NetRangeInput | null,
-    netIncome: NetRangeInput | null,
+    netWorth: ValueRangeInput | null,
+    netIncome: ValueRangeInput | null,
     isCompleted: boolean
 }
 
-
 export type CompanyDraftAccountSchema = {
-    name: PersonalNameInput,
+    companyName: CompanyNameInput,
     address: AddressInput,
-    ein: { ein: string },
-    annualRevenue: { revenue: string },
-    numberOfEmployees: { numberOfEmployees: string },
-    industry: { industry: string },
-    documents: { id: string, fileName: string }[],
-    avatar: AvatarInput,
-    stakeholders: { ssn: string, firstName: string, lastName: string }[],
-    companyType: CompanyType,
+    ein: SensitiveNumberSchema,
+    annualRevenue: ValueRangeInput,
+    numberOfEmployees: ValueRangeInput,
+    industry: ValueStringInput,
+    companyType: CompanyTypeInput,
+    avatar: AvatarInput | null,
+    companyDocuments: DocumentSchema[];
+    stakeholders: StakeholderSchema[];
+    isCompleted: boolean,
 }
 
 export type DraftInput = {
@@ -61,9 +82,8 @@ export type IndividualDraftInput = DraftInput & {
 }
 
 export type CompanyDraftInput = DraftInput & {
-    data: CompanyDraftInput
+    data: CompanyDraftAccountSchema
 }
-
 
 export abstract class DraftAccount {
     protected profileId: string;
@@ -109,6 +129,10 @@ export abstract class DraftAccount {
             accountType: this.accountType,
             data: {} as IndividualDraftAccountSchema | CompanyDraftAccountSchema
         };
+    }
+
+    getInitials(): string {
+        return this.accountType.charAt(0).toUpperCase();
     }
 
     isIndividual(): boolean {
@@ -252,52 +276,87 @@ export class IndividualDraftAccount extends DraftAccount {
     setAsCompleted() {
         this.isCompleted = true;
     }
+
+    getInitials(): string {
+        return super.getInitials();
+    }
 }
 
 export class CompanyDraftAccount extends DraftAccount {
     private isCompleted: boolean = false;
+    private companyName: CompanyName | null = null;
+    private address: Address | null = null;
+    private ein: EIN | null = null;
+    private annualRevenue: AnnualRevenue | null = null;
+    private numberOfEmployees: NumberOfEmployees | null = null;
+    private industry: Industry | null = null;
+    private companyType: Company | null = null;
+    private avatar: Avatar | null = null;
+    private documents: CompanyDocuments | null = null;
+    private stakeholders: CompanyStakeholders | null = null;
 
     static setCompanyData(draftAccount: CompanyDraftAccount, data: CompanyDraftAccountSchema): void {
         if (!data) {
             return;
         }
 
-        // if (data.employmentStatus) {
-        //     draftAccount.setEmploymentStatus(EmploymentStatus.create(data.employmentStatus));
-        // }
-        //
-        // if (data.avatar) {
-        //     draftAccount.setAvatarDocument(Avatar.create(data.avatar));
-        // }
-        //
-        // if (data.employer) {
-        //     draftAccount.setEmployer(Employer.create(data.employer));
-        // }
-        //
-        // if (data.netWorth) {
-        //     draftAccount.setNetWorth(NetWorth.create(data.netWorth));
-        // }
-        //
-        // if (data.netIncome) {
-        //     draftAccount.setNetIncome(NetIncome.create(data.netIncome));
-        // }
-        //
-        // if (data.isCompleted) {
-        //     draftAccount.setAsCompleted();
-        // }
+        if (data.companyName) {
+            draftAccount.setCompanyName(CompanyName.create(data.companyName));
+        }
 
+        if (data.address) {
+            draftAccount.setAddress(Address.create(data.address));
+        }
+
+        if (data.ein) {
+            draftAccount.setEIN(EIN.create(data.ein));
+        }
+
+        if (data.annualRevenue) {
+            draftAccount.setAnnualRevenue(AnnualRevenue.create(data.annualRevenue));
+        }
+
+        if (data.numberOfEmployees) {
+            draftAccount.setNumberOfEmployees(NumberOfEmployees.create(data.numberOfEmployees));
+        }
+
+        if (data.industry) {
+            draftAccount.setIndustry(Industry.create(data.industry));
+        }
+
+        if (data.companyType) {
+            draftAccount.setCompanyType(Company.create(data.companyType));
+        }
+
+        if (data.avatar) {
+            draftAccount.setAvatarDocument(Avatar.create(data.avatar));
+        }
+
+        draftAccount.setDocuments(CompanyDocuments.create(data.companyDocuments ?? []));
+        draftAccount.setStakeholders(CompanyStakeholders.create(data.stakeholders ?? []));
+    }
+
+    getInitials(): string {
+        return this.companyName
+            ? this.companyName.getInitials()
+            : super.getInitials();
     }
 
     toObject(): CompanyDraftInput {
         return {
             ...super.toObject(),
             data: {
-                // employmentStatus: this.get(this.employmentStatus),
-                // employer: this.get(this.employer),
-                // netWorth: this.get(this.netWorth),
-                // netIncome: this.get(this.netIncome),
-                // avatar: this.get(this.avatar),
-                // isCompleted: this.isCompleted
+                isCompleted: this.isCompleted,
+                companyName: this.get(this.companyName),
+                address: this.get(this.address),
+                ein: this.get(this.ein),
+                annualRevenue: this.get(this.annualRevenue),
+                numberOfEmployees: this.get(this.numberOfEmployees),
+                industry: this.get(this.industry),
+                companyType: this.get(this.companyType),
+                avatar: this.get(this.avatar),
+                companyDocuments: this.get(this.documents),
+                stakeholders: this.get(this.stakeholders),
             }
         }
     }
@@ -330,6 +389,61 @@ export class CompanyDraftAccount extends DraftAccount {
         return this.isCompleted;
     }
 
+    public setCompanyName(companyName: CompanyName) {
+        this.companyName = companyName;
+    }
+
+    setAddress(address: Address) {
+        this.address = address;
+    }
+
+    setEIN(ein: EIN) {
+        this.ein = ein;
+    }
+
+    setAnnualRevenue(annualRevenue: AnnualRevenue) {
+        this.annualRevenue = annualRevenue;
+    }
+
+    setNumberOfEmployees(numberOfEmployees: NumberOfEmployees) {
+        this.numberOfEmployees = numberOfEmployees;
+    }
+
+    setIndustry(industry: Industry) {
+        this.industry = industry;
+    }
+
+    setCompanyType(company: Company) {
+        this.companyType = company;
+    }
+
+    setAvatarDocument(avatar: Avatar) {
+        this.avatar = avatar;
+    }
+
+    setDocuments(documents: CompanyDocuments) {
+        this.documents = documents;
+    }
+
+    addDocument(document: DocumentSchema) {
+        this.documents?.addDocument(document);
+    }
+
+    removeDocument(document: DocumentSchema) {
+        this.documents?.removeDocument(document);
+    }
+
+    setStakeholders(companyStakeholders: CompanyStakeholders) {
+        this.stakeholders = companyStakeholders;
+    }
+
+    addStakeholder(stakeholder: Stakeholder) {
+        this.stakeholders?.addStakeholder(stakeholder);
+    }
+
+    removeStakeholder(ssn: SSN) {
+        this.stakeholders?.removeStakeholder(ssn);
+    }
 }
 
 export class CorporateDraftAccount extends CompanyDraftAccount {

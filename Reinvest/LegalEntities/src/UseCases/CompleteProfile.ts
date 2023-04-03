@@ -5,7 +5,7 @@ import {DateOfBirth, DateOfBirthInput} from "LegalEntities/Domain/ValueObject/Da
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
 import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
 import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
-import {SSN, SSNInput} from "LegalEntities/Domain/ValueObject/SSN";
+import {SensitiveNumber, SensitiveNumberInput, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {LegalProfileCompleted} from "LegalEntities/Domain/Events/ProfileEvents";
 import {ValidationErrorEnum, ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";
@@ -15,7 +15,7 @@ export type CompleteProfileInput = {
     dateOfBirth?: DateOfBirthInput,
     address?: AddressInput,
     idScan?: { id: string, fileName: string }[],
-    SSN?: { ssn: SSNInput },
+    SSN?: { ssn: SensitiveNumberInput },
     domicile?: DomicileInput,
     investingExperience?: InvestingExperienceInput,
     statements?: PersonalStatementInput[],

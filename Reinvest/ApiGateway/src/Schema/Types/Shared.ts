@@ -61,6 +61,10 @@ const schema = `
         ein: String!
     }
 
+    type EIN {
+        ein: String
+    }
+
     input AddressInput {
         addressLine1: String!
         addressLine2: String

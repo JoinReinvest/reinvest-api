@@ -2,15 +2,15 @@ import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/Valu
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
-import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
+import {NetIncome, ValueRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
 
 export type IndividualSchema = {
     accountId: string,
     profileId: string,
     employmentStatus: EmploymentStatusInput | null,
     employer: EmployerInput | null,
-    netWorth: NetRangeInput | null,
-    netIncome: NetRangeInput | null,
+    netWorth: ValueRangeInput | null,
+    netIncome: ValueRangeInput | null,
     avatar: AvatarInput | null,
 }
 
@@ -66,11 +66,11 @@ export class IndividualAccount {
         }
 
         if (netWorth) {
-            account.setNetWorth(NetWorth.create(netWorth as NetRangeInput));
+            account.setNetWorth(NetWorth.create(netWorth as ValueRangeInput));
         }
 
         if (netIncome) {
-            account.setNetIncome(NetIncome.create(netIncome as NetRangeInput));
+            account.setNetIncome(NetIncome.create(netIncome as ValueRangeInput));
         }
 
         return account;

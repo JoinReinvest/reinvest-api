@@ -8,7 +8,7 @@ import {
     PersonalStatementType
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {SSN, SSNSchema} from "LegalEntities/Domain/ValueObject/SSN";
+import {SensitiveNumber, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
 import {IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
@@ -18,7 +18,7 @@ export type ProfileSchema = {
     externalId: string,
     label: string,
     name: PersonalNameInput | null,
-    ssnObject: SSNSchema | null,
+    ssnObject: SensitiveNumberSchema | null,
     ssn: string | null,
     dateOfBirth: string | null,
     address: AddressInput | null,

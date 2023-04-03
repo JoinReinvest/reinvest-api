@@ -121,80 +121,116 @@ const corporateTrustSchema = `
     }
 
     type CorporateDraftAccount {
-        id: ID
-        name: String
-        address: Address
-        ein: String
-        annualRevenue: String
-        numberOfEmployees: String
-        industry: String
-        companyDocuments: [DocumentFileLinkId]
+        id: ID,
+        state: DraftAccountState
         avatar: GetAvatarLink
-        stakeholders: [Stakeholder]
-        companyType: CorporateCompanyType
+        isCompleted: Boolean
+        details: CompanyDraftAccountDetails
     }
 
     type TrustDraftAccount {
-        id: ID
-        name: String
-        address: Address
-        ein: String
-        annualRevenue: String
-        numberOfEmployees: String
-        industry: String
-        companyDocuments: [DocumentFileLinkId]
+        id: ID,
+        state: DraftAccountState
         avatar: GetAvatarLink
-        stakeholders: [Stakeholder]
-        companyType: TrustCompanyType
+        isCompleted: Boolean
+        details: CompanyDraftAccountDetails
     }
 
     input CompanyNameInput {
         name: String!
     }
 
+    type CompanyName {
+        name: String
+    }
+
     input AnnualRevenueInput {
-        revenue: String!
+        range: String!
+    }
+
+    type AnnualRevenue {
+        range: String
     }
 
     input NumberOfEmployeesInput {
-        numberOfEmployees: String!
+        range: String!
+    }
+
+    type NumberOfEmployees {
+        range: String
     }
 
     input IndustryInput {
-        industry: String!
+        value: String!
     }
 
-    enum CorporateCompanyType {
+    type Industry {
+        value: String
+    }
+
+    enum CorporateCompanyTypeEnum {
         PARTNERSHIP
         LLC
         CORPORATION
     }
 
-    enum TrustCompanyType {
+    input CorporateCompanyTypeInput {
+        type: CorporateCompanyTypeEnum!
+    }
+
+    type CorporateCompanyType {
+        type: CorporateCompanyTypeEnum
+    }
+
+    enum TrustCompanyTypeEnum {
         REVOCABLE
         IRREVOCABLE
     }
 
-    input CorporateCompanyTypeInput {
-        type: CorporateCompanyType!
+    input TrustCompanyTypeInput {
+        type: TrustCompanyTypeEnum!
     }
 
-    input TrustCompanyTypeInput {
-        type: TrustCompanyType
+    type TrustCompanyType{
+        type: TrustCompanyTypeEnum
+    }
+
+    enum CompanyTypeEnum {
+        PARTNERSHIP
+        LLC
+        CORPORATION
+        REVOCABLE
+        IRREVOCABLE
+    }
+
+    type CompanyType {
+        type: CompanyTypeEnum
     }
 
     input StakeholderInput {
-        name: PersonName!
-        dateOfBirth: ISODate!
+#        name: PersonName!
+#        dateOfBirth: ISODate!
         ssn: SSNInput!
-        address: AddressInput!
-        domicile: DomicileInput!
-        idScan: [DocumentFileLinkInput]!
-        email: EmailInput
+#        address: AddressInput!
+#        domicile: DomicileInput!
+#        idScan: [DocumentFileLinkInput]!
+#        email: EmailInput
+    }
+
+    type CompanyDraftAccountDetails {
+        companyName: CompanyName
+        address: Address
+        ein: EIN
+        annualRevenue: AnnualRevenue
+        numberOfEmployees: NumberOfEmployees
+        industry: Industry
+        companyDocuments: [DocumentFileLinkId]
+        stakeholders: [Stakeholder]
+        companyType: CompanyType
     }
 
     input CorporateDraftAccountInput {
-        name: CompanyNameInput
+        companyName: CompanyNameInput
         address: AddressInput
         ein: EINInput
         annualRevenue: AnnualRevenueInput
@@ -209,7 +245,7 @@ const corporateTrustSchema = `
     }
 
     input TrustDraftAccountInput {
-        name: CompanyNameInput
+        companyName: CompanyNameInput
         address: AddressInput
         ein: EINInput
         annualRevenue: AnnualRevenueInput

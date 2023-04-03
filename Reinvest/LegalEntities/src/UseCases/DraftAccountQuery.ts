@@ -1,18 +1,24 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {
-    DraftAccount,
+    CompanyDraftAccountSchema,
     DraftAccountState, DraftAccountType,
     IndividualDraftAccountSchema
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
-import {FileLink} from "Documents/Adapter/S3/FileLinkService";
+import {AvatarOutput} from "LegalEntities/Port/Api/ReadAccountController";
+import {DocumentSchema} from "LegalEntities/Domain/ValueObject/Document";
+import {StakeholderInput, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
 
 export type DraftQuery = {
     id: string,
     state: DraftAccountState,
-    avatar: FileLink | null,
+    avatar: AvatarOutput | null,
     isCompleted: boolean,
-    details: IndividualDraftAccountSchema | null
+    details: IndividualDraftAccountSchema | (CompanyDraftAccountSchema | {
+        ein: string,
+        companyDocuments: { id: string, fileName: string }[]
+        stakeholders: StakeholderInput[]
+    })
 }
 
 export type DraftsList = {
@@ -31,19 +37,62 @@ export class DraftAccountQuery {
     }
 
     async getDraftDetails(profileId: string, draftId: string, accountType: DraftAccountType): Promise<DraftQuery | null> {
-        const draft = await this.draftAccountRepository.getDraftForProfile<DraftAccount>(profileId, draftId);
+        let draft = null;
+        switch (accountType) {
+            case DraftAccountType.INDIVIDUAL:
+                draft = await this.draftAccountRepository.getIndividualDraftForProfile(profileId, draftId);
+                break;
+            case DraftAccountType.CORPORATE:
+                draft = await this.draftAccountRepository.getCorporateDraftForProfile(profileId, draftId);
+                break;
+            case DraftAccountType.TRUST:
+                draft = await this.draftAccountRepository.getTrustDraftForProfile(profileId, draftId);
+                break;
+            default:
+                throw new Error('Unknown account type');
+        }
 
         if (!draft.isType(accountType)) {
             return null;
         }
 
         const {state, data} = draft.toObject();
+
+        // @ts-ignore
+        if (data.ein) {
+            // @ts-ignore
+            data.ein = {ein: data.ein.anonymized};
+        }
+
+        // @ts-ignore
+        if (data.companyDocuments) {
+            // @ts-ignore
+            data.companyDocuments = data.companyDocuments.map((document: DocumentSchema) => {
+                return {
+                    id: document.id,
+                    fileName: document.fileName
+                }
+            });
+        }
+
+        if (data.stakeholders) {
+            data.stakeholders = data.stakeholders.map((stakeholder: StakeholderSchema) => {
+                return {
+                    ...stakeholder,
+                    ssn: stakeholder.ssn.anonymized
+                }
+            });
+        }
+
         return {
             id: draftId,
             state: state,
             isCompleted: data?.isCompleted ?? false,
             // @ts-ignore
-            avatar: await this.documents.getAvatarFileLink(data?.avatar ?? null),
+            avatar: {
+                ...await this.documents.getAvatarFileLink(data?.avatar ?? null),
+                initials: draft.getInitials()
+            },
             details: data
         }
     }
