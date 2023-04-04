@@ -77,8 +77,6 @@ const individualSchema = `
         netWorth: NetRangeInput
         netIncome: NetRangeInput
         avatar: AvatarFileLinkInput
-        "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
-        verifyAndFinish: Boolean
     }
 
     type IndividualDraftAccountDetails {

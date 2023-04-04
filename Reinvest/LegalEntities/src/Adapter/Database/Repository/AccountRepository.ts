@@ -126,6 +126,30 @@ export class AccountRepository {
         } catch (error: any) {
             return null;
         }
+    }
+
+    // async createIndividualAccount(account: IndividualAccount): Promise<boolean> {
+    async createCorporateAccount(account: any) {
+        // const {accountId, profileId, employmentStatus, employer, netIncome, netWorth, avatar} = account.toObject();
+        try {
+            // await this.databaseAdapterProvider.provide()
+            //     .insertInto(legalEntitiesIndividualAccountTable)
+            //     .values({
+            //         accountId,
+            //         profileId,
+            //         employmentStatus: JSON.stringify(employmentStatus),
+            //         employer: JSON.stringify(employer),
+            //         netWorth: JSON.stringify(netWorth),
+            //         netIncome: JSON.stringify(netIncome),
+            //         avatar: JSON.stringify(avatar),
+            //     })
+            //     .execute();
+
+            return true;
+        } catch (error: any) {
+            console.error(`Cannot create corporate account: ${error.message}`);
+            return false;
+        }
 
     }
 }

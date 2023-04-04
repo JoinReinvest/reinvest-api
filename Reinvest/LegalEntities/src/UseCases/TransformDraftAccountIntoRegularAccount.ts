@@ -1,7 +1,11 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {InvestmentAccountsService} from "LegalEntities/Adapter/Modules/InvestmentAccountsService";
 import {AccountType} from "LegalEntities/Domain/AccountType";
-import {IndividualDraftAccount} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import {
+    CorporateDraftAccount,
+    DraftAccount,
+    IndividualDraftAccount
+} from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
@@ -27,14 +31,17 @@ export class TransformDraftAccountIntoRegularAccount {
 
     async execute(profileId: string, draftAccountId: string): Promise<string | null> {
         try {
-            const draftAccount = await this.draftAccountRepository.getDraftForProfile<IndividualDraftAccount>(profileId, draftAccountId);
-            if (!draftAccount.isAccountCompleted()) {
+            const draftAccount = await this.draftAccountRepository.getDraftForProfile<DraftAccount>(profileId, draftAccountId);
+            if (!draftAccount.verifyCompletion()) {
                 throw new Error('DRAFT_NOT_COMPLETED');
             }
 
             switch (true) {
                 case draftAccount.isIndividual():
-                    await this.openIndividualAccount(draftAccount);
+                    await this.openIndividualAccount(draftAccount as IndividualDraftAccount);
+                    break;
+                case draftAccount.isCorporate():
+                    await this.openCorporateAccount(draftAccount as CorporateDraftAccount);
                     break;
                 default:
                     throw new Error('DRAFT_UNKNOWN_TYPE');
@@ -57,6 +64,23 @@ export class TransformDraftAccountIntoRegularAccount {
             const account = draftAccount.transformIntoAccount();
             await this.accountRepository.createIndividualAccount(account);
             await this.draftAccountRepository.removeDraft(profileId, draftId);
+        });
+
+        if (!status) {
+            throw new Error('ACCOUNT_TRANSFORMATION_FAILED');
+        }
+    }
+
+    private async openCorporateAccount(draftAccount: CorporateDraftAccount): Promise<void> {
+        const {profileId, draftId} = draftAccount.toObject();
+        // const accountOpened = await this.investmentAccountService.openAccount(profileId, draftId, AccountType.CORPORATE);
+        // if (!accountOpened) {
+        //     throw new Error('CANNOT_OPEN_ANOTHER_CORPORATE_ACCOUNT');
+        // }
+        const status = await this.transactionAdapter.transaction(`Open corporate account "${draftId}" for profile ${profileId}`, async () => {
+            const account = draftAccount.transformIntoAccount();
+            await this.accountRepository.createCorporateAccount(account);
+            // await this.draftAccountRepository.removeDraft(profileId, draftId);
         });
 
         if (!status) {

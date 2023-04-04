@@ -1,11 +1,11 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {
     CompanyDraftAccount,
-    CompanyDraftAccountType, DraftAccount,
+    DraftAccount,
     DraftAccountType, IndividualDraftAccount
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
-import {Avatar, IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
+import {Avatar} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
 import {
     NetIncome,
@@ -24,14 +24,10 @@ import {Company, CompanyName, CompanyNameInput, CompanyTypeInput} from "../Domai
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
 import {
     EIN,
-    SensitiveNumber,
     SensitiveNumberInput,
-    SensitiveNumberSchema,
-    SSN
 } from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
-import {Stakeholder, StakeholderInput, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
-import * as constants from "constants";
+import {Stakeholder, StakeholderInput} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 
 export type IndividualDraftAccountInput = {
@@ -39,8 +35,7 @@ export type IndividualDraftAccountInput = {
     employer?: EmployerInput,
     netWorth?: ValueRangeInput,
     netIncome?: ValueRangeInput,
-    avatar?: { id: string },
-    verifyAndFinish?: boolean
+    avatar?: { id: string }
 };
 
 export type CompanyDraftAccountInput = {
@@ -53,8 +48,7 @@ export type CompanyDraftAccountInput = {
     companyType?: CompanyTypeInput,
     stakeholders?: StakeholderInput[],
     removeStakeholders?: { id: string }[],
-    avatar?: { id: string },
-    verifyAndFinish?: boolean
+    avatar?: { id: string }
 };
 
 
@@ -105,8 +99,6 @@ export class CompleteDraftAccount {
                         case 'netIncome':
                             draft.setNetIncome(NetIncome.create(data))
                             break;
-                        case 'verifyAndFinish':
-                            break;
                         default:
                             errors.push(<ValidationErrorType>{
                                 type: ValidationErrorEnum.UNKNOWN_ERROR,
@@ -124,17 +116,6 @@ export class CompleteDraftAccount {
                             field: step,
                         });
                     }
-                }
-            }
-
-            if (errors.length === 0 && input.verifyAndFinish) {
-                if (draft.verifyCompletion()) {
-                    draft.setAsCompleted();
-                } else {
-                    errors.push(<ValidationErrorType>{
-                        type: ValidationErrorEnum.FAILED,
-                        field: "verifyAndFinish",
-                    });
                 }
             }
 
@@ -247,8 +228,6 @@ export class CompleteDraftAccount {
                                 draft.removeStakeholder(Uuid.create(id))
                             });
                             break;
-                        case 'verifyAndFinish':
-                            break;
                         default:
                             errors.push(<ValidationErrorType>{
                                 type: ValidationErrorEnum.UNKNOWN_ERROR,
@@ -268,17 +247,6 @@ export class CompleteDraftAccount {
                     }
                 }
             }
-
-            // if (errors.length === 0 && input.verifyAndFinish) {
-            //     if (draft.verifyCompletion()) {
-            //         draft.setAsCompleted();
-            //     } else {
-            //         errors.push(<ValidationErrorType>{
-            //             type: ValidationErrorEnum.FAILED,
-            //             field: "verifyAndFinish",
-            //         });
-            //     }
-            // }
 
             await this.draftAccountRepository.storeDraft(draft);
         } catch (error: any) {

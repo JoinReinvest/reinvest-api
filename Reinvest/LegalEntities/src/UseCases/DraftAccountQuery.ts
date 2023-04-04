@@ -96,7 +96,7 @@ export class DraftAccountQuery {
         return {
             id: draftId,
             state: state,
-            isCompleted: data?.isCompleted ?? false,
+            isCompleted: draft.verifyCompletion(),
             // @ts-ignore
             avatar: {
                 ...await this.documents.getAvatarFileLink(data?.avatar ?? null),

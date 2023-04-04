@@ -4,7 +4,6 @@ import {
     Avatar,
     AvatarInput,
     CompanyDocuments,
-    Document,
     DocumentSchema
 } from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
@@ -17,18 +16,17 @@ import {
 } from "LegalEntities/Domain/ValueObject/ValueRange";
 import {IndividualAccount} from "LegalEntities/Domain/Accounts/IndividualAccount";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
 import {
     Company,
     CompanyName,
     CompanyNameInput,
-    CompanyType, CompanyTypeInput,
-    CorporateType
+    CompanyTypeInput,
 } from "LegalEntities/Domain/ValueObject/Company";
 import {EIN, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
 import {CompanyStakeholders, Stakeholder, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import {Uuid} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {CompanyAccount} from "LegalEntities/Domain/Accounts/CompanyAccount";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -50,7 +48,6 @@ export type IndividualDraftAccountSchema = {
     employer: EmployerInput | null,
     netWorth: ValueRangeInput | null,
     netIncome: ValueRangeInput | null,
-    isCompleted: boolean
 }
 
 export type CompanyDraftAccountSchema = {
@@ -62,9 +59,8 @@ export type CompanyDraftAccountSchema = {
     industry: ValueStringInput,
     companyType: CompanyTypeInput,
     avatar: AvatarInput | null,
-    companyDocuments: DocumentSchema[];
-    stakeholders: StakeholderSchema[];
-    isCompleted: boolean,
+    companyDocuments: DocumentSchema[],
+    stakeholders: StakeholderSchema[],
 }
 
 export type DraftInput = {
@@ -153,7 +149,8 @@ export abstract class DraftAccount {
         return this.accountType === accountType;
     }
 
-    abstract isAccountCompleted(): boolean;
+    abstract verifyCompletion(): boolean;
+
 
 }
 
@@ -163,7 +160,6 @@ export class IndividualDraftAccount extends DraftAccount {
     private employer: Employer | null = null;
     private netWorth: NetWorth | null = null;
     private netIncome: NetIncome | null = null;
-    private isCompleted: boolean = false;
 
     constructor(profileId: string, draftId: string, state: DraftAccountState) {
         super(profileId, draftId, state, DraftAccountType.INDIVIDUAL);
@@ -199,10 +195,6 @@ export class IndividualDraftAccount extends DraftAccount {
             draftAccount.setNetIncome(NetIncome.create(data.netIncome));
         }
 
-        if (data.isCompleted) {
-            draftAccount.setAsCompleted();
-        }
-
         return draftAccount;
     }
 
@@ -215,7 +207,6 @@ export class IndividualDraftAccount extends DraftAccount {
                 netWorth: this.get(this.netWorth),
                 netIncome: this.get(this.netIncome),
                 avatar: this.get(this.avatar),
-                isCompleted: this.isCompleted
             }
         }
     }
@@ -244,15 +235,15 @@ export class IndividualDraftAccount extends DraftAccount {
         })
     }
 
-    isAccountCompleted(): boolean {
-        return this.isCompleted;
-    }
+    verifyCompletion(): boolean {
+        if (this.netWorth === null || this.netIncome === null || this.employmentStatus === null) {
+            return false;
+        }
+        if (this.employmentStatus.isEmployed() && this.employer === null) {
+            return false;
+        }
 
-    verifyCompletion() {
-        return !(this.employmentStatus === null ||
-            this.employer === null ||
-            this.netWorth === null ||
-            this.netIncome === null);
+        return true;
     }
 
     setAvatarDocument(avatar: Avatar) {
@@ -271,17 +262,12 @@ export class IndividualDraftAccount extends DraftAccount {
         this.netIncome = netIncome;
     }
 
-    setAsCompleted() {
-        this.isCompleted = true;
-    }
-
     getInitials(): string {
         return super.getInitials();
     }
 }
 
 export class CompanyDraftAccount extends DraftAccount {
-    private isCompleted: boolean = false;
     private companyName: CompanyName | null = null;
     private address: Address | null = null;
     private ein: EIN | null = null;
@@ -290,8 +276,8 @@ export class CompanyDraftAccount extends DraftAccount {
     private industry: Industry | null = null;
     private companyType: Company | null = null;
     private avatar: Avatar | null = null;
-    private documents: CompanyDocuments | null = null;
-    private stakeholders: CompanyStakeholders | null = null;
+    private documents: CompanyDocuments = new CompanyDocuments([]);
+    private stakeholders: CompanyStakeholders = new CompanyStakeholders([]);
 
     static setCompanyData(draftAccount: CompanyDraftAccount, data: CompanyDraftAccountSchema): void {
         if (!data) {
@@ -344,7 +330,6 @@ export class CompanyDraftAccount extends DraftAccount {
         return {
             ...super.toObject(),
             data: {
-                isCompleted: this.isCompleted,
                 companyName: this.get(this.companyName),
                 address: this.get(this.address),
                 ein: this.get(this.ein),
@@ -359,35 +344,41 @@ export class CompanyDraftAccount extends DraftAccount {
         }
     }
 
-    // transformIntoAccount(): IndividualAccount {
-    //     const {
-    //         profileId,
-    //         draftId: accountId,
-    //         data: {
-    //             employmentStatus,
-    //             employer,
-    //             netIncome,
-    //             netWorth,
-    //             avatar
-    //         }
-    //     } = this.toObject();
-    //
-    //     return IndividualAccount.create({
-    //         profileId,
-    //         accountId,
-    //         employmentStatus,
-    //         employer,
-    //         netWorth,
-    //         netIncome,
-    //         avatar
-    //     })
-    // }
+    transformIntoAccount(): CompanyAccount {
+        const {
+            profileId,
+            draftId: accountId,
+            data: {
+                companyName,
+                address,
+                ein,
+                annualRevenue,
+                numberOfEmployees,
+                industry,
+                companyType,
+                avatar,
+                stakeholders,
+                companyDocuments,
+            }
+        } = this.toObject();
 
-    isAccountCompleted(): boolean {
-        return this.isCompleted;
+        return CompanyAccount.create({
+            profileId,
+            accountId,
+            companyName,
+            address,
+            ein,
+            annualRevenue,
+            numberOfEmployees,
+            industry,
+            companyType,
+            avatar,
+            stakeholders,
+            companyDocuments,
+        })
     }
 
-    public setCompanyName(companyName: CompanyName) {
+    setCompanyName(companyName: CopanyName) {
         this.companyName = companyName;
     }
 
@@ -441,6 +432,19 @@ export class CompanyDraftAccount extends DraftAccount {
 
     removeStakeholder(id: Uuid) {
         this.stakeholders?.removeStakeholder(id);
+    }
+
+    verifyCompletion(): boolean {
+        return !(
+            this.companyName === null
+            || this.address === null
+            || this.ein === null
+            || this.annualRevenue === null
+            || this.numberOfEmployees === null
+            || this.industry === null
+            || this.companyType === null
+            || this.documents.isEmpty()
+        );
     }
 }
 

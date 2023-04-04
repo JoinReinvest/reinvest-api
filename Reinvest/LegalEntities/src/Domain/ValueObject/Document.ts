@@ -119,6 +119,10 @@ export class CompanyDocuments implements ToObject {
         const documentToRemove = new Document(document);
         this.documents = this.documents.filter((doc: Document) => !doc.isTheSameDocument(documentToRemove));
     }
+
+    isEmpty(): boolean {
+        return this.documents.length === 0;
+    }
 }
 
 export class Avatar implements ToObject {
