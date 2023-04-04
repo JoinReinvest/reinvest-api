@@ -60,7 +60,7 @@ export class AdapterServiceProvider {
         container
             .addSingleton(CompleteProfile, [ProfileRepository])
             .addSingleton(CreateDraftAccount, [DraftAccountRepository])
-            .addSingleton(CompleteDraftAccount, [DraftAccountRepository])
+            .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator])
             .addSingleton(DraftAccountQuery, [DraftAccountRepository, DocumentsService])
             .addSingleton(RemoveDraftAccount, [DraftAccountRepository])
             .addSingleton(TransformDraftAccountIntoRegularAccount, [DraftAccountRepository, InvestmentAccountsService, AccountRepository, "LegalEntitiesTransactionalAdapter"])

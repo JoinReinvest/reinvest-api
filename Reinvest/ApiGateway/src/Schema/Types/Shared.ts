@@ -5,8 +5,18 @@ const schema = `
         middleName: String
         lastName: String! @constraint(minLength: 1)
     }
+    
+    type PersonNameType {
+        firstName: String
+        middleName: String
+        lastName: String
+    }
 
     input DateOfBirthInput {
+        dateOfBirth: ISODate!
+    }
+
+    type DateOfBirth {
         dateOfBirth: ISODate!
     }
 

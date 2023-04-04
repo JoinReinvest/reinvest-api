@@ -75,11 +75,20 @@ export class DraftAccountQuery {
             });
         }
 
+        // @ts-ignore
         if (data.stakeholders) {
+            // @ts-ignore
             data.stakeholders = data.stakeholders.map((stakeholder: StakeholderSchema) => {
                 return {
                     ...stakeholder,
-                    ssn: stakeholder.ssn.anonymized
+                    // @ts-ignore
+                    ssn: stakeholder.ssn.anonymized,
+                    domicile: {
+                        type: stakeholder.domicile?.type,
+                        birthCountry: stakeholder.domicile?.forGreenCard?.birthCountry ?? stakeholder.domicile?.forVisa?.birthCountry,
+                        citizenshipCountry: stakeholder.domicile?.forGreenCard?.citizenshipCountry ?? stakeholder.domicile?.forVisa?.citizenshipCountry,
+                        visaType: stakeholder.domicile?.forVisa?.visaType
+                    }
                 }
             });
         }

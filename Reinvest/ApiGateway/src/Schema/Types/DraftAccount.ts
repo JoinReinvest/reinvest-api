@@ -110,15 +110,6 @@ const individualSchema = `
 `;
 const corporateTrustSchema = `
     #graphql
-    type Stakeholder {
-        legalName: String
-        dateOfBirth: ISODate
-        ssn: String
-        address: Address
-        domicile: Domicile
-        idScan: [DocumentFileLinkId]
-        email: EmailAddress
-    }
 
     type CorporateDraftAccount {
         id: ID,
@@ -208,13 +199,23 @@ const corporateTrustSchema = `
     }
 
     input StakeholderInput {
-#        name: PersonName!
-#        dateOfBirth: ISODate!
+        name: PersonName!
+        dateOfBirth: DateOfBirthInput!
         ssn: SSNInput!
-#        address: AddressInput!
-#        domicile: DomicileInput!
-#        idScan: [DocumentFileLinkInput]!
-#        email: EmailInput
+        address: AddressInput!
+        domicile: DomicileInput!
+        idScan: [DocumentFileLinkInput]!
+    }
+
+    type Stakeholder {
+        id: ID
+        label: String
+        name: PersonNameType
+        dateOfBirth: DateOfBirth
+        ssn: String
+        address: Address
+        domicile: Domicile
+        idScan: [DocumentFileLinkId]
     }
 
     type CompanyDraftAccountDetails {
@@ -229,6 +230,10 @@ const corporateTrustSchema = `
         companyType: CompanyType
     }
 
+    input StakeholderIdInput {
+        id: ID!
+    }
+
     input CorporateDraftAccountInput {
         companyName: CompanyNameInput
         address: AddressInput
@@ -240,7 +245,7 @@ const corporateTrustSchema = `
         removeDocuments: [DocumentFileLinkInput]
         avatar: AvatarFileLinkInput
         stakeholders: [StakeholderInput]
-        removeStakeholders: [SSNInput]
+        removeStakeholders: [StakeholderIdInput]
         companyType: CorporateCompanyTypeInput
     }
 
@@ -255,7 +260,7 @@ const corporateTrustSchema = `
         removeDocuments: [DocumentFileLinkInput]
         avatar: AvatarFileLinkInput
         stakeholders: [StakeholderInput]
-        removeStakeholders: [SSNInput]
+        removeStakeholders: [StakeholderIdInput]
         companyType: TrustCompanyTypeInput
     }
 
@@ -420,7 +425,7 @@ export const DraftAccount = {
                 modules
             }: SessionContext) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.completeCompanyDraftAccount(profileId, accountId, CompanyDraftAccountType.CORPORATE, input);
+                const errors = await api.completeCompanyDraftAccount(profileId, accountId, DraftAccountType.CORPORATE, input);
 
                 if (errors.length > 0) {
                     throw new JsonGraphQLError(errors);
@@ -433,7 +438,7 @@ export const DraftAccount = {
                 modules
             }: SessionContext) => {
                 const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.completeCompanyDraftAccount(profileId, accountId, CompanyDraftAccountType.TRUST, input);
+                const errors = await api.completeCompanyDraftAccount(profileId, accountId, DraftAccountType.TRUST, input);
 
                 if (errors.length > 0) {
                     throw new JsonGraphQLError(errors);

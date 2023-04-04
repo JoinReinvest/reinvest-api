@@ -15,16 +15,24 @@ import {
     NumberOfEmployees
 } from "LegalEntities/Domain/ValueObject/ValueRange";
 import {
+    Uuid,
     ValidationError,
     ValidationErrorEnum,
     ValidationErrorType
 } from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {Company, CompanyName, CompanyNameInput, CompanyTypeInput} from "../Domain/ValueObject/Company";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {EIN, SensitiveNumber, SensitiveNumberInput, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {
+    EIN,
+    SensitiveNumber,
+    SensitiveNumberInput,
+    SensitiveNumberSchema,
+    SSN
+} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
 import {Stakeholder, StakeholderInput, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import * as constants from "constants";
+import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 
 export type IndividualDraftAccountInput = {
     employmentStatus?: EmploymentStatusInput
@@ -44,7 +52,7 @@ export type CompanyDraftAccountInput = {
     industry?: ValueStringInput,
     companyType?: CompanyTypeInput,
     stakeholders?: StakeholderInput[],
-    removeStakeholders?: string[],
+    removeStakeholders?: { id: string }[],
     avatar?: { id: string },
     verifyAndFinish?: boolean
 };
@@ -53,9 +61,11 @@ export type CompanyDraftAccountInput = {
 export class CompleteDraftAccount {
     public static getClassName = (): string => "CompleteDraftAccount";
     private draftAccountRepository: DraftAccountRepository;
+    private uniqueIdGenerator: IdGeneratorInterface;
 
-    constructor(draftAccountRepository: DraftAccountRepository) {
+    constructor(draftAccountRepository: DraftAccountRepository, uniqueIdGenerator: IdGeneratorInterface) {
         this.draftAccountRepository = draftAccountRepository;
+        this.uniqueIdGenerator = uniqueIdGenerator;
     }
 
     public async completeIndividual(
@@ -217,16 +227,25 @@ export class CompleteDraftAccount {
                             break;
                         case 'stakeholders':
                             data.map((stakeholder: StakeholderInput) => {
-                                const stakeholderSchema = {...stakeholder} as StakeholderSchema;
-                                const {ssn: {ssn}} = stakeholder;
+                                const stakeholderSchema = {...stakeholder} as StakeholderInput;
+                                const {ssn: {ssn}, idScan} = stakeholder;
+                                // @ts-ignore
                                 stakeholderSchema.ssn = ssn;
+                                stakeholderSchema.id = this.uniqueIdGenerator.createUuid();
+
+                                stakeholderSchema.idScan = idScan.map((document: { id: string, fileName: string }) => ({
+                                    id: document.id,
+                                    fileName: document.fileName,
+                                    path: profileId
+                                }));
                                 draft.addStakeholder(Stakeholder.create(stakeholderSchema))
                             });
                             break;
                         case 'removeStakeholders':
-                            data.map((ssn: string) => (
-                                draft.removeStakeholder(SSN.createFromRawSSN(ssn))
-                            ));
+                            data.map((idToRemove: { id: string }) => {
+                                const {id} = idToRemove;
+                                draft.removeStakeholder(Uuid.create(id))
+                            });
                             break;
                         case 'verifyAndFinish':
                             break;

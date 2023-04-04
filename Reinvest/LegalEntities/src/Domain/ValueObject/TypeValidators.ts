@@ -99,6 +99,10 @@ export class Uuid {
     toString(): string {
         return this.uuid;
     }
+
+    static create(id: string): Uuid {
+        return new Uuid(id);
+    }
 }
 
 export class Url {

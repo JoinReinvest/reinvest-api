@@ -28,6 +28,7 @@ import {
 import {EIN, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
 import {CompanyStakeholders, Stakeholder, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
+import {Uuid} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -41,10 +42,7 @@ export enum DraftAccountType {
     TRUST = "TRUST"
 }
 
-export enum CompanyDraftAccountType {
-    CORPORATE = "CORPORATE",
-    TRUST = "TRUST"
-}
+export type CompanyDraftAccountType = Exclude<DraftAccountType, DraftAccountType.INDIVIDUAL>
 
 export type IndividualDraftAccountSchema = {
     employmentStatus: EmploymentStatusInput | null,
@@ -441,8 +439,8 @@ export class CompanyDraftAccount extends DraftAccount {
         this.stakeholders?.addStakeholder(stakeholder);
     }
 
-    removeStakeholder(ssn: SSN) {
-        this.stakeholders?.removeStakeholder(ssn);
+    removeStakeholder(id: Uuid) {
+        this.stakeholders?.removeStakeholder(id);
     }
 }
 

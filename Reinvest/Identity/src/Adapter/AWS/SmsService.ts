@@ -1,9 +1,9 @@
-import {PhoneNumber} from "Identity/Domain/PhoneNumber";
 import {OneTimeToken} from "Identity/Domain/OneTimeToken";
 import {PublishCommand, SNSClient} from "@aws-sdk/client-sns";
 
 export type SNSConfig = {
     region: string,
+    // originationNumber: string,
 }
 
 export class SmsService {
@@ -21,6 +21,12 @@ export class SmsService {
         });
         const command = new PublishCommand({
             Message: `Your authentication code is ${sms.code}`,
+            // MessageAttributes: {
+            //     'AWS.MM.SMS.OriginationNumber': {
+            //         DataType: 'String',
+            //         StringValue: this.config.originationNumber,
+            //     }
+            // },
             PhoneNumber: sms.phoneNumber,
         });
         await client.send(command);
