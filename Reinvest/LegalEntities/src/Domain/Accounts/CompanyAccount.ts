@@ -1,11 +1,7 @@
-import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {Avatar, AvatarInput, CompanyDocuments, DocumentSchema} from "LegalEntities/Domain/ValueObject/Document";
-import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
 import {
-    NetIncome,
     ValueRangeInput,
-    NetWorth,
     AnnualRevenue,
     NumberOfEmployees
 } from "LegalEntities/Domain/ValueObject/ValueRange";
