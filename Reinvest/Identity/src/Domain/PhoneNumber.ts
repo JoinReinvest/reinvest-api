@@ -34,4 +34,8 @@ export class PhoneNumber {
     isSmsAllowed(): boolean {
         return this._isSmsAllowed;
     }
+
+    isUSNumber(): boolean {
+        return this.countryCode === '+1';
+    }
 }
