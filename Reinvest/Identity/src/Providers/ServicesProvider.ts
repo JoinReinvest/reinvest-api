@@ -19,8 +19,8 @@ export class ServicesProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(UserRegistrationService, [UserRepository, ProfileService, CognitoService, IdGenerator, IncentiveTokenRepository])
-            .addClass(PhoneRegistrationService, [UserRepository, PhoneRepository, UniqueTokenGenerator])
+            .addSingleton(UserRegistrationService, [UserRepository, ProfileService, CognitoService, IdGenerator, IncentiveTokenRepository])
+            .addSingleton(PhoneRegistrationService, [UserRepository, PhoneRepository, UniqueTokenGenerator])
         ;
     }
 }

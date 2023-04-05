@@ -8,6 +8,7 @@ import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationServic
 import {ProfileController} from "Identity/Port/Api/ProfileController";
 import {IncentiveTokenController} from "Identity/Port/Api/IncentiveTokenController";
 import {IncentiveTokenRepository} from "Identity/Adapter/Database/Repository/IncentiveTokenRepository";
+import {CognitoService} from "Identity/Adapter/AWS/CognitoService";
 
 export class PortsProvider {
     private config: Identity.Config;
@@ -20,10 +21,10 @@ export class PortsProvider {
         container.addAsValue('webAppUrl', this.config.webAppUrl);
         //controllers
         container
-            .addClass(ProfileController, [UserRepository])
-            .addClass(PhoneController, [PhoneRegistrationService])
-            .addClass(UserRegistrationController, [UserRegistrationService])
-            .addClass(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl'])
+            .addSingleton(ProfileController, [UserRepository])
+            .addSingleton(PhoneController, [PhoneRegistrationService, CognitoService])
+            .addSingleton(UserRegistrationController, [UserRegistrationService])
+            .addSingleton(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl'])
         ;
     }
 }

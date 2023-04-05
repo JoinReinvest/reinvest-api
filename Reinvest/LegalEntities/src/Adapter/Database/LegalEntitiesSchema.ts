@@ -1,23 +1,12 @@
 import {Insertable} from "kysely";
 
-// export interface LegalEntitiesPerson {
-//     person_id: string;
-//     date_created: Date;
-//     name: string;
-//     dob: string;
-//     address: string;
-//     id_scans_ids: string;
-//     domicile: string;
-//     ssn: string;
-//     is_completed: boolean;
-// }
-
 export interface LegalEntitiesProfile {
     profileId: string;
     externalId: string;
     label: string;
     name: string | null;
     ssn: string | null;
+    ssnObject: string | null;
     dateOfBirth: string | null;
     address: string | null;
     idScan: string | null;
@@ -35,7 +24,17 @@ export interface LegalEntitiesDraftAccount {
     data: string | null;
 };
 
-export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience'];
+export interface LegalEntitiesIndividualAccount {
+    accountId: string;
+    profileId: string;
+    employmentStatus: string | null;
+    employer: string | null;
+    netWorth: string | null;
+    netIncome: string | null;
+    avatar: string | null;
+};
+
+export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'ssnObject'];
 
 export type InsertableProfile = Insertable<LegalEntitiesProfile>;
 export type InsertableDraftAccount = Insertable<LegalEntitiesDraftAccount>;

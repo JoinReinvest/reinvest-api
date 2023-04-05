@@ -14,6 +14,7 @@ jobs:
         run: |
           CURRENT_BRANCH=${GITHUB_REF##*/} 
           echo "Current branch: ${CURRENT_BRANCH}"
+          SHARED_ENVIRONMENT="TEST"
           if [ $CURRENT_BRANCH == "development" ]; then
             ENVIRONMENT="DEVELOPMENT"
           elif [ $CURRENT_BRANCH == "integrations" ]; then
@@ -22,12 +23,14 @@ jobs:
             ENVIRONMENT="STAGING"
           elif [ $CURRENT_BRANCH == "main" ]; then
             ENVIRONMENT="PRODUCTION"
+            SHARED_ENVIRONMENT="PRODUCTION"
           else
             echo "Wrong branch";
             exit 1;
           fi
           echo "Current environment: ${ENVIRONMENT}"
           echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
+          echo "SHARED_ENVIRONMENT=${SHARED_ENVIRONMENT}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -45,6 +48,15 @@ jobs:
           WEB_APP_URL: ${{ secrets[format('{0}_WEB_APP_URL', env.ENVIRONMENT)] }}
           EMAIL_SEND_FROM: ${{ secrets.EMAIL_SEND_FROM }}
           EMAIL_REPLY_TO: ${{ secrets.EMAIL_REPLY_TO }}
+          EMAIL_DOMAIN: ${{ secrets[format('{0}_EMAIL_DOMAIN', env.SHARED_ENVIRONMENT)] }}
+          NORTH_CAPITAL_CLIENT_ID: ${{ secrets[format('{0}_NORTH_CAPITAL_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
+          NORTH_CAPITAL_DEVELOPER_API_KEY: ${{ secrets[format('{0}_NORTH_CAPITAL_DEVELOPER_API_KEY', env.SHARED_ENVIRONMENT)] }}
+          NORTH_CAPITAL_API_URL: ${{ secrets[format('{0}_NORTH_CAPITAL_API_URL', env.SHARED_ENVIRONMENT)] }}
+          NORTH_CAPITAL_OFFERING_ID: ${{ secrets[format('{0}_NORTH_CAPITAL_OFFERING_ID', env.SHARED_ENVIRONMENT)] }}
+          VERTALO_API_URL: ${{ secrets[format('{0}_VERTALO_API_URL', env.SHARED_ENVIRONMENT)] }}
+          VERTALO_CLIENT_ID: ${{ secrets[format('{0}_VERTALO_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
+          VERTALO_CLIENT_SECRET: ${{ secrets[format('{0}_VERTALO_CLIENT_SECRET', env.SHARED_ENVIRONMENT)] }}
+          SNS_ORIGINATION_NUMBER: ${{ secrets.SNS_ORIGINATION_NUMBER }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:functions"

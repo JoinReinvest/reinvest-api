@@ -1,13 +1,12 @@
 import Container, {ContainerInterface} from "Container/Container";
 import {Api, EventHandler, Module} from "Reinvest/Modules";
-import {MigrationManager} from "PostgreSQL/MigrationManager";
 import {PortsProvider} from "Documents/Providers/PortsProvider";
 import {DocumentsApi, DocumentsApiType} from "Documents/Port/Api/DocumentsApi";
 import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
-import {DocumentsDatabase} from "Documents/Adapter/Database/DatabaseAdapter";
 import {AdapterServiceProvider} from "Documents/Providers/AdapterServiceProvider";
 import {S3Config} from "Documents/Adapter/S3/S3Adapter";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
+
 
 export namespace Documents {
     export const moduleName = "Documents";

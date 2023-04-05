@@ -138,7 +138,7 @@ export const CognitoResources = {
                         Notify: true,
                     },
                     LowAction: {
-                        EventAction: "MFA_IF_CONFIGURED",
+                        EventAction: "NO_ACTION",
                         Notify: true,
                     },
                 },
@@ -195,7 +195,7 @@ export const CognitoAuthorizer = {
         name: getResourceName("cognito-authorizer"),
         identitySource: "$request.header.Authorization",
         issuerUrl: importOutput('CognitoIssuerUrl'),
-        audience: [{Ref: "WebsiteCognito"}],
+        audience: [{Ref: "WebsiteCognito"}, {Ref: "LocalCognito"}],
     },
 };
 
@@ -225,7 +225,7 @@ export const CognitoClientResources = {
             AllowedOAuthFlows: ["implicit"],
             AllowedOAuthScopes: ["profile", "openid"],
             CallbackURLs: [margeWithApiGatewayUrl("/set-header")],
-            ClientName: "Postman Test Client",
+            ClientName: "Website and Mobile Cognito Client",
             EnableTokenRevocation: true,
             PreventUserExistenceErrors: "ENABLED",
             ExplicitAuthFlows: [
@@ -258,6 +258,7 @@ export const CognitoClientResources = {
             ExplicitAuthFlows: [
                 "ALLOW_USER_SRP_AUTH",
                 "ALLOW_REFRESH_TOKEN_AUTH",
+                "ALLOW_USER_PASSWORD_AUTH"
             ],
             GenerateSecret: false,
             SupportedIdentityProviders: ["COGNITO"],
@@ -266,6 +267,7 @@ export const CognitoClientResources = {
         },
     },
 }
+
 export const CognitoClientsOutputs = {
     WebsiteCognitoClientId: {
         Value: {Ref: "WebsiteCognito"},
@@ -299,6 +301,7 @@ export const CognitoUpdateAttributesPolicyBasedOnOutputArn = [
         Effect: "Allow",
         Action: [
             "cognito-idp:AdminUpdateUserAttributes",
+            "cognito-idp:AdminGetUser",
         ],
         Resource: importOutput('CognitoUserPoolArn'),
     },

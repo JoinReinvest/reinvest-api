@@ -1,4 +1,4 @@
-import {SessionContext} from "ApiGateway/index";
+import {JsonGraphQLError, SessionContext} from "ApiGateway/index";
 import {LegalEntities} from "LegalEntities/index";
 import {GraphQLError} from "graphql";
 import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
@@ -15,7 +15,7 @@ const sharedSchema = `
 
     type DraftAccount {
         id: ID
-        type: AccountType
+        type: DraftAccountType
     }
 
     enum DraftAccountState {
@@ -26,20 +26,19 @@ const sharedSchema = `
 
     type Query {
         """
-        [MOCK] List all existing draft accounts if you need come back to onboarding
+        List all existing draft accounts if you need come back to onboarding
         """
         listAccountDrafts: [DraftAccount]
-        getIndividualDraftAccount: IndividualDraftAccount
     }
 
     type Mutation {
         """
-        [MOCK] Create draft of an account to fulfill with data before open it.
+        Create draft of an account to fulfill with data before open it.
         You can have only one draft account created of a specific type in the same time.
         """
-        createDraftAccount(type: AccountType): DraftAccount
-        "[MOCK] Remove draft account"
-        removeDraftAccount(id: ID): Boolean
+        createDraftAccount(type: DraftAccountType): DraftAccount
+        "Remove draft account"
+        removeDraftAccount(draftAccountId: ID): Boolean
     }
 
 `;
@@ -77,7 +76,7 @@ const individualSchema = `
         employer: EmployerInput
         netWorth: NetRangeInput
         netIncome: NetRangeInput
-        avatar: FileLinkInput
+        avatar: AvatarFileLinkInput
         "Send this field if you want to finish the onboarding. In case of success verification, onboarding will be considered as completed"
         verifyAndFinish: Boolean
     }
@@ -98,12 +97,14 @@ const individualSchema = `
     }
 
     type Query {
-        "[MOCK] Individual draft account"
+        """
+        Get details of individual draft account
+        """
         getIndividualDraftAccount(accountId: ID): IndividualDraftAccount
     }
 
     type Mutation {
-        "[MOCK] Complete individual draft account"
+        "Complete individual draft account"
         completeIndividualDraftAccount(accountId: ID, input: IndividualAccountInput): IndividualDraftAccount
     }
 `;
@@ -115,7 +116,7 @@ const corporateTrustSchema = `
         ssn: String
         address: Address
         domicile: Domicile
-        idScan: [FileLinkId]
+        idScan: [DocumentFileLinkId]
         email: EmailAddress
     }
 
@@ -128,7 +129,7 @@ const corporateTrustSchema = `
         annualRevenue: String
         numberOfEmployees: String
         industry: String
-        companyDocuments: [FileLinkId]
+        companyDocuments: [DocumentFileLinkId]
         avatar: GetAvatarLink
         stakeholders: [Stakeholder]
         companyType: CorporateCompanyType
@@ -142,7 +143,7 @@ const corporateTrustSchema = `
         annualRevenue: String
         numberOfEmployees: String
         industry: String
-        companyDocuments: [FileLinkId]
+        companyDocuments: [DocumentFileLinkId]
         avatar: GetAvatarLink
         stakeholders: [Stakeholder]
         companyType: TrustCompanyType
@@ -189,7 +190,7 @@ const corporateTrustSchema = `
         ssn: SSNInput!
         address: AddressInput!
         domicile: DomicileInput!
-        idScan: [FileLinkInput]!
+        idScan: [DocumentFileLinkInput]!
         email: EmailInput
     }
 
@@ -200,9 +201,9 @@ const corporateTrustSchema = `
         annualRevenue: AnnualRevenueInput
         numberOfEmployees: NumberOfEmployeesInput
         industry: IndustryInput
-        companyDocuments: [FileLinkInput]
-        removeDocuments: [FileLinkInput]
-        avatar: FileLinkInput
+        companyDocuments: [DocumentFileLinkInput]
+        removeDocuments: [DocumentFileLinkInput]
+        avatar: AvatarFileLinkInput
         stakeholders: [StakeholderInput]
         removeStakeholders: [SSNInput]
         companyType: CorporateCompanyTypeInput
@@ -215,9 +216,9 @@ const corporateTrustSchema = `
         annualRevenue: AnnualRevenueInput
         numberOfEmployees: NumberOfEmployeesInput
         industry: IndustryInput
-        companyDocuments: [FileLinkInput]
-        removeDocuments: [FileLinkInput]
-        avatar: FileLinkInput
+        companyDocuments: [DocumentFileLinkInput]
+        removeDocuments: [DocumentFileLinkInput]
+        avatar: AvatarFileLinkInput
         stakeholders: [StakeholderInput]
         removeStakeholders: [SSNInput]
         companyType: TrustCompanyTypeInput
@@ -271,11 +272,14 @@ const corporateTrustMockResponse = (isTrust: boolean = false) => ({
     numberOfEmployees: "<10",
     industry: "Housekeeping",
     companyDocuments: [{
-        id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
+        id: "d98ad8f6-4328-4151-9cc8-3694b7104444",
+        fileName: "document.pdf"
     }, {
-        id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
+        id: "d98ad8f6-4328-4151-9cc8-3694b7104444",
+        fileName: "document.pdf"
     }, {
-        id: "d98ad8f6-4328-4151-9cc8-3694b710444s4"
+        id: "d98ad8f6-4328-4151-9cc8-3694b710444s4",
+        fileName: "document.pdf"
     }],
     avatar: {
         url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU",
@@ -300,7 +304,8 @@ const corporateTrustMockResponse = (isTrust: boolean = false) => ({
 
         },
         idScan: [{
-            id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
+            id: "d98ad8f6-4328-4151-9cc8-3694b7104444",
+            fileName: "document.pdf"
         }],
         email: "john.doe@devkick.pl"
     }],
@@ -316,10 +321,11 @@ export const DraftAccount = {
     typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
     resolvers: {
         Query: {
-            listAccountDrafts: async (parent: any, input: any, {profileId, modules}: SessionContext) => ([{
-                id: 'test',
-                type: "INDIVIDUAL"
-            }]),
+            listAccountDrafts: async (parent: any, input: any, {profileId, modules}: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+                return api.listDrafts(profileId);
+            },
             getIndividualDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
@@ -349,9 +355,14 @@ export const DraftAccount = {
                     id,
                     type
                 }
-            }
-            ,
-            removeDraftAccount: async (parent: any, input: any, {profileId, modules}: SessionContext) => true,
+            },
+            removeDraftAccount: async (parent: any, {draftAccountId}: { draftAccountId: string }, {
+                profileId,
+                modules
+            }: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+                return await api.removeDraft(profileId, draftAccountId);
+            },
             completeIndividualDraftAccount: async (
                 parent: any,
                 {accountId, input}: { accountId: string, input: any },
@@ -361,7 +372,7 @@ export const DraftAccount = {
                 const errors = await api.completeIndividualDraftAccount(profileId, accountId, input);
 
                 if (errors.length > 0) {
-                    throw new GraphQLError(JSON.stringify(errors));
+                    throw new JsonGraphQLError(errors);
                 }
 
                 return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);

@@ -2,6 +2,9 @@ import {Documents} from "Documents/index";
 import {FileInput} from "LegalEntities/Domain/ValueObject/Document";
 import {FileLink} from "Documents/Adapter/S3/FileLinkService";
 
+/**
+ * Documents Module ACL
+ */
 export class DocumentsService {
     public static getClassName = () => "DocumentsService";
     private documentsModule: Documents.Main;
@@ -10,9 +13,9 @@ export class DocumentsService {
         this.documentsModule = documentsModule;
     }
 
-    async getAvatarFileLink(fileInput: FileInput | null): Promise<FileLink | null> {
+    async getAvatarFileLink(fileInput: FileInput | null): Promise<FileLink | {}> {
         if (fileInput === null) {
-            return null;
+            return {};
         }
         const {id, path} = fileInput;
 

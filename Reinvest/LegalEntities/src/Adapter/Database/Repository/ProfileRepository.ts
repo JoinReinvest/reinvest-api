@@ -9,15 +9,19 @@ import {
     LegalEntitiesProfile
 } from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 import {SSN} from "LegalEntities/Domain/ValueObject/SSN";
+import {DomainEvent} from "SimpleAggregator/Types";
+import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
 
 export class ProfileRepository {
     public static getClassName = (): string => "ProfileRepository";
     private databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider;
     private idGenerator: IdGeneratorInterface;
+    private eventsPublisher: SimpleEventBus;
 
-    constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, uniqueGenerator: IdGeneratorInterface) {
+    constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, uniqueGenerator: IdGeneratorInterface, eventsPublisher: SimpleEventBus) {
         this.databaseAdapterProvider = databaseAdapterProvider;
         this.idGenerator = uniqueGenerator;
+        this.eventsPublisher = eventsPublisher;
     }
 
     private async createProfile(profileId: string, externalId: string | null = null, defaultLabel: string = 'Individual investor') {
@@ -32,7 +36,7 @@ export class ProfileRepository {
     public async findProfile(profileId: string): Promise<Profile | null> {
         const data = await this.databaseAdapterProvider.provide()
             .selectFrom(legalEntitiesProfileTable)
-            .select(['profileId', 'externalId', 'label', 'name', 'ssn', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'isCompleted'])
+            .select(['profileId', 'externalId', 'label', 'name', 'ssn', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'isCompleted', 'ssnObject'])
             .where('profileId', '=', profileId)
             .limit(1)
             .executeTakeFirst();
@@ -50,7 +54,7 @@ export class ProfileRepository {
         return profile ?? await this.createProfile(profileId);
     }
 
-    async storeProfile(profile: Profile): Promise<void> {
+    async storeProfile(profile: Profile, events: DomainEvent[] = []): Promise<void> {
         const rawProfile = this.prepareProfileForStoring(profile);
 
         await this.databaseAdapterProvider.provide()
@@ -62,6 +66,8 @@ export class ProfileRepository {
             )
             .execute()
         ;
+
+        await this.publishEvents(events);
     }
 
     private prepareProfileForStoring(profile: Profile): LegalEntitiesProfile {
@@ -92,11 +98,19 @@ export class ProfileRepository {
         const isProfileWithTheSSNExist = await this.databaseAdapterProvider.provide()
             .selectFrom(legalEntitiesProfileTable)
             .select(['profileId'])
-            .where('ssn', '=', ssn.toObject())
+            .where('ssn', '=', ssn.getHash())
             .where('profileId', '!=', profileId)
             .limit(1)
             .executeTakeFirst();
 
         return !isProfileWithTheSSNExist;
+    }
+
+    async publishEvents(events: DomainEvent[] = []): Promise<void> {
+        if (events.length === 0) {
+            return;
+        }
+
+        this.eventsPublisher.publishMany(events);
     }
 }

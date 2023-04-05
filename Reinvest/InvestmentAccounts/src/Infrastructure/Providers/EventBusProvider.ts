@@ -3,6 +3,7 @@ import {InvestmentAccounts} from "InvestmentAccounts/index";
 import {EventBus, SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
 import {ProfileQueryEventHandler} from "InvestmentAccounts/Infrastructure/Events/EventHandlers";
 import {ProfileQuery} from "InvestmentAccounts/Infrastructure/Storage/Queries/ProfileQuery";
+import {SendToQueueEventHandler} from "SimpleAggregator/EventBus/SendToQueueEventHandler";
 
 export default class EventBusProvider {
     private config: InvestmentAccounts.Config;
@@ -13,12 +14,18 @@ export default class EventBusProvider {
 
     public boot(container: ContainerInterface) {
         container
-            .addClass(ProfileQueryEventHandler, [ProfileQuery])
+            .addSingleton(ProfileQueryEventHandler, [ProfileQuery])
 
 
         const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
         // eventBus
         //     .subscribe('ProfileSnapshotChanged', ProfileQueryEventHandler.getClassName())
+        ;
+
+        eventBus
+            .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+                "IndividualAccountOpened",
+            ]);
         ;
 
     }

@@ -14,12 +14,8 @@ import {
 } from "./devops/serverless/cognito";
 import {S3Resources} from "./devops/serverless/s3";
 import {VpcResources} from "./devops/serverless/vpc";
-import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-config";
+import {QueueFunction, QueueOutputs, QueueResources} from "./devops/functions/queue/queue-config";
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
-import {
-    LocalSignUpLambdaFunction,
-    LocalSignUpLambdaResources
-} from "./devops/functions/localSignUp/local-sign-up-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {ProviderEnvironment} from "./devops/serverless/serverless-common";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
@@ -28,6 +24,11 @@ import {
     UnauthorizedEndpointsFunction,
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
+import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
+import {
+    CronDocumentSyncFunction,
+    CronDocumentSyncResources
+} from "./devops/functions/cronDocumentSync/cron-document-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-local",
@@ -52,7 +53,9 @@ const serverlessConfiguration: AWS = {
             ...ProviderEnvironment,
             // @ts-ignore
             ExplorerHostedUI: "${env:LocalHostedUiUrl}",
-            ApiUrl: "http://localhost:3000/api"
+            ApiUrl: "http://localhost:3000/api",
+            SQS_QUEUE_URL: "http://localhost:9324/000000000000/development-sqs-notification",
+            IT_IS_LOCAL: "true",
         },
         logs: {
             httpApi: true, // turn on Api Gateway logs
@@ -75,10 +78,11 @@ const serverlessConfiguration: AWS = {
         explorer: ExplorerLambdaFunction,
         migration: MigrationLambdaFunction,
         queue: QueueFunction,
+        cronDocumentsSync: CronDocumentSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
-        localSignUp: LocalSignUpLambdaFunction,
-        unauthorizedEndpoints: UnauthorizedEndpointsFunction
+        unauthorizedEndpoints: UnauthorizedEndpointsFunction,
+        tests: TestsFunction,
     },
     resources: {
         Resources: {
@@ -93,8 +97,9 @@ const serverlessConfiguration: AWS = {
             ...MigrationLambdaResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...QueueResources,
-            ...LocalSignUpLambdaResources,
             ...SesResources,
+            ...TestsLambdaResources,
+            ...CronDocumentSyncResources,
         },
         Outputs: {
             ...CognitoOutputs,
@@ -117,8 +122,8 @@ const serverlessConfiguration: AWS = {
         'serverless-offline-sqs': {
             autoCreate: true,
             apiVersion: '2012-11-05',
-            region: '${aws:region}',
-            endpoint: 'http://0.0.0.0:9324',
+            region: 'us-east-1',
+            endpoint: 'http://0.0.0.0:9324'
         },
         bundle: {
             ignorePackages: ['pg-native'],

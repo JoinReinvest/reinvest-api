@@ -17,11 +17,13 @@ import {
     InvestmentAccountDbProvider,
     investmentAccountsDatabaseProviderName
 } from "InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter";
+import {QueueConfig} from "shared/hkek-sqs/QueueSender";
 
 export namespace InvestmentAccounts {
     export const moduleName = "InvestmentAccounts";
     export type Config = {
         database: PostgreSQLConfig;
+        queue: QueueConfig;
     };
 
     export type ApiType = InvestmentAccountsApiType & Api;

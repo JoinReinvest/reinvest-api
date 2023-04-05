@@ -14,7 +14,7 @@ import {
     GreenCardInput,
     VisaInput
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Domicile";
-import {SSN, SSNInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
+import {SSN, SSNInput, SSNSchema} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
 import {
     AccreditedInvestorStatements, ForAccreditedInvestor,
     ForFINRA,
@@ -84,9 +84,9 @@ context("Given the user wants to complete the profile", () => {
 
         it("Then complete the date of birth in ISO format", async () => {
             const date = "2000-12-24";
-            profile.setDateOfBirth(DateOfBirth.create(date))
+            profile.setDateOfBirth(DateOfBirth.create({dateOfBirth: date}))
             const profileOutput = profile.toObject();
-            const dob = profileOutput.dateOfBirth as DateOfBirthInput;
+            const dob = profileOutput.dateOfBirth;
 
             expect(dob).to.be.equal(date);
         });
@@ -94,7 +94,7 @@ context("Given the user wants to complete the profile", () => {
         it("Or if provided wrong date of birth, Then expects a validation error", async () => {
             const date = "12/24/2000";
             try {
-                profile.setDateOfBirth(DateOfBirth.create(date))
+                profile.setDateOfBirth(DateOfBirth.create({dateOfBirth: date}))
             } catch (error: any) {
                 expect(error).to.exist;
             }
@@ -160,17 +160,20 @@ context("Given the user wants to complete the profile", () => {
         const ids = ['427aa662-a4da-48ee-a44f-780bd8743c93', '7ca02cbe-db35-413b-8fe3-1851643ab3b7'];
         const path = '6539e4e3-802b-4a83-9197-0a0f41832317';
         it("Then add ID scans", async () => {
-            const input = {ids, path};
+            const input = [{id: ids[0], path, fileName: 'id1.jpg'}, {id: ids[1], path, fileName: 'id2.jpg'}];
             profile.setIdentityDocument(IdentityDocument.create(input))
             const profileOutput = profile.toObject();
             const idScan = profileOutput.idScan as IdScanInput;
 
-            expect(idScan.ids).to.include.members(ids);
-            expect(idScan.path).to.be.equal(path);
+            expect(idScan.length).to.be.equal(2);
+            expect(idScan[0].id).to.be.equal(ids[0]);
+            expect(idScan[0].path).to.be.equal(path);
+            expect(idScan[1].id).to.be.equal(ids[1]);
+            expect(idScan[1].path).to.be.equal(path);
         });
 
-        it("Or if ids list is empty Then expects validation error", async () => {
-            const input = {ids: [], path};
+        it("Or if id is wrong uuid Then expects validation error", async () => {
+            const input = [{id: "wrong-uuid", path, fileName: 'id1.jpg'}];
 
             try {
                 profile.setIdentityDocument(IdentityDocument.create(input))
@@ -268,20 +271,45 @@ context("Given the user wants to complete the profile", () => {
         });
 
         it("Then complete the SSN", async () => {
-            const input = 'AAA-GG-SSSS'
-            profile.setSSN(SSN.create(input))
+            const input = '111-22-3333'
+            const ssnValueObject = SSN.createFromRawSSN(input);
+            profile.setSSN(ssnValueObject);
 
             const profileOutput = profile.toObject();
-            const ssn = profileOutput.ssn as unknown as SSNInput;
+            const ssn = profileOutput.ssnObject as unknown as SSNSchema;
 
-            expect(ssn).to.be.equal(input);
+            expect(ssn.anonymized).to.be.equal("***-**-3333");
+            expect(ssnValueObject.decrypt()).to.be.equal(input);
+        });
+
+        it("And Then the SSN object output should be a valid input for regular SSN", async () => {
+            const input = '111-22-3333'
+
+            const ssnValueObject = SSN.createFromRawSSN(input);
+            const rawObject = ssnValueObject.toObject();
+
+            const restoredSsnValueObject = SSN.create(rawObject);
+            const restoredRawObject = restoredSsnValueObject.toObject();
+
+            expect(restoredRawObject.anonymized).to.be.equal("***-**-3333");
+            expect(restoredSsnValueObject.decrypt()).to.be.equal(input);
         });
 
         it("Or complete the SSN without details Then expects validation error", async () => {
-            const input = <SSNInput>{};
+            const input = "";
 
             try {
-                profile.setSSN(SSN.create(input))
+                profile.setSSN(SSN.createFromRawSSN(input))
+            } catch (error: any) {
+                expect(error).to.exist;
+            }
+        });
+
+        it("Or complete the SSN with wrong value Then expects validation error", async () => {
+            const input = 'AAA-BB-1234'
+
+            try {
+                profile.setSSN(SSN.createFromRawSSN(input))
             } catch (error: any) {
                 expect(error).to.exist;
             }

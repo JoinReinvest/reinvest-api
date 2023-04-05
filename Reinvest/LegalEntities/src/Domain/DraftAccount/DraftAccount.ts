@@ -1,8 +1,9 @@
-import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/DraftAccount/EmploymentStatus";
+import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
-import {Employer, EmployerInput} from "LegalEntities/Domain/DraftAccount/Employer";
-import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/DraftAccount/ValueRange";
+import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
+import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
+import {IndividualAccount} from "LegalEntities/Domain/Accounts/IndividualAccount";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -30,7 +31,7 @@ export type DraftInput = {
     draftId: string,
     state: DraftAccountState,
     accountType: DraftAccountType,
-    data: null | IndividualDraftAccountSchema
+    data: IndividualDraftAccountSchema
 }
 
 
@@ -72,7 +73,7 @@ export abstract class DraftAccount {
             draftId: this.draftId,
             state: this.state,
             accountType: this.accountType,
-            data: null
+            data: {} as IndividualDraftAccountSchema
         };
     }
 
@@ -95,8 +96,10 @@ export abstract class DraftAccount {
     isType(accountType: DraftAccountType) {
         return this.accountType === accountType;
     }
-}
 
+    abstract isAccountCompleted(): boolean;
+
+}
 
 export class IndividualDraftAccount extends DraftAccount {
     private employmentStatus: EmploymentStatus | null = null;
@@ -159,6 +162,34 @@ export class IndividualDraftAccount extends DraftAccount {
                 isCompleted: this.isCompleted
             }
         }
+    }
+
+    transformIntoAccount(): IndividualAccount {
+        const {
+            profileId,
+            draftId: accountId,
+            data: {
+                employmentStatus,
+                employer,
+                netIncome,
+                netWorth,
+                avatar
+            }
+        } = this.toObject();
+
+        return IndividualAccount.create({
+            profileId,
+            accountId,
+            employmentStatus,
+            employer,
+            netWorth,
+            netIncome,
+            avatar
+        })
+    }
+
+    isAccountCompleted(): boolean {
+        return this.isCompleted;
     }
 
     verifyCompletion() {

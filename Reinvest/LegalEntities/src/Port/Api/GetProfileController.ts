@@ -7,6 +7,7 @@ import {
     PersonalStatement,
     PersonalStatementType
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
+import {DocumentSchema, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
 
 export type ProfileResponse = {
     externalId: string,
@@ -26,7 +27,7 @@ export type ProfileResponse = {
         },
         ssn: string | null,
         address: AddressInput | null,
-        idScan?: { id: string }[],
+        idScan?: { id: string, fileName: string }[],
         statements: {
             type: PersonalStatementType,
             details: string[]
@@ -34,14 +35,24 @@ export type ProfileResponse = {
     }
 }
 
+export type ProfileForSynchronization = {
+    firstName?: string,
+    middleName?: string,
+    lastName?: string,
+    dateOfBirth: string | null,
+    experience: string | null,
+    domicileType: DomicileType | null,
+    ssn: string | null,
+    address: AddressInput | null,
+    idScan: IdScanInput,
+}
+
 export class GetProfileController {
     public static getClassName = (): string => "GetProfileController";
     private profileRepository: ProfileRepository;
-    private documents: DocumentsService;
 
-    constructor(profileRepository: ProfileRepository, documents: DocumentsService) {
+    constructor(profileRepository: ProfileRepository) {
         this.profileRepository = profileRepository;
-        this.documents = documents;
     }
 
     public async getProfile(profileId: string): Promise<ProfileResponse> {
@@ -68,13 +79,37 @@ export class GetProfileController {
                     visaType: profileObject.domicile?.forVisa?.visaType
                 },
                 address: profileObject.address,
-                ssn: profileObject.ssn,
-                idScan: profileObject.idScan?.ids.map((id) => ({id})),
+                ssn: profileObject.ssnObject !== null ? profileObject.ssnObject.anonymized : null,
+                idScan: profileObject.idScan?.map((document: DocumentSchema) => ({
+                    id: document.id,
+                    fileName: document.fileName
+                })),
                 statements: profile.getStatements().map((statement: PersonalStatement) => ({
                     type: statement.getType(),
                     details: statement.getDetails()
                 }))
             }
+        };
+    }
+
+    public async getProfileForSynchronization(profileId: string): Promise<ProfileForSynchronization | null> {
+        const profile = await this.profileRepository.findProfile(profileId);
+        if (profile === null) {
+            return null;
+        }
+
+        const profileObject = profile.toObject();
+        return {
+            firstName: profileObject.name?.firstName,
+            middleName: profileObject.name?.middleName,
+            lastName: profileObject.name?.lastName,
+            experience: profileObject.investingExperience ? profileObject.investingExperience?.experience : null,
+            dateOfBirth: profileObject.dateOfBirth,
+            // @ts-ignore
+            domicile: profileObject.domicile ? profileObject.domicile.type : null,
+            address: profileObject.address,
+            ssn: profile.exposeSSN(),
+            idScan: profileObject.idScan ?? [],
         };
     }
 }

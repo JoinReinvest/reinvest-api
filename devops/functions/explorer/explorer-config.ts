@@ -1,6 +1,12 @@
 import { CloudwatchPolicies } from "../../serverless/cloudwatch";
 import { getAttribute, getResourceName } from "../../serverless/utils";
-import {EniPolicies, importPrivateSubnetRefs, importVpcRef} from "../../serverless/vpc";
+import {
+  EniPolicies,
+  importPrivateSubnetRefs,
+  importVpcRef,
+  SecurityGroupEgressRules,
+  SecurityGroupIngressRules
+} from "../../serverless/vpc";
 
 export const ExplorerLambdaFunction = {
   handler: `devops/functions/explorer/handler.main`,
@@ -57,6 +63,8 @@ export const ExplorerLambdaResources = {
     Properties: {
       GroupName: getResourceName("sg-explorer-lambda"),
       GroupDescription: getResourceName("sg-explorer-lambda"),
+      SecurityGroupIngress: SecurityGroupIngressRules,
+      SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),
     },
   },

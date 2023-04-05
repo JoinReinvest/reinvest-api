@@ -2,19 +2,6 @@ import {Kysely, sql} from 'kysely';
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
 
 export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
-    // await db.schema
-    //     .createTable('legal_entities_person')
-    //     .addColumn('person_id', 'uuid', col => col.primaryKey().notNull().unique())
-    //     .addColumn('date_created', 'timestamp', col => col.notNull())
-    //     .addColumn('name', 'json', col => col.notNull())
-    //     .addColumn('dob', 'json', col => col.notNull())
-    //     .addColumn('address', 'json', col => col.notNull())
-    //     .addColumn('id_scans_ids', 'json', col => col.notNull())
-    //     .addColumn('domicile', 'json', col => col.notNull())
-    //     .addColumn('ssn', 'json', col => col.notNull())
-    //     .addColumn('is_completed', 'boolean', col => col.notNull())
-    //     .execute();
-
     await db.schema
         .createTable('legal_entities_profile')
         .addColumn('dateCreated', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
@@ -38,5 +25,4 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
 export async function down(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
     await db.schema.dropIndex('legal_entities_ssn_index').execute();
     await db.schema.dropTable('legal_entities_profile').execute();
-    // await db.schema.dropTable('legal_entities_person').execute();
 }

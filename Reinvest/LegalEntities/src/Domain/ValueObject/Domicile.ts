@@ -1,5 +1,5 @@
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export enum DomicileType {
     CITIZEN = "CITIZEN",
@@ -26,8 +26,8 @@ export type DomicileInput = {
 
 export abstract class Domicile implements ToObject {
     static create(domicile: DomicileInput): Domicile {
-        const {type, forGreenCard, forVisa} = domicile;
         try {
+            const {type, forGreenCard, forVisa} = domicile;
             switch (type) {
                 case DomicileType.CITIZEN:
                     return new USCitizen();
@@ -38,10 +38,10 @@ export abstract class Domicile implements ToObject {
                     const {birthCountry: birth, citizenshipCountry: citizenship, visaType} = forVisa as VisaInput;
                     return new VisaResident(birth, citizenship, visaType);
                 default:
-                    throw new ValidationError("Wrong domicile type");
+                    throw new ValidationError(ValidationErrorEnum.INVALID_TYPE, type);
             }
         } catch (error: any) {
-            throw new ValidationError('Missing domicile details');
+            throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, "domicile");
         }
     }
 

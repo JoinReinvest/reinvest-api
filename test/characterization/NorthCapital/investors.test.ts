@@ -67,7 +67,7 @@ context('Given I am an individual person and I want to create an account in the 
 
             await cacheService.cacheValue('PARTY_ACCOUNT_LINK_ID', linkId);
         });
-        
+
         it('And Then I should be able to get details of my account', async () => {
             const details = await requester.getAccountDetails(accountId);
 

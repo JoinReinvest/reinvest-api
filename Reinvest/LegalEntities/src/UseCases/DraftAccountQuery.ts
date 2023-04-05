@@ -15,6 +15,11 @@ export type DraftQuery = {
     details: IndividualDraftAccountSchema | null
 }
 
+export type DraftsList = {
+    id: string,
+    type: DraftAccountType
+}[]
+
 export class DraftAccountQuery {
     public static getClassName = (): string => "DraftAccountQuery";
     private draftAccountRepository: DraftAccountRepository;
@@ -37,8 +42,13 @@ export class DraftAccountQuery {
             id: draftId,
             state: state,
             isCompleted: data?.isCompleted ?? false,
+            // @ts-ignore
             avatar: await this.documents.getAvatarFileLink(data?.avatar ?? null),
             details: data
         }
+    }
+
+    async listDrafts(profileId: string): Promise<DraftsList> {
+        return this.draftAccountRepository.getAllActiveDraftsIds(profileId);
     }
 }
