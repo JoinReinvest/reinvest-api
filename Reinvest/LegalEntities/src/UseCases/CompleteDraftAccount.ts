@@ -2,17 +2,18 @@ import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/
 import {
     CompanyDraftAccount,
     DraftAccount,
-    DraftAccountType, IndividualDraftAccount
+    DraftAccountType,
+    IndividualDraftAccount
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
 import {Avatar} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
 import {
-    NetIncome,
-    ValueRangeInput,
-    NetWorth,
     AnnualRevenue,
-    NumberOfEmployees
+    NetIncome,
+    NetWorth,
+    NumberOfEmployees,
+    ValueRangeInput
 } from "LegalEntities/Domain/ValueObject/ValueRange";
 import {
     Uuid,
@@ -22,13 +23,11 @@ import {
 } from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {Company, CompanyName, CompanyNameInput, CompanyTypeInput} from "../Domain/ValueObject/Company";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {
-    EIN,
-    SensitiveNumberInput,
-} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {EIN, SensitiveNumberInput,} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
 import {Stakeholder, StakeholderInput} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
+import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
 
 export type IndividualDraftAccountInput = {
     employmentStatus?: EmploymentStatusInput
@@ -56,10 +55,12 @@ export class CompleteDraftAccount {
     public static getClassName = (): string => "CompleteDraftAccount";
     private draftAccountRepository: DraftAccountRepository;
     private uniqueIdGenerator: IdGeneratorInterface;
+    private accountRepository: AccountRepository;
 
-    constructor(draftAccountRepository: DraftAccountRepository, uniqueIdGenerator: IdGeneratorInterface) {
+    constructor(draftAccountRepository: DraftAccountRepository, uniqueIdGenerator: IdGeneratorInterface, accountRepository: AccountRepository) {
         this.draftAccountRepository = draftAccountRepository;
         this.uniqueIdGenerator = uniqueIdGenerator;
+        this.accountRepository = accountRepository;
     }
 
     public async completeIndividual(
@@ -162,15 +163,11 @@ export class CompleteDraftAccount {
                         case 'ein':
                             const {ein: einValue} = data;
                             const ein = EIN.createFromRawEIN(einValue);
+
+                            if (!await this.accountRepository.isEinUnique(ein)) {
+                                throw new ValidationError(ValidationErrorEnum.NOT_UNIQUE, 'ein');
+                            }
                             draft.setEIN(ein);
-                            // if (await this.profileRepository.isSSNUnique(ssn, profileId)) {
-                            //     profile.setSSN(ssn);
-                            // } else {
-                            //     errors.push(<ValidationErrorType>{
-                            //         type: ValidationErrorEnum.NOT_UNIQUE,
-                            //         field: "ssn",
-                            //     });
-                            // }
                             break;
                         case 'annualRevenue':
                             draft.setAnnualRevenue(AnnualRevenue.create(data));

@@ -97,8 +97,8 @@ export class Stakeholder implements ToObject {
             const ssnObject = SSN.create(ssn)
 
             return new Stakeholder(idObject, ssnObject, personalName, dateOfBirthObject, addressObject, domicileObject, documents);
-        } catch {
-            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "stakeholder");
+        } catch (error: any) {
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "stakeholder", error.message);
         }
     }
 }

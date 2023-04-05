@@ -12,6 +12,11 @@ import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/Value
 import {CompanyStakeholders, Stakeholder, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import {Uuid} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
+export enum CompanyAccountType {
+    CORPORATE = "CORPORATE",
+    TRUST = "TRUST",
+}
+
 export type CompanySchema = {
     accountId: string,
     profileId: string,
@@ -25,6 +30,8 @@ export type CompanySchema = {
     avatar: AvatarInput | null,
     companyDocuments: DocumentSchema[],
     stakeholders: StakeholderSchema[],
+    accountType: CompanyAccountType,
+    einHash: string,
 }
 
 export class CompanyAccount {
@@ -40,11 +47,13 @@ export class CompanyAccount {
     private avatar: Avatar | null = null;
     private documents: CompanyDocuments = new CompanyDocuments([]);
     private stakeholders: CompanyStakeholders = new CompanyStakeholders([]);
+    private readonly accountType: CompanyAccountType;
 
 
-    constructor(profileId: string, accountId: string) {
+    constructor(profileId: string, accountId: string, accountType: CompanyAccountType) {
         this.profileId = profileId;
         this.accountId = accountId;
+        this.accountType = accountType;
     }
 
     private get(value: ToObject | null) {
@@ -70,6 +79,8 @@ export class CompanyAccount {
             avatar: this.get(this.avatar),
             companyDocuments: this.get(this.documents),
             stakeholders: this.get(this.stakeholders),
+            accountType: this.accountType,
+            einHash: this.ein?.getHash() ?? "",
         };
     }
 
@@ -86,9 +97,10 @@ export class CompanyAccount {
             companyType,
             avatar,
             stakeholders,
-            companyDocuments
+            companyDocuments,
+            accountType
         } = companyData;
-        const account = new CompanyAccount(profileId, accountId);
+        const account = new CompanyAccount(profileId, accountId, accountType);
 
         if (companyName) {
             account.setCompanyName(CompanyName.create(companyName));

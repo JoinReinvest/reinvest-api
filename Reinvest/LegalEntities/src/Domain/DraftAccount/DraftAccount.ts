@@ -26,7 +26,7 @@ import {EIN, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/
 import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
 import {CompanyStakeholders, Stakeholder, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import {Uuid} from "LegalEntities/Domain/ValueObject/TypeValidators";
-import {CompanyAccount} from "LegalEntities/Domain/Accounts/CompanyAccount";
+import {CompanyAccount, CompanyAccountType} from "LegalEntities/Domain/Accounts/CompanyAccount";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -152,6 +152,7 @@ export abstract class DraftAccount {
     abstract verifyCompletion(): boolean;
 
 
+    abstract transformIntoAccount(): IndividualAccount | CompanyAccount;
 }
 
 export class IndividualDraftAccount extends DraftAccount {
@@ -361,6 +362,7 @@ export class CompanyDraftAccount extends DraftAccount {
                 companyDocuments,
             }
         } = this.toObject();
+        const accountType = this.isCorporate() ? CompanyAccountType.CORPORATE : CompanyAccountType.TRUST;
 
         return CompanyAccount.create({
             profileId,
@@ -375,10 +377,12 @@ export class CompanyDraftAccount extends DraftAccount {
             avatar,
             stakeholders,
             companyDocuments,
+            accountType,
+            einHash: this.ein?.getHash() ?? ""
         })
     }
 
-    setCompanyName(companyName: CopanyName) {
+    setCompanyName(companyName: CompanyName) {
         this.companyName = companyName;
     }
 
@@ -432,6 +436,10 @@ export class CompanyDraftAccount extends DraftAccount {
 
     removeStakeholder(id: Uuid) {
         this.stakeholders?.removeStakeholder(id);
+    }
+
+    getEIN(): EIN {
+        return this.ein as EIN;
     }
 
     verifyCompletion(): boolean {
