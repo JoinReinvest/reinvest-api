@@ -1,4 +1,5 @@
 import {CompleteProfile, CompleteProfileInput} from "LegalEntities/UseCases/CompleteProfile";
+import {ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export class CompleteProfileController {
     public static getClassName = (): string => "CompleteProfileController";
@@ -8,7 +9,7 @@ export class CompleteProfileController {
         this.completeProfileUseCase = completeProfileUseCase;
     }
 
-    public async completeProfile(input: CompleteProfileInput, profileId: string): Promise<string[]> {
+    public async completeProfile(input: CompleteProfileInput, profileId: string): Promise<ValidationErrorType[]> {
         return this.completeProfileUseCase.execute(input, profileId);
     }
 }

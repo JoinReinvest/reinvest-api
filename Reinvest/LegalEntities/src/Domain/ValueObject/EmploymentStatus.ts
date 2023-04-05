@@ -1,4 +1,4 @@
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export type EmploymentStatusInput = {
     status: EmploymentStatusEnum
@@ -22,12 +22,12 @@ export class EmploymentStatus {
         try {
             const {status} = input;
             if (!Object.values(EmploymentStatusEnum).includes(status)) {
-                throw new ValidationError('WRONG_EMPLOYMENT_STATUS_TYPE')
+                throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "employmentStatus");
             }
 
             return new EmploymentStatus(status);
-        } catch (error) {
-            throw new ValidationError('WRONG_EMPLOYMENT_STATUS_TYPE')
+        } catch (error: any) {
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "employmentStatus");
         }
     }
 

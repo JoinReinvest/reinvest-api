@@ -22,4 +22,7 @@ export class FileLinksController {
         return this.fileLinkService.getAvatarFileLink(id, catalog);
     }
 
+    public async getDocumentLink(id: string, catalog: string): Promise<FileLink> {
+        return this.fileLinkService.getDocumentFileLink(id, catalog);
+    }
 }

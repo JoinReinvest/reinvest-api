@@ -30,7 +30,7 @@ export class NorthCapitalSynchronizationRepository {
         try {
             const data = await this.databaseAdapterProvider.provide()
                 .selectFrom(northCapitalSynchronizationTable)
-                .select(['recordId', 'northCapitalId', 'type', 'crc', 'documents', 'version', 'links'])
+                .select(['recordId', 'northCapitalId', 'type', 'crc', 'version', 'links'])
                 .where('recordId', '=', recordId)
                 .limit(1)
                 .executeTakeFirstOrThrow() as SelectableNorthCapitalSynchronizationRecord as NorthCapitalSynchronizationRecordType;
@@ -49,7 +49,6 @@ export class NorthCapitalSynchronizationRepository {
                 northCapitalId,
                 crc,
                 type: entityType,
-                documents: JSON.stringify([]),
                 version: 0,
                 links: JSON.stringify([]),
             })

@@ -138,7 +138,7 @@ export const CognitoResources = {
                         Notify: true,
                     },
                     LowAction: {
-                        EventAction: "MFA_IF_CONFIGURED",
+                        EventAction: "NO_ACTION",
                         Notify: true,
                     },
                 },
@@ -301,6 +301,7 @@ export const CognitoUpdateAttributesPolicyBasedOnOutputArn = [
         Effect: "Allow",
         Action: [
             "cognito-idp:AdminUpdateUserAttributes",
+            "cognito-idp:AdminGetUser",
         ],
         Resource: importOutput('CognitoUserPoolArn'),
     },

@@ -22,6 +22,10 @@ import {
     UnauthorizedEndpointsLambdaResources
 } from "./devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config";
 import {TestsFunction, TestsLambdaResources} from "./devops/functions/tests/tests-config";
+import {
+    CronDocumentSyncFunction,
+    CronDocumentSyncResources
+} from "./devops/functions/cronDocumentSync/cron-document-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -60,6 +64,7 @@ const serverlessConfiguration: AWS = {
             VERTALO_API_URL: "${env:VERTALO_API_URL}",
             VERTALO_CLIENT_ID: "${env:VERTALO_CLIENT_ID}",
             VERTALO_CLIENT_SECRET: "${env:VERTALO_CLIENT_SECRET}",
+            SNS_ORIGINATION_NUMBER: "${env:SNS_ORIGINATION_NUMBER}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,
@@ -83,6 +88,7 @@ const serverlessConfiguration: AWS = {
         migration: MigrationLambdaFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         queue: QueueFunction,
+        cronDocumentsSync: CronDocumentSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         tests: TestsFunction,
@@ -99,6 +105,7 @@ const serverlessConfiguration: AWS = {
             ...QueueResources,
             ...UnauthorizedEndpointsLambdaResources,
             ...TestsLambdaResources,
+            ...CronDocumentSyncResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,

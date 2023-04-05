@@ -1,5 +1,43 @@
 # REINVEST API CHANGELOG
 
+## 1.7.3 - 03/31/2023
+
+* query `phoneCompleted` is no longer mocked and returns real phone number completion status
+
+## 1.7.2 - 03/31/2023
+
+* Add optional `isSmsAllowed` field for `setPhoneNumber` mutation
+    * If `isSmsAllowed` is set to `false` then SMS TOPT will not be sent
+    * On default `isSmsAllowed` is set to `true`
+
+## 1.7.1 - 03/30/2023
+
+* Make consistent error response for mutation
+    * `completeProfileDetails`
+    * `completeIndividualDraftAccount`
+* Details of errors are provided in the `errors.extensions.details` field
+    * single error contains 3 fields:
+        * `field` - step name
+        * `type` - one of: UNKNOWN_ERROR, EMPTY_VALUE, FAILED, INVALID_DATE_FORMAT,
+          INVALID_ID_FORMAT, INVALID_FORMAT, INVALID_TYPE, MISSING_MANDATORY_FIELDS, ALREADY_COMPLETED, NOT_UNIQUE,
+          NOT_ACTIVE, NOT_INDIVIDUAL
+        * `details` - additional details about the error
+* fixes:
+    * properly formatted phone number in `setPhoneNumber`/`verifyPhoneNumber` mutations
+
+## 1.7.0 - 03/30/2023
+
+* Change FileLink types and inputs for GraphQL
+    * separate `DocumentFileLinkInput` and `AvatarFileLinkInput`
+    * `DocumentFileLinkInput` requires `fileName` field
+    * `DocumentFileLinkId` and `GetDocumentLink` returns `fileName` field
+    * limit fileName only to `jpeg`, `jpg`, `png` and `pdf` extensions
+* Synchronization profile documents with North Capital
+    * Add `cronDocumentSync` lambda function triggered every 1 hour that synchronize up to 20 documents
+* [TEST] endpoints:
+    * `POST /tests/north-capital/get-profile` - returns also `partyDocuments` fields
+    * `POST /tests/north-capital/sync-documents` - immediately synchronize up to 20 documents with North Capital
+
 ## 1.6.0 - 03/28/2023
 
 * Updated `completeProfileDetails` mutation schema for dateOfBirth field (string to object)

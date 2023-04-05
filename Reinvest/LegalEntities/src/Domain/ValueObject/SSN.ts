@@ -1,4 +1,4 @@
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import crypto from "crypto";
 
@@ -30,7 +30,7 @@ export class SSN implements ToObject {
 
             return new SSN(anonymized, encrypted, hashed);
         } catch (error: any) {
-            throw new ValidationError('Missing SSN value');
+            throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, "ssn");
         }
     }
 
@@ -43,7 +43,7 @@ export class SSN implements ToObject {
 
             return new SSN(anonymized, encrypted, hashed);
         } catch (error: any) {
-            throw new ValidationError('Missing SSN value');
+            throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, "ssn");
         }
     }
 
@@ -58,7 +58,7 @@ export class SSN implements ToObject {
     private static validate(ssn: string) {
         const ssnRegExp = new RegExp("^[0-9]{3}-[0-9]{2}-[0-9]{4}$")
         if (!ssnRegExp.test(ssn)) {
-            throw new ValidationError('Invalid SSN format');
+            throw new ValidationError(ValidationErrorEnum.INVALID_FORMAT, "ssn");
         }
     }
 

@@ -9,6 +9,10 @@ import {
     VertaloEntityType, VertaloIds,
     VertaloSynchronizationRecordType
 } from "Registration/Domain/VendorModel/Vertalo/VertaloTypes";
+import {
+    DocumentSyncState,
+    NorthCapitalObjectType
+} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
 export interface MappingRegistryTable {
     recordId: string;
@@ -28,11 +32,23 @@ export interface NorthCapitalSynchronizationTable {
     northCapitalId: string;
     type: NorthCapitalEntityType,
     crc: string;
-    documents: string | null;
     version: number;
     createdDate: Date;
     updatedDate: Date;
     links: object | string;
+}
+
+export interface NorthCapitalDocumentsSynchronizationTable {
+    recordId: string;
+    northCapitalId: string;
+    northCapitalType: NorthCapitalObjectType
+    documentId: string;
+    documentPath: string;
+    documentFilename: string;
+    version: number;
+    state: DocumentSyncState;
+    createdDate: Date;
+    updatedDate: Date;
 }
 
 export interface VertaloSynchronizationTable {
@@ -55,3 +71,5 @@ export type SelectablePartyId = Pick<NorthCapitalSynchronizationTable, 'northCap
 
 export type InsertableVertaloSynchronization = Insertable<VertaloSynchronizationTable>;
 export type SelectableVertaloSynchronizationRecord = Pick<VertaloSynchronizationTable, keyof VertaloSynchronizationRecordType>;
+
+export type InsertableNorthCapitalDocumentsSynchronization = Insertable<NorthCapitalDocumentsSynchronizationTable>;

@@ -7,6 +7,7 @@ export type DocumentsApiType = {
     createAvatarFileLink: FileLinksController["createAvatarFileLink"],
     createDocumentsFileLinks: FileLinksController["createDocumentsFileLinks"],
     getAvatarLink: FileLinksController["getAvatarLink"],
+    getDocumentLink: FileLinksController["getDocumentLink"],
     signDocumentFromTemplate: SigningController["signDocumentFromTemplate"],
     getTemplate: TemplatesController["getTemplate"],
 }
@@ -15,6 +16,7 @@ export const DocumentsApi = (container: ContainerInterface): DocumentsApiType =>
     createAvatarFileLink: container.delegateTo(FileLinksController, 'createAvatarFileLink'),
     createDocumentsFileLinks: container.delegateTo(FileLinksController, 'createDocumentsFileLinks'),
     getAvatarLink: container.delegateTo(FileLinksController, 'getAvatarLink'),
+    getDocumentLink: container.delegateTo(FileLinksController, 'getDocumentLink'),
     signDocumentFromTemplate: container.delegateTo(SigningController, 'signDocumentFromTemplate'),
     getTemplate: container.delegateTo(TemplatesController, 'getTemplate'),
 })

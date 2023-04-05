@@ -37,6 +37,9 @@ export class PhoneRepository {
             async () => {
                 // store in the db transitionally
                 await this.createToken(oneTimeToken);
+                if (!oneTimeToken.shouldSendViaSms()) {
+                    return;
+                }
                 await this.smsService.sendSmsWithToken(oneTimeToken);
             });
     }

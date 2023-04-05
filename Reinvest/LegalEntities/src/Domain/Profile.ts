@@ -9,7 +9,7 @@ import {
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {SSN, SSNSchema} from "LegalEntities/Domain/ValueObject/SSN";
-import {ValidationError} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
 import {IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
 
@@ -152,7 +152,8 @@ export class Profile {
 
             return profile;
         } catch (error: any) {
-            throw new ValidationError('Invalid profile');
+            console.error(`Profile restoration failed: ${error.message}`);
+            throw new ValidationError(ValidationErrorEnum.FAILED, "profile");
         }
 
     }

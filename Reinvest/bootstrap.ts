@@ -85,6 +85,7 @@ export function boot(): Modules {
             emailDomain: EMAIL_DOMAIN,
         } as Registration.Config, {
             legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
+            documents: modules.get(Documents.moduleName) as Documents.Main,
         })
     );
 
