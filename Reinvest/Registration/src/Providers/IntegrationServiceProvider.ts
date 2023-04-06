@@ -6,6 +6,7 @@ import {LegalEntitiesService} from "Registration/Adapter/Modules/LegalEntitiesSe
 import {NorthCapitalSynchronizer} from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizer";
 import {SynchronizeIndividualAccount} from "Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount";
 import {VertaloSynchronizer} from "Registration/Adapter/Vertalo/VertaloSynchronizer";
+import {SynchronizeCompanyAccount} from "Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount";
 
 
 export class IntegrationServiceProvider {
@@ -19,7 +20,7 @@ export class IntegrationServiceProvider {
         container
             .addSingleton(SynchronizeProfile, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer])
             .addSingleton(SynchronizeIndividualAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer])
+            .addSingleton(SynchronizeCompanyAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer])
         ;
-
     }
 }

@@ -20,6 +20,7 @@ import {
 } from "Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository";
 import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 import {RegistrationDocumentsService} from "Registration/Adapter/Modules/RegistrationDocumentsService";
+import {NorthCapitalCompanyAccount} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyAccount";
 
 export class NorthCapitalSynchronizer {
     static getClassName = () => 'NorthCapitalSynchronizer';
@@ -179,5 +180,27 @@ export class NorthCapitalSynchronizer {
         }
 
         return false;
+    }
+
+    async synchronizeCompanyAccount(recordId: string, northCapitalCompanyAccount: NorthCapitalCompanyAccount) {
+        try {
+            let synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
+
+            if (synchronizationRecord === null) {
+                const companyAccountId = await this.northCapitalAdapter.createAccount(northCapitalCompanyAccount.getAccountData());
+                await this.northCapitalSynchronizationRepository.createSynchronizationRecord(recordId, companyAccountId, northCapitalCompanyAccount.getCrc(), NorthCapitalEntityType.ACCOUNT);
+
+            } else if (synchronizationRecord.isOutdated(northCapitalCompanyAccount.getCrc())) {
+
+                if (northCapitalCompanyAccount.isOutdatedAccount(synchronizationRecord.getCrc())) {
+                    await this.northCapitalAdapter.updateAccount(synchronizationRecord.getNorthCapitalId(), northCapitalCompanyAccount.getAccountData());
+                }
+
+                synchronizationRecord.setCrc(northCapitalCompanyAccount.getCrc());
+                await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
+            }
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
     }
 }

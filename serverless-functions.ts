@@ -26,6 +26,10 @@ import {
     CronDocumentSyncFunction,
     CronDocumentSyncResources
 } from "./devops/functions/cronDocumentSync/cron-document-sync-config";
+import {
+    CronVendorsSyncFunction,
+    CronVendorsSyncResources
+} from "./devops/functions/cronVendorsSync/cron-vendors-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -89,6 +93,7 @@ const serverlessConfiguration: AWS = {
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         queue: QueueFunction,
         cronDocumentsSync: CronDocumentSyncFunction,
+        cronVendorsSync: CronVendorsSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         tests: TestsFunction,
@@ -106,6 +111,7 @@ const serverlessConfiguration: AWS = {
             ...UnauthorizedEndpointsLambdaResources,
             ...TestsLambdaResources,
             ...CronDocumentSyncResources,
+            ...CronVendorsSyncResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,

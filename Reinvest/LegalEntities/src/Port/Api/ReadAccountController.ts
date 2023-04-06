@@ -1,6 +1,6 @@
 import {
-    AccountRepository,
-    IndividualAccountForSynchronization
+    AccountRepository, CompanyAccountForSynchronization, CompanyForSynchronization,
+    IndividualAccountForSynchronization, StakeholderForSynchronization
 } from "LegalEntities/Adapter/Database/Repository/AccountRepository";
 import {AccountType} from "LegalEntities/Domain/AccountType";
 import {AvatarOutput, AvatarQuery} from "LegalEntities/Port/Api/AvatarQuery";
@@ -113,6 +113,18 @@ export class ReadAccountController {
 
     public async getIndividualAccountForSynchronization(profileId: string, accountId: string): Promise<IndividualAccountForSynchronization | null> {
         return this.accountRepository.getIndividualAccountForSynchronization(profileId, accountId);
+    }
+
+    public async getCompanyAccountForSynchronization(profileId: string, accountId: string): Promise<CompanyAccountForSynchronization | null> {
+        return this.accountRepository.getCompanyAccountForSynchronization(profileId, accountId);
+    }
+
+    public async getCompanyForSynchronization(profileId: string, accountId: string): Promise<CompanyForSynchronization | null> {
+        return this.accountRepository.getCompanyForSynchronization(profileId, accountId);
+    }
+
+    public async getStakeholderForSynchronization(profileId: string, accountId: string, stakeholderId: string): Promise<StakeholderForSynchronization | null> {
+        return this.accountRepository.getStakeholderForSynchronization(profileId, accountId, stakeholderId);
     }
 
     public async getAccountsOverview(profileId: string): Promise<AccountsOverviewResponse[]> {

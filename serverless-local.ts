@@ -29,6 +29,10 @@ import {
     CronDocumentSyncFunction,
     CronDocumentSyncResources
 } from "./devops/functions/cronDocumentSync/cron-document-sync-config";
+import {
+    CronVendorsSyncFunction,
+    CronVendorsSyncResources
+} from "./devops/functions/cronVendorsSync/cron-vendors-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-local",
@@ -79,6 +83,7 @@ const serverlessConfiguration: AWS = {
         migration: MigrationLambdaFunction,
         queue: QueueFunction,
         cronDocumentsSync: CronDocumentSyncFunction,
+        cronVendorsSync: CronVendorsSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
@@ -100,6 +105,7 @@ const serverlessConfiguration: AWS = {
             ...SesResources,
             ...TestsLambdaResources,
             ...CronDocumentSyncResources,
+            ...CronVendorsSyncResources,
         },
         Outputs: {
             ...CognitoOutputs,

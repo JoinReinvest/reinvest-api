@@ -7,6 +7,14 @@ export enum NorthCapitalDomicile {
     "NON_RESIDENT" = "non-resident"
 }
 
+export enum NorthCapitalEntityType {
+    "REVOCABLE" = "Revocable Trust",
+    "IRREVOCABLE" = "Irrevocable Trust",
+    "PARTNERSHIP" = "Limited Partnership",
+    "LLC" = "LLC",
+    "CORPORATION" = "Corporation",
+}
+
 export enum NorthCapitalEmploymentStatus {
     EMPLOYED = "Employed",
     UNEMPLOYED = "Not Employed",
@@ -56,6 +64,18 @@ export type NorthCapitalIndividualAccountStructure = {
     country: string,
 }
 
+export type NorthCapitalCompanyAccountStructure = {
+    accountRegistration: string,
+    type: "Entity",
+    entityType: NorthCapitalEntityType | null,
+    streetAddress1: string,
+    streetAddress2?: string,
+    city: string,
+    state: string,
+    zip: string,
+    country: string,
+}
+
 export type NorthCapitalLinkMappingConfiguration = {
     type: MappedType,
     profileId: string,
@@ -82,6 +102,13 @@ export type NorthCapitalIndividualAccountType = {
     profileId: string,
     extendedParty: NorthCapitalIndividualExtendedMainPartyType,
     account: NorthCapitalIndividualAccountStructure,
+    links: NorthCapitalLink[]
+}
+
+export type NorthCapitalCompanyAccountType = {
+    profileId: string,
+    // extendedParty: NorthCapitalIndividualExtendedMainPartyType,
+    account: NorthCapitalCompanyAccountStructure,
     links: NorthCapitalLink[]
 }
 

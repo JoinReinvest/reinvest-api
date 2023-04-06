@@ -85,7 +85,8 @@ router.post("/get-sms-topt", async (req: any, res: any) => {
 
 router.post("/events", async (req: any, res: any) => {
     try {
-        const {kind, id} = req.body;
+        const {kind} = req.body;
+        const id = await getProfileIdFromAccessToken(req.headers.authorization);
         switch (kind) {
             case "LegalProfileCompleted":
                 await sendMessage(kind, id, {});
@@ -93,6 +94,14 @@ router.post("/events", async (req: any, res: any) => {
             case "IndividualAccountOpened":
                 const {individualAccountId} = req.body;
                 await sendMessage(kind, id, {individualAccountId});
+                break;
+            case "CorporateAccountOpened":
+                const {accountId: corporateAccountIds} = req.body;
+                await sendMessage(kind, id, {corporateAccountIds: [corporateAccountIds]});
+                break;
+            case "TrustAccountOpened":
+                const {accountId: trustAccountIds} = req.body;
+                await sendMessage(kind, id, {trustAccountIds: [trustAccountIds]});
                 break;
             default:
                 throw new Error("Unknown event");

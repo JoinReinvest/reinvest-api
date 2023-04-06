@@ -1,6 +1,10 @@
 import {LegalEntities} from "LegalEntities/index";
 import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
-import {IndividualAccountForSynchronization} from "Registration/Domain/Model/Account";
+import {
+    CompanyAccountForSynchronization,
+    CompanyForSynchronization,
+    IndividualAccountForSynchronization, StakeholderForSynchronization
+} from "Registration/Domain/Model/Account";
 
 /**
  * Legal Entities Module ACL
@@ -32,5 +36,35 @@ export class LegalEntitiesService {
         }
 
         return individualAccount;
+    }
+
+    async getCompanyAccount(profileId: string, accountId: string): Promise<CompanyAccountForSynchronization | never> {
+        const api = this.legalEntitiesModule.api();
+        const companyAccount = await api.getCompanyAccountForSynchronization(profileId, accountId) as CompanyAccountForSynchronization | null;
+        if (companyAccount === null) {
+            throw new Error(`Company account not found, profileId: ${profileId}, accountId: ${accountId}`);
+        }
+
+        return companyAccount;
+    }
+
+    async getCompany(profileId: string, accountId: string): Promise<CompanyForSynchronization | never> {
+        const api = this.legalEntitiesModule.api();
+        const company = await api.getCompanyForSynchronization(profileId, accountId) as CompanyForSynchronization | null;
+        if (company === null) {
+            throw new Error(`Company not found, profileId: ${profileId}, accountId: ${accountId}`);
+        }
+
+        return company;
+    }
+
+    async getStakeholder(profileId: string, accountId: string, stakeholderId: string): Promise<StakeholderForSynchronization | never> {
+        const api = this.legalEntitiesModule.api();
+        const stakeholder = await api.getStakeholderForSynchronization(profileId, accountId, stakeholderId) as StakeholderForSynchronization | null;
+        if (stakeholder === null) {
+            throw new Error(`Stakeholder not found, profileId: ${profileId}, accountId: ${accountId}, stakeholderId: ${stakeholderId}`);
+        }
+
+        return stakeholder;
     }
 }

@@ -1,5 +1,6 @@
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 import {
+    northCapitalDocumentsSynchronizationTable,
     RegistrationDatabaseAdapterProvider,
     registrationMappingRegistryTable
 } from "Registration/Adapter/Database/DatabaseAdapter";
@@ -10,8 +11,10 @@ import {
 import {MappedRecordStatus, MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {EmailCreator} from "Registration/Domain/EmailCreator";
 import {MappedRecord, MappedRecordType} from "Registration/Domain/Model/Mapping/MappedRecord";
+import {DocumentSyncState} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
 const LOCK_TIME_SECONDS = 30;
+export const EMPTY_UUID = "00000000-0000-0000-0000-000000000000";
 
 export class MappingRegistryRepository {
     public static getClassName = (): string => "MappingRegistryRepository";
@@ -26,9 +29,8 @@ export class MappingRegistryRepository {
         this.emailCreator = emailCreator;
     }
 
-    async addRecord(profileId: string, externalId: string, mappedType: MappedType): Promise<MappedRecord> {
-        const email = this.emailCreator.create(profileId, externalId, mappedType);
-        // close connection
+    async addRecord(mappedType: MappedType, profileId: string, externalId: string = EMPTY_UUID, dependentId: string = EMPTY_UUID): Promise<MappedRecord> {
+        const email = this.emailCreator.create(profileId, externalId, dependentId, mappedType);
         let recordId = this.idGenerator.createUuid();
 
         await this.databaseAdapterProvider.provide()
@@ -39,6 +41,7 @@ export class MappingRegistryRepository {
                 externalId,
                 mappedType,
                 email,
+                dependentId
             })
             .onConflict((oc) => oc
                 .constraint('profile_external_ids_unique')
@@ -47,20 +50,33 @@ export class MappingRegistryRepository {
             .execute()
         ;
 
-        return this.getRecordByProfileAndExternalId(profileId, externalId);
+        return this.getRecordByProfileAndExternalId(profileId, externalId, dependentId);
     }
 
-    async getRecordByProfileAndExternalId(profileId: string, externalId: string): Promise<MappedRecord> {
+    async getRecordByProfileAndExternalId(profileId: string, externalId: string, dependentId: string): Promise<MappedRecord> {
         const data = await this.databaseAdapterProvider.provide()
             .selectFrom(registrationMappingRegistryTable)
             .select(['recordId', 'profileId', 'externalId', 'mappedType', 'email', 'status', 'version'])
             .where('profileId', '=', profileId)
             .where('externalId', '=', externalId)
+            .where('dependentId', '=', dependentId)
             .limit(1)
             .executeTakeFirstOrThrow() as SelectableMappedRecord as MappedRecordType;
 
         return MappedRecord.create(data);
     }
+
+    async getRecordById(recordId: string): Promise<MappedRecord> {
+        const data = await this.databaseAdapterProvider.provide()
+            .selectFrom(registrationMappingRegistryTable)
+            .select(['recordId', 'profileId', 'externalId', 'mappedType', 'email', 'status', 'version'])
+            .where('recordId', '=', recordId)
+            .limit(1)
+            .executeTakeFirstOrThrow() as SelectableMappedRecord as MappedRecordType;
+
+        return MappedRecord.create(data);
+    }
+
 
     async lockRecord(record: MappedRecord) {
         const lockedUntil = new Date();
@@ -152,6 +168,24 @@ export class MappingRegistryRepository {
         } catch (error: any) {
             console.log(error);
             return false;
+        }
+    }
+
+    async listObjectsToSync(): Promise<string[]> {
+        try {
+            const data = await this.databaseAdapterProvider.provide()
+                .selectFrom(registrationMappingRegistryTable)
+                .select(['recordId'])
+                .where('status', '=', MappedRecordStatus.DIRTY)
+                .orWhere('status', '=', MappedRecordStatus.TO_BE_DELETED)
+                .orderBy('updatedDate', 'asc')
+                .limit(20)
+                .execute();
+
+            return data.map((row: any) => row.recordId);
+        } catch (error: any) {
+            console.log(error.message);
+            return [];
         }
     }
 }
