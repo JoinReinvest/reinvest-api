@@ -15,7 +15,7 @@ export type ProfileCreated = DomainEvent & {
 export type IndividualAccountOpened = DomainEvent & {
     kind: "IndividualAccountOpened",
     data: {
-        individualAccountIds: string[]
+        individualAccountId: string
     }
 }
 
