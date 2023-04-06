@@ -38,11 +38,11 @@ export type NorthCapitalMainPartyType = {
 }
 
 export type NorthCapitalIndividualExtendedMainPartyType = {
-    occupation: string | null,
-    empName: string | null,
-    empStatus: NorthCapitalEmploymentStatus | null,
-    householdNetworth: string | null,
-    currentHouseholdIncome: string | null,
+    occupation?: string | null,
+    empName?: string | null,
+    empStatus?: NorthCapitalEmploymentStatus | null,
+    householdNetworth?: string | null,
+    currentHouseholdIncome?: string | null,
 }
 
 export type NorthCapitalIndividualAccountStructure = {

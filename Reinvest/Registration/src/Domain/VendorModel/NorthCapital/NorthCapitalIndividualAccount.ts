@@ -8,6 +8,7 @@ import {
 import {IndividualAccountForSynchronization} from "Registration/Domain/Model/Account";
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+import {DictionaryType} from "HKEKTypes/Generics";
 
 export class NorthCapitalIndividualAccount {
     private readonly data: NorthCapitalIndividualAccountType;
@@ -104,7 +105,14 @@ export class NorthCapitalIndividualAccount {
     }
 
     getPartyData(): NorthCapitalIndividualExtendedMainPartyType {
-        return this.data.extendedParty;
+        const party = <DictionaryType>{};
+        for (const [key, value] of Object.entries(this.data.extendedParty)) {
+            if (value !== null) {
+                party[key] = value;
+            }
+        }
+
+        return party;
     }
 
     getAccountData(): NorthCapitalIndividualAccountStructure {

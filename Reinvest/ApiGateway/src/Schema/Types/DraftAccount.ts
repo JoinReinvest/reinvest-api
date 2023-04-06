@@ -263,97 +263,19 @@ const corporateTrustSchema = `
     }
 
     type Query {
-        "[MOCK]"
+        "Get draft corporate account details"
         getCorporateDraftAccount(accountId: ID): CorporateDraftAccount
-        "[MOCK]"
+        "Get draft trust account details"
         getTrustDraftAccount(accountId: ID): TrustDraftAccount
     }
 
     type Mutation {
-        "[MOCK] Complete corporate draft account"
+        "Complete corporate draft account"
         completeCorporateDraftAccount(accountId: ID, input: CorporateDraftAccountInput): CorporateDraftAccount
-        "[MOCK] Complete trust draft account"
+        "Complete trust draft account"
         completeTrustDraftAccount(accountId: ID, input: TrustDraftAccountInput): TrustDraftAccount
     }
 `;
-
-
-const individualAccountMockResponse = {
-    id: 'c73ad8f6-4328-4151-9cc8-3694b71054f6',
-    avatar: {
-        url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU",
-        id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
-    },
-    employmentStatus: "EMPLOYED",
-    employer: {
-        nameOfEmployer: "Housekeeper Limited",
-        title: "The Doer of Everything",
-        industry: "Housekeeping"
-    },
-    netWorth: {range: "$25000-$100000"},
-    netIncome: {range: "<$15000"}
-}
-
-const corporateTrustMockResponse = (isTrust: boolean = false) => ({
-    id: 'c73ad8f6-4328-4151-9cc8-3694b71054f6',
-    name: isTrust ? "Trust company" : "Corporate company",
-    address: {
-        addressLine1: "Sausage line",
-        addressLine2: "2a/1",
-        city: "NYC",
-        zip: "90210",
-        country: "USA",
-        state: "NY"
-    },
-    ein: "12-3456789",
-    annualRevenue: "$100000-$5000000",
-    numberOfEmployees: "<10",
-    industry: "Housekeeping",
-    companyDocuments: [{
-        id: "d98ad8f6-4328-4151-9cc8-3694b7104444",
-        fileName: "document.pdf"
-    }, {
-        id: "d98ad8f6-4328-4151-9cc8-3694b7104444",
-        fileName: "document.pdf"
-    }, {
-        id: "d98ad8f6-4328-4151-9cc8-3694b710444s4",
-        fileName: "document.pdf"
-    }],
-    avatar: {
-        url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65qIxj7XlHTYOUsTX40vLGa5EuhKPBfirgg&usqp=CAU",
-        id: "d98ad8f6-4328-4151-9cc8-3694b7104444"
-    },
-    stakeholders: [{
-        address: {
-            addressLine1: "Sausage line",
-            addressLine2: "2a/1",
-            city: "NYC",
-            zip: "90210",
-            country: "USA",
-            state: "NY"
-        },
-        legalName: "John Doe",
-        dateOfBirth: "2000-01-01",
-        ssn: "12-345-6789",
-        domicile: {
-            type: "GREEN_CARD",
-            birthCountry: 'France',
-            citizenshipCountry: 'UK'
-
-        },
-        idScan: [{
-            id: "d98ad8f6-4328-4151-9cc8-3694b7104444",
-            fileName: "document.pdf"
-        }],
-        email: "john.doe@devkick.pl"
-    }],
-    companyType: isTrust ? "IRREVOCABLE" : "LLC"
-});
-
-type NetRange = {
-    from: string,
-    to: string
-}
 
 export const DraftAccount = {
     typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
@@ -375,11 +297,19 @@ export const DraftAccount = {
             getCorporateDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
-            }: SessionContext) => (corporateTrustMockResponse(false)),
+            }: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+                return api.readDraft(profileId, accountId, DraftAccountType.CORPORATE);
+            },
             getTrustDraftAccount: async (parent: any, {accountId}: any, {
                 profileId,
                 modules
-            }: SessionContext) => (corporateTrustMockResponse(true)),
+            }: SessionContext) => {
+                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+                return api.readDraft(profileId, accountId, DraftAccountType.TRUST);
+            },
         },
         Mutation: {
             createDraftAccount: async (parent: any, {type}: { type: DraftAccountType }, {
