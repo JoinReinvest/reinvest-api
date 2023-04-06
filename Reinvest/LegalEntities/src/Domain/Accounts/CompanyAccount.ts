@@ -34,6 +34,37 @@ export type CompanySchema = {
     einHash: string,
 }
 
+export type CompanyOverviewSchema = {
+    accountId: string,
+    profileId: string,
+    companyName: CompanyNameInput,
+    accountType: CompanyAccountType,
+    avatar: AvatarInput | null,
+}
+
+function getAccountLabel(accountType: CompanyAccountType, companyName: CompanyName | null): string {
+    if (companyName) {
+        return companyName.getLabel();
+    }
+
+    switch (accountType) {
+        case CompanyAccountType.CORPORATE:
+            return "Corporate Account";
+        case CompanyAccountType.TRUST:
+            return "Trust Account";
+        default:
+            return "Company Account";
+    }
+}
+
+function getAccountInitials(accountType: CompanyAccountType, companyName: CompanyName | null): string {
+    if (companyName) {
+        return companyName.getInitials();
+    }
+
+    return accountType.slice(0, 1).toUpperCase();
+}
+
 export class CompanyAccount {
     private profileId: string;
     private accountId: string;
@@ -140,6 +171,18 @@ export class CompanyAccount {
         return account;
     }
 
+    getId(): string {
+        return this.accountId;
+    }
+
+    getAccountType(): string {
+        return this.accountType;
+    }
+
+    getLabel(): string {
+        return getAccountLabel(this.accountType, this.companyName);
+    }
+
     setCompanyName(companyName: CompanyName) {
         this.companyName = companyName;
     }
@@ -149,7 +192,7 @@ export class CompanyAccount {
     }
 
     getInitials(): string {
-        return "I";
+        return getAccountInitials(this.accountType, this.companyName);
     }
 
     setAddress(address: Address) {
@@ -198,5 +241,73 @@ export class CompanyAccount {
 
     removeStakeholder(id: Uuid) {
         this.stakeholders?.removeStakeholder(id);
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
+    }
+}
+
+export class CompanyAccountOverview {
+    private profileId: string;
+    private accountId: string;
+    private companyName: CompanyName | null = null;
+    private avatar: Avatar | null = null;
+    private readonly accountType: CompanyAccountType;
+
+
+    constructor(profileId: string, accountId: string, accountType: CompanyAccountType) {
+        this.profileId = profileId;
+        this.accountId = accountId;
+        this.accountType = accountType;
+    }
+
+    static create(companyData: CompanyOverviewSchema): CompanyAccountOverview {
+        const {
+            profileId,
+            accountId,
+            companyName,
+            avatar,
+            accountType
+        } = companyData;
+        const account = new CompanyAccountOverview(profileId, accountId, accountType);
+
+        if (companyName) {
+            account.setCompanyName(CompanyName.create(companyName));
+        }
+
+        if (avatar) {
+            account.setAvatarDocument(Avatar.create(avatar));
+        }
+
+        return account;
+    }
+
+    getId(): string {
+        return this.accountId;
+    }
+
+    getAccountType(): string {
+        return this.accountType;
+    }
+
+    getLabel(): string {
+        return getAccountLabel(this.accountType, this.companyName);
+    }
+
+    setCompanyName(companyName: CompanyName) {
+        this.companyName = companyName;
+    }
+
+    setAvatarDocument(avatar: Avatar) {
+        this.avatar = avatar;
+    }
+
+    getInitials(): string {
+        return getAccountInitials(this.accountType, this.companyName);
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
     }
 }

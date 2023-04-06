@@ -5,7 +5,7 @@ import {
     CompleteDraftAccount,
     IndividualDraftAccountInput
 } from "LegalEntities/UseCases/CompleteDraftAccount";
-import {DraftAccountQuery, DraftQuery, DraftsList} from "LegalEntities/UseCases/DraftAccountQuery";
+import {DraftAccountQuery, DraftQuery, DraftsList} from "LegalEntities/Port/Api/DraftAccountQuery";
 import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
 import {ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";

@@ -12,7 +12,7 @@ import {
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {LegalEntitiesDraftAccount} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 import {Selectable} from "kysely";
-import {DraftsList} from "LegalEntities/UseCases/DraftAccountQuery";
+import {DraftsList} from "LegalEntities/Port/Api/DraftAccountQuery";
 
 export class DraftAccountRepository {
     public static getClassName = (): string => "DraftAccountRepository";

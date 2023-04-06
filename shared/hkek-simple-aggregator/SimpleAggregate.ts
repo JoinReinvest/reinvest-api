@@ -22,6 +22,9 @@ export class SimpleAggregate implements Aggregate {
     }
 
     protected getState(key: string, defaultValue: any = null) {
+        if (!('state' in this.aggregate)) {
+            this.aggregate.state = {};
+        }
         return key in this.aggregate.state ? this.aggregate.state[key] : defaultValue;
     }
 

@@ -57,7 +57,7 @@ class Profile extends SimpleAggregate {
             id: this.getId(),
             kind: "IndividualAccountOpened",
             data: {
-                individualAccountIds: [accountId]
+                individualAccountId: accountId
             }
         };
 

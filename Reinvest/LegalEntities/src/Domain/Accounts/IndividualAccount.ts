@@ -3,6 +3,9 @@ import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
 import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
 import {NetIncome, ValueRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
+import {PersonalName, PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
+
+const INDIVIDUAL_ACCOUNT_LABEL: string = "Individual account";
 
 export type IndividualSchema = {
     accountId: string,
@@ -12,6 +15,14 @@ export type IndividualSchema = {
     netWorth: ValueRangeInput | null,
     netIncome: ValueRangeInput | null,
     avatar: AvatarInput | null,
+    name?: PersonalNameInput | null
+}
+
+export type IndividualOverviewSchema = {
+    accountId: string,
+    profileId: string,
+    avatar: AvatarInput | null,
+    name?: PersonalNameInput | null
 }
 
 export class IndividualAccount {
@@ -22,6 +33,7 @@ export class IndividualAccount {
     private netWorth: NetWorth | null = null;
     private netIncome: NetIncome | null = null;
     private avatar: Avatar | null = null;
+    private name: PersonalName | null = null;
 
     constructor(profileId: string, accountId: string) {
         this.profileId = profileId;
@@ -73,7 +85,15 @@ export class IndividualAccount {
             account.setNetIncome(NetIncome.create(netIncome as ValueRangeInput));
         }
 
+        if (individualData.name) {
+            account.setName(PersonalName.create(individualData.name as PersonalNameInput));
+        }
+
         return account;
+    }
+
+    getId(): string {
+        return this.accountId;
     }
 
     setEmploymentStatus(employmentStatus: EmploymentStatus) {
@@ -96,7 +116,87 @@ export class IndividualAccount {
         this.netIncome = netIncome;
     }
 
+    setName(personalName: PersonalName) {
+        this.name = personalName;
+    }
+
     getInitials(): string {
+        if (this.name) {
+            return this.name.getInitials();
+        }
+
         return "I";
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
+    }
+
+    getLabel(): string {
+        if (this.name) {
+            return this.name.getLabel();
+        }
+
+        return INDIVIDUAL_ACCOUNT_LABEL;
+    }
+}
+
+export class IndividualAccountOverview {
+    private profileId: string;
+    private accountId: string;
+    private avatar: Avatar | null = null;
+    private name: PersonalName | null = null;
+
+    constructor(profileId: string, accountId: string) {
+        this.profileId = profileId;
+        this.accountId = accountId;
+    }
+
+    static create(individualData: IndividualOverviewSchema): IndividualAccountOverview {
+        const {profileId, accountId, avatar} = individualData;
+        const account = new IndividualAccountOverview(profileId, accountId);
+
+        if (avatar) {
+            account.setAvatar(Avatar.create(avatar as AvatarInput));
+        }
+
+        if (individualData.name) {
+            account.setName(PersonalName.create(individualData.name as PersonalNameInput));
+        }
+
+        return account;
+    }
+
+    getId(): string {
+        return this.accountId;
+    }
+
+    setAvatar(avatar: Avatar) {
+        this.avatar = avatar;
+    }
+
+
+    setName(personalName: PersonalName) {
+        this.name = personalName;
+    }
+
+    getInitials(): string {
+        if (this.name) {
+            return this.name.getInitials();
+        }
+
+        return "I";
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
+    }
+
+    getLabel(): string {
+        if (this.name) {
+            return this.name.getLabel();
+        }
+
+        return INDIVIDUAL_ACCOUNT_LABEL;
     }
 }

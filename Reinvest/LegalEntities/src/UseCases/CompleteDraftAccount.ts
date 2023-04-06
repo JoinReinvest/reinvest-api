@@ -89,7 +89,7 @@ export class CompleteDraftAccount {
                             break;
                         case 'avatar':
                             const {id} = data;
-                            draft.setAvatarDocument(Avatar.create({id, path: profileId}));
+                            draft.setAvatar(Avatar.create({id, path: profileId}));
                             break;
                         case 'employer':
                             draft.setEmployer(Employer.create(data))
@@ -183,7 +183,7 @@ export class CompleteDraftAccount {
                             break;
                         case 'avatar':
                             const {id} = data;
-                            draft.setAvatarDocument(Avatar.create({id, path: profileId}));
+                            draft.setAvatar(Avatar.create({id, path: profileId}));
                             break;
                         case 'companyDocuments':
                             data.map((document: { id: string, fileName: string }) => (

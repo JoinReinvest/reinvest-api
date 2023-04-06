@@ -70,4 +70,8 @@ export class PersonalName implements ToObject {
             'middleName': this.middleName.toString(),
         }
     }
+
+    getInitials() {
+        return this.firstName.toString().charAt(0) + this.lastName.toString().charAt(0);
+    }
 }

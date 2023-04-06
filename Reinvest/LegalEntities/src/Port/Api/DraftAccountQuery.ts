@@ -1,13 +1,13 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {
-    CompanyDraftAccountSchema,
-    DraftAccountState, DraftAccountType,
-    IndividualDraftAccountSchema
+    CompanyDraftAccountSchema, CorporateDraftAccount,
+    DraftAccountState, DraftAccountType, IndividualDraftAccount,
+    IndividualDraftAccountSchema, TrustDraftAccount
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
-import {AvatarOutput} from "LegalEntities/Port/Api/ReadAccountController";
 import {DocumentSchema} from "LegalEntities/Domain/ValueObject/Document";
 import {StakeholderInput, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
+import {AvatarOutput, AvatarQuery} from "LegalEntities/Port/Api/AvatarQuery";
 
 export type DraftQuery = {
     id: string,
@@ -29,24 +29,24 @@ export type DraftsList = {
 export class DraftAccountQuery {
     public static getClassName = (): string => "DraftAccountQuery";
     private draftAccountRepository: DraftAccountRepository;
-    private documents: DocumentsService;
+    private avatarQuery: AvatarQuery;
 
-    constructor(draftAccountRepository: DraftAccountRepository, documents: DocumentsService) {
+    constructor(draftAccountRepository: DraftAccountRepository, avatarQuery: AvatarQuery) {
         this.draftAccountRepository = draftAccountRepository;
-        this.documents = documents;
+        this.avatarQuery = avatarQuery;
     }
 
     async getDraftDetails(profileId: string, draftId: string, accountType: DraftAccountType): Promise<DraftQuery | null> {
         let draft = null;
         switch (accountType) {
             case DraftAccountType.INDIVIDUAL:
-                draft = await this.draftAccountRepository.getIndividualDraftForProfile(profileId, draftId);
+                draft = await this.draftAccountRepository.getIndividualDraftForProfile(profileId, draftId) as IndividualDraftAccount;
                 break;
             case DraftAccountType.CORPORATE:
-                draft = await this.draftAccountRepository.getCorporateDraftForProfile(profileId, draftId);
+                draft = await this.draftAccountRepository.getCorporateDraftForProfile(profileId, draftId) as CorporateDraftAccount;
                 break;
             case DraftAccountType.TRUST:
-                draft = await this.draftAccountRepository.getTrustDraftForProfile(profileId, draftId);
+                draft = await this.draftAccountRepository.getTrustDraftForProfile(profileId, draftId) as TrustDraftAccount;
                 break;
             default:
                 throw new Error('Unknown account type');
@@ -98,10 +98,7 @@ export class DraftAccountQuery {
             state: state,
             isCompleted: draft.verifyCompletion(),
             // @ts-ignore
-            avatar: {
-                ...await this.documents.getAvatarFileLink(data?.avatar ?? null),
-                initials: draft.getInitials()
-            },
+            avatar: await this.avatarQuery.getAvatarForDraft(draft),
             details: data
         }
     }

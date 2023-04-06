@@ -1,13 +1,23 @@
 import {
     legalEntitiesCompanyAccountTable,
     LegalEntitiesDatabaseAdapterProvider,
-    legalEntitiesIndividualAccountTable, legalEntitiesProfileTable,
+    legalEntitiesIndividualAccountTable,
+    legalEntitiesProfileTable,
 } from "LegalEntities/Adapter/Database/DatabaseAdapter";
 
-import {IndividualAccount, IndividualSchema} from "LegalEntities/Domain/Accounts/IndividualAccount";
+import {
+    IndividualAccount,
+    IndividualAccountOverview, IndividualOverviewSchema,
+    IndividualSchema
+} from "LegalEntities/Domain/Accounts/IndividualAccount";
 import {PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
 import {AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {CompanyAccount} from "LegalEntities/Domain/Accounts/CompanyAccount";
+import {
+    CompanyAccount,
+    CompanyAccountOverview,
+    CompanyOverviewSchema,
+    CompanySchema
+} from "LegalEntities/Domain/Accounts/CompanyAccount";
 import {EIN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 
 export type IndividualAccountForSynchronization = {
@@ -58,13 +68,22 @@ export class AccountRepository {
         }
     }
 
-    async findIndividualAccount(profileId: string, accountId: string): Promise<IndividualAccount | null> {
+    async findIndividualAccount(profileId: string): Promise<IndividualAccount | null> {
         try {
             const account = await this.databaseAdapterProvider.provide()
                 .selectFrom(legalEntitiesIndividualAccountTable)
-                .select(['accountId', 'profileId', 'employmentStatus', 'employer', 'netWorth', 'netIncome', 'avatar'])
-                .where("accountId", '=', accountId)
-                .where("profileId", '=', profileId)
+                .fullJoin(legalEntitiesProfileTable, `${legalEntitiesProfileTable}.profileId`, `${legalEntitiesIndividualAccountTable}.profileId`)
+                .select([
+                    `${legalEntitiesIndividualAccountTable}.accountId`,
+                    `${legalEntitiesIndividualAccountTable}.profileId`,
+                    `${legalEntitiesIndividualAccountTable}.employmentStatus`,
+                    `${legalEntitiesIndividualAccountTable}.employer`,
+                    `${legalEntitiesIndividualAccountTable}.netWorth`,
+                    `${legalEntitiesIndividualAccountTable}.netIncome`,
+                    `${legalEntitiesIndividualAccountTable}.avatar`
+                ])
+                .select([`${legalEntitiesProfileTable}.name`])
+                .where(`${legalEntitiesIndividualAccountTable}.profileId`, '=', profileId)
                 .limit(1)
                 .executeTakeFirstOrThrow();
 
@@ -75,18 +94,26 @@ export class AccountRepository {
         }
     }
 
-    async getAllIndividualAccounts(profileId: string): Promise<IndividualAccount[]> {
+    async findIndividualAccountOverview(profileId: string): Promise<IndividualAccountOverview | null> {
         try {
-            const accounts = await this.databaseAdapterProvider.provide()
+            const account = await this.databaseAdapterProvider.provide()
                 .selectFrom(legalEntitiesIndividualAccountTable)
-                .select(['accountId', 'avatar'])
-                .where("profileId", '=', profileId)
-                .execute();
+                .fullJoin(legalEntitiesProfileTable, `${legalEntitiesProfileTable}.profileId`, `${legalEntitiesIndividualAccountTable}.profileId`)
+                .select([
+                    `${legalEntitiesIndividualAccountTable}.accountId`,
+                    `${legalEntitiesIndividualAccountTable}.profileId`,
+                    `${legalEntitiesIndividualAccountTable}.avatar`
+                ])
+                .select([`${legalEntitiesProfileTable}.name`])
+                .where(`${legalEntitiesIndividualAccountTable}.profileId`, '=', profileId)
+                .limit(1)
+                .castTo<IndividualOverviewSchema>()
+                .executeTakeFirstOrThrow();
 
-            return accounts.map((account) => IndividualAccount.create(account as IndividualSchema));
+            return IndividualAccountOverview.create(account);
         } catch (error: any) {
             console.error(`Cannot find individual account: ${error.message}`);
-            return [];
+            return null;
         }
     }
 
@@ -204,5 +231,59 @@ export class AccountRepository {
             return false;
         }
 
+    }
+
+    async findCompanyAccount(profileId: string, accountId: string): Promise<CompanyAccount | null> {
+        try {
+            const account = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesCompanyAccountTable)
+                .select([
+                    "profileId",
+                    "accountId",
+                    "companyName",
+                    "address",
+                    "ein",
+                    "annualRevenue",
+                    "numberOfEmployees",
+                    "industry",
+                    "companyType",
+                    "avatar",
+                    "accountType",
+                    "companyDocuments",
+                    "stakeholders"
+                ])
+                .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
+                .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
+                .limit(1)
+                .castTo<CompanySchema>()
+                .executeTakeFirstOrThrow();
+
+            return CompanyAccount.create(account);
+        } catch (error: any) {
+            console.error(`Cannot find any company account: ${error.message}`);
+            return null;
+        }
+    }
+
+    async findCompanyAccountOverviews(profileId: string): Promise<CompanyAccountOverview[]> {
+        try {
+            const accounts = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesCompanyAccountTable)
+                .select([
+                    "accountId",
+                    "profileId",
+                    "companyName",
+                    "avatar",
+                    "accountType",
+                ])
+                .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
+                .castTo<CompanyOverviewSchema>()
+                .execute();
+
+            return accounts.map((account) => CompanyAccountOverview.create(account));
+        } catch (error: any) {
+            console.error(`Cannot find any company account: ${error.message}`);
+            return [];
+        }
     }
 }

@@ -12,6 +12,7 @@ import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import {LegalEntitiesDatabase} from "LegalEntities/Adapter/Database/DatabaseAdapter";
 import {IndividualAccount} from "LegalEntities/Domain/Accounts/IndividualAccount";
 import {CompanyAccount} from "LegalEntities/Domain/Accounts/CompanyAccount";
+import {ProfileRepository} from "LegalEntities/Adapter/Database/Repository/ProfileRepository";
 
 export class TransformDraftAccountIntoRegularAccount {
     public static getClassName = (): string => "TransformDraftAccountIntoRegularAccount";
@@ -19,21 +20,29 @@ export class TransformDraftAccountIntoRegularAccount {
     private investmentAccountService: InvestmentAccountsService;
     private accountRepository: AccountRepository;
     private transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>;
+    private profileRepository: ProfileRepository;
 
     constructor(
         draftAccountRepository: DraftAccountRepository,
         investmentAccountService: InvestmentAccountsService,
         accountRepository: AccountRepository,
-        transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>
+        transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>,
+        profileRepository: ProfileRepository,
     ) {
         this.draftAccountRepository = draftAccountRepository;
         this.investmentAccountService = investmentAccountService;
         this.accountRepository = accountRepository;
         this.transactionAdapter = transactionAdapter;
+        this.profileRepository = profileRepository;
     }
 
     async execute(profileId: string, draftAccountId: string): Promise<string | null> {
         try {
+            const profile = await this.profileRepository.findProfile(profileId);
+            if (profile === null || !profile.isCompleted()) {
+                throw new Error('PROFILE_NOT_COMPLETED');
+            }
+
             const draftAccount = await this.draftAccountRepository.getDraftForProfile<DraftAccount>(profileId, draftAccountId);
             if (!draftAccount.verifyCompletion()) {
                 throw new Error('DRAFT_NOT_COMPLETED');

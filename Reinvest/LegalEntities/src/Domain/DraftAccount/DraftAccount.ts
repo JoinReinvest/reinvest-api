@@ -151,8 +151,9 @@ export abstract class DraftAccount {
 
     abstract verifyCompletion(): boolean;
 
-
     abstract transformIntoAccount(): IndividualAccount | CompanyAccount;
+
+    abstract getAvatar(): Avatar | null;
 }
 
 export class IndividualDraftAccount extends DraftAccount {
@@ -181,7 +182,7 @@ export class IndividualDraftAccount extends DraftAccount {
         }
 
         if (data.avatar) {
-            draftAccount.setAvatarDocument(Avatar.create(data.avatar));
+            draftAccount.setAvatar(Avatar.create(data.avatar));
         }
 
         if (data.employer) {
@@ -247,8 +248,12 @@ export class IndividualDraftAccount extends DraftAccount {
         return true;
     }
 
-    setAvatarDocument(avatar: Avatar) {
+    setAvatar(avatar: Avatar) {
         this.avatar = avatar;
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
     }
 
     setEmployer(employer: Employer) {
@@ -314,7 +319,7 @@ export class CompanyDraftAccount extends DraftAccount {
         }
 
         if (data.avatar) {
-            draftAccount.setAvatarDocument(Avatar.create(data.avatar));
+            draftAccount.setAvatar(Avatar.create(data.avatar));
         }
 
         draftAccount.setDocuments(CompanyDocuments.create(data.companyDocuments ?? []));
@@ -410,8 +415,12 @@ export class CompanyDraftAccount extends DraftAccount {
         this.companyType = company;
     }
 
-    setAvatarDocument(avatar: Avatar) {
+    setAvatar(avatar: Avatar) {
         this.avatar = avatar;
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
     }
 
     setDocuments(documents: CompanyDocuments) {

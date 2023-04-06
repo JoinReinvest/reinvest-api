@@ -114,7 +114,7 @@ context("Given an investor created an individual draft account", () => {
         const path = 'e78cd92b-cb1b-4e20-83eb-1c2d421cee34';
         it("Then add an avatar", async () => {
             const input = {id: avatarId, path};
-            draftAccount.setAvatarDocument(Avatar.create(input))
+            draftAccount.setAvatar(Avatar.create(input))
             const {data} = draftAccount.toObject();
             const avatar = data?.avatar as AvatarInput;
 
@@ -126,7 +126,7 @@ context("Given an investor created an individual draft account", () => {
             const input = <AvatarInput>{path};
 
             expectThrows(
-                () => draftAccount.setAvatarDocument(Avatar.create(input)),
+                () => draftAccount.setAvatar(Avatar.create(input)),
                 "avatar:MISSING_MANDATORY_FIELDS"
             );
         });

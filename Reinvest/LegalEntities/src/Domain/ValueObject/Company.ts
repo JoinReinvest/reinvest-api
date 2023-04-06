@@ -68,7 +68,24 @@ export class CompanyName implements ToObject {
     }
 
     getInitials(): string {
-        return this.name.slice(0, 1).toUpperCase();
+        const name = this.name
+            .replace(/\+/g, '')
+            .replace(/[^\w\s]/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .trim()
+        ;
+
+        let initials = name.slice(0, 1).toUpperCase();
+        const words = name.split(" ");
+
+        if (words[1]) {
+            initials += words[1].slice(0, 1).toUpperCase();
+        }
+        return initials;
+    }
+
+    getLabel(): string {
+        return this.name;
     }
 }
 

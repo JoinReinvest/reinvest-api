@@ -10,13 +10,13 @@ import {SensitiveNumberInput, SensitiveNumberSchema, SSN} from "LegalEntities/Do
 import {PersonalName, PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
 import {DateOfBirth, DateOfBirthInput} from "LegalEntities/Domain/ValueObject/DateOfBirth";
 import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
-import {Domicile, DomicileInput} from "LegalEntities/Domain/ValueObject/Domicile";
+import {Domicile, DomicileInput, DomicileType} from "LegalEntities/Domain/ValueObject/Domicile";
 import {DocumentSchema, IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
 
 export type StakeholderSchema = {
     id: string,
     label: string;
-    ssn: SensitiveNumberSchema | string;
+    ssn: SensitiveNumberSchema;
     name: PersonalNameInput;
     dateOfBirth: DateOfBirthInput;
     address: AddressInput,
@@ -27,6 +27,16 @@ export type StakeholderSchema = {
 export type StakeholderInput = StakeholderSchema & {
     ssn: { ssn: string },
     idScan: { id: string, fileName: string }[],
+}
+
+export type StakeholderOutput = StakeholderInput & {
+    ssn: string,
+    domicile: {
+        type?: DomicileType,
+        birthCountry?: String,
+        citizenshipCountry?: String,
+        visaType?: String,
+    },
 }
 
 export class Stakeholder implements ToObject {
