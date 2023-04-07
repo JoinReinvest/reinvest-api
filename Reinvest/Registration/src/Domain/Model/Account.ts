@@ -39,9 +39,12 @@ export type StakeholderForSynchronization = {
     address: Address,
     domicile: DomicileType,
     idScan: DocumentSchema[],
+    accountType: AccountType,
 }
 
 export type CompanyForSynchronization = {
+    profileId: string;
+    accountId: string;
     ein: string | null,
     companyDocuments: DocumentSchema[],
     accountType: AccountType
@@ -49,8 +52,7 @@ export type CompanyForSynchronization = {
     companyName: {
         name: string,
     },
-    companyType: CompanyType,
-
+    companyType: { type: CompanyType },
 }
 
 export type CompanyAccountForSynchronization = {
@@ -62,6 +64,6 @@ export type CompanyAccountForSynchronization = {
         lastName: string,
     }
     address: Address,
-    companyType: CompanyType,
+    companyType: { type: CompanyType },
     stakeholders: { id: string }[],
 }

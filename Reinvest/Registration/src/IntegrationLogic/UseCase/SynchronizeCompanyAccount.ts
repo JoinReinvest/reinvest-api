@@ -26,9 +26,9 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
         this.vertaloSynchronizer = vertaloSynchronizer;
     }
 
-    async execute(record: MappedRecord): Promise<void> {
+    async execute(record: MappedRecord): Promise<boolean> {
         if (!record.isCompanyAccount() || !await this.lockExecution(record)) {
-            return;
+            return false;
         }
         try {
             console.log(`[START] Company account synchronization, recordId: ${record.getRecordId()}`);
@@ -45,6 +45,7 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
             if (northCapitalStatus) { //  && vertaloStatus
                 await this.setCleanAndUnlockExecution(record);
                 console.log(`[SUCCESS] Company account synchronized, recordId: ${record.getRecordId()}`);
+                return true;
             } else {
                 console.error(`[FAILED] Company account synchronization FAILED, recordId: ${record.getRecordId()}`);
                 await this.unlockExecution(record);
@@ -53,6 +54,8 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
             console.error(`[FAILED] Company account synchronization FAILED with error, recordId: ${record.getRecordId()}: ${error.message}`);
             await this.unlockExecution(record);
         }
+
+        return false;
     }
 
     private async synchronizeNorthCapital(record: MappedRecord, companyAccount: CompanyAccountForSynchronization): Promise<boolean> {
@@ -61,7 +64,7 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
             await this.northCapitalSynchronizer.synchronizeCompanyAccount(record.getRecordId(), northCapitalCompanyAccount);
             await this.northCapitalSynchronizer.synchronizeLinks(record.getRecordId(), northCapitalCompanyAccount.getLinksConfiguration());
 
-            console.log(`[North Capital SUCCESS] Individual account synchronized, recordId: ${record.getRecordId()}`);
+            console.log(`[North Capital SUCCESS] Company account synchronized, recordId: ${record.getRecordId()}`);
             return true;
         } catch (error: any) {
             console.error(`[North Capital FAILED] North Capital Company account synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);

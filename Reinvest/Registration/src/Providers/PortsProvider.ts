@@ -19,6 +19,7 @@ import {CompanyAccountOpenedEventHandler} from "Registration/Port/Queue/EventHan
 import {SynchronizeCompanyAccount} from "Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount";
 import {SynchronizationQuery} from "Registration/Port/Api/SynchronizationQuery";
 import {SynchronizationController} from "Registration/Port/Api/SynchronizationController";
+import {SynchronizeCompany} from "Registration/IntegrationLogic/UseCase/SynchronizeCompany";
 
 
 export class PortsProvider {
@@ -32,7 +33,13 @@ export class PortsProvider {
         // api
         container
             .addSingleton(SynchronizationQuery, [MappingRegistryRepository])
-            .addSingleton(SynchronizationController, [MappingRegistryRepository])
+            .addSingleton(SynchronizationController, [
+                MappingRegistryRepository,
+                SynchronizeProfile,
+                SynchronizeIndividualAccount,
+                SynchronizeCompanyAccount,
+                SynchronizeCompany
+            ])
             .addSingleton(NorthCapitalDocumentSynchronizationQuery, [NorthCapitalDocumentsSynchronizationRepository])
             .addSingleton(NorthCapitalDocumentSynchronizationController, [NorthCapitalSynchronizer])
         ;

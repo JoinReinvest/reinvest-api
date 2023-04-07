@@ -1,7 +1,7 @@
 import {CrcService} from "Registration/Domain/CrcService";
 import {
     NorthCapitalIndividualAccountType,
-    NorthCapitalIndividualExtendedMainPartyType,
+    NorthCapitalIndividualExtendedMainPartyStructure,
     NorthCapitalIndividualAccountStructure, NorthCapitalLink
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
@@ -104,7 +104,7 @@ export class NorthCapitalIndividualAccount {
         return this.data.profileId;
     }
 
-    getPartyData(): NorthCapitalIndividualExtendedMainPartyType {
+    getPartyData(): NorthCapitalIndividualExtendedMainPartyStructure {
         const party = <DictionaryType>{};
         for (const [key, value] of Object.entries(this.data.extendedParty)) {
             if (value !== null) {

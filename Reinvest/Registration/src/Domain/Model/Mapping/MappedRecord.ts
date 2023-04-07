@@ -68,7 +68,23 @@ export class MappedRecord {
         return this.mappedType === MappedType.CORPORATE_ACCOUNT || this.mappedType === MappedType.TRUST_ACCOUNT;
     }
 
+    isCompany() {
+        return this.mappedType === MappedType.COMPANY;
+    }
+
     getExternalId() {
         return this.externalId;
+    }
+
+    getMappedType() {
+        return this.mappedType;
+    }
+
+    isStakeholder() {
+        return this.mappedType === MappedType.STAKEHOLDER;
+    }
+
+    getDependentId() {
+        return this.dependentId;
     }
 }

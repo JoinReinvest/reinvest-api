@@ -15,7 +15,7 @@ export const CronVendorsSyncFunction = {
     },
     events: [
         {
-            schedule: "rate(1 minute)",
+            schedule: "rate(1 hour)",
         },
     ],
 };

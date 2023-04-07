@@ -1,16 +1,16 @@
 import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
 import {CrcService} from "Registration/Domain/CrcService";
-import {NorthCapitalMainPartyType} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
+import {NorthCapitalPartyStructure} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 import DateTime from "date-and-time";
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {DictionaryType} from "HKEKTypes/Generics";
 import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 
 export class MainParty {
-    private data: NorthCapitalMainPartyType;
+    private data: NorthCapitalPartyStructure;
     private crc: string;
 
-    constructor(data: NorthCapitalMainPartyType) {
+    constructor(data: NorthCapitalPartyStructure) {
         this.data = data;
         this.crc = this.generateCrc(data);
     }
@@ -38,7 +38,7 @@ export class MainParty {
         });
     }
 
-    private generateCrc(data: NorthCapitalMainPartyType): string {
+    private generateCrc(data: NorthCapitalPartyStructure): string {
         const values = [
             data.domicile ?? "",
             data.firstName,

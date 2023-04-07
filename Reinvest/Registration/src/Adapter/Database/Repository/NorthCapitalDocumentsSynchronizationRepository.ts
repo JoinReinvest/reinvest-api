@@ -34,7 +34,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
             documentPath: document.path,
             documentFilename: document.fileName,
             version: 0,
-            state: 'DIRTY',
+            state: DocumentSyncState.DIRTY,
             createdDate: new Date(),
             updatedDate: new Date(),
         }));

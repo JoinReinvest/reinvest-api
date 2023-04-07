@@ -310,7 +310,44 @@ const userRouter = () => {
 
     return router;
 }
+const syncRouter = () => {
+    const router = express.Router({mergeParams: true});
+    router.post("/sync-dirties", async (req: any, res: any) => {
+        try {
+            const modules = boot();
+            const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+            const ids = await registrationApi.listObjectsToSync();
+            if (ids.length === 0) {
+                res.status(404).json({
+                    status: false,
+                    message: "No dirty objects to synchronize",
+                });
 
+                return;
+            }
+            const statuses = [];
+            for (const id of ids) {
+                const syncStatus = await registrationApi.synchronize(id);
+                statuses.push({
+                    id: id,
+                    status: syncStatus,
+                });
+            }
+
+            res.status(200).json({
+                statuses,
+            });
+        } catch (e: any) {
+            console.log(e);
+            res.status(500).json({
+                status: false,
+                message: e.message,
+            });
+        }
+    });
+
+    return router;
+}
 const northCapitalRouter = () => {
     const router = express.Router({mergeParams: true});
     router.post("/get-profile", async (req: any, res: any) => {
@@ -469,5 +506,7 @@ const vertaloRouter = () => {
 router.use("/user", userRouter());
 router.use("/north-capital", northCapitalRouter());
 router.use("/vertalo", vertaloRouter());
+router.use("/sync", syncRouter());
+
 app.use("/tests", router);
 export const main = serverless(app);

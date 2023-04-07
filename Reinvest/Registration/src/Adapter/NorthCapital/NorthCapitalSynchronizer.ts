@@ -21,6 +21,7 @@ import {
 import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 import {RegistrationDocumentsService} from "Registration/Adapter/Modules/RegistrationDocumentsService";
 import {NorthCapitalCompanyAccount} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyAccount";
+import {NorthCapitalCompanyEntity} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyEntity";
 
 export class NorthCapitalSynchronizer {
     static getClassName = () => 'NorthCapitalSynchronizer';
@@ -100,12 +101,12 @@ export class NorthCapitalSynchronizer {
             throw new Error('Synchronization record is not found');
         }
 
-        const profileEntities = await this.northCapitalSynchronizationRepository.getAllProfileSynchronizationMapping(synchronizationRecord.getRecordId());
-        const synchronizedLinks = synchronizationRecord.getLinks();
+        const profileEntities = await this.northCapitalSynchronizationRepository.getAllProfileSynchronizationMapping(synchronizationRecord.getRecordId()); // all synced objects with North Capital
+        const synchronizedLinks = synchronizationRecord.getLinks(); // existing links
 
-        for (const link of linksConfiguration) {
+        for (const link of linksConfiguration) { // definition of what parties should be linked to the account
             const {mappingConfiguration, linkConfiguration} = link;
-            const existingSynchronizedLink = synchronizedLinks.find((synchronizedLink: NorthCapitalLinkMapping) => {
+            const existingSynchronizedLink = synchronizedLinks.find((synchronizedLink: NorthCapitalLinkMapping) => { // check if link already exists
                 return synchronizedLink.mapping.type === mappingConfiguration.type
                     && synchronizedLink.mapping.profileId === mappingConfiguration.profileId
                     && synchronizedLink.mapping.externalId === mappingConfiguration.externalId;
@@ -115,19 +116,23 @@ export class NorthCapitalSynchronizer {
                 continue;
             }
 
-            const existingSynchronizedEntity = profileEntities.find((entity: NorthCapitalSynchronizationMapping) => {
+            const existingSynchronizedEntity = profileEntities.find((entity: NorthCapitalSynchronizationMapping) => { // check if entity is already synced, so exists in North Capital
                 return entity.mapping.type === mappingConfiguration.type
                     && entity.mapping.profileId === mappingConfiguration.profileId
                     && entity.mapping.externalId === mappingConfiguration.externalId;
             });
 
-            if (!existingSynchronizedEntity) {
+            if (!existingSynchronizedEntity) { // entity not exists in North Capital
                 throw new Error('Entity is not synchronized');
             }
 
+            const linkedRecordIsAccount = mappingConfiguration?.thisIsAccountEntry; // check if entity is account or party, because account should always be a first entry in link
+            const accountId = linkedRecordIsAccount ? existingSynchronizedEntity.northCapitalId : synchronizationRecord.getNorthCapitalId();
+            const entityId = linkedRecordIsAccount ? synchronizationRecord.getNorthCapitalId() : existingSynchronizedEntity.northCapitalId;
+
             const linkId = await this.northCapitalAdapter.linkEntityToAccount(
-                existingSynchronizedEntity.northCapitalId,
-                synchronizationRecord.getNorthCapitalId(),
+                entityId,
+                accountId,
                 linkConfiguration
             );
 
@@ -136,6 +141,50 @@ export class NorthCapitalSynchronizer {
 
         await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
     }
+
+    // public async linkMainParty(recordId: string) {
+    //     let mainPartyId =
+    //     let record = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
+    //     if (record === null) {
+    //         throw new Error('Synchronization record is not found');
+    //     }
+    //
+    //     const profileEntities = await this.northCapitalSynchronizationRepository.getAllProfileSynchronizationMapping(record.getRecordId());
+    //     const synchronizedLinks = record.getLinks();
+    //
+    //     for (const link of linksConfiguration) {
+    //         const {mappingConfiguration, linkConfiguration} = link;
+    //         const existingSynchronizedLink = synchronizedLinks.find((synchronizedLink: NorthCapitalLinkMapping) => {
+    //             return synchronizedLink.mapping.type === mappingConfiguration.type
+    //                 && synchronizedLink.mapping.profileId === mappingConfiguration.profileId
+    //                 && synchronizedLink.mapping.externalId === mappingConfiguration.externalId;
+    //         });
+    //
+    //         if (existingSynchronizedLink) {
+    //             continue;
+    //         }
+    //
+    //         const existingSynchronizedEntity = profileEntities.find((entity: NorthCapitalSynchronizationMapping) => {
+    //             return entity.mapping.type === mappingConfiguration.type
+    //                 && entity.mapping.profileId === mappingConfiguration.profileId
+    //                 && entity.mapping.externalId === mappingConfiguration.externalId;
+    //         });
+    //
+    //         if (!existingSynchronizedEntity) {
+    //             throw new Error('Entity is not synchronized');
+    //         }
+    //
+    //         const linkId = await this.northCapitalAdapter.linkEntityToAccount(
+    //             existingSynchronizedEntity.northCapitalId,
+    //             record.getNorthCapitalId(),
+    //             linkConfiguration
+    //         );
+    //
+    //         record.addLink(linkId, existingSynchronizedEntity.northCapitalId, mappingConfiguration);
+    //     }
+    //
+    //     await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(record);
+    // }
 
     async synchronizeDocument(documentId: string): Promise<boolean> {
         let document = await this.northCapitalDocumentSynchronizationRepository.getDocumentToSync(documentId);
@@ -148,9 +197,9 @@ export class NorthCapitalSynchronizer {
 
             if (await this.checkIfFileExistsInNorthCapital(northCapitalId, documentId)) {
                 console.log(`Document ${documentId} already exists in North Capital for ${northCapitalType} ${northCapitalId}`);
-            } else if (northCapitalType === NorthCapitalObjectType.PARTY) {
+            } else if (northCapitalType === NorthCapitalObjectType.PARTY || northCapitalType === NorthCapitalObjectType.ENTITY) {
                 const {url} = await this.documentService.getDocumentFileLink(documentId, documentPath);
-                await this.northCapitalAdapter.uploadPartyDocument(northCapitalId, url, documentFilename, documentId);
+                await this.northCapitalAdapter.uploadPartyDocument(northCapitalId, url, documentFilename, documentId, northCapitalType);
             }
 
             return await this.northCapitalDocumentSynchronizationRepository.setClean(document);
@@ -197,6 +246,32 @@ export class NorthCapitalSynchronizer {
                 }
 
                 synchronizationRecord.setCrc(northCapitalCompanyAccount.getCrc());
+                await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
+            }
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+    }
+
+    async synchronizeCompanyEntity(recordId: string, northCapitalCompanyEntity: NorthCapitalCompanyEntity) {
+        try {
+            let synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
+
+            if (synchronizationRecord === null) {
+                const companyEntityId = await this.northCapitalAdapter.createEntity(northCapitalCompanyEntity.getEntityData());
+                await this.northCapitalSynchronizationRepository.createSynchronizationRecord(recordId, companyEntityId, northCapitalCompanyEntity.getCrc(), NorthCapitalEntityType.ENTITY);
+                await this.addDocuments(recordId, companyEntityId, NorthCapitalObjectType.ENTITY, northCapitalCompanyEntity.getDocuments());
+            } else if (synchronizationRecord.isOutdated(northCapitalCompanyEntity.getCrc())) {
+
+                if (northCapitalCompanyEntity.isOutdatedEntity(synchronizationRecord.getCrc())) {
+                    await this.northCapitalAdapter.updateEntity(synchronizationRecord.getNorthCapitalId(), northCapitalCompanyEntity.getEntityData());
+                }
+
+                if (northCapitalCompanyEntity.isOutdatedDocuments(synchronizationRecord.getCrc())) {
+                    await this.addDocuments(recordId, synchronizationRecord.getNorthCapitalId(), NorthCapitalObjectType.ENTITY, northCapitalCompanyEntity.getDocuments());
+                }
+
+                synchronizationRecord.setCrc(northCapitalCompanyEntity.getCrc());
                 await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
             }
         } catch (error: any) {

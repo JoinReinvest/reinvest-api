@@ -1,7 +1,7 @@
 import {CrcService} from "Registration/Domain/CrcService";
 import {
     NorthCapitalIndividualAccountType,
-    NorthCapitalIndividualExtendedMainPartyType,
+    NorthCapitalIndividualExtendedMainPartyStructure,
     NorthCapitalIndividualAccountStructure,
     NorthCapitalLink,
     NorthCapitalCompanyAccountType,
@@ -37,7 +37,7 @@ export class NorthCapitalCompanyAccount {
             account: {
                 accountRegistration: ownerName,
                 type: "Entity",
-                entityType: NorthCapitalMapper.mapCompanyType(data.companyType),
+                entityType: NorthCapitalMapper.mapCompanyType(data.companyType.type),
                 streetAddress1: data.address.addressLine1,
                 streetAddress2: data.address?.addressLine2,
                 city: data.address.city,

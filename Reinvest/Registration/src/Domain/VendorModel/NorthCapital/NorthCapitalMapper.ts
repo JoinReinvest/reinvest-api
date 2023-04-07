@@ -1,6 +1,10 @@
 import {ProfileForSynchronization} from "Registration/Domain/Model/Profile";
 import {MainParty} from "Registration/Domain/VendorModel/NorthCapital/MainParty";
-import {CompanyAccountForSynchronization, IndividualAccountForSynchronization} from "Registration/Domain/Model/Account";
+import {
+    CompanyAccountForSynchronization,
+    CompanyForSynchronization,
+    IndividualAccountForSynchronization, StakeholderForSynchronization
+} from "Registration/Domain/Model/Account";
 import {
     NorthCapitalIndividualAccount
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalIndividualAccount";
@@ -10,18 +14,28 @@ import {
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 import {CompanyType, DomicileType, EmploymentStatusType} from "Registration/Domain/Model/ReinvestTypes";
 import {NorthCapitalCompanyAccount} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyAccount";
+import {NorthCapitalCompanyEntity} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyEntity";
+import {NorthCapitalStakeholderParty} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalStakeholderParty";
 
 export class NorthCapitalMapper {
     static mapProfile(profile: ProfileForSynchronization, email: string): MainParty {
         return MainParty.createFromProfileForSynchronization(profile, email);
     }
 
-    static mapIndividualAccount(individualAccount: IndividualAccountForSynchronization) {
+    static mapIndividualAccount(individualAccount: IndividualAccountForSynchronization): NorthCapitalIndividualAccount {
         return NorthCapitalIndividualAccount.createFromIndividualAccountForSynchronization(individualAccount);
     }
 
-    static mapCompanyAccount(companyAccount: CompanyAccountForSynchronization) {
+    static mapCompanyAccount(companyAccount: CompanyAccountForSynchronization): NorthCapitalCompanyAccount {
         return NorthCapitalCompanyAccount.createFromCompanyAccountForSynchronization(companyAccount);
+    }
+
+    static mapCompany(company: CompanyForSynchronization, email: string): NorthCapitalCompanyEntity {
+        return NorthCapitalCompanyEntity.createFromCompanyForSynchronization(company, email);
+    }
+
+    static mapStakeholder(stakeholder: StakeholderForSynchronization, email: string): NorthCapitalStakeholderParty {
+        return NorthCapitalStakeholderParty.createFromStakeholderForSynchronization(stakeholder, email);
     }
 
     static mapDomicile(domicile: DomicileType): NorthCapitalDomicile | null {

@@ -65,6 +65,7 @@ export type StakeholderForSynchronization = StakeholderOutput & {
     domicile: DomicileType,
     idScan: DocumentSchema[],
     dateOfBirth: string;
+    accountType: string;
 }
 
 export class AccountRepository {
@@ -411,6 +412,7 @@ export class AccountRepository {
                 .select([
                     `${legalEntitiesCompanyAccountTable}.accountId`,
                     `${legalEntitiesCompanyAccountTable}.profileId`,
+                    `${legalEntitiesCompanyAccountTable}.accountType`,
                     `${legalEntitiesCompanyAccountTable}.stakeholders`,
                 ])
                 .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
@@ -428,6 +430,7 @@ export class AccountRepository {
             return {
                 accountId: account.accountId as string,
                 profileId: account.profileId as string,
+                accountType: account.accountType as string,
                 ...stakeholder,
                 // @ts-ignore
                 domicile: stakeholder.domicile.type,
