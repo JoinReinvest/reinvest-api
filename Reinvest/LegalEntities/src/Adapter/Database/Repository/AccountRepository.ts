@@ -19,7 +19,7 @@ import {
     CompanyOverviewSchema,
     CompanySchema
 } from "LegalEntities/Domain/Accounts/CompanyAccount";
-import {EIN, SensitiveNumberSchema} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {EIN, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {CompanyNameInput, CompanyTypeInput} from "LegalEntities/Domain/ValueObject/Company";
 import {DocumentSchema} from "LegalEntities/Domain/ValueObject/Document";
 import {StakeholderOutput, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
@@ -66,6 +66,7 @@ export type StakeholderForSynchronization = StakeholderOutput & {
     idScan: DocumentSchema[],
     dateOfBirth: string;
     accountType: string;
+    ssn: string | null
 }
 
 export class AccountRepository {
@@ -426,6 +427,15 @@ export class AccountRepository {
             if (!stakeholder) {
                 return null;
             }
+            let ssn = null;
+            if (stakeholder.ssn) {
+                try {
+                    const ssnObject = SSN.create(stakeholder.ssn as unknown as SensitiveNumberSchema);
+                    ssn = ssnObject.decrypt();
+                } catch (error: any) {
+                    console.warn(`Cannot decrypt SSN: ${error.message}`);
+                }
+            }
 
             return {
                 accountId: account.accountId as string,
@@ -436,6 +446,8 @@ export class AccountRepository {
                 domicile: stakeholder.domicile.type,
                 // @ts-ignore
                 dateOfBirth: stakeholder.dateOfBirth.dateOfBirth,
+                // @ts-ignore
+                ssn
             }
         } catch (error: any) {
             return null;

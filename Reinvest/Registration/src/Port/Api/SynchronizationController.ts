@@ -4,6 +4,7 @@ import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {SynchronizeProfile} from "Registration/IntegrationLogic/UseCase/SynchronizeProfile";
 import {SynchronizeIndividualAccount} from "Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount";
 import {SynchronizeCompanyAccount} from "Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount";
+import {SynchronizeStakeholder} from "Registration/IntegrationLogic/UseCase/SynchronizeStakeholder";
 
 export class SynchronizationController {
     public static getClassName = (): string => "SynchronizationController";
@@ -12,18 +13,21 @@ export class SynchronizationController {
     private synchronizeIndividualAccountUseCase: SynchronizeIndividualAccount;
     private synchronizeCompanyAccountUseCase: SynchronizeCompanyAccount;
     private synchronizeCompanyUseCase: SynchronizeCompany;
+    private synchronizeStakeholderUseCase: SynchronizeStakeholder;
 
     constructor(mappingRegistryRepository: MappingRegistryRepository,
                 synchronizeProfileUseCase: SynchronizeProfile,
                 synchronizeIndividualAccountUseCase: SynchronizeIndividualAccount,
                 synchronizeCompanyAccountUseCase: SynchronizeCompanyAccount,
-                synchronizeCompanyUseCase: SynchronizeCompany
+                synchronizeCompanyUseCase: SynchronizeCompany,
+                synchronizeStakeholderUseCase: SynchronizeStakeholder
     ) {
         this.synchronizeProfileUseCase = synchronizeProfileUseCase;
         this.synchronizeIndividualAccountUseCase = synchronizeIndividualAccountUseCase;
         this.synchronizeCompanyAccountUseCase = synchronizeCompanyAccountUseCase;
         this.mappingRegistryRepository = mappingRegistryRepository;
         this.synchronizeCompanyUseCase = synchronizeCompanyUseCase;
+        this.synchronizeStakeholderUseCase = synchronizeStakeholderUseCase;
     }
 
     public async synchronize(recordId: string): Promise<boolean> {
@@ -35,7 +39,7 @@ export class SynchronizationController {
             case MappedType.COMPANY:
                 return await this.synchronizeCompanyUseCase.execute(record);
             case MappedType.STAKEHOLDER:
-                return true;
+                return await this.synchronizeStakeholderUseCase.execute(record);
             case MappedType.PROFILE:
                 return await this.synchronizeProfileUseCase.execute(record);
             case MappedType.INDIVIDUAL_ACCOUNT:

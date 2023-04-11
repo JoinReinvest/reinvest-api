@@ -22,6 +22,7 @@ import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 import {RegistrationDocumentsService} from "Registration/Adapter/Modules/RegistrationDocumentsService";
 import {NorthCapitalCompanyAccount} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyAccount";
 import {NorthCapitalCompanyEntity} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyEntity";
+import {NorthCapitalStakeholderParty} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalStakeholderParty";
 
 export class NorthCapitalSynchronizer {
     static getClassName = () => 'NorthCapitalSynchronizer';
@@ -44,17 +45,23 @@ export class NorthCapitalSynchronizer {
 
     async synchronizeMainParty(recordId: string, mainParty: MainParty): Promise<void> {
         const synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
-        const documents = mainParty.getDocuments();
 
         if (synchronizationRecord === null) {
             const partyId = await this.northCapitalAdapter.createParty(mainParty.getPartyData());
             await this.northCapitalSynchronizationRepository.createSynchronizationRecord(recordId, partyId, mainParty.getCrc(), NorthCapitalEntityType.PARTY);
-            await this.addDocuments(recordId, partyId, NorthCapitalObjectType.PARTY, documents);
+            await this.addDocuments(recordId, partyId, NorthCapitalObjectType.PARTY, mainParty.getDocuments());
+
         } else if (synchronizationRecord.isOutdated(mainParty.getCrc())) {
-            await this.northCapitalAdapter.updateParty(synchronizationRecord.getNorthCapitalId(), mainParty.getPartyData());
+            if (mainParty.isPartyOutdated(synchronizationRecord.getCrc())) {
+                await this.northCapitalAdapter.updateParty(synchronizationRecord.getNorthCapitalId(), mainParty.getPartyData());
+            }
+
+            if (mainParty.isDocumentsOutdated(synchronizationRecord.getCrc())) {
+                await this.addDocuments(recordId, synchronizationRecord.getNorthCapitalId(), NorthCapitalObjectType.PARTY, mainParty.getDocuments());
+            }
+
             synchronizationRecord.setCrc(mainParty.getCrc());
             await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
-            await this.addDocuments(recordId, synchronizationRecord.getNorthCapitalId(), NorthCapitalObjectType.PARTY, documents);
         }
     }
 
@@ -141,50 +148,6 @@ export class NorthCapitalSynchronizer {
 
         await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
     }
-
-    // public async linkMainParty(recordId: string) {
-    //     let mainPartyId =
-    //     let record = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
-    //     if (record === null) {
-    //         throw new Error('Synchronization record is not found');
-    //     }
-    //
-    //     const profileEntities = await this.northCapitalSynchronizationRepository.getAllProfileSynchronizationMapping(record.getRecordId());
-    //     const synchronizedLinks = record.getLinks();
-    //
-    //     for (const link of linksConfiguration) {
-    //         const {mappingConfiguration, linkConfiguration} = link;
-    //         const existingSynchronizedLink = synchronizedLinks.find((synchronizedLink: NorthCapitalLinkMapping) => {
-    //             return synchronizedLink.mapping.type === mappingConfiguration.type
-    //                 && synchronizedLink.mapping.profileId === mappingConfiguration.profileId
-    //                 && synchronizedLink.mapping.externalId === mappingConfiguration.externalId;
-    //         });
-    //
-    //         if (existingSynchronizedLink) {
-    //             continue;
-    //         }
-    //
-    //         const existingSynchronizedEntity = profileEntities.find((entity: NorthCapitalSynchronizationMapping) => {
-    //             return entity.mapping.type === mappingConfiguration.type
-    //                 && entity.mapping.profileId === mappingConfiguration.profileId
-    //                 && entity.mapping.externalId === mappingConfiguration.externalId;
-    //         });
-    //
-    //         if (!existingSynchronizedEntity) {
-    //             throw new Error('Entity is not synchronized');
-    //         }
-    //
-    //         const linkId = await this.northCapitalAdapter.linkEntityToAccount(
-    //             existingSynchronizedEntity.northCapitalId,
-    //             record.getNorthCapitalId(),
-    //             linkConfiguration
-    //         );
-    //
-    //         record.addLink(linkId, existingSynchronizedEntity.northCapitalId, mappingConfiguration);
-    //     }
-    //
-    //     await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(record);
-    // }
 
     async synchronizeDocument(documentId: string): Promise<boolean> {
         let document = await this.northCapitalDocumentSynchronizationRepository.getDocumentToSync(documentId);
@@ -276,6 +239,28 @@ export class NorthCapitalSynchronizer {
             }
         } catch (error: any) {
             throw new Error(error.message);
+        }
+    }
+
+    async synchronizeStakeholderParty(recordId: string, stakeholder: NorthCapitalStakeholderParty): Promise<void> {
+        const synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
+
+        if (synchronizationRecord === null) {
+            const partyId = await this.northCapitalAdapter.createParty(stakeholder.getPartyData());
+            await this.northCapitalSynchronizationRepository.createSynchronizationRecord(recordId, partyId, stakeholder.getCrc(), NorthCapitalEntityType.PARTY);
+            await this.addDocuments(recordId, partyId, NorthCapitalObjectType.PARTY, stakeholder.getDocuments());
+
+        } else if (synchronizationRecord.isOutdated(stakeholder.getCrc())) {
+            if (stakeholder.isPartyOutdated(synchronizationRecord.getCrc())) {
+                await this.northCapitalAdapter.updateParty(synchronizationRecord.getNorthCapitalId(), stakeholder.getPartyData());
+            }
+
+            if (stakeholder.isDocumentsOutdated(synchronizationRecord.getCrc())) {
+                await this.addDocuments(recordId, synchronizationRecord.getNorthCapitalId(), NorthCapitalObjectType.PARTY, stakeholder.getDocuments());
+            }
+
+            synchronizationRecord.setCrc(stakeholder.getCrc());
+            await this.northCapitalSynchronizationRepository.updateSynchronizationRecord(synchronizationRecord);
         }
     }
 }

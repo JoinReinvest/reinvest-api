@@ -42,7 +42,6 @@ export type NorthCapitalPartyStructure = {
     primCountry: string,
     emailAddress: string,
     socialSecurityNumber: string | null,
-    documents: DocumentSchema[],
 }
 
 export type NorthCapitalEntityStructure = {
@@ -132,9 +131,15 @@ export type NorthCapitalCompanyEntityType = {
     links: NorthCapitalLink[]
 }
 
+export type NorthCapitalMainPartyType = {
+    party: NorthCapitalPartyStructure,
+    documents: DocumentSchema[],
+}
+
 export type NorthCapitalCompanyStakeholderType = {
     profileId: string,
     party: NorthCapitalPartyStructure,
+    documents: DocumentSchema[],
     links: NorthCapitalLink[]
 }
 

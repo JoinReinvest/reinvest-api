@@ -50,12 +50,11 @@ export class SynchronizeStakeholder extends AbstractSynchronize {
     private async synchronizeNorthCapital(record: MappedRecord, stakeholder: StakeholderForSynchronization): Promise<boolean> {
         try {
             const northCapitalStakeholderParty = NorthCapitalMapper.mapStakeholder(stakeholder, record.getEmail());
-            // todo sync stakeholder party and its documents
-            // await this.northCapitalSynchronizer.synchronizeStakeholderParty(record.getRecordId(), northCapitalStakeholderParty);
-            // await this.northCapitalSynchronizer.synchronizeLinks(record.getRecordId(), northCapitalStakeholderParty.getLinksConfiguration());
+            await this.northCapitalSynchronizer.synchronizeStakeholderParty(record.getRecordId(), northCapitalStakeholderParty);
+            await this.northCapitalSynchronizer.synchronizeLinks(record.getRecordId(), northCapitalStakeholderParty.getLinksConfiguration());
 
             console.log(`[North Capital SUCCESS] Stakeholder synchronized, recordId: ${record.getRecordId()}`);
-            return false;
+            return true;
         } catch (error: any) {
             console.error(`[North Capital FAILED] North Capital Stakeholder synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
             return false;

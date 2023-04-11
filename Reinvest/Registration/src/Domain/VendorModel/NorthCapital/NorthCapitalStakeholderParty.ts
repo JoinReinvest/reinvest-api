@@ -1,11 +1,10 @@
 import {CrcService} from "Registration/Domain/CrcService";
 import {
-    NorthCapitalCompanyEntityType, NorthCapitalCompanyStakeholderType,
-    NorthCapitalEntityStructure,
-    NorthCapitalLink
+    NorthCapitalCompanyStakeholderType,
+    NorthCapitalLink, NorthCapitalPartyStructure
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
-import {CompanyForSynchronization, StakeholderForSynchronization,} from "Registration/Domain/Model/Account";
+import {StakeholderForSynchronization} from "Registration/Domain/Model/Account";
 import {DictionaryType} from "HKEKTypes/Generics";
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {AccountType, DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
@@ -14,14 +13,13 @@ import DateTime from "date-and-time";
 
 export class NorthCapitalStakeholderParty {
     private readonly data: NorthCapitalCompanyStakeholderType;
-    // private entityCrc: string;
-    // private documentsCrc: string;
+    private partyCrc: string;
+    private documentsCrc: string;
 
     constructor(data: NorthCapitalCompanyStakeholderType) {
         this.data = data;
-        // todo finish mapping stakeholder party!!
-        // this.entityCrc = this.generateEntityCrc(data.entity);
-        // this.documentsCrc = this.generateDocumentsCrc(data.documents);
+        this.partyCrc = this.generatePartyCrc(data.party);
+        this.documentsCrc = this.generateDocumentsCrc(data.documents);
     }
 
     static createFromStakeholderForSynchronization(data: StakeholderForSynchronization, email: string): NorthCapitalStakeholderParty | never {
@@ -45,8 +43,8 @@ export class NorthCapitalStakeholderParty {
                 primCountry: data.address.country,
                 emailAddress: email,
                 socialSecurityNumber: data.ssn ?? null,
-                documents: data.idScan,
             },
+            documents: data.idScan,
             links: [
                 {
                     mappingConfiguration: {
@@ -65,16 +63,20 @@ export class NorthCapitalStakeholderParty {
         });
     }
 
-    private generateEntityCrc(data: NorthCapitalEntityStructure): string {
+    private generatePartyCrc(data: NorthCapitalPartyStructure): string {
         const values = [
-            data.entityName,
+            data.domicile ?? "",
+            data.firstName,
+            data.middleInitial ?? "",
+            data.lastName,
+            data.dob,
             data.primAddress1,
             data.primAddress2 ?? "",
             data.primCity,
             data.primState,
             data.primZip,
             data.primCountry,
-            data.entityType ?? "",
+            data.emailAddress,
         ];
 
         return CrcService.generateCrc(values);
@@ -83,8 +85,8 @@ export class NorthCapitalStakeholderParty {
 
     getCrc(): string {
         return JSON.stringify({
-            entity: this.entityCrc,
-            documents: this.documentsCrc,
+            party: this.partyCrc,
+            documentsCrc: this.documentsCrc
         });
     }
 
@@ -92,10 +94,10 @@ export class NorthCapitalStakeholderParty {
         return this.data.profileId;
     }
 
-    getEntityData(): DictionaryType {
+    getPartyData(): DictionaryType {
         const entity = <DictionaryType>{};
-        for (const [key, value] of Object.entries(this.data.entity)) {
-            if (value !== null || value !== "") {
+        for (const [key, value] of Object.entries(this.data.party)) {
+            if (value !== null && value !== "") {
                 entity[key] = value;
             }
         }
@@ -107,20 +109,36 @@ export class NorthCapitalStakeholderParty {
         return this.data.links;
     }
 
-    isOutdatedEntity(crc: string): boolean {
-        return this.entityCrc !== JSON.parse(crc)?.entity;
+    isPartyOutdated(crc: string): boolean {
+        try {
+            const data = JSON.parse(crc);
+            return this.partyCrc !== data?.partyCrc;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
     }
 
-    isOutdatedDocuments(crc: string): boolean {
-        return this.documentsCrc !== JSON.parse(crc)?.documents;
+    isDocumentsOutdated(crc: string): boolean {
+        try {
+            const data = JSON.parse(crc);
+            return this.documentsCrc !== data?.documentsCrc;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
     }
 
     getDocuments(): DocumentSchema[] {
         return this.data.documents;
     }
 
-    private generateDocumentsCrc(documents: DocumentSchema[]): string {
-        const values = documents.map(document => document.id);
+    private generateDocumentsCrc(documents: DocumentSchema[]) {
+        const values = [
+            documents
+                .map((document: DocumentSchema) => `${document.id}/${document.path}/${document.fileName}`)
+                .join(",") ?? "",
+        ];
 
         return CrcService.generateCrc(values);
     }

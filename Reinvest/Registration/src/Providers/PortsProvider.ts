@@ -20,6 +20,7 @@ import {SynchronizeCompanyAccount} from "Registration/IntegrationLogic/UseCase/S
 import {SynchronizationQuery} from "Registration/Port/Api/SynchronizationQuery";
 import {SynchronizationController} from "Registration/Port/Api/SynchronizationController";
 import {SynchronizeCompany} from "Registration/IntegrationLogic/UseCase/SynchronizeCompany";
+import {SynchronizeStakeholder} from "Registration/IntegrationLogic/UseCase/SynchronizeStakeholder";
 
 
 export class PortsProvider {
@@ -38,7 +39,8 @@ export class PortsProvider {
                 SynchronizeProfile,
                 SynchronizeIndividualAccount,
                 SynchronizeCompanyAccount,
-                SynchronizeCompany
+                SynchronizeCompany,
+                SynchronizeStakeholder
             ])
             .addSingleton(NorthCapitalDocumentSynchronizationQuery, [NorthCapitalDocumentsSynchronizationRepository])
             .addSingleton(NorthCapitalDocumentSynchronizationController, [NorthCapitalSynchronizer])

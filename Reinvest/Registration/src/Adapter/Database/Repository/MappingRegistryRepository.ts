@@ -11,7 +11,6 @@ import {
 import {MappedRecordStatus, MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {EmailCreator} from "Registration/Domain/EmailCreator";
 import {MappedRecord, MappedRecordType} from "Registration/Domain/Model/Mapping/MappedRecord";
-import {DocumentSyncState} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
 const LOCK_TIME_SECONDS = 30;
 export const EMPTY_UUID = "00000000-0000-0000-0000-000000000000";
@@ -56,7 +55,7 @@ export class MappingRegistryRepository {
     async getRecordByProfileAndExternalId(profileId: string, externalId: string, dependentId: string): Promise<MappedRecord> {
         const data = await this.databaseAdapterProvider.provide()
             .selectFrom(registrationMappingRegistryTable)
-            .select(['recordId', 'profileId', 'externalId', 'mappedType', 'email', 'status', 'version'])
+            .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
             .where('profileId', '=', profileId)
             .where('externalId', '=', externalId)
             .where('dependentId', '=', dependentId)
@@ -69,7 +68,7 @@ export class MappingRegistryRepository {
     async getRecordById(recordId: string): Promise<MappedRecord> {
         const data = await this.databaseAdapterProvider.provide()
             .selectFrom(registrationMappingRegistryTable)
-            .select(['recordId', 'profileId', 'externalId', 'mappedType', 'email', 'status', 'version'])
+            .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
             .where('recordId', '=', recordId)
             .limit(1)
             .executeTakeFirstOrThrow() as SelectableMappedRecord as MappedRecordType;

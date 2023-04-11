@@ -90,7 +90,7 @@ export class NorthCapitalCompanyEntity {
     getEntityData(): DictionaryType {
         const entity = <DictionaryType>{};
         for (const [key, value] of Object.entries(this.data.entity)) {
-            if (value !== null || value !== "") {
+            if (value !== null && value !== "") {
                 entity[key] = value;
             }
         }
@@ -103,11 +103,21 @@ export class NorthCapitalCompanyEntity {
     }
 
     isOutdatedEntity(crc: string): boolean {
-        return this.entityCrc !== JSON.parse(crc)?.entity;
+        try {
+            return this.entityCrc !== JSON.parse(crc)?.entity;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
     }
 
     isOutdatedDocuments(crc: string): boolean {
-        return this.documentsCrc !== JSON.parse(crc)?.documents;
+        try {
+            return this.documentsCrc !== JSON.parse(crc)?.documents;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
     }
 
     getDocuments(): DocumentSchema[] {

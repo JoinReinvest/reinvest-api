@@ -107,7 +107,7 @@ export class NorthCapitalIndividualAccount {
     getPartyData(): NorthCapitalIndividualExtendedMainPartyStructure {
         const party = <DictionaryType>{};
         for (const [key, value] of Object.entries(this.data.extendedParty)) {
-            if (value !== null) {
+            if (value !== null && value !== "") {
                 party[key] = value;
             }
         }
@@ -124,10 +124,21 @@ export class NorthCapitalIndividualAccount {
     }
 
     isOutdatedAccount(crc: string): boolean {
-        return this.accountCrc !== JSON.parse(crc)?.account;
+        try {
+            return this.accountCrc !== JSON.parse(crc)?.account;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
     }
 
     isOutdatedParty(crc: string): boolean {
-        return this.partyCrc !== JSON.parse(crc)?.party;
+        try {
+            return this.partyCrc !== JSON.parse(crc)?.party;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
+
     }
 }
