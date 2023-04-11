@@ -1,54 +1,54 @@
-import {Insertable} from "kysely";
+import { Insertable } from 'kysely';
 
 export interface LegalEntitiesProfile {
-    profileId: string;
-    externalId: string;
-    label: string;
-    name: string | null;
-    ssn: string | null;
-    ssnObject: string | null;
-    dateOfBirth: string | null;
-    address: string | null;
-    idScan: string | null;
-    domicile: string | null;
-    statements: string | null;
-    investingExperience: string | null;
-    isCompleted: boolean;
+  address: string | null;
+  dateOfBirth: string | null;
+  domicile: string | null;
+  externalId: string;
+  idScan: string | null;
+  investingExperience: string | null;
+  isCompleted: boolean;
+  label: string;
+  name: string | null;
+  profileId: string;
+  ssn: string | null;
+  ssnObject: string | null;
+  statements: string | null;
 }
 
 export interface LegalEntitiesDraftAccount {
-    draftId: string;
-    profileId: string;
-    state: string;
-    accountType: string;
-    data: string | null;
+  accountType: string;
+  data: string | null;
+  draftId: string;
+  profileId: string;
+  state: string;
 }
 
 export interface LegalEntitiesIndividualAccount {
-    accountId: string;
-    profileId: string;
-    employmentStatus: string | null;
-    employer: string | null;
-    netWorth: string | null;
-    netIncome: string | null;
-    avatar: string | null;
+  accountId: string;
+  avatar: string | null;
+  employer: string | null;
+  employmentStatus: string | null;
+  netIncome: string | null;
+  netWorth: string | null;
+  profileId: string;
 }
 
 export interface LegalEntitiesCompanyAccount {
-    accountId: string;
-    profileId: string;
-    companyName: string | null;
-    address: string | null;
-    ein: string | null;
-    annualRevenue: string | null;
-    numberOfEmployees: string | null;
-    industry: string | null;
-    companyType: string | null;
-    stakeholders: string | null;
-    companyDocuments: string | null;
-    accountType: string;
-    avatar: string | null;
-    einHash: string;
+  accountId: string;
+  accountType: string;
+  address: string | null;
+  annualRevenue: string | null;
+  avatar: string | null;
+  companyDocuments: string | null;
+  companyName: string | null;
+  companyType: string | null;
+  ein: string | null;
+  einHash: string;
+  industry: string | null;
+  numberOfEmployees: string | null;
+  profileId: string;
+  stakeholders: string | null;
 }
 
 export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'ssnObject'];

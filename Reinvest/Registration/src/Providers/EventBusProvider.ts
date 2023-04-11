@@ -1,6 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
 import { Registration } from 'Registration/index';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export default class EventBusProvider {
   private config: Registration.Config;

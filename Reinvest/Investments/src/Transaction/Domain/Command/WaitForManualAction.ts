@@ -10,11 +10,11 @@ export class WaitForManualAction implements TransactionCommand {
     this._transactionId = transactionId;
   }
 
-  static create(transactionId: TransactionId) {
-    return new WaitForManualAction(transactionId);
-  }
-
   get transactionId(): TransactionId {
     return this._transactionId;
+  }
+
+  static create(transactionId: TransactionId) {
+    return new WaitForManualAction(transactionId);
   }
 }

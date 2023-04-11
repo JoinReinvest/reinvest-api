@@ -2,7 +2,6 @@ import { IncentiveTokenRepository } from 'Identity/Adapter/Database/Repository/I
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 
 export class IncentiveTokenController {
-  public static getClassName = (): string => 'IncentiveTokenController';
   private incentiveTokenRepository: IncentiveTokenRepository;
   private webAppUrl: string;
 
@@ -10,6 +9,8 @@ export class IncentiveTokenController {
     this.incentiveTokenRepository = incentiveTokenRepository;
     this.webAppUrl = webAppUrl;
   }
+
+  public static getClassName = (): string => 'IncentiveTokenController';
 
   async isIncentiveTokenValid(token: string): Promise<boolean> {
     try {

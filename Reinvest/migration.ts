@@ -15,9 +15,7 @@ export async function migrate(command: 'migrateLatest' | 'migrateUp' | 'migrateD
       try {
         const moduleMigrations = module.migration();
         allMigrations = Object.assign(allMigrations, moduleMigrations);
-      } catch (exception: any | NoMigrationException) {
-        continue;
-      }
+      } catch (exception: any | NoMigrationException) {}
     }
   }
 

@@ -44,21 +44,6 @@ export namespace Registration {
       this.container = new Container();
     }
 
-    private boot(): void {
-      if (this.booted) {
-        return;
-      }
-
-      this.container.addAsValue('LegalEntities', this.modules.legalEntities);
-      this.container.addAsValue('Documents', this.modules.documents);
-      new AdapterServiceProvider(this.config).boot(this.container);
-      new IntegrationServiceProvider(this.config).boot(this.container);
-      new EventBusProvider(this.config).boot(this.container);
-      new PortsProvider(this.config).boot(this.container);
-
-      this.booted = true;
-    }
-
     // public module API
     api(): ApiType {
       this.boot();
@@ -84,6 +69,21 @@ export namespace Registration {
       if (this.booted) {
         await this.container.getValue<RegistrationDatabaseAdapterProvider>(RegistrationDatabaseAdapterInstanceProvider).close();
       }
+    }
+
+    private boot(): void {
+      if (this.booted) {
+        return;
+      }
+
+      this.container.addAsValue('LegalEntities', this.modules.legalEntities);
+      this.container.addAsValue('Documents', this.modules.documents);
+      new AdapterServiceProvider(this.config).boot(this.container);
+      new IntegrationServiceProvider(this.config).boot(this.container);
+      new EventBusProvider(this.config).boot(this.container);
+      new PortsProvider(this.config).boot(this.container);
+
+      this.booted = true;
     }
   }
 

@@ -3,12 +3,13 @@ export class QueryProfileRepository {
 }
 
 class ProfileQueryService {
-  static getClassName = (): string => 'ProfileQueryService';
   private repository: QueryProfileRepository;
 
   constructor(repository: QueryProfileRepository) {
     this.repository = repository;
   }
+
+  static getClassName = (): string => 'ProfileQueryService';
 
   async getProfileByUserId(userId: string) {
     // const profileQuery = new ProfileQuery(); // inject!

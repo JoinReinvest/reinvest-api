@@ -13,15 +13,15 @@ export class ResumeLastEvent implements TransactionCommand {
     this._state = state;
   }
 
-  static create(transactionId: TransactionId, state: TransactionState) {
-    return new ResumeLastEvent(transactionId, state);
-  }
-
   get transactionId(): TransactionId {
     return this._transactionId;
   }
 
   get state(): TransactionState {
     return this._state;
+  }
+
+  static create(transactionId: TransactionId, state: TransactionState) {
+    return new ResumeLastEvent(transactionId, state);
   }
 }

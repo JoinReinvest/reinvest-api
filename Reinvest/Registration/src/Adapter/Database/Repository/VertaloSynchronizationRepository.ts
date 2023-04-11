@@ -5,15 +5,15 @@ import { VertaloSynchronizationRecord } from 'Registration/Adapter/Vertalo/Verta
 import { VertaloEntityType, VertaloIds, VertaloSynchronizationRecordType } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
 
 export class VertaloSynchronizationRepository {
-  public static getClassName = (): string => 'VertaloSynchronizationRepository';
   private databaseAdapterProvider: RegistrationDatabaseAdapterProvider;
-
   private idGenerator: IdGeneratorInterface;
 
   constructor(databaseAdapterProvider: RegistrationDatabaseAdapterProvider, uniqueGenerator: IdGeneratorInterface) {
     this.databaseAdapterProvider = databaseAdapterProvider;
     this.idGenerator = uniqueGenerator;
   }
+
+  public static getClassName = (): string => 'VertaloSynchronizationRepository';
 
   async getSynchronizationRecord(recordId: string): Promise<VertaloSynchronizationRecord | null> {
     try {

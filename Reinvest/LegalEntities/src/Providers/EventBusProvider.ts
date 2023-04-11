@@ -1,5 +1,4 @@
 import { ContainerInterface } from 'Container/Container';
-import { LegalProfileCompleted } from 'LegalEntities/Domain/Events/ProfileEvents';
 import { LegalEntities } from 'LegalEntities/index';
 import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';

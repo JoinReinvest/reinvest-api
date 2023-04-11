@@ -10,11 +10,11 @@ export class SignSubscriptionAgreement implements TransactionCommand {
     this._transactionId = transactionId;
   }
 
-  static create(transactionId: TransactionId) {
-    return new SignSubscriptionAgreement(transactionId);
-  }
-
   get transactionId(): TransactionId {
     return this._transactionId;
+  }
+
+  static create(transactionId: TransactionId) {
+    return new SignSubscriptionAgreement(transactionId);
   }
 }

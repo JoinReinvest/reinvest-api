@@ -1,4 +1,4 @@
-import { Kysely, sql } from 'kysely';
+import { Kysely } from 'kysely';
 import { LegalEntitiesDatabase } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 
 export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {

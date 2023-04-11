@@ -10,11 +10,11 @@ export class DisburseTrade implements TransactionCommand {
     this._transactionId = transactionId;
   }
 
-  static create(transactionId: TransactionId) {
-    return new DisburseTrade(transactionId);
-  }
-
   get transactionId(): TransactionId {
     return this._transactionId;
+  }
+
+  static create(transactionId: TransactionId) {
+    return new DisburseTrade(transactionId);
   }
 }

@@ -4,12 +4,13 @@ import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/U
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 
 export class UserRepository {
-  public static getClassName = (): string => 'UserRepository';
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
+
+  public static getClassName = (): string => 'UserRepository';
 
   async registerUser(
     id: string,

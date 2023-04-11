@@ -7,7 +7,6 @@ export type QueueConfig = {
 };
 
 export class QueueSender {
-  static getClassName = (): string => 'QueueSender';
   private sqs: SQSClient;
   private queueUrl: string;
 
@@ -24,6 +23,8 @@ export class QueueSender {
 
     this.sqs = new SQSClient(SQSConfig);
   }
+
+  static getClassName = (): string => 'QueueSender';
 
   async send(message: string): Promise<void> {
     const params = {

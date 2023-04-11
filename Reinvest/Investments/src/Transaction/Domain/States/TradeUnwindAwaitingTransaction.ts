@@ -1,5 +1,4 @@
 import { Counter } from '../../../Commons/Counter';
-import { DoNothing } from '../Command/DoNothing';
 import { UnwindTrade } from '../Command/UnwindTrade';
 import { TradeUnwound } from '../Events/TradeUnwound';
 import { TradeUnwoundFailed } from '../Events/TradeUnwoundFailed';

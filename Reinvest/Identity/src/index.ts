@@ -41,19 +41,6 @@ export namespace Identity {
       this.container = new Container();
     }
 
-    private boot(): void {
-      if (this.booted) {
-        return;
-      }
-
-      this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
-      new AdapterServiceProvider(this.config).boot(this.container);
-      new ServicesProvider(this.config).boot(this.container);
-      new PortsProvider(this.config).boot(this.container);
-
-      this.booted = true;
-    }
-
     // public module API
     api(): ApiType {
       this.boot();
@@ -79,6 +66,19 @@ export namespace Identity {
       if (this.booted) {
         await this.container.getValue<IdentityDatabaseAdapterProvider>(DatabaseAdapterProvider).close();
       }
+    }
+
+    private boot(): void {
+      if (this.booted) {
+        return;
+      }
+
+      this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
+      new AdapterServiceProvider(this.config).boot(this.container);
+      new ServicesProvider(this.config).boot(this.container);
+      new PortsProvider(this.config).boot(this.container);
+
+      this.booted = true;
     }
   }
 

@@ -1,7 +1,6 @@
 import Container, { ContainerInterface } from 'Container/Container';
 import { Documents } from 'Documents/index';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
-import { InvestmentAccountDbProvider, investmentAccountsDatabaseProviderName } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
 import { LegalEntitiesDatabaseAdapterInstanceProvider, LegalEntitiesDatabaseAdapterProvider } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { LegalEntitiesApi, LegalEntitiesApiType } from 'LegalEntities/Port/Api/LegalEntitiesApi';
 import { LegalEntitiesTechnicalHandler, LegalEntitiesTechnicalHandlerType } from 'LegalEntities/Port/Events/LegalEntitiesTechnicalHandler';
@@ -41,21 +40,6 @@ export namespace LegalEntities {
       this.container = new Container();
     }
 
-    private boot(): void {
-      if (this.booted) {
-        return;
-      }
-
-      this.container.addAsValue('Documents', this.modules.documents);
-      this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
-
-      new AdapterServiceProvider(this.config).boot(this.container);
-      new PortsProvider(this.config).boot(this.container);
-      new EventBusProvider(this.config).boot(this.container);
-
-      this.booted = true;
-    }
-
     // public module API
     api(): ApiType {
       this.boot();
@@ -81,6 +65,21 @@ export namespace LegalEntities {
       if (this.booted) {
         await this.container.getValue<LegalEntitiesDatabaseAdapterProvider>(LegalEntitiesDatabaseAdapterInstanceProvider).close();
       }
+    }
+
+    private boot(): void {
+      if (this.booted) {
+        return;
+      }
+
+      this.container.addAsValue('Documents', this.modules.documents);
+      this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
+
+      new AdapterServiceProvider(this.config).boot(this.container);
+      new PortsProvider(this.config).boot(this.container);
+      new EventBusProvider(this.config).boot(this.container);
+
+      this.booted = true;
     }
   }
 

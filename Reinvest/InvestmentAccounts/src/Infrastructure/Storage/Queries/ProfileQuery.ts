@@ -20,12 +20,13 @@ type ProfileQueryStructure = {
 };
 
 export class ProfileQuery {
-  static getClassName = (): string => 'ProfileQuery';
   private databaseProvider: InvestmentAccountDbProvider;
 
   constructor(databaseProvider: InvestmentAccountDbProvider) {
     this.databaseProvider = databaseProvider;
   }
+
+  static getClassName = (): string => 'ProfileQuery';
 
   async getQuery(filters: ProfileQueryStructure['filters']): Promise<any> {
     const database = this.databaseProvider.provide();

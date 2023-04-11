@@ -6,7 +6,6 @@ import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 
 export class UserRegistrationService {
-  public static getClassName = (): string => 'UserRegistrationService';
   private userRepository: UserRepository;
   private profileService: ProfileService;
   private cognitoService: CognitoService;
@@ -26,6 +25,8 @@ export class UserRegistrationService {
     this.idGenerator = idGenerator;
     this.incentiveTokenRepository = incentiveTokenRepository;
   }
+
+  public static getClassName = (): string => 'UserRegistrationService';
 
   async registerUser(userId: string, email: string, incentiveToken: IncentiveToken | null): Promise<boolean> {
     try {

@@ -7,7 +7,6 @@ import { AggregateRepository } from 'SimpleAggregator/Storage/AggregateRepositor
 import { AggregateState, DomainEvent } from 'SimpleAggregator/Types';
 
 export class ProfileRepository {
-  public static getClassName = (): string => 'ProfileRepository';
   private aggregateRepository: AggregateRepository<InvestmentAccountDbProvider>;
   private tableName = 'investment_accounts_profile_aggregate';
   private transactionalAdapter: TransactionalAdapter<any>;
@@ -18,6 +17,8 @@ export class ProfileRepository {
     this.transactionalAdapter = transactionalAdapter;
     this.eventBus = eventBus;
   }
+
+  public static getClassName = (): string => 'ProfileRepository';
 
   public async storeAndPublish(events: DomainEvent[], snapshot: AggregateState): Promise<void> {
     await this.transactionalAdapter.transaction(`Store and publish aggregate state: ${this.tableName}/${snapshot.aggregateId}`, async () => {

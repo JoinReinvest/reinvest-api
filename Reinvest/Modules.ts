@@ -1,5 +1,3 @@
-import { MigrationManager } from 'PostgreSQL/MigrationManager';
-
 export type Api = { [apiName: string]: Function };
 export type EventHandler = { [kind: string]: (event: any) => void };
 

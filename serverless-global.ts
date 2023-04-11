@@ -1,12 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
-import { BastionOutputs, BastionResources } from './devops/serverless/bastion';
-import { CognitoOutputs, CognitoResources } from './devops/serverless/cognito';
-import { RdsOutputs, RdsResources } from './devops/serverless/rds';
-import { S3Outputs, S3Resources } from './devops/serverless/s3';
 import { ProviderConfiguration, ProviderEnvironment } from './devops/serverless/serverless-common';
 import { SesResources } from './devops/serverless/ses';
-import { VpcOutputs, VpcResources } from './devops/serverless/vpc';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-global',

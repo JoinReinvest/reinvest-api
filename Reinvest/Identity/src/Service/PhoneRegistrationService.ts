@@ -7,7 +7,6 @@ import { UniqueTokenGeneratorInterface } from 'IdGenerator/UniqueTokenGenerator'
 const TOPT_SIZE = 6;
 
 export class PhoneRegistrationService {
-  public static getClassName = (): string => 'PhoneRegistrationService';
   private userRepository: UserRepository;
   private phoneRepository: PhoneRepository;
   private uniqueTokenGenerator: UniqueTokenGeneratorInterface;
@@ -17,6 +16,8 @@ export class PhoneRegistrationService {
     this.userRepository = userRepository;
     this.uniqueTokenGenerator = uniqueTokenGenerator;
   }
+
+  public static getClassName = (): string => 'PhoneRegistrationService';
 
   async registerUnverifiedPhoneNumber(userId: string, phoneNumber: PhoneNumber): Promise<boolean> {
     try {

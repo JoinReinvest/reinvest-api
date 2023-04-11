@@ -3,7 +3,6 @@ import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
 import { PhoneRegistrationService } from 'Identity/Service/PhoneRegistrationService';
 
 export class PhoneController {
-  public static getClassName = (): string => 'PhoneController';
   private phoneRegistrationService: PhoneRegistrationService;
   private cognitoService: CognitoService;
 
@@ -11,6 +10,8 @@ export class PhoneController {
     this.phoneRegistrationService = phoneRegistrationService;
     this.cognitoService = cognitoService;
   }
+
+  public static getClassName = (): string => 'PhoneController';
 
   async setPhoneNumber(userId: string, countryCode: string, phoneNumber: string, isSmsAllowed: boolean = true): Promise<boolean> {
     try {

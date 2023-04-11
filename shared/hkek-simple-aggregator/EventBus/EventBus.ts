@@ -16,8 +16,6 @@ export interface EventBus {
 }
 
 export class SimpleEventBus implements EventBus {
-  static getClassName = (): string => 'EventBus';
-
   private handlers: {
     [kind: string]: string[];
   } = {};
@@ -26,6 +24,8 @@ export class SimpleEventBus implements EventBus {
   constructor(container: ContainerInterface) {
     this.container = container;
   }
+
+  static getClassName = (): string => 'EventBus';
 
   public publish(event: DomainEvent): this {
     const kind = event.kind;

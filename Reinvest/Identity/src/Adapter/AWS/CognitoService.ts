@@ -13,16 +13,13 @@ type CognitoUserType = {
 };
 
 export class CognitoService {
-  public static getClassName = (): string => 'CognitoService';
   private config: CognitoConfig;
 
   constructor(config: CognitoConfig) {
     this.config = config;
   }
 
-  private getClient(): CognitoIdentityProviderClient {
-    return new CognitoIdentityProviderClient({ region: this.config.region });
-  }
+  public static getClassName = (): string => 'CognitoService';
 
   async addVerifiedPhoneNumber(userId: string, phoneNumber: string): Promise<boolean> {
     const setPhoneNumberCommand = new AdminUpdateUserAttributesCommand({
@@ -59,6 +56,10 @@ export class CognitoService {
 
       return false;
     }
+  }
+
+  private getClient(): CognitoIdentityProviderClient {
+    return new CognitoIdentityProviderClient({ region: this.config.region });
   }
 
   private async sendAttributeUpdateCommand(command: AdminUpdateUserAttributesCommand): Promise<boolean> {

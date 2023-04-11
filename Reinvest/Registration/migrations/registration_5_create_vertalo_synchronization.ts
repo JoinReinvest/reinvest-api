@@ -1,6 +1,6 @@
 import { Kysely, sql } from 'kysely';
 import { LegalEntitiesDatabase } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
-import { northCapitalSynchronizationTable, registrationMappingRegistryTable, vertaloSynchronizationTable } from 'Registration/Adapter/Database/DatabaseAdapter';
+import { vertaloSynchronizationTable } from 'Registration/Adapter/Database/DatabaseAdapter';
 
 export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
   await db.schema

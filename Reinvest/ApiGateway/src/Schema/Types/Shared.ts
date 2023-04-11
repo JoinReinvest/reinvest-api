@@ -5,7 +5,7 @@ const schema = `
         middleName: String
         lastName: String! @constraint(minLength: 1)
     }
-    
+
     type PersonNameType {
         firstName: String
         middleName: String

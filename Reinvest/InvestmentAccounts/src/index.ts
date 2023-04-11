@@ -35,19 +35,6 @@ export namespace InvestmentAccounts {
       this.container = new Container();
     }
 
-    private boot(): void {
-      if (this.booted) {
-        return;
-      }
-
-      new AdaptersProviders(this.config).boot(this.container);
-      new UseCaseProviders(this.config).boot(this.container);
-      new PortsProviders(this.config).boot(this.container);
-      new EventBusProvider(this.config).boot(this.container);
-
-      this.booted = true;
-    }
-
     // public module API
     api(): ApiType {
       this.boot();
@@ -73,6 +60,19 @@ export namespace InvestmentAccounts {
       if (this.booted) {
         await this.container.getValue<InvestmentAccountDbProvider>(investmentAccountsDatabaseProviderName).close();
       }
+    }
+
+    private boot(): void {
+      if (this.booted) {
+        return;
+      }
+
+      new AdaptersProviders(this.config).boot(this.container);
+      new UseCaseProviders(this.config).boot(this.container);
+      new PortsProviders(this.config).boot(this.container);
+      new EventBusProvider(this.config).boot(this.container);
+
+      this.booted = true;
     }
   }
 

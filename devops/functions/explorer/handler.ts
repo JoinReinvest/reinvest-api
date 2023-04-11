@@ -48,7 +48,7 @@ const page = `
             url: '${apiEndpoint}',
             headers: {
                 Authorization: "Bearer <put_your_jwt_here>"
-            } 
+            }
           }),
           defaultEditorToolsVisibility: true,
         }),

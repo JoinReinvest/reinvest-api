@@ -1,6 +1,4 @@
-import { FileLink } from 'Documents/Adapter/S3/FileLinkService';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
-import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DocumentSchema, IdScanInput } from 'LegalEntities/Domain/ValueObject/Document';
 import { DomicileType } from 'LegalEntities/Domain/ValueObject/Domicile';
@@ -45,12 +43,13 @@ export type ProfileForSynchronization = {
 };
 
 export class GetProfileController {
-  public static getClassName = (): string => 'GetProfileController';
   private profileRepository: ProfileRepository;
 
   constructor(profileRepository: ProfileRepository) {
     this.profileRepository = profileRepository;
   }
+
+  public static getClassName = (): string => 'GetProfileController';
 
   public async getProfile(profileId: string): Promise<ProfileResponse> {
     const profile = await this.profileRepository.findProfile(profileId);

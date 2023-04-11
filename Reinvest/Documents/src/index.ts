@@ -3,7 +3,7 @@ import { S3Config } from 'Documents/Adapter/S3/S3Adapter';
 import { DocumentsApi, DocumentsApiType } from 'Documents/Port/Api/DocumentsApi';
 import { AdapterServiceProvider } from 'Documents/Providers/AdapterServiceProvider';
 import { PortsProvider } from 'Documents/Providers/PortsProvider';
-import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
+import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NoMigrationException } from 'PostgreSQL/NoMigrationException';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 
@@ -27,17 +27,6 @@ export namespace Documents {
       this.container = new Container();
     }
 
-    private boot(): void {
-      if (this.booted) {
-        return;
-      }
-
-      new AdapterServiceProvider(this.config).boot(this.container);
-      new PortsProvider(this.config).boot(this.container);
-
-      this.booted = true;
-    }
-
     // public module API
     api(): ApiType {
       this.boot();
@@ -58,6 +47,17 @@ export namespace Documents {
     }
 
     async close(): Promise<void> {}
+
+    private boot(): void {
+      if (this.booted) {
+        return;
+      }
+
+      new AdapterServiceProvider(this.config).boot(this.container);
+      new PortsProvider(this.config).boot(this.container);
+
+      this.booted = true;
+    }
   }
 
   export function create(config: Documents.Config) {

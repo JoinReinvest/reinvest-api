@@ -1,12 +1,13 @@
 import { FileLink, FileLinkService, FileType } from '../../Adapter/S3/FileLinkService';
 
 export class FileLinksController {
-  public static getClassName = (): string => 'FileLinksController';
   private fileLinkService: FileLinkService;
 
   constructor(fileLinkService: FileLinkService) {
     this.fileLinkService = fileLinkService;
   }
+
+  public static getClassName = (): string => 'FileLinksController';
 
   public async createAvatarFileLink(profileId: string): Promise<FileLink> {
     const fileLinks = await this.fileLinkService.createFileLinks(FileType.AVATAR, profileId);

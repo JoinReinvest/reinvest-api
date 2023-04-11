@@ -1,47 +1,40 @@
-import {CrcService} from "Registration/Domain/CrcService";
-import {
-    AccountNameOwner,
-} from "Registration/Domain/Model/Account";
-import {VertaloAccountStructure} from "Registration/Domain/VendorModel/Vertalo/VertaloTypes";
+import { CrcService } from 'Registration/Domain/CrcService';
+import { AccountNameOwner } from 'Registration/Domain/Model/Account';
+import { VertaloAccountStructure } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
 
 export class VertaloAccount {
-    private readonly data: VertaloAccountStructure;
-    private crc: string;
+  private readonly data: VertaloAccountStructure;
+  private crc: string;
 
+  constructor(data: VertaloAccountStructure) {
+    this.data = data;
+    this.crc = this.generateCrc(data);
+  }
 
-    constructor(data: VertaloAccountStructure) {
-        this.data = data;
-        this.crc = this.generateCrc(data);
+  static createAccount(data: AccountNameOwner, email: string): VertaloAccount | never {
+    if (data === null) {
+      throw new Error('Cannot create account from null');
     }
 
-    static createAccount(data: AccountNameOwner, email: string): VertaloAccount | never {
-        if (data === null) {
-            throw new Error('Cannot create account from null');
-        }
+    const fullName = [data.firstName, data?.middleName, data.lastName].filter((value?: string) => value !== null && value !== '').join(' ');
 
-        const fullName = [data.firstName, data?.middleName, data.lastName]
-            .filter((value?: string) => value !== null && value !== "")
-            .join(" ");
+    return new VertaloAccount({
+      email,
+      name: fullName,
+    });
+  }
 
-        return new VertaloAccount({
-            email,
-            name: fullName
-        });
-    }
+  getCrc(): string {
+    return this.crc;
+  }
 
-    private generateCrc(data: VertaloAccountStructure): string {
-        const values = [
-            data.name,
-        ];
+  getData(): VertaloAccountStructure {
+    return this.data;
+  }
 
-        return CrcService.generateCrc(values);
-    }
+  private generateCrc(data: VertaloAccountStructure): string {
+    const values = [data.name];
 
-    getCrc(): string {
-        return this.crc;
-    }
-
-    getData(): VertaloAccountStructure {
-        return this.data;
-    }
+    return CrcService.generateCrc(values);
+  }
 }

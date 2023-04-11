@@ -3,12 +3,13 @@ import { AggregateException } from 'SimpleAggregator/AggregateException';
 import { AggregateState } from 'SimpleAggregator/Types';
 
 export class AggregateRepository<DatabaseProviderType extends DatabaseProvider<any>> {
-  public static getClassName = (): string => 'AggregateRepository';
   private databaseProvider: DatabaseProviderType;
 
   constructor(databaseProvider: DatabaseProviderType) {
     this.databaseProvider = databaseProvider;
   }
+
+  public static getClassName = (): string => 'AggregateRepository';
 
   public async store(tableName: string, snapshot: AggregateState): Promise<void | never> {
     const snapshotState = snapshot['state'] ? snapshot.state : {};

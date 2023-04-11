@@ -19,10 +19,6 @@ export class CreateTrade implements TransactionCommand {
     this._amountToInvest = amountToInvest;
   }
 
-  static create(transactionId: TransactionId, portfolioId: PortfolioId, investorAccountId: InvestorAccountId, amountToInvest: Money): CreateTrade {
-    return new CreateTrade(transactionId, portfolioId, investorAccountId, amountToInvest);
-  }
-
   get transactionId(): TransactionId {
     return this._transactionId;
   }
@@ -37,5 +33,9 @@ export class CreateTrade implements TransactionCommand {
 
   get amountToInvest(): Money {
     return this._amountToInvest;
+  }
+
+  static create(transactionId: TransactionId, portfolioId: PortfolioId, investorAccountId: InvestorAccountId, amountToInvest: Money): CreateTrade {
+    return new CreateTrade(transactionId, portfolioId, investorAccountId, amountToInvest);
   }
 }

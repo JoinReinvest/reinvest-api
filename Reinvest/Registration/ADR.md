@@ -12,19 +12,19 @@
 
 * Author: Lukasz Duraj
 * Drivers:
-    * This is edge module to register objects on the North Capital and Vertalo sides.
+  * This is edge module to register objects on the North Capital and Vertalo sides.
 * Decision: 3-layered architecture
-    - Port: input data from HTTP/ or ports/adapters to other modules
-    - IntegrationLogic: integration logic between
-    - Adapter: output data to DB/Filesystem/Queue/North Capital/Vertalo
-    - Dependencies flow: Downstream--->Upstream (upstream is not aware of downstream)
-    - Execution flow: Port ---> Integration -----> OutputPort
+  - Port: input data from HTTP/ or ports/adapters to other modules
+  - IntegrationLogic: integration logic between
+  - Adapter: output data to DB/Filesystem/Queue/North Capital/Vertalo
+  - Dependencies flow: Downstream--->Upstream (upstream is not aware of downstream)
+  - Execution flow: Port ---> Integration -----> OutputPort
 * Context:
-    - to add
+  - to add
 * Consequences:
-    * We should not put any extra logic here, as this architecture can easily become messy and unreadable
-    * Coupling data models to the infrastructure
-    * The logic of creating and validating models is run inside controllers (coupling)
+  * We should not put any extra logic here, as this architecture can easily become messy and unreadable
+  * Coupling data models to the infrastructure
+  * The logic of creating and validating models is run inside controllers (coupling)
 
 ## Testing
 

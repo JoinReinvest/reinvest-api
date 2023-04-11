@@ -19,16 +19,16 @@ export class CommonTransaction implements Transaction {
     this.transactionId = transactionId;
   }
 
-  protected validateEvent(event: TransactionEvent): void {
-    if (!event.getTransactionId().isEqualTo(this.transactionId)) {
-      TransactionException.throw('This event is not for this transaction');
-    }
-  }
-
   public execute(event: TransactionEvent): TransactionDecision {
     switch (true) {
       default:
         return this.justWait();
+    }
+  }
+
+  protected validateEvent(event: TransactionEvent): void {
+    if (!event.getTransactionId().isEqualTo(this.transactionId)) {
+      TransactionException.throw('This event is not for this transaction');
     }
   }
 

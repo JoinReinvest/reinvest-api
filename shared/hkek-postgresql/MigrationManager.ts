@@ -13,6 +13,24 @@ export class MigrationManager {
     this.databaseProvider = databaseProvider;
   }
 
+  async migrateUp() {
+    return await this.run(async migrator => {
+      return await migrator.migrateUp();
+    });
+  }
+
+  async migrateDown() {
+    return await this.run(async migrator => {
+      return await migrator.migrateDown();
+    });
+  }
+
+  async migrateToLatest() {
+    return await this.run(async migrator => {
+      return await migrator.migrateToLatest();
+    });
+  }
+
   private async run(callback: (migrator: Migrator) => Promise<MigrationResultSet>) {
     const db = this.databaseProvider.provide();
     const migrator = new Migrator({
@@ -38,23 +56,5 @@ export class MigrationManager {
     }
 
     await db.destroy();
-  }
-
-  async migrateUp() {
-    return await this.run(async migrator => {
-      return await migrator.migrateUp();
-    });
-  }
-
-  async migrateDown() {
-    return await this.run(async migrator => {
-      return await migrator.migrateDown();
-    });
-  }
-
-  async migrateToLatest() {
-    return await this.run(async migrator => {
-      return await migrator.migrateToLatest();
-    });
   }
 }

@@ -15,57 +15,6 @@ export default class NorthCapitalRequester {
     this.url = url;
   }
 
-  private async putRequest(endpoint: string, data: any): Promise<any> {
-    try {
-      const putData = this.extendWithCredentials(data);
-      const response: AxiosResponse = await axios.put(`${this.url}/${endpoint}`, putData);
-
-      return response.data;
-    } catch (error) {
-      const {
-        response: {
-          data: { statusCode, statusDesc },
-        },
-      } = error;
-      throw new NorthCapitalException(statusCode, statusDesc);
-    }
-  }
-
-  private async postRequest(endpoint: string, data: any): Promise<any> {
-    try {
-      const formData = this.transformToFormData(data);
-      const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
-
-      return response.data;
-    } catch (error) {
-      const {
-        response: {
-          data: { statusCode, statusDesc },
-        },
-      } = error;
-      throw new NorthCapitalException(statusCode, statusDesc);
-    }
-  }
-
-  private transformToFormData(data: any): FormData {
-    const extendedData = this.extendWithCredentials(data);
-    const formData = new FormData();
-
-    for (const key of Object.keys(extendedData)) {
-      formData.append(key, extendedData[key]);
-    }
-
-    return formData;
-  }
-
-  private extendWithCredentials(data: any): any {
-    return {
-      clientID: this.clientId,
-      developerAPIKey: this.developerAPIKey,
-      ...data,
-    };
-  }
-
   public async linkExternalAchAccount(accountId: string): Promise<string> {
     const endpoint = 'tapiv3/index.php/v3/linkExternalAccount';
     const data = {
@@ -515,5 +464,56 @@ export default class NorthCapitalRequester {
     const { statusCode, statusDesc, 'Financial Escrow Details': details } = response;
 
     return details;
+  }
+
+  private async putRequest(endpoint: string, data: any): Promise<any> {
+    try {
+      const putData = this.extendWithCredentials(data);
+      const response: AxiosResponse = await axios.put(`${this.url}/${endpoint}`, putData);
+
+      return response.data;
+    } catch (error) {
+      const {
+        response: {
+          data: { statusCode, statusDesc },
+        },
+      } = error;
+      throw new NorthCapitalException(statusCode, statusDesc);
+    }
+  }
+
+  private async postRequest(endpoint: string, data: any): Promise<any> {
+    try {
+      const formData = this.transformToFormData(data);
+      const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
+
+      return response.data;
+    } catch (error) {
+      const {
+        response: {
+          data: { statusCode, statusDesc },
+        },
+      } = error;
+      throw new NorthCapitalException(statusCode, statusDesc);
+    }
+  }
+
+  private transformToFormData(data: any): FormData {
+    const extendedData = this.extendWithCredentials(data);
+    const formData = new FormData();
+
+    for (const key of Object.keys(extendedData)) {
+      formData.append(key, extendedData[key]);
+    }
+
+    return formData;
+  }
+
+  private extendWithCredentials(data: any): any {
+    return {
+      clientID: this.clientId,
+      developerAPIKey: this.developerAPIKey,
+      ...data,
+    };
   }
 }

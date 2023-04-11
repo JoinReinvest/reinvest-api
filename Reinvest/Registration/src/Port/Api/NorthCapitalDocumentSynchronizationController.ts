@@ -1,12 +1,13 @@
 import { NorthCapitalSynchronizer } from 'Registration/Adapter/NorthCapital/NorthCapitalSynchronizer';
 
 export class NorthCapitalDocumentSynchronizationController {
-  public static getClassName = (): string => 'NorthCapitalDocumentSynchronizationController';
   private northCapitalSynchronizer: NorthCapitalSynchronizer;
 
   constructor(northCapitalSynchronizer: NorthCapitalSynchronizer) {
     this.northCapitalSynchronizer = northCapitalSynchronizer;
   }
+
+  public static getClassName = (): string => 'NorthCapitalDocumentSynchronizationController';
 
   public async synchronizeDocument(documentId: string): Promise<boolean> {
     try {

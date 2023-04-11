@@ -7,7 +7,6 @@ import { Money } from '../../../../../src/Commons/Money';
 import { PortfolioId } from '../../../../../src/Commons/PortfolioId';
 import { CreateTrade } from '../../../../../src/Transaction/Domain/Command/CreateTrade';
 import { SignSubscriptionAgreement } from '../../../../../src/Transaction/Domain/Command/SignSubscriptionAgreement';
-import { TransferFunds } from '../../../../../src/Transaction/Domain/Command/TransferFunds';
 import { UnwindTrade } from '../../../../../src/Transaction/Domain/Command/UnwindTrade';
 import { WaitForAdminManualAction } from '../../../../../src/Transaction/Domain/Command/WaitForAdminManualAction';
 import { TradeCreated } from '../../../../../src/Transaction/Domain/Events/TradeCreated';

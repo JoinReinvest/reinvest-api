@@ -9,7 +9,6 @@ import { TransactionEvent } from '../Events/TransactionEvent';
 import { Transaction } from '../Transaction';
 import { TransactionDecision } from '../TransactionDecision';
 import { TransactionStateChange } from '../TransactionStateChange';
-import { FailureCompletionReason } from '../ValueObject/FailureCompletionReason';
 import { ManualActionReason } from '../ValueObject/ManualActionReason';
 import { TransactionId } from '../ValueObject/TransactionId';
 import { CommonTransaction } from './CommonTransaction';

@@ -15,7 +15,6 @@ import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 
 export class PhoneRepository {
-  public static getClassName = (): string => 'PhoneRepository';
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
   private transactionalAdapter: TransactionalAdapter<IdentityDatabase>;
   private cognitoService: CognitoService;
@@ -33,6 +32,8 @@ export class PhoneRepository {
     this.transactionalAdapter = transactionalAdapter;
   }
 
+  public static getClassName = (): string => 'PhoneRepository';
+
   public async storeToken(oneTimeToken: OneTimeToken): Promise<boolean> {
     const { userId } = oneTimeToken.toArray();
 
@@ -46,29 +47,6 @@ export class PhoneRepository {
 
       await this.smsService.sendSmsWithToken(oneTimeToken);
     });
-  }
-
-  private async createToken(oneTimeToken: OneTimeToken) {
-    try {
-      const dataToInsert = {
-        ...oneTimeToken.toArray(),
-      };
-      await this.databaseAdapterProvider
-        .provide()
-        .insertInto(phoneVerificationTable)
-        .values(<InsertableOneTimeToken>{
-          ...dataToInsert,
-        })
-        .onConflict(oc =>
-          oc.column('userId').doUpdateSet({
-            ...dataToInsert,
-          }),
-        )
-        .execute();
-    } catch (error: any) {
-      console.log({ PhoneRepository_storeToken: error });
-      throw new PhoneException('Cannot store phone verification: ' + error.message);
-    }
   }
 
   public async findToken(userId: string, phone: PhoneNumber): Promise<OneTimeToken | never> {
@@ -106,6 +84,29 @@ export class PhoneRepository {
     }
 
     return false;
+  }
+
+  private async createToken(oneTimeToken: OneTimeToken) {
+    try {
+      const dataToInsert = {
+        ...oneTimeToken.toArray(),
+      };
+      await this.databaseAdapterProvider
+        .provide()
+        .insertInto(phoneVerificationTable)
+        .values(<InsertableOneTimeToken>{
+          ...dataToInsert,
+        })
+        .onConflict(oc =>
+          oc.column('userId').doUpdateSet({
+            ...dataToInsert,
+          }),
+        )
+        .execute();
+    } catch (error: any) {
+      console.log({ PhoneRepository_storeToken: error });
+      throw new PhoneException('Cannot store phone verification: ' + error.message);
+    }
   }
 
   private async updateToken(userId: string, phoneNumber: string): Promise<boolean> {

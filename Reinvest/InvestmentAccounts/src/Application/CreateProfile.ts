@@ -3,13 +3,13 @@ import { ProfileException } from 'InvestmentAccounts/Domain/ProfileAggregate/Pro
 import { ProfileRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository';
 
 class CreateProfile {
-  static getClassName = (): string => 'CreateProfile';
-
   private readonly profileRepository: ProfileRepository;
 
   constructor(profileRepository: ProfileRepository) {
     this.profileRepository = profileRepository;
   }
+
+  static getClassName = (): string => 'CreateProfile';
 
   async execute(profileId: string) {
     const checkIfExists = await this.profileRepository.restore(profileId);

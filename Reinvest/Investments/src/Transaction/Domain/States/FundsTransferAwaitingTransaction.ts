@@ -4,7 +4,6 @@ import { TransferFunds } from '../Command/TransferFunds';
 import { FundsTransferInitializationFailed } from '../Events/FundsTransferInitializationFailed';
 import { FundsTransferInitialized } from '../Events/FundsTransferInitialized';
 import { SubscriptionAgreementSigned } from '../Events/SubscriptionAgreementSigned';
-import { TradeCreated } from '../Events/TradeCreated';
 import { TransactionCancelled } from '../Events/TransactionCancelled';
 import { TransactionEvent } from '../Events/TransactionEvent';
 import { Transaction } from '../Transaction';

@@ -4,7 +4,6 @@ import { INCENTIVE_TOKEN_SIZE, IncentiveToken } from 'Identity/Domain/IncentiveT
 import { UniqueTokenGeneratorInterface } from 'IdGenerator/UniqueTokenGenerator';
 
 export class IncentiveTokenRepository {
-  public static getClassName = (): string => 'IncentiveTokenRepository';
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
   private uniqueTokenGenerator: UniqueTokenGeneratorInterface;
 
@@ -12,6 +11,8 @@ export class IncentiveTokenRepository {
     this.databaseAdapterProvider = databaseAdapterProvider;
     this.uniqueTokenGenerator = uniqueTokenGenerator;
   }
+
+  public static getClassName = (): string => 'IncentiveTokenRepository';
 
   public async generateUniqueIncentiveToken(tries: number = 1): Promise<IncentiveToken> {
     const randomString = this.uniqueTokenGenerator.generateRandomString(INCENTIVE_TOKEN_SIZE);

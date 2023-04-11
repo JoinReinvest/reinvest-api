@@ -1,5 +1,3 @@
-import { Path } from 'LegalEntities/Domain/ValueObject/Document';
-import { Id } from 'LegalEntities/Domain/ValueObject/Id';
 import { ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 
 export type EmployerInput = {

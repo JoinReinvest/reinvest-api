@@ -12,7 +12,6 @@ export enum FileType {
 }
 
 export class FileLinkService {
-  public static getClassName = (): string => 'FileLinkService';
   private adapter: S3Adapter;
   private idGenerator: IdGeneratorInterface;
 
@@ -20,6 +19,8 @@ export class FileLinkService {
     this.adapter = adapter;
     this.idGenerator = idGenerator;
   }
+
+  public static getClassName = (): string => 'FileLinkService';
 
   async createFileLinks(type: FileType, catalog: string, numberOfLinks: number = 1): Promise<FileLink[]> {
     const fileLinks = <FileLink[]>[];

@@ -1,4 +1,3 @@
-import { DoNothing } from '../Command/DoNothing';
 import { VerifyInvestor } from '../Command/VerifyInvestor';
 import { FailedPayment } from '../Events/FailedPayment';
 import { SuccessfulPayment } from '../Events/SuccessfulPayment';

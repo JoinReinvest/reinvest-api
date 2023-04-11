@@ -10,11 +10,11 @@ export class TransferFunds implements TransactionCommand {
     this._transactionId = transactionId;
   }
 
-  static create(transactionId: TransactionId) {
-    return new TransferFunds(transactionId);
-  }
-
   get transactionId(): TransactionId {
     return this._transactionId;
+  }
+
+  static create(transactionId: TransactionId) {
+    return new TransferFunds(transactionId);
   }
 }

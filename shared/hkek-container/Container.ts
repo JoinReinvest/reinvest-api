@@ -73,6 +73,16 @@ class Container implements ContainerInterface {
     return this;
   }
 
+  delegateTo(tokenizedClass: NameProvider, methodName: string): any {
+    const containerSelf = this;
+
+    return async function () {
+      const controller = containerSelf.getValue(tokenizedClass.getClassName()) as Object;
+
+      return controller[methodName](...arguments);
+    };
+  }
+
   private getTokensToInject(injectDependencies: (string | NameProvider)[] = []): string[] {
     const tokensToInject = [];
 
@@ -85,16 +95,6 @@ class Container implements ContainerInterface {
     }
 
     return tokensToInject;
-  }
-
-  delegateTo(tokenizedClass: NameProvider, methodName: string): any {
-    const containerSelf = this;
-
-    return async function () {
-      const controller = containerSelf.getValue(tokenizedClass.getClassName()) as Object;
-
-      return controller[methodName](...arguments);
-    };
   }
 }
 

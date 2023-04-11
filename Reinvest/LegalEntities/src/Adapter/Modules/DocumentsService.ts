@@ -6,12 +6,13 @@ import { FileInput } from 'LegalEntities/Domain/ValueObject/Document';
  * Documents Module ACL
  */
 export class DocumentsService {
-  public static getClassName = () => 'DocumentsService';
   private documentsModule: Documents.Main;
 
   constructor(documentsModule: Documents.Main) {
     this.documentsModule = documentsModule;
   }
+
+  public static getClassName = () => 'DocumentsService';
 
   async getAvatarFileLink(fileInput: FileInput | null): Promise<FileLink | {}> {
     if (fileInput === null) {
