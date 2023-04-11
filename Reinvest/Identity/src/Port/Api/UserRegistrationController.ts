@@ -25,7 +25,7 @@ export class UserRegistrationController {
         try {
             return incentiveToken === null ? null : new IncentiveToken(incentiveToken);
         } catch (error: any) {
-            console.error(`Wrong format of incentive token. Incentive token skipped: ${incentiveToken} for user id: ${userId}`);
+            console.warn(`Wrong format of incentive token. Incentive token skipped: ${incentiveToken} for user id: ${userId}`);
             return null;
         }
     }

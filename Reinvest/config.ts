@@ -39,6 +39,7 @@ export const COGNITO_CONFIG = {
 
 export const SNS_CONFIG = {
     region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+    originationNumber: process.env.SNS_ORIGINATION_NUMBER as string,
 }
 export const SQS_CONFIG = {
     region: process.env.INFRASTRUCTURE_AWS_REGION as string,
@@ -48,6 +49,12 @@ export const SQS_CONFIG = {
 
 export const LAMBDA_CONFIG = {
     region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+    isLocal: process.env.IT_IS_LOCAL === 'true',
+}
+
+export const SENTRY_CONFIG = {
+    dsn: process.env.SENTRY_DSN as string,
+    environment: process.env.NODE_ENV as string,
     isLocal: process.env.IT_IS_LOCAL === 'true',
 }
 

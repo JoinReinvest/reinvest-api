@@ -26,6 +26,10 @@ import {
     CronDocumentSyncFunction,
     CronDocumentSyncResources
 } from "./devops/functions/cronDocumentSync/cron-document-sync-config";
+import {
+    CronVendorsSyncFunction,
+    CronVendorsSyncResources
+} from "./devops/functions/cronVendorsSync/cron-vendors-sync-config";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-functions",
@@ -64,6 +68,8 @@ const serverlessConfiguration: AWS = {
             VERTALO_API_URL: "${env:VERTALO_API_URL}",
             VERTALO_CLIENT_ID: "${env:VERTALO_CLIENT_ID}",
             VERTALO_CLIENT_SECRET: "${env:VERTALO_CLIENT_SECRET}",
+            SNS_ORIGINATION_NUMBER: "${env:SNS_ORIGINATION_NUMBER}",
+            SENTRY_DSN: "${env:SENTRY_DSN}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,
@@ -88,6 +94,7 @@ const serverlessConfiguration: AWS = {
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         queue: QueueFunction,
         cronDocumentsSync: CronDocumentSyncFunction,
+        cronVendorsSync: CronVendorsSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         tests: TestsFunction,
@@ -105,6 +112,7 @@ const serverlessConfiguration: AWS = {
             ...UnauthorizedEndpointsLambdaResources,
             ...TestsLambdaResources,
             ...CronDocumentSyncResources,
+            ...CronVendorsSyncResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,

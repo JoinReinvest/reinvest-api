@@ -1,10 +1,26 @@
 {
   "extends": "@hookooekoo/configs-tsconfig/tsconfig.json",
   "compilerOptions": {
-    "outDir": "./out",
-    "baseUrl": "./src",
+    "outDir": "./build",
+    "baseUrl": ".",
     "incremental": true,
     "jsx": "preserve"
+  },
+  "paths": {
+    "Reinvest/*": ["./Reinvest/*"],
+    "PostgreSQL/*": ["./shared/hkek-postgresql/*"],
+    "SimpleAggregator/*": ["./shared/hkek-simple-aggregator/*"],
+    "Container/*": ["./shared/hkek-container/*"],
+    "IdGenerator/*": ["./shared/hkek-id-generator/*"],
+    "HKEKTypes/*": ["./shared/hkek-types/*"],
+    "Logger/*": ["./shared/hkek-logger/*"],
+
+    "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
+    "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],
+    "LegalEntities/*": ["./Reinvest/LegalEntities/src/*"],
+    "Documents/*": ["./Reinvest/Documents/src/*"],
+    "Identity/*": ["./Reinvest/Identity/src/*"],
+    "Registration/*": ["./Reinvest/Registration/src/*"],
   },
   "include": [
       "./devops/**/*.ts",

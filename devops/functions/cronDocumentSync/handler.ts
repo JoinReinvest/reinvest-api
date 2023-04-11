@@ -32,7 +32,6 @@ async function invokeSynchronization(functionName: string) {
 
     const lambdaConfig = {region: LAMBDA_CONFIG.region};
     if (LAMBDA_CONFIG.isLocal) {
-        // @ts-ignore
         lambdaConfig.endpoint = "http://localhost:3002";
     }
     const client = new LambdaClient(lambdaConfig);
@@ -47,7 +46,6 @@ function selfInvoker(client: LambdaClient, functionName: string): Function {
         const command = new InvokeCommand({
             FunctionName: functionName,
             InvocationType: "Event",
-            // @ts-ignore
             Payload: JSON.stringify({syncDocumentId}),
         });
         return client.send(command);

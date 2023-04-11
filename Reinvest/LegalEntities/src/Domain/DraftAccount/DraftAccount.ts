@@ -1,9 +1,32 @@
 import {EmploymentStatus, EmploymentStatusInput} from "LegalEntities/Domain/ValueObject/EmploymentStatus";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {Avatar, AvatarInput} from "LegalEntities/Domain/ValueObject/Document";
+import {
+    Avatar,
+    AvatarInput,
+    CompanyDocuments,
+    DocumentSchema
+} from "LegalEntities/Domain/ValueObject/Document";
 import {Employer, EmployerInput} from "LegalEntities/Domain/ValueObject/Employer";
-import {NetIncome, NetRangeInput, NetWorth} from "LegalEntities/Domain/ValueObject/ValueRange";
+import {
+    NetIncome,
+    ValueRangeInput,
+    NetWorth,
+    AnnualRevenue,
+    NumberOfEmployees
+} from "LegalEntities/Domain/ValueObject/ValueRange";
 import {IndividualAccount} from "LegalEntities/Domain/Accounts/IndividualAccount";
+import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
+import {
+    Company,
+    CompanyName,
+    CompanyNameInput,
+    CompanyTypeInput,
+} from "LegalEntities/Domain/ValueObject/Company";
+import {EIN, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/ValueString";
+import {CompanyStakeholders, Stakeholder, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
+import {Uuid} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {CompanyAccount, CompanyAccountType} from "LegalEntities/Domain/Accounts/CompanyAccount";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -17,13 +40,27 @@ export enum DraftAccountType {
     TRUST = "TRUST"
 }
 
+export type CompanyDraftAccountType = Exclude<DraftAccountType, DraftAccountType.INDIVIDUAL>
+
 export type IndividualDraftAccountSchema = {
     employmentStatus: EmploymentStatusInput | null,
     avatar: AvatarInput | null,
     employer: EmployerInput | null,
-    netWorth: NetRangeInput | null,
-    netIncome: NetRangeInput | null,
-    isCompleted: boolean
+    netWorth: ValueRangeInput | null,
+    netIncome: ValueRangeInput | null,
+}
+
+export type CompanyDraftAccountSchema = {
+    companyName: CompanyNameInput,
+    address: AddressInput,
+    ein: SensitiveNumberSchema,
+    annualRevenue: ValueRangeInput,
+    numberOfEmployees: ValueRangeInput,
+    industry: ValueStringInput,
+    companyType: CompanyTypeInput,
+    avatar: AvatarInput | null,
+    companyDocuments: DocumentSchema[],
+    stakeholders: StakeholderSchema[],
 }
 
 export type DraftInput = {
@@ -31,9 +68,16 @@ export type DraftInput = {
     draftId: string,
     state: DraftAccountState,
     accountType: DraftAccountType,
+    data: unknown
+}
+
+export type IndividualDraftInput = DraftInput & {
     data: IndividualDraftAccountSchema
 }
 
+export type CompanyDraftInput = DraftInput & {
+    data: CompanyDraftAccountSchema
+}
 
 export abstract class DraftAccount {
     protected profileId: string;
@@ -53,6 +97,10 @@ export abstract class DraftAccount {
         switch (accountType) {
             case DraftAccountType.INDIVIDUAL:
                 return IndividualDraftAccount.createIndividual(profileId, draftId, state, data as IndividualDraftAccountSchema);
+            case DraftAccountType.CORPORATE:
+                return CorporateDraftAccount.createCorporate(profileId, draftId, state, data as CompanyDraftAccountSchema);
+            case DraftAccountType.TRUST:
+                return TrustDraftAccount.createTrust(profileId, draftId, state, data as CompanyDraftAccountSchema);
             default:
                 throw new Error('Draft type does not exist');
         }
@@ -73,8 +121,12 @@ export abstract class DraftAccount {
             draftId: this.draftId,
             state: this.state,
             accountType: this.accountType,
-            data: {} as IndividualDraftAccountSchema
+            data: {} as IndividualDraftAccountSchema | CompanyDraftAccountSchema
         };
+    }
+
+    getInitials(): string {
+        return this.accountType.charAt(0).toUpperCase();
     }
 
     isIndividual(): boolean {
@@ -97,8 +149,11 @@ export abstract class DraftAccount {
         return this.accountType === accountType;
     }
 
-    abstract isAccountCompleted(): boolean;
+    abstract verifyCompletion(): boolean;
 
+    abstract transformIntoAccount(): IndividualAccount | CompanyAccount;
+
+    abstract getAvatar(): Avatar | null;
 }
 
 export class IndividualDraftAccount extends DraftAccount {
@@ -107,7 +162,6 @@ export class IndividualDraftAccount extends DraftAccount {
     private employer: Employer | null = null;
     private netWorth: NetWorth | null = null;
     private netIncome: NetIncome | null = null;
-    private isCompleted: boolean = false;
 
     constructor(profileId: string, draftId: string, state: DraftAccountState) {
         super(profileId, draftId, state, DraftAccountType.INDIVIDUAL);
@@ -128,7 +182,7 @@ export class IndividualDraftAccount extends DraftAccount {
         }
 
         if (data.avatar) {
-            draftAccount.setAvatarDocument(Avatar.create(data.avatar));
+            draftAccount.setAvatar(Avatar.create(data.avatar));
         }
 
         if (data.employer) {
@@ -143,14 +197,10 @@ export class IndividualDraftAccount extends DraftAccount {
             draftAccount.setNetIncome(NetIncome.create(data.netIncome));
         }
 
-        if (data.isCompleted) {
-            draftAccount.setAsCompleted();
-        }
-
         return draftAccount;
     }
 
-    toObject(): DraftInput {
+    toObject(): IndividualDraftInput {
         return {
             ...super.toObject(),
             data: {
@@ -159,7 +209,6 @@ export class IndividualDraftAccount extends DraftAccount {
                 netWorth: this.get(this.netWorth),
                 netIncome: this.get(this.netIncome),
                 avatar: this.get(this.avatar),
-                isCompleted: this.isCompleted
             }
         }
     }
@@ -188,19 +237,23 @@ export class IndividualDraftAccount extends DraftAccount {
         })
     }
 
-    isAccountCompleted(): boolean {
-        return this.isCompleted;
+    verifyCompletion(): boolean {
+        if (this.netWorth === null || this.netIncome === null || this.employmentStatus === null) {
+            return false;
+        }
+        if (this.employmentStatus.isEmployed() && this.employer === null) {
+            return false;
+        }
+
+        return true;
     }
 
-    verifyCompletion() {
-        return !(this.employmentStatus === null ||
-            this.employer === null ||
-            this.netWorth === null ||
-            this.netIncome === null);
-    }
-
-    setAvatarDocument(avatar: Avatar) {
+    setAvatar(avatar: Avatar) {
         this.avatar = avatar;
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
     }
 
     setEmployer(employer: Employer) {
@@ -215,7 +268,225 @@ export class IndividualDraftAccount extends DraftAccount {
         this.netIncome = netIncome;
     }
 
-    setAsCompleted() {
-        this.isCompleted = true;
+    getInitials(): string {
+        return super.getInitials();
+    }
+}
+
+export class CompanyDraftAccount extends DraftAccount {
+    private companyName: CompanyName | null = null;
+    private address: Address | null = null;
+    private ein: EIN | null = null;
+    private annualRevenue: AnnualRevenue | null = null;
+    private numberOfEmployees: NumberOfEmployees | null = null;
+    private industry: Industry | null = null;
+    private companyType: Company | null = null;
+    private avatar: Avatar | null = null;
+    private documents: CompanyDocuments = new CompanyDocuments([]);
+    private stakeholders: CompanyStakeholders = new CompanyStakeholders([]);
+
+    static setCompanyData(draftAccount: CompanyDraftAccount, data: CompanyDraftAccountSchema): void {
+        if (!data) {
+            return;
+        }
+
+        if (data.companyName) {
+            draftAccount.setCompanyName(CompanyName.create(data.companyName));
+        }
+
+        if (data.address) {
+            draftAccount.setAddress(Address.create(data.address));
+        }
+
+        if (data.ein) {
+            draftAccount.setEIN(EIN.create(data.ein));
+        }
+
+        if (data.annualRevenue) {
+            draftAccount.setAnnualRevenue(AnnualRevenue.create(data.annualRevenue));
+        }
+
+        if (data.numberOfEmployees) {
+            draftAccount.setNumberOfEmployees(NumberOfEmployees.create(data.numberOfEmployees));
+        }
+
+        if (data.industry) {
+            draftAccount.setIndustry(Industry.create(data.industry));
+        }
+
+        if (data.companyType) {
+            draftAccount.setCompanyType(Company.create(data.companyType));
+        }
+
+        if (data.avatar) {
+            draftAccount.setAvatar(Avatar.create(data.avatar));
+        }
+
+        draftAccount.setDocuments(CompanyDocuments.create(data.companyDocuments ?? []));
+        draftAccount.setStakeholders(CompanyStakeholders.create(data.stakeholders ?? []));
+    }
+
+    getInitials(): string {
+        return this.companyName
+            ? this.companyName.getInitials()
+            : super.getInitials();
+    }
+
+    toObject(): CompanyDraftInput {
+        return {
+            ...super.toObject(),
+            data: {
+                companyName: this.get(this.companyName),
+                address: this.get(this.address),
+                ein: this.get(this.ein),
+                annualRevenue: this.get(this.annualRevenue),
+                numberOfEmployees: this.get(this.numberOfEmployees),
+                industry: this.get(this.industry),
+                companyType: this.get(this.companyType),
+                avatar: this.get(this.avatar),
+                companyDocuments: this.get(this.documents),
+                stakeholders: this.get(this.stakeholders),
+            }
+        }
+    }
+
+    transformIntoAccount(): CompanyAccount {
+        const {
+            profileId,
+            draftId: accountId,
+            data: {
+                companyName,
+                address,
+                ein,
+                annualRevenue,
+                numberOfEmployees,
+                industry,
+                companyType,
+                avatar,
+                stakeholders,
+                companyDocuments,
+            }
+        } = this.toObject();
+        const accountType = this.isCorporate() ? CompanyAccountType.CORPORATE : CompanyAccountType.TRUST;
+
+        return CompanyAccount.create({
+            profileId,
+            accountId,
+            companyName,
+            address,
+            ein,
+            annualRevenue,
+            numberOfEmployees,
+            industry,
+            companyType,
+            avatar,
+            stakeholders,
+            companyDocuments,
+            accountType,
+            einHash: this.ein?.getHash() ?? ""
+        })
+    }
+
+    setCompanyName(companyName: CompanyName) {
+        this.companyName = companyName;
+    }
+
+    setAddress(address: Address) {
+        this.address = address;
+    }
+
+    setEIN(ein: EIN) {
+        this.ein = ein;
+    }
+
+    setAnnualRevenue(annualRevenue: AnnualRevenue) {
+        this.annualRevenue = annualRevenue;
+    }
+
+    setNumberOfEmployees(numberOfEmployees: NumberOfEmployees) {
+        this.numberOfEmployees = numberOfEmployees;
+    }
+
+    setIndustry(industry: Industry) {
+        this.industry = industry;
+    }
+
+    setCompanyType(company: Company) {
+        this.companyType = company;
+    }
+
+    setAvatar(avatar: Avatar) {
+        this.avatar = avatar;
+    }
+
+    getAvatar(): Avatar | null {
+        return this.avatar;
+    }
+
+    setDocuments(documents: CompanyDocuments) {
+        this.documents = documents;
+    }
+
+    addDocument(document: DocumentSchema) {
+        this.documents?.addDocument(document);
+    }
+
+    removeDocument(document: DocumentSchema) {
+        this.documents?.removeDocument(document);
+    }
+
+    setStakeholders(companyStakeholders: CompanyStakeholders) {
+        this.stakeholders = companyStakeholders;
+    }
+
+    addStakeholder(stakeholder: Stakeholder) {
+        this.stakeholders?.addStakeholder(stakeholder);
+    }
+
+    removeStakeholder(id: Uuid) {
+        this.stakeholders?.removeStakeholder(id);
+    }
+
+    getEIN(): EIN {
+        return this.ein as EIN;
+    }
+
+    verifyCompletion(): boolean {
+        return !(
+            this.companyName === null
+            || this.address === null
+            || this.ein === null
+            || this.annualRevenue === null
+            || this.numberOfEmployees === null
+            || this.industry === null
+            || this.companyType === null
+            || this.documents.isEmpty()
+        );
+    }
+}
+
+export class CorporateDraftAccount extends CompanyDraftAccount {
+    constructor(profileId: string, draftId: string, state: DraftAccountState) {
+        super(profileId, draftId, state, DraftAccountType.CORPORATE);
+    }
+
+    static createCorporate(profileId: string, draftId: string, state: DraftAccountState, data: CompanyDraftAccountSchema): CorporateDraftAccount {
+        const corporateDraftAccount = new CorporateDraftAccount(profileId, draftId, state);
+        super.setCompanyData(corporateDraftAccount, data);
+
+        return corporateDraftAccount;
+    }
+}
+
+export class TrustDraftAccount extends CompanyDraftAccount {
+    constructor(profileId: string, draftId: string, state: DraftAccountState) {
+        super(profileId, draftId, state, DraftAccountType.TRUST);
+    }
+
+    static createTrust(profileId: string, draftId: string, state: DraftAccountState, data: CompanyDraftAccountSchema): TrustDraftAccount {
+        const trustDraftAccount = new TrustDraftAccount(profileId, draftId, state);
+        super.setCompanyData(trustDraftAccount, data);
+
+        return trustDraftAccount;
     }
 }

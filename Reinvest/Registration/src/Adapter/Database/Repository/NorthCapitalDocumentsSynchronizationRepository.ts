@@ -34,7 +34,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
             documentPath: document.path,
             documentFilename: document.fileName,
             version: 0,
-            state: 'DIRTY',
+            state: DocumentSyncState.DIRTY,
             createdDate: new Date(),
             updatedDate: new Date(),
         }));
@@ -78,7 +78,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
                 .castTo<NorthCapitalDocumentToSync>()
                 .executeTakeFirstOrThrow();
         } catch (error: any) {
-            console.error(error.message);
+            console.error(error);
             return null;
         }
     }
@@ -102,7 +102,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
 
             return true;
         } catch (error: any) {
-            console.error('Failed to set document as clean - probably race conditioning', error.message);
+            console.error('Failed to set document as clean - probably race conditioning', error);
             return false;
         }
     }
@@ -125,7 +125,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
                 .executeTakeFirstOrThrow();
 
         } catch (error: any) {
-            console.error('Failed to set document as failed - probably race conditioning', error.message);
+            console.error('Failed to set document as failed - probably race conditioning', error);
         }
     }
 
@@ -145,7 +145,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
                 .executeTakeFirstOrThrow();
 
         } catch (error: any) {
-            console.error('Failed to set document move to the end of queue - probably race conditioning', error.message);
+            console.error('Failed to set document move to the end of queue - probably race conditioning', error);
         }
     }
 }

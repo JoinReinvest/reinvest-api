@@ -42,6 +42,10 @@ export class OneTimeToken {
         }
     }
 
+    public doesRequireOriginationNumber(): boolean {
+        return this.phoneNumber.isUSNumber();
+    }
+
     public getSms() {
         return {
             phoneNumber: this.phoneNumber.getFullPhoneNumber(),

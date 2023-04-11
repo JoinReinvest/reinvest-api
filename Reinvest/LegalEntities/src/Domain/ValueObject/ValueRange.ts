@@ -1,20 +1,20 @@
 import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
-export type NetRangeInput = {
+export type ValueRangeInput = {
     range: string
 }
 
 
-export abstract class NetRange {
+export abstract class ValueRange {
     private range: string;
 
     constructor(range: string) {
         this.range = range;
     }
 
-    static getValidRange(netRangeInput: NetRangeInput, name: string): string {
+    static getValidRange(valueRangeInput: ValueRangeInput, name: string): string {
         try {
-            const {range} = netRangeInput;
+            const {range} = valueRangeInput;
             if (!range) {
                 throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, name);
             }
@@ -25,23 +25,37 @@ export abstract class NetRange {
         }
     }
 
-    toObject(): NetRangeInput {
+    toObject(): ValueRangeInput {
         return {
             range: this.range
         }
     }
 }
 
-export class NetWorth extends NetRange {
-    static create(netRangeInput: NetRangeInput): NetWorth {
-        const range = NetRange.getValidRange(netRangeInput, 'netWorth');
+export class NetWorth extends ValueRange {
+    static create(valueRangeInput: ValueRangeInput): NetWorth {
+        const range = ValueRange.getValidRange(valueRangeInput, 'netWorth');
         return new NetWorth(range);
     }
 }
 
-export class NetIncome extends NetRange {
-    static create(netRangeInput: NetRangeInput): NetIncome {
-        const range = NetRange.getValidRange(netRangeInput, 'netIncome');
+export class NetIncome extends ValueRange {
+    static create(valueRangeInput: ValueRangeInput): NetIncome {
+        const range = ValueRange.getValidRange(valueRangeInput, 'netIncome');
         return new NetWorth(range);
+    }
+}
+
+export class AnnualRevenue extends ValueRange {
+    static create(valueRangeInput: ValueRangeInput): AnnualRevenue {
+        const range = ValueRange.getValidRange(valueRangeInput, 'annualRevenue');
+        return new AnnualRevenue(range);
+    }
+}
+
+export class NumberOfEmployees extends ValueRange {
+    static create(valueRangeInput: ValueRangeInput): NumberOfEmployees {
+        const range = ValueRange.getValidRange(valueRangeInput, 'numberOfEmployees');
+        return new NumberOfEmployees(range);
     }
 }

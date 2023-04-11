@@ -111,7 +111,6 @@ export abstract class ExecutionVertaloAdapter {
 
             return response.data.data;
         } catch (error) {
-            // @ts-ignore
             throw new Error(`Request error: ${error.message}`)
         }
     }

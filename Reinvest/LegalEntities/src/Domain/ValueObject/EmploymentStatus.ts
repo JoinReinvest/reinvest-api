@@ -36,4 +36,8 @@ export class EmploymentStatus {
             status: this.employmentStatus
         }
     }
+
+    isEmployed() {
+        return this.employmentStatus === EmploymentStatusEnum.EMPLOYED;
+    }
 }

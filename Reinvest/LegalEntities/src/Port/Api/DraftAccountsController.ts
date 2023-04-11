@@ -1,7 +1,11 @@
 import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
-import {DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
-import {CompleteDraftAccount, IndividualDraftAccountInput} from "LegalEntities/UseCases/CompleteDraftAccount";
-import {DraftAccountQuery, DraftQuery, DraftsList} from "LegalEntities/UseCases/DraftAccountQuery";
+import {CompanyDraftAccountType, DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import {
+    CompanyDraftAccountInput,
+    CompleteDraftAccount,
+    IndividualDraftAccountInput
+} from "LegalEntities/UseCases/CompleteDraftAccount";
+import {DraftAccountQuery, DraftQuery, DraftsList} from "LegalEntities/Port/Api/DraftAccountQuery";
 import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 import {RemoveDraftAccount} from "LegalEntities/UseCases/RemoveDraftAccount";
 import {ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";
@@ -36,6 +40,7 @@ export class DraftAccountsController {
                 status: true
             }
         } catch (error) {
+            console.error(error);
             return {
                 status: false,
                 message: `Draft account with type ${type} already exists`
@@ -70,6 +75,21 @@ export class DraftAccountsController {
     ): Promise<ValidationErrorType[]> {
         try {
             return await this.completeDraftAccount.completeIndividual(profileId, draftAccountId, individualInput)
+        } catch (error: any) {
+            return [
+                error.message
+            ];
+        }
+    }
+
+    public async completeCompanyDraftAccount(
+        profileId: string,
+        draftAccountId: string,
+        accountType: CompanyDraftAccountType,
+        companyInput: CompanyDraftAccountInput
+    ): Promise<ValidationErrorType[]> {
+        try {
+            return await this.completeDraftAccount.completeCompany(profileId, draftAccountId, accountType, companyInput)
         } catch (error: any) {
             return [
                 error.message

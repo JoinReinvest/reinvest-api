@@ -1,7 +1,11 @@
 import {SimpleAggregate} from "SimpleAggregator/SimpleAggregate";
-import {AggregateState} from "SimpleAggregator/Types";
+import {AggregateState, DomainEvent} from "SimpleAggregator/Types";
 
-import {IndividualAccountOpened, ProfileCreated} from "InvestmentAccounts/Domain/ProfileAggregate/ProfileEvents";
+import {
+    CorporateAccountOpened,
+    IndividualAccountOpened,
+    ProfileCreated, TrustAccountOpened
+} from "InvestmentAccounts/Domain/ProfileAggregate/ProfileEvents";
 import {ProfileException} from "InvestmentAccounts/Domain/ProfileAggregate/ProfileException";
 import {AccountType} from "InvestmentAccounts/Domain/ProfileAggregate/AccountType";
 
@@ -60,6 +64,52 @@ class Profile extends SimpleAggregate {
         return this.apply(event);
     }
 
+    openCorporateAccount(accountId: string) {
+        const corporateAccountIds = this.getState("corporateAccountIds", []);
+        const isAlreadyOpened = corporateAccountIds.includes(accountId);
+
+        if (isAlreadyOpened) {
+            ProfileException.throw("THE_ACCOUNT_ALREADY_OPENED");
+        }
+
+        if (!this.canOpenCorporateAccount()) {
+            ProfileException.throw("CANNOT_OPEN_ACCOUNT");
+        }
+
+        const event = <CorporateAccountOpened>{
+            id: this.getId(),
+            kind: "CorporateAccountOpened",
+            data: {
+                corporateAccountIds: [accountId]
+            }
+        };
+
+        return this.apply(event);
+    }
+
+    openTrustAccount(accountId: string) {
+        const trustAccountIds = this.getState("trustAccountIds", []);
+        const isAlreadyOpened = trustAccountIds.includes(accountId);
+
+        if (isAlreadyOpened) {
+            ProfileException.throw("THE_ACCOUNT_ALREADY_OPENED");
+        }
+
+        if (!this.canOpenTrustAccount()) {
+            ProfileException.throw("CANNOT_OPEN_ACCOUNT");
+        }
+
+        const event = <TrustAccountOpened>{
+            id: this.getId(),
+            kind: "TrustAccountOpened",
+            data: {
+                trustAccountIds: [accountId]
+            }
+        };
+
+        return this.apply(event);
+    }
+
     listAccountTypesUserCanOpen(): AccountType[] {
         const availableAccountTypes = [];
         if (this.canOpenIndividualAccount()) {
@@ -88,21 +138,36 @@ class Profile extends SimpleAggregate {
             return false;
         }
 
-        const beneficiaryAccountIds = this.getState("beneficiaryAccountIds");
+        const beneficiaryAccountIds = this.getState("beneficiaryAccountIds", []);
 
         return beneficiaryAccountIds.length < MAX_NUMBER_OF_BENEFICIARIES;
     }
 
     private canOpenCorporateAccount(): boolean {
-        const corporateAccountIds = this.getState("corporateAccountIds");
+        const corporateAccountIds = this.getState("corporateAccountIds", []);
 
         return corporateAccountIds.length < MAX_NUMBER_OF_CORPORATES;
     }
 
     private canOpenTrustAccount(): boolean {
-        const trustAccountIds = this.getState("trustAccountIds");
+        const trustAccountIds = this.getState("trustAccountIds", []);
 
         return trustAccountIds.length < MAX_NUMBER_OF_TRUSTS;
+    }
+
+    apply<Event extends DomainEvent>(event: Event) {
+        const eventCopy = this.deepCopy(event);
+        if (event.data.corporateAccountIds) {
+            eventCopy.data.corporateAccountIds = [...this.getState("corporateAccountIds", [])];
+            eventCopy.data.corporateAccountIds.push(event.data.corporateAccountIds[0]);
+        }
+
+        if (event.data.trustAccountIds) {
+            eventCopy.data.trustAccountIds = [...this.getState("trustAccountIds", [])];
+            eventCopy.data.trustAccountIds.push(event.data.trustAccountIds[0]);
+        }
+
+        return super.apply(eventCopy);
     }
 }
 

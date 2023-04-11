@@ -14,7 +14,7 @@ export interface LegalEntitiesProfile {
     statements: string | null;
     investingExperience: string | null;
     isCompleted: boolean;
-};
+}
 
 export interface LegalEntitiesDraftAccount {
     draftId: string;
@@ -22,7 +22,7 @@ export interface LegalEntitiesDraftAccount {
     state: string;
     accountType: string;
     data: string | null;
-};
+}
 
 export interface LegalEntitiesIndividualAccount {
     accountId: string;
@@ -32,7 +32,24 @@ export interface LegalEntitiesIndividualAccount {
     netWorth: string | null;
     netIncome: string | null;
     avatar: string | null;
-};
+}
+
+export interface LegalEntitiesCompanyAccount {
+    accountId: string;
+    profileId: string;
+    companyName: string | null;
+    address: string | null;
+    ein: string | null;
+    annualRevenue: string | null;
+    numberOfEmployees: string | null;
+    industry: string | null;
+    companyType: string | null;
+    stakeholders: string | null;
+    companyDocuments: string | null;
+    accountType: string;
+    avatar: string | null;
+    einHash: string;
+}
 
 export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'ssnObject'];
 

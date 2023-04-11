@@ -11,14 +11,19 @@ export class JsonGraphQLError extends GraphQLError {
         super('Invalid query/mutation', undefined, undefined, undefined, undefined, undefined, {
             details: json,
             ...extensions,
-
         });
     }
 }
 
 const server = new ApolloServer({
     schema: Schema,
-    includeStacktraceInErrorResponses: false, // todo this should be debug flag
+
+    // todo this should be debug flag
+    includeStacktraceInErrorResponses: false,
+    formatError: (error) => {
+        console.warn(error);
+        return error;
+    }
 });
 
 export type SessionContext = { modules: Modules, profileId: string, userId: string }
@@ -27,33 +32,28 @@ export const app = (modules: Modules) => {
     return startServerAndCreateLambdaHandler(server, {
 
         context: async ({event, context}) => {
-            try {
-
-                const {authorizer} = event.requestContext;
-                if (!authorizer || !authorizer.jwt.claims.sub) {
-                    throw new GraphQLError('User is not authenticated', {
-                        extensions: {
-                            code: 'UNAUTHENTICATED',
-                            http: {status: 401},
-                        },
-                    });
-                }
-                const userId = authorizer.jwt.claims.sub;
-                const api = modules.getApi<Identity.ApiType>(Identity);
-                const profileId = await api.getProfileId(userId);
-
-                if (profileId === null) {
-                    throw new GraphQLError('Profile not exist');
-                }
-
-                return <SessionContext>{
-                    userId,
-                    profileId,
-                    modules,
-                };
-            } catch (error: any) {
-                console.log(error);
+            const {authorizer} = event.requestContext;
+            if (!authorizer || !authorizer.jwt.claims.sub) {
+                throw new GraphQLError('User is not authenticated', {
+                    extensions: {
+                        code: 'UNAUTHENTICATED',
+                        http: {status: 401},
+                    },
+                });
             }
+            const userId = authorizer.jwt.claims.sub;
+            const api = modules.getApi<Identity.ApiType>(Identity);
+            const profileId = await api.getProfileId(userId);
+
+            if (profileId === null) {
+                throw new GraphQLError('Profile not exist');
+            }
+
+            return <SessionContext>{
+                userId,
+                profileId,
+                modules,
+            };
         },
     });
 };

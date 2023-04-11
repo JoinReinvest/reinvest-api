@@ -21,8 +21,13 @@ export class OpenAccount {
 
         switch (accountType) {
             case AccountType.INDIVIDUAL:
-                const event = profile.openIndividualAccount(accountId);
-                events.push(event);
+                events.push(profile.openIndividualAccount(accountId));
+                break;
+            case AccountType.CORPORATE:
+                events.push(profile.openCorporateAccount(accountId));
+                break;
+            case AccountType.TRUST:
+                events.push(profile.openTrustAccount(accountId));
                 break;
             default:
                 ProfileException.throw(`Unknown account type: ${accountType}`);

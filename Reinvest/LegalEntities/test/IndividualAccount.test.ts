@@ -18,7 +18,7 @@ import {Avatar, AvatarInput} from "Reinvest/LegalEntities/src/Domain/ValueObject
 import {Employer, EmployerInput} from "Reinvest/LegalEntities/src/Domain/ValueObject/Employer";
 import {
     NetIncome,
-    NetRangeInput,
+    ValueRangeInput,
     NetWorth,
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/ValueRange";
 
@@ -114,7 +114,7 @@ context("Given an investor created an individual draft account", () => {
         const path = 'e78cd92b-cb1b-4e20-83eb-1c2d421cee34';
         it("Then add an avatar", async () => {
             const input = {id: avatarId, path};
-            draftAccount.setAvatarDocument(Avatar.create(input))
+            draftAccount.setAvatar(Avatar.create(input))
             const {data} = draftAccount.toObject();
             const avatar = data?.avatar as AvatarInput;
 
@@ -126,7 +126,7 @@ context("Given an investor created an individual draft account", () => {
             const input = <AvatarInput>{path};
 
             expectThrows(
-                () => draftAccount.setAvatarDocument(Avatar.create(input)),
+                () => draftAccount.setAvatar(Avatar.create(input)),
                 "avatar:MISSING_MANDATORY_FIELDS"
             );
         });
@@ -165,13 +165,13 @@ context("Given an investor created an individual draft account", () => {
             };
             draftAccount.setNetWorth(NetWorth.create(input))
             const {data} = draftAccount.toObject();
-            const netWorth = data?.netWorth as NetRangeInput;
+            const netWorth = data?.netWorth as ValueRangeInput;
 
             expect(netWorth.range).to.be.equal(range);
         });
 
         it("Or add an Net Worth without details Then expects validation error", async () => {
-            const input = <NetRangeInput>{};
+            const input = <ValueRangeInput>{};
 
             expectThrows(
                 () => draftAccount.setNetWorth(NetWorth.create(input)),
@@ -190,13 +190,13 @@ context("Given an investor created an individual draft account", () => {
             };
             draftAccount.setNetIncome(NetIncome.create(input))
             const {data} = draftAccount.toObject();
-            const netWorth = data?.netWorth as NetRangeInput;
+            const netWorth = data?.netWorth as ValueRangeInput;
 
             expect(netWorth.range).to.be.equal(range);
         });
 
         it("Or add an Net Income without details Then expects validation error", async () => {
-            const input = <NetRangeInput>{};
+            const input = <ValueRangeInput>{};
 
             expectThrows(
                 () => draftAccount.setNetIncome(NetIncome.create(input)),

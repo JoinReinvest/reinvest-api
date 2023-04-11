@@ -9,3 +9,5 @@ export * as migration_20230329130500_create_north_capital_documents_synchronizat
     from './registration_6_create_north_capital_documents_synchronization';
 export * as migration_20230330130500_rop_documents_column_from_north_capital_synchronization
     from './registration_7_drop_documents_column_from_north_capital_synchronization';
+export * as migration_20230406185900_add_sub_mapping_sub_id
+    from './registration_8_add_sub_mapping_sub_id';
