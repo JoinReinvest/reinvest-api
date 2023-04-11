@@ -83,7 +83,7 @@ export class DraftAccountRepository {
 
             return true;
         } catch (error: any) {
-            console.error(`Cannot create draft account: ${error.message}`);
+            console.error(`Cannot create draft account: ${error.message}`, error);
             return false;
         }
     }

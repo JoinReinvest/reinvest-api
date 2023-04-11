@@ -169,10 +169,10 @@ export class NorthCapitalSynchronizer {
         } catch (error: any) {
             const {reason} = error;
             if (document && reason === 'FILE_NOT_FOUND') {
-                console.error(`Document ${documentId} not found in document service`, error.message);
+                console.error(`Document ${documentId} not found in document service`, error);
                 await this.northCapitalDocumentSynchronizationRepository.setFailed(document);
             } else {
-                console.error(`Document ${documentId} synchronization failed`, error.message);
+                console.error(`Document ${documentId} synchronization failed`, error);
                 if (document) {
                     await this.northCapitalDocumentSynchronizationRepository.moveToTheEndOfQueue(document);
                 }

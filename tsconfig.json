@@ -13,6 +13,7 @@
       "Container/*": ["./shared/hkek-container/*"],
       "IdGenerator/*": ["./shared/hkek-id-generator/*"],
       "HKEKTypes/*": ["./shared/hkek-types/*"],
+      "Logger/*": ["./shared/hkek-logger/*"],
 
       "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
       "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],

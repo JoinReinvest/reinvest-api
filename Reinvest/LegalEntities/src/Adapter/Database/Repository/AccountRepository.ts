@@ -99,7 +99,7 @@ export class AccountRepository {
 
             return true;
         } catch (error: any) {
-            console.error(`Cannot create individual account: ${error.message}`);
+            console.error(`Cannot create individual account: ${error.message}`, error);
             return false;
         }
     }
@@ -125,7 +125,7 @@ export class AccountRepository {
 
             return IndividualAccount.create(account as IndividualSchema);
         } catch (error: any) {
-            console.error(`Cannot find individual account: ${error.message}`);
+            console.warn(`Cannot find individual account: ${error.message}`);
             return null;
         }
     }
@@ -148,7 +148,7 @@ export class AccountRepository {
 
             return IndividualAccountOverview.create(account);
         } catch (error: any) {
-            console.error(`Cannot find individual account: ${error.message}`);
+            console.warn(`Cannot find individual account: ${error.message}`);
             return null;
         }
     }
@@ -263,10 +263,9 @@ export class AccountRepository {
 
             return true;
         } catch (error: any) {
-            console.error(`Cannot create company account: ${error.message}`);
+            console.error(`Cannot create company account: ${error.message}`, error);
             return false;
         }
-
     }
 
     async findCompanyAccount(profileId: string, accountId: string): Promise<CompanyAccount | null> {
@@ -296,7 +295,7 @@ export class AccountRepository {
 
             return CompanyAccount.create(account);
         } catch (error: any) {
-            console.error(`Cannot find any company account: ${error.message}`);
+            console.warn(`Cannot find any company account: ${error.message}`);
             return null;
         }
     }
@@ -318,7 +317,7 @@ export class AccountRepository {
 
             return accounts.map((account) => CompanyAccountOverview.create(account));
         } catch (error: any) {
-            console.error(`Cannot find any company account: ${error.message}`);
+            console.warn(`Cannot find any company account: ${error.message}`);
             return [];
         }
     }
