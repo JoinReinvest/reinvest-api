@@ -7,6 +7,12 @@ import {
 } from "Registration/Domain/Model/ReinvestTypes";
 
 
+export type AccountNameOwner = {
+    firstName: string
+    middleName?: string
+    lastName: string,
+}
+
 export type IndividualAccountForSynchronization = {
     accountId: string,
     profileId: string,
@@ -62,7 +68,7 @@ export type CompanyAccountForSynchronization = {
         firstName: string
         middleName?: string
         lastName: string,
-    }
+    },
     address: Address,
     companyType: { type: CompanyType },
     stakeholders: { id: string }[],

@@ -7,6 +7,7 @@ import {NorthCapitalSynchronizer} from "../../Adapter/NorthCapital/NorthCapitalS
 import {VertaloSynchronizer} from "Registration/Adapter/Vertalo/VertaloSynchronizer";
 import {CompanyAccountForSynchronization} from "Registration/Domain/Model/Account";
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+import {VertaloMapper} from "Registration/Domain/VendorModel/Vertalo/VertaloMapper";
 
 export class SynchronizeCompanyAccount extends AbstractSynchronize {
     static getClassName = () => 'SynchronizeCompanyAccount';
@@ -40,9 +41,9 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
             });
 
             const northCapitalStatus = await this.synchronizeNorthCapital(record, companyAccount);
-            //     const vertaloStatus = await this.synchronizeVertalo(record, individualAccount);
-            //
-            if (northCapitalStatus) { //  && vertaloStatus
+            const vertaloStatus = await this.synchronizeVertalo(record, companyAccount);
+
+            if (northCapitalStatus && vertaloStatus) {
                 await this.setCleanAndUnlockExecution(record);
                 console.log(`[SUCCESS] Company account synchronized, recordId: ${record.getRecordId()}`);
                 return true;
@@ -72,17 +73,16 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
         }
     }
 
-    // private async synchronizeVertalo(record: MappedRecord, individualAccount: IndividualAccountForSynchronization): Promise<boolean> {
-    // try {
-    //     const vertaloIndividualAccount = VertaloMapper.mapIndividualAccount(individualAccount, record.getEmail());
-    //     await this.vertaloSynchronizer.synchronizeIndividualAccount(record.getRecordId(), vertaloIndividualAccount)
-    //
-    //     console.log(`[Vertalo SUCCESS] Individual account synchronized, recordId: ${record.getRecordId()}`);
-    //     return true;
-    // } catch (error: any) {
-    //     console.error(`[Vertalo FAILED] Vertalo Individual account synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
-    //     return false;
-    // }
-    // }
+    private async synchronizeVertalo(record: MappedRecord, companyAccount: CompanyAccountForSynchronization): Promise<boolean> {
+        try {
+            const vertaloAccount = VertaloMapper.mapCompanyAccount(companyAccount, record.getEmail());
+            await this.vertaloSynchronizer.synchronizeAccount(record.getRecordId(), vertaloAccount)
 
+            console.log(`[Vertalo SUCCESS] Company account synchronized, recordId: ${record.getRecordId()}`);
+            return true;
+        } catch (error: any) {
+            console.error(`[Vertalo FAILED] Company account synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
+            return false;
+        }
+    }
 }

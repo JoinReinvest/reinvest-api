@@ -1,5 +1,9 @@
 # REINVEST API CHANGELOG
 
+## 1.8.2 - 04/11/2023
+
+* Synchronization corporate/trust companies with Vertalo
+
 ## 1.8.1 - 04/11/2023
 
 * Synchronization corporate/trust entities with North Capital:

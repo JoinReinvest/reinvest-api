@@ -69,7 +69,7 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
     private async synchronizeVertalo(record: MappedRecord, individualAccount: IndividualAccountForSynchronization): Promise<boolean> {
         try {
             const vertaloIndividualAccount = VertaloMapper.mapIndividualAccount(individualAccount, record.getEmail());
-            await this.vertaloSynchronizer.synchronizeIndividualAccount(record.getRecordId(), vertaloIndividualAccount)
+            await this.vertaloSynchronizer.synchronizeAccount(record.getRecordId(), vertaloIndividualAccount)
 
             console.log(`[Vertalo SUCCESS] Individual account synchronized, recordId: ${record.getRecordId()}`);
             return true;
