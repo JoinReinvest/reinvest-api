@@ -1,40 +1,43 @@
-import { ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 
 export type EmploymentStatusInput = {
-  status: EmploymentStatusEnum;
-};
+    status: EmploymentStatusEnum
+}
 
 export enum EmploymentStatusEnum {
-  EMPLOYED = 'EMPLOYED',
-  UNEMPLOYED = 'UNEMPLOYED',
-  RETIRED = 'RETIRED',
-  STUDENT = 'STUDENT',
+    EMPLOYED = "EMPLOYED",
+    UNEMPLOYED = "UNEMPLOYED",
+    RETIRED = "RETIRED",
+    STUDENT = "STUDENT",
 }
 
 export class EmploymentStatus {
-  private employmentStatus: EmploymentStatusEnum;
+    private employmentStatus: EmploymentStatusEnum;
 
-  constructor(employmentStatus: EmploymentStatusEnum) {
-    this.employmentStatus = employmentStatus;
-  }
-
-  static create(input: EmploymentStatusInput) {
-    try {
-      const { status } = input;
-
-      if (!Object.values(EmploymentStatusEnum).includes(status)) {
-        throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, 'employmentStatus');
-      }
-
-      return new EmploymentStatus(status);
-    } catch (error: any) {
-      throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, 'employmentStatus');
+    constructor(employmentStatus: EmploymentStatusEnum) {
+        this.employmentStatus = employmentStatus;
     }
-  }
 
-  toObject(): EmploymentStatusInput {
-    return {
-      status: this.employmentStatus,
-    };
-  }
+    static create(input: EmploymentStatusInput) {
+        try {
+            const {status} = input;
+            if (!Object.values(EmploymentStatusEnum).includes(status)) {
+                throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "employmentStatus");
+            }
+
+            return new EmploymentStatus(status);
+        } catch (error: any) {
+            throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, "employmentStatus");
+        }
+    }
+
+    toObject(): EmploymentStatusInput {
+        return {
+            status: this.employmentStatus
+        }
+    }
+
+    isEmployed() {
+        return this.employmentStatus === EmploymentStatusEnum.EMPLOYED;
+    }
 }

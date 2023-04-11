@@ -56,6 +56,8 @@ jobs:
           VERTALO_API_URL: ${{ secrets[format('{0}_VERTALO_API_URL', env.SHARED_ENVIRONMENT)] }}
           VERTALO_CLIENT_ID: ${{ secrets[format('{0}_VERTALO_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
           VERTALO_CLIENT_SECRET: ${{ secrets[format('{0}_VERTALO_CLIENT_SECRET', env.SHARED_ENVIRONMENT)] }}
+          SNS_ORIGINATION_NUMBER: ${{ secrets.SNS_ORIGINATION_NUMBER }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:functions"

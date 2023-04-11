@@ -1,43 +1,44 @@
-import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
-import { LegalEntitiesService } from 'Registration/Adapter/Modules/LegalEntitiesService';
-import { MappedRecord } from 'Registration/Domain/Model/Mapping/MappedRecord';
-import { NorthCapitalMapper } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper';
-import { AbstractSynchronize } from 'Registration/IntegrationLogic/UseCase/AbstractSynchronize';
-
-import { NorthCapitalSynchronizer } from '../../Adapter/NorthCapital/NorthCapitalSynchronizer';
+import {AbstractSynchronize} from "Registration/IntegrationLogic/UseCase/AbstractSynchronize";
+import {MappingRegistryRepository} from "Registration/Adapter/Database/Repository/MappingRegistryRepository";
+import {LegalEntitiesService} from "Registration/Adapter/Modules/LegalEntitiesService";
+import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
+import {MappedRecord} from "Registration/Domain/Model/Mapping/MappedRecord";
+import {NorthCapitalSynchronizer} from "../../Adapter/NorthCapital/NorthCapitalSynchronizer";
 
 export class SynchronizeProfile extends AbstractSynchronize {
-  static getClassName = () => 'SynchronizeProfile';
-  private legalEntitiesService: LegalEntitiesService;
-  private northCapitalSynchronizer: NorthCapitalSynchronizer;
+    static getClassName = () => 'SynchronizeProfile';
+    private legalEntitiesService: LegalEntitiesService;
+    private northCapitalSynchronizer: NorthCapitalSynchronizer;
 
-  constructor(
-    mappingRegistryRepository: MappingRegistryRepository,
-    legalEntitiesService: LegalEntitiesService,
-    northCapitalSynchronizer: NorthCapitalSynchronizer,
-  ) {
-    super(mappingRegistryRepository);
-    this.legalEntitiesService = legalEntitiesService;
-    this.northCapitalSynchronizer = northCapitalSynchronizer;
-  }
-
-  async execute(record: MappedRecord): Promise<void> {
-    if (!record.isProfile() || !(await this.lockExecution(record))) {
-      return;
+    constructor(
+        mappingRegistryRepository: MappingRegistryRepository,
+        legalEntitiesService: LegalEntitiesService,
+        northCapitalSynchronizer: NorthCapitalSynchronizer,
+    ) {
+        super(mappingRegistryRepository);
+        this.legalEntitiesService = legalEntitiesService;
+        this.northCapitalSynchronizer = northCapitalSynchronizer;
     }
 
-    try {
-      console.log(`[START] Profile synchronization, recordId: ${record.getRecordId()}`);
-      const profile = await this.legalEntitiesService.getProfile(record.getProfileId());
+    async execute(record: MappedRecord): Promise<boolean> {
+        if (!record.isProfile() || !await this.lockExecution(record)) {
+            return false;
+        }
 
-      const northCapitalMainParty = NorthCapitalMapper.mapProfile(profile, record.getEmail());
-      await this.northCapitalSynchronizer.synchronizeMainParty(record.getRecordId(), northCapitalMainParty);
+        try {
+            console.log(`[START] Profile synchronization, recordId: ${record.getRecordId()}`);
+            const profile = await this.legalEntitiesService.getProfile(record.getProfileId());
 
-      await this.setCleanAndUnlockExecution(record);
-      console.log(`[FINISHED] Profile synchronization, recordId: ${record.getRecordId()}`);
-    } catch (error: any) {
-      console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}: ${error.message}`);
-      await this.unlockExecution(record);
+            const northCapitalMainParty = NorthCapitalMapper.mapProfile(profile, record.getEmail());
+            await this.northCapitalSynchronizer.synchronizeMainParty(record.getRecordId(), northCapitalMainParty);
+
+            await this.setCleanAndUnlockExecution(record);
+            console.log(`[FINISHED] Profile synchronization, recordId: ${record.getRecordId()}`);
+            return true;
+        } catch (error: any) {
+            console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}`, error);
+            await this.unlockExecution(record);
+        }
+        return false;
     }
-  }
 }
