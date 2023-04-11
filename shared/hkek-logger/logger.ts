@@ -3,9 +3,9 @@ import * as Sentry from "@sentry/node";
 const originalConsole = {...console};
 
 export function logger(config: { dsn: string, isLocal: boolean, environment: string }) {
-    // if (config.isLocal) {
-    //     return originalConsole;
-    // }
+    if (config.isLocal) {
+        return originalConsole;
+    }
 
     Sentry.init({
         dsn: config.dsn,
