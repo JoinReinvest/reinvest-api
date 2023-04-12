@@ -25,7 +25,7 @@ export const CronVendorsSyncResources = {
     CronVendorsSyncRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-            AssumeRolePolicyVendors: {
+            AssumeRolePolicyDocument: {
                 Statement: [
                     {
                         Effect: 'Allow',
@@ -39,7 +39,7 @@ export const CronVendorsSyncResources = {
             Policies: [
                 {
                     PolicyName: 'QueuePolicy',
-                    PolicyVendors: {
+                    PolicyDocument: {
                         Statement: [
                             ...CloudwatchPolicies,
                             ...EniPolicies,
