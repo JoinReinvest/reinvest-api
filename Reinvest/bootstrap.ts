@@ -22,7 +22,7 @@ import {VertaloConfig} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapte
 import {logger} from "Logger/logger";
 
 console = logger(SENTRY_CONFIG);
-
+console.log("Starting Reinvest API");
 export function boot(): Modules {
     const modules = new Modules();
 
