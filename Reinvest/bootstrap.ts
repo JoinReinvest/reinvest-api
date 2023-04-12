@@ -10,7 +10,7 @@ import {
     VERTALO_CONFIG,
     S3_CONFIG,
     SNS_CONFIG, SQS_CONFIG,
-    WEB_APP_URL
+    WEB_APP_URL, SENTRY_CONFIG
 } from "Reinvest/config";
 import {Documents} from "Documents/index";
 import {Registration} from "Reinvest/Registration/src";
@@ -19,6 +19,9 @@ import {CognitoConfig} from "Identity/Adapter/AWS/CognitoService";
 import {QueueConfig} from "shared/hkek-sqs/QueueSender";
 import {NorthCapitalConfig} from "Registration/Adapter/NorthCapital/NorthCapitalAdapter";
 import {VertaloConfig} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapter";
+import {logger} from "Logger/logger";
+
+console = logger(SENTRY_CONFIG);
 
 export function boot(): Modules {
     const modules = new Modules();

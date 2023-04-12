@@ -144,7 +144,7 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
                 }
             });
         } catch (error: any) {
-            console.error(`Retrieve all links for North Capital account ${northCapitalAccountId} failed: ${error.message}`);
+            console.error(`Retrieve all links for North Capital account ${northCapitalAccountId} failed`, error);
             return [];
         }
     }

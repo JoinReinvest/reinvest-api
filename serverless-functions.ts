@@ -69,6 +69,7 @@ const serverlessConfiguration: AWS = {
             VERTALO_CLIENT_ID: "${env:VERTALO_CLIENT_ID}",
             VERTALO_CLIENT_SECRET: "${env:VERTALO_CLIENT_SECRET}",
             SNS_ORIGINATION_NUMBER: "${env:SNS_ORIGINATION_NUMBER}",
+            SENTRY_DSN: "${env:SENTRY_DSN}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,

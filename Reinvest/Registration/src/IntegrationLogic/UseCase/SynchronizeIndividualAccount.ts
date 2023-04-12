@@ -46,7 +46,7 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
                 await this.unlockExecution(record);
             }
         } catch (error: any) {
-            console.error(`[FAILED] Individual account synchronization FAILED with error, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[FAILED] Individual account synchronization FAILED with error, recordId: ${record.getRecordId()}`, error);
             await this.unlockExecution(record);
         }
         return false;
@@ -61,7 +61,7 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
             console.log(`[North Capital SUCCESS] Individual account synchronized, recordId: ${record.getRecordId()}`);
             return true;
         } catch (error: any) {
-            console.error(`[North Capital FAILED] North Capital Individual account synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[North Capital FAILED] North Capital Individual account synchronization FAILED, recordId: ${record.getRecordId()}`, error);
             return false;
         }
     }
@@ -69,12 +69,12 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
     private async synchronizeVertalo(record: MappedRecord, individualAccount: IndividualAccountForSynchronization): Promise<boolean> {
         try {
             const vertaloIndividualAccount = VertaloMapper.mapIndividualAccount(individualAccount, record.getEmail());
-            await this.vertaloSynchronizer.synchronizeIndividualAccount(record.getRecordId(), vertaloIndividualAccount)
+            await this.vertaloSynchronizer.synchronizeAccount(record.getRecordId(), vertaloIndividualAccount)
 
             console.log(`[Vertalo SUCCESS] Individual account synchronized, recordId: ${record.getRecordId()}`);
             return true;
         } catch (error: any) {
-            console.error(`[Vertalo FAILED] Vertalo Individual account synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[Vertalo FAILED] Vertalo Individual account synchronization FAILED, recordId: ${record.getRecordId()}`, error);
             return false;
         }
     }

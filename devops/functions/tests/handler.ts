@@ -75,8 +75,8 @@ router.post("/get-sms-topt", async (req: any, res: any) => {
             topt: data.topt,
             status: true
         });
-    } catch (e) {
-        console.log(e);
+    } catch (e: any) {
+        console.log(e.message);
         res.status(500).json({
             status: false
         });
