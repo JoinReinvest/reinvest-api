@@ -40,7 +40,7 @@ export class SynchronizeCompany extends AbstractSynchronize {
                 await this.unlockExecution(record);
             }
         } catch (error: any) {
-            console.error(`[FAILED] Company synchronization FAILED with error, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[FAILED] Company synchronization FAILED with error, recordId: ${record.getRecordId()}`, error);
             await this.unlockExecution(record);
         }
 
@@ -56,7 +56,7 @@ export class SynchronizeCompany extends AbstractSynchronize {
             console.log(`[North Capital SUCCESS] Company synchronized, recordId: ${record.getRecordId()}`);
             return true;
         } catch (error: any) {
-            console.error(`[North Capital FAILED] North Capital Company synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[North Capital FAILED] North Capital Company synchronization FAILED, recordId: ${record.getRecordId()}`, error);
             return false;
         }
     }

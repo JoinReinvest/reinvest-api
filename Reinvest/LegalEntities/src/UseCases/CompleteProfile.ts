@@ -117,7 +117,7 @@ export class CompleteProfile {
                 if ('getValidationError' in error) {
                     errors.push(error.getValidationError());
                 } else {
-                    console.error(error.message);
+                    console.error(error);
                     errors.push(<ValidationErrorType>{
                         type: ValidationErrorEnum.UNKNOWN_ERROR,
                         field: step,

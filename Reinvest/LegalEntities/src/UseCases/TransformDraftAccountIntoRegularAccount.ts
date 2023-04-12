@@ -72,7 +72,7 @@ export class TransformDraftAccountIntoRegularAccount {
 
             return null;
         } catch (error: any) {
-            console.error(error.message);
+            console.error(error);
             return error.message;
         }
     }

@@ -52,7 +52,7 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
                 await this.unlockExecution(record);
             }
         } catch (error: any) {
-            console.error(`[FAILED] Company account synchronization FAILED with error, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[FAILED] Company account synchronization FAILED with error, recordId: ${record.getRecordId()}`, error);
             await this.unlockExecution(record);
         }
 
@@ -68,7 +68,7 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
             console.log(`[North Capital SUCCESS] Company account synchronized, recordId: ${record.getRecordId()}`);
             return true;
         } catch (error: any) {
-            console.error(`[North Capital FAILED] North Capital Company account synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[North Capital FAILED] North Capital Company account synchronization FAILED, recordId: ${record.getRecordId()}`, error);
             return false;
         }
     }
@@ -81,7 +81,7 @@ export class SynchronizeCompanyAccount extends AbstractSynchronize {
             console.log(`[Vertalo SUCCESS] Company account synchronized, recordId: ${record.getRecordId()}`);
             return true;
         } catch (error: any) {
-            console.error(`[Vertalo FAILED] Company account synchronization FAILED, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[Vertalo FAILED] Company account synchronization FAILED, recordId: ${record.getRecordId()}`, error);
             return false;
         }
     }

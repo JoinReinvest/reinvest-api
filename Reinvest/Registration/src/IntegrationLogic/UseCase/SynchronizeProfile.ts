@@ -36,7 +36,7 @@ export class SynchronizeProfile extends AbstractSynchronize {
             console.log(`[FINISHED] Profile synchronization, recordId: ${record.getRecordId()}`);
             return true;
         } catch (error: any) {
-            console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}`, error);
             await this.unlockExecution(record);
         }
         return false;

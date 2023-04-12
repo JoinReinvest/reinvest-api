@@ -52,5 +52,11 @@ export const LAMBDA_CONFIG = {
     isLocal: process.env.IT_IS_LOCAL === 'true',
 }
 
+export const SENTRY_CONFIG = {
+    dsn: process.env.SENTRY_DSN as string,
+    environment: process.env.NODE_ENV as string,
+    isLocal: process.env.IT_IS_LOCAL === 'true',
+}
+
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
 
