@@ -111,7 +111,7 @@ export class CompleteDraftAccount {
                     if ('getValidationError' in error) {
                         errors.push(error.getValidationError());
                     } else {
-                        console.error(error.message);
+                        console.error(error);
                         errors.push(<ValidationErrorType>{
                             type: ValidationErrorEnum.UNKNOWN_ERROR,
                             field: step,
@@ -122,7 +122,7 @@ export class CompleteDraftAccount {
 
             await this.draftAccountRepository.storeDraft(draft);
         } catch (error: any) {
-            console.error(error.message);
+            console.error(error);
             errors.push(<ValidationErrorType>{
                 type: ValidationErrorEnum.UNKNOWN_ERROR,
                 field: 'draft',
@@ -236,7 +236,7 @@ export class CompleteDraftAccount {
                     if ('getValidationError' in error) {
                         errors.push(error.getValidationError());
                     } else {
-                        console.error(error.message);
+                        console.error(error);
                         errors.push(<ValidationErrorType>{
                             type: ValidationErrorEnum.UNKNOWN_ERROR,
                             field: step,
@@ -247,7 +247,7 @@ export class CompleteDraftAccount {
 
             await this.draftAccountRepository.storeDraft(draft);
         } catch (error: any) {
-            console.error(error.message);
+            console.error(error);
             errors.push(<ValidationErrorType>{
                 type: ValidationErrorEnum.UNKNOWN_ERROR,
                 field: 'draft',

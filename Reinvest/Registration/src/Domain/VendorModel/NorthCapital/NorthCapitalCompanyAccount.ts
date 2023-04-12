@@ -1,48 +1,40 @@
 import {CrcService} from "Registration/Domain/CrcService";
 import {
-    NorthCapitalIndividualAccountType,
-    NorthCapitalIndividualExtendedMainPartyStructure,
-    NorthCapitalIndividualAccountStructure, NorthCapitalLink
+    NorthCapitalLink,
+    NorthCapitalCompanyAccountType,
+    NorthCapitalCompanyAccountStructure
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
-import {IndividualAccountForSynchronization} from "Registration/Domain/Model/Account";
+import {CompanyAccountForSynchronization} from "Registration/Domain/Model/Account";
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {DictionaryType} from "HKEKTypes/Generics";
 
-export class NorthCapitalIndividualAccount {
-    private readonly data: NorthCapitalIndividualAccountType;
+export class NorthCapitalCompanyAccount {
+    private readonly data: NorthCapitalCompanyAccountType;
     private accountCrc: string;
-    private partyCrc: string;
 
 
-    constructor(data: NorthCapitalIndividualAccountType) {
+    constructor(data: NorthCapitalCompanyAccountType) {
         this.data = data;
         this.accountCrc = this.generateAccountCrc(data.account);
-        this.partyCrc = this.generateParty(data.extendedParty);
     }
 
-    static createFromIndividualAccountForSynchronization(data: IndividualAccountForSynchronization): NorthCapitalIndividualAccount | never {
+    static createFromCompanyAccountForSynchronization(data: CompanyAccountForSynchronization): NorthCapitalCompanyAccount | never {
         if (data === null) {
-            throw new Error('Cannot create individual account from null');
+            throw new Error('Cannot create company account from null');
         }
 
-        const fullName = [data.name.firstName, data.name?.middleName, data.name.lastName]
+        const ownerName = [data.ownerName.firstName, data.ownerName?.middleName, data.ownerName.lastName]
             .filter((value?: string) => value !== null && value !== "")
             .join(" ");
 
-        return new NorthCapitalIndividualAccount({
+        return new NorthCapitalCompanyAccount({
             profileId: data.profileId,
-            extendedParty: {
-                occupation: data.title ?? null,
-                empStatus: NorthCapitalMapper.mapEmploymentStatus(data.employmentStatus),
-                empName: data.nameOfEmployer ?? null,
-                householdNetworth: data.netIncome ?? null,
-                currentHouseholdIncome: data.netWorth ?? null,
-            },
             account: {
-                accountRegistration: fullName,
-                type: "Individual",
+                accountRegistration: ownerName,
+                type: "Entity",
+                entityType: NorthCapitalMapper.mapCompanyType(data.companyType.type),
                 streetAddress1: data.address.addressLine1,
                 streetAddress2: data.address?.addressLine2,
                 city: data.address.city,
@@ -67,9 +59,10 @@ export class NorthCapitalIndividualAccount {
         });
     }
 
-    private generateAccountCrc(data: NorthCapitalIndividualAccountType['account']): string {
+    private generateAccountCrc(data: NorthCapitalCompanyAccountStructure): string {
         const values = [
             data.accountRegistration,
+            data.entityType ?? "",
             data.streetAddress1,
             data.streetAddress2 ?? "",
             data.city,
@@ -81,22 +74,9 @@ export class NorthCapitalIndividualAccount {
         return CrcService.generateCrc(values);
     }
 
-    private generateParty(data: NorthCapitalIndividualAccountType['extendedParty']): string {
-        const values = [
-            data.occupation ?? "",
-            data.empStatus ?? "",
-            data.empName ?? "",
-            data.householdNetworth ?? "",
-            data.currentHouseholdIncome ?? "",
-        ];
-
-        return CrcService.generateCrc(values);
-    }
-
     getCrc(): string {
         return JSON.stringify({
             account: this.accountCrc,
-            party: this.partyCrc,
         });
     }
 
@@ -104,19 +84,15 @@ export class NorthCapitalIndividualAccount {
         return this.data.profileId;
     }
 
-    getPartyData(): NorthCapitalIndividualExtendedMainPartyStructure {
-        const party = <DictionaryType>{};
-        for (const [key, value] of Object.entries(this.data.extendedParty)) {
+    getAccountData(): DictionaryType {
+        const account = <DictionaryType>{};
+        for (const [key, value] of Object.entries(this.data.account)) {
             if (value !== null && value !== "") {
-                party[key] = value;
+                account[key] = value;
             }
         }
 
-        return party;
-    }
-
-    getAccountData(): NorthCapitalIndividualAccountStructure {
-        return this.data.account;
+        return account;
     }
 
     getLinksConfiguration(): NorthCapitalLink[] {
@@ -130,15 +106,5 @@ export class NorthCapitalIndividualAccount {
             console.warn(`Cannot parse crc: ${error.message}`);
             return true;
         }
-    }
-
-    isOutdatedParty(crc: string): boolean {
-        try {
-            return this.partyCrc !== JSON.parse(crc)?.party;
-        } catch (error: any) {
-            console.warn(`Cannot parse crc: ${error.message}`);
-            return true;
-        }
-
     }
 }

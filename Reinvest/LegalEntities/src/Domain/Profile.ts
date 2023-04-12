@@ -152,7 +152,7 @@ export class Profile {
 
             return profile;
         } catch (error: any) {
-            console.error(`Profile restoration failed: ${error.message}`);
+            console.error(`Profile restoration failed: ${error.message}`, error);
             throw new ValidationError(ValidationErrorEnum.FAILED, "profile");
         }
 

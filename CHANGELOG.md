@@ -1,5 +1,22 @@
 # REINVEST API CHANGELOG
 
+## 1.8.3 - 04/11/2023
+
+* Error handling with sentry integrated
+
+## 1.8.2 - 04/11/2023
+
+* Synchronization corporate/trust companies with Vertalo
+
+## 1.8.1 - 04/11/2023
+
+* Synchronization corporate/trust entities with North Capital:
+    * Company entity: LLC/Partnership/Corporation/Revocable Trust/Irrevocable Trust
+    * Company account: Corporate/Trust
+    * Company stakeholder: Corporate/Trust
+    * Documents upload for company entity and stakeholders
+    * Linking company/stakeholders with an account
+
 ## 1.8.0 - 04/06/2023
 
 * Employer field is optional if Employment Status is not "Employed" for `completeIndividualDraftAccount` mutation
@@ -24,7 +41,8 @@
     * `completeCorporateDraftAccount` and `completeTrustDraftAccount` are no longer MOCKED
         * it returns new field "label"
         * it returns avatar with working "initials" field
-* EIN uniqueness is verified against opened accounts, so it is possible to create draft account with the same EIN, but not to open both of them
+* EIN uniqueness is verified against opened accounts, so it is possible to create draft account with the same EIN, but
+  not to open both of them
 
 ## 1.7.3 - 03/31/2023
 

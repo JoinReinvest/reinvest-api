@@ -17,7 +17,7 @@ export class ProfileCompletedEventHandler implements EventHandler<DomainEvent> {
 
     public async handle(event: DomainEvent): Promise<void> {
         const {id: profileId} = event;
-        const record = await this.mappingRegistryRepository.addRecord(profileId, profileId, MappedType.PROFILE);
+        const record = await this.mappingRegistryRepository.addRecord(MappedType.PROFILE, profileId);
 
         await this.synchronizeProfileUseCase.execute(record);
     }

@@ -4,6 +4,7 @@ export type MappedRecordType = {
     recordId: string;
     profileId: string;
     externalId: string;
+    dependentId: string;
     mappedType: MappedType;
     email: string;
     status: MappedRecordStatus;
@@ -14,6 +15,7 @@ export class MappedRecord {
     private readonly recordId: string;
     private readonly profileId: string;
     private readonly externalId: string;
+    private readonly dependentId: string;
     private readonly mappedType: MappedType;
     private readonly email: string;
     private status: MappedRecordStatus;
@@ -23,6 +25,7 @@ export class MappedRecord {
         this.recordId = data.recordId;
         this.profileId = data.profileId;
         this.externalId = data.externalId;
+        this.dependentId = data.dependentId;
         this.mappedType = data.mappedType;
         this.email = data.email;
         this.status = data.status;
@@ -61,7 +64,27 @@ export class MappedRecord {
         return this.mappedType === MappedType.INDIVIDUAL_ACCOUNT;
     }
 
+    isCompanyAccount() {
+        return this.mappedType === MappedType.CORPORATE_ACCOUNT || this.mappedType === MappedType.TRUST_ACCOUNT;
+    }
+
+    isCompany() {
+        return this.mappedType === MappedType.COMPANY;
+    }
+
     getExternalId() {
         return this.externalId;
+    }
+
+    getMappedType() {
+        return this.mappedType;
+    }
+
+    isStakeholder() {
+        return this.mappedType === MappedType.STAKEHOLDER;
+    }
+
+    getDependentId() {
+        return this.dependentId;
     }
 }

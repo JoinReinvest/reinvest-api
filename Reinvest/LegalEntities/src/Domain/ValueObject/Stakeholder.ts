@@ -16,7 +16,7 @@ import {DocumentSchema, IdentityDocument} from "LegalEntities/Domain/ValueObject
 export type StakeholderSchema = {
     id: string,
     label: string;
-    ssn: SensitiveNumberSchema;
+    ssn: SensitiveNumberSchema | string;
     name: PersonalNameInput;
     dateOfBirth: DateOfBirthInput;
     address: AddressInput,

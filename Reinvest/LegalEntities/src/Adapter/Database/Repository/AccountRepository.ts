@@ -7,7 +7,8 @@ import {
 
 import {
     IndividualAccount,
-    IndividualAccountOverview, IndividualOverviewSchema,
+    IndividualAccountOverview,
+    IndividualOverviewSchema,
     IndividualSchema
 } from "LegalEntities/Domain/Accounts/IndividualAccount";
 import {PersonalNameInput} from "LegalEntities/Domain/ValueObject/PersonalName";
@@ -18,7 +19,12 @@ import {
     CompanyOverviewSchema,
     CompanySchema
 } from "LegalEntities/Domain/Accounts/CompanyAccount";
-import {EIN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {EIN, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {CompanyNameInput, CompanyTypeInput} from "LegalEntities/Domain/ValueObject/Company";
+import {DocumentSchema} from "LegalEntities/Domain/ValueObject/Document";
+import {StakeholderOutput, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
+import {AccountType} from "LegalEntities/Domain/AccountType";
+import {DomicileType} from "LegalEntities/Domain/ValueObject/Domicile";
 
 export type IndividualAccountForSynchronization = {
     accountId: string,
@@ -31,6 +37,36 @@ export type IndividualAccountForSynchronization = {
     industry?: string | null,
     netWorth?: string | null,
     netIncome?: string | null,
+}
+
+export type CompanyAccountForSynchronization = {
+    accountId: string,
+    profileId: string,
+    ownerName: PersonalNameInput,
+    address: AddressInput,
+    companyType: CompanyTypeInput,
+    stakeholders: { id: string }[],
+}
+
+export type CompanyForSynchronization = {
+    accountId: string,
+    profileId: string,
+    companyName: CompanyNameInput,
+    address: AddressInput,
+    ein: string | null,
+    companyType: CompanyTypeInput,
+    companyDocuments: DocumentSchema[],
+    accountType: string
+}
+
+export type StakeholderForSynchronization = StakeholderOutput & {
+    accountId: string,
+    profileId: string,
+    domicile: DomicileType,
+    idScan: DocumentSchema[],
+    dateOfBirth: string;
+    accountType: string;
+    ssn: string | null
 }
 
 export class AccountRepository {
@@ -63,7 +99,7 @@ export class AccountRepository {
 
             return true;
         } catch (error: any) {
-            console.error(`Cannot create individual account: ${error.message}`);
+            console.error(`Cannot create individual account: ${error.message}`, error);
             return false;
         }
     }
@@ -89,7 +125,7 @@ export class AccountRepository {
 
             return IndividualAccount.create(account as IndividualSchema);
         } catch (error: any) {
-            console.error(`Cannot find individual account: ${error.message}`);
+            console.warn(`Cannot find individual account: ${error.message}`);
             return null;
         }
     }
@@ -112,7 +148,7 @@ export class AccountRepository {
 
             return IndividualAccountOverview.create(account);
         } catch (error: any) {
-            console.error(`Cannot find individual account: ${error.message}`);
+            console.warn(`Cannot find individual account: ${error.message}`);
             return null;
         }
     }
@@ -227,10 +263,9 @@ export class AccountRepository {
 
             return true;
         } catch (error: any) {
-            console.error(`Cannot create company account: ${error.message}`);
+            console.error(`Cannot create company account: ${error.message}`, error);
             return false;
         }
-
     }
 
     async findCompanyAccount(profileId: string, accountId: string): Promise<CompanyAccount | null> {
@@ -260,7 +295,7 @@ export class AccountRepository {
 
             return CompanyAccount.create(account);
         } catch (error: any) {
-            console.error(`Cannot find any company account: ${error.message}`);
+            console.warn(`Cannot find any company account: ${error.message}`);
             return null;
         }
     }
@@ -282,8 +317,139 @@ export class AccountRepository {
 
             return accounts.map((account) => CompanyAccountOverview.create(account));
         } catch (error: any) {
-            console.error(`Cannot find any company account: ${error.message}`);
+            console.warn(`Cannot find any company account: ${error.message}`);
             return [];
+        }
+    }
+
+    async getCompanyAccountForSynchronization(profileId: string, accountId: string): Promise<CompanyAccountForSynchronization | null> {
+        try {
+            const account = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesCompanyAccountTable)
+                .fullJoin(legalEntitiesProfileTable, `${legalEntitiesProfileTable}.profileId`, `${legalEntitiesCompanyAccountTable}.profileId`)
+                .select([
+                    `${legalEntitiesCompanyAccountTable}.accountId`,
+                    `${legalEntitiesCompanyAccountTable}.profileId`,
+                    `${legalEntitiesCompanyAccountTable}.address`,
+                    `${legalEntitiesCompanyAccountTable}.companyType`,
+                    `${legalEntitiesCompanyAccountTable}.stakeholders`,
+                ])
+                .select([
+                    `${legalEntitiesProfileTable}.name`,
+                ])
+                .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
+                .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
+                .limit(1)
+                .executeTakeFirstOrThrow();
+
+
+            return {
+                accountId: account.accountId as string,
+                profileId: account.profileId as string,
+                ownerName: account.name as unknown as PersonalNameInput,
+                address: account.address as unknown as AddressInput,
+                companyType: account.companyType as unknown as CompanyTypeInput,
+                stakeholders: !account.stakeholders
+                    ? []
+                    // @ts-ignore
+                    : account.stakeholders.map((stakeholder: StakeholderSchema): { id: string } => ({
+                        id: stakeholder.id
+                    })),
+            }
+        } catch (error: any) {
+            return null;
+        }
+    }
+
+    async getCompanyForSynchronization(profileId: string, accountId: string): Promise<CompanyForSynchronization | null> {
+        try {
+            const account = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesCompanyAccountTable)
+                .select([
+                    `${legalEntitiesCompanyAccountTable}.accountId`,
+                    `${legalEntitiesCompanyAccountTable}.profileId`,
+                    `${legalEntitiesCompanyAccountTable}.companyName`,
+                    `${legalEntitiesCompanyAccountTable}.address`,
+                    `${legalEntitiesCompanyAccountTable}.ein`,
+                    `${legalEntitiesCompanyAccountTable}.companyType`,
+                    `${legalEntitiesCompanyAccountTable}.companyDocuments`,
+                    `${legalEntitiesCompanyAccountTable}.accountType`,
+                ])
+
+                .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
+                .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
+                .limit(1)
+                .executeTakeFirstOrThrow();
+
+            let ein = null;
+            try {
+                const einObject = EIN.create(account.ein as unknown as SensitiveNumberSchema);
+                ein = einObject.decrypt();
+            } catch (error: any) {
+                console.warn(`Cannot decrypt EIN: ${error.message}`);
+            }
+
+            return {
+                accountId: account.accountId as string,
+                profileId: account.profileId as string,
+                companyName: account.companyName as unknown as CompanyNameInput,
+                address: account.address as unknown as AddressInput,
+                ein,
+                companyType: account.companyType as unknown as CompanyTypeInput,
+                companyDocuments: account.companyDocuments as unknown as DocumentSchema[],
+                accountType: account.accountType as unknown as AccountType,
+
+            }
+        } catch (error: any) {
+            return null;
+        }
+    }
+
+    async getStakeholderForSynchronization(profileId: string, accountId: string, stakeholderId: string): Promise<StakeholderForSynchronization | null> {
+        try {
+            const account = await this.databaseAdapterProvider.provide()
+                .selectFrom(legalEntitiesCompanyAccountTable)
+                .select([
+                    `${legalEntitiesCompanyAccountTable}.accountId`,
+                    `${legalEntitiesCompanyAccountTable}.profileId`,
+                    `${legalEntitiesCompanyAccountTable}.accountType`,
+                    `${legalEntitiesCompanyAccountTable}.stakeholders`,
+                ])
+                .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
+                .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
+                .limit(1)
+                .executeTakeFirstOrThrow();
+
+            const stakeholders = account.stakeholders as unknown as StakeholderSchema[];
+            const stakeholder = stakeholders?.find((stakeholder: StakeholderSchema) => stakeholder.id === stakeholderId);
+
+            if (!stakeholder) {
+                return null;
+            }
+            let ssn = null;
+            if (stakeholder.ssn) {
+                try {
+                    const ssnObject = SSN.create(stakeholder.ssn as unknown as SensitiveNumberSchema);
+                    ssn = ssnObject.decrypt();
+                } catch (error: any) {
+                    console.warn(`Cannot decrypt SSN: ${error.message}`);
+                }
+            }
+
+            return {
+                accountId: account.accountId as string,
+                profileId: account.profileId as string,
+                accountType: account.accountType as string,
+                ...stakeholder,
+                // @ts-ignore
+                domicile: stakeholder.domicile.type,
+                // @ts-ignore
+                dateOfBirth: stakeholder.dateOfBirth.dateOfBirth,
+                // @ts-ignore
+                ssn
+            }
+        } catch (error: any) {
+            return null;
         }
     }
 }
