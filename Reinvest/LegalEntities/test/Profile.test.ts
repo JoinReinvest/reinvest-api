@@ -14,7 +14,10 @@ import {
     GreenCardInput,
     VisaInput
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Domicile";
-import {SSN, SSNInput, SSNSchema} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
+import {
+    SensitiveNumberSchema,
+    SSN
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/SensitiveNumber";
 import {
     AccreditedInvestorStatements, ForAccreditedInvestor,
     ForFINRA,
@@ -276,7 +279,7 @@ context("Given the user wants to complete the profile", () => {
             profile.setSSN(ssnValueObject);
 
             const profileOutput = profile.toObject();
-            const ssn = profileOutput.ssnObject as unknown as SSNSchema;
+            const ssn = profileOutput.ssnObject as unknown as SensitiveNumberSchema;
 
             expect(ssn.anonymized).to.be.equal("***-**-3333");
             expect(ssnValueObject.decrypt()).to.be.equal(input);

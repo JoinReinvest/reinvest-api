@@ -75,8 +75,8 @@ router.post("/get-sms-topt", async (req: any, res: any) => {
             topt: data.topt,
             status: true
         });
-    } catch (e) {
-        console.log(e);
+    } catch (e: any) {
+        console.log(e.message);
         res.status(500).json({
             status: false
         });
@@ -85,7 +85,8 @@ router.post("/get-sms-topt", async (req: any, res: any) => {
 
 router.post("/events", async (req: any, res: any) => {
     try {
-        const {kind, id} = req.body;
+        const {kind} = req.body;
+        const id = await getProfileIdFromAccessToken(req.headers.authorization);
         switch (kind) {
             case "LegalProfileCompleted":
                 await sendMessage(kind, id, {});
@@ -93,6 +94,14 @@ router.post("/events", async (req: any, res: any) => {
             case "IndividualAccountOpened":
                 const {individualAccountId} = req.body;
                 await sendMessage(kind, id, {individualAccountId});
+                break;
+            case "CorporateAccountOpened":
+                const {accountId: corporateAccountIds} = req.body;
+                await sendMessage(kind, id, {corporateAccountIds: [corporateAccountIds]});
+                break;
+            case "TrustAccountOpened":
+                const {accountId: trustAccountIds} = req.body;
+                await sendMessage(kind, id, {trustAccountIds: [trustAccountIds]});
                 break;
             default:
                 throw new Error("Unknown event");
@@ -301,7 +310,44 @@ const userRouter = () => {
 
     return router;
 }
+const syncRouter = () => {
+    const router = express.Router({mergeParams: true});
+    router.post("/sync-dirties", async (req: any, res: any) => {
+        try {
+            const modules = boot();
+            const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+            const ids = await registrationApi.listObjectsToSync();
+            if (ids.length === 0) {
+                res.status(404).json({
+                    status: false,
+                    message: "No dirty objects to synchronize",
+                });
 
+                return;
+            }
+            const statuses = [];
+            for (const id of ids) {
+                const syncStatus = await registrationApi.synchronize(id);
+                statuses.push({
+                    id: id,
+                    status: syncStatus,
+                });
+            }
+
+            res.status(200).json({
+                statuses,
+            });
+        } catch (e: any) {
+            console.log(e);
+            res.status(500).json({
+                status: false,
+                message: e.message,
+            });
+        }
+    });
+
+    return router;
+}
 const northCapitalRouter = () => {
     const router = express.Router({mergeParams: true});
     router.post("/get-profile", async (req: any, res: any) => {
@@ -460,5 +506,7 @@ const vertaloRouter = () => {
 router.use("/user", userRouter());
 router.use("/north-capital", northCapitalRouter());
 router.use("/vertalo", vertaloRouter());
+router.use("/sync", syncRouter());
+
 app.use("/tests", router);
 export const main = serverless(app);

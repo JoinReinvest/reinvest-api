@@ -8,6 +8,7 @@ export type ProfileCreated = DomainEvent & {
         individualAccountId: null,
         corporateAccountIds: [],
         trustAccountIds: [],
+        beneficiaryAccountIds: [],
     }
 }
 
@@ -18,4 +19,16 @@ export type IndividualAccountOpened = DomainEvent & {
     }
 }
 
+export type CorporateAccountOpened = DomainEvent & {
+    kind: "CorporateAccountOpened",
+    data: {
+        corporateAccountIds: string[]
+    }
+}
 
+export type TrustAccountOpened = DomainEvent & {
+    kind: "TrustAccountOpened",
+    data: {
+        trustAccountIds: string[]
+    }
+}

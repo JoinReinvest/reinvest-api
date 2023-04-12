@@ -2,7 +2,7 @@ import {VertaloAdapter} from "Registration/Adapter/Vertalo/VertaloAdapter";
 import {
     VertaloSynchronizationRepository
 } from "Registration/Adapter/Database/Repository/VertaloSynchronizationRepository";
-import {VertaloIndividualAccount} from "Registration/Domain/VendorModel/Vertalo/VertaloIndividualAccount";
+import {VertaloAccount} from "Registration/Domain/VendorModel/Vertalo/VertaloAccount";
 import {VertaloEntityType} from "Registration/Domain/VendorModel/Vertalo/VertaloTypes";
 
 export class VertaloSynchronizer {
@@ -15,17 +15,17 @@ export class VertaloSynchronizer {
         this.vertaloSynchronizationRepository = vertaloSynchronizationRepository;
     }
 
-    async synchronizeIndividualAccount(recordId: string, vertaloIndividualAccount: VertaloIndividualAccount): Promise<void> {
+    async synchronizeAccount(recordId: string, vertaloAccount: VertaloAccount): Promise<void> {
         const vertaloSynchronizationRecord = await this.vertaloSynchronizationRepository.getSynchronizationRecord(recordId);
         if (vertaloSynchronizationRecord === null) {
-            const {name, email} = vertaloIndividualAccount.getData();
+            const {name, email} = vertaloAccount.getData();
             const investorIds = await this.vertaloAdapter.createInvestor(name, email);
-            await this.vertaloSynchronizationRepository.createSynchronizationRecord(recordId, investorIds, vertaloIndividualAccount.getCrc(), VertaloEntityType.ACCOUNT);
+            await this.vertaloSynchronizationRepository.createSynchronizationRecord(recordId, investorIds, vertaloAccount.getCrc(), VertaloEntityType.ACCOUNT);
 
-        } else if (vertaloSynchronizationRecord.isOutdated(vertaloIndividualAccount.getCrc())) {
-            const {name} = vertaloIndividualAccount.getData();
+        } else if (vertaloSynchronizationRecord.isOutdated(vertaloAccount.getCrc())) {
+            const {name} = vertaloAccount.getData();
             await this.vertaloAdapter.updateInvestor(vertaloSynchronizationRecord.getInvestorIds(), name);
-            vertaloSynchronizationRecord.setCrc(vertaloIndividualAccount.getCrc());
+            vertaloSynchronizationRecord.setCrc(vertaloAccount.getCrc());
             await this.vertaloSynchronizationRepository.updateSynchronizationRecord(vertaloSynchronizationRecord);
         }
     }

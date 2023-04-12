@@ -104,6 +104,21 @@ export class NorthCapitalSynchronizationRepository {
         }
     }
 
+    async getProfileIdOfRecord(recordId: string): Promise<string | never> {
+        try {
+            const data = await this.databaseAdapterProvider.provide()
+                .selectFrom(registrationMappingRegistryTable)
+                .select(['profileId'])
+                .where('recordId', '=', recordId)
+                .limit(1)
+                .executeTakeFirstOrThrow();
+
+            return data.profileId;
+        } catch (error: any) {
+            throw new Error('PROFILE_NOT_FOUND');
+        }
+    }
+
     async getAllProfileSynchronizationMapping(recordId: string): Promise<NorthCapitalSynchronizationMapping[]> {
         const {profileId} = await this.databaseAdapterProvider.provide()
             .selectFrom(registrationMappingRegistryTable)

@@ -7,6 +7,14 @@ export enum NorthCapitalDomicile {
     "NON_RESIDENT" = "non-resident"
 }
 
+export enum NorthCapitalEntityType {
+    "REVOCABLE" = "Revocable Trust",
+    "IRREVOCABLE" = "Irrevocable Trust",
+    "PARTNERSHIP" = "Limited Partnership",
+    "LLC" = "LLC",
+    "CORPORATION" = "Corporation",
+}
+
 export enum NorthCapitalEmploymentStatus {
     EMPLOYED = "Employed",
     UNEMPLOYED = "Not Employed",
@@ -20,7 +28,7 @@ export enum NorthCapitalObjectType {
     ENTITY = "ENTITY",
 }
 
-export type NorthCapitalMainPartyType = {
+export type NorthCapitalPartyStructure = {
     domicile: NorthCapitalDomicile | null,
     firstName: string,
     middleInitial?: string,
@@ -34,15 +42,27 @@ export type NorthCapitalMainPartyType = {
     primCountry: string,
     emailAddress: string,
     socialSecurityNumber: string | null,
-    documents: DocumentSchema[],
 }
 
-export type NorthCapitalIndividualExtendedMainPartyType = {
-    occupation: string | null,
-    empName: string | null,
-    empStatus: NorthCapitalEmploymentStatus | null,
-    householdNetworth: string | null,
-    currentHouseholdIncome: string | null,
+export type NorthCapitalEntityStructure = {
+    entityName: string,
+    ein?: string | null,
+    primAddress1: string,
+    primAddress2?: string | null,
+    primCity: string,
+    primState: string,
+    primZip: string,
+    primCountry: string,
+    emailAddress: string,
+    entityType?: string | null,
+}
+
+export type NorthCapitalIndividualExtendedMainPartyStructure = {
+    occupation?: string | null,
+    empName?: string | null,
+    empStatus?: NorthCapitalEmploymentStatus | null,
+    householdNetworth?: string | null,
+    currentHouseholdIncome?: string | null,
 }
 
 export type NorthCapitalIndividualAccountStructure = {
@@ -56,10 +76,23 @@ export type NorthCapitalIndividualAccountStructure = {
     country: string,
 }
 
+export type NorthCapitalCompanyAccountStructure = {
+    accountRegistration: string,
+    type: "Entity",
+    entityType: NorthCapitalEntityType | null,
+    streetAddress1: string,
+    streetAddress2?: string,
+    city: string,
+    state: string,
+    zip: string,
+    country: string,
+}
+
 export type NorthCapitalLinkMappingConfiguration = {
     type: MappedType,
     profileId: string,
     externalId: string,
+    thisIsAccountEntry?: boolean
 }
 
 export type NorthCapitalSynchronizationMapping = {
@@ -80,11 +113,35 @@ export type NorthCapitalLink = {
 
 export type NorthCapitalIndividualAccountType = {
     profileId: string,
-    extendedParty: NorthCapitalIndividualExtendedMainPartyType,
+    extendedParty: NorthCapitalIndividualExtendedMainPartyStructure,
     account: NorthCapitalIndividualAccountStructure,
     links: NorthCapitalLink[]
 }
 
+export type NorthCapitalCompanyAccountType = {
+    profileId: string,
+    account: NorthCapitalCompanyAccountStructure,
+    links: NorthCapitalLink[]
+}
+
+export type NorthCapitalCompanyEntityType = {
+    profileId: string,
+    entity: NorthCapitalEntityStructure,
+    documents: DocumentSchema[],
+    links: NorthCapitalLink[]
+}
+
+export type NorthCapitalMainPartyType = {
+    party: NorthCapitalPartyStructure,
+    documents: DocumentSchema[],
+}
+
+export type NorthCapitalCompanyStakeholderType = {
+    profileId: string,
+    party: NorthCapitalPartyStructure,
+    documents: DocumentSchema[],
+    links: NorthCapitalLink[]
+}
 
 export enum DocumentSyncState {
     DIRTY = 'DIRTY',

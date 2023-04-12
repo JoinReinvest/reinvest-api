@@ -1,5 +1,49 @@
 # REINVEST API CHANGELOG
 
+## 1.8.3 - 04/11/2023
+
+* Error handling with sentry integrated
+
+## 1.8.2 - 04/11/2023
+
+* Synchronization corporate/trust companies with Vertalo
+
+## 1.8.1 - 04/11/2023
+
+* Synchronization corporate/trust entities with North Capital:
+    * Company entity: LLC/Partnership/Corporation/Revocable Trust/Irrevocable Trust
+    * Company account: Corporate/Trust
+    * Company stakeholder: Corporate/Trust
+    * Documents upload for company entity and stakeholders
+    * Linking company/stakeholders with an account
+
+## 1.8.0 - 04/06/2023
+
+* Employer field is optional if Employment Status is not "Employed" for `completeIndividualDraftAccount` mutation
+* New queries:
+    * `getCorporateAccount`
+    * `getTrustAccount`
+* Updated queries:
+    * `getCorporateDraftAccount` and `getTrustDraftAccount` are no longer MOCKED
+        * it returns new field "label"
+        * it returns avatar with working "initials" field
+    * `getAccountsOverview`:
+        * it returns Individual, Corporate and Trust accounts
+        * it returns new field "label"
+        * it returns avatar with working "initials" field
+    * `getIndividualAccount`:
+        * it returns avatar with working "initials" field
+        * it returns new field "label"
+    * for `getCorporateDraftAccount`, `getTrustDraftAccount` and `getIndividualDraftAccount`:
+        * `isCompleted` field is calculated dynamically on every call
+        * `verifyAndFinish` field is removed from draft accounts mutations
+* Updated mutations:
+    * `completeCorporateDraftAccount` and `completeTrustDraftAccount` are no longer MOCKED
+        * it returns new field "label"
+        * it returns avatar with working "initials" field
+* EIN uniqueness is verified against opened accounts, so it is possible to create draft account with the same EIN, but
+  not to open both of them
+
 ## 1.7.3 - 03/31/2023
 
 * query `phoneCompleted` is no longer mocked and returns real phone number completion status

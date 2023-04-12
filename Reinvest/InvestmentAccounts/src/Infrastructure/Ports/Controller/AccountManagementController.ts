@@ -13,7 +13,7 @@ export class AccountManagementController {
         try {
             await this.openAccountUseCase.execute(profileId, accountId, accountType);
         } catch (error: any) {
-            console.error({"Opening account error": error.message});
+            console.error("Opening account error", error);
             return error.message === "THE_ACCOUNT_ALREADY_OPENED";
         }
         return true;

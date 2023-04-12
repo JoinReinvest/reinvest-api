@@ -1,10 +1,10 @@
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {IdGenerator} from "IdGenerator/IdGenerator";
 import {
+    CompanyDraftAccountSchema,
     DraftAccount,
     DraftAccountState,
-    DraftAccountType,
-    IndividualDraftAccountSchema
+    DraftAccountType, IndividualDraftAccountSchema
 } from "LegalEntities/Domain/DraftAccount/DraftAccount";
 
 export class CreateDraftAccount {
@@ -27,7 +27,8 @@ export class CreateDraftAccount {
             draftId,
             state: DraftAccountState.ACTIVE,
             accountType: type,
-            data: {} as IndividualDraftAccountSchema
+            // @ts-ignore
+            data: {}
         });
         const status = await this.draftAccountRepository.storeDraft(draft);
 

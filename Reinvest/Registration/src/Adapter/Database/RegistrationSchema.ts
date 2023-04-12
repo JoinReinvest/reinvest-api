@@ -4,7 +4,7 @@ import {
     NorthCapitalEntityType,
     NorthCapitalSynchronizationRecordType
 } from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord";
-import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+import {MappedRecordStatus, MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {
     VertaloEntityType, VertaloIds,
     VertaloSynchronizationRecordType
@@ -18,9 +18,10 @@ export interface MappingRegistryTable {
     recordId: string;
     profileId: string;
     externalId: string;
+    dependentId: string | null;
     mappedType: MappedType;
     email: string | null;
-    status: "DIRTY" | "CLEAN";
+    status: MappedRecordStatus
     version: number;
     createdDate: Date;
     updatedDate: Date;

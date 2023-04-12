@@ -4,8 +4,11 @@ import NorthCapitalException from "Registration/Adapter/NorthCapital/NorthCapita
 import {MainParty} from "../../Domain/VendorModel/NorthCapital/MainParty";
 import {DictionaryType} from "HKEKTypes/Generics";
 import {
-    NorthCapitalIndividualExtendedMainPartyType,
-    NorthCapitalIndividualAccountStructure, NorthCapitalLinkConfiguration, NorthCapitalUploadedDocument
+    NorthCapitalIndividualExtendedMainPartyStructure,
+    NorthCapitalIndividualAccountStructure,
+    NorthCapitalLinkConfiguration,
+    NorthCapitalUploadedDocument,
+    NorthCapitalObjectType
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 import {ExecutionNorthCapitalAdapter} from "Registration/Adapter/NorthCapital/ExecutionNorthCapitalAdapter";
 
@@ -141,7 +144,7 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
                 }
             });
         } catch (error: any) {
-            console.error(`Retrieve all links for North Capital account ${northCapitalAccountId} failed: ${error.message}`);
+            console.error(`Retrieve all links for North Capital account ${northCapitalAccountId} failed`, error);
             return [];
         }
     }
@@ -161,8 +164,10 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
         return account;
     }
 
-    async uploadPartyDocument(northCapitalId: string, url: string, documentFilename: string, documentId: string): Promise<void | never> {
-        const endpoint = 'tapiv3/index.php/v3/uploadPartyDocument';
+    async uploadPartyDocument(northCapitalId: string, url: string, documentFilename: string, documentId: string, objectType: NorthCapitalObjectType): Promise<void | never> {
+        const endpoint = objectType === NorthCapitalObjectType.PARTY
+            ? 'tapiv3/index.php/v3/uploadPartyDocument'
+            : 'tapiv3/index.php/v3/uploadEntityDocument';
 
         const data = {
             partyId: northCapitalId,
@@ -209,5 +214,29 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
         } catch (error: any) {
             return [];
         }
+    }
+
+    async createEntity(entityData: DictionaryType): Promise<string | never> {
+        const endpoint = 'tapiv3/index.php/v3/createEntity';
+
+        const response = await this.putRequest(endpoint, entityData);
+        const {statusCode, statusDesc, entityDetails: [status, [{partyId: entityId}]]} = response;
+
+        console.log({action: "Create north capital entity", statusCode, statusDesc, entityId});
+        return entityId;
+    }
+
+    async updateEntity(northCapitalId: string, entityData: DictionaryType): Promise<void | never> {
+        const endpoint = 'tapiv3/index.php/v3/updateEntity';
+
+        const data = {
+            partyId: northCapitalId,
+            ...entityData,
+        }
+
+        const response = await this.postRequest(endpoint, data);
+        const {statusCode, statusDesc, entityDetails: [status, [{partyId: entityId}]]} = response;
+
+        console.log({action: "Update north capital entity", statusCode, statusDesc, entityId});
     }
 }

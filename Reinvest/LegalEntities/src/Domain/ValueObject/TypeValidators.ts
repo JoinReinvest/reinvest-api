@@ -12,7 +12,7 @@ export enum ValidationErrorEnum {
     ALREADY_COMPLETED = 'ALREADY_COMPLETED',
     NOT_UNIQUE = 'NOT_UNIQUE',
     NOT_ACTIVE = 'NOT_ACTIVE',
-    NOT_INDIVIDUAL = 'NOT_INDIVIDUAL',
+    WRONG_TYPE = 'WRONG_TYPE',
 }
 
 export type ValidationErrorType = {
@@ -98,6 +98,10 @@ export class Uuid {
 
     toString(): string {
         return this.uuid;
+    }
+
+    static create(id: string): Uuid {
+        return new Uuid(id);
     }
 }
 
