@@ -1,6 +1,6 @@
 export const ProviderConfiguration = {
     name: "aws",
-    runtime: "nodejs16.x",
+    runtime: "nodejs18.x",
     region: "us-east-1",
 }
 
