@@ -7,7 +7,6 @@ import {
 } from "./devops/serverless/cognito";
 import {
     margeWithApiGatewayUrl,
-    ProviderConfiguration,
     ProviderEnvironment
 } from "./devops/serverless/serverless-common";
 import {ApiLambdaFunction, ApiLambdaResources} from "./devops/functions/api/api-config";
