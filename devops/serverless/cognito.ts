@@ -77,9 +77,9 @@ export const CognitoResources = {
             },
             EmailConfiguration: {
                 EmailSendingAccount: "DEVELOPER",
-                SourceArn: SesInputs.SendFromEmailArn,
-                From: SesInputs.SendFromEmail,
-                ReplyToEmailAddress: SesInputs.NoReplyEmail,
+                SourceArn: "${env:EMAIL_SEND_FROM_ARN}",
+                From: "REINVEST Community <${env:EMAIL_SEND_FROM}>",
+                ReplyToEmailAddress: "${env:EMAIL_NO_REPLY}",
             },
             EnabledMfas: [
                 "SMS_MFA"

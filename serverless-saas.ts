@@ -25,6 +25,9 @@ const serverlessConfiguration: AWS = {
             POSTGRESQL_AWS_DB_STORAGE_GB: "${env:POSTGRESQL_AWS_DB_STORAGE_GB}",
             POSTGRESQL_MAIN_USER: "${env:POSTGRESQL_MAIN_USER}",
             POSTGRESQL_MAIN_PASSWORD: "${env:POSTGRESQL_MAIN_PASSWORD}",
+            EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
+            EMAIL_NO_REPLY: "${env:EMAIL_NO_REPLY}",
+            EMAIL_SEND_FROM_ARN: "${env:EMAIL_SEND_FROM_ARN}",
         }
     },
     resources: {
