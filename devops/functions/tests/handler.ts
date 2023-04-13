@@ -265,11 +265,37 @@ const userRouter = () => {
                     .limit(1)
                     .executeTakeFirstOrThrow();
 
+                const recordIds = await databaseProvider.provide()
+                    .selectFrom("registration_mapping_registry")
+                    .select(['recordId'])
+                    .where('profileId', '=', profileId)
+                    .execute();
+
+                if (recordIds.length > 0) {
+                    const removeByRecordId = [
+                        "registration_north_capital_synchronization",
+                        "registration_vertalo_synchronization",
+                        "registration_north_capital_documents_synchronization",
+                    ];
+
+                    for (const table of removeByRecordId) {
+                        for (const record of recordIds) {
+                            await databaseProvider.provide()
+                                .deleteFrom(table)
+                                .where('recordId', '=', record.recordId)
+                                .execute()
+                            ;
+                        }
+                    }
+                }
+
                 const removeItemsByProfile = {
                     legal_entities_draft_accounts: 'profileId',
                     legal_entities_individual_account: 'profileId',
+                    legal_entities_company_account: 'profileId',
                     legal_entities_profile: 'profileId',
                     investment_accounts_profile_aggregate: 'aggregateId',
+                    registration_mapping_registry: 'profileId',
                     identity_user: 'profileId',
                 }
 
