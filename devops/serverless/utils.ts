@@ -21,7 +21,7 @@ export const exportOutput = (name: string) => ({
 });
 
 export const importOutput = (name: string, isGlobal: boolean = false) => ({
-    "Fn::ImportValue": "reinvest-" + isGlobal ? "global" : "${sls:stage}" + "-" + name
+    "Fn::ImportValue": "reinvest-" + (isGlobal ? "global" : "${sls:stage}") + "-" + name
 });
 
 export const importOutputFrom = (name: string) => ({
