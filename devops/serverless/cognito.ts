@@ -1,6 +1,5 @@
 import {exportOutput, getAttribute, getResourceName, importOutput} from "./utils";
 import {margeWithApiGatewayUrl} from "./serverless-common";
-import {SesInputs} from "./ses";
 
 // SAAS Part
 export const CognitoResources = {
