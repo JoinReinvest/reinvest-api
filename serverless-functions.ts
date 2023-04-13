@@ -16,7 +16,7 @@ import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-conf
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
-import {getAttribute, importOutput} from "./devops/serverless/utils";
+import {getAttribute, getResourceName, importOutput} from "./devops/serverless/utils";
 import {
     UnauthorizedEndpointsFunction,
     UnauthorizedEndpointsLambdaResources
@@ -40,9 +40,10 @@ const serverlessConfiguration: AWS = {
         "serverless-stack-termination-protection",
         "serverless-esbuild",
     ],
-    // @ts-ignore
     provider: {
-        ...ProviderConfiguration,
+        name: "aws",
+        runtime: "nodejs18.x",
+        region: "us-east-1",
         environment: {
             ...ProviderEnvironment,
             ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
@@ -81,7 +82,6 @@ const serverlessConfiguration: AWS = {
         },
         httpApi: {
             cors: true,
-            //@ts-ignore
             authorizers: {
                 ...CognitoAuthorizer,
             },
@@ -95,8 +95,8 @@ const serverlessConfiguration: AWS = {
         queue: QueueFunction,
         cronDocumentsSync: CronDocumentSyncFunction,
         cronVendorsSync: CronVendorsSyncFunction,
-        // cognitoPostSignUpFunction,
-        // cognitoPreSignUpFunction,
+        cognitoPostSignUpFunction,
+        cognitoPreSignUpFunction,
         tests: TestsFunction,
     },
     resources: {

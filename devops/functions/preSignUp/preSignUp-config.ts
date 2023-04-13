@@ -7,9 +7,22 @@ import {
     SecurityGroupIngressRules
 } from "../../serverless/vpc";
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
-import {LambdaConfigType} from "@aws-sdk/client-cognito-identity-provider";
 
-const trigger: keyof LambdaConfigType = 'PreSignUp';
+const cognitoUserPool: {
+    cognitoUserPool: {
+        pool: string;
+        trigger: "PreSignUp";
+        existing?: boolean;
+        forceDeploy?: boolean;
+    };
+} = {
+    cognitoUserPool: {
+        pool: "reinvest-user-pool-${sls:stage}",
+        trigger: "PreSignUp",
+        existing: true,
+        forceDeploy: true
+    },
+}
 
 export const cognitoPreSignUpFunction = {
     handler: `devops/functions/preSignUp/handler.main`,
@@ -18,13 +31,7 @@ export const cognitoPreSignUpFunction = {
         securityGroupIds: [getAttribute("PreSignUpSecurityGroup", "GroupId")],
         subnetIds: [...importPrivateSubnetRefs()],
     },
-    events: [{
-        cognitoUserPool: {
-            pool: "reinvest-user-pool-${sls:stage}",
-            trigger,
-            existing: true,
-        },
-    }],
+    events: [cognitoUserPool],
 };
 export const CognitoPreSignUpResources = {
     CognitoPreSignUpLambdaRole: {

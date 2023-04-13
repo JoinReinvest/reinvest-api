@@ -1,5 +1,6 @@
 import {exportOutput, getAttribute, getResourceName, importOutput} from "./utils";
 import {margeWithApiGatewayUrl} from "./serverless-common";
+import {AwsCfInstruction} from "@serverless/typescript";
 
 // SAAS Part
 export const CognitoResources = {
@@ -195,7 +196,16 @@ export const CognitoOutputs = {
         ...exportOutput('CognitoIssuerUrl')
     },
 }
-export const CognitoAuthorizer = {
+export const CognitoAuthorizer: {
+    [k: string]:
+        | {
+        type?: "jwt";
+        name?: string;
+        identitySource: AwsCfInstruction;
+        issuerUrl: AwsCfInstruction;
+        audience: AwsCfInstruction | AwsCfInstruction[];
+    }
+} = {
     CognitoAuthorizer: {
         type: "jwt",
         name: getResourceName("cognito-authorizer"),

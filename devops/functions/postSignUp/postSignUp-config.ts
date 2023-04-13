@@ -9,9 +9,22 @@ import {
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
 import {CognitoUpdateAttributesPolicyBasedOnOutputArn} from "../../serverless/cognito";
 import {SQSSendPolicy} from "../queue/queue-config";
-import {LambdaConfigType} from "@aws-sdk/client-cognito-identity-provider";
 
-const trigger: keyof LambdaConfigType = 'PostConfirmation';
+const cognitoUserPool: {
+    cognitoUserPool: {
+        pool: string;
+        trigger: "PostConfirmation";
+        existing?: boolean;
+        forceDeploy?: boolean;
+    };
+} = {
+    cognitoUserPool: {
+        pool: "reinvest-user-pool-${sls:stage}",
+        trigger: "PostConfirmation",
+        existing: true,
+        forceDeploy: true
+    },
+}
 
 export const cognitoPostSignUpFunction = {
     handler: `devops/functions/postSignUp/handler.main`,
@@ -20,13 +33,7 @@ export const cognitoPostSignUpFunction = {
         securityGroupIds: [getAttribute("PostSignUpSecurityGroup", "GroupId")],
         subnetIds: [...importPrivateSubnetRefs()],
     },
-    events: [{
-        cognitoUserPool: {
-            pool: "reinvest-user-pool-${sls:stage}",
-            trigger,
-            existing: true,
-        },
-    }],
+    events: [cognitoUserPool],
 };
 export const CognitoPostSignUpResources = {
     CognitoPostSignUpLambdaRole: {
