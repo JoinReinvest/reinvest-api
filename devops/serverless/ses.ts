@@ -45,7 +45,7 @@ export const SesOutputs = {
 }
 
 export const SesInputs = {
-    SendFromEmailArn: importOutput('SendFromEmailArn'),
-    SendFromEmail: importOutput('SendFromEmail'),
-    NoReplyEmail: importOutput('NoReplyEmail'),
+    SendFromEmailArn: importOutput('SendFromEmailArn', true),
+    SendFromEmail: importOutput('SendFromEmail', true),
+    NoReplyEmail: importOutput('NoReplyEmail', true),
 }
