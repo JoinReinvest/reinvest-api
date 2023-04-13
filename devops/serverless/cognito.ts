@@ -1,5 +1,6 @@
 import {exportOutput, getAttribute, getResourceName, importOutput} from "./utils";
 import {margeWithApiGatewayUrl} from "./serverless-common";
+import {SesInputs} from "./ses";
 
 // SAAS Part
 export const CognitoResources = {
@@ -73,6 +74,12 @@ export const CognitoResources = {
             SmsConfiguration: {
                 ExternalId: "reinvest-user-pool-${sls:stage}-external-id",
                 SnsCallerArn: getAttribute("CognitoSMSRole", "Arn"),
+            },
+            EmailConfiguration: {
+                EmailSendingAccount: "DEVELOPER",
+                SourceArn: SesInputs.SendFromEmailArn,
+                From: SesInputs.SendFromEmail,
+                ReplyToEmailAddress: SesInputs.NoReplyEmail,
             },
             EnabledMfas: [
                 "SMS_MFA"

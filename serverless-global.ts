@@ -5,7 +5,7 @@ import {RdsOutputs, RdsResources} from "./devops/serverless/rds";
 import {S3Outputs, S3Resources} from "./devops/serverless/s3";
 import {BastionOutputs, BastionResources} from "./devops/serverless/bastion";
 import {ProviderConfiguration, ProviderEnvironment} from "./devops/serverless/serverless-common";
-import {SesResources} from "./devops/serverless/ses";
+import {SesOutputs, SesResources} from "./devops/serverless/ses";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest-global",
@@ -27,6 +27,9 @@ const serverlessConfiguration: AWS = {
         Resources: {
             ...SesResources,
         },
+        Outputs: {
+            ...SesOutputs,
+        }
     },
     custom: {
         serverlessTerminationProtection: {
