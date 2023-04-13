@@ -1,13 +1,13 @@
-import {LambdaConfigType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
-import {getAttribute, getResourceName} from "../..//serverless/utils";
+import {getAttribute, getResourceName} from "../../serverless/utils";
 import {
     EniPolicies,
     importPrivateSubnetRefs,
     importVpcRef,
     SecurityGroupEgressRules,
     SecurityGroupIngressRules
-} from "../..//serverless/vpc";
+} from "../../serverless/vpc";
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
+import {LambdaConfigType} from "@aws-sdk/client-cognito-identity-provider";
 
 const trigger: keyof LambdaConfigType = 'PreSignUp';
 

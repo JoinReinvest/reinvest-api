@@ -32,7 +32,7 @@ import {
 } from "./devops/functions/cronVendorsSync/cron-vendors-sync-config";
 
 const serverlessConfiguration: AWS = {
-    service: "reinvest-functions",
+    service: 'reinvest-functions',
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
