@@ -55,7 +55,7 @@ const serverlessConfiguration: AWS = {
         },
         environment: {
             ...ProviderEnvironment,
-            // @ts-ignore
+            
             ExplorerHostedUI: "${env:LocalHostedUiUrl}",
             ApiUrl: "http://localhost:3000/api",
             SQS_QUEUE_URL: "http://localhost:9324/000000000000/development-sqs-notification",
@@ -118,7 +118,6 @@ const serverlessConfiguration: AWS = {
             minify: false,
             sourcemap: true,
             exclude: ["aws-sdk", "pg-native"],
-            target: "node16",
             define: {"require.resolve": undefined},
             platform: "node",
             outputBuildFolder: "build",

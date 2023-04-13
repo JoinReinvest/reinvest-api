@@ -1,11 +1,10 @@
 {
+  "extends": "@hookooekoo/configs-tsconfig/tsconfig.json",
   "compilerOptions": {
-    "sourceMap": true,
-    "target": "ES2019",
-    "module": "commonjs",
     "outDir": "./build",
     "baseUrl": ".",
-    "strict": true,
+    "incremental": true,
+    "jsx": "preserve",
     "paths": {
       "Reinvest/*": ["./Reinvest/*"],
       "PostgreSQL/*": ["./shared/hkek-postgresql/*"],
@@ -21,29 +20,16 @@
       "Documents/*": ["./Reinvest/Documents/src/*"],
       "Identity/*": ["./Reinvest/Identity/src/*"],
       "Registration/*": ["./Reinvest/Registration/src/*"],
-    },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./@types"
-    ],
-    "esModuleInterop": true,
-    "noImplicitAny": true,
-    "moduleResolution": "node",
-    "experimentalDecorators": true
+    }
   },
   "include": [
-    "Reinvest/**/*",
-    "shared/**/*",
-    "devops/**/handler.ts"
+      "./devops/**/*.ts",
+      "./Reinvest/**/*.ts",
+      "./shared/**/*.ts",
+      "./test/**/*.ts",
   ],
   "exclude": [
-    "Reinvest/**/*.test.ts",
-    "Reinvest/**/*.feature.ts",
-    "node_modules",
-    "tsconfig.json",
-    "test/**/*",
-    "serverless.ts",
-    "devops/**/*",
-    ".serverless/**/*"
+    "./out/**/*",
+    "./node_modules/**/*"
   ]
 }

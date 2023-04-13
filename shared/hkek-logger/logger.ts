@@ -4,7 +4,8 @@ const originalConsole = {...console};
 
 export function logger(config: { dsn: string, isLocal: boolean, environment: string }) {
     if (config.isLocal) {
-        return originalConsole;
+        // return originalConsole;
+        config.environment = 'local';
     }
 
     Sentry.init({
@@ -15,8 +16,20 @@ export function logger(config: { dsn: string, isLocal: boolean, environment: str
     });
 
     return {
-        ...console,
-        error() {
+        ...originalConsole,
+        warn: function () {
+            return originalConsole.warn("[Warning]", ...arguments);
+        },
+        log: function () {
+            return originalConsole.log("[Log]", ...arguments);
+        },
+        debug: function () {
+            return originalConsole.log("[Debug]", ...arguments);
+        },
+        info: function () {
+            return originalConsole.log("[Info]", ...arguments);
+        },
+        error: function () {
             const args = [...arguments];
             let messages: string[] = [];
             let message = "";
@@ -35,10 +48,9 @@ export function logger(config: { dsn: string, isLocal: boolean, environment: str
             if (error === null) {
                 error = new Error(message);
             } else {
-                // @ts-ignore
                 error["message"] = message;
             }
-            originalConsole.error("[SentryError]", ...arguments);
+            originalConsole.error("[Error]", ...arguments);
             Sentry.captureException(error);
         },
     }
