@@ -1,5 +1,5 @@
 import {WelcomeTemplate} from "./emailTemplates/welcome";
-import {exportOutput, importOutput} from "devops/serverless/utils";
+import {exportOutput, importOutput} from "./utils";
 
 export const SesResources = {
     SendFromEmail: {
