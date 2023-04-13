@@ -95,8 +95,8 @@ const serverlessConfiguration: AWS = {
         queue: QueueFunction,
         cronDocumentsSync: CronDocumentSyncFunction,
         cronVendorsSync: CronVendorsSyncFunction,
-        cognitoPostSignUpFunction,
-        cognitoPreSignUpFunction,
+        // cognitoPostSignUpFunction,
+        // cognitoPreSignUpFunction,
         tests: TestsFunction,
     },
     resources: {
