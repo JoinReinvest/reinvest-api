@@ -75,12 +75,12 @@ export const CognitoResources = {
                 ExternalId: "reinvest-user-pool-${sls:stage}-external-id",
                 SnsCallerArn: getAttribute("CognitoSMSRole", "Arn"),
             },
-            // EmailConfiguration: {
-            //     EmailSendingAccount: "DEVELOPER",
-            //     SourceArn: "${env:EMAIL_SEND_FROM_ARN}",
-            //     From: "REINVEST Community <${env:EMAIL_SEND_FROM}>",
-            //     ReplyToEmailAddress: "${env:EMAIL_NO_REPLY}",
-            // },
+            EmailConfiguration: {
+                EmailSendingAccount: "DEVELOPER",
+                SourceArn: "${env:EMAIL_SEND_FROM_ARN}",
+                From: "REINVEST Community <${env:EMAIL_SEND_FROM}>",
+                ReplyToEmailAddress: "${env:EMAIL_NO_REPLY}",
+            },
             EnabledMfas: [
                 "SMS_MFA"
             ],
