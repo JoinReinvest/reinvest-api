@@ -1,5 +1,5 @@
 import {WelcomeTemplate} from "./emailTemplates/welcome";
-import {exportOutput, importOutput} from "./utils";
+import {exportOutput, getAttribute, importOutput} from "./utils";
 
 export const SesResources = {
     SendFromEmail: {
@@ -28,7 +28,7 @@ export const SesResources = {
 
 export const SesOutputs = {
     SendFromEmailArn: {
-        Value: {Ref: "SendFromEmail"},
+        Value: getAttribute("SendFromEmail", "Arn"),
         Description: "The verified send from email address ARN (resource name)",
         ...exportOutput('SendFromEmailArn')
     },
