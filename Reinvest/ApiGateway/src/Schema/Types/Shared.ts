@@ -5,7 +5,7 @@ const schema = `
         middleName: String
         lastName: String! @constraint(minLength: 1)
     }
-    
+
     type PersonNameType {
         firstName: String
         middleName: String
@@ -121,6 +121,8 @@ const schema = `
         TradingCompanyStakeholder
         Politician
         AccreditedInvestor
+        TermsAndConditions
+        PrivacyPolicy
     }
 
     input TradingCompanyStakeholderInput {
@@ -144,11 +146,30 @@ const schema = `
         statement: AccreditedInvestorStatement!
     }
 
+    enum TermsAndConditionsStatement {
+        I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_TERMS_AND_CONDITIONS
+    }
+
+    input TermsAndConditionsInput {
+        statement: TermsAndConditionsStatement!
+    }
+
+    enum PrivacyPolicyStatement {
+        I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_PRIVACY_POLICY
+    }
+
+    input PrivacyPolicyInput {
+        statement: PrivacyPolicyStatement!
+    }
+
     """
     An investor statements for:
     - being a FINRA member
     - politician
     - public trading company stakeholder
+    - accredited investor
+    - terms and conditions
+    - privacy policy
     Choose type and add details depending on the chosen type
     """
     input StatementInput {
@@ -157,6 +178,8 @@ const schema = `
         forPolitician: PoliticianStatementInput
         forStakeholder: TradingCompanyStakeholderInput
         forAccreditedInvestor: AccreditedInvestorInput
+        forTermsAndConditions: TermsAndConditionsInput
+        forPrivacyPolicy: PrivacyPolicyInput
     }
 
     type Statement {

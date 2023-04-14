@@ -60,7 +60,13 @@ const schema = `
         Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
         """
         idScan: [DocumentFileLinkInput]
-        "FINRA, Politician, Trading company stakeholder, accredited investor statements"
+        """
+        FINRA, Politician, Trading company stakeholder, accredited investor, terms and conditions, privacy policy statements
+        REQUIRED statements to complete the profile:
+        - accredited investor
+        - terms and conditions
+        - privacy policy
+        """
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"
         removeStatements: [StatementInput]

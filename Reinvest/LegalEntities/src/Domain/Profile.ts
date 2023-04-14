@@ -42,6 +42,7 @@ export class Profile {
     private investingExperience: InvestingExperience | null = null;
     private statements: PersonalStatement[] = [];
     private completed: boolean = false;
+    private completionErrors: string[] = [];
 
     constructor(profileId: string, externalId: string, label: string) {
         this.profileId = profileId;
@@ -197,6 +198,7 @@ export class Profile {
     }
 
     verifyCompletion() {
+        this.completionErrors = [];
         const isAnyNull =
             this.ssn === null ||
             this.name === null ||
@@ -207,6 +209,7 @@ export class Profile {
             this.domicile === null;
 
         if (isAnyNull) {
+            this.completionErrors.push("Some of the required fields are missing");
             return false;
         }
 
@@ -214,10 +217,23 @@ export class Profile {
             (statement: PersonalStatement) => statement.isType(PersonalStatementType.AccreditedInvestor)
         );
 
-        if (!isAccreditedInvestorStatementExist) {
+        const isTermsAndConditionsStatementExist = this.statements.find(
+            (statement: PersonalStatement) => statement.isType(PersonalStatementType.TermsAndConditions)
+        );
+
+        const isPrivacyPolicyStatementExist = this.statements.find(
+            (statement: PersonalStatement) => statement.isType(PersonalStatementType.PrivacyPolicy)
+        );
+
+        if (!isAccreditedInvestorStatementExist || !isTermsAndConditionsStatementExist || !isPrivacyPolicyStatementExist) {
+            this.completionErrors.push("Some of the required statements are missing (Accredited Investor, Terms and Conditions or Privacy Policy)");
             return false;
         }
 
         return true;
+    }
+
+    getCompletionErrors() {
+        return this.completionErrors;
     }
 }
