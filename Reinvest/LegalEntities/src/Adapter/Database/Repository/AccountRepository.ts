@@ -80,6 +80,9 @@ export class AccountRepository {
     async createIndividualAccount(account: IndividualAccount): Promise<boolean> {
         const {accountId, profileId, employmentStatus, employer, netIncome, netWorth, avatar} = account.toObject();
         try {
+            if (await this.isAccountAlreadyOpened(accountId, legalEntitiesIndividualAccountTable)) {
+                return true;
+            }
             await this.databaseAdapterProvider.provide()
                 .insertInto(legalEntitiesIndividualAccountTable)
                 .values({
@@ -198,19 +201,44 @@ export class AccountRepository {
         }
     }
 
-    async isEinUnique(ein: EIN): Promise<boolean> {
+    async isEinUnique(ein: EIN, accountId: string | null = null): Promise<boolean> {
         const einHash = ein.getHash();
         try {
-            await this.databaseAdapterProvider.provide()
+            let qb = this.databaseAdapterProvider.provide()
                 .selectFrom(legalEntitiesCompanyAccountTable)
                 .select(['einHash'])
-                .where("einHash", '=', einHash)
+                .where("einHash", '=', einHash);
+
+            if (accountId) {
+                qb = qb.where('accountId', '!=', accountId)
+            }
+
+            await qb
                 .limit(1)
                 .executeTakeFirstOrThrow();
 
             return false;
         } catch (error: any) {
             return true;
+        }
+    }
+
+    async isAccountAlreadyOpened(accountId: string, table: string): Promise<boolean> {
+        try {
+            const result = await this.databaseAdapterProvider.provide()
+                .selectFrom(table)
+                .select(['accountId'])
+                .where('accountId', '=', accountId)
+                .limit(1)
+                .executeTakeFirst();
+
+            if (result) {
+                return true;
+            }
+
+            return false;
+        } catch (error: any) {
+            return false;
         }
     }
 
@@ -233,6 +261,10 @@ export class AccountRepository {
         } = account.toObject();
 
         try {
+            if (await this.isAccountAlreadyOpened(accountId, legalEntitiesCompanyAccountTable)) {
+                return true;
+            }
+
             await this.databaseAdapterProvider.provide()
                 .insertInto(legalEntitiesCompanyAccountTable)
                 .values({
@@ -252,10 +284,6 @@ export class AccountRepository {
                     einHash,
                 })
                 .onConflict((oc) => oc
-                    .columns(['accountId'])
-                    .doNothing()
-                )
-                .onConflict((oc) => oc
                     .columns(['einHash'])
                     .doNothing()
                 )
@@ -263,7 +291,7 @@ export class AccountRepository {
 
             return true;
         } catch (error: any) {
-            console.error(`Cannot create company account: ${error.message}`, error);
+            console.warn(`Cannot create company account: ${error.message}`, error);
             return false;
         }
     }

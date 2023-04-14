@@ -9,6 +9,7 @@ import {CompanyAccountForSynchronization} from "Registration/Domain/Model/Accoun
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
 import {DictionaryType} from "HKEKTypes/Generics";
+import {EMPTY_UUID} from "Registration/Adapter/Database/Repository/MappingRegistryRepository";
 
 export class NorthCapitalCompanyAccount {
     private readonly data: NorthCapitalCompanyAccountType;
@@ -47,7 +48,7 @@ export class NorthCapitalCompanyAccount {
                     mappingConfiguration: {
                         type: MappedType.PROFILE,
                         profileId: data.profileId,
-                        externalId: data.profileId,
+                        externalId: EMPTY_UUID
                     },
                     linkConfiguration: {
                         relatedEntryType: "IndivACParty",

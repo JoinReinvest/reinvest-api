@@ -22,13 +22,13 @@ export type IndividualAccountOpened = DomainEvent & {
 export type CorporateAccountOpened = DomainEvent & {
     kind: "CorporateAccountOpened",
     data: {
-        corporateAccountIds: string[]
+        corporateAccountId: string
     }
 }
 
 export type TrustAccountOpened = DomainEvent & {
     kind: "TrustAccountOpened",
     data: {
-        trustAccountIds: string[]
+        trustAccountId: string
     }
 }

@@ -447,21 +447,31 @@ export class CompanyDraftAccount extends DraftAccount {
         this.stakeholders?.removeStakeholder(id);
     }
 
-    getEIN(): EIN {
-        return this.ein as EIN;
+    getEIN(): EIN | null {
+        return this.ein;
+    }
+
+    isIrrevocableTrust(): boolean {
+        return this.companyType?.isIrrevocableTrust() ?? false;
     }
 
     verifyCompletion(): boolean {
-        return !(
-            this.companyName === null
+        if (this.companyName === null
             || this.address === null
-            || this.ein === null
             || this.annualRevenue === null
             || this.numberOfEmployees === null
             || this.industry === null
             || this.companyType === null
             || this.documents.isEmpty()
-        );
+        ) {
+            return false;
+        }
+
+        if (!this.isIrrevocableTrust() && this.ein === null) {
+            return false;
+        }
+
+        return true;
     }
 }
 

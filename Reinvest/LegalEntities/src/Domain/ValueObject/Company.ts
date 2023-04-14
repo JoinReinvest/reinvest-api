@@ -43,6 +43,10 @@ export class Company implements ToObject {
             type: this.companyType,
         }
     }
+
+    isIrrevocableTrust() {
+        return this.companyType === TrustType.IRREVOCABLE;
+    }
 }
 
 export class CompanyName implements ToObject {

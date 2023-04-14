@@ -51,7 +51,11 @@ export class TransformDraftAccountIntoRegularAccount {
             if (draftAccount.isCorporate() || draftAccount.isTrust()) {
                 const companyDraft = draftAccount as CompanyDraftAccount;
                 const ein = companyDraft.getEIN();
-                if (!await this.accountRepository.isEinUnique(ein)) {
+                if (ein === null) {
+                    if (!companyDraft.isIrrevocableTrust()) {
+                        throw new Error('DRAFT_MISSING_EIN');
+                    }
+                } else if (!await this.accountRepository.isEinUnique(ein, draftAccountId)) {
                     throw new Error('EIN_ALREADY_EXISTS');
                 }
             }
@@ -92,17 +96,16 @@ export class TransformDraftAccountIntoRegularAccount {
     private async openAccount(draftAccount: DraftAccount, accountType: AccountType): Promise<void> {
         const {profileId, draftId} = draftAccount.toObject();
 
-        const accountOpened = await this.investmentAccountService.openAccount(profileId, draftId, accountType);
-        if (!accountOpened) {
-            throw new Error(`CANNOT_OPEN_ANOTHER_ACCOUNT_OF_TYPE_${accountType}`);
-        }
-
         const status = await this.transactionAdapter.transaction(`Open ${accountType} account "${draftId}" for profile ${profileId}`, async () => {
             const account = draftAccount.transformIntoAccount();
             if (accountType === AccountType.INDIVIDUAL) {
                 await this.accountRepository.createIndividualAccount(account as IndividualAccount);
             } else {
                 await this.accountRepository.createCompanyAccount(account as CompanyAccount);
+            }
+            const accountOpened = await this.investmentAccountService.openAccount(profileId, draftId, accountType);
+            if (!accountOpened) {
+                throw new Error(`CANNOT_OPEN_ANOTHER_ACCOUNT_OF_TYPE_${accountType}`);
             }
             await this.draftAccountRepository.removeDraft(profileId, draftId);
         });

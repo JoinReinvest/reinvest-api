@@ -49,6 +49,13 @@ export class SimpleAggregate implements Aggregate {
         return <Event>event;
     }
 
+    protected setState(key: string, value: any) {
+        if (!('state' in this.aggregate)) {
+            this.aggregate.state = {};
+        }
+        this.aggregate.state[key] = value;
+    }
+
     public getSnapshot(): AggregateState {
         return {...this.aggregate};
     }

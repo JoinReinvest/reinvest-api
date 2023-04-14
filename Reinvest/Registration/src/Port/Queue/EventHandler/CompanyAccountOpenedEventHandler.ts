@@ -19,10 +19,10 @@ export class CompanyAccountOpenedEventHandler implements EventHandler<DomainEven
         let accountId = null;
         let mappedType = null;
         if (event.kind === 'CorporateAccountOpened') {
-            accountId = event.data.corporateAccountIds[0];
+            accountId = event.data.corporateAccountId;
             mappedType = MappedType.CORPORATE_ACCOUNT;
         } else if (event.kind === 'TrustAccountOpened') {
-            accountId = event.data.trustAccountIds[0];
+            accountId = event.data.trustAccountId;
             mappedType = MappedType.TRUST_ACCOUNT;
         } else {
             return;
