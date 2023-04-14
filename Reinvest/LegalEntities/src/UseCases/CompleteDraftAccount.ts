@@ -28,6 +28,8 @@ import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/Value
 import {Stakeholder, StakeholderInput} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
 import {AccountRepository} from "LegalEntities/Adapter/Database/Repository/AccountRepository";
+import {getDocumentRemoveEvent} from "LegalEntities/Domain/Events/DocumentEvents";
+import {DomainEvent} from "SimpleAggregator/Types";
 
 export type IndividualDraftAccountInput = {
     employmentStatus?: EmploymentStatusInput
@@ -141,7 +143,7 @@ export class CompleteDraftAccount {
         const errors = [];
         try {
             const draft = await this.getDraftAccount<CompanyDraftAccount>(profileId, draftAccountId, accountType);
-
+            let events: DomainEvent[] = [];
             for (const step of Object.keys(input)) {
                 try {
                     // @ts-ignore
@@ -183,7 +185,11 @@ export class CompleteDraftAccount {
                             break;
                         case 'avatar':
                             const {id} = data;
-                            draft.setAvatar(Avatar.create({id, path: profileId}));
+                            const removeAvatarEvent = draft.replaceAvatar(Avatar.create({id, path: profileId}));
+
+                            if (removeAvatarEvent) {
+                                events.push(removeAvatarEvent);
+                            }
                             break;
                         case 'companyDocuments':
                             data.map((document: { id: string, fileName: string }) => (
@@ -195,13 +201,17 @@ export class CompleteDraftAccount {
                             );
                             break;
                         case 'removeDocuments':
-                            data.map((document: { id: string, fileName: string }) => (
-                                draft.removeDocument({
-                                    id: document.id,
-                                    fileName: document.fileName,
-                                    path: profileId
-                                }))
+                            const removedDocumentsEvents = data.map((document: { id: string, fileName: string }) => {
+                                    const documentSchema = {
+                                        id: document.id,
+                                        fileName: document.fileName,
+                                        path: profileId
+                                    }
+                                    draft.removeDocument(documentSchema);
+                                    return getDocumentRemoveEvent(documentSchema);
+                                }
                             );
+                            events = [...events, ...removedDocumentsEvents];
                             break;
                         case 'stakeholders':
                             data.map((stakeholder: StakeholderInput) => {
@@ -245,7 +255,7 @@ export class CompleteDraftAccount {
                 }
             }
 
-            await this.draftAccountRepository.storeDraft(draft);
+            await this.draftAccountRepository.storeDraft(draft, events);
         } catch (error: any) {
             console.error(error);
             errors.push(<ValidationErrorType>{

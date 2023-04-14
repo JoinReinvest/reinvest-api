@@ -1,5 +1,5 @@
 import {DomainEvent} from "SimpleAggregator/Types";
-import {DocumentSchema} from "LegalEntities/Domain/ValueObject/Document";
+import {AvatarInput, DocumentSchema} from "LegalEntities/Domain/ValueObject/Document";
 
 export type LegalEntityDocumentRemoved = DomainEvent & {
     kind: "LegalEntityDocumentRemoved",
@@ -25,10 +25,10 @@ export type LegalEntityAvatarRemoved = DomainEvent & {
     }
 }
 
-export const getAvatarRemoveEvent = (document: DocumentSchema): LegalEntityAvatarRemoved => ({
+export const getAvatarRemoveEvent = (avatar: AvatarInput): LegalEntityAvatarRemoved => ({
     kind: "LegalEntityAvatarRemoved",
-    id: document.id,
+    id: avatar.id,
     data: {
-        path: document.path,
+        path: avatar.path,
     }
 });

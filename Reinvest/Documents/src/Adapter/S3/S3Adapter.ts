@@ -38,7 +38,7 @@ export class S3Adapter {
         const putInput: PutObjectCommandInput = {
             Bucket: bucketName,
             Key: `${catalog}/${fileName}`,
-            ACL: 'public-read'
+            ACL: 'private',
         };
         const putCommand = new PutObjectCommand(putInput);
 

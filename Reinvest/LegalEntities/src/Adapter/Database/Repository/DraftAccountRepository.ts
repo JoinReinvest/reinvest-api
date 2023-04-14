@@ -13,15 +13,19 @@ import {
 import {LegalEntitiesDraftAccount} from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
 import {Selectable} from "kysely";
 import {DraftsList} from "LegalEntities/Port/Api/DraftAccountQuery";
+import {DomainEvent} from "SimpleAggregator/Types";
+import {EventBus} from "SimpleAggregator/EventBus/EventBus";
 
 export class DraftAccountRepository {
     public static getClassName = (): string => "DraftAccountRepository";
     private databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider;
     private idGenerator: IdGeneratorInterface;
+    private eventBus: EventBus;
 
-    constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, uniqueGenerator: IdGeneratorInterface) {
+    constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, uniqueGenerator: IdGeneratorInterface, eventBus: EventBus) {
         this.databaseAdapterProvider = databaseAdapterProvider;
         this.idGenerator = uniqueGenerator;
+        this.eventBus = eventBus;
     }
 
     async getActiveDraftsOfType(type: DraftAccountType, profileId: string): Promise<DraftAccount[]> {
@@ -58,7 +62,7 @@ export class DraftAccountRepository {
         }));
     }
 
-    async storeDraft(draft: DraftAccount): Promise<boolean> {
+    async storeDraft(draft: DraftAccount, events: DomainEvent[] = []): Promise<boolean> {
         const {draftId, profileId, accountType, state, data} = draft.toObject();
         try {
             await this.databaseAdapterProvider.provide()
@@ -80,6 +84,8 @@ export class DraftAccountRepository {
                 )
                 .returning('draftId')
                 .executeTakeFirstOrThrow();
+
+            this.eventBus.publishMany(events);
 
             return true;
         } catch (error: any) {

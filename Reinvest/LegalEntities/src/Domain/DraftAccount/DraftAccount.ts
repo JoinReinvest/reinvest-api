@@ -27,6 +27,7 @@ import {Industry, ValueStringInput} from "LegalEntities/Domain/ValueObject/Value
 import {CompanyStakeholders, Stakeholder, StakeholderSchema} from "LegalEntities/Domain/ValueObject/Stakeholder";
 import {Uuid} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {CompanyAccount, CompanyAccountType} from "LegalEntities/Domain/Accounts/CompanyAccount";
+import {getAvatarRemoveEvent, LegalEntityAvatarRemoved} from "LegalEntities/Domain/Events/DocumentEvents";
 
 export enum DraftAccountState {
     ACTIVE = "ACTIVE",
@@ -417,6 +418,16 @@ export class CompanyDraftAccount extends DraftAccount {
 
     setAvatar(avatar: Avatar) {
         this.avatar = avatar;
+    }
+
+    replaceAvatar(avatar: Avatar): LegalEntityAvatarRemoved | null {
+        if (this.avatar !== null && !this.avatar.isTheSame(avatar)) {
+            this.avatar = avatar;
+            return getAvatarRemoveEvent(this.avatar.toObject());
+        }
+        this.avatar = avatar;
+
+        return null;
     }
 
     getAvatar(): Avatar | null {

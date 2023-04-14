@@ -123,7 +123,12 @@ const userRouter = () => {
     const router = express.Router({mergeParams: true});
     const password = "ThisTestUserPassword123!";
     const getUserEmail = (userNumber: number) => `reinvest-test-user-${userNumber}@devkick.pl`;
-
+    router.post("/my-profile-id", async (req: any, res: any) => {
+        const profileId = await getProfileIdFromAccessToken(req.headers.authorization);
+        res.status(200).json({
+            profileId,
+        });
+    });
     router.post("/create-and-login", async (req: any, res: any) => {
         try {
             const {userNumber, referralCode} = req.body;

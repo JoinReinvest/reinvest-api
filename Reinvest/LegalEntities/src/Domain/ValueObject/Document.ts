@@ -168,4 +168,8 @@ export class Avatar implements ToObject {
             path: this.path.toString(),
         }
     }
+
+    isTheSame(avatar: Avatar) {
+        return this.id.toString() === avatar.toObject().id.toString();
+    }
 }
