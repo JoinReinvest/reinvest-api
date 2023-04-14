@@ -1,5 +1,23 @@
 # REINVEST API CHANGELOG
 
+## 1.9.0 - 04/14/2023
+
+* [BREAKING CHANGE] Add new types of statements:
+    * Privacy Policy Statement
+    * Terms and Conditions Statement
+* Privacy Policy Statement and Terms and Conditions Statement are required to be accepted by the user
+    * If the user has not accepted the Privacy Policy Statement and Terms and Conditions Statement, then the profile
+      will not be completed
+* Allow to open Trust Account with empty EIN if Trust type is "Irrevocable Trust"
+
+## 1.8.4 - 04/13/2023
+
+* Cognito uses SES to send emails
+* Bump dependencies versions
+    * all libraries to the latest version
+    * typescript to version 5
+    * NodeJS from version 16 to 18
+
 ## 1.8.3 - 04/11/2023
 
 * Error handling with sentry integrated

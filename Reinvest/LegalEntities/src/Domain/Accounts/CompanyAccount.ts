@@ -31,7 +31,7 @@ export type CompanySchema = {
     companyDocuments: DocumentSchema[],
     stakeholders: StakeholderSchema[],
     accountType: CompanyAccountType,
-    einHash: string,
+    einHash: string | null,
 }
 
 export type CompanyOverviewSchema = {
@@ -111,7 +111,7 @@ export class CompanyAccount {
             companyDocuments: this.get(this.documents),
             stakeholders: this.get(this.stakeholders),
             accountType: this.accountType,
-            einHash: this.ein?.getHash() ?? "",
+            einHash: this.ein?.getHash() ?? null,
         };
     }
 

@@ -137,6 +137,7 @@ export class CompleteProfile {
                 errors.push(<ValidationErrorType>{
                     type: ValidationErrorEnum.FAILED,
                     field: "verifyAndFinish",
+                    details: profile.getCompletionErrors(),
                 });
             }
         }
