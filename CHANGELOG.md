@@ -8,6 +8,7 @@
 * Privacy Policy Statement and Terms and Conditions Statement are required to be accepted by the user
     * If the user has not accepted the Privacy Policy Statement and Terms and Conditions Statement, then the profile
       will not be completed
+* Allow to open Trust Account with empty EIN if Trust type is "Irrevocable Trust"
 
 ## 1.8.4 - 04/13/2023
 
