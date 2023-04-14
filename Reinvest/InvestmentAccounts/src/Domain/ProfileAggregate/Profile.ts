@@ -80,7 +80,7 @@ class Profile extends SimpleAggregate {
             id: this.getId(),
             kind: "CorporateAccountOpened",
             data: {
-                corporateAccountIds: [accountId]
+                corporateAccountId: accountId
             }
         };
 
@@ -103,7 +103,7 @@ class Profile extends SimpleAggregate {
             id: this.getId(),
             kind: "TrustAccountOpened",
             data: {
-                trustAccountIds: [accountId]
+                trustAccountId: accountId
             }
         };
 
@@ -156,18 +156,22 @@ class Profile extends SimpleAggregate {
     }
 
     apply<Event extends DomainEvent>(event: Event) {
-        const eventCopy = this.deepCopy(event);
-        if (event.data.corporateAccountIds) {
-            eventCopy.data.corporateAccountIds = [...this.getState("corporateAccountIds", [])];
-            eventCopy.data.corporateAccountIds.push(event.data.corporateAccountIds[0]);
+        switch (event.kind) {
+            case "CorporateAccountOpened":
+                const corporateAccountIds = [...this.getState("corporateAccountIds", [])]
+                corporateAccountIds.push(event.data.corporateAccountId);
+                this.setState('corporateAccountIds', corporateAccountIds);
+                break;
+            case "TrustAccountOpened":
+                const trustAccountIds = [...this.getState("trustAccountIds", [])]
+                trustAccountIds.push(event.data.trustAccountId);
+                this.setState('trustAccountIds', trustAccountIds);
+                break;
+            default:
+                return super.apply(event);
         }
 
-        if (event.data.trustAccountIds) {
-            eventCopy.data.trustAccountIds = [...this.getState("trustAccountIds", [])];
-            eventCopy.data.trustAccountIds.push(event.data.trustAccountIds[0]);
-        }
-
-        return super.apply(eventCopy);
+        return event;
     }
 }
 
