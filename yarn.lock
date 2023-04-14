@@ -3789,7 +3789,7 @@
     "@sentry/utils" "7.47.0"
     tslib "^1.9.3"
 
-"@sentry/node@^7.47.0":
+"@sentry/node@7.47.0", "@sentry/node@^7.47.0":
   version "7.47.0"
   resolved "https://registry.yarnpkg.com/@sentry/node/-/node-7.47.0.tgz#2c1a8c4777eaf20232fc16d3aa2f26f3fd04bfd1"
   integrity sha512-LTg2r5EV9yh4GLYDF+ViSltR9LLj/pcvk8YhANJcMO3Fp//xh8njcdU0FC2yNthUREawYDzAsVzLyCYJfV0H1A==
@@ -3801,6 +3801,18 @@
     cookie "^0.4.1"
     https-proxy-agent "^5.0.0"
     lru_map "^0.3.3"
+    tslib "^1.9.3"
+
+"@sentry/serverless@^7.47.0":
+  version "7.47.0"
+  resolved "https://registry.yarnpkg.com/@sentry/serverless/-/serverless-7.47.0.tgz#099bc053dd6cbca98309950ec0f2b6662f651f8f"
+  integrity sha512-ROt35Kp1JiR/h37Cw6Fjv/MI3grZCKQSeA5SXpuJObwtpdHI5OIYULivsvwB6HieJBKhS/k3Iplnf/E39808Lg==
+  dependencies:
+    "@sentry/node" "7.47.0"
+    "@sentry/types" "7.47.0"
+    "@sentry/utils" "7.47.0"
+    "@types/aws-lambda" "^8.10.62"
+    "@types/express" "^4.17.14"
     tslib "^1.9.3"
 
 "@sentry/types@7.47.0":
@@ -3985,7 +3997,7 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@types/aws-lambda@^8.10.106":
+"@types/aws-lambda@^8.10.106", "@types/aws-lambda@^8.10.62":
   version "8.10.114"
   resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.114.tgz#4048273ebcd517dd118ecaa34b1368d275b6c7ad"
   integrity sha512-M8WpEGfC9iQ6V2Ccq6nGIXoQgeVc6z0Ngk8yCOL5V/TYIxshvb0MWQYLFFTZDesL0zmsoBc4OBjG9DB/4rei6w==

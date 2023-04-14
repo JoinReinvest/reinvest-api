@@ -1,10 +1,5 @@
-export const ProviderConfiguration = {
-    name: "aws",
-    runtime: "nodejs18.x",
-    region: "us-east-1",
-}
-
 export const ProviderEnvironment = {
+    ENVIRONMENT_STAGE: "${sls:stage}",
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
     NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
     SERVERLESS_SERVICE: "reinvest",

@@ -158,6 +158,7 @@ export class MappingRegistryRepository {
                 .updateTable(registrationMappingRegistryTable)
                 .set({
                     lockedUntil: null,
+                    updatedDate: new Date(),
                 })
                 .where('recordId', '=', record.getRecordId())
                 .where('version', '=', record.getVersion())

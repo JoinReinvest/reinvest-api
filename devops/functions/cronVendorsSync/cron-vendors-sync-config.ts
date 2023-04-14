@@ -9,6 +9,7 @@ import {S3PoliciesWithImport} from "../../serverless/s3";
 export const CronVendorsSyncFunction = {
     handler: `devops/functions/cronVendorsSync/handler.main`,
     role: "CronVendorsSyncRole",
+    timeout: 30,
     vpc: {
         securityGroupIds: [getAttribute("CronVendorsSyncSecurityGroup", "GroupId")],
         subnetIds: [...importPrivateSubnetRefs()],

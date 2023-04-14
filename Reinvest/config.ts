@@ -54,7 +54,7 @@ export const LAMBDA_CONFIG = {
 
 export const SENTRY_CONFIG = {
     dsn: process.env.SENTRY_DSN as string,
-    environment: process.env.NODE_ENV as string,
+    environment: process.env.ENVIRONMENT_STAGE as string,
     isLocal: process.env.IT_IS_LOCAL === 'true',
 }
 
