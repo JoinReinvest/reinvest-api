@@ -1,4 +1,10 @@
-import {GetObjectCommand, PutObjectCommand, PutObjectCommandInput, S3Client,} from "@aws-sdk/client-s3";
+import {
+    DeleteObjectCommand,
+    GetObjectCommand,
+    PutObjectCommand,
+    PutObjectCommandInput,
+    S3Client,
+} from "@aws-sdk/client-s3";
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import {FileType} from "Documents/Adapter/S3/FileLinkService";
 
@@ -54,5 +60,21 @@ export class S3Adapter {
         return getSignedUrl(client, getCommand, {expiresIn: 3600});
     }
 
+    async deleteFile(catalog: string, fileName: string, fileType: FileType): Promise<boolean> {
+        const client = new S3Client({
+            region: this.config.region
+        });
+
+        const bucketName = fileType === FileType.AVATAR ? this.config.avatarsBucket : this.config.documentsBucket;
+
+        const command = new DeleteObjectCommand({
+            Bucket: bucketName,
+            Key: `${catalog}/${fileName}`,
+        });
+
+        await client.send(command);
+
+        return true;
+    }
 }
 

@@ -17,6 +17,7 @@ export default class EventBusProvider {
         eventBus
             .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
                 "LegalProfileCompleted",
+                "LegalEntityDocumentRemoved"
             ]);
         ;
 

@@ -13,24 +13,29 @@ import {Address, AddressInput} from "LegalEntities/Domain/ValueObject/Address";
 import {Domicile, DomicileInput, DomicileType} from "LegalEntities/Domain/ValueObject/Domicile";
 import {DocumentSchema, IdentityDocument} from "LegalEntities/Domain/ValueObject/Document";
 
-export type StakeholderSchema = {
+export type DefaultStakeholder = {
     id: string,
     label: string;
-    ssn: SensitiveNumberSchema | string;
     name: PersonalNameInput;
     dateOfBirth: DateOfBirthInput;
     address: AddressInput,
-    domicile: DomicileInput,
-    idScan: DocumentSchema[],
 }
 
-export type StakeholderInput = StakeholderSchema & {
+export type StakeholderSchema = DefaultStakeholder & {
+    ssn: SensitiveNumberSchema | string;
+    idScan: DocumentSchema[],
+    domicile: DomicileInput,
+}
+
+export type StakeholderInput = DefaultStakeholder & {
     ssn: { ssn: string },
     idScan: { id: string, fileName: string }[],
+    domicile: DomicileInput,
 }
 
-export type StakeholderOutput = StakeholderInput & {
+export type StakeholderOutput = DefaultStakeholder & {
     ssn: string,
+    idScan: DocumentSchema[],
     domicile: {
         type?: DomicileType,
         birthCountry?: String,

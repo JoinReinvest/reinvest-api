@@ -11,5 +11,5 @@ export type AggregateState = {
 export type DomainEvent = {
     id: string;
     kind: string,
-    data?: any
+    data?: unknown,
 }

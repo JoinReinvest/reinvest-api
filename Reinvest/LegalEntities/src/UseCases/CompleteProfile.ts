@@ -9,6 +9,7 @@ import {SensitiveNumber, SensitiveNumberInput, SSN} from "LegalEntities/Domain/V
 import {PersonalStatement, PersonalStatementInput} from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {LegalProfileCompleted} from "LegalEntities/Domain/Events/ProfileEvents";
 import {ValidationErrorEnum, ValidationErrorType} from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {DomainEvent} from "SimpleAggregator/Types";
 
 export type CompleteProfileInput = {
     name?: PersonalNameInput,
@@ -33,7 +34,7 @@ export class CompleteProfile {
 
     public async execute(input: CompleteProfileInput, profileId: string): Promise<ValidationErrorType[]> {
         let profile = await this.profileRepository.findOrCreateProfile(profileId);
-        const events = [];
+        let events: DomainEvent[] = [];
         const errors = [];
         if (profile.isCompleted()) {
             errors.push(<ValidationErrorType>{
@@ -72,7 +73,8 @@ export class CompleteProfile {
                             fileName: document.fileName,
                             path: profileId
                         }));
-                        profile.setIdentityDocument(IdentityDocument.create(documents));
+                        const removedDocumentsEvents = profile.replaceIdentityDocumentAndReturnRemoved(IdentityDocument.create(documents));
+                        events = [...events, ...removedDocumentsEvents];
                         break;
                     case 'domicile':
                         profile.setDomicile(Domicile.create(data));

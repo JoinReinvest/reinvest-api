@@ -1,6 +1,7 @@
 import {Id} from "LegalEntities/Domain/ValueObject/Id";
 import {NonEmptyString, ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
+import {getDocumentRemoveEvent, LegalEntityDocumentRemoved} from "LegalEntities/Domain/Events/DocumentEvents";
 
 export class Path extends NonEmptyString {
     constructor(value: string) {
@@ -82,6 +83,23 @@ export class IdentityDocument implements ToObject {
 
     toObject(): DocumentSchema[] {
         return this.documents.map((document: Document) => document.toObject());
+    }
+
+    getDocuments(): Document[] {
+        return this.documents;
+    }
+
+    replaceDocumentsAndReturnRemoved(idScan: IdentityDocument): LegalEntityDocumentRemoved[] {
+        const currentDocument = this.documents;
+        const newDocuments = idScan.getDocuments();
+        const documentsToRemove = currentDocument.filter((document: Document) => {
+            const existsInNewDocuments = newDocuments.find((newDocument: Document) => newDocument.isTheSameDocument(document));
+            return !existsInNewDocuments;
+        });
+
+        this.documents = newDocuments;
+
+        return documentsToRemove.map((document: Document) => getDocumentRemoveEvent(document.toObject()));
     }
 }
 

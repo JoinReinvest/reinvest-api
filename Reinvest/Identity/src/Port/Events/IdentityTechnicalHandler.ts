@@ -1,12 +1,6 @@
 import {ContainerInterface} from "Container/Container";
 
-export type IdentityTechnicalHandlerType = {
-    ProfileCreated: () => void,
-}
+export type IdentityTechnicalHandlerType = {}
 
 
-export const identityTechnicalHandler = (container: ContainerInterface): IdentityTechnicalHandlerType => ({
-    ProfileCreated: (): void => {
-        console.log('profile created testss - identity')
-    }
-})
+export const identityTechnicalHandler = (container: ContainerInterface): IdentityTechnicalHandlerType => ({})

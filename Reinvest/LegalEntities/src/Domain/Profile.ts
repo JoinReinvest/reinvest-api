@@ -8,10 +8,12 @@ import {
     PersonalStatementType
 } from "LegalEntities/Domain/ValueObject/PersonalStatements";
 import {ToObject} from "LegalEntities/Domain/ValueObject/ToObject";
-import {SensitiveNumber, SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import {SensitiveNumberSchema, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {ValidationError, ValidationErrorEnum} from "LegalEntities/Domain/ValueObject/TypeValidators";
 import {InvestingExperience, InvestingExperienceInput} from "LegalEntities/Domain/ValueObject/InvestingExperience";
 import {IdentityDocument, IdScanInput} from "LegalEntities/Domain/ValueObject/Document";
+import {LegalEntityDocumentRemoved} from "LegalEntities/Domain/Events/DocumentEvents";
+
 
 export type ProfileSchema = {
     profileId: string,
@@ -69,6 +71,15 @@ export class Profile {
 
     setIdentityDocument(idScan: IdentityDocument) {
         this.idScan = idScan;
+    }
+
+    replaceIdentityDocumentAndReturnRemoved(idScan: IdentityDocument): LegalEntityDocumentRemoved[] {
+        if (this.idScan === null) {
+            this.idScan = idScan;
+            return [];
+        }
+
+        return this.idScan.replaceDocumentsAndReturnRemoved(idScan);
     }
 
     setDomicile(domicile: Domicile) {
