@@ -4,7 +4,7 @@ import {LAMBDA_CONFIG} from "Reinvest/config";
 import {Registration} from "Reinvest/Registration/src";
 
 export const main = async (event: any, context: any, callback: Function) => {
-    if (event.syncId) {
+    if (event.syncId) {https://github.com/JoinReinvest/reinvest-api/pull/42
         await synchronizeObject(event.syncId);
     } else {
         await invokeSynchronization(context.functionName)

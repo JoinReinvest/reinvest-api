@@ -13,7 +13,6 @@ import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type CompleteProfileInput = {
   verifyAndFinish: boolean;
-  SSN?: { ssn: SensitiveNumberInput };
   address?: AddressInput;
   dateOfBirth?: DateOfBirthInput;
   domicile?: DomicileInput;
@@ -21,6 +20,7 @@ export type CompleteProfileInput = {
   investingExperience?: InvestingExperienceInput;
   name?: PersonalNameInput;
   removeStatements?: PersonalStatementInput[];
+  ssn?: { ssn: SensitiveNumberInput };
   statements?: PersonalStatementInput[];
 };
 
@@ -86,7 +86,7 @@ export class CompleteProfile {
           case 'investingExperience':
             profile.setInvestingExperience(InvestingExperience.create(data as InvestingExperienceInput));
             break;
-          case 'SSN':
+          case 'ssn':
             // @ts-ignore
             const { ssn: ssnValue } = data;
             const ssn = SSN.createFromRawSSN(ssnValue);
