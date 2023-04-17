@@ -1,13 +1,13 @@
-import {ContainerInterface} from "Container/Container";
-import {DocumentRemovedEventHandler} from "Documents/Port/Queue/EventHandler/DocumentRemovedEventHandler";
-import {AvatarRemovedEventHandler} from "Documents/Port/Queue/EventHandler/AvatarRemovedEventHandler";
+import { ContainerInterface } from 'Container/Container';
+import { AvatarRemovedEventHandler } from 'Documents/Port/Queue/EventHandler/AvatarRemovedEventHandler';
+import { DocumentRemovedEventHandler } from 'Documents/Port/Queue/EventHandler/DocumentRemovedEventHandler';
 
 export type DocumentsTechnicalHandlerType = {
-    LegalEntityDocumentRemoved: DocumentRemovedEventHandler['handle'],
-    LegalEntityAvatarRemoved: AvatarRemovedEventHandler['handle'],
-}
+  LegalEntityAvatarRemoved: AvatarRemovedEventHandler['handle'];
+  LegalEntityDocumentRemoved: DocumentRemovedEventHandler['handle'];
+};
 
 export const documentsTechnicalHandler = (container: ContainerInterface): DocumentsTechnicalHandlerType => ({
-    LegalEntityDocumentRemoved: container.delegateTo(DocumentRemovedEventHandler, 'handle'),
-    LegalEntityAvatarRemoved: container.delegateTo(AvatarRemovedEventHandler, 'handle'),
-})
+  LegalEntityDocumentRemoved: container.delegateTo(DocumentRemovedEventHandler, 'handle'),
+  LegalEntityAvatarRemoved: container.delegateTo(AvatarRemovedEventHandler, 'handle'),
+});

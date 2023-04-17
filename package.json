@@ -104,7 +104,13 @@
     "typescript": "^5.0.4"
   },
   "eslintConfig": {
-    "extends": "@hookooekoo/eslint-config"
+    "extends": "@hookooekoo/eslint-config",
+    "rules": {
+      "no-case-declarations": 0,
+      "no-console": 0,
+      "no-global-assign": 0,
+      "@typescript-eslint/ban-ts-comment": 0
+    }
   },
   "prettier": "@hookooekoo/eslint-config/prettier.json"
 }
