@@ -1,5 +1,17 @@
 # REINVEST API CHANGELOG
 
+## 1.9.1 - 04/17/2023
+
+* Removing documents from s3 bucket for documents and avatar
+  * API removes files from s3 automatically if they are not used anymore
+  * If you stopped using specific documentId, you can't re-use it again
+  * Auto-removal files happens when:
+    * avatar id changes (for individual/corporate/trust accounts) - the previous file is deleted
+    * one or more document ids for idScans changes (for profile/stakeholder) - the previous files are deleted
+    * explicitly run `removeCompanyDocuments`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount` mutation
+    * explicitly run `removeStakeholder`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount` mutation
+    * remove draft
+
 ## 1.9.0 - 04/14/2023
 
 * [BREAKING CHANGE] Add new types of statements:
