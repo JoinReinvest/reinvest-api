@@ -58,6 +58,7 @@ const schema = `
         """
         ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
         Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
+        IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
         """
         idScan: [DocumentFileLinkInput]
         """

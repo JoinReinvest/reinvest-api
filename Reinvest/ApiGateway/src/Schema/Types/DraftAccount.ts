@@ -37,7 +37,10 @@ const sharedSchema = `
         You can have only one draft account created of a specific type in the same time.
         """
         createDraftAccount(type: DraftAccountType): DraftAccount
-        "Remove draft account"
+        """
+        Remove draft account
+        IMPORTANT: it removes all uploaded avatar and documents from s3 for this draft account
+        """
         removeDraftAccount(draftAccountId: ID): Boolean
     }
 
@@ -76,6 +79,9 @@ const individualSchema = `
         employer: EmployerInput
         netWorth: NetRangeInput
         netIncome: NetRangeInput
+        """
+        IMPORTANT: it removes previously uploaded avatar from s3 for this draft account
+        """
         avatar: AvatarFileLinkInput
     }
 
@@ -202,6 +208,9 @@ const corporateTrustSchema = `
         ssn: SSNInput!
         address: AddressInput!
         domicile: DomicileInput!
+        """
+        IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
+        """
         idScan: [DocumentFileLinkInput]!
     }
 
@@ -240,9 +249,18 @@ const corporateTrustSchema = `
         numberOfEmployees: NumberOfEmployeesInput
         industry: IndustryInput
         companyDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes these documents from s3
+        """
         removeDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes previously uploaded avatar from s3 for this draft account
+        """
         avatar: AvatarFileLinkInput
         stakeholders: [StakeholderInput]
+        """
+        IMPORTANT: it removes previously uploaded id scan documents from s3 for this stakeholder
+        """
         removeStakeholders: [StakeholderIdInput]
         companyType: CorporateCompanyTypeInput
     }
@@ -255,9 +273,18 @@ const corporateTrustSchema = `
         numberOfEmployees: NumberOfEmployeesInput
         industry: IndustryInput
         companyDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes these documents from s3
+        """
         removeDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes previously uploaded avatar from s3 for this draft account
+        """
         avatar: AvatarFileLinkInput
         stakeholders: [StakeholderInput]
+        """
+        IMPORTANT: it removes previously uploaded id scan documents from s3 for this stakeholder
+        """
         removeStakeholders: [StakeholderIdInput]
         companyType: TrustCompanyTypeInput
     }
