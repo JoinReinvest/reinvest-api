@@ -180,7 +180,6 @@ export class ReadAccountController {
                 })),
                 stakeholders: accountObject.stakeholders.map((stakeholder: StakeholderSchema): StakeholderOutput => ({
                     ...stakeholder,
-                    // @ts-ignore
                     ssn: stakeholder.ssn.anonymized,
                     domicile: {
                         type: stakeholder.domicile?.type,
@@ -188,7 +187,6 @@ export class ReadAccountController {
                         citizenshipCountry: stakeholder.domicile?.forGreenCard?.citizenshipCountry ?? stakeholder.domicile?.forVisa?.citizenshipCountry,
                         visaType: stakeholder.domicile?.forVisa?.visaType
                     },
-                    // @ts-ignore
                     idScan: stakeholder.idScan.map((idScan: DocumentSchema) => ({
                         id: idScan.id,
                         fileName: idScan.fileName,

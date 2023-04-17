@@ -46,7 +46,7 @@ export class AdapterServiceProvider {
         container
             .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
             .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
-            .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+            .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
             .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
             .addObjectFactory("LegalEntitiesTransactionalAdapter",
                 (databaseProvider: LegalEntitiesDatabaseAdapterProvider) =>
