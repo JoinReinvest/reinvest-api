@@ -90,7 +90,7 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       accountDetails: [{ accountId }],
     } = response;
 
-    console.log({ action: 'Create north capital individual account', accountId, statusCode, statusDesc });
+    console.log({ action: 'Create north capital account', accountId, statusCode, statusDesc });
 
     return accountId;
   }
@@ -108,7 +108,7 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     const { statusCode, statusDesc, accountDetails } = response;
 
     console.log({
-      action: 'Update north capital individual account',
+      action: 'Update north capital account',
       northCapitalAccountId,
       statusCode,
       statusDesc,
@@ -217,7 +217,7 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
 
     const data = {
       partyId: northCapitalId,
-      documentTitle: `documentTitle0=${documentFilename} [id: ${documentId}]`,
+      documentTitle: `documentTitle0=[id:${documentId}]-${documentFilename}`,
       file_name: `filename0=${documentFilename}`,
     };
 
@@ -251,8 +251,24 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     }
   }
 
-  async getUploadedDocuments(northCapitalId: string): Promise<NorthCapitalUploadedDocument[]> {
+  async getUploadedPartyDocuments(northCapitalId: string): Promise<NorthCapitalUploadedDocument[]> {
     const endpoint = 'tapiv3/index.php/v3/getuploadPartyDocument';
+
+    const data = {
+      partyId: northCapitalId,
+    };
+    try {
+      const response = await this.postRequest(endpoint, data);
+      const { statusCode, statusDesc, partyDocumentDetails: details } = response;
+
+      return details ?? [];
+    } catch (error: any) {
+      return [];
+    }
+  }
+
+  async getUploadedEntityDocuments(northCapitalId: string): Promise<NorthCapitalUploadedDocument[]> {
+    const endpoint = 'tapiv3/index.php/v3/getEntityDocument';
 
     const data = {
       partyId: northCapitalId,

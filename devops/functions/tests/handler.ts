@@ -405,7 +405,7 @@ const northCapitalRouter = () => {
 
       const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
       const party = await ncAdapter.getParty(ncSyncRecord.northCapitalId);
-      const partyDocuments = await ncAdapter.getUploadedDocuments(ncSyncRecord.northCapitalId);
+      const partyDocuments = await ncAdapter.getUploadedPartyDocuments(ncSyncRecord.northCapitalId);
 
       res.status(200).json({
         status: true,
@@ -450,11 +450,11 @@ const northCapitalRouter = () => {
       for (const link of accountLinks) {
         if (link.relatedEntryType === 'IndivACParty') {
           link['party'] = await ncAdapter.getParty(link.relatedEntry);
+          link['partyDocuments'] = await ncAdapter.getUploadedPartyDocuments(link.relatedEntry);
         } else if (link.relatedEntryType === 'EntityACParty') {
           link['party'] = await ncAdapter.getEntity(link.relatedEntry);
+          link['partyDocuments'] = await ncAdapter.getUploadedEntityDocuments(link.relatedEntry);
         }
-
-        link['partyDocuments'] = await ncAdapter.getUploadedDocuments(link.relatedEntry);
       }
 
       res.status(200).json({
