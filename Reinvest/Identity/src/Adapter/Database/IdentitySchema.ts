@@ -1,23 +1,23 @@
-import {Insertable} from "kysely";
+import { Insertable } from 'kysely';
 
 export interface IdentityUser {
-    id: string;
-    cognitoUserId: string;
-    profileId: string;
-    email: string;
-    invitedByIncentiveToken: string;
-    userIncentiveToken: string;
-    createdAt: string;
+  cognitoUserId: string;
+  createdAt: string;
+  email: string;
+  id: string;
+  invitedByIncentiveToken: string;
+  profileId: string;
+  userIncentiveToken: string;
 }
 
 export interface IdentityPhoneVerification {
-    userId: string;
-    countryCode: string;
-    phoneNumber: string;
-    topt: string;
-    tries: number,
-    createdAt: Date;
-    expiresAfterMinutes: number;
+  countryCode: string;
+  createdAt: Date;
+  expiresAfterMinutes: number;
+  phoneNumber: string;
+  topt: string;
+  tries: number;
+  userId: string;
 }
 
 export type InsertableUser = Insertable<IdentityUser>;
