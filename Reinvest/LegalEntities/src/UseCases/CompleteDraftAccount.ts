@@ -194,17 +194,18 @@ export class CompleteDraftAccount {
               );
               break;
             case 'removeDocuments':
-              const removedDocumentsEvents = data.map((document: { fileName: string; id: string }) => {
+              data.map((document: { fileName: string; id: string }) => {
                 const documentSchema = {
                   id: document.id,
                   fileName: document.fileName,
                   path: profileId,
                 };
-                draft.removeDocument(documentSchema);
+                const removedDocumentEvent = draft.removeDocument(documentSchema);
 
-                return getDocumentRemoveEvent(documentSchema);
+                if (removedDocumentEvent) {
+                  events.push(removedDocumentEvent);
+                }
               });
-              events = [...events, ...removedDocumentsEvents];
               break;
             case 'stakeholders':
               data.map((stakeholder: StakeholderInput) => {

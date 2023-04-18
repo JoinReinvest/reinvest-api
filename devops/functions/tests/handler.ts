@@ -3,7 +3,6 @@ import {
   AdminCreateUserCommand,
   AdminDeleteUserCommand,
   AdminSetUserPasswordCommand,
-  ChangePasswordCommand,
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
   ListUsersCommand,

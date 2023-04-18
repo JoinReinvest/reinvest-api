@@ -415,8 +415,8 @@ export class CompanyDraftAccount extends DraftAccount {
     this.documents?.addDocument(document);
   }
 
-  removeDocument(document: DocumentSchema) {
-    this.documents?.removeDocument(document);
+  removeDocument(document: DocumentSchema): LegalEntityDocumentRemoved | null {
+    return this.documents?.removeDocument(document) ?? null;
   }
 
   removeAllDocuments(): LegalEntityDocumentRemoved[] {

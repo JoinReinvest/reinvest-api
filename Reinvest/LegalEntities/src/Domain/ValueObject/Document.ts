@@ -140,9 +140,17 @@ export class CompanyDocuments implements ToObject {
     }
   }
 
-  removeDocument(document: DocumentSchema): void {
+  removeDocument(document: DocumentSchema): LegalEntityDocumentRemoved | null {
     const documentToRemove = new Document(document);
-    this.documents = this.documents.filter((doc: Document) => !doc.isTheSameDocument(documentToRemove));
+    const documentToRemoveExists = this.documents.find((doc: Document) => doc.isTheSameDocument(documentToRemove));
+
+    if (documentToRemoveExists) {
+      this.documents = this.documents.filter((doc: Document) => !doc.isTheSameDocument(documentToRemove));
+
+      return getDocumentRemoveEvent(documentToRemoveExists.toObject());
+    }
+
+    return null;
   }
 
   isEmpty(): boolean {
