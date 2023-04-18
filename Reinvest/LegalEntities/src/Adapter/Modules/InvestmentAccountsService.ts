@@ -1,4 +1,5 @@
 import {InvestmentAccounts} from "InvestmentAccounts/index";
+import {AccountType as InvestmentAccountType} from "InvestmentAccounts/Domain/ProfileAggregate/AccountType";
 import {AccountType} from "LegalEntities/Domain/AccountType";
 
 /**
@@ -15,6 +16,6 @@ export class InvestmentAccountsService {
     async openAccount(profileId: string, accountId: string, accountType: AccountType): Promise<boolean> {
         const api = this.investmentAccountsModule.api();
 
-        return api.openAccount(profileId, accountId, accountType);
+        return api.openAccount(profileId, accountId, accountType as InvestmentAccountType);
     }
 }

@@ -25,3 +25,17 @@ export type DocumentSchema = {
     path: string,
     fileName: string,
 }
+
+export enum AccountType {
+    CORPORATE = "CORPORATE",
+    TRUST = "TRUST",
+}
+
+export enum CompanyType {
+    PARTNERSHIP = 'PARTNERSHIP',
+    LLC = 'LLC',
+    CORPORATION = 'CORPORATION',
+    REVOCABLE = 'REVOCABLE',
+    IRREVOCABLE = 'IRREVOCABLE'
+}
+

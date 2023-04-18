@@ -11,13 +11,18 @@ export type LegalEntitiesApiType = {
 
     createDraftAccount: DraftAccountsController["createDraftAccount"],
     completeIndividualDraftAccount: DraftAccountsController["completeIndividualDraftAccount"],
+    completeCompanyDraftAccount: DraftAccountsController["completeCompanyDraftAccount"],
     readDraft: DraftAccountsController["readDraft"],
     listDrafts: DraftAccountsController["listDrafts"],
     removeDraft: DraftAccountsController["removeDraft"],
     transformDraftAccountIntoRegularAccount: DraftAccountsController["transformDraftAccountIntoRegularAccount"],
 
     getIndividualAccount: ReadAccountController["getIndividualAccount"],
+    getCompanyAccount: ReadAccountController["getCompanyAccount"],
     getIndividualAccountForSynchronization: ReadAccountController["getIndividualAccountForSynchronization"],
+    getCompanyAccountForSynchronization: ReadAccountController["getCompanyAccountForSynchronization"],
+    getCompanyForSynchronization: ReadAccountController["getCompanyForSynchronization"],
+    getStakeholderForSynchronization: ReadAccountController["getStakeholderForSynchronization"],
     getAccountsOverview: ReadAccountController["getAccountsOverview"],
 };
 
@@ -31,9 +36,15 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
     readDraft: container.delegateTo(DraftAccountsController, 'readDraft'),
     removeDraft: container.delegateTo(DraftAccountsController, 'removeDraft'),
     completeIndividualDraftAccount: container.delegateTo(DraftAccountsController, 'completeIndividualDraftAccount'),
+    completeCompanyDraftAccount: container.delegateTo(DraftAccountsController, 'completeCompanyDraftAccount'),
     transformDraftAccountIntoRegularAccount: container.delegateTo(DraftAccountsController, 'transformDraftAccountIntoRegularAccount'),
 
     getIndividualAccount: container.delegateTo(ReadAccountController, 'getIndividualAccount'),
     getIndividualAccountForSynchronization: container.delegateTo(ReadAccountController, 'getIndividualAccountForSynchronization'),
+    getCompanyAccountForSynchronization: container.delegateTo(ReadAccountController, 'getCompanyAccountForSynchronization'),
+    getCompanyForSynchronization: container.delegateTo(ReadAccountController, 'getCompanyForSynchronization'),
+    getStakeholderForSynchronization: container.delegateTo(ReadAccountController, 'getStakeholderForSynchronization'),
+
+    getCompanyAccount: container.delegateTo(ReadAccountController, 'getCompanyAccount'),
     getAccountsOverview: container.delegateTo(ReadAccountController, 'getAccountsOverview'),
 });

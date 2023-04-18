@@ -9,6 +9,7 @@ import {S3PoliciesWithImport} from "../../serverless/s3";
 export const CronDocumentSyncFunction = {
     handler: `devops/functions/cronDocumentSync/handler.main`,
     role: "CronDocumentSyncRole",
+    timeout: 60,
     vpc: {
         securityGroupIds: [getAttribute("CronDocumentSyncSecurityGroup", "GroupId")],
         subnetIds: [...importPrivateSubnetRefs()],

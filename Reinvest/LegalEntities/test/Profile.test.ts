@@ -14,20 +14,24 @@ import {
     GreenCardInput,
     VisaInput
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/Domicile";
-import {SSN, SSNInput, SSNSchema} from "Reinvest/LegalEntities/src/Domain/ValueObject/SSN";
+import {
+    SensitiveNumberSchema,
+    SSN
+} from "Reinvest/LegalEntities/src/Domain/ValueObject/SensitiveNumber";
 import {
     AccreditedInvestorStatements, ForAccreditedInvestor,
     ForFINRA,
-    ForPolitician,
-    ForStakeholder,
+    ForPolitician, ForPrivacyPolicy,
+    ForStakeholder, ForTermsAndConditions,
     PersonalStatement,
     PersonalStatementInput,
-    PersonalStatementType
+    PersonalStatementType, PrivacyPolicyStatements, TermsAndConditionsStatements
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/PersonalStatements";
 import {
     InvestingExperience, InvestingExperienceInput,
     InvestingExperienceType
 } from "Reinvest/LegalEntities/src/Domain/ValueObject/InvestingExperience";
+import {DocumentSchema} from "Registration/Domain/Model/ReinvestTypes";
 
 context("Given the user wants to complete the profile", () => {
 
@@ -157,19 +161,19 @@ context("Given the user wants to complete the profile", () => {
             }
         });
 
-        const ids = ['427aa662-a4da-48ee-a44f-780bd8743c93', '7ca02cbe-db35-413b-8fe3-1851643ab3b7'];
+        const id1 = '427aa662-a4da-48ee-a44f-780bd8743c93';
+        const id2 = '7ca02cbe-db35-413b-8fe3-1851643ab3b7';
         const path = '6539e4e3-802b-4a83-9197-0a0f41832317';
         it("Then add ID scans", async () => {
-            const input = [{id: ids[0], path, fileName: 'id1.jpg'}, {id: ids[1], path, fileName: 'id2.jpg'}];
+            const input = [{id: id1, path, fileName: 'id1.jpg'}, {id: id2, path, fileName: 'id2.jpg'}];
             profile.setIdentityDocument(IdentityDocument.create(input))
             const profileOutput = profile.toObject();
-            const idScan = profileOutput.idScan as IdScanInput;
+            const [scan1, scan2] = <[DocumentSchema, DocumentSchema]>profileOutput.idScan;
 
-            expect(idScan.length).to.be.equal(2);
-            expect(idScan[0].id).to.be.equal(ids[0]);
-            expect(idScan[0].path).to.be.equal(path);
-            expect(idScan[1].id).to.be.equal(ids[1]);
-            expect(idScan[1].path).to.be.equal(path);
+            expect(scan1.id).to.be.equal(id1);
+            expect(scan1.path).to.be.equal(path);
+            expect(scan2.id).to.be.equal(id2);
+            expect(scan2.path).to.be.equal(path);
         });
 
         it("Or if id is wrong uuid Then expects validation error", async () => {
@@ -276,7 +280,7 @@ context("Given the user wants to complete the profile", () => {
             profile.setSSN(ssnValueObject);
 
             const profileOutput = profile.toObject();
-            const ssn = profileOutput.ssnObject as unknown as SSNSchema;
+            const ssn = profileOutput.ssnObject as unknown as SensitiveNumberSchema;
 
             expect(ssn.anonymized).to.be.equal("***-**-3333");
             expect(ssnValueObject.decrypt()).to.be.equal(input);
@@ -358,12 +362,12 @@ context("Given the user wants to complete the profile", () => {
             };
             profile.addStatement(PersonalStatement.create(input))
             const profileOutput = profile.toObject();
-            const statements = profileOutput.statements as PersonalStatementInput[];
+            const statements = profileOutput.statements as PersonalStatementInput[]
 
             expect(statements).length(1);
-            const forFINRA = statements[0].forFINRA as ForFINRA;
-            expect(statements[0].type).to.be.equal(PersonalStatementType.FINRAMember);
-            expect(forFINRA.name).to.be.equal("Dalmore");
+            const forFINRA = statements[0]?.forFINRA as ForFINRA;
+            expect(statements[0]?.type).to.be.equal(PersonalStatementType.FINRAMember);
+            expect(forFINRA?.name).to.be.equal("Dalmore");
         });
 
         const politicianStatementCheck = (description: string) => {
@@ -378,9 +382,9 @@ context("Given the user wants to complete the profile", () => {
             const statements = profileOutput.statements as PersonalStatementInput[];
 
             expect(statements).length(2);
-            const forPolitician = statements[1].forPolitician as ForPolitician;
-            expect(statements[1].type).to.be.equal(PersonalStatementType.Politician);
-            expect(forPolitician.description).to.be.equal(description);
+            const forPolitician = statements[1]?.forPolitician as ForPolitician;
+            expect(statements[1]?.type).to.be.equal(PersonalStatementType.Politician);
+            expect(forPolitician?.description).to.be.equal(description);
         }
 
         it("And Then add the statement that you are a politician", async () => {
@@ -399,7 +403,7 @@ context("Given the user wants to complete the profile", () => {
             const statements = profileOutput.statements as PersonalStatementInput[];
 
             expect(statements).length(1);
-            expect(statements[0].type).to.be.equal(PersonalStatementType.FINRAMember);
+            expect(statements[0]?.type).to.be.equal(PersonalStatementType.FINRAMember);
         });
 
         it("And Then add the statement that you are a public trading company stakeholder", async () => {
@@ -415,8 +419,8 @@ context("Given the user wants to complete the profile", () => {
             const statements = profileOutput.statements as PersonalStatementInput[];
 
             expect(statements).length(2);
-            const forStakeholder = statements[1].forStakeholder as ForStakeholder;
-            expect(statements[1].type).to.be.equal(PersonalStatementType.TradingCompanyStakeholder);
+            const forStakeholder = statements[1]?.forStakeholder as ForStakeholder;
+            expect(statements[1]?.type).to.be.equal(PersonalStatementType.TradingCompanyStakeholder);
             expect(forStakeholder.tickerSymbols).to.include.members(tickerSymbols);
         });
 
@@ -432,8 +436,8 @@ context("Given the user wants to complete the profile", () => {
             const statements = profileOutput.statements as PersonalStatementInput[];
 
             expect(statements).length(3);
-            const forAccreditedInvestor = statements[2].forAccreditedInvestor as ForAccreditedInvestor;
-            expect(statements[2].type).to.be.equal(PersonalStatementType.AccreditedInvestor);
+            const forAccreditedInvestor = statements[2]?.forAccreditedInvestor as ForAccreditedInvestor;
+            expect(statements[2]?.type).to.be.equal(PersonalStatementType.AccreditedInvestor);
             expect(forAccreditedInvestor.statement).to.be.equal(statement);
         };
 
@@ -445,12 +449,46 @@ context("Given the user wants to complete the profile", () => {
             checkAccreditedInvestor(AccreditedInvestorStatements.I_AM_AN_ACCREDITED_INVESTOR);
         });
 
-        it("Then verify the profile and should be completed now", async () => {
-            verifyProfile(true);
-        });
-
         it("And Then change you statement that you are not accredited investor", async () => {
             checkAccreditedInvestor(AccreditedInvestorStatements.I_AM_NOT_EXCEEDING_10_PERCENT_OF_MY_NET_WORTH_OR_ANNUAL_INCOME);
+        });
+
+        it("And Then add the statement that you have read terms and conditions", async () => {
+            const input = <PersonalStatementInput>{
+                type: PersonalStatementType.TermsAndConditions,
+                forTermsAndConditions: {
+                    statement: TermsAndConditionsStatements.I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_TERMS_AND_CONDITIONS
+                }
+            };
+            profile.addStatement(PersonalStatement.create(input))
+            const profileOutput = profile.toObject();
+            const statements = profileOutput.statements as PersonalStatementInput[];
+
+            expect(statements).length(4);
+            const forTermsAndConditions = statements[3]?.forTermsAndConditions as ForTermsAndConditions;
+            expect(statements[3]?.type).to.be.equal(PersonalStatementType.TermsAndConditions);
+            expect(forTermsAndConditions.statement).to.be.equal(TermsAndConditionsStatements.I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_TERMS_AND_CONDITIONS);
+        });
+
+        it("And Then add the statement that you have read privacy policy", async () => {
+            const input = <PersonalStatementInput>{
+                type: PersonalStatementType.PrivacyPolicy,
+                forPrivacyPolicy: {
+                    statement: PrivacyPolicyStatements.I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_PRIVACY_POLICY
+                }
+            };
+
+            profile.addStatement(PersonalStatement.create(input))
+            const profileOutput = profile.toObject();
+            const statements = profileOutput.statements as PersonalStatementInput[];
+            expect(statements).length(5);
+            const forPrivacyPolicy = statements[4]?.forPrivacyPolicy as ForPrivacyPolicy;
+            expect(statements[4]?.type).to.be.equal(PersonalStatementType.PrivacyPolicy);
+            expect(forPrivacyPolicy.statement).to.be.equal(PrivacyPolicyStatements.I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_PRIVACY_POLICY);
+        });
+
+        it("Then verify the profile and should be completed now", async () => {
+            verifyProfile(true);
         });
 
         it("Or add the statement without all required data Then expects validation error", async () => {

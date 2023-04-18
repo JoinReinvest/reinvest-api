@@ -1,5 +1,6 @@
 import {exportOutput, getAttribute, getResourceName, importOutput} from "./utils";
 import {margeWithApiGatewayUrl} from "./serverless-common";
+import {AwsCfInstruction} from "@serverless/typescript";
 
 // SAAS Part
 export const CognitoResources = {
@@ -73,6 +74,12 @@ export const CognitoResources = {
             SmsConfiguration: {
                 ExternalId: "reinvest-user-pool-${sls:stage}-external-id",
                 SnsCallerArn: getAttribute("CognitoSMSRole", "Arn"),
+            },
+            EmailConfiguration: {
+                EmailSendingAccount: "DEVELOPER",
+                SourceArn: "${env:EMAIL_SEND_FROM_ARN}",
+                From: "REINVEST Community <${env:EMAIL_SEND_FROM}>",
+                ReplyToEmailAddress: "${env:EMAIL_NO_REPLY}",
             },
             EnabledMfas: [
                 "SMS_MFA"
@@ -189,7 +196,16 @@ export const CognitoOutputs = {
         ...exportOutput('CognitoIssuerUrl')
     },
 }
-export const CognitoAuthorizer = {
+export const CognitoAuthorizer: {
+    [k: string]:
+        | {
+        type?: "jwt";
+        name?: string;
+        identitySource: AwsCfInstruction;
+        issuerUrl: AwsCfInstruction;
+        audience: AwsCfInstruction | AwsCfInstruction[];
+    }
+} = {
     CognitoAuthorizer: {
         type: "jwt",
         name: getResourceName("cognito-authorizer"),

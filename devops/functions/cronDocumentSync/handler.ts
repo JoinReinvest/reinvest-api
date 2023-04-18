@@ -18,6 +18,7 @@ async function synchronizeDocument(documentId: string) {
     const modules = boot();
     const registrationApi = modules.getApi<Registration.ApiType>(Registration);
     const documentSynchronizationStatus = await registrationApi.synchronizeDocument(documentId);
+    await modules.close();
     console.log(`[END] Syncing document with North Capital ${documentId} - ${documentSynchronizationStatus}`);
 }
 
@@ -26,6 +27,7 @@ async function invokeSynchronization(functionName: string) {
 
     const registrationApi = modules.getApi<Registration.ApiType>(Registration);
     const documentIds = await registrationApi.listDocumentsToSynchronize();
+    await modules.close();
     if (documentIds.length === 0) {
         return;
     }

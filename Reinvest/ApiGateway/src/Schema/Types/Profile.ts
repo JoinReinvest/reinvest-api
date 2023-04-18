@@ -1,9 +1,9 @@
-import {LegalEntities} from "LegalEntities/index";
-import {JsonGraphQLError, SessionContext} from "ApiGateway/index";
-import {ProfileResponse} from "LegalEntities/Port/Api/GetProfileController";
-import {GraphQLError} from "graphql";
-import {InvestmentAccounts} from "InvestmentAccounts/index";
-import {CompleteProfileInput} from "LegalEntities/UseCases/CompleteProfile";
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { GraphQLError } from 'graphql';
+import { InvestmentAccounts } from 'InvestmentAccounts/index';
+import { LegalEntities } from 'LegalEntities/index';
+import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
+import { CompleteProfileInput } from 'LegalEntities/UseCases/CompleteProfile';
 
 const schema = `
     #graphql
@@ -58,9 +58,16 @@ const schema = `
         """
         ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
         Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
+        IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
         """
         idScan: [DocumentFileLinkInput]
-        "FINRA, Politician, Trading company stakeholder, accredited investor statements"
+        """
+        FINRA, Politician, Trading company stakeholder, accredited investor, terms and conditions, privacy policy statements
+        REQUIRED statements to complete the profile:
+        - accredited investor
+        - terms and conditions
+        - privacy policy
+        """
         statements: [StatementInput]
         "If an investor decided to remove one of the statements during onboarding"
         removeStatements: [StatementInput]
@@ -94,56 +101,47 @@ const schema = `
 `;
 
 type CompleteProfileDetailsInput = {
-    input: CompleteProfileInput
-}
+  input: CompleteProfileInput;
+};
 
 export const Profile = {
-    typeDefs: schema,
-    resolvers: {
-        Query: {
-            getProfile: async (parent: any,
-                               input: undefined,
-                               {profileId, modules}: SessionContext
-            ): Promise<ProfileResponse> => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                return api.getProfile(profileId);
-            },
-            listAccountTypesUserCanOpen: async (parent: any,
-                                                data: undefined,
-                                                {profileId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
-                return api.listAccountTypesUserCanOpen(profileId);
-            },
-        },
-        Mutation: {
-            completeProfileDetails: async (parent: any,
-                                           data: CompleteProfileDetailsInput,
-                                           {profileId, modules}: SessionContext
-            ): Promise<ProfileResponse> => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const {input} = data;
-                const errors = await api.completeProfile(input, profileId);
-                if (errors.length > 0) {
-                    throw new JsonGraphQLError(errors);
-                }
+  typeDefs: schema,
+  resolvers: {
+    Query: {
+      getProfile: async (parent: any, input: undefined, { profileId, modules }: SessionContext): Promise<ProfileResponse> => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
 
-                return api.getProfile(profileId);
-            },
+        return api.getProfile(profileId);
+      },
+      listAccountTypesUserCanOpen: async (parent: any, data: undefined, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
 
-            openAccount: async (parent: any,
-                                {draftAccountId}: any,
-                                {profileId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
-                if (error !== null) {
-                    throw new GraphQLError(error);
-                }
+        return api.listAccountTypesUserCanOpen(profileId);
+      },
+    },
+    Mutation: {
+      completeProfileDetails: async (parent: any, data: CompleteProfileDetailsInput, { profileId, modules }: SessionContext): Promise<ProfileResponse> => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const { input } = data;
+        const errors = await api.completeProfile(input, profileId);
 
-                return true;
-            },
-        },
-    }
-}
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
+        return api.getProfile(profileId);
+      },
+
+      openAccount: async (parent: any, { draftAccountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
+
+        if (error !== null) {
+          throw new GraphQLError(error);
+        }
+
+        return true;
+      },
+    },
+  },
+};

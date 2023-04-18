@@ -1,5 +1,79 @@
 # REINVEST API CHANGELOG
 
+## 1.9.1 - 04/17/2023
+
+* Removing documents from s3 bucket for documents and avatar
+  * API removes files from s3 automatically if they are not used anymore
+  * If you stopped using specific documentId, you can't re-use it again
+  * Auto-removal files happens when:
+    * avatar id changes (for individual/corporate/trust accounts) - the previous file is deleted
+    * one or more document ids for idScans changes (for profile/stakeholder) - the previous files are deleted
+    * explicitly run `removeCompanyDocuments`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount` mutation
+    * explicitly run `removeStakeholder`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount` mutation
+    * remove draft
+
+## 1.9.0 - 04/14/2023
+
+* [BREAKING CHANGE] Add new types of statements:
+    * Privacy Policy Statement
+    * Terms and Conditions Statement
+* Privacy Policy Statement and Terms and Conditions Statement are required to be accepted by the user
+    * If the user has not accepted the Privacy Policy Statement and Terms and Conditions Statement, then the profile
+      will not be completed
+* Allow to open Trust Account with empty EIN if Trust type is "Irrevocable Trust"
+
+## 1.8.4 - 04/13/2023
+
+* Cognito uses SES to send emails
+* Bump dependencies versions
+    * all libraries to the latest version
+    * typescript to version 5
+    * NodeJS from version 16 to 18
+
+## 1.8.3 - 04/11/2023
+
+* Error handling with sentry integrated
+
+## 1.8.2 - 04/11/2023
+
+* Synchronization corporate/trust companies with Vertalo
+
+## 1.8.1 - 04/11/2023
+
+* Synchronization corporate/trust entities with North Capital:
+    * Company entity: LLC/Partnership/Corporation/Revocable Trust/Irrevocable Trust
+    * Company account: Corporate/Trust
+    * Company stakeholder: Corporate/Trust
+    * Documents upload for company entity and stakeholders
+    * Linking company/stakeholders with an account
+
+## 1.8.0 - 04/06/2023
+
+* Employer field is optional if Employment Status is not "Employed" for `completeIndividualDraftAccount` mutation
+* New queries:
+    * `getCorporateAccount`
+    * `getTrustAccount`
+* Updated queries:
+    * `getCorporateDraftAccount` and `getTrustDraftAccount` are no longer MOCKED
+        * it returns new field "label"
+        * it returns avatar with working "initials" field
+    * `getAccountsOverview`:
+        * it returns Individual, Corporate and Trust accounts
+        * it returns new field "label"
+        * it returns avatar with working "initials" field
+    * `getIndividualAccount`:
+        * it returns avatar with working "initials" field
+        * it returns new field "label"
+    * for `getCorporateDraftAccount`, `getTrustDraftAccount` and `getIndividualDraftAccount`:
+        * `isCompleted` field is calculated dynamically on every call
+        * `verifyAndFinish` field is removed from draft accounts mutations
+* Updated mutations:
+    * `completeCorporateDraftAccount` and `completeTrustDraftAccount` are no longer MOCKED
+        * it returns new field "label"
+        * it returns avatar with working "initials" field
+* EIN uniqueness is verified against opened accounts, so it is possible to create draft account with the same EIN, but
+  not to open both of them
+
 ## 1.7.3 - 03/31/2023
 
 * query `phoneCompleted` is no longer mocked and returns real phone number completion status

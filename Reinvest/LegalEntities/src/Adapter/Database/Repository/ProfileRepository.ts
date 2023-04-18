@@ -8,7 +8,7 @@ import {
     LegalEntitiesJsonFields,
     LegalEntitiesProfile
 } from "LegalEntities/Adapter/Database/LegalEntitiesSchema";
-import {SSN} from "LegalEntities/Domain/ValueObject/SSN";
+import {SensitiveNumber, SSN} from "LegalEntities/Domain/ValueObject/SensitiveNumber";
 import {DomainEvent} from "SimpleAggregator/Types";
 import {SimpleEventBus} from "SimpleAggregator/EventBus/EventBus";
 
