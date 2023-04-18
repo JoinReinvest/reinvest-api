@@ -179,7 +179,7 @@ export class NorthCapitalSynchronizer {
   }
 
   private async checkIfFileExistsInNorthCapital(northCapitalId: string, documentId: string): Promise<boolean> {
-    const uploadedDocuments = await this.northCapitalAdapter.getUploadedDocuments(northCapitalId);
+    const uploadedDocuments = await this.northCapitalAdapter.getUploadedPartyDocuments(northCapitalId);
     const documentIdRegex = new RegExp(`.*(${documentId}).*`);
 
     for (const document of uploadedDocuments) {
