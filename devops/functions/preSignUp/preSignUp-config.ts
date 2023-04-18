@@ -1,15 +1,28 @@
-import {LambdaConfigType} from 'aws-sdk/clients/cognitoidentityserviceprovider';
-import {getAttribute, getResourceName} from "../..//serverless/utils";
+import {getAttribute, getResourceName} from "../../serverless/utils";
 import {
     EniPolicies,
     importPrivateSubnetRefs,
     importVpcRef,
     SecurityGroupEgressRules,
     SecurityGroupIngressRules
-} from "../..//serverless/vpc";
+} from "../../serverless/vpc";
 import {CloudwatchPolicies} from "../../serverless/cloudwatch";
 
-const trigger: keyof LambdaConfigType = 'PreSignUp';
+const cognitoUserPool: {
+    cognitoUserPool: {
+        pool: string;
+        trigger: "PreSignUp";
+        existing?: boolean;
+        forceDeploy?: boolean;
+    };
+} = {
+    cognitoUserPool: {
+        pool: "reinvest-user-pool-${sls:stage}",
+        trigger: "PreSignUp",
+        existing: true,
+        forceDeploy: true
+    },
+}
 
 export const cognitoPreSignUpFunction = {
     handler: `devops/functions/preSignUp/handler.main`,
@@ -18,13 +31,7 @@ export const cognitoPreSignUpFunction = {
         securityGroupIds: [getAttribute("PreSignUpSecurityGroup", "GroupId")],
         subnetIds: [...importPrivateSubnetRefs()],
     },
-    events: [{
-        cognitoUserPool: {
-            pool: "reinvest-user-pool-${sls:stage}",
-            trigger,
-            existing: true,
-        },
-    }],
+    events: [cognitoUserPool],
 };
 export const CognitoPreSignUpResources = {
     CognitoPreSignUpLambdaRole: {

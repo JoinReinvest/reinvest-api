@@ -20,9 +20,9 @@ export class SynchronizeProfile extends AbstractSynchronize {
         this.northCapitalSynchronizer = northCapitalSynchronizer;
     }
 
-    async execute(record: MappedRecord): Promise<void> {
+    async execute(record: MappedRecord): Promise<boolean> {
         if (!record.isProfile() || !await this.lockExecution(record)) {
-            return;
+            return false;
         }
 
         try {
@@ -34,9 +34,11 @@ export class SynchronizeProfile extends AbstractSynchronize {
 
             await this.setCleanAndUnlockExecution(record);
             console.log(`[FINISHED] Profile synchronization, recordId: ${record.getRecordId()}`);
+            return true;
         } catch (error: any) {
-            console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}: ${error.message}`);
+            console.error(`[FAILED] Profile synchronization, recordId: ${record.getRecordId()}`, error);
             await this.unlockExecution(record);
         }
+        return false;
     }
 }

@@ -4,7 +4,7 @@ import {CognitoOutputs, CognitoResources} from "./devops/serverless/cognito";
 import {RdsOutputs, RdsResources} from "./devops/serverless/rds";
 import {S3Outputs, S3Resources} from "./devops/serverless/s3";
 import {BastionOutputs, BastionResources} from "./devops/serverless/bastion";
-import {ProviderConfiguration, ProviderEnvironment} from "./devops/serverless/serverless-common";
+import {ProviderEnvironment} from "./devops/serverless/serverless-common";
 
 const serverlessConfiguration: AWS = {
     service: "reinvest",
@@ -16,7 +16,9 @@ const serverlessConfiguration: AWS = {
     ],
     //@ts-ignore
     provider: {
-        ...ProviderConfiguration,
+        name: "aws",
+        runtime: "nodejs18.x",
+        region: "us-east-1",
         environment: {
             ...ProviderEnvironment,
             COGNITO_RETENTION_POLICY: 'Delete',
@@ -25,6 +27,9 @@ const serverlessConfiguration: AWS = {
             POSTGRESQL_AWS_DB_STORAGE_GB: "${env:POSTGRESQL_AWS_DB_STORAGE_GB}",
             POSTGRESQL_MAIN_USER: "${env:POSTGRESQL_MAIN_USER}",
             POSTGRESQL_MAIN_PASSWORD: "${env:POSTGRESQL_MAIN_PASSWORD}",
+            EMAIL_SEND_FROM: "${env:EMAIL_SEND_FROM}",
+            EMAIL_NO_REPLY: "${env:EMAIL_NO_REPLY}",
+            EMAIL_SEND_FROM_ARN: "${env:EMAIL_SEND_FROM_ARN}",
         }
     },
     resources: {

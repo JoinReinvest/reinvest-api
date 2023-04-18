@@ -1,13 +1,15 @@
 import {CrcService} from "Registration/Domain/CrcService";
 import {
     NorthCapitalIndividualAccountType,
-    NorthCapitalIndividualExtendedMainPartyType,
+    NorthCapitalIndividualExtendedMainPartyStructure,
     NorthCapitalIndividualAccountStructure, NorthCapitalLink
 } from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
 
 import {IndividualAccountForSynchronization} from "Registration/Domain/Model/Account";
 import {NorthCapitalMapper} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper";
 import {MappedType} from "Registration/Domain/Model/Mapping/MappedType";
+import {DictionaryType} from "HKEKTypes/Generics";
+import {EMPTY_UUID} from "Registration/Adapter/Database/Repository/MappingRegistryRepository";
 
 export class NorthCapitalIndividualAccount {
     private readonly data: NorthCapitalIndividualAccountType;
@@ -54,7 +56,7 @@ export class NorthCapitalIndividualAccount {
                     mappingConfiguration: {
                         type: MappedType.PROFILE,
                         profileId: data.profileId,
-                        externalId: data.profileId,
+                        externalId: EMPTY_UUID,
                     },
                     linkConfiguration: {
                         relatedEntryType: "IndivACParty",
@@ -103,8 +105,15 @@ export class NorthCapitalIndividualAccount {
         return this.data.profileId;
     }
 
-    getPartyData(): NorthCapitalIndividualExtendedMainPartyType {
-        return this.data.extendedParty;
+    getPartyData(): NorthCapitalIndividualExtendedMainPartyStructure {
+        const party = <DictionaryType>{};
+        for (const [key, value] of Object.entries(this.data.extendedParty)) {
+            if (value !== null && value !== "") {
+                party[key] = value;
+            }
+        }
+
+        return party;
     }
 
     getAccountData(): NorthCapitalIndividualAccountStructure {
@@ -116,10 +125,21 @@ export class NorthCapitalIndividualAccount {
     }
 
     isOutdatedAccount(crc: string): boolean {
-        return this.accountCrc !== JSON.parse(crc)?.account;
+        try {
+            return this.accountCrc !== JSON.parse(crc)?.account;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
     }
 
     isOutdatedParty(crc: string): boolean {
-        return this.partyCrc !== JSON.parse(crc)?.party;
+        try {
+            return this.partyCrc !== JSON.parse(crc)?.party;
+        } catch (error: any) {
+            console.warn(`Cannot parse crc: ${error.message}`);
+            return true;
+        }
+
     }
 }

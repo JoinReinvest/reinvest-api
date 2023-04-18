@@ -5,7 +5,9 @@ export enum PersonalStatementType {
     FINRAMember = "FINRAMember",
     TradingCompanyStakeholder = "TradingCompanyStakeholder",
     Politician = "Politician",
-    AccreditedInvestor = "AccreditedInvestor"
+    AccreditedInvestor = "AccreditedInvestor",
+    TermsAndConditions = "TermsAndConditions",
+    PrivacyPolicy = "PrivacyPolicy"
 }
 
 export type ForFINRA = {
@@ -28,12 +30,32 @@ export type ForAccreditedInvestor = {
     statement: AccreditedInvestorStatements
 };
 
+export enum TermsAndConditionsStatements {
+    I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_TERMS_AND_CONDITIONS = "I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_TERMS_AND_CONDITIONS"
+}
+
+export type ForTermsAndConditions = {
+    statement: TermsAndConditionsStatements,
+    date?: string
+}
+
+export enum PrivacyPolicyStatements {
+    I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_PRIVACY_POLICY = "I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_PRIVACY_POLICY"
+}
+
+export type ForPrivacyPolicy = {
+    statement: PrivacyPolicyStatements,
+    date?: string
+}
+
 export type PersonalStatementInput = {
     type: PersonalStatementType,
     forFINRA?: ForFINRA,
     forPolitician?: ForPolitician,
     forStakeholder?: ForStakeholder,
-    forAccreditedInvestor?: ForAccreditedInvestor
+    forAccreditedInvestor?: ForAccreditedInvestor,
+    forTermsAndConditions?: ForTermsAndConditions,
+    forPrivacyPolicy?: ForPrivacyPolicy
 }
 
 export abstract class PersonalStatement implements ToObject {
@@ -44,7 +66,15 @@ export abstract class PersonalStatement implements ToObject {
     }
 
     static create(rawStatement: PersonalStatementInput): PersonalStatement {
-        const {type, forFINRA, forStakeholder, forAccreditedInvestor, forPolitician} = rawStatement;
+        const {
+            type,
+            forFINRA,
+            forStakeholder,
+            forAccreditedInvestor,
+            forPolitician,
+            forTermsAndConditions,
+            forPrivacyPolicy
+        } = rawStatement;
         try {
             switch (type) {
                 case PersonalStatementType.FINRAMember:
@@ -59,6 +89,20 @@ export abstract class PersonalStatement implements ToObject {
                 case PersonalStatementType.AccreditedInvestor:
                     const {statement} = forAccreditedInvestor as ForAccreditedInvestor;
                     return new AccreditedInvestorStatement(statement);
+                case PersonalStatementType.TermsAndConditions:
+                    const {
+                        statement: termsAndConditionsStatement,
+                        date: termsAndConditionsDate
+                    } = forTermsAndConditions as ForTermsAndConditions;
+                    const agreeDateOfTC = !termsAndConditionsDate ? new Date() : new Date(termsAndConditionsDate);
+                    return new TermsAndConditionsStatement(termsAndConditionsStatement, agreeDateOfTC);
+                case PersonalStatementType.PrivacyPolicy:
+                    const {
+                        statement: privacyPolicyStatement,
+                        date: privacyPolicyDate
+                    } = forPrivacyPolicy as ForPrivacyPolicy;
+                    const agreeDateOfPP = !privacyPolicyDate ? new Date() : new Date(privacyPolicyDate);
+                    return new PrivacyPolicyStatement(privacyPolicyStatement, agreeDateOfPP);
                 default:
                     throw new ValidationError(ValidationErrorEnum.INVALID_TYPE, type);
             }
@@ -176,5 +220,55 @@ export class AccreditedInvestorStatement extends PersonalStatement implements To
 
     getDetails(): string[] {
         return [this.statement];
+    }
+}
+
+class TermsAndConditionsStatement extends PersonalStatement implements ToObject {
+    private statement: TermsAndConditionsStatements;
+    private agreeDate: Date;
+
+    constructor(statement: TermsAndConditionsStatements, agreeDate: Date) {
+        super(PersonalStatementType.TermsAndConditions);
+        this.statement = statement;
+        this.agreeDate = agreeDate;
+    }
+
+    toObject(): PersonalStatementInput {
+        return {
+            type: this.type,
+            forTermsAndConditions: {
+                statement: this.statement,
+                date: this.agreeDate.toISOString()
+            }
+        }
+    }
+
+    getDetails(): string[] {
+        return [this.statement, this.agreeDate.toISOString()];
+    }
+}
+
+class PrivacyPolicyStatement extends PersonalStatement implements ToObject {
+    private statement: PrivacyPolicyStatements;
+    private agreeDate: Date;
+
+    constructor(statement: PrivacyPolicyStatements, agreeDate: Date) {
+        super(PersonalStatementType.PrivacyPolicy);
+        this.statement = statement;
+        this.agreeDate = agreeDate;
+    }
+
+    toObject(): PersonalStatementInput {
+        return {
+            type: this.type,
+            forPrivacyPolicy: {
+                statement: this.statement,
+                date: this.agreeDate.toISOString()
+            }
+        }
+    }
+
+    getDetails(): string[] {
+        return [this.statement, this.agreeDate.toISOString()];
     }
 }

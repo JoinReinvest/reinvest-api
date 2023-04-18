@@ -6,6 +6,10 @@ import {DatabaseProvider, PostgreSQLConfig} from "PostgreSQL/DatabaseProvider";
 import {AdapterServiceProvider} from "Documents/Providers/AdapterServiceProvider";
 import {S3Config} from "Documents/Adapter/S3/S3Adapter";
 import {NoMigrationException} from "PostgreSQL/NoMigrationException";
+import {
+    documentsTechnicalHandler,
+    DocumentsTechnicalHandlerType
+} from "Documents/Port/Queue/DocumentsTechnicalHandlerType";
 
 
 export namespace Documents {
@@ -16,7 +20,7 @@ export namespace Documents {
     };
 
     export type ApiType = DocumentsApiType & Api;
-    export type TechnicalHandlerType = EventHandler;
+    export type TechnicalHandlerType = DocumentsTechnicalHandlerType & EventHandler;
 
     export class Main implements Module {
         private readonly config: Documents.Config;
@@ -45,11 +49,12 @@ export namespace Documents {
         }
 
         isHandleEvent(kind: string): boolean {
-            return false;
+            return kind in documentsTechnicalHandler(new Container());
         }
 
         technicalEventHandler(): TechnicalHandlerType {
-            return {};
+            this.boot();
+            return documentsTechnicalHandler(this.container);
         }
 
         migration() {

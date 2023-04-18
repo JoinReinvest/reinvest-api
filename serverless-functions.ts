@@ -7,7 +7,6 @@ import {
 } from "./devops/serverless/cognito";
 import {
     margeWithApiGatewayUrl,
-    ProviderConfiguration,
     ProviderEnvironment
 } from "./devops/serverless/serverless-common";
 import {ApiLambdaFunction, ApiLambdaResources} from "./devops/functions/api/api-config";
@@ -16,7 +15,7 @@ import {QueueFunction, QueueResources} from "./devops/functions/queue/queue-conf
 import {cognitoPostSignUpFunction, CognitoPostSignUpResources} from "./devops/functions/postSignUp/postSignUp-config";
 import {cognitoPreSignUpFunction, CognitoPreSignUpResources} from "./devops/functions/preSignUp/preSignUp-config";
 import {MigrationLambdaFunction, MigrationLambdaResources} from "./devops/functions/migration/migration-config";
-import {getAttribute, importOutput} from "./devops/serverless/utils";
+import {getAttribute, getResourceName, importOutput} from "./devops/serverless/utils";
 import {
     UnauthorizedEndpointsFunction,
     UnauthorizedEndpointsLambdaResources
@@ -26,9 +25,13 @@ import {
     CronDocumentSyncFunction,
     CronDocumentSyncResources
 } from "./devops/functions/cronDocumentSync/cron-document-sync-config";
+import {
+    CronVendorsSyncFunction,
+    CronVendorsSyncResources
+} from "./devops/functions/cronVendorsSync/cron-vendors-sync-config";
 
 const serverlessConfiguration: AWS = {
-    service: "reinvest-functions",
+    service: 'reinvest-functions',
     frameworkVersion: "3",
     useDotenv: true,
     plugins: [
@@ -36,9 +39,10 @@ const serverlessConfiguration: AWS = {
         "serverless-stack-termination-protection",
         "serverless-esbuild",
     ],
-    // @ts-ignore
     provider: {
-        ...ProviderConfiguration,
+        name: "aws",
+        runtime: "nodejs18.x",
+        region: "us-east-1",
         environment: {
             ...ProviderEnvironment,
             ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
@@ -65,6 +69,7 @@ const serverlessConfiguration: AWS = {
             VERTALO_CLIENT_ID: "${env:VERTALO_CLIENT_ID}",
             VERTALO_CLIENT_SECRET: "${env:VERTALO_CLIENT_SECRET}",
             SNS_ORIGINATION_NUMBER: "${env:SNS_ORIGINATION_NUMBER}",
+            SENTRY_DSN: "${env:SENTRY_DSN}",
         },
         apiGateway: {
             minimumCompressionSize: 1024,
@@ -76,7 +81,6 @@ const serverlessConfiguration: AWS = {
         },
         httpApi: {
             cors: true,
-            //@ts-ignore
             authorizers: {
                 ...CognitoAuthorizer,
             },
@@ -89,6 +93,7 @@ const serverlessConfiguration: AWS = {
         unauthorizedEndpoints: UnauthorizedEndpointsFunction,
         queue: QueueFunction,
         cronDocumentsSync: CronDocumentSyncFunction,
+        cronVendorsSync: CronVendorsSyncFunction,
         cognitoPostSignUpFunction,
         cognitoPreSignUpFunction,
         tests: TestsFunction,
@@ -106,6 +111,7 @@ const serverlessConfiguration: AWS = {
             ...UnauthorizedEndpointsLambdaResources,
             ...TestsLambdaResources,
             ...CronDocumentSyncResources,
+            ...CronVendorsSyncResources,
         },
         Outputs: {
             ...CognitoClientsOutputs,

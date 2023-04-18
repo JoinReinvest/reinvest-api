@@ -1,4 +1,4 @@
-export type VertaloIndividualAccountStructure = {
+export type VertaloAccountStructure = {
     email: string;
     name: string;
 }

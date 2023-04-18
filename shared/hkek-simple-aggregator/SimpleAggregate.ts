@@ -21,12 +21,19 @@ export class SimpleAggregate implements Aggregate {
         return (new this(aggregateState)) as InstanceType<T>;
     }
 
-    protected getState(key: string) {
-        return key in this.aggregate.state ? this.aggregate.state[key] : null;
+    protected getState(key: string, defaultValue: any = null) {
+        if (!('state' in this.aggregate)) {
+            this.aggregate.state = {};
+        }
+        return key in this.aggregate.state ? this.aggregate.state[key] : defaultValue;
     }
 
     protected getId(): string {
         return this.aggregate.aggregateId;
+    }
+
+    protected deepCopy<T>(obj: T): T {
+        return JSON.parse(JSON.stringify(obj));
     }
 
     // event apply
@@ -34,10 +41,19 @@ export class SimpleAggregate implements Aggregate {
         if (!('state' in this.aggregate)) {
             this.aggregate.state = {};
         }
+        const stateCopy = this.deepCopy(this.aggregate.state);
+        const eventCopy = this.deepCopy(event);
 
-        this.aggregate.state = {...this.aggregate.state, ...event.data};
+        this.aggregate.state = {...stateCopy, ...eventCopy.data};
         this.aggregate.currentVersion++;
         return <Event>event;
+    }
+
+    protected setState(key: string, value: any) {
+        if (!('state' in this.aggregate)) {
+            this.aggregate.state = {};
+        }
+        this.aggregate.state[key] = value;
     }
 
     public getSnapshot(): AggregateState {

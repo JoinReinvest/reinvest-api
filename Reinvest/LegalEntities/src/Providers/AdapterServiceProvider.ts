@@ -10,7 +10,6 @@ import {DocumentsService} from "LegalEntities/Adapter/Modules/DocumentsService";
 import {DraftAccountRepository} from "LegalEntities/Adapter/Database/Repository/DraftAccountRepository";
 import {CreateDraftAccount} from "LegalEntities/UseCases/CreateDraftAccount";
 import {CompleteDraftAccount} from "LegalEntities/UseCases/CompleteDraftAccount";
-import {DraftAccountQuery} from "LegalEntities/UseCases/DraftAccountQuery";
 import {TransactionalAdapter} from "PostgreSQL/TransactionalAdapter";
 import {TransformDraftAccountIntoRegularAccount} from "LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount";
 import {InvestmentAccountsService} from "LegalEntities/Adapter/Modules/InvestmentAccountsService";
@@ -47,7 +46,7 @@ export class AdapterServiceProvider {
         container
             .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
             .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
-            .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+            .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
             .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
             .addObjectFactory("LegalEntitiesTransactionalAdapter",
                 (databaseProvider: LegalEntitiesDatabaseAdapterProvider) =>
@@ -60,10 +59,9 @@ export class AdapterServiceProvider {
         container
             .addSingleton(CompleteProfile, [ProfileRepository])
             .addSingleton(CreateDraftAccount, [DraftAccountRepository])
-            .addSingleton(CompleteDraftAccount, [DraftAccountRepository])
-            .addSingleton(DraftAccountQuery, [DraftAccountRepository, DocumentsService])
+            .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator, AccountRepository])
             .addSingleton(RemoveDraftAccount, [DraftAccountRepository])
-            .addSingleton(TransformDraftAccountIntoRegularAccount, [DraftAccountRepository, InvestmentAccountsService, AccountRepository, "LegalEntitiesTransactionalAdapter"])
+            .addSingleton(TransformDraftAccountIntoRegularAccount, [DraftAccountRepository, InvestmentAccountsService, AccountRepository, "LegalEntitiesTransactionalAdapter", ProfileRepository])
         ;
     }
 }

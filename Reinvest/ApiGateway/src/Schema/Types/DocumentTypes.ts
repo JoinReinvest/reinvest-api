@@ -34,7 +34,6 @@ const schema = `
     type GetDocumentLink {
         id: String
         url: String
-        fileName: String
     }
 
     "Link id + PUT url to store resource in the storage"
@@ -68,6 +67,9 @@ const schema = `
         [WIP]
         """
         getTemplate(templateName: TemplateName): Template
+
+        "Returns document link by id"
+        getDocument(documentId: String!): GetDocumentLink
     }
 
     type Mutation {
@@ -110,6 +112,13 @@ export const DocumentTypes = {
             ) => {
                 const api = modules.getApi<Documents.ApiType>(Documents);
                 return api.getTemplate(templateName);
+            },
+            getDocument: async (parent: any,
+                                {documentId}: { documentId: string },
+                                {modules, profileId}: SessionContext
+            ) => {
+                const api = modules.getApi<Documents.ApiType>(Documents);
+                return api.getDocumentLink(documentId, profileId);
             },
         },
         Mutation: {
