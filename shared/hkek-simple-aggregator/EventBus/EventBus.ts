@@ -6,9 +6,9 @@ export interface EventHandler<Event extends DomainEvent> {
 }
 
 export interface EventBus {
-  publish(event: DomainEvent): this;
+  publish(event: DomainEvent): Promise<void>;
 
-  publishMany(events: DomainEvent[]): this;
+  publishMany(events: DomainEvent[]): Promise<void>;
 
   subscribe(forKind: string, handler: string): this;
 
@@ -27,27 +27,29 @@ export class SimpleEventBus implements EventBus {
     this.container = container;
   }
 
-  public publish(event: DomainEvent): this {
+  public async publish(event: DomainEvent): Promise<void> {
     const kind = event.kind;
 
     if (!(kind in this.handlers)) {
-      return this;
+      return;
     }
 
-    for (const handlerName of this.handlers[kind]) {
+    const handlersForKind = this.handlers[kind];
+
+    for (const handlerName of handlersForKind) {
       const handler = this.container.getValue(handlerName) as EventHandler<any>;
-      handler.handle(event);
+      await handler.handle(event);
     }
 
-    return this;
+    return;
   }
 
-  public publishMany(events: DomainEvent[]): this {
+  public async publishMany(events: DomainEvent[]): Promise<void> {
     for (const event of events) {
-      this.publish(event);
+      await this.publish(event);
     }
 
-    return this;
+    return;
   }
 
   public subscribe(forKind: string, handler: string): this {
