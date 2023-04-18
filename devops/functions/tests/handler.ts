@@ -7,10 +7,13 @@ import {
   InitiateAuthCommand,
   ListUsersCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
+import * as bodyParser from 'body-parser';
+import express from 'express';
 import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
+import { RegistrationDatabase } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { boot } from 'Reinvest/bootstrap';
 import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from 'Reinvest/config';
-import { IdentityDatabase } from 'Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter';
+import { IdentityDatabase, userTable } from 'Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter';
 import { InvestmentAccountsDatabase } from 'Reinvest/InvestmentAccounts/src/Infrastructure/Storage/DatabaseAdapter';
 import { LegalEntitiesDatabase } from 'Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter';
 import { Registration } from 'Reinvest/Registration/src';
@@ -21,13 +24,9 @@ import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/Datab
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 
 import { main as postSignUp } from '../postSignUp/handler';
-
-const express = require('express');
-const bodyParser = require('body-parser');
-
 // dependencies
-type AllDatabases = IdentityDatabase & LegalEntitiesDatabase & InvestmentAccountsDatabase;
-const databaseProvider = new DatabaseProvider<AllDatabases>(DATABASE_CONFIG as PostgreSQLConfig);
+type AllDatabases = IdentityDatabase & LegalEntitiesDatabase & InvestmentAccountsDatabase & RegistrationDatabase;
+const databaseProvider: DatabaseProvider<AllDatabases> = new DatabaseProvider<AllDatabases>(DATABASE_CONFIG as PostgreSQLConfig);
 
 const queueSender = new QueueSender(SQS_CONFIG);
 
@@ -37,7 +36,7 @@ async function sendMessage(kind: string, id: string, data: any): Promise<void> {
 }
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }) as any);
 const router = express.Router();
 
 const decodeJwt = (token: string) => JSON.parse(atob(token.split('.')[1]));
@@ -45,7 +44,7 @@ const getProfileIdFromAccessToken = async token => {
   const { sub } = decodeJwt(token);
   const { profileId } = await databaseProvider
     .provide()
-    .selectFrom('identity_user')
+    .selectFrom(userTable)
     .select(['profileId'])
     .where('cognitoUserId', '=', sub)
     .limit(1)
@@ -439,19 +438,31 @@ const northCapitalRouter = () => {
       const ncSyncRecord = await databaseProvider
         .provide()
         .selectFrom('registration_north_capital_synchronization')
-        .select(['northCapitalId', 'recordId', 'type', 'crc', 'documents', 'links', 'version', 'createdDate', 'updatedDate'])
+        .select(['northCapitalId', 'recordId', 'type', 'crc', 'links', 'version', 'createdDate', 'updatedDate'])
         .where('recordId', '=', mappedRecord.recordId)
         .limit(1)
         .executeTakeFirstOrThrow();
 
       const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
       const account = await ncAdapter.getAccount(ncSyncRecord.northCapitalId);
+      const accountLinks = await ncAdapter.getAllRawAccountLinks(ncSyncRecord.northCapitalId);
+
+      for (const link of accountLinks) {
+        if (link.relatedEntryType === 'IndivACParty') {
+          link['party'] = await ncAdapter.getParty(link.relatedEntry);
+        } else if (link.relatedEntryType === 'EntityACParty') {
+          link['party'] = await ncAdapter.getEntity(link.relatedEntry);
+        }
+
+        link['partyDocuments'] = await ncAdapter.getUploadedDocuments(link.relatedEntry);
+      }
 
       res.status(200).json({
         status: true,
         mappedRecord,
         ncSyncRecord,
         account,
+        accountLinks,
       });
     } catch (e: any) {
       console.log(e);
