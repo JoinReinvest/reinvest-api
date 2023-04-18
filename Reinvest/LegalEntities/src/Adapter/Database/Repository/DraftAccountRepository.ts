@@ -88,7 +88,7 @@ export class DraftAccountRepository {
         .returning('draftId')
         .executeTakeFirstOrThrow();
 
-      this.eventBus.publishMany(events);
+      await this.eventBus.publishMany(events);
 
       return true;
     } catch (error: any) {
@@ -136,7 +136,7 @@ export class DraftAccountRepository {
         .where('draftId', '=', draftId)
         .execute();
 
-      this.eventBus.publishMany(events);
+      await this.eventBus.publishMany(events);
 
       return true;
     } catch (error: any) {
