@@ -1,5 +1,6 @@
 export enum DomicileType {
     CITIZEN = "CITIZEN",
+    RESIDENT = "RESIDENT",
     GREEN_CARD = "GREEN_CARD",
     VISA = "VISA",
 }

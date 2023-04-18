@@ -1,5 +1,10 @@
 # REINVEST API CHANGELOG
 
+## 1.10.0 - 04/18/2023
+
+* Updated Stakeholder domicile
+  * New type `SimplifiedDomicile` that accept only values `RESIDENT` and `CITIZEN`
+
 ## 1.9.1 - 04/17/2023
 
 * Removing documents from s3 bucket for documents and avatar
