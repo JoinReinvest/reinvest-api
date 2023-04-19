@@ -96,7 +96,6 @@ export class NorthCapitalSynchronizationRepository {
         .fullJoin(northCapitalSynchronizationTable, `${northCapitalSynchronizationTable}.recordId`, `${registrationMappingRegistryTable}.recordId`)
         .select([`${northCapitalSynchronizationTable}.northCapitalId`])
         .where(`${registrationMappingRegistryTable}.profileId`, '=', profileId)
-        .where(`${registrationMappingRegistryTable}.externalId`, '=', profileId)
         .where(`${registrationMappingRegistryTable}.mappedType`, '=', MappedType.PROFILE)
         .limit(1)
         .castTo<SelectablePartyId>()
