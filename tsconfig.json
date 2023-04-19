@@ -20,6 +20,7 @@
       "Documents/*": ["./Reinvest/Documents/src/*"],
       "Identity/*": ["./Reinvest/Identity/src/*"],
       "Registration/*": ["./Reinvest/Registration/src/*"],
+      "Verification/*": ["./Reinvest/Verification/src/*"]
     }
   },
   "include": [

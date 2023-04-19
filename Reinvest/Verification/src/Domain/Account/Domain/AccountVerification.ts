@@ -1,5 +1,5 @@
-import { Id } from '../../Common/Domain/ValueObject/Id';
-import { InvestingAccountId } from './ValueObject/InvestingAccountId';
+import { InvestingAccountId } from 'Reinvest/Verification/src/Domain/Account/Domain/ValueObject/InvestingAccountId';
+import { Id } from 'Verification/Domain/ValueObject/Id';
 
 export class AccountVerification {
   private membersId: Id[];

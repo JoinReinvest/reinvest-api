@@ -1,5 +1,5 @@
-import { Id } from '../../../Common/Domain/ValueObject/Id';
-import { AccountMember } from './AccountMember';
+import { AccountMember } from 'Reinvest/Verification/src/Domain/Account/Domain/ValueObject/AccountMember';
+import { Id } from 'Verification/Domain/ValueObject/Id';
 
 export class AccountStructure {
   getMembersId(): Id[] {

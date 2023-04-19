@@ -1,12 +1,13 @@
+import { VerificationFactory } from 'Reinvest/Verification/src/Domain/Account/Application/Factory/VerificationFactory';
+import { AccountStructureQueryInterface } from 'Reinvest/Verification/src/Domain/Account/Application/Query/AccountStructureQueryInterface';
+import { AccountVerification } from 'Reinvest/Verification/src/Domain/Account/Domain/AccountVerification';
+import { AccountVerificationRepositoryInterface } from 'Reinvest/Verification/src/Domain/Account/Domain/Repository/AccountVerificationRepositoryInterface';
+import { InvestingAccountId } from 'Reinvest/Verification/src/Domain/Account/Domain/ValueObject/InvestingAccountId';
+
 import { CompanyVerification } from '../../Company/Domain/CompanyVerification';
 import { CompanyVerificationRepositoryInterface } from '../../Company/Domain/Repository/CompanyVerificationRepositoryInterface';
 import { PersonVerification } from '../../Person/Domain/PersonVerification';
 import { PersonVerificationRepositoryInterface } from '../../Person/Domain/Repository/PersonVerificationRepositoryInterface';
-import { AccountVerification } from '../Domain/AccountVerification';
-import { AccountVerificationRepositoryInterface } from '../Domain/Repository/AccountVerificationRepositoryInterface';
-import { InvestingAccountId } from '../Domain/ValueObject/InvestingAccountId';
-import { VerificationFactory } from './Factory/VerificationFactory';
-import { AccountStructureQueryInterface } from './Query/AccountStructureQueryInterface';
 
 export class CreateAccountVerification {
   private accountStructureQuery: AccountStructureQueryInterface;
