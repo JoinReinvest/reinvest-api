@@ -1,9 +1,5 @@
-import {
-    DomainEvent
-} from "SimpleAggregator/Types";
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type LegalProfileCompleted = DomainEvent & {
-    kind: "LegalProfileCompleted",
-}
-
-
+  kind: 'LegalProfileCompleted';
+};

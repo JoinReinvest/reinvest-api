@@ -1,33 +1,33 @@
-import {DomainEvent} from "SimpleAggregator/Types";
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type PhoneEvent = DomainEvent;
 
 export type TOPTExpired = PhoneEvent & {
-    kind: "TOPTExpired",
-    data: {
-        status: false,
-    }
-}
+  data: {
+    status: false;
+  };
+  kind: 'TOPTExpired';
+};
 
 export type TOPTTriesExceeded = PhoneEvent & {
-    kind: "TOPTTriesExceeded",
-    data: {
-        status: false,
-    }
-}
+  data: {
+    status: false;
+  };
+  kind: 'TOPTTriesExceeded';
+};
 
 export type TOPTVerified = PhoneEvent & {
-    kind: "TOPTVerified",
-    data: {
-        status: true,
-        phoneNumber: string
-    }
-}
+  data: {
+    phoneNumber: string;
+    status: true;
+  };
+  kind: 'TOPTVerified';
+};
 
 export type TOPTInvalid = PhoneEvent & {
-    kind: "TOPTInvalid",
-    data: {
-        status: false,
-        tries: number,
-    }
-}
+  data: {
+    status: false;
+    tries: number;
+  };
+  kind: 'TOPTInvalid';
+};

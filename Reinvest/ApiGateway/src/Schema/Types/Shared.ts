@@ -201,6 +201,5 @@ const schema = `
     }
 `;
 export const Shared = {
-    typeDefs: schema,
-}
-
+  typeDefs: schema,
+};

@@ -1,26 +1,20 @@
-import { DisburseTrade } from "../Command/DisburseTrade";
-import { DoNothing } from "../Command/DoNothing";
-import { GracePeriodEnded } from "../Events/GracePeriodEnded";
-import { InvestmentVerified } from "../Events/InvestmentVerified";
-import { InvestorVerified } from "../Events/InvestorVerified";
-import { TransactionCancelled } from "../Events/TransactionCancelled";
-import { TransactionEvent } from "../Events/TransactionEvent";
-import { Transaction } from "../Transaction";
-import { TransactionDecision } from "../TransactionDecision";
-import { TransactionStateChange } from "../TransactionStateChange";
-import { GracePeriodStatus } from "../ValueObject/GracePeriodStatus";
-import { TransactionId } from "../ValueObject/TransactionId";
-import { TransactionState } from "../ValueObject/TransactionState";
-import {
-  InvestmentVerificationStatus,
-  InvestorVerificationStatus,
-} from "../ValueObject/VerificationStatus";
-import { CommonTransaction } from "./CommonTransaction";
+import { DisburseTrade } from '../Command/DisburseTrade';
+import { DoNothing } from '../Command/DoNothing';
+import { GracePeriodEnded } from '../Events/GracePeriodEnded';
+import { InvestmentVerified } from '../Events/InvestmentVerified';
+import { InvestorVerified } from '../Events/InvestorVerified';
+import { TransactionCancelled } from '../Events/TransactionCancelled';
+import { TransactionEvent } from '../Events/TransactionEvent';
+import { Transaction } from '../Transaction';
+import { TransactionDecision } from '../TransactionDecision';
+import { TransactionStateChange } from '../TransactionStateChange';
+import { GracePeriodStatus } from '../ValueObject/GracePeriodStatus';
+import { TransactionId } from '../ValueObject/TransactionId';
+import { TransactionState } from '../ValueObject/TransactionState';
+import { InvestmentVerificationStatus, InvestorVerificationStatus } from '../ValueObject/VerificationStatus';
+import { CommonTransaction } from './CommonTransaction';
 
-export class VerificationAwaitingTransaction
-  extends CommonTransaction
-  implements Transaction
-{
+export class VerificationAwaitingTransaction extends CommonTransaction implements Transaction {
   private investorVerificationStatus: InvestorVerificationStatus;
   private investmentVerificationStatus: InvestmentVerificationStatus;
   private gracePeriodStatus: GracePeriodStatus;
@@ -29,7 +23,7 @@ export class VerificationAwaitingTransaction
     transactionId: TransactionId,
     investorVerificationStatus: InvestorVerificationStatus,
     investmentVerificationStatus: InvestmentVerificationStatus,
-    gracePeriodStatus: GracePeriodStatus
+    gracePeriodStatus: GracePeriodStatus,
   ) {
     super(transactionId);
     this.investmentVerificationStatus = investmentVerificationStatus;
@@ -48,9 +42,7 @@ export class VerificationAwaitingTransaction
       case event instanceof InvestmentVerified:
         return this.investmentVerified();
       case event instanceof TransactionCancelled:
-        return this.gracePeriodStatus === GracePeriodStatus.Ongoing
-          ? this.cancelTrade()
-          : this.justWait();
+        return this.gracePeriodStatus === GracePeriodStatus.Ongoing ? this.cancelTrade() : this.justWait();
       default:
         return super.execute(event);
     }
@@ -80,8 +72,7 @@ export class VerificationAwaitingTransaction
 
     if (
       this.investorVerificationStatus === InvestorVerificationStatus.Verified &&
-      this.investmentVerificationStatus ===
-        InvestmentVerificationStatus.Verified &&
+      this.investmentVerificationStatus === InvestmentVerificationStatus.Verified &&
       this.gracePeriodStatus == GracePeriodStatus.Ended
     ) {
       goToStatus = TransactionState.TradeDisbursementAwaiting;
@@ -95,8 +86,8 @@ export class VerificationAwaitingTransaction
         goToStatus,
         this.investorVerificationStatus,
         this.investmentVerificationStatus,
-        this.gracePeriodStatus
-      )
+        this.gracePeriodStatus,
+      ),
     );
   }
 }

@@ -1,4 +1,4 @@
-import { TransactionCommand } from "./TransactionCommand";
+import { TransactionCommand } from './TransactionCommand';
 
 export class DoNothing implements TransactionCommand {
   transactionCommandGuard = true;
