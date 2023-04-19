@@ -5,7 +5,7 @@ import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class CompanyAccountOpenedEventHandler implements EventHandler<DomainEvent> {
-  static getClassName = (): string => 'IndividualAccountOpenedEventHandler';
+  static getClassName = (): string => 'CompanyAccountOpenedEventHandler';
   private mappingRegistryRepository: MappingRegistryRepository;
   private synchronizeCompanyAccount: SynchronizeCompanyAccount;
 
