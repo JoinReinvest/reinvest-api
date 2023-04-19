@@ -1,5 +1,9 @@
 import { ContainerInterface } from 'Container/Container';
+import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
+import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
+import { AccountVerifier } from 'Verification/IntegrationLogic/Verifier/AccountVerifier';
+import { PartyVerifierFactory } from 'Verification/IntegrationLogic/Verifier/PartyVerifierFactory';
 
 export class IntegrationServiceProvider {
   private config: Verification.Config;
@@ -9,11 +13,6 @@ export class IntegrationServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
-    // container
-    //   .addSingleton(SynchronizeProfile, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer])
-    //   .addSingleton(SynchronizeIndividualAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer])
-    //   .addSingleton(SynchronizeCompanyAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer])
-    //   .addSingleton(SynchronizeCompany, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer])
-    //   .addSingleton(SynchronizeStakeholder, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer]);
+    container.addSingleton(PartyVerifierFactory, [VerificationNorthCapitalAdapter]).addSingleton(AccountVerifier, [RegistrationService, PartyVerifierFactory]);
   }
 }
