@@ -1,6 +1,6 @@
-import { TransactionId } from "../ValueObject/TransactionId";
-import { TransactionState } from "../ValueObject/TransactionState";
-import { TransactionCommand } from "./TransactionCommand";
+import { TransactionId } from '../ValueObject/TransactionId';
+import { TransactionState } from '../ValueObject/TransactionState';
+import { TransactionCommand } from './TransactionCommand';
 
 export class ResumeLastEvent implements TransactionCommand {
   transactionCommandGuard = true;

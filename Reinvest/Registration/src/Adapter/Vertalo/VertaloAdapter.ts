@@ -1,11 +1,11 @@
-import {ExecutionVertaloAdapter} from "Registration/Adapter/Vertalo/ExecutionVertaloAdapter";
-import {InvestorVertaloIds} from "Registration/Domain/VendorModel/Vertalo/VertaloTypes";
+import { ExecutionVertaloAdapter } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
+import { InvestorVertaloIds } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
 
 export class VertaloAdapter extends ExecutionVertaloAdapter {
-    static getClassName = () => 'VertaloAdapter';
+  static getClassName = () => 'VertaloAdapter';
 
-    async createInvestor(name: string, email: string): Promise<InvestorVertaloIds | never> {
-        const mutationQuery = `
+  async createInvestor(name: string, email: string): Promise<InvestorVertaloIds | never> {
+    const mutationQuery = `
             mutation {
               makeCustomer (
                 input: {
@@ -19,16 +19,20 @@ export class VertaloAdapter extends ExecutionVertaloAdapter {
                 }
               }
             }
-        `
+        `;
 
-        const {makeCustomer: {customer: {id: customerId, investorId}}} = await this.sendRequest(mutationQuery);
+    const {
+      makeCustomer: {
+        customer: { id: customerId, investorId },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return {investorId, customerId};
-    }
+    return { investorId, customerId };
+  }
 
-    async updateInvestor(investorIds: InvestorVertaloIds, name: string): Promise<void> {
-        const {customerId, investorId} = investorIds;
-        const mutationQuery = `
+  async updateInvestor(investorIds: InvestorVertaloIds, name: string): Promise<void> {
+    const { customerId, investorId } = investorIds;
+    const mutationQuery = `
             mutation {
               updateCustomerById(input: {
                 clientMutationId: "${investorId}",
@@ -41,13 +45,13 @@ export class VertaloAdapter extends ExecutionVertaloAdapter {
                 customer { status }
               }
             }
-        `
+        `;
 
-        await this.sendRequest(mutationQuery);
-    }
+    await this.sendRequest(mutationQuery);
+  }
 
-    async getAccount(customerId: string): Promise<object | never> {
-        const query = `
+  async getAccount(customerId: string): Promise<object | never> {
+    const query = `
             query {
               customerById (id: "${customerId}") {
                 name
@@ -57,10 +61,10 @@ export class VertaloAdapter extends ExecutionVertaloAdapter {
                 investorType
               }
             }
-        `
+        `;
 
-        const customer = await this.sendRequest(query);
+    const customer = await this.sendRequest(query);
 
-        return customer;
-    }
+    return customer;
+  }
 }

@@ -11,6 +11,7 @@
   },
   "scripts": {
     "lint": "yarn eslint ./Reinvest ./test ./shared ./devops",
+    "lint:errors": "yarn lint --quiet",
     "lint:fix": "yarn lint --fix",
     "check-types": "tsc --pretty",
     "test:characterization": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 test/characterization/**/*.test.ts",
@@ -110,7 +111,11 @@
       "no-case-declarations": 0,
       "no-console": 0,
       "no-global-assign": 0,
-      "@typescript-eslint/ban-ts-comment": 0
+      "@typescript-eslint/no-namespace": 0,
+      "@typescript-eslint/ban-ts-comment": 1,
+      "@typescript-eslint/no-explicit-any": 1,
+      "no-return-await": 1,
+      "@typescript-eslint/no-empty-interface": 1
     }
   },
   "prettier": "@hookooekoo/eslint-config/prettier.json"

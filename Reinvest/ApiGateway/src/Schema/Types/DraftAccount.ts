@@ -1,7 +1,7 @@
-import {JsonGraphQLError, SessionContext} from "ApiGateway/index";
-import {LegalEntities} from "LegalEntities/index";
-import {GraphQLError} from "graphql";
-import {CompanyDraftAccountType, DraftAccountType} from "LegalEntities/Domain/DraftAccount/DraftAccount";
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { GraphQLError } from 'graphql';
+import { CompanyDraftAccountType, DraftAccountType } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
+import { LegalEntities } from 'LegalEntities/index';
 
 const sharedSchema = `
     #graphql
@@ -207,7 +207,7 @@ const corporateTrustSchema = `
         dateOfBirth: DateOfBirthInput!
         ssn: SSNInput!
         address: AddressInput!
-        domicile: DomicileInput!
+        domicile: SimplifiedDomicileInput!
         """
         IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
         """
@@ -221,7 +221,7 @@ const corporateTrustSchema = `
         dateOfBirth: DateOfBirth
         ssn: String
         address: Address
-        domicile: Domicile
+        domicile: SimplifiedDomicile
         idScan: [DocumentFileLinkId]
     }
 
@@ -305,102 +305,79 @@ const corporateTrustSchema = `
 `;
 
 export const DraftAccount = {
-    typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
-    resolvers: {
-        Query: {
-            listAccountDrafts: async (parent: any, input: any, {profileId, modules}: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+  typeDefs: [sharedSchema, individualSchema, corporateTrustSchema],
+  resolvers: {
+    Query: {
+      listAccountDrafts: async (parent: any, input: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
 
-                return api.listDrafts(profileId);
-            },
-            getIndividualDraftAccount: async (parent: any, {accountId}: any, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        return api.listDrafts(profileId);
+      },
+      getIndividualDraftAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
 
-                return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
-            },
-            getCorporateDraftAccount: async (parent: any, {accountId}: any, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
+      },
+      getCorporateDraftAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
 
-                return api.readDraft(profileId, accountId, DraftAccountType.CORPORATE);
-            },
-            getTrustDraftAccount: async (parent: any, {accountId}: any, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        return api.readDraft(profileId, accountId, DraftAccountType.CORPORATE);
+      },
+      getTrustDraftAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
 
-                return api.readDraft(profileId, accountId, DraftAccountType.TRUST);
-            },
-        },
-        Mutation: {
-            createDraftAccount: async (parent: any, {type}: { type: DraftAccountType }, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const {status, id, message} = await api.createDraftAccount(profileId, type);
-                if (!status) {
-                    throw new GraphQLError(message as string);
-                }
+        return api.readDraft(profileId, accountId, DraftAccountType.TRUST);
+      },
+    },
+    Mutation: {
+      createDraftAccount: async (parent: any, { type }: { type: DraftAccountType }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const { status, id, message } = await api.createDraftAccount(profileId, type);
 
-                return {
-                    id,
-                    type
-                }
-            },
-            removeDraftAccount: async (parent: any, {draftAccountId}: { draftAccountId: string }, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                return await api.removeDraft(profileId, draftAccountId);
-            },
-            completeIndividualDraftAccount: async (
-                parent: any,
-                {accountId, input}: { accountId: string, input: any },
-                {profileId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.completeIndividualDraftAccount(profileId, accountId, input);
-
-                if (errors.length > 0) {
-                    throw new JsonGraphQLError(errors);
-                }
-
-                return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
-            },
-            completeCorporateDraftAccount: async (parent: any, {accountId, input}: { accountId: string, input: any }, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.completeCompanyDraftAccount(profileId, accountId, DraftAccountType.CORPORATE, input);
-
-                if (errors.length > 0) {
-                    throw new JsonGraphQLError(errors);
-                }
-
-                return api.readDraft(profileId, accountId, DraftAccountType.CORPORATE);
-            },
-            completeTrustDraftAccount: async (parent: any, {accountId, input}: { accountId: string, input: any }, {
-                profileId,
-                modules
-            }: SessionContext) => {
-                const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-                const errors = await api.completeCompanyDraftAccount(profileId, accountId, DraftAccountType.TRUST, input);
-
-                if (errors.length > 0) {
-                    throw new JsonGraphQLError(errors);
-                }
-
-                return api.readDraft(profileId, accountId, DraftAccountType.TRUST);
-            }
+        if (!status) {
+          throw new GraphQLError(message as string);
         }
-    }
-}
+
+        return {
+          id,
+          type,
+        };
+      },
+      removeDraftAccount: async (parent: any, { draftAccountId }: { draftAccountId: string }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+        return await api.removeDraft(profileId, draftAccountId);
+      },
+      completeIndividualDraftAccount: async (parent: any, { accountId, input }: { accountId: string; input: any }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const errors = await api.completeIndividualDraftAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.readDraft(profileId, accountId, DraftAccountType.INDIVIDUAL);
+      },
+      completeCorporateDraftAccount: async (parent: any, { accountId, input }: { accountId: string; input: any }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const errors = await api.completeCompanyDraftAccount(profileId, accountId, DraftAccountType.CORPORATE, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.readDraft(profileId, accountId, DraftAccountType.CORPORATE);
+      },
+      completeTrustDraftAccount: async (parent: any, { accountId, input }: { accountId: string; input: any }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const errors = await api.completeCompanyDraftAccount(profileId, accountId, DraftAccountType.TRUST, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.readDraft(profileId, accountId, DraftAccountType.TRUST);
+      },
+    },
+  },
+};

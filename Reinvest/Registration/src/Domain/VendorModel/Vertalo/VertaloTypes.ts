@@ -1,24 +1,24 @@
 export type VertaloAccountStructure = {
-    email: string;
-    name: string;
-}
+  email: string;
+  name: string;
+};
 
 export enum VertaloEntityType {
-    ACCOUNT = 'ACCOUNT',
+  ACCOUNT = 'ACCOUNT',
 }
 
 export type InvestorVertaloIds = {
-    customerId: string,
-    investorId: string
-}
+  customerId: string;
+  investorId: string;
+};
 
 export type VertaloIds = InvestorVertaloIds;
 
 export type VertaloSynchronizationRecordType = {
-    recordId: string;
-    vertaloIds: VertaloIds;
-    type: VertaloEntityType;
-    crc: string;
-    documents: string | null;
-    version: number;
-}
+  crc: string;
+  documents: string | null;
+  recordId: string;
+  type: VertaloEntityType;
+  version: number;
+  vertaloIds: VertaloIds;
+};

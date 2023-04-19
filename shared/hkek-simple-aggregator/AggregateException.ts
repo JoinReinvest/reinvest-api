@@ -1,2 +1,1 @@
-export class AggregateException extends Error {
-}
+export class AggregateException extends Error {}

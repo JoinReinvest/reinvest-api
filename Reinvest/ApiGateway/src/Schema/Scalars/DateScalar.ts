@@ -1,6 +1,6 @@
-import {GraphQLError, GraphQLScalarType, Kind} from 'graphql';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import DateTime from 'date-and-time';
-import {makeExecutableSchema} from "@graphql-tools/schema";
+import { GraphQLError, GraphQLScalarType, Kind } from 'graphql';
 
 const DateSchema = `
     #graphql
@@ -8,41 +8,43 @@ const DateSchema = `
 `;
 
 function isValidISODate(value: string) {
-    if (!DateTime.isValid(value, 'YYYY-MM-DD')) {
-        throw new GraphQLError("The value format must be YYYY-MM-DD");
-    }
+  if (!DateTime.isValid(value, 'YYYY-MM-DD')) {
+    throw new GraphQLError('The value format must be YYYY-MM-DD');
+  }
 }
 
 const DateResolver = new GraphQLScalarType({
-    name: 'ISODate',
-    description: 'Date in format YYYY-MM-DD',
+  name: 'ISODate',
+  description: 'Date in format YYYY-MM-DD',
 
-    // @ts-ignore
-    serialize(date: string): string { // BE -> FE
-        return date;
-    },
-    // @ts-ignore
-    parseValue(value: string): string { // FE (variable) -> BE
-        isValidISODate(value);
-        return value;
-    },
-    // @ts-ignore
-    parseLiteral(ast): string | never { // FE (hardcoded) -> BE
-        if (ast.kind !== Kind.STRING) {
-            throw new GraphQLError("The value must be string");
-        }
+  // @ts-ignore
+  serialize(date: string): string {
+    // BE -> FE
+    return date;
+  },
+  // @ts-ignore
+  parseValue(value: string): string {
+    // FE (variable) -> BE
+    isValidISODate(value);
 
-        isValidISODate(ast.value);
+    return value;
+  },
+  // @ts-ignore
+  parseLiteral(ast): string | never {
+    // FE (hardcoded) -> BE
+    if (ast.kind !== Kind.STRING) {
+      throw new GraphQLError('The value must be string');
+    }
 
-        return ast.value;
-    },
+    isValidISODate(ast.value);
 
-
+    return ast.value;
+  },
 });
 
 export const DateScalar = makeExecutableSchema({
-    typeDefs: DateSchema,
-    resolvers: {
-        ISODate: DateResolver,
-    },
+  typeDefs: DateSchema,
+  resolvers: {
+    ISODate: DateResolver,
+  },
 });

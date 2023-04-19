@@ -1,5 +1,5 @@
-import {SessionContext} from "ApiGateway/index";
-import {Documents} from "Documents/index";
+import { SessionContext } from 'ApiGateway/index';
+import { Documents } from 'Documents/index';
 
 const schema = `
     #graphql
@@ -8,7 +8,7 @@ const schema = `
         "This is @PutFileLink.id"
         id: String!
         "File name should be in format: .pdf, .jpeg, .jpg, .png"
-        fileName: String! @constraint(pattern: ".*\.(pdf|jpeg|jpg|png)$")
+        fileName: String! @constraint(pattern: ".*.(pdf|jpeg|jpg|png)$")
     }
 
     "Avatar link id input"
@@ -103,51 +103,40 @@ const schema = `
 `;
 
 export const DocumentTypes = {
-    typeDefs: schema,
-    resolvers: {
-        Query: {
-            getTemplate: async (parent: any,
-                                {templateName}: { templateName: string },
-                                {modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Documents.ApiType>(Documents);
-                return api.getTemplate(templateName);
-            },
-            getDocument: async (parent: any,
-                                {documentId}: { documentId: string },
-                                {modules, profileId}: SessionContext
-            ) => {
-                const api = modules.getApi<Documents.ApiType>(Documents);
-                return api.getDocumentLink(documentId, profileId);
-            },
-        },
-        Mutation: {
-            createDocumentsFileLinks: async (parent: any,
-                                             {numberOfLinks}: { numberOfLinks: number },
-                                             {profileId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Documents.ApiType>(Documents);
-                return api.createDocumentsFileLinks(numberOfLinks, profileId);
-            },
-            signDocumentFromTemplate: async (parent: any,
-                                             {
-                                                 templateId,
-                                                 fields,
-                                                 signature
-                                             }: { templateId: string, fields: any, signature: string },
-                                             {profileId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Documents.ApiType>(Documents);
-                return api.signDocumentFromTemplate(templateId, fields, "8.8.8.8", (new Date()).getTime(), "my name", profileId);
-            },
-            createAvatarFileLink: async (parent: any,
-                                         args: any,
-                                         {profileId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Documents.ApiType>(Documents);
-                return api.createAvatarFileLink(profileId);
-            },
-        },
-    }
-}
+  typeDefs: schema,
+  resolvers: {
+    Query: {
+      getTemplate: async (parent: any, { templateName }: { templateName: string }, { modules }: SessionContext) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
 
+        return api.getTemplate(templateName);
+      },
+      getDocument: async (parent: any, { documentId }: { documentId: string }, { modules, profileId }: SessionContext) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
+
+        return api.getDocumentLink(documentId, profileId);
+      },
+    },
+    Mutation: {
+      createDocumentsFileLinks: async (parent: any, { numberOfLinks }: { numberOfLinks: number }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
+
+        return api.createDocumentsFileLinks(numberOfLinks, profileId);
+      },
+      signDocumentFromTemplate: async (
+        parent: any,
+        { templateId, fields, signature }: { fields: any; signature: string; templateId: string },
+        { profileId, modules }: SessionContext,
+      ) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
+
+        return api.signDocumentFromTemplate(templateId, fields, '8.8.8.8', new Date().getTime(), 'my name', profileId);
+      },
+      createAvatarFileLink: async (parent: any, args: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
+
+        return api.createAvatarFileLink(profileId);
+      },
+    },
+  },
+};

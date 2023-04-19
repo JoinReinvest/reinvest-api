@@ -2,41 +2,32 @@ import { getDocumentRemoveEvent, LegalEntityDocumentRemoved } from 'LegalEntitie
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DateOfBirth, DateOfBirthInput } from 'LegalEntities/Domain/ValueObject/DateOfBirth';
 import { DocumentSchema, IdentityDocument } from 'LegalEntities/Domain/ValueObject/Document';
-import { Domicile, DomicileInput, DomicileType } from 'LegalEntities/Domain/ValueObject/Domicile';
-import { Id } from 'LegalEntities/Domain/ValueObject/Id';
+import { SimplifiedDomicile, SimplifiedDomicileInput } from 'LegalEntities/Domain/ValueObject/Domicile';
 import { PersonalName, PersonalNameInput } from 'LegalEntities/Domain/ValueObject/PersonalName';
-import { SensitiveNumberInput, SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
+import { SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
-import { NonEmptyString, Uuid, ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
-import { DomainEvent } from 'SimpleAggregator/Types';
+import { Uuid, ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 
 export type DefaultStakeholder = {
   address: AddressInput;
   dateOfBirth: DateOfBirthInput;
+  domicile: SimplifiedDomicileInput;
   id: string;
   label: string;
   name: PersonalNameInput;
 };
 
 export type StakeholderSchema = DefaultStakeholder & {
-  domicile: DomicileInput;
   idScan: DocumentSchema[];
   ssn: SensitiveNumberSchema | string;
 };
 
 export type StakeholderInput = DefaultStakeholder & {
-  domicile: DomicileInput;
   idScan: { fileName: string; id: string }[];
   ssn: { ssn: string };
 };
 
 export type StakeholderOutput = DefaultStakeholder & {
-  domicile: {
-    birthCountry?: string;
-    citizenshipCountry?: string;
-    type?: DomicileType;
-    visaType?: string;
-  };
   idScan: DocumentSchema[];
   ssn: string;
 };
@@ -46,11 +37,11 @@ export class Stakeholder implements ToObject {
   private name: PersonalName;
   private dateOfBirth: DateOfBirth;
   private address: Address;
-  private domicile: Domicile;
+  private domicile: SimplifiedDomicile;
   private idScan: IdentityDocument;
   private id: Uuid;
 
-  constructor(id: Uuid, ssn: SSN, name: PersonalName, dateOfBirth: DateOfBirth, address: Address, domicile: Domicile, idScan: IdentityDocument) {
+  constructor(id: Uuid, ssn: SSN, name: PersonalName, dateOfBirth: DateOfBirth, address: Address, domicile: SimplifiedDomicile, idScan: IdentityDocument) {
     this.id = id;
     this.ssn = ssn;
     this.name = name;
@@ -96,7 +87,7 @@ export class Stakeholder implements ToObject {
       const personalName = PersonalName.create(name);
       const dateOfBirthObject = DateOfBirth.create(dateOfBirth);
       const addressObject = Address.create(address);
-      const domicileObject = Domicile.create(domicile);
+      const domicileObject = SimplifiedDomicile.create(domicile);
       const documents = IdentityDocument.create(idScan);
       const ssnObject = SSN.create(ssn);
 

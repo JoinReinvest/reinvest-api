@@ -1,75 +1,67 @@
-import {
-    AccountType,
-    Address,
-    CompanyType,
-    DocumentSchema, DomicileType,
-    EmploymentStatusType
-} from "Registration/Domain/Model/ReinvestTypes";
-
+import { AccountType, Address, CompanyType, DocumentSchema, DomicileType, EmploymentStatusType } from 'Registration/Domain/Model/ReinvestTypes';
 
 export type AccountNameOwner = {
-    firstName: string
-    middleName?: string
-    lastName: string,
-}
+  firstName: string;
+  lastName: string;
+  middleName?: string;
+};
 
 export type IndividualAccountForSynchronization = {
-    accountId: string,
-    profileId: string,
-    employmentStatus?: EmploymentStatusType,
-    name: {
-        firstName: string
-        middleName?: string
-        lastName: string,
-    },
-    address: Address,
-    nameOfEmployer?: string,
-    title?: string,
-    industry?: string,
-    netWorth?: string,
-    netIncome?: string,
-}
-
+  accountId: string;
+  address: Address;
+  name: {
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+  };
+  profileId: string;
+  employmentStatus?: EmploymentStatusType;
+  industry?: string;
+  nameOfEmployer?: string;
+  netIncome?: string;
+  netWorth?: string;
+  title?: string;
+};
 
 export type StakeholderForSynchronization = {
-    accountId: string,
-    profileId: string,
-    id: string,
-    ssn: string | null;
-    name: {
-        firstName: string
-        middleName?: string
-        lastName: string,
-    }
-    dateOfBirth: string;
-    address: Address,
-    domicile: DomicileType,
-    idScan: DocumentSchema[],
-    accountType: AccountType,
-}
+  accountId: string;
+  accountType: AccountType;
+  address: Address;
+  dateOfBirth: string;
+  domicile: DomicileType;
+  id: string;
+  idScan: DocumentSchema[];
+  name: {
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+  };
+  profileId: string;
+  ssn: string | null;
+};
 
 export type CompanyForSynchronization = {
-    profileId: string;
-    accountId: string;
-    ein: string | null,
-    companyDocuments: DocumentSchema[],
-    accountType: AccountType
-    address: Address,
-    companyName: {
-        name: string,
-    },
-    companyType: { type: CompanyType },
-}
+  accountId: string;
+  accountType: AccountType;
+  address: Address;
+  companyDocuments: DocumentSchema[];
+  companyName: {
+    name: string;
+  };
+  companyType: { type: CompanyType };
+  ein: string | null;
+  profileId: string;
+};
 
 export type CompanyAccountForSynchronization = {
-    accountId: string,
-    profileId: string,
-    ownerName: {
-        firstName: string
-        middleName?: string
-        lastName: string,
-    },
-    address: Address,
-    companyType: { type: CompanyType },
-    stakeholders: { id: string }[],
-}
+  accountId: string;
+  address: Address;
+  companyType: { type: CompanyType };
+  ownerName: {
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+  };
+  profileId: string;
+  stakeholders: { id: string }[];
+};

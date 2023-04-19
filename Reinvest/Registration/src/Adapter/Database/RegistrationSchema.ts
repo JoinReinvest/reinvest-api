@@ -1,66 +1,57 @@
-import {Insertable} from "kysely";
-import {MappedRecordType} from "Registration/Domain/Model/Mapping/MappedRecord";
-import {
-    NorthCapitalEntityType,
-    NorthCapitalSynchronizationRecordType
-} from "Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord";
-import {MappedRecordStatus, MappedType} from "Registration/Domain/Model/Mapping/MappedType";
-import {
-    VertaloEntityType, VertaloIds,
-    VertaloSynchronizationRecordType
-} from "Registration/Domain/VendorModel/Vertalo/VertaloTypes";
-import {
-    DocumentSyncState,
-    NorthCapitalObjectType
-} from "Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes";
+import { Insertable } from 'kysely';
+import { NorthCapitalEntityType, NorthCapitalSynchronizationRecordType } from 'Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord';
+import { MappedRecordType } from 'Registration/Domain/Model/Mapping/MappedRecord';
+import { MappedRecordStatus, MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
+import { DocumentSyncState, NorthCapitalObjectType } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
+import { VertaloEntityType, VertaloIds, VertaloSynchronizationRecordType } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
 
 export interface MappingRegistryTable {
-    recordId: string;
-    profileId: string;
-    externalId: string;
-    dependentId: string | null;
-    mappedType: MappedType;
-    email: string | null;
-    status: MappedRecordStatus
-    version: number;
-    createdDate: Date;
-    updatedDate: Date;
-    lockedUntil: Date | null;
+  createdDate: Date;
+  dependentId: string | null;
+  email: string | null;
+  externalId: string;
+  lockedUntil: Date | null;
+  mappedType: MappedType;
+  profileId: string;
+  recordId: string;
+  status: MappedRecordStatus;
+  updatedDate: Date;
+  version: number;
 }
 
 export interface NorthCapitalSynchronizationTable {
-    recordId: string;
-    northCapitalId: string;
-    type: NorthCapitalEntityType,
-    crc: string;
-    version: number;
-    createdDate: Date;
-    updatedDate: Date;
-    links: object | string;
+  crc: string;
+  createdDate: Date;
+  links: object | string;
+  northCapitalId: string;
+  recordId: string;
+  type: NorthCapitalEntityType;
+  updatedDate: Date;
+  version: number;
 }
 
 export interface NorthCapitalDocumentsSynchronizationTable {
-    recordId: string;
-    northCapitalId: string;
-    northCapitalType: NorthCapitalObjectType
-    documentId: string;
-    documentPath: string;
-    documentFilename: string;
-    version: number;
-    state: DocumentSyncState;
-    createdDate: Date;
-    updatedDate: Date;
+  createdDate: Date;
+  documentFilename: string;
+  documentId: string;
+  documentPath: string;
+  northCapitalId: string;
+  northCapitalType: NorthCapitalObjectType;
+  recordId: string;
+  state: DocumentSyncState;
+  updatedDate: Date;
+  version: number;
 }
 
 export interface VertaloSynchronizationTable {
-    recordId: string;
-    vertaloIds: VertaloIds | string;
-    type: VertaloEntityType,
-    crc: string;
-    documents: string | null;
-    version: number;
-    createdDate: Date;
-    updatedDate: Date;
+  crc: string;
+  createdDate: Date;
+  documents: string | null;
+  recordId: string;
+  type: VertaloEntityType;
+  updatedDate: Date;
+  version: number;
+  vertaloIds: VertaloIds | string;
 }
 
 export type InsertableMappingRegistry = Insertable<MappingRegistryTable>;

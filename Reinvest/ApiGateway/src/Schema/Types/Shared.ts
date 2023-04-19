@@ -62,6 +62,19 @@ const schema = `
         forVisa: VisaInput
     }
 
+    enum SimplifiedDomicileType {
+        CITIZEN
+        RESIDENT
+    }
+
+    input SimplifiedDomicileInput {
+        type: SimplifiedDomicileType!
+    }
+    
+    type SimplifiedDomicile {
+        type: SimplifiedDomicileType
+    }
+
     input SSNInput {
         "The valid SSN is 9 digits in format 'XXX-XX-XXXX'"
         ssn: String! @constraint(pattern: "^[0-9]{3}-[0-9]{2}-[0-9]{4}$")
@@ -188,6 +201,5 @@ const schema = `
     }
 `;
 export const Shared = {
-    typeDefs: schema,
-}
-
+  typeDefs: schema,
+};

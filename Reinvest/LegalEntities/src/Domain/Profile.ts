@@ -22,8 +22,8 @@ export type ProfileSchema = {
   name: PersonalNameInput | null;
   profileId: string;
   ssn: string | null;
-  statements: PersonalStatementInput[];
   ssnObject: SensitiveNumberSchema | null;
+  statements: PersonalStatementInput[];
 };
 
 export class Profile {
