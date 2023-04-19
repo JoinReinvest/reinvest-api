@@ -70,10 +70,6 @@ export class AnyString {
   }
 }
 
-export class Money {
-  constructor() {}
-}
-
 export class IsoDate {
   constructor(date: string) {
     if (!date || !DateTime.isValid(date, 'YYYY-MM-DD')) {
@@ -104,8 +100,4 @@ export class Uuid {
   static create(id: string): Uuid {
     return new Uuid(id);
   }
-}
-
-export class Url {
-  constructor() {}
 }

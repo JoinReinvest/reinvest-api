@@ -1,3 +1,3 @@
 export interface ToObject {
-    toObject(): any;
+  toObject(): any;
 }

@@ -1,4 +1,4 @@
-import { TransactionId } from "../ValueObject/TransactionId";
+import { TransactionId } from '../ValueObject/TransactionId';
 
 export interface TransactionEvent {
   getTransactionId(): TransactionId;

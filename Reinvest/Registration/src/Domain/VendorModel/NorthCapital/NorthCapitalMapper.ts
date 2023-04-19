@@ -1,17 +1,17 @@
-import { ProfileForSynchronization } from 'Registration/Domain/Model/Profile';
-import { MainParty } from 'Registration/Domain/VendorModel/NorthCapital/MainParty';
 import {
   CompanyAccountForSynchronization,
   CompanyForSynchronization,
   IndividualAccountForSynchronization,
   StakeholderForSynchronization,
 } from 'Registration/Domain/Model/Account';
-import { NorthCapitalIndividualAccount } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalIndividualAccount';
-import { NorthCapitalDomicile, NorthCapitalEmploymentStatus, NorthCapitalEntityType } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
+import { ProfileForSynchronization } from 'Registration/Domain/Model/Profile';
 import { CompanyType, DomicileType, EmploymentStatusType } from 'Registration/Domain/Model/ReinvestTypes';
+import { MainParty } from 'Registration/Domain/VendorModel/NorthCapital/MainParty';
 import { NorthCapitalCompanyAccount } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyAccount';
 import { NorthCapitalCompanyEntity } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalCompanyEntity';
+import { NorthCapitalIndividualAccount } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalIndividualAccount';
 import { NorthCapitalStakeholderParty } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalStakeholderParty';
+import { NorthCapitalDomicile, NorthCapitalEmploymentStatus, NorthCapitalEntityType } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
 
 export class NorthCapitalMapper {
   static mapProfile(profile: ProfileForSynchronization, email: string): MainParty {

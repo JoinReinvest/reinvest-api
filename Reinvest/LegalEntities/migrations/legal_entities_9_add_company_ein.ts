@@ -1,15 +1,13 @@
-import {Kysely, sql} from 'kysely';
-import {
-    LegalEntitiesDatabase, legalEntitiesCompanyAccountTable,
-} from "LegalEntities/Adapter/Database/DatabaseAdapter";
+import { Kysely, sql } from 'kysely';
+import { legalEntitiesCompanyAccountTable, LegalEntitiesDatabase } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 
 export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
-    await db.schema
-        .alterTable(legalEntitiesCompanyAccountTable)
-        .addColumn('einHash', 'varchar(255)', col => col.unique())
-        .execute();
+  await db.schema
+    .alterTable(legalEntitiesCompanyAccountTable)
+    .addColumn('einHash', 'varchar(255)', col => col.unique())
+    .execute();
 }
 
 export async function down(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
-    await db.schema.alterTable(legalEntitiesCompanyAccountTable).dropColumn('einHash').execute();
+  await db.schema.alterTable(legalEntitiesCompanyAccountTable).dropColumn('einHash').execute();
 }

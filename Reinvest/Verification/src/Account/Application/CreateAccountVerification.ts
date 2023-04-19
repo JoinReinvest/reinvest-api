@@ -1,12 +1,12 @@
-import { CompanyVerification } from "../../Company/Domain/CompanyVerification";
-import { CompanyVerificationRepositoryInterface } from "../../Company/Domain/Repository/CompanyVerificationRepositoryInterface";
-import { PersonVerification } from "../../Person/Domain/PersonVerification";
-import { PersonVerificationRepositoryInterface } from "../../Person/Domain/Repository/PersonVerificationRepositoryInterface";
-import { AccountVerification } from "../Domain/AccountVerification";
-import { AccountVerificationRepositoryInterface } from "../Domain/Repository/AccountVerificationRepositoryInterface";
-import { InvestingAccountId } from "../Domain/ValueObject/InvestingAccountId";
-import { VerificationFactory } from "./Factory/VerificationFactory";
-import { AccountStructureQueryInterface } from "./Query/AccountStructureQueryInterface";
+import { CompanyVerification } from '../../Company/Domain/CompanyVerification';
+import { CompanyVerificationRepositoryInterface } from '../../Company/Domain/Repository/CompanyVerificationRepositoryInterface';
+import { PersonVerification } from '../../Person/Domain/PersonVerification';
+import { PersonVerificationRepositoryInterface } from '../../Person/Domain/Repository/PersonVerificationRepositoryInterface';
+import { AccountVerification } from '../Domain/AccountVerification';
+import { AccountVerificationRepositoryInterface } from '../Domain/Repository/AccountVerificationRepositoryInterface';
+import { InvestingAccountId } from '../Domain/ValueObject/InvestingAccountId';
+import { VerificationFactory } from './Factory/VerificationFactory';
+import { AccountStructureQueryInterface } from './Query/AccountStructureQueryInterface';
 
 export class CreateAccountVerification {
   private accountStructureQuery: AccountStructureQueryInterface;
@@ -18,7 +18,7 @@ export class CreateAccountVerification {
     accountStructureQuery: AccountStructureQueryInterface,
     accountVerificationRepository: AccountVerificationRepositoryInterface,
     personVerificationRepository: PersonVerificationRepositoryInterface,
-    companyVerificationRepository: CompanyVerificationRepositoryInterface
+    companyVerificationRepository: CompanyVerificationRepositoryInterface,
   ) {
     this.accountStructureQuery = accountStructureQuery;
     this.accountVerificationRepository = accountVerificationRepository;
@@ -27,19 +27,12 @@ export class CreateAccountVerification {
   }
 
   public create(accountId: InvestingAccountId) {
-    const accountStructure =
-      this.accountStructureQuery.getAccountStructure(accountId);
+    const accountStructure = this.accountStructureQuery.getAccountStructure(accountId);
 
-    this.accountVerificationRepository.save(
-      new AccountVerification(accountId, accountStructure.getMembersId())
-    );
-    const accountVerification =
-      this.accountVerificationRepository.get(accountId);
+    this.accountVerificationRepository.save(new AccountVerification(accountId, accountStructure.getMembersId()));
+    const accountVerification = this.accountVerificationRepository.get(accountId);
 
-    if (
-      accountVerification.isApproved() ||
-      accountVerification.isWaitingForManualVerification()
-    ) {
+    if (accountVerification.isApproved() || accountVerification.isWaitingForManualVerification()) {
       // send event that account is already verified
       return;
     }
@@ -49,9 +42,7 @@ export class CreateAccountVerification {
 
     for (const member of accountStructure.getMembers()) {
       const verification = VerificationFactory.createFromAccountMember(member);
-      verification instanceof PersonVerification
-        ? personVerifications.push(verification)
-        : companyVerifications.push(verification);
+      verification instanceof PersonVerification ? personVerifications.push(verification) : companyVerifications.push(verification);
     }
 
     this.personVerificationRepository.save(personVerifications);

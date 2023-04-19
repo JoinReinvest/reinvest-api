@@ -1,32 +1,26 @@
-import { CloudwatchPolicies } from "../../serverless/cloudwatch";
-import { getAttribute, getResourceName } from "../../serverless/utils";
-import {
-  EniPolicies,
-  importPrivateSubnetRefs,
-  importVpcRef,
-  SecurityGroupEgressRules,
-  SecurityGroupIngressRules
-} from "../../serverless/vpc";
+import { CloudwatchPolicies } from '../../serverless/cloudwatch';
+import { getAttribute, getResourceName } from '../../serverless/utils';
+import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
 
 export const ExplorerLambdaFunction = {
   handler: `devops/functions/explorer/handler.main`,
-  role: "ExplorerLambdaRole",
+  role: 'ExplorerLambdaRole',
   timeout: 10,
   vpc: {
-    securityGroupIds: [getAttribute("ExplorerSecurityGroup", "GroupId")],
+    securityGroupIds: [getAttribute('ExplorerSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
   },
   events: [
     {
       httpApi: {
-        method: "GET",
-        path: "/explorer",
+        method: 'GET',
+        path: '/explorer',
       },
     },
     {
       httpApi: {
-        method: "GET",
-        path: "/set-header",
+        method: 'GET',
+        path: '/set-header',
       },
     },
   ],
@@ -34,23 +28,23 @@ export const ExplorerLambdaFunction = {
 
 export const ExplorerLambdaResources = {
   ExplorerLambdaRole: {
-    Type: "AWS::IAM::Role",
+    Type: 'AWS::IAM::Role',
     Properties: {
-      RoleName: getResourceName("ExplorerLambdaRole"),
+      RoleName: getResourceName('ExplorerLambdaRole'),
       AssumeRolePolicyDocument: {
         Statement: [
           {
-            Effect: "Allow",
-            Action: "sts:AssumeRole",
+            Effect: 'Allow',
+            Action: 'sts:AssumeRole',
             Principal: {
-              Service: "lambda.amazonaws.com",
+              Service: 'lambda.amazonaws.com',
             },
           },
         ],
       },
       Policies: [
         {
-          PolicyName: "ExplorerLambdaPolicy",
+          PolicyName: 'ExplorerLambdaPolicy',
           PolicyDocument: {
             Statement: [...CloudwatchPolicies, ...EniPolicies],
           },
@@ -59,10 +53,10 @@ export const ExplorerLambdaResources = {
     },
   },
   ExplorerSecurityGroup: {
-    Type: "AWS::EC2::SecurityGroup",
+    Type: 'AWS::EC2::SecurityGroup',
     Properties: {
-      GroupName: getResourceName("sg-explorer-lambda"),
-      GroupDescription: getResourceName("sg-explorer-lambda"),
+      GroupName: getResourceName('sg-explorer-lambda'),
+      GroupDescription: getResourceName('sg-explorer-lambda'),
       SecurityGroupIngress: SecurityGroupIngressRules,
       SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),

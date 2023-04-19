@@ -1,26 +1,23 @@
-import { Counter } from "../../../Commons/Counter";
-import { DoNothing } from "../Command/DoNothing";
-import { TransferFunds } from "../Command/TransferFunds";
-import { FundsTransferInitializationFailed } from "../Events/FundsTransferInitializationFailed";
-import { FundsTransferInitialized } from "../Events/FundsTransferInitialized";
-import { SubscriptionAgreementSigned } from "../Events/SubscriptionAgreementSigned";
-import { TradeCreated } from "../Events/TradeCreated";
-import { TransactionCancelled } from "../Events/TransactionCancelled";
-import { TransactionEvent } from "../Events/TransactionEvent";
-import { Transaction } from "../Transaction";
-import { TransactionDecision } from "../TransactionDecision";
-import { TransactionStateChange } from "../TransactionStateChange";
-import { FailureCompletionReason } from "../ValueObject/FailureCompletionReason";
-import { ManualActionReason } from "../ValueObject/ManualActionReason";
-import { TransactionId } from "../ValueObject/TransactionId";
-import { CommonTransaction } from "./CommonTransaction";
+import { Counter } from '../../../Commons/Counter';
+import { DoNothing } from '../Command/DoNothing';
+import { TransferFunds } from '../Command/TransferFunds';
+import { FundsTransferInitializationFailed } from '../Events/FundsTransferInitializationFailed';
+import { FundsTransferInitialized } from '../Events/FundsTransferInitialized';
+import { SubscriptionAgreementSigned } from '../Events/SubscriptionAgreementSigned';
+import { TradeCreated } from '../Events/TradeCreated';
+import { TransactionCancelled } from '../Events/TransactionCancelled';
+import { TransactionEvent } from '../Events/TransactionEvent';
+import { Transaction } from '../Transaction';
+import { TransactionDecision } from '../TransactionDecision';
+import { TransactionStateChange } from '../TransactionStateChange';
+import { FailureCompletionReason } from '../ValueObject/FailureCompletionReason';
+import { ManualActionReason } from '../ValueObject/ManualActionReason';
+import { TransactionId } from '../ValueObject/TransactionId';
+import { CommonTransaction } from './CommonTransaction';
 
 export const NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION = 3;
 
-export class FundsTransferAwaitingTransaction
-  extends CommonTransaction
-  implements Transaction
-{
+export class FundsTransferAwaitingTransaction extends CommonTransaction implements Transaction {
   private readonly fundsTransferInitializationCounter: Counter;
 
   constructor(transactionId: TransactionId, tradeTriesCounter: Counter) {
@@ -33,15 +30,11 @@ export class FundsTransferAwaitingTransaction
 
     switch (true) {
       case event instanceof SubscriptionAgreementSigned:
-        return this.retryInitializeFundsTransfer(
-          event as SubscriptionAgreementSigned
-        );
+        return this.retryInitializeFundsTransfer(event as SubscriptionAgreementSigned);
       case event instanceof FundsTransferInitialized:
         return this.waitForPayment(event as FundsTransferInitialized);
       case event instanceof FundsTransferInitializationFailed:
-        return super.cancelTrade(
-          FailureCompletionReason.FundsTransferInitializationFailed
-        );
+        return super.cancelTrade(FailureCompletionReason.FundsTransferInitializationFailed);
       case event instanceof TransactionCancelled:
         return this.cancelTrade();
       default:
@@ -50,29 +43,17 @@ export class FundsTransferAwaitingTransaction
   }
 
   private retryInitializeFundsTransfer(event: SubscriptionAgreementSigned) {
-    if (
-      this.fundsTransferInitializationCounter.isHigherEqualThan(
-        NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION
-      )
-    ) {
-      return super.waitForManualAction(
-        ManualActionReason.CannotInitializeFundsTransfer
-      );
+    if (this.fundsTransferInitializationCounter.isHigherEqualThan(NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION)) {
+      return super.waitForManualAction(ManualActionReason.CannotInitializeFundsTransfer);
     }
 
     return new TransactionDecision(
       TransferFunds.create(this.transactionId),
-      TransactionStateChange.retryFundsTransferAwaiting(
-        this.transactionId,
-        this.fundsTransferInitializationCounter.increment()
-      )
+      TransactionStateChange.retryFundsTransferAwaiting(this.transactionId, this.fundsTransferInitializationCounter.increment()),
     );
   }
 
   private waitForPayment(event: FundsTransferInitialized): TransactionDecision {
-    return new TransactionDecision(
-      DoNothing.create(),
-      TransactionStateChange.paymentAwaiting(this.transactionId)
-    );
+    return new TransactionDecision(DoNothing.create(), TransactionStateChange.paymentAwaiting(this.transactionId));
   }
 }

@@ -1,117 +1,122 @@
-import axios, {AxiosError, AxiosResponse} from "axios";
-import VertaloException from "./VertaloException";
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
-type roles = 'empty' | 'initial' | 'account_admin'
+import VertaloException from './VertaloException';
+
+type roles = 'empty' | 'initial' | 'account_admin';
 export default class VertaloRequester {
-    clientId: string;
-    clientSecret: string;
-    authorizationToken: { token: string, role: roles };
-    roles: any;
-    tokenValidBefore: Date | null;
-    url: string;
+  clientId: string;
+  clientSecret: string;
+  authorizationToken: { role: roles; token: string };
+  roles: any;
+  tokenValidBefore: Date | null;
+  url: string;
 
-    constructor(clientId: string, clientSecret: string, url: string) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.url = url
-        this.roles = {}
-        this.authorizationToken = {token: '', role: 'empty'};
-        this.tokenValidBefore = null
+  constructor(clientId: string, clientSecret: string, url: string) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.url = url;
+    this.roles = {};
+    this.authorizationToken = { token: '', role: 'empty' };
+    this.tokenValidBefore = null;
+  }
+
+  private async getToken(): Promise<string> {
+    if (this.authorizationToken.role === 'empty' || <Date>this.tokenValidBefore < new Date()) {
+      const {
+        token: { access_token },
+        roles: { data: roles },
+      } = await this.authorize();
+      this.roles = roles.reduce((tempRoles: any, role: any) => {
+        tempRoles[role.user_role] = role;
+
+        return tempRoles;
+      }, {});
+
+      this.setToken(access_token, 'initial');
     }
 
-    private async getToken(): Promise<string> {
-        if (this.authorizationToken.role === 'empty' || <Date>this.tokenValidBefore < new Date()) {
-            const {token: {access_token}, roles: {data: roles}} = await this.authorize()
-            this.roles = roles.reduce((tempRoles: any, role: any) => {
-                tempRoles[role.user_role] = role;
-                return tempRoles;
-            }, {});
+    return this.authorizationToken.token;
+  }
 
-            this.setToken(access_token, 'initial');
-        }
+  private setToken(token: string, role: roles): void {
+    this.authorizationToken = { token, role };
+    this.tokenValidBefore = new Date(new Date().getTime() + 60 * 60000);
+  }
 
-        return this.authorizationToken.token;
+  private clearToken(): void {
+    this.authorizationToken = { token: '', role: 'empty' };
+    this.tokenValidBefore = null;
+  }
+
+  private async authorize(): Promise<any> {
+    try {
+      const response: AxiosResponse = await axios.get(`${this.url}/authenticate/token/login?client_id=${this.clientId}&client_secret=${this.clientSecret}`);
+
+      return response.data;
+    } catch (error: any) {
+      throw new VertaloException(error.message, { status: error.response.status });
+    }
+  }
+
+  private async authorizeAsAccountAdmin(): Promise<any> {
+    if (this.authorizationToken.role === 'account_admin') {
+      return;
+    } else if (this.authorizationToken.role !== 'initial') {
+      this.clearToken();
+      await this.preAuthorize();
     }
 
-    private setToken(token: string, role: roles): void {
-        this.authorizationToken = {token, role};
-        this.tokenValidBefore = new Date(new Date().getTime() + (60 * 60000));
+    const {
+      account_admin: { users_account_id: userAccountId },
+    } = this.roles;
+
+    const { access_token } = await this.authorizeByRole(userAccountId);
+    this.setToken(access_token, 'account_admin');
+  }
+
+  private async authorizeByRole(userAccountId: string): Promise<any> {
+    try {
+      const token = await this.getToken();
+      const response: AxiosResponse = await axios.get(`${this.url}/authenticate/token/role/${userAccountId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data.token;
+    } catch (error: any) {
+      throw new VertaloException(error.response.status, error.message);
     }
+  }
 
-    private clearToken(): void {
-        this.authorizationToken = {token: '', role: 'empty'};
-        this.tokenValidBefore = null
+  public async preAuthorize(): Promise<string> {
+    return await this.getToken();
+  }
+
+  private async sendRequest(query: string): Promise<any> {
+    await this.authorizeAsAccountAdmin();
+    const token = await this.getToken();
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.url}/token/api/v2/graphql`,
+        { query: query },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return response.data.data;
+    } catch (error) {
+      // @ts-ignore
+      throw new Error(`Request error: ${error.message}`);
     }
+  }
 
-    private async authorize(): Promise<any> {
-        try {
-            const response: AxiosResponse = await axios
-                .get(`${this.url}/authenticate/token/login?client_id=${this.clientId}&client_secret=${this.clientSecret}`);
-            return response.data;
-        } catch (error: any) {
-            throw new VertaloException(error.message, {status: error.response.status});
-        }
-    }
-
-    private async authorizeAsAccountAdmin(): Promise<any> {
-        if (this.authorizationToken.role === 'account_admin') {
-            return;
-        } else if (this.authorizationToken.role !== 'initial') {
-            this.clearToken();
-            await this.preAuthorize();
-        }
-
-        const {account_admin: {users_account_id: userAccountId}} = this.roles;
-
-        const {access_token} = await this.authorizeByRole(userAccountId);
-        this.setToken(access_token, 'account_admin');
-
-    }
-
-    private async authorizeByRole(userAccountId: string): Promise<any> {
-        try {
-            const token = await this.getToken();
-            const response: AxiosResponse = await axios
-                .get(`${this.url}/authenticate/token/role/${userAccountId}`,
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    });
-
-            return response.data.token;
-        } catch (error: any) {
-            throw new VertaloException(error.response.status, error.message);
-        }
-    }
-
-    public async preAuthorize(): Promise<string> {
-        return await this.getToken();
-    }
-
-    private async sendRequest(query: string): Promise<any> {
-        await this.authorizeAsAccountAdmin();
-        const token = await this.getToken()
-        try {
-            const response: AxiosResponse = await axios
-                .post(`${this.url}/token/api/v2/graphql`,
-                    {"query": query},
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        }
-                    });
-
-            return response.data.data;
-        } catch (error) {
-            // @ts-ignore
-            throw new Error(`Request error: ${error.message}`)
-        }
-    }
-
-    public async createAsset(assetName: string, assetType: string, authorizedTotal: string, status: string): Promise<string> {
-        const mutationQuery = `
+  public async createAsset(assetName: string, assetType: string, authorizedTotal: string, status: string): Promise<string> {
+    const mutationQuery = `
             mutation {
               createAsset (
                 input: {
@@ -128,23 +133,28 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {createAsset: {asset: {id}}} = await this.sendRequest(mutationQuery);
+    const {
+      createAsset: {
+        asset: { id },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return id;
-    }
+    return id;
+  }
 
-    async createRound(assetId: string,
-                      name: string,
-                      opensOn: string,
-                      closesOn: string,
-                      total: string,
-                      price: string,
-                      status: string,
-                      termsUrl: string
-    ): Promise<string> {
-        const mutationQuery = `
+  async createRound(
+    assetId: string,
+    name: string,
+    opensOn: string,
+    closesOn: string,
+    total: string,
+    price: string,
+    status: string,
+    termsUrl: string,
+  ): Promise<string> {
+    const mutationQuery = `
             mutation {
               makeRound (
                 input: {
@@ -163,20 +173,19 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {makeRound: {round: {id}}} = await this.sendRequest(mutationQuery);
+    const {
+      makeRound: {
+        round: { id },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return id;
-    }
+    return id;
+  }
 
-    async createAllocation(roundId: string,
-                           issuerId: string,
-                           name: string,
-                           opensOn: string,
-                           closesOn: string
-    ): Promise<string> {
-        const mutationQuery = `
+  async createAllocation(roundId: string, issuerId: string, name: string, opensOn: string, closesOn: string): Promise<string> {
+    const mutationQuery = `
             mutation {
               createAllocation (
                 input: {
@@ -194,16 +203,19 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {createAllocation: {allocation: {id}}} = await this.sendRequest(mutationQuery);
+    const {
+      createAllocation: {
+        allocation: { id },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return id;
-    }
+    return id;
+  }
 
-    async createInvestor(name: string, email: string
-    ): Promise<any> {
-        const mutationQuery = `
+  async createInvestor(name: string, email: string): Promise<any> {
+    const mutationQuery = `
             mutation {
               makeCustomer (
                 input: {
@@ -217,16 +229,19 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {makeCustomer: {customer: {id: customerId, investorId}}} = await this.sendRequest(mutationQuery);
+    const {
+      makeCustomer: {
+        customer: { id: customerId, investorId },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return {customerId, investorId};
-    }
+    return { customerId, investorId };
+  }
 
-    async createAtsInvestor(name: string, email: string
-    ): Promise<any> {
-        const mutationQuery = `
+  async createAtsInvestor(name: string, email: string): Promise<any> {
+    const mutationQuery = `
             mutation {
               makeInvestor (
                 input: {
@@ -239,16 +254,19 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {makeInvestor: {account: {id: investorId}}} = await this.sendRequest(mutationQuery);
+    const {
+      makeInvestor: {
+        account: { id: investorId },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return investorId;
-    }
+    return investorId;
+  }
 
-    async createDistribution(allocationId: string, investorEmail: string, sharesAmount: string
-    ): Promise<any> {
-        const mutationQuery = `
+  async createDistribution(allocationId: string, investorEmail: string, sharesAmount: string): Promise<any> {
+    const mutationQuery = `
       mutation {
           makeDistribution (
             input: {
@@ -263,23 +281,19 @@ export default class VertaloRequester {
             }
           }
         }
-        `
+        `;
 
-        const {
-            makeDistribution: {
-                distribution: {
-                    id: distributionId,
-                    status
-                }
-            }
-        } = await this.sendRequest(mutationQuery);
+    const {
+      makeDistribution: {
+        distribution: { id: distributionId, status },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return {distributionId, status};
-    }
+    return { distributionId, status };
+  }
 
-    async updateDistributionStatus(distributionId: string, statusToUpdate: "open" | "closed"
-    ): Promise<boolean> {
-        const mutationQuery = `
+  async updateDistributionStatus(distributionId: string, statusToUpdate: 'open' | 'closed'): Promise<boolean> {
+    const mutationQuery = `
             mutation {
               updateDistributionById (
                 input: {
@@ -293,16 +307,19 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {updateDistributionById: {distribution: {status}}} = await this.sendRequest(mutationQuery);
+    const {
+      updateDistributionById: {
+        distribution: { status },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return status === statusToUpdate;
-    }
+    return status === statusToUpdate;
+  }
 
-    async markPayment(distributionId: string, paymentAmount: string
-    ): Promise<any> {
-        const mutationQuery = `
+  async markPayment(distributionId: string, paymentAmount: string): Promise<any> {
+    const mutationQuery = `
             mutation {
               createDistributionPayment(
                 input: {
@@ -318,23 +335,19 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {
-            createDistributionPayment: {
-                distributionPayment: {
-                    id: paymentId,
-                    paidOn
-                }
-            }
-        } = await this.sendRequest(mutationQuery);
+    const {
+      createDistributionPayment: {
+        distributionPayment: { id: paymentId, paidOn },
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return {paymentId, paidOn};
+    return { paymentId, paidOn };
+  }
 
-    }
-
-    async issueShares(distributionId: string): Promise<any> {
-        const mutationQuery = `
+  async issueShares(distributionId: string): Promise<any> {
+    const mutationQuery = `
             mutation {
               issueDistributions (
                 input: {
@@ -348,21 +361,19 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const {
-            issueDistributions: {
-                issuanceEvents: [{
-                    holdingId
-                }]
-            }
-        } = await this.sendRequest(mutationQuery);
+    const {
+      issueDistributions: {
+        issuanceEvents: [{ holdingId }],
+      },
+    } = await this.sendRequest(mutationQuery);
 
-        return holdingId;
-    }
+    return holdingId;
+  }
 
-    async queryCapTable(roundId: string): Promise<any> {
-        const query = `
+  async queryCapTable(roundId: string): Promise<any> {
+    const query = `
             query {
               roundById(id: ${roundId}) {
                 tokenByTokenId {
@@ -385,10 +396,10 @@ export default class VertaloRequester {
                 }
               }
             }
-        `
+        `;
 
-        const response = await this.sendRequest(query);
+    const response = await this.sendRequest(query);
 
-        return response;
-    }
+    return response;
+  }
 }
