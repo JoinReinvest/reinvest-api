@@ -8,7 +8,7 @@ import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { Employer, EmployerInput } from 'LegalEntities/Domain/ValueObject/Employer';
 import { EmploymentStatus, EmploymentStatusInput } from 'LegalEntities/Domain/ValueObject/EmploymentStatus';
 import { EIN, SensitiveNumberInput } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
-import { Stakeholder, StakeholderInput } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { Stakeholder, StakeholderInput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { Uuid, ValidationError, ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { AnnualRevenue, NetIncome, NetWorth, NumberOfEmployees, ValueRangeInput } from 'LegalEntities/Domain/ValueObject/ValueRange';
 import { Industry, ValueStringInput } from 'LegalEntities/Domain/ValueObject/ValueString';
@@ -208,28 +208,8 @@ export class CompleteDraftAccount {
               });
               break;
             case 'stakeholders':
-              data.map((stakeholder: StakeholderInput) => {
-                const stakeholderSchema = { ...stakeholder } as StakeholderInput;
-                const {
-                  ssn: { ssn },
-                  idScan,
-                } = stakeholder;
-                // @ts-ignore
-                stakeholderSchema.ssn = ssn;
-                stakeholderSchema.id = this.uniqueIdGenerator.createUuid();
-
-                stakeholderSchema.idScan = idScan.map((document: { fileName: string; id: string }) => ({
-                  id: document.id,
-                  fileName: document.fileName,
-                  path: profileId,
-                }));
-                // @ts-ignore
-                const stakeholderAddEvents = draft.addStakeholder(Stakeholder.create(stakeholderSchema));
-
-                if (stakeholderAddEvents) {
-                  events = [...events, ...stakeholderAddEvents];
-                }
-              });
+              const stakeholdersEvents = this.addStakeholder(draft, data, profileId);
+              events = [...events, ...stakeholdersEvents];
               break;
             case 'removeStakeholders':
               data.map((idToRemove: { id: string }) => {
@@ -285,5 +265,51 @@ export class CompleteDraftAccount {
     }
 
     return draft;
+  }
+
+  private addStakeholder(draft: CompanyDraftAccount, data: StakeholderInput[], profileId: string): DomainEvent[] {
+    let events: DomainEvent[] = [];
+    data.map((stakeholder: StakeholderInput) => {
+      const stakeholderSchema = { ...stakeholder } as unknown as StakeholderSchema; // mapping stakeholder input to stakeholder schema
+      const { id, idScan } = stakeholder;
+      const isNewStakeholder = !id; // if id is not null, then it is an existing stakeholder
+      const existingStakeholder = !isNewStakeholder ? draft.getStakeholderById(id) : null;
+
+      if (!isNewStakeholder && existingStakeholder === null) {
+        throw new ValidationError(ValidationErrorEnum.NOT_FOUND, 'stakeholder', id);
+      }
+
+      const ssn = stakeholder?.ssn?.ssn ?? null;
+
+      if (ssn === null) {
+        if (isNewStakeholder) {
+          throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, 'ssn');
+        } else {
+          // rewrite previous ssn
+          stakeholderSchema.ssn = (<Stakeholder>existingStakeholder).getRawSSN();
+        }
+      } else {
+        // update ssn
+        stakeholderSchema.ssn = ssn;
+      }
+
+      stakeholderSchema.id = isNewStakeholder ? this.uniqueIdGenerator.createUuid() : id;
+
+      stakeholderSchema.idScan = idScan.map((document: { fileName: string; id: string }) => ({
+        id: document.id,
+        fileName: document.fileName,
+        path: profileId,
+      }));
+
+      const stakeholderEvents = isNewStakeholder
+        ? draft.addStakeholder(Stakeholder.create(stakeholderSchema))
+        : draft.updateStakeholder(Stakeholder.create(stakeholderSchema));
+
+      if (stakeholderEvents) {
+        events = [...events, ...stakeholderEvents];
+      }
+    });
+
+    return events;
   }
 }

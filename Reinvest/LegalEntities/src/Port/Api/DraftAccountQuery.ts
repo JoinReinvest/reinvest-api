@@ -1,6 +1,7 @@
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
 import {
+  CompanyDraftAccountDefaultSchema,
   CompanyDraftAccountSchema,
   CorporateDraftAccount,
   DraftAccountState,
@@ -10,21 +11,19 @@ import {
   TrustDraftAccount,
 } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
 import { DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
-import { StakeholderInput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { AvatarOutput, AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
+import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
+
+export type CompanyDraftAccountOutput = CompanyDraftAccountDefaultSchema & {
+  companyDocuments: { fileName: string; id: string }[];
+  ein: { ein: string };
+  stakeholders: StakeholderOutput[];
+};
 
 export type DraftQuery = {
   avatar: AvatarOutput | null;
-  details:
-    | IndividualDraftAccountSchema
-    | (
-        | CompanyDraftAccountSchema
-        | {
-            companyDocuments: { fileName: string; id: string }[];
-            ein: string;
-            stakeholders: StakeholderInput[];
-          }
-      );
+  details: IndividualDraftAccountSchema | CompanyDraftAccountOutput;
   id: string;
   isCompleted: boolean;
   state: DraftAccountState;
@@ -65,18 +64,27 @@ export class DraftAccountQuery {
       return null;
     }
 
-    const { state, data } = draft.toObject();
+    const { state, data: draftData } = draft.toObject();
+    const data = draft.isIndividual() ? <IndividualDraftAccountSchema>draftData : this.transformDraftDataForCompany(<CompanyDraftAccountSchema>draftData);
 
-    // @ts-ignore
-    if (data.ein) {
-      // @ts-ignore
-      data.ein = { ein: data.ein.anonymized };
+    return {
+      id: draftId,
+      state: state,
+      isCompleted: draft.verifyCompletion(),
+      avatar: await this.avatarQuery.getAvatarForDraft(draft),
+      details: data,
+    };
+  }
+
+  private transformDraftDataForCompany(companySchemaData: CompanyDraftAccountSchema): CompanyDraftAccountOutput {
+    const data = { ...companySchemaData } as unknown as CompanyDraftAccountOutput; // mapping one type to another
+
+    if (companySchemaData.ein) {
+      data.ein = { ein: companySchemaData.ein.anonymized };
     }
 
-    // @ts-ignore
-    if (data.companyDocuments) {
-      // @ts-ignore
-      data.companyDocuments = data.companyDocuments.map((document: DocumentSchema) => {
+    if (companySchemaData.companyDocuments) {
+      data.companyDocuments = companySchemaData.companyDocuments.map((document: DocumentSchema) => {
         return {
           id: document.id,
           fileName: document.fileName,
@@ -84,32 +92,16 @@ export class DraftAccountQuery {
       });
     }
 
-    // @ts-ignore
-    if (data.stakeholders) {
-      // @ts-ignore
-      data.stakeholders = data.stakeholders.map((stakeholder: StakeholderSchema) => {
+    if (companySchemaData.stakeholders) {
+      data.stakeholders = companySchemaData.stakeholders.map((stakeholder: StakeholderSchema): StakeholderOutput => {
         return {
           ...stakeholder,
-          // @ts-ignore
-          ssn: stakeholder.ssn.anonymized,
-          domicile: {
-            type: stakeholder.domicile?.type,
-            birthCountry: stakeholder.domicile?.forGreenCard?.birthCountry ?? stakeholder.domicile?.forVisa?.birthCountry,
-            citizenshipCountry: stakeholder.domicile?.forGreenCard?.citizenshipCountry ?? stakeholder.domicile?.forVisa?.citizenshipCountry,
-            visaType: stakeholder.domicile?.forVisa?.visaType,
-          },
+          ssn: (<SensitiveNumberSchema>stakeholder.ssn).anonymized,
         };
       });
     }
 
-    return {
-      id: draftId,
-      state: state,
-      isCompleted: draft.verifyCompletion(),
-      // @ts-ignore
-      avatar: await this.avatarQuery.getAvatarForDraft(draft),
-      details: data,
-    };
+    return data;
   }
 
   async listDrafts(profileId: string): Promise<DraftsList> {
