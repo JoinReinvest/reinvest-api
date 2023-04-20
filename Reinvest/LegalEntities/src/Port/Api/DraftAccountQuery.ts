@@ -10,8 +10,9 @@ import {
   TrustDraftAccount,
 } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
 import { DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
-import { StakeholderInput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { StakeholderInput, StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { AvatarOutput, AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
+import { SensitiveNumber, SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 
 export type DraftQuery = {
   avatar: AvatarOutput | null;
@@ -87,17 +88,10 @@ export class DraftAccountQuery {
     // @ts-ignore
     if (data.stakeholders) {
       // @ts-ignore
-      data.stakeholders = data.stakeholders.map((stakeholder: StakeholderSchema) => {
+      data.stakeholders = data.stakeholders.map((stakeholder: StakeholderSchema): StakeholderOutput => {
         return {
           ...stakeholder,
-          // @ts-ignore
-          ssn: stakeholder.ssn.anonymized,
-          domicile: {
-            type: stakeholder.domicile?.type,
-            birthCountry: stakeholder.domicile?.forGreenCard?.birthCountry ?? stakeholder.domicile?.forVisa?.birthCountry,
-            citizenshipCountry: stakeholder.domicile?.forGreenCard?.citizenshipCountry ?? stakeholder.domicile?.forVisa?.citizenshipCountry,
-            visaType: stakeholder.domicile?.forVisa?.visaType,
-          },
+          ssn: (<SensitiveNumberSchema>stakeholder.ssn).anonymized,
         };
       });
     }

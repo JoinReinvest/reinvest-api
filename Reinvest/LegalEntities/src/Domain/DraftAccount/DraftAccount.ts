@@ -1,28 +1,38 @@
-import { CompanyAccount, CompanyAccountType } from 'LegalEntities/Domain/Accounts/CompanyAccount';
-import { IndividualAccount } from 'LegalEntities/Domain/Accounts/IndividualAccount';
-import { getAvatarRemoveEvent, LegalEntityAvatarRemoved, LegalEntityDocumentRemoved } from 'LegalEntities/Domain/Events/DocumentEvents';
-import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
-import { Company, CompanyName, CompanyNameInput, CompanyTypeInput } from 'LegalEntities/Domain/ValueObject/Company';
-import { Avatar, AvatarInput, CompanyDocuments, DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
-import { Employer, EmployerInput } from 'LegalEntities/Domain/ValueObject/Employer';
-import { EmploymentStatus, EmploymentStatusInput } from 'LegalEntities/Domain/ValueObject/EmploymentStatus';
-import { EIN, SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
-import { CompanyStakeholders, Stakeholder, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
-import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
-import { Uuid } from 'LegalEntities/Domain/ValueObject/TypeValidators';
-import { AnnualRevenue, NetIncome, NetWorth, NumberOfEmployees, ValueRangeInput } from 'LegalEntities/Domain/ValueObject/ValueRange';
-import { Industry, ValueStringInput } from 'LegalEntities/Domain/ValueObject/ValueString';
+import { CompanyAccount, CompanyAccountType } from "LegalEntities/Domain/Accounts/CompanyAccount";
+import { IndividualAccount } from "LegalEntities/Domain/Accounts/IndividualAccount";
+import {
+  getAvatarRemoveEvent,
+  LegalEntityAvatarRemoved,
+  LegalEntityDocumentRemoved
+} from "LegalEntities/Domain/Events/DocumentEvents";
+import { Address, AddressInput } from "LegalEntities/Domain/ValueObject/Address";
+import { Company, CompanyName, CompanyNameInput, CompanyTypeInput } from "LegalEntities/Domain/ValueObject/Company";
+import { Avatar, AvatarInput, CompanyDocuments, DocumentSchema } from "LegalEntities/Domain/ValueObject/Document";
+import { Employer, EmployerInput } from "LegalEntities/Domain/ValueObject/Employer";
+import { EmploymentStatus, EmploymentStatusInput } from "LegalEntities/Domain/ValueObject/EmploymentStatus";
+import { EIN, SensitiveNumberSchema } from "LegalEntities/Domain/ValueObject/SensitiveNumber";
+import { CompanyStakeholders, Stakeholder, StakeholderSchema } from "LegalEntities/Domain/ValueObject/Stakeholder";
+import { ToObject } from "LegalEntities/Domain/ValueObject/ToObject";
+import { Uuid } from "LegalEntities/Domain/ValueObject/TypeValidators";
+import {
+  AnnualRevenue,
+  NetIncome,
+  NetWorth,
+  NumberOfEmployees,
+  ValueRangeInput
+} from "LegalEntities/Domain/ValueObject/ValueRange";
+import { Industry, ValueStringInput } from "LegalEntities/Domain/ValueObject/ValueString";
 
 export enum DraftAccountState {
-  ACTIVE = 'ACTIVE',
-  OPENED = 'OPENED',
-  CANCELED = 'CANCELED',
+  ACTIVE = "ACTIVE",
+  OPENED = "OPENED",
+  CANCELED = "CANCELED",
 }
 
 export enum DraftAccountType {
-  INDIVIDUAL = 'INDIVIDUAL',
-  CORPORATE = 'CORPORATE',
-  TRUST = 'TRUST',
+  INDIVIDUAL = "INDIVIDUAL",
+  CORPORATE = "CORPORATE",
+  TRUST = "TRUST",
 }
 
 export type CompanyDraftAccountType = Exclude<DraftAccountType, DraftAccountType.INDIVIDUAL>;
@@ -88,7 +98,7 @@ export abstract class DraftAccount {
       case DraftAccountType.TRUST:
         return TrustDraftAccount.createTrust(profileId, draftId, state, data as CompanyDraftAccountSchema);
       default:
-        throw new Error('Draft type does not exist');
+        throw new Error("Draft type does not exist");
     }
   }
 
@@ -106,7 +116,7 @@ export abstract class DraftAccount {
       draftId: this.draftId,
       state: this.state,
       accountType: this.accountType,
-      data: {} as IndividualDraftAccountSchema | CompanyDraftAccountSchema,
+      data: {} as IndividualDraftAccountSchema | CompanyDraftAccountSchema
     };
   }
 
@@ -231,8 +241,8 @@ export class IndividualDraftAccount extends DraftAccount {
         employer: this.get(this.employer),
         netWorth: this.get(this.netWorth),
         netIncome: this.get(this.netIncome),
-        avatar: this.get(this.avatar),
-      },
+        avatar: this.get(this.avatar)
+      }
     };
   }
 
@@ -240,7 +250,7 @@ export class IndividualDraftAccount extends DraftAccount {
     const {
       profileId,
       draftId: accountId,
-      data: { employmentStatus, employer, netIncome, netWorth, avatar },
+      data: { employmentStatus, employer, netIncome, netWorth, avatar }
     } = this.toObject();
 
     return IndividualAccount.create({
@@ -250,7 +260,7 @@ export class IndividualDraftAccount extends DraftAccount {
       employer,
       netWorth,
       netIncome,
-      avatar,
+      avatar
     });
   }
 
@@ -348,8 +358,8 @@ export class CompanyDraftAccount extends DraftAccount {
         companyType: this.get(this.companyType),
         avatar: this.get(this.avatar),
         companyDocuments: this.get(this.documents),
-        stakeholders: this.get(this.stakeholders),
-      },
+        stakeholders: this.get(this.stakeholders)
+      }
     };
   }
 
@@ -357,7 +367,18 @@ export class CompanyDraftAccount extends DraftAccount {
     const {
       profileId,
       draftId: accountId,
-      data: { companyName, address, ein, annualRevenue, numberOfEmployees, industry, companyType, avatar, stakeholders, companyDocuments },
+      data: {
+        companyName,
+        address,
+        ein,
+        annualRevenue,
+        numberOfEmployees,
+        industry,
+        companyType,
+        avatar,
+        stakeholders,
+        companyDocuments
+      }
     } = this.toObject();
     const accountType = this.isCorporate() ? CompanyAccountType.CORPORATE : CompanyAccountType.TRUST;
 
@@ -375,7 +396,7 @@ export class CompanyDraftAccount extends DraftAccount {
       stakeholders,
       companyDocuments,
       accountType,
-      einHash: this.ein?.getHash() ?? '',
+      einHash: this.ein?.getHash() ?? ""
     });
   }
 
@@ -434,6 +455,10 @@ export class CompanyDraftAccount extends DraftAccount {
     return this.stakeholders?.addStakeholder(stakeholder) ?? [];
   }
 
+  updateStakeholder(stakeholder1: Stakeholder): LegalEntityDocumentRemoved[] {
+    return this.stakeholders?.updateStakeholder(stakeholder1) ?? [];
+  }
+
   removeStakeholder(id: Uuid): LegalEntityDocumentRemoved[] {
     return this.stakeholders?.removeStakeholder(id) ?? [];
   }
@@ -467,6 +492,12 @@ export class CompanyDraftAccount extends DraftAccount {
     }
 
     return !(!this.isIrrevocableTrust() && this.ein === null);
+  }
+
+  getStakeholderById(id: string): Stakeholder | null {
+    const stakeholder = this.stakeholders?.getStakeholderById(new Uuid(id));
+
+    return stakeholder ?? null;
   }
 }
 
