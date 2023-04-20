@@ -15,6 +15,8 @@ import { SynchronizationQuery } from 'Registration/Port/Api/SynchronizationQuery
 import { CompanyAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/CompanyAccountOpenedEventHandler';
 import { IndividualAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler';
 import { ProfileCompletedEventHandler } from 'Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler';
+import { RegistryQuery } from 'Registration/Port/Api/RegistryQuery';
+import { RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 
 export class PortsProvider {
   private config: Registration.Config;
@@ -36,7 +38,8 @@ export class PortsProvider {
         SynchronizeStakeholder,
       ])
       .addSingleton(NorthCapitalDocumentSynchronizationQuery, [NorthCapitalDocumentsSynchronizationRepository])
-      .addSingleton(NorthCapitalDocumentSynchronizationController, [NorthCapitalSynchronizer]);
+      .addSingleton(NorthCapitalDocumentSynchronizationController, [NorthCapitalSynchronizer])
+      .addSingleton(RegistryQuery, [RegistryQueryRepository]);
 
     // event handlers
     container

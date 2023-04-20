@@ -1,22 +1,31 @@
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
-import { PartyVerifierFactory } from 'Verification/IntegrationLogic/Verifier/PartyVerifierFactory';
+import { VerifierFactory } from 'Verification/IntegrationLogic/Verifier/VerifierFactory';
 
 export class AccountVerifier {
   static getClassName = () => 'AccountVerifier';
   private registrationService: RegistrationService;
-  private partyVerifierFactory: PartyVerifierFactory;
+  private verifierFactory: VerifierFactory;
 
-  constructor(registrationService: RegistrationService, partyVerifierFactory: PartyVerifierFactory) {
+  constructor(registrationService: RegistrationService, partyVerifierFactory: VerifierFactory) {
     this.registrationService = registrationService;
-    this.partyVerifierFactory = partyVerifierFactory;
+    this.verifierFactory = partyVerifierFactory;
   }
 
   async verifyAccount(profileId: string, accountId: string): Promise<boolean> {
-    // get account structure from registration module that includes all linked parties, entities and it's ids in north capital
+    try {
+      const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
+      const verifiers = await this.verifierFactory.createVerifiersFromAccountStructure(accountStructure);
 
-    // create party verifiers for all parties from party factory
-    // run verify method for all verifiers
-    // based on decisions from verifiers create verification actions
-    return true;
+      await this.verifierFactory.storeVerifiers(verifiers);
+      // create party verifiers for all parties from party factory
+      // run verify method for all verifiers
+      // based on decisions from verifiers create verification actions
+
+      return true;
+    } catch (error: any) {
+      console.error(error);
+
+      return false;
+    }
   }
 }

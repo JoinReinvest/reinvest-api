@@ -1,10 +1,10 @@
-import { Kysely } from 'kysely';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
+import { VerifierRecordsTable } from 'Verification/Adapter/Database/RegistrationSchema';
 
-// export const verificationMappingRegistryTable = 'verification_mapping_registry';
+export const verifierRecordsTable = 'verifier_records';
 
 export interface VerificationDatabase {
-  // [northCapitalDocumentsSynchronizationTable]: NorthCapitalDocumentsSynchronizationTable;
+  [verifierRecordsTable]: VerifierRecordsTable;
 }
 
 export const VerificationDatabaseAdapterInstanceProvider = 'VerificationDatabaseAdapterProvider';

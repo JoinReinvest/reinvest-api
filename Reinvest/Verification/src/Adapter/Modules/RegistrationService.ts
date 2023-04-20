@@ -1,25 +1,26 @@
-import { Verification } from 'Verification/index';
+import { Registration } from 'Registration/index';
+import { AccountStructure } from 'Verification/Domain/ValueObject/AccountStructure';
 
 /**
  * Registration Module ACL
  */
 export class RegistrationService {
   public static getClassName = () => 'RegistrationService';
-  private verificationModule: Verification.Main;
+  private registrationModule: Registration.Main;
 
-  constructor(verificationModule: Verification.Main) {
-    this.verificationModule = verificationModule;
+  constructor(registrationModule: Registration.Main) {
+    this.registrationModule = registrationModule;
   }
 
-  // async getProfile(profileId: string): Promise<ProfileForSynchronization | never> {
-  //   const api = this.verificationModule.api();
-  //
-  //   const profile = (await api.getProfileForSynchronization(profileId)) as ProfileForSynchronization | null;
-  //
-  //   if (profile === null) {
-  //     throw new Error(`Profile not found, profileId: ${profileId}`);
-  //   }
-  //
-  //   return profile;
-  // }
+  async getNorthCapitalAccountStructure(profileId: string, accountId: string) {
+    const api = this.registrationModule.api();
+
+    const accountStructure = (await api.getNorthCapitalAccountStructure(profileId, accountId)) as AccountStructure | null;
+
+    if (accountStructure === null) {
+      throw new Error(`Account structure not found or not ready, profileId: ${profileId}, accountId: ${accountId}`);
+    }
+
+    return accountStructure;
+  }
 }

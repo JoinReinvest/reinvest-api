@@ -1,1 +1,1 @@
-// export * as migration_20230320154400_reg_create_mapping_registry from './registration_1_create_mapping_registry';
+export * as migration_20230420152900_create_verifier_records from './verification_1_create_verifier_records';

@@ -3,7 +3,8 @@ import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationSe
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
 import { AccountVerifier } from 'Verification/IntegrationLogic/Verifier/AccountVerifier';
-import { PartyVerifierFactory } from 'Verification/IntegrationLogic/Verifier/PartyVerifierFactory';
+import { VerifierFactory } from 'Verification/IntegrationLogic/Verifier/VerifierFactory';
+import { VerificationRepository } from 'Verification/Adapter/Database/Repository/VerificationRepository';
 
 export class IntegrationServiceProvider {
   private config: Verification.Config;
@@ -13,6 +14,8 @@ export class IntegrationServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(PartyVerifierFactory, [VerificationNorthCapitalAdapter]).addSingleton(AccountVerifier, [RegistrationService, PartyVerifierFactory]);
+    container
+      .addSingleton(VerifierFactory, [VerificationNorthCapitalAdapter, VerificationRepository])
+      .addSingleton(AccountVerifier, [RegistrationService, VerifierFactory]);
   }
 }

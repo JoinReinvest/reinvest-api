@@ -13,6 +13,7 @@ import { VertaloAdapter } from 'Registration/Adapter/Vertalo/VertaloAdapter';
 import { VertaloSynchronizer } from 'Registration/Adapter/Vertalo/VertaloSynchronizer';
 import { EmailCreator } from 'Registration/Domain/EmailCreator';
 import { Registration } from 'Registration/index';
+import { RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 
 export class AdapterServiceProvider {
   private config: Registration.Config;
@@ -30,7 +31,8 @@ export class AdapterServiceProvider {
       .addSingleton(MappingRegistryRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator, EmailCreator])
       .addSingleton(NorthCapitalSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(NorthCapitalDocumentsSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
-      .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator]);
+      .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
+      .addSingleton(RegistryQueryRepository, [RegistrationDatabaseAdapterInstanceProvider]);
 
     // modules
     container.addSingleton(LegalEntitiesService, ['LegalEntities']).addSingleton(RegistrationDocumentsService, ['Documents']);
