@@ -24,7 +24,7 @@ export type StakeholderSchema = DefaultStakeholder & {
 
 export type StakeholderInput = DefaultStakeholder & {
   idScan: { fileName: string; id: string }[];
-  ssn: { ssn: string };
+  ssn?: { ssn: string };
 };
 
 export type StakeholderOutput = DefaultStakeholder & {
@@ -70,6 +70,10 @@ export class Stakeholder implements ToObject {
       domicile: this.domicile.toObject(),
       idScan: this.idScan.toObject(),
     };
+  }
+
+  getRawSSN(): string {
+    return this.ssn.decrypt();
   }
 
   getSSN(): SSN {
@@ -154,8 +158,29 @@ export class CompanyStakeholders implements ToObject {
     return events;
   }
 
+  updateStakeholder(stakeholderToUpdate: Stakeholder): LegalEntityDocumentRemoved[] {
+    let events: LegalEntityDocumentRemoved[] = [];
+    const stakeholderExists = this.getStakeholderById(stakeholderToUpdate.getId());
+
+    const stakeholders = this.stakeholders.filter((stakeholder: Stakeholder) => !stakeholder.isTheSameId(stakeholderToUpdate.getId())); // stakeholders without stakeholder to update
+    const stakeholderWithTheSameSSNExists = stakeholders.find((stakeholder: Stakeholder) => stakeholder.isTheSameSSN(stakeholderToUpdate.getSSN())); // validating if ssn is duplicated
+
+    if (stakeholderWithTheSameSSNExists) {
+      throw new ValidationError(ValidationErrorEnum.NOT_UNIQUE, 'ssn', stakeholderToUpdate.getId().toString());
+    }
+
+    if (stakeholderExists) {
+      events = stakeholderExists.removeDocumentsIfDifferent(stakeholderToUpdate.getDocuments());
+    }
+
+    stakeholders.push(stakeholderToUpdate);
+    this.stakeholders = stakeholders;
+
+    return events;
+  }
+
   removeStakeholder(id: Uuid): LegalEntityDocumentRemoved[] {
-    const stakeholderToRemove = this.stakeholders.find((stakeholder: Stakeholder) => stakeholder.isTheSameId(id));
+    const stakeholderToRemove = this.getStakeholderById(id);
     this.stakeholders = this.stakeholders.filter((doc: Stakeholder) => !doc.isTheSameId(id));
 
     if (stakeholderToRemove) {
@@ -174,5 +199,9 @@ export class CompanyStakeholders implements ToObject {
     });
 
     return events;
+  }
+
+  getStakeholderById(id: Uuid): Stakeholder | undefined {
+    return this.stakeholders.find((stakeholder: Stakeholder) => stakeholder.isTheSameId(id));
   }
 }

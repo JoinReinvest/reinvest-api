@@ -13,6 +13,7 @@ export enum ValidationErrorEnum {
   NOT_UNIQUE = 'NOT_UNIQUE',
   NOT_ACTIVE = 'NOT_ACTIVE',
   WRONG_TYPE = 'WRONG_TYPE',
+  NOT_FOUND = 'NOT_FOUND',
 }
 
 export type ValidationErrorType = {

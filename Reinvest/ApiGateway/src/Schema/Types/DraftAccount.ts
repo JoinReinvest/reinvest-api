@@ -203,14 +203,15 @@ const corporateTrustSchema = `
     }
 
     input StakeholderInput {
+        """ IMPORTANT: id is required for update """
+        id: ID
         name: PersonName!
         dateOfBirth: DateOfBirthInput!
-        ssn: SSNInput!
+        """ IMPORTANT: ssn is required for create. If you want to update it, you need to provide it in the request with id """
+        ssn: SSNInput
         address: AddressInput!
         domicile: SimplifiedDomicileInput!
-        """
-        IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
-        """
+        """IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request"""
         idScan: [DocumentFileLinkInput]!
     }
 
