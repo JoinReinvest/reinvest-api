@@ -8,7 +8,7 @@ export type SNSConfig = {
 };
 
 export class SmsService {
-  public static getClassName = (): string => 'SmsService';
+  public static getClassName = (): string => 'SmsService3';
   private config: SNSConfig;
 
   constructor(config: SNSConfig) {

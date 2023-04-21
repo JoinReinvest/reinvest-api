@@ -1,4 +1,5 @@
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
+import { VerificationEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 
 export enum VerifierType {
   PROFILE = 'PROFILE',
@@ -6,23 +7,14 @@ export enum VerifierType {
   COMPANY = 'COMPANY',
 }
 
-export type VerificationParty = {
-  northCapitalId: string;
-  objectId: string;
-  objectType: 'party' | 'entity';
-};
-
-export type VerificationEvent = {
-  amlStatus: string;
-  kycStatus: string;
-  ncId: string;
+export type VerificationEventsList = {
+  list: VerificationEvent[];
 };
 
 export type VerificationState = {
-  aml: any[];
-  decisions: any[];
+  decision: VerificationDecision;
+  events: VerificationEventsList;
   id: string;
-  kyc: any[];
   ncId: string;
   type: VerifierType;
 };
@@ -30,7 +22,7 @@ export type VerificationState = {
 export interface Verifier {
   getVerificationState(): VerificationState;
 
-  handleVerificationEvent(event: VerificationEvent): Promise<void>;
+  handleVerificationEvent(event: VerificationEvent): void;
 
   verify(): Promise<VerificationDecision>;
 }

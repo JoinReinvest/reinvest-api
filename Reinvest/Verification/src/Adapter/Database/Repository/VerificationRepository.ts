@@ -1,3 +1,4 @@
+import { JSONObject } from 'HKEKTypes/Generics';
 import { VerificationDatabaseAdapterProvider, verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 import { InsertableVerifierRecord, VerifierRecord } from 'Verification/Adapter/Database/RegistrationSchema';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
@@ -15,7 +16,7 @@ export class VerificationRepository {
       return await this.databaseAdapterProvider
         .provide()
         .selectFrom(verifierRecordsTable)
-        .select(['aml', 'decisions', 'id', 'kyc', 'ncId', 'type', 'updatedDate'])
+        .select(['decisionJson', 'id', 'eventsJson', 'ncId', 'type', 'updatedDate'])
         .where(`id`, '=', id)
         .limit(1)
         .$castTo<VerifierRecord>()
@@ -30,9 +31,8 @@ export class VerificationRepository {
       id,
       ncId,
       type,
-      aml: [],
-      kyc: [],
-      decisions: [],
+      eventsJson: {},
+      decisionJson: {},
       updatedDate: new Date(),
     };
   }
@@ -47,9 +47,8 @@ export class VerificationRepository {
         id: record.id,
         ncId: record.ncId,
         type: record.type,
-        aml: JSON.stringify(record.aml),
-        kyc: JSON.stringify(record.kyc),
-        decisions: JSON.stringify(record.decisions),
+        eventsJson: record.events as unknown as JSONObject,
+        decisionJson: <JSONObject>record.decision,
         updatedDate: new Date(),
         createdDate: new Date(),
       };
@@ -59,13 +58,11 @@ export class VerificationRepository {
       .provide()
       .insertInto(verifierRecordsTable)
       .values(recordsToStore)
-      // todo on conflict no work - verify why
       .onConflict(oc =>
         oc.column('id').doUpdateSet({
-          aml: eb => eb.ref(`${verifierRecordsTable}.aml`),
-          kyc: eb => eb.ref(`${verifierRecordsTable}.kyc`),
-          decisions: eb => eb.ref(`${verifierRecordsTable}.decisions`),
-          updatedDate: eb => eb.ref(`${verifierRecordsTable}.updatedDate`),
+          eventsJson: eb => eb.ref(`excluded.eventsJson`),
+          decisionJson: eb => eb.ref(`excluded.decisionJson`),
+          updatedDate: eb => eb.ref(`excluded.updatedDate`),
         }),
       )
       .execute();

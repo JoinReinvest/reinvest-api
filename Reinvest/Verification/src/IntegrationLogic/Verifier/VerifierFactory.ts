@@ -2,8 +2,9 @@ import { VerifierRecord } from 'Verification/Adapter/Database/RegistrationSchema
 import { VerificationRepository } from 'Verification/Adapter/Database/Repository/VerificationRepository';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { AccountStructure, IdToNCId } from 'Verification/Domain/ValueObject/AccountStructure';
-import { VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
+import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/Verifier';
+import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
 
 export class VerifierFactory {
   static getClassName = () => 'VerifierFactory';
@@ -64,9 +65,8 @@ export class VerifierFactory {
 
   private mapVerifiedRecordToState(verifierRecord: VerifierRecord): VerificationState {
     return {
-      aml: verifierRecord.aml,
-      kyc: verifierRecord.kyc,
-      decisions: verifierRecord.decisions,
+      events: verifierRecord.eventsJson as unknown as VerificationEventsList,
+      decision: verifierRecord.decisionJson as unknown as VerificationDecision,
       type: verifierRecord.type,
       id: verifierRecord.id,
       ncId: verifierRecord.ncId,

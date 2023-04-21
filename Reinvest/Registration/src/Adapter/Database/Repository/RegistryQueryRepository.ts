@@ -15,7 +15,7 @@ export type NCAccountStructureMapping = {
 };
 
 export class RegistryQueryRepository {
-  public static getClassName = (): string => 'MappingRegistryRepository';
+  public static getClassName = (): string => 'RegistryQueryRepository';
   private databaseAdapterProvider: RegistrationDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: RegistrationDatabaseAdapterProvider) {

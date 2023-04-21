@@ -37,7 +37,7 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     return partyId;
   }
 
-  async updateParty(northCapitalId: string, toUpdate: DictionaryType): Promise<void | never> {
+  async updateParty(northCapitalId: string, toUpdate: DictionaryType): Promise<string | never> {
     const endpoint = 'tapiv3/index.php/v3/updateParty';
     const data = {
       partyId: northCapitalId,
@@ -51,6 +51,8 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       partyDetails: [status],
     } = response;
     console.log({ action: 'Update north capital party', northCapitalId, statusCode, statusDesc, status });
+
+    return status;
   }
 
   async getParty(partyId: string): Promise<object | never> {

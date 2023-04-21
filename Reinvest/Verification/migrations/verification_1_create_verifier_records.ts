@@ -6,9 +6,8 @@ export async function up(db: Kysely<VerificationDatabase>): Promise<void> {
   await db.schema
     .createTable(verifierRecordsTable)
     .addColumn('id', 'uuid', col => col.primaryKey().notNull().unique())
-    .addColumn('aml', 'json', col => col.notNull())
-    .addColumn('kyc', 'json', col => col.notNull())
-    .addColumn('decisions', 'json', col => col.notNull())
+    .addColumn('eventsJson', 'json', col => col.notNull())
+    .addColumn('decisionJson', 'json', col => col.notNull())
     .addColumn('ncId', 'varchar(255)', col => col.notNull())
     .addColumn('type', 'varchar(255)', col => col.notNull())
     .addColumn('createdDate', 'timestamp', col => col.notNull().defaultTo(sql`now()`))

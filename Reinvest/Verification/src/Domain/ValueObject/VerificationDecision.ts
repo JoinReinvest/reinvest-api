@@ -7,6 +7,21 @@ export enum ActionName {
   REQUIRE_MANUAL_REVIEW = 'REQUIRE_MANUAL_REVIEW',
 }
 
+export enum VerificationDecisionType {
+  REQUEST_VERIFICATION = 'REQUEST_VERIFICATION',
+  APPROVED = 'APPROVED',
+  WAIT_FOR_SUPPORT = 'WAIT_FOR_SUPPORT',
+  UPDATE_REQUIRED = 'UPDATE_REQUIRED',
+  PROFILE_BANNED = 'PROFILE_BANNED',
+  ACCOUNT_BANNED = 'ACCOUNT_BANNED',
+  MANUAL_REVIEW_REQUIRED = 'MANUAL_REVIEW_REQUIRED',
+}
+
+export type VerificationDecision = {
+  decision: VerificationDecisionType;
+  reasons?: string[];
+};
+
 export type VerificationAction = {
   action: ActionName;
   onObjectId: string;
@@ -15,10 +30,5 @@ export type VerificationAction = {
 export type AccountVerificationDecision = {
   canUserContinueTheInvestment: boolean;
   isAccountVerified: boolean;
-  requiredActions: VerificationAction[];
-};
-
-export type VerificationDecision = {
-  isVerified: boolean;
   requiredActions: VerificationAction[];
 };
