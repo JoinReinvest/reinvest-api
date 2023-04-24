@@ -84,6 +84,40 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     }
   }
 
+  async getAmlVerificationOnly(partyId: string): Promise<VerificationEvent[]> {
+    const endpoint = 'tapiv3/index.php/v3/getKycAmlResponse';
+    const response = await this.postRequest(endpoint, { partyId, type: 'AML Only' });
+    try {
+      const { statusCode, statusDesc } = response;
+      const amlResponse = response['kycamlDetails'];
+      console.log({
+        action: 'Read AML verification status',
+        partyId,
+        statusCode,
+        statusDesc,
+        amlResponse,
+      });
+
+      return this.mapAMLResponseToVerificationResultEvents(amlResponse, partyId);
+    } catch (error: any) {
+      console.error({
+        action: 'North Capital automatic aml verification on entity. Invalid response',
+        partyId,
+        response,
+      });
+
+      return [
+        <VerificationNorthCapitalEvent>{
+          date: new Date(),
+          name: 'REQUEST_FAILED',
+          kind: 'VerificationNorthCapitalEvent',
+          ncId: partyId,
+          reason: error.message,
+        },
+      ];
+    }
+  }
+
   private mapKycResponseToVerificationResultEvents(kyc: any, partyId: string): VerificationResultEvent[] {
     const {
       response: { 'id-number': verificationId },
@@ -146,6 +180,95 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
         return VerificationStatus.DISAPPROVED;
       default:
         return VerificationStatus.PENDING;
+    }
+  }
+
+  async verifyEntityAml(partyId: string): Promise<VerificationEvent[]> {
+    const endpoint = 'tapiv3/index.php/v3/performAml';
+    const response = await this.postRequest(endpoint, { partyId });
+    try {
+      const { statusCode, statusDesc } = response;
+      const amlResponse = response['partyDetails'];
+      console.log({
+        action: 'Automatic entity AML verification',
+        partyId,
+        statusCode,
+        statusDesc,
+        amlResponse,
+      });
+
+      return this.mapAMLResponseToVerificationResultEvents(amlResponse, partyId);
+    } catch (error: any) {
+      console.error({
+        action: 'North Capital automatic aml verification on entity. Invalid response',
+        partyId,
+        response,
+      });
+
+      return [
+        <VerificationNorthCapitalEvent>{
+          date: new Date(),
+          name: 'REQUEST_FAILED',
+          kind: 'VerificationNorthCapitalEvent',
+          ncId: partyId,
+          reason: error.message,
+        },
+      ];
+    }
+  }
+
+  private mapAMLResponseToVerificationResultEvents(aml: any, partyId: string): VerificationResultEvent[] {
+    const {
+      response: { 'id-number': verificationId },
+      amlStatus,
+    } = aml;
+
+    return [
+      <VerificationResultEvent>{
+        kind: 'VerificationResult',
+        date: new Date(),
+        ncId: partyId,
+        reasons: [],
+        source: 'DIRECT',
+        status: this.mapVerificationStatus(amlStatus),
+        type: 'AML',
+        eventId: `aml-${verificationId}`,
+        verificationWay: 'AUTOMATIC',
+      },
+    ];
+  }
+
+  async getEntityVerificationStatus(partyId: string): Promise<VerificationEvent[]> {
+    const endpoint = 'tapiv3/index.php/v3/getKycAml'; // todo how to verify kyb status?
+    const response = await this.postRequest(endpoint, { partyId });
+    try {
+      const { statusCode, statusDesc } = response;
+      // const kycResponse = response['kycamlDetails']['kyc'];
+      // console.log({
+      //   action: 'Read verification status',
+      //   partyId,
+      //   statusCode,
+      //   statusDesc,
+      //   kycResponse,
+      // });
+
+      return [];
+    } catch (error: any) {
+      console.error({
+        action: 'North Capital automatic kyc/aml verification on parties. Invalid response',
+        partyId,
+        response,
+      });
+
+      return [
+        <VerificationNorthCapitalEvent>{
+          date: new Date(),
+          name: 'REQUEST_FAILED',
+          kind: 'VerificationNorthCapitalEvent',
+          ncId: partyId,
+          reason: error.message,
+        },
+      ];
     }
   }
 }

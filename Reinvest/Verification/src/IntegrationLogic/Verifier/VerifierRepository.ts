@@ -6,6 +6,7 @@ import { VerificationDecision } from 'Verification/Domain/ValueObject/Verificati
 import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileVerifier';
 import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/StakeholderVerifier';
+import { CompanyVerifier } from 'Verification/IntegrationLogic/Verifier/CompanyVerifier';
 
 export class VerifierRepository {
   static getClassName = () => 'VerifierRepository';
@@ -54,7 +55,8 @@ export class VerifierRepository {
     }
 
     if (accountStructure.type === 'COMPANY') {
-      // verifiers.push(await this.createCompanyVerifier(accountStructure.company));
+      verifiers.push(await this.createCompanyVerifier(<IdToNCId>accountStructure.company));
+
       if (accountStructure?.stakeholders && accountStructure.stakeholders.length > 0) {
         for (const stakeholder of accountStructure.stakeholders) {
           verifiers.push(await this.createStakeholderVerifier(stakeholder, accountStructure.account));
@@ -89,5 +91,11 @@ export class VerifierRepository {
     const verificationState = await this.findOrInitializeVerificationState(stakeholder.id, stakeholder.ncId, VerifierType.STAKEHOLDER);
 
     return new StakeholderVerifier(this.northCapitalAdapter, verificationState, account.id);
+  }
+
+  private async createCompanyVerifier(company: IdToNCId): Promise<CompanyVerifier> {
+    const verificationState = await this.findOrInitializeVerificationState(company.id, company.ncId, VerifierType.COMPANY);
+
+    return new CompanyVerifier(this.northCapitalAdapter, verificationState);
   }
 }

@@ -34,6 +34,9 @@ export class AccountVerifier {
         case VerificationDecisionType.PROFILE_BANNED:
           this.banProfile(investmentsVerifications, objectVerifications, requiredActions, decision);
           break;
+        case VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED:
+          this.manualVerificationRequired(investmentsVerifications, objectVerifications, requiredActions, decision);
+          break;
         default: {
           investmentsVerifications.push(false);
           objectVerifications.push(false);
@@ -96,6 +99,20 @@ export class AccountVerifier {
       action: ActionName.BAN_PROFILE,
       onObject: decision.onObject,
       reasons: decision.reasons,
+    });
+  }
+
+  private manualVerificationRequired(
+    investmentsVerifications: boolean[],
+    objectVerifications: boolean[],
+    requiredActions: VerificationAction[],
+    decision: VerificationDecision,
+  ) {
+    investmentsVerifications.push(true);
+    objectVerifications.push(false);
+    requiredActions.push({
+      action: ActionName.REQUIRE_MANUAL_REVIEW,
+      onObject: decision.onObject,
     });
   }
 }
