@@ -4,16 +4,29 @@ import { Verification } from 'Verification/index';
 const schema = `
     #graphql
     enum ActionName {
-        UPDATE_PROFILE
-        UPDATE_STAKEHOLDER
-        UPDATE_COMPANY
+        UPDATE_MEMBER
         BAN_ACCOUNT
         BAN_PROFILE
+        REQUIRE_MANUAL_REVIEW
+        REQUIRE_ADMIN_SUPPORT
+    }
+
+    enum VerificationObjectType {
+        PROFILE
+        COMPANY
+        STAKEHOLDER
+    }
+
+    type VerificationObject {
+        type: VerificationObjectType!
+        accountId: String
+        stakeholderId: String
     }
 
     type VerificationAction {
         action: ActionName!
-        onObjectId: String
+        onObject: VerificationObject!
+        reasons: [String]
     }
 
     type VerificationDecision {

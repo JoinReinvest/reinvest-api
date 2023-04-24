@@ -556,6 +556,21 @@ const northCapitalRouter = () => {
             socialSecurityNumber: '112-22-3345',
           };
           break;
+        case 'AML_FAIL':
+          toUpdate = {
+            firstName: 'Joseph',
+            lastName: 'Gilbert',
+            dob: '04-08-1943',
+            primAddress1: '123 Main Street',
+            primCity: 'MASSACHUSETTS',
+            primState: 'MA',
+            primZip: '02116',
+            primCountry: 'USA',
+            socialSecurityNumber: '666-00-0001',
+            AMLstatus: 'Pending',
+            KYCstatus: 'Pending',
+          };
+          break;
         default:
           throw new Error('Unknown verification type');
       }

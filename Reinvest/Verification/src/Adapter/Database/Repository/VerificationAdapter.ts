@@ -3,8 +3,8 @@ import { VerificationDatabaseAdapterProvider, verifierRecordsTable } from 'Verif
 import { InsertableVerifierRecord, VerifierRecord } from 'Verification/Adapter/Database/RegistrationSchema';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 
-export class VerificationRepository {
-  public static getClassName = (): string => 'VerificationRepository';
+export class VerificationAdapter {
+  public static getClassName = (): string => 'VerificationAdapter';
   private databaseAdapterProvider: VerificationDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: VerificationDatabaseAdapterProvider) {

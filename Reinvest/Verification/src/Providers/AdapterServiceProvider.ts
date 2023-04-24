@@ -3,7 +3,7 @@ import { createVerificationDatabaseAdapterProvider, VerificationDatabaseAdapterI
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
-import { VerificationRepository } from 'Verification/Adapter/Database/Repository/VerificationRepository';
+import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
 
 export class AdapterServiceProvider {
   private config: Verification.Config;
@@ -16,7 +16,7 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(VerificationDatabaseAdapterInstanceProvider, createVerificationDatabaseAdapterProvider(this.config.database))
-      .addSingleton(VerificationRepository, [VerificationDatabaseAdapterInstanceProvider]);
+      .addSingleton(VerificationAdapter, [VerificationDatabaseAdapterInstanceProvider]);
 
     //modules
     container.addSingleton(RegistrationService, ['Registration']);

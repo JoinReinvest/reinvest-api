@@ -1,33 +1,101 @@
-import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
-import { VerifierFactory } from 'Verification/IntegrationLogic/Verifier/VerifierFactory';
-import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
+import {
+  AccountVerificationDecision,
+  ActionName,
+  VerificationAction,
+  VerificationDecision,
+  VerificationDecisionType,
+} from 'Verification/Domain/ValueObject/VerificationDecision';
 
 export class AccountVerifier {
-  static getClassName = () => 'AccountVerifier';
-  private registrationService: RegistrationService;
-  private verifierFactory: VerifierFactory;
+  private profileId: string;
+  private accountId: string;
 
-  constructor(registrationService: RegistrationService, verifierFactory: VerifierFactory) {
-    this.registrationService = registrationService;
-    this.verifierFactory = verifierFactory;
+  constructor(profileId: string, accountId: string) {
+    this.profileId = profileId;
+    this.accountId = accountId;
   }
 
-  async verifyAccount(profileId: string, accountId: string): Promise<boolean> {
-    try {
-      const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
-      const verifiers = await this.verifierFactory.createVerifiersFromAccountStructure(accountStructure);
-      const decisions = await Promise.all(verifiers.map((verifier: Verifier) => verifier.verify()));
+  makeAccountVerificationDecision(membersDecisions: VerificationDecision[]): AccountVerificationDecision {
+    const investmentsVerifications: boolean[] = [];
+    const objectVerifications: boolean[] = [];
+    const requiredActions: VerificationAction[] = [];
 
-      await this.verifierFactory.storeVerifiers(verifiers);
-
-      // based on decisions from verifiers create verification actions
-      console.log({ decisions });
-
-      return true;
-    } catch (error: any) {
-      console.error(error);
-
-      return false;
+    for (const decision of membersDecisions) {
+      switch (decision.decision) {
+        case VerificationDecisionType.APPROVED:
+          this.approve(investmentsVerifications, objectVerifications);
+          break;
+        case VerificationDecisionType.WAIT_FOR_SUPPORT:
+          this.requireAdminSupport(investmentsVerifications, objectVerifications, requiredActions, decision);
+          break;
+        case VerificationDecisionType.UPDATE_REQUIRED:
+          this.updateRequired(investmentsVerifications, objectVerifications, requiredActions, decision);
+          break;
+        case VerificationDecisionType.PROFILE_BANNED:
+          this.banProfile(investmentsVerifications, objectVerifications, requiredActions, decision);
+          break;
+        default: {
+          investmentsVerifications.push(false);
+          objectVerifications.push(false);
+          break;
+        }
+      }
     }
+
+    return {
+      canUserContinueTheInvestment: investmentsVerifications.reduce((a, b) => a && b, true),
+      isAccountVerified: objectVerifications.reduce((a, b) => a && b, true),
+      requiredActions,
+    };
+  }
+
+  private approve(investmentsVerifications: boolean[], objectVerifications: boolean[]) {
+    investmentsVerifications.push(true);
+    objectVerifications.push(true);
+  }
+
+  private requireAdminSupport(
+    investmentsVerifications: boolean[],
+    objectVerifications: boolean[],
+    requiredActions: VerificationAction[],
+    decision: VerificationDecision,
+  ) {
+    investmentsVerifications.push(true);
+    objectVerifications.push(false);
+    requiredActions.push({
+      action: ActionName.REQUIRE_ADMIN_SUPPORT,
+      onObject: decision.onObject,
+      reasons: decision.reasons,
+    });
+  }
+
+  private updateRequired(
+    investmentsVerifications: boolean[],
+    objectVerifications: boolean[],
+    requiredActions: VerificationAction[],
+    decision: VerificationDecision,
+  ) {
+    investmentsVerifications.push(false);
+    objectVerifications.push(false);
+    requiredActions.push({
+      action: ActionName.UPDATE_MEMBER,
+      onObject: decision.onObject,
+      reasons: decision.reasons,
+    });
+  }
+
+  private banProfile(
+    investmentsVerifications: boolean[],
+    objectVerifications: boolean[],
+    requiredActions: VerificationAction[],
+    decision: VerificationDecision,
+  ) {
+    investmentsVerifications.push(false);
+    objectVerifications.push(false);
+    requiredActions.push({
+      action: ActionName.BAN_PROFILE,
+      onObject: decision.onObject,
+      reasons: decision.reasons,
+    });
   }
 }

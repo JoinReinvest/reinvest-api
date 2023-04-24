@@ -152,13 +152,27 @@ export class ProfileVerifier implements Verifier {
     if (wasFailedRequest) {
       decision = VerificationDecisionType.WAIT_FOR_SUPPORT;
 
-      return { decision, reasons: someReasons };
+      return {
+        decision,
+        reasons: someReasons,
+        onObject: {
+          type: VerifierType.PROFILE,
+          profileId: this.id,
+        },
+      };
     }
 
     if (amlStatus === VerificationStatus.DISAPPROVED) {
       decision = VerificationDecisionType.PROFILE_BANNED;
 
-      return { decision };
+      return {
+        decision,
+        onObject: {
+          type: VerifierType.PROFILE,
+          profileId: this.id,
+        },
+        reasons: ['AML verification failed'],
+      };
     }
 
     if (kycStatus === VerificationStatus.DISAPPROVED) {
@@ -172,18 +186,38 @@ export class ProfileVerifier implements Verifier {
 
       if (kycCounter >= 3) {
         decision = VerificationDecisionType.PROFILE_BANNED;
+        someReasons = ['Manual KYC verification failed'];
       }
 
-      return { decision, reasons: someReasons };
+      return {
+        decision,
+        reasons: someReasons,
+        onObject: {
+          type: VerifierType.PROFILE,
+          profileId: this.id,
+        },
+      };
     }
 
     if (kycStatus === VerificationStatus.APPROVED && amlStatus === VerificationStatus.APPROVED) {
       decision = VerificationDecisionType.APPROVED;
 
-      return { decision };
+      return {
+        decision,
+        onObject: {
+          type: VerifierType.PROFILE,
+          profileId: this.id,
+        },
+      };
     }
 
-    return { decision };
+    return {
+      decision,
+      onObject: {
+        type: VerifierType.PROFILE,
+        profileId: this.id,
+      },
+    };
   }
 
   // private isEventAllowedInCurrentState(event: VerificationEvent): boolean {

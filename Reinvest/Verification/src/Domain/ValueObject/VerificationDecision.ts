@@ -1,13 +1,15 @@
+import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
+
 export enum ActionName {
-  UPDATE_PROFILE = 'UPDATE_PROFILE',
-  UPDATE_STAKEHOLDER = 'UPDATE_STAKEHOLDER',
-  UPDATE_COMPANY = 'UPDATE_COMPANY',
+  UPDATE_MEMBER = 'UPDATE_MEMBER',
   BAN_ACCOUNT = 'BAN_ACCOUNT',
   BAN_PROFILE = 'BAN_PROFILE',
   REQUIRE_MANUAL_REVIEW = 'REQUIRE_MANUAL_REVIEW',
+  REQUIRE_ADMIN_SUPPORT = 'REQUIRE_ADMIN_SUPPORT',
 }
 
 export enum VerificationDecisionType {
+  UNKNOWN = 'UNKNOWN',
   REQUEST_VERIFICATION = 'REQUEST_VERIFICATION',
   APPROVED = 'APPROVED',
   WAIT_FOR_SUPPORT = 'WAIT_FOR_SUPPORT',
@@ -17,14 +19,23 @@ export enum VerificationDecisionType {
   MANUAL_REVIEW_REQUIRED = 'MANUAL_REVIEW_REQUIRED',
 }
 
+export type VerificationObject = {
+  type: VerifierType;
+  accountId?: string;
+  profileId?: string;
+  stakeholderId?: string;
+};
+
 export type VerificationDecision = {
   decision: VerificationDecisionType;
+  onObject: VerificationObject;
   reasons?: string[];
 };
 
 export type VerificationAction = {
   action: ActionName;
-  onObjectId: string;
+  onObject: VerificationObject;
+  reasons?: string[];
 };
 
 export type AccountVerificationDecision = {

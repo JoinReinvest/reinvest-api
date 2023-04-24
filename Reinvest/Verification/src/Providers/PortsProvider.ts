@@ -1,7 +1,8 @@
 import { ContainerInterface } from 'Container/Container';
+import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { Verification } from 'Verification/index';
 import { VerifyAccount } from 'Verification/IntegrationLogic/UseCase/VerifyAccount';
-import { AccountVerifier } from 'Verification/IntegrationLogic/Verifier/AccountVerifier';
+import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 
 export class PortsProvider {
   private config: Verification.Config;
@@ -12,6 +13,6 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     // api
-    container.addSingleton(VerifyAccount, [AccountVerifier]);
+    container.addSingleton(VerifyAccount, [RegistrationService, VerifierRepository]);
   }
 }

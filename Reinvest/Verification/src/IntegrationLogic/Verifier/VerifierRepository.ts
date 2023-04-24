@@ -1,19 +1,19 @@
 import { VerifierRecord } from 'Verification/Adapter/Database/RegistrationSchema';
-import { VerificationRepository } from 'Verification/Adapter/Database/Repository/VerificationRepository';
+import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { AccountStructure, IdToNCId } from 'Verification/Domain/ValueObject/AccountStructure';
 import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/Verifier';
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
 
-export class VerifierFactory {
-  static getClassName = () => 'VerifierFactory';
+export class VerifierRepository {
+  static getClassName = () => 'VerifierRepository';
   private northCapitalAdapter: VerificationNorthCapitalAdapter;
-  private verificationRepository: VerificationRepository;
+  private verificationAdapter: VerificationAdapter;
 
-  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter, verificationRepository: VerificationRepository) {
+  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter, verificationAdapter: VerificationAdapter) {
     this.northCapitalAdapter = northCapitalAdapter;
-    this.verificationRepository = verificationRepository;
+    this.verificationAdapter = verificationAdapter;
   }
 
   private async createProfileVerifier(profile: IdToNCId): Promise<ProfileVerifier> {
@@ -23,10 +23,10 @@ export class VerifierFactory {
   }
 
   private async findOrInitializeVerificationState(id: string, ncId: string, type: VerifierType): Promise<VerificationState> {
-    let verifierRecord = await this.verificationRepository.findVerifierRecord(id);
+    let verifierRecord = await this.verificationAdapter.findVerifierRecord(id);
 
     if (!verifierRecord) {
-      verifierRecord = this.verificationRepository.createVerifierRecord(id, ncId, type);
+      verifierRecord = this.verificationAdapter.createVerifierRecord(id, ncId, type);
     }
 
     return this.mapVerifiedRecordToState(verifierRecord);
@@ -41,7 +41,7 @@ export class VerifierFactory {
       verificationStates.push(verificationState);
     });
 
-    await this.verificationRepository.storeVerifierRecords(verificationStates);
+    await this.verificationAdapter.storeVerifierRecords(verificationStates);
   }
 
   async createVerifiersFromAccountStructure(accountStructure: AccountStructure): Promise<Verifier[]> {
