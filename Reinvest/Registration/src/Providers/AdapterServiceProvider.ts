@@ -4,6 +4,7 @@ import { createRegistrationDatabaseAdapterProvider, RegistrationDatabaseAdapterI
 import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { NorthCapitalDocumentsSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository';
 import { NorthCapitalSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalSynchronizationRepository';
+import { RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 import { VertaloSynchronizationRepository } from 'Registration/Adapter/Database/Repository/VertaloSynchronizationRepository';
 import { LegalEntitiesService } from 'Registration/Adapter/Modules/LegalEntitiesService';
 import { RegistrationDocumentsService } from 'Registration/Adapter/Modules/RegistrationDocumentsService';
@@ -13,7 +14,6 @@ import { VertaloAdapter } from 'Registration/Adapter/Vertalo/VertaloAdapter';
 import { VertaloSynchronizer } from 'Registration/Adapter/Vertalo/VertaloSynchronizer';
 import { EmailCreator } from 'Registration/Domain/EmailCreator';
 import { Registration } from 'Registration/index';
-import { RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 
 export class AdapterServiceProvider {
   private config: Registration.Config;

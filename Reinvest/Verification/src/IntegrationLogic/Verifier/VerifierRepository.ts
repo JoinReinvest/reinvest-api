@@ -2,9 +2,10 @@ import { VerifierRecord } from 'Verification/Adapter/Database/RegistrationSchema
 import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { AccountStructure, IdToNCId } from 'Verification/Domain/ValueObject/AccountStructure';
-import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
-import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/Verifier';
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
+import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
+import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileVerifier';
+import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/StakeholderVerifier';
 
 export class VerifierRepository {
   static getClassName = () => 'VerifierRepository';
@@ -52,6 +53,17 @@ export class VerifierRepository {
       return verifiers;
     }
 
+    if (accountStructure.type === 'COMPANY') {
+      // verifiers.push(await this.createCompanyVerifier(accountStructure.company));
+      if (accountStructure?.stakeholders && accountStructure.stakeholders.length > 0) {
+        for (const stakeholder of accountStructure.stakeholders) {
+          verifiers.push(await this.createStakeholderVerifier(stakeholder, accountStructure.account));
+        }
+      }
+
+      return verifiers;
+    }
+
     // verifiers.push(this.partyVerifierFactory.createCompanyVerifier(accountStructure.company));
 
     // if (accountStructure.stakeholders) {
@@ -71,5 +83,11 @@ export class VerifierRepository {
       id: verifierRecord.id,
       ncId: verifierRecord.ncId,
     };
+  }
+
+  private async createStakeholderVerifier(stakeholder: IdToNCId, account: IdToNCId): Promise<StakeholderVerifier> {
+    const verificationState = await this.findOrInitializeVerificationState(stakeholder.id, stakeholder.ncId, VerifierType.STAKEHOLDER);
+
+    return new StakeholderVerifier(this.northCapitalAdapter, verificationState, account.id);
   }
 }

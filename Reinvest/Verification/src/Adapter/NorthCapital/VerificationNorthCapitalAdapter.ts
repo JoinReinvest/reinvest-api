@@ -93,6 +93,10 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
 
     const qualifiers: string[] = [];
 
+    if (kyc?.response?.results?.key && kyc?.response?.results?.message && kyc?.response?.results?.key !== 'result.match') {
+      qualifiers.push(kyc?.response?.results?.message);
+    }
+
     if (kyc?.response?.qualifiers?.qualifier) {
       const qualifier = kyc?.response?.qualifiers?.qualifier;
 
