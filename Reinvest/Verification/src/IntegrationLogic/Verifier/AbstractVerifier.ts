@@ -44,11 +44,13 @@ export abstract class AbstractVerifier {
     amlStatus: VerificationStatus;
     kycCounter: number;
     kycStatus: VerificationStatus;
+    objectUpdatesCounter: number;
     reasons: string[];
     wasFailedRequest: boolean;
   } {
     let amlStatus = VerificationStatus.PENDING;
     let kycStatus = VerificationStatus.PENDING;
+    let objectUpdatesCounter = 0;
     let kycCounter = 0;
     let someReasons: string[] = [];
     let wasFailedRequest = false;
@@ -80,6 +82,14 @@ export abstract class AbstractVerifier {
         }
       }
 
+      if (kind === 'VerificationUserEvent') {
+        const { name } = <VerificationUserEvent>event;
+
+        if (name === 'OBJECT_UPDATED') {
+          objectUpdatesCounter++;
+        }
+      }
+
       if (kind === 'VerificationAdministrativeEvent') {
         const { name } = <VerificationAdministrativeEvent>event;
 
@@ -96,6 +106,7 @@ export abstract class AbstractVerifier {
       kycCounter,
       reasons: someReasons,
       wasFailedRequest,
+      objectUpdatesCounter,
     };
   }
 

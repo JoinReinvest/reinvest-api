@@ -5,6 +5,12 @@ import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/Abstrac
 
 export class CompanyVerifier extends AbstractVerifier implements Verifier {
   makeDecision(): VerificationDecision {
+    this.decision = this.makeDecisionForCompany();
+
+    return this.decision;
+  }
+
+  private makeDecisionForCompany(): VerificationDecision {
     const onObject = {
       type: this.type,
       accountId: this.id,

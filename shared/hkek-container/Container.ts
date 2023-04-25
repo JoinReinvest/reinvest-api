@@ -92,7 +92,7 @@ class Container implements ContainerInterface {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const containerSelf = this;
 
-    return async function (...rest) {
+    return async function (...rest: any[]) {
       const controller = containerSelf.getValue(tokenizedClass.getClassName()) as object;
 
       // eslint-disable-next-line security/detect-object-injection

@@ -1,4 +1,3 @@
-import { VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 
 export class UserVerificationActions {

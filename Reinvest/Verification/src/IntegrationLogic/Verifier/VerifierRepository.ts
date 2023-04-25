@@ -34,7 +34,7 @@ export class VerifierRepository {
   async storeVerifiers(verifiers: Verifier[]): Promise<void> {
     const verificationStates: VerificationState[] = [];
 
-    verifiers.forEach(verifier => {
+    verifiers.forEach((verifier: Verifier) => {
       const verificationState = verifier.getVerificationState();
 
       verificationStates.push(verificationState);

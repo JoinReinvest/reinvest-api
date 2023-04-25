@@ -11,10 +11,12 @@ export class StakeholderVerifier extends PartyVerifier implements Verifier {
   }
 
   makeDecision(): VerificationDecision {
-    return this.makeDecisionForParty({
+    this.decision = this.makeDecisionForParty({
       type: this.type,
       stakeholderId: this.id,
       accountId: this.accountId,
     });
+
+    return this.decision;
   }
 }

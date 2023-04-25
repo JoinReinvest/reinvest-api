@@ -6,7 +6,7 @@ import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/Abstrac
 export class PartyVerifier extends AbstractVerifier {
   protected makeDecisionForParty(onObject: VerificationObject): VerificationDecision {
     let decision: VerificationDecisionType = VerificationDecisionType.REQUEST_VERIFICATION;
-    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest } = this.analyzeEvents();
+    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest, objectUpdatesCounter } = this.analyzeEvents();
     let someReasons = reasons;
 
     if (wasFailedRequest) {
@@ -31,7 +31,11 @@ export class PartyVerifier extends AbstractVerifier {
 
     if (kycStatus === VerificationStatus.DISAPPROVED) {
       if (kycCounter <= 1) {
+        // if (objectUpdatesCounter === kycCounter) { // todo infinite loop - fix it
+        //   decision = VerificationDecisionType.REQUEST_VERIFICATION;
+        // } else {
         decision = VerificationDecisionType.UPDATE_REQUIRED;
+        // }
       }
 
       // if (kycCounter === 2) {

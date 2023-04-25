@@ -4,9 +4,11 @@ import { PartyVerifier } from 'Verification/IntegrationLogic/Verifier/PartyVerif
 
 export class ProfileVerifier extends PartyVerifier implements Verifier {
   makeDecision(): VerificationDecision {
-    return this.makeDecisionForParty({
+    this.decision = this.makeDecisionForParty({
       type: this.type,
       profileId: this.id,
     });
+
+    return this.decision;
   }
 }
