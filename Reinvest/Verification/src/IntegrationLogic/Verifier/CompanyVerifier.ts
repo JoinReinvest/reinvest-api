@@ -4,33 +4,6 @@ import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
 import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/AbstractVerifier';
 
 export class CompanyVerifier extends AbstractVerifier implements Verifier {
-  async verify(): Promise<VerificationDecision> {
-    let decision = this.makeDecision();
-
-    if ([VerificationDecisionType.REQUEST_AML_VERIFICATION].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.verifyEntityAml(this.ncId);
-
-      verificationResult?.forEach(event => {
-        this.handleVerificationEvent(event);
-      });
-
-      decision = this.makeDecision();
-      // todo revisit manual kyb decisions
-    } else if ([VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED, VerificationDecisionType.UPDATE_REQUIRED].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.getEntityVerificationStatus(this.ncId);
-
-      verificationResult?.forEach(event => {
-        this.handleVerificationEvent(event);
-      });
-
-      decision = this.makeDecision();
-    }
-
-    this.decision = decision;
-
-    return decision;
-  }
-
   makeDecision(): VerificationDecision {
     const onObject = {
       type: this.type,
@@ -77,7 +50,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
 
     if (kycStatus === VerificationStatus.DISAPPROVED) {
       if (kycCounter === 1) {
-        decision = VerificationDecisionType.UPDATE_REQUIRED;
+        decision = VerificationDecisionType.ENTITY_UPDATE_REQUIRED;
         someReasons = reasons;
       }
 

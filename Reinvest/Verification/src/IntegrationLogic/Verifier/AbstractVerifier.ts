@@ -1,4 +1,3 @@
-import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
   VerificationAdministrativeEvent,
@@ -6,19 +5,18 @@ import {
   VerificationNorthCapitalEvent,
   VerificationResultEvent,
   VerificationStatus,
+  VerificationUserEvent,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 
 export abstract class AbstractVerifier {
-  protected northCapitalAdapter: VerificationNorthCapitalAdapter;
   protected ncId: string;
   protected id: string;
   protected events: VerificationState['events'];
   protected decision: VerificationDecision;
   protected type: VerifierType;
 
-  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter, { ncId, id, events, decision, type }: VerificationState) {
-    this.northCapitalAdapter = northCapitalAdapter;
+  constructor({ ncId, id, events, decision, type }: VerificationState) {
     this.ncId = ncId;
     this.id = id;
     this.events = events;
@@ -148,6 +146,10 @@ export abstract class AbstractVerifier {
     return false;
   }
 
+  getPartyId(): string {
+    return this.ncId;
+  }
+
   recover(): void {
     this.handleVerificationEvent(<VerificationAdministrativeEvent>{
       kind: 'VerificationAdministrativeEvent',
@@ -155,5 +157,18 @@ export abstract class AbstractVerifier {
       date: new Date(),
       ncId: this.ncId,
     });
+  }
+
+  notifyAboutUpdate(): void {
+    this.handleVerificationEvent(<VerificationUserEvent>{
+      kind: 'VerificationUserEvent',
+      name: 'OBJECT_UPDATED',
+      date: new Date(),
+      ncId: this.ncId,
+    });
+  }
+
+  canBeUpdated(): boolean {
+    return this.decision.decision === VerificationDecisionType.UPDATE_REQUIRED;
   }
 }

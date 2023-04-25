@@ -27,7 +27,7 @@ export type VerificationAdministrativeEvent = VerificationEvent & {
 
 export type VerificationUserEvent = VerificationEvent & {
   kind: 'VerificationUserEvent';
-  name: 'PROFILE_UPDATED' | 'COMPANY_UPDATED' | 'STAKEHOLDER_UPDATED';
+  name: 'OBJECT_UPDATED';
 };
 
 export type VerificationNorthCapitalEvent = VerificationEvent & {

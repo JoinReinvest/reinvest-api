@@ -65,12 +65,11 @@ const eventsResolver = (...events: VerificationEvent[]): Promise<VerificationEve
 
 context('Given an investor has completed profile and synchronized with North Capital and all data is correct', () => {
   describe('When the system verifies the investor profile and returns the AML and KYC are approved', async () => {
-    const northCapitalAdapter = sinon.stubInterface<VerificationNorthCapitalAdapter>();
-    northCapitalAdapter.verifyParty.returns(eventsResolver(kycEvent, amlEvent));
-
     it('Then expect APPROVED decision', async () => {
-      const verifier = new ProfileVerifier(northCapitalAdapter, cleanVerifierState());
-      const result = await verifier.verify();
+      const verifier = new ProfileVerifier(cleanVerifierState());
+      verifier.handleVerificationEvent(kycEvent);
+      verifier.handleVerificationEvent(amlEvent);
+      const result = verifier.makeDecision();
 
       expect(result.decision).to.be.equal(VerificationDecisionType.APPROVED);
     });
@@ -79,18 +78,16 @@ context('Given an investor has completed profile and synchronized with North Cap
 
 context('Given an investor has completed profile and synchronized with North Capital, but is on the AML list', () => {
   describe('When the system verifies the investor profile and returns the AML is DISAPPROVED', async () => {
-    const northCapitalAdapter = sinon.stubInterface<VerificationNorthCapitalAdapter>();
-    const verifier = new ProfileVerifier(northCapitalAdapter, cleanVerifierState());
+    const verifier = new ProfileVerifier(cleanVerifierState());
 
-    northCapitalAdapter.verifyParty.returns(
-      eventsResolver(kycEvent, <VerificationResultEvent>{
-        ...amlEvent,
-        status: VerificationStatus.DISAPPROVED,
-      }),
-    );
+    verifier.handleVerificationEvent(kycEvent);
+    verifier.handleVerificationEvent(<VerificationResultEvent>{
+      ...amlEvent,
+      status: VerificationStatus.DISAPPROVED,
+    });
 
     it('Then expect PROFILE_BANNED decision', async () => {
-      const result = await verifier.verify();
+      const result = verifier.makeDecision();
 
       expect(result.decision).to.be.equal(VerificationDecisionType.PROFILE_BANNED);
     });
@@ -99,21 +96,16 @@ context('Given an investor has completed profile and synchronized with North Cap
 
 context('Given an investor has completed profile and synchronized with North Capital, but some data is incorrect', () => {
   describe('When the system verifies the investor profile and returns the KYC is DISAPPROVED', async () => {
-    const northCapitalAdapter = sinon.stubInterface<VerificationNorthCapitalAdapter>();
-    const verifier = new ProfileVerifier(northCapitalAdapter, cleanVerifierState());
-    northCapitalAdapter.verifyParty.returns(
-      eventsResolver(
-        <VerificationResultEvent>{
-          ...kycEvent,
-          status: VerificationStatus.DISAPPROVED,
-          reasons: ['Some reason'],
-        },
-        amlEvent,
-      ),
-    );
+    const verifier = new ProfileVerifier(cleanVerifierState());
+    verifier.handleVerificationEvent(<VerificationResultEvent>{
+      ...kycEvent,
+      status: VerificationStatus.DISAPPROVED,
+      reasons: ['Some reason'],
+    });
+    verifier.handleVerificationEvent(amlEvent);
 
     it('Then expect UPDATE_REQUIRED decision', async () => {
-      const result = await verifier.verify();
+      const result = verifier.makeDecision();
       const [reason] = <string[]>result?.reasons;
       expect(result.decision).to.be.equal(VerificationDecisionType.UPDATE_REQUIRED);
       expect(reason).to.be.equal('Some reason');
@@ -122,24 +114,22 @@ context('Given an investor has completed profile and synchronized with North Cap
 });
 
 context('Given an investor has completed profile and synchronized with North Capital, but North Capital is unavailable', () => {
-  const northCapitalAdapter = sinon.stubInterface<VerificationNorthCapitalAdapter>();
-  const verifier = new ProfileVerifier(northCapitalAdapter, cleanVerifierState());
+  const verifier = new ProfileVerifier(cleanVerifierState());
   describe('When the system verifies the investor profile and returns an error', async () => {
-    northCapitalAdapter.verifyParty.returns(eventsResolver(errorEvent));
+    verifier.handleVerificationEvent(errorEvent);
 
     it('Then expect WAIT_FOR_SUPPORT decision', async () => {
-      const result = await verifier.verify();
+      const result = verifier.makeDecision();
       const [reason] = <string[]>result?.reasons;
       expect(result.decision).to.be.equal(VerificationDecisionType.WAIT_FOR_SUPPORT);
       expect(reason).to.be.equal(errorEvent.reason);
     });
 
     describe('When the admin fixed an error and recovered verification', async () => {
-      it('Then expect APPROVED decision', async () => {
-        northCapitalAdapter.verifyParty.returns(eventsResolver(kycEvent, amlEvent));
+      it('Then expect REQUEST_VERIFICATION decision', async () => {
         verifier.recover();
-        const result = await verifier.verify();
-        expect(result.decision).to.be.equal(VerificationDecisionType.APPROVED);
+        const result = verifier.makeDecision();
+        expect(result.decision).to.be.equal(VerificationDecisionType.REQUEST_VERIFICATION);
       });
     });
   });

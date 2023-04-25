@@ -4,28 +4,6 @@ import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/AbstractVerifier';
 
 export class PartyVerifier extends AbstractVerifier {
-  protected async verifyParty(decision: VerificationDecision): Promise<boolean> {
-    if ([VerificationDecisionType.REQUEST_VERIFICATION].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.verifyParty(this.ncId);
-
-      verificationResult?.forEach(event => {
-        this.handleVerificationEvent(event);
-      });
-
-      return true;
-    } else if ([VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED, VerificationDecisionType.UPDATE_REQUIRED].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.getPartyVerificationStatus(this.ncId);
-
-      verificationResult?.forEach(event => {
-        this.handleVerificationEvent(event);
-      });
-
-      return true;
-    }
-
-    return false;
-  }
-
   protected makeDecisionForParty(onObject: VerificationObject): VerificationDecision {
     let decision: VerificationDecisionType = VerificationDecisionType.REQUEST_VERIFICATION;
     const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest } = this.analyzeEvents();

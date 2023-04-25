@@ -20,13 +20,17 @@ export type VerificationState = {
 };
 
 export interface Verifier {
+  canBeUpdated(): boolean;
+
+  getPartyId(): string;
+
   getVerificationState(): VerificationState;
 
   handleVerificationEvent(event: VerificationEvent): void;
 
   makeDecision(): VerificationDecision;
 
-  recover(): void;
+  notifyAboutUpdate(): void;
 
-  verify(): Promise<VerificationDecision>;
+  recover(): void;
 }

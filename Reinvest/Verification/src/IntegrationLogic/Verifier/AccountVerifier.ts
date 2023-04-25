@@ -29,6 +29,7 @@ export class AccountVerifier {
           this.requireAdminSupport(investmentsVerifications, objectVerifications, requiredActions, decision);
           break;
         case VerificationDecisionType.UPDATE_REQUIRED:
+        case VerificationDecisionType.ENTITY_UPDATE_REQUIRED:
           this.updateRequired(investmentsVerifications, objectVerifications, requiredActions, decision);
           break;
         case VerificationDecisionType.PROFILE_BANNED:
