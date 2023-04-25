@@ -35,16 +35,19 @@ export type IndividualDraftAccountSchema = {
   netWorth: ValueRangeInput | null;
 };
 
-export type CompanyDraftAccountSchema = {
+export type CompanyDraftAccountDefaultSchema = {
   address: AddressInput;
   annualRevenue: ValueRangeInput;
   avatar: AvatarInput | null;
-  companyDocuments: DocumentSchema[];
   companyName: CompanyNameInput;
   companyType: CompanyTypeInput;
-  ein: SensitiveNumberSchema;
   industry: ValueStringInput;
   numberOfEmployees: ValueRangeInput;
+};
+
+export type CompanyDraftAccountSchema = CompanyDraftAccountDefaultSchema & {
+  companyDocuments: DocumentSchema[];
+  ein: SensitiveNumberSchema;
   stakeholders: StakeholderSchema[];
 };
 
@@ -434,6 +437,10 @@ export class CompanyDraftAccount extends DraftAccount {
     return this.stakeholders?.addStakeholder(stakeholder) ?? [];
   }
 
+  updateStakeholder(stakeholder1: Stakeholder): LegalEntityDocumentRemoved[] {
+    return this.stakeholders?.updateStakeholder(stakeholder1) ?? [];
+  }
+
   removeStakeholder(id: Uuid): LegalEntityDocumentRemoved[] {
     return this.stakeholders?.removeStakeholder(id) ?? [];
   }
@@ -467,6 +474,12 @@ export class CompanyDraftAccount extends DraftAccount {
     }
 
     return !(!this.isIrrevocableTrust() && this.ein === null);
+  }
+
+  getStakeholderById(id: string): Stakeholder | null {
+    const stakeholder = this.stakeholders?.getStakeholderById(new Uuid(id));
+
+    return stakeholder ?? null;
   }
 }
 

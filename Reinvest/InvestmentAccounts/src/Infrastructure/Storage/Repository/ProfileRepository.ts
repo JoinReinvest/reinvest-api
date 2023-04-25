@@ -1,10 +1,10 @@
+import Profile from 'InvestmentAccounts/Domain/ProfileAggregate/Profile';
+import { InvestmentAccountDbProvider } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
+import { ProfileSnapshotChanged } from 'InvestmentAccounts/Infrastructure/Storage/Queries/Events/ProfileSnapshotChanged';
+import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { AggregateRepository } from 'SimpleAggregator/Storage/AggregateRepository';
 import { AggregateState, DomainEvent } from 'SimpleAggregator/Types';
-import { InvestmentAccountDbProvider } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
-import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
-import Profile from 'InvestmentAccounts/Domain/ProfileAggregate/Profile';
-import { ProfileSnapshotChanged } from 'InvestmentAccounts/Infrastructure/Storage/Queries/Events/ProfileSnapshotChanged';
-import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class ProfileRepository {
   public static getClassName = (): string => 'ProfileRepository';
@@ -40,6 +40,7 @@ export class ProfileRepository {
       return new Profile(aggregateState);
     } catch (error: any) {
       console.log(`Aggregate restoration info: aggregate ${profileId} not exists`);
+
       return null;
     }
   }

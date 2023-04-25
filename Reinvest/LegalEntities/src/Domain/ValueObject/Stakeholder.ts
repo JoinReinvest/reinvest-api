@@ -2,41 +2,32 @@ import { getDocumentRemoveEvent, LegalEntityDocumentRemoved } from 'LegalEntitie
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DateOfBirth, DateOfBirthInput } from 'LegalEntities/Domain/ValueObject/DateOfBirth';
 import { DocumentSchema, IdentityDocument } from 'LegalEntities/Domain/ValueObject/Document';
-import { Domicile, DomicileInput, DomicileType } from 'LegalEntities/Domain/ValueObject/Domicile';
-import { Id } from 'LegalEntities/Domain/ValueObject/Id';
+import { SimplifiedDomicile, SimplifiedDomicileInput } from 'LegalEntities/Domain/ValueObject/Domicile';
 import { PersonalName, PersonalNameInput } from 'LegalEntities/Domain/ValueObject/PersonalName';
-import { SensitiveNumberInput, SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
+import { SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
-import { NonEmptyString, Uuid, ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
-import { DomainEvent } from 'SimpleAggregator/Types';
+import { Uuid, ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 
 export type DefaultStakeholder = {
   address: AddressInput;
   dateOfBirth: DateOfBirthInput;
+  domicile: SimplifiedDomicileInput;
   id: string;
   label: string;
   name: PersonalNameInput;
 };
 
 export type StakeholderSchema = DefaultStakeholder & {
-  domicile: DomicileInput;
   idScan: DocumentSchema[];
   ssn: SensitiveNumberSchema | string;
 };
 
 export type StakeholderInput = DefaultStakeholder & {
-  domicile: DomicileInput;
   idScan: { fileName: string; id: string }[];
-  ssn: { ssn: string };
+  ssn?: { ssn: string };
 };
 
 export type StakeholderOutput = DefaultStakeholder & {
-  domicile: {
-    birthCountry?: string;
-    citizenshipCountry?: string;
-    type?: DomicileType;
-    visaType?: string;
-  };
   idScan: DocumentSchema[];
   ssn: string;
 };
@@ -46,11 +37,11 @@ export class Stakeholder implements ToObject {
   private name: PersonalName;
   private dateOfBirth: DateOfBirth;
   private address: Address;
-  private domicile: Domicile;
+  private domicile: SimplifiedDomicile;
   private idScan: IdentityDocument;
   private id: Uuid;
 
-  constructor(id: Uuid, ssn: SSN, name: PersonalName, dateOfBirth: DateOfBirth, address: Address, domicile: Domicile, idScan: IdentityDocument) {
+  constructor(id: Uuid, ssn: SSN, name: PersonalName, dateOfBirth: DateOfBirth, address: Address, domicile: SimplifiedDomicile, idScan: IdentityDocument) {
     this.id = id;
     this.ssn = ssn;
     this.name = name;
@@ -81,6 +72,10 @@ export class Stakeholder implements ToObject {
     };
   }
 
+  getRawSSN(): string {
+    return this.ssn.decrypt();
+  }
+
   getSSN(): SSN {
     return this.ssn;
   }
@@ -96,7 +91,7 @@ export class Stakeholder implements ToObject {
       const personalName = PersonalName.create(name);
       const dateOfBirthObject = DateOfBirth.create(dateOfBirth);
       const addressObject = Address.create(address);
-      const domicileObject = Domicile.create(domicile);
+      const domicileObject = SimplifiedDomicile.create(domicile);
       const documents = IdentityDocument.create(idScan);
       const ssnObject = SSN.create(ssn);
 
@@ -163,8 +158,29 @@ export class CompanyStakeholders implements ToObject {
     return events;
   }
 
+  updateStakeholder(stakeholderToUpdate: Stakeholder): LegalEntityDocumentRemoved[] {
+    let events: LegalEntityDocumentRemoved[] = [];
+    const stakeholderExists = this.getStakeholderById(stakeholderToUpdate.getId());
+
+    const stakeholders = this.stakeholders.filter((stakeholder: Stakeholder) => !stakeholder.isTheSameId(stakeholderToUpdate.getId())); // stakeholders without stakeholder to update
+    const stakeholderWithTheSameSSNExists = stakeholders.find((stakeholder: Stakeholder) => stakeholder.isTheSameSSN(stakeholderToUpdate.getSSN())); // validating if ssn is duplicated
+
+    if (stakeholderWithTheSameSSNExists) {
+      throw new ValidationError(ValidationErrorEnum.NOT_UNIQUE, 'ssn', stakeholderToUpdate.getId().toString());
+    }
+
+    if (stakeholderExists) {
+      events = stakeholderExists.removeDocumentsIfDifferent(stakeholderToUpdate.getDocuments());
+    }
+
+    stakeholders.push(stakeholderToUpdate);
+    this.stakeholders = stakeholders;
+
+    return events;
+  }
+
   removeStakeholder(id: Uuid): LegalEntityDocumentRemoved[] {
-    const stakeholderToRemove = this.stakeholders.find((stakeholder: Stakeholder) => stakeholder.isTheSameId(id));
+    const stakeholderToRemove = this.getStakeholderById(id);
     this.stakeholders = this.stakeholders.filter((doc: Stakeholder) => !doc.isTheSameId(id));
 
     if (stakeholderToRemove) {
@@ -183,5 +199,9 @@ export class CompanyStakeholders implements ToObject {
     });
 
     return events;
+  }
+
+  getStakeholderById(id: Uuid): Stakeholder | undefined {
+    return this.stakeholders.find((stakeholder: Stakeholder) => stakeholder.isTheSameId(id));
   }
 }

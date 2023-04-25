@@ -13,6 +13,7 @@ export enum ValidationErrorEnum {
   NOT_UNIQUE = 'NOT_UNIQUE',
   NOT_ACTIVE = 'NOT_ACTIVE',
   WRONG_TYPE = 'WRONG_TYPE',
+  NOT_FOUND = 'NOT_FOUND',
 }
 
 export type ValidationErrorType = {
@@ -70,10 +71,6 @@ export class AnyString {
   }
 }
 
-export class Money {
-  constructor() {}
-}
-
 export class IsoDate {
   constructor(date: string) {
     if (!date || !DateTime.isValid(date, 'YYYY-MM-DD')) {
@@ -104,8 +101,4 @@ export class Uuid {
   static create(id: string): Uuid {
     return new Uuid(id);
   }
-}
-
-export class Url {
-  constructor() {}
 }

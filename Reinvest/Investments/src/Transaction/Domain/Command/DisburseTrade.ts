@@ -1,5 +1,5 @@
-import { TransactionId } from "../ValueObject/TransactionId";
-import { TransactionCommand } from "./TransactionCommand";
+import { TransactionId } from '../ValueObject/TransactionId';
+import { TransactionCommand } from './TransactionCommand';
 
 export class DisburseTrade implements TransactionCommand {
   transactionCommandGuard = true;

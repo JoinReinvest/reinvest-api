@@ -1,16 +1,37 @@
 # REINVEST API CHANGELOG
 
+## 1.10.1 - 04/20/2023
+
+* Update stakeholder in draft by id:
+    * if `id` field for stakeholder is provided, then stakeholder with the id will be updated - `UPDATE MODE`
+    * if not `id` field for stakeholder is provided, then new stakeholder will be created - `CREATE MODE`
+    * in `UPDATE MODE`:
+        * ssn is optional
+        * if ssn is provided, then it must be unique for all stakeholders in the draft
+        * if ssn is provided, then it will be updated
+        * rest of all fields are required
+    * in `CREATE MODE`:
+        * ssn is required
+        * ssn must be unique for all stakeholders in the draft
+        * if ssn is not unique, then existing stakeholder with this ssn will be overwritten
+
+## 1.10.0 - 04/18/2023
+
+* Updated Stakeholder domicile
+    * New type `SimplifiedDomicile` that accept only values `RESIDENT` and `CITIZEN`
+
 ## 1.9.1 - 04/17/2023
 
 * Removing documents from s3 bucket for documents and avatar
-  * API removes files from s3 automatically if they are not used anymore
-  * If you stopped using specific documentId, you can't re-use it again
-  * Auto-removal files happens when:
-    * avatar id changes (for individual/corporate/trust accounts) - the previous file is deleted
-    * one or more document ids for idScans changes (for profile/stakeholder) - the previous files are deleted
-    * explicitly run `removeCompanyDocuments`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount` mutation
-    * explicitly run `removeStakeholder`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount` mutation
-    * remove draft
+    * API removes files from s3 automatically if they are not used anymore
+    * If you stopped using specific documentId, you can't re-use it again
+    * Auto-removal files happens when:
+        * avatar id changes (for individual/corporate/trust accounts) - the previous file is deleted
+        * one or more document ids for idScans changes (for profile/stakeholder) - the previous files are deleted
+        * explicitly run `removeCompanyDocuments`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount`
+          mutation
+        * explicitly run `removeStakeholder`' for `completeCorporateDraftAccount`/`completeTrustDraftAccount` mutation
+        * remove draft
 
 ## 1.9.0 - 04/14/2023
 

@@ -1,6 +1,6 @@
-import {SessionContext} from "ApiGateway/index";
-import {Identity} from "Identity/index";
-import {GraphQLError} from "graphql";
+import { SessionContext } from 'ApiGateway/index';
+import { GraphQLError } from 'graphql';
+import { Identity } from 'Identity/index';
 
 const schema = `
     #graphql
@@ -37,56 +37,45 @@ const schema = `
     }
 `;
 
-
 export const PhoneNumberVerification = {
-    typeDefs: schema,
-    resolvers: {
-        Query: {
-            phoneCompleted: async (parent: any,
-                                   input: undefined,
-                                   {userId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Identity.ApiType>(Identity);
+  typeDefs: schema,
+  resolvers: {
+    Query: {
+      phoneCompleted: async (parent: any, input: undefined, { userId, modules }: SessionContext) => {
+        const api = modules.getApi<Identity.ApiType>(Identity);
 
-                return api.isPhoneNumberCompleted(userId);
-            },
-            userInvitationLink: async (parent: any,
-                                       data: any,
-                                       {userId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Identity.ApiType>(Identity);
-                const incentiveLink = await api.getUserInvitationLink(userId);
-                if (incentiveLink === null) {
-                    throw new GraphQLError('Link does not exist');
-                }
+        return api.isPhoneNumberCompleted(userId);
+      },
+      userInvitationLink: async (parent: any, data: any, { userId, modules }: SessionContext) => {
+        const api = modules.getApi<Identity.ApiType>(Identity);
+        const incentiveLink = await api.getUserInvitationLink(userId);
 
-                return {url: incentiveLink};
-            },
-        },
-        Mutation: {
-            setPhoneNumber: async (parent: any,
-                                   {
-                                       countryCode,
-                                       phoneNumber,
-                                       isSmsAllowed
-                                   }: { countryCode: string, phoneNumber: string, isSmsAllowed: boolean },
-                                   {userId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Identity.ApiType>(Identity);
-                return api.setPhoneNumber(userId, countryCode, phoneNumber, isSmsAllowed);
-            },
-            verifyPhoneNumber: async (parent: any,
-                                      {
-                                          countryCode,
-                                          phoneNumber,
-                                          authCode
-                                      }: { countryCode: string, phoneNumber: string, authCode: string },
-                                      {userId, modules}: SessionContext
-            ) => {
-                const api = modules.getApi<Identity.ApiType>(Identity);
-                return api.verifyPhoneNumber(userId, countryCode, phoneNumber, authCode);
-            },
+        if (incentiveLink === null) {
+          throw new GraphQLError('Link does not exist');
         }
-    }
-}
 
+        return { url: incentiveLink };
+      },
+    },
+    Mutation: {
+      setPhoneNumber: async (
+        parent: any,
+        { countryCode, phoneNumber, isSmsAllowed }: { countryCode: string; isSmsAllowed: boolean; phoneNumber: string },
+        { userId, modules }: SessionContext,
+      ) => {
+        const api = modules.getApi<Identity.ApiType>(Identity);
+
+        return api.setPhoneNumber(userId, countryCode, phoneNumber, isSmsAllowed);
+      },
+      verifyPhoneNumber: async (
+        parent: any,
+        { countryCode, phoneNumber, authCode }: { authCode: string; countryCode: string; phoneNumber: string },
+        { userId, modules }: SessionContext,
+      ) => {
+        const api = modules.getApi<Identity.ApiType>(Identity);
+
+        return api.verifyPhoneNumber(userId, countryCode, phoneNumber, authCode);
+      },
+    },
+  },
+};

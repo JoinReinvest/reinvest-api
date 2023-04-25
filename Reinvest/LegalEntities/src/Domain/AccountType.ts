@@ -1,5 +1,5 @@
 export enum AccountType {
-    INDIVIDUAL = "INDIVIDUAL",
-    CORPORATE = "CORPORATE",
-    TRUST = "TRUST"
+  INDIVIDUAL = 'INDIVIDUAL',
+  CORPORATE = 'CORPORATE',
+  TRUST = 'TRUST',
 }

@@ -1,8 +1,8 @@
 export interface AggregateTable {
-    aggregateId: string;
-    dateCreated: string,
-    version: number;
-    previousVersion: number,
-    kind: string,
-    state: string
+  aggregateId: string;
+  dateCreated: string;
+  kind: string;
+  previousVersion: number;
+  state: string;
+  version: number;
 }

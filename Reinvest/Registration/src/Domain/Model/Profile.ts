@@ -1,13 +1,13 @@
-import {Address, DocumentSchema, DomicileType} from "Registration/Domain/Model/ReinvestTypes";
+import { Address, DocumentSchema, DomicileType } from 'Registration/Domain/Model/ReinvestTypes';
 
 export type ProfileForSynchronization = {
-    firstName: string,
-    middleName?: string,
-    lastName: string,
-    dateOfBirth: string,
-    experience: string,
-    domicile: DomicileType,
-    ssn: string | null,
-    address: Address,
-    idScan: DocumentSchema[]
-}
+  address: Address;
+  dateOfBirth: string;
+  domicile: DomicileType;
+  experience: string;
+  firstName: string;
+  idScan: DocumentSchema[];
+  lastName: string;
+  ssn: string | null;
+  middleName?: string;
+};

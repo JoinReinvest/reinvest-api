@@ -1,4 +1,4 @@
-import { Money } from "../../../Commons/Money";
+import { Money } from '../../../Commons/Money';
 
 export class UnitPrice {
   private readonly _unitPrice: Money;

@@ -1,17 +1,17 @@
 export enum USER_EXCEPTION_CODES {
-    USER_ALREADY_EXISTS = 1001,
-    CANNOT_GENERATE_UNIQUE_TOKEN = 1002
+  USER_ALREADY_EXISTS = 1001,
+  CANNOT_GENERATE_UNIQUE_TOKEN = 1002,
 }
 
 export class UserException extends Error {
-    exceptionCode: USER_EXCEPTION_CODES;
+  exceptionCode: USER_EXCEPTION_CODES;
 
-    constructor(code: USER_EXCEPTION_CODES, message: string) {
-        super(`User exception: [${code}] ${message}`);
-        this.exceptionCode = code;
-    }
+  constructor(code: USER_EXCEPTION_CODES, message: string) {
+    super(`User exception: [${code}] ${message}`);
+    this.exceptionCode = code;
+  }
 
-    ifUserAlreadyExists() {
-        return this.exceptionCode === USER_EXCEPTION_CODES.USER_ALREADY_EXISTS;
-    }
+  ifUserAlreadyExists() {
+    return this.exceptionCode === USER_EXCEPTION_CODES.USER_ALREADY_EXISTS;
+  }
 }
