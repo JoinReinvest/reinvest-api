@@ -24,5 +24,9 @@ export interface Verifier {
 
   handleVerificationEvent(event: VerificationEvent): void;
 
+  makeDecision(): VerificationDecision;
+
+  recover(): void;
+
   verify(): Promise<VerificationDecision>;
 }

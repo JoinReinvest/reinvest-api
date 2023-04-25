@@ -31,7 +31,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     return decision;
   }
 
-  private makeDecision(): VerificationDecision {
+  makeDecision(): VerificationDecision {
     const onObject = {
       type: this.type,
       accountId: this.id,

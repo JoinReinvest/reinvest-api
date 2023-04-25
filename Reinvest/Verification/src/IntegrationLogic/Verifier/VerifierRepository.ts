@@ -98,4 +98,24 @@ export class VerifierRepository {
 
     return new CompanyVerifier(this.northCapitalAdapter, verificationState);
   }
+
+  async findVerifierById(objectId: string): Promise<Verifier | null> {
+    const verifierRecord = await this.verificationAdapter.findVerifierRecord(objectId);
+
+    if (!verifierRecord) {
+      return null;
+    }
+
+    const state = this.mapVerifiedRecordToState(verifierRecord);
+    switch (state.type) {
+      case VerifierType.PROFILE:
+        return new ProfileVerifier(this.northCapitalAdapter, state);
+      case VerifierType.STAKEHOLDER:
+        return new StakeholderVerifier(this.northCapitalAdapter, state, ''); // todo include account id into state
+      case VerifierType.COMPANY:
+        return new CompanyVerifier(this.northCapitalAdapter, state);
+      default:
+        return null;
+    }
+  }
 }

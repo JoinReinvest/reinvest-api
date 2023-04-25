@@ -122,9 +122,9 @@ context('Given an investor has completed profile and synchronized with North Cap
 });
 
 context('Given an investor has completed profile and synchronized with North Capital, but North Capital is unavailable', () => {
+  const northCapitalAdapter = sinon.stubInterface<VerificationNorthCapitalAdapter>();
+  const verifier = new ProfileVerifier(northCapitalAdapter, cleanVerifierState());
   describe('When the system verifies the investor profile and returns an error', async () => {
-    const northCapitalAdapter = sinon.stubInterface<VerificationNorthCapitalAdapter>();
-    const verifier = new ProfileVerifier(northCapitalAdapter, cleanVerifierState());
     northCapitalAdapter.verifyParty.returns(eventsResolver(errorEvent));
 
     it('Then expect WAIT_FOR_SUPPORT decision', async () => {
@@ -132,6 +132,15 @@ context('Given an investor has completed profile and synchronized with North Cap
       const [reason] = <string[]>result?.reasons;
       expect(result.decision).to.be.equal(VerificationDecisionType.WAIT_FOR_SUPPORT);
       expect(reason).to.be.equal(errorEvent.reason);
+    });
+
+    describe('When the admin fixed an error and recovered verification', async () => {
+      it('Then expect APPROVED decision', async () => {
+        northCapitalAdapter.verifyParty.returns(eventsResolver(kycEvent, amlEvent));
+        verifier.recover();
+        const result = await verifier.verify();
+        expect(result.decision).to.be.equal(VerificationDecisionType.APPROVED);
+      });
     });
   });
 });

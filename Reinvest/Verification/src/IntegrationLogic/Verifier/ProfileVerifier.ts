@@ -21,7 +21,7 @@ export class ProfileVerifier extends PartyVerifier implements Verifier {
     return decision;
   }
 
-  private makeDecision(): VerificationDecision {
+  makeDecision(): VerificationDecision {
     return this.makeDecisionForParty({
       type: this.type,
       profileId: this.id,

@@ -24,7 +24,7 @@ export class StakeholderVerifier extends PartyVerifier implements Verifier {
     return decision;
   }
 
-  private makeDecision(): VerificationDecision {
+  makeDecision(): VerificationDecision {
     return this.makeDecisionForParty({
       type: this.type,
       stakeholderId: this.id,

@@ -1,6 +1,7 @@
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
+  VerificationAdministrativeEvent,
   VerificationEvent,
   VerificationNorthCapitalEvent,
   VerificationResultEvent,
@@ -80,6 +81,15 @@ export abstract class AbstractVerifier {
           someReasons = [reason];
         }
       }
+
+      if (kind === 'VerificationAdministrativeEvent') {
+        const { name } = <VerificationAdministrativeEvent>event;
+
+        if (name === 'VERIFICATION_RECOVERED') {
+          wasFailedRequest = false;
+          someReasons = [];
+        }
+      }
     }
 
     return {
@@ -136,5 +146,14 @@ export abstract class AbstractVerifier {
     }
 
     return false;
+  }
+
+  recover(): void {
+    this.handleVerificationEvent(<VerificationAdministrativeEvent>{
+      kind: 'VerificationAdministrativeEvent',
+      name: 'VERIFICATION_RECOVERED',
+      date: new Date(),
+      ncId: this.ncId,
+    });
   }
 }
