@@ -2,6 +2,7 @@ import { ContainerInterface } from 'Container/Container';
 import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
+import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/VerifierExecutor';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 
 export class IntegrationServiceProvider {
@@ -12,6 +13,7 @@ export class IntegrationServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(VerifierRepository, [VerificationNorthCapitalAdapter, VerificationAdapter]);
+    container.addSingleton(VerifierExecutor, [VerificationNorthCapitalAdapter]);
+    container.addSingleton(VerifierRepository, [VerificationAdapter]);
   }
 }

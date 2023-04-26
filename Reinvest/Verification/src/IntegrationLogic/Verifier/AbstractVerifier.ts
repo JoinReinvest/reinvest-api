@@ -1,24 +1,23 @@
-import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
-import { VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
+import { AvailableEventsForDecision, VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
-  VerificationAdministrativeEvent,
+  VerificationAmlResultEvent,
   VerificationEvent,
-  VerificationNorthCapitalEvent,
+  VerificationEvents,
+  VerificationKycResultEvent,
+  VerificationNorthCapitalObjectFailedEvent,
   VerificationResultEvent,
   VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 
 export abstract class AbstractVerifier {
-  protected northCapitalAdapter: VerificationNorthCapitalAdapter;
   protected ncId: string;
   protected id: string;
   protected events: VerificationState['events'];
   protected decision: VerificationDecision;
   protected type: VerifierType;
 
-  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter, { ncId, id, events, decision, type }: VerificationState) {
-    this.northCapitalAdapter = northCapitalAdapter;
+  constructor({ ncId, id, events, decision, type }: VerificationState) {
     this.ncId = ncId;
     this.id = id;
     this.events = events;
@@ -46,11 +45,13 @@ export abstract class AbstractVerifier {
     amlStatus: VerificationStatus;
     kycCounter: number;
     kycStatus: VerificationStatus;
+    objectUpdatesCounter: number;
     reasons: string[];
     wasFailedRequest: boolean;
   } {
     let amlStatus = VerificationStatus.PENDING;
     let kycStatus = VerificationStatus.PENDING;
+    let objectUpdatesCounter = 0;
     let kycCounter = 0;
     let someReasons: string[] = [];
     let wasFailedRequest = false;
@@ -59,36 +60,31 @@ export abstract class AbstractVerifier {
       const { kind } = event;
       wasFailedRequest = false;
 
-      if (kind === 'VerificationResult') {
-        const { type, status, reasons } = <VerificationResultEvent>event;
-
-        if (type === 'AML') {
-          amlStatus = status;
-        }
-
-        if (type === 'KYC' && kycStatus !== status) {
-          kycStatus = status;
-          kycCounter++;
-          someReasons = reasons;
-        }
+      if (kind === VerificationEvents.VERIFICATION_KYC_RESULT) {
+        const { status, reasons } = <VerificationKycResultEvent>event;
+        kycStatus = status;
+        kycCounter++;
+        someReasons = reasons;
       }
 
-      if (kind === 'VerificationNorthCapitalEvent') {
-        const { name, reason } = <VerificationNorthCapitalEvent>event;
-
-        if (name === 'REQUEST_FAILED') {
-          wasFailedRequest = true;
-          someReasons = [reason];
-        }
+      if (kind === VerificationEvents.VERIFICATION_AML_RESULT) {
+        const { status } = <VerificationAmlResultEvent>event;
+        amlStatus = status;
       }
 
-      if (kind === 'VerificationAdministrativeEvent') {
-        const { name } = <VerificationAdministrativeEvent>event;
+      if (kind === VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED) {
+        const { reason } = <VerificationNorthCapitalObjectFailedEvent>event;
+        wasFailedRequest = true;
+        someReasons = [reason];
+      }
 
-        if (name === 'VERIFICATION_RECOVERED') {
-          wasFailedRequest = false;
-          someReasons = [];
-        }
+      if (kind === VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED) {
+        objectUpdatesCounter++;
+      }
+
+      if (kind === VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE) {
+        wasFailedRequest = false;
+        someReasons = [];
       }
     }
 
@@ -98,14 +94,21 @@ export abstract class AbstractVerifier {
       kycCounter,
       reasons: someReasons,
       wasFailedRequest,
+      objectUpdatesCounter,
     };
   }
 
-  handleVerificationEvent(event: VerificationEvent): void {
+  protected handleEvent(event: VerificationEvent, availableEvents: AvailableEventsForDecision): void {
     const { ncId } = event;
 
     if (ncId !== this.ncId) {
       console.error('Verification event is not for this party', event);
+
+      return;
+    }
+
+    if (!this.canThisEventBeHandled(event, availableEvents)) {
+      console.error('Wrong verification event in the current state', event, this.decision);
 
       return;
     }
@@ -128,11 +131,13 @@ export abstract class AbstractVerifier {
   }
 
   protected wasEventSeen(newEvent: VerificationEvent): boolean {
+    const verificationResultsEvents = [VerificationEvents.VERIFICATION_KYC_RESULT, VerificationEvents.VERIFICATION_AML_RESULT];
+
     // result event with the same id
-    if (newEvent.kind === 'VerificationResult') {
+    if (verificationResultsEvents.includes(newEvent.kind)) {
       const { eventId } = <VerificationResultEvent>newEvent;
       const eventExists = this.events.list.find(
-        (event: VerificationEvent) => event.kind === 'VerificationResult' && (<VerificationResultEvent>event).eventId === eventId,
+        (event: VerificationEvent) => verificationResultsEvents.includes(event.kind) && (<VerificationResultEvent>event).eventId === eventId,
       );
 
       return !!eventExists;
@@ -148,12 +153,31 @@ export abstract class AbstractVerifier {
     return false;
   }
 
-  recover(): void {
-    this.handleVerificationEvent(<VerificationAdministrativeEvent>{
-      kind: 'VerificationAdministrativeEvent',
-      name: 'VERIFICATION_RECOVERED',
-      date: new Date(),
-      ncId: this.ncId,
-    });
+  getPartyId(): string {
+    return this.ncId;
+  }
+
+  canBeUpdated(): boolean {
+    return [
+      VerificationDecisionType.UPDATE_REQUIRED,
+      VerificationDecisionType.SECOND_UPDATE_REQUIRED,
+      VerificationDecisionType.ENTITY_UPDATE_REQUIRED,
+    ].includes(this.decision.decision);
+  }
+
+  private canThisEventBeHandled(event: VerificationEvent, availableEvents: AvailableEventsForDecision) {
+    const { decision } = this.decision;
+    const { kind } = event;
+
+    if (availableEvents['ANY_TIME'] && availableEvents['ANY_TIME'].includes(kind)) {
+      return true;
+    }
+
+    // @ts-ignore
+    if (availableEvents[decision] && availableEvents[decision].includes(kind)) {
+      return true;
+    }
+
+    return false;
   }
 }

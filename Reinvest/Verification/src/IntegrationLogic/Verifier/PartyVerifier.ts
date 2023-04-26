@@ -1,34 +1,40 @@
-import { VerificationDecision, VerificationDecisionType, VerificationObject } from 'Verification/Domain/ValueObject/VerificationDecision';
-import { VerificationStatus } from 'Verification/Domain/ValueObject/VerificationEvents';
+import {
+  AvailableEventsForDecision,
+  VerificationDecision,
+  VerificationDecisionType,
+  VerificationObject,
+} from 'Verification/Domain/ValueObject/VerificationDecision';
+import { VerificationEvents, VerificationStatus } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/AbstractVerifier';
 
 export class PartyVerifier extends AbstractVerifier {
-  protected async verifyParty(decision: VerificationDecision): Promise<boolean> {
-    if ([VerificationDecisionType.REQUEST_VERIFICATION].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.verifyParty(this.ncId);
-
-      verificationResult?.forEach(event => {
-        this.handleVerificationEvent(event);
-      });
-
-      return true;
-    } else if ([VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED, VerificationDecisionType.UPDATE_REQUIRED].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.getPartyVerificationStatus(this.ncId);
-
-      verificationResult?.forEach(event => {
-        this.handleVerificationEvent(event);
-      });
-
-      return true;
-    }
-
-    return false;
-  }
+  protected availableEventsForDecision: AvailableEventsForDecision = {
+    ANY_TIME: [VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED, VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE],
+    [VerificationDecisionType.REQUEST_VERIFICATION]: [
+      VerificationEvents.VERIFICATION_KYC_RESULT,
+      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+    ],
+    [VerificationDecisionType.WAIT_FOR_SUPPORT]: [
+      VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
+      VerificationEvents.VERIFICATION_KYC_RESULT,
+      VerificationEvents.VERIFICATION_AML_RESULT,
+    ],
+    [VerificationDecisionType.UPDATE_REQUIRED]: [VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED],
+    [VerificationDecisionType.SECOND_UPDATE_REQUIRED]: [VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED],
+    [VerificationDecisionType.PROFILE_BANNED]: [VerificationEvents.VERIFICATION_PROFILE_UNBANNED_ADMINISTRATIVE],
+    [VerificationDecisionType.ACCOUNT_BANNED]: [VerificationEvents.VERIFICATION_ACCOUNT_UNBANNED_ADMINISTRATIVE],
+    [VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED]: [
+      VerificationEvents.VERIFICATION_KYC_RESULT,
+      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+    ],
+  };
 
   protected makeDecisionForParty(onObject: VerificationObject): VerificationDecision {
-    let decision: VerificationDecisionType = VerificationDecisionType.REQUEST_VERIFICATION;
-    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest } = this.analyzeEvents();
+    let decision: VerificationDecisionType = VerificationDecisionType.UNKNOWN;
+    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest, objectUpdatesCounter } = this.analyzeEvents();
     let someReasons = reasons;
 
     if (wasFailedRequest) {
@@ -52,13 +58,25 @@ export class PartyVerifier extends AbstractVerifier {
     }
 
     if (kycStatus === VerificationStatus.DISAPPROVED) {
-      if (kycCounter <= 1) {
+      // must await for update
+      if (kycCounter === 1 && objectUpdatesCounter === 0) {
         decision = VerificationDecisionType.UPDATE_REQUIRED;
       }
 
-      // if (kycCounter === 2) {
-      //   decision = VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED;
-      // }
+      // user updated object, so we can check it again
+      if (kycCounter === 1 && objectUpdatesCounter === 1) {
+        decision = VerificationDecisionType.REQUEST_VERIFICATION;
+      }
+
+      // user updated object, but it failed again - request another update
+      if (kycCounter === 2 && objectUpdatesCounter === 1) {
+        decision = VerificationDecisionType.SECOND_UPDATE_REQUIRED;
+      }
+
+      // user updated object, so now we must wait for manual kyc review
+      if (kycCounter === 2 && objectUpdatesCounter === 2) {
+        decision = VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED;
+      }
 
       if (kycCounter >= 3) {
         decision = this.isProfile() ? VerificationDecisionType.PROFILE_BANNED : VerificationDecisionType.ACCOUNT_BANNED;
@@ -81,10 +99,26 @@ export class PartyVerifier extends AbstractVerifier {
       };
     }
 
-    return {
-      decision,
+    if (kycStatus === VerificationStatus.PENDING || amlStatus === VerificationStatus.PENDING) {
+      decision = VerificationDecisionType.REQUEST_VERIFICATION;
+
+      return {
+        decision,
+        onObject,
+      };
+    }
+
+    console.error('Decision for party verification is unknown', {
       onObject,
-    };
+      amlStatus,
+      kycStatus,
+      kycCounter,
+      reasons,
+      wasFailedRequest,
+      objectUpdatesCounter,
+    });
+
+    throw new Error('Unknown decision for party verification');
   }
 
   private isProfile(): boolean {

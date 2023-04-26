@@ -1,3 +1,4 @@
+import { VerificationEvents, VerificationRecoveredAdministrativeEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 
 export class AdminVerificationActions {
@@ -15,8 +16,12 @@ export class AdminVerificationActions {
       return false;
     }
 
-    verifier.recover();
-    verifier.makeDecision();
+    verifier.handleVerificationEvent(<VerificationRecoveredAdministrativeEvent>{
+      kind: VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
+      date: new Date(),
+      ncId: verifier.getPartyId(),
+    });
+
     await this.verifierRepository.storeVerifiers([verifier]);
 
     return true;

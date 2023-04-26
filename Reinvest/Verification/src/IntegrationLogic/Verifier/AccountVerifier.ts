@@ -29,19 +29,28 @@ export class AccountVerifier {
           this.requireAdminSupport(investmentsVerifications, objectVerifications, requiredActions, decision);
           break;
         case VerificationDecisionType.UPDATE_REQUIRED:
-          this.updateRequired(investmentsVerifications, objectVerifications, requiredActions, decision);
+        case VerificationDecisionType.ENTITY_UPDATE_REQUIRED:
+          this.updateRequired(investmentsVerifications, objectVerifications, requiredActions, decision, false);
+          break;
+        case VerificationDecisionType.SECOND_UPDATE_REQUIRED:
+          this.updateRequired(investmentsVerifications, objectVerifications, requiredActions, decision, true);
           break;
         case VerificationDecisionType.PROFILE_BANNED:
           this.banProfile(investmentsVerifications, objectVerifications, requiredActions, decision);
           break;
+        case VerificationDecisionType.ACCOUNT_BANNED:
+          this.banAccount(investmentsVerifications, objectVerifications, requiredActions, decision);
+          break;
         case VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED:
+        case VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED:
+        case VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED:
           this.manualVerificationRequired(investmentsVerifications, objectVerifications, requiredActions, decision);
           break;
-        default: {
+        default:
+          console.warn(`Unknown decision type in account verifier ${decision.decision}`, decision);
           investmentsVerifications.push(false);
           objectVerifications.push(false);
           break;
-        }
       }
     }
 
@@ -77,11 +86,12 @@ export class AccountVerifier {
     objectVerifications: boolean[],
     requiredActions: VerificationAction[],
     decision: VerificationDecision,
+    again: boolean,
   ) {
     investmentsVerifications.push(false);
     objectVerifications.push(false);
     requiredActions.push({
-      action: ActionName.UPDATE_MEMBER,
+      action: again ? ActionName.UPDATE_MEMBER_AGAIN : ActionName.UPDATE_MEMBER,
       onObject: decision.onObject,
       reasons: decision.reasons,
     });
@@ -97,6 +107,21 @@ export class AccountVerifier {
     objectVerifications.push(false);
     requiredActions.push({
       action: ActionName.BAN_PROFILE,
+      onObject: decision.onObject,
+      reasons: decision.reasons,
+    });
+  }
+
+  private banAccount(
+    investmentsVerifications: boolean[],
+    objectVerifications: boolean[],
+    requiredActions: VerificationAction[],
+    decision: VerificationDecision,
+  ) {
+    investmentsVerifications.push(false);
+    objectVerifications.push(false);
+    requiredActions.push({
+      action: ActionName.BAN_ACCOUNT,
       onObject: decision.onObject,
       reasons: decision.reasons,
     });

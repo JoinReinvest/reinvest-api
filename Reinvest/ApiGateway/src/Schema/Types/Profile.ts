@@ -76,6 +76,23 @@ const schema = `
         verifyAndFinish: Boolean
     }
 
+    input UpdateProfileForVerificationInput {
+        "An investor name"
+        name: PersonName
+        "Date of Birth in format YYYY-MM-DD"
+        dateOfBirth: DateOfBirthInput
+        "Is the investor US. Citizen or US. Resident with Green Card or Visa"
+        domicile: DomicileInput
+        "Permanent address of an investor"
+        address: AddressInput
+        """
+        ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
+        Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
+        IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
+        """
+        idScan: [DocumentFileLinkInput]
+    }
+
     type Query {
         """Get user profile"""
         getProfile: Profile
