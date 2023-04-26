@@ -9,6 +9,7 @@ const schema = `
     #graphql
     enum ActionName {
         UPDATE_MEMBER
+        UPDATE_MEMBER_AGAIN
         BAN_ACCOUNT
         BAN_PROFILE
         REQUIRE_MANUAL_REVIEW
@@ -58,7 +59,7 @@ const schema = `
         to display to user what went wrong
 
         List of current actions:
-        * 'UPDATE_MEMBER': it means that user must update details of object specified in 'onObject' field
+        * 'UPDATE_MEMBER' or 'UPDATE_MEMBER_AGAIN': it means that user must update details of object specified in 'onObject' field
         * 'BAN_ACCOUNT': it means that account must be banned and investment process and all other investments
         are blocked
         * 'BAN_PROFILE': it means that profile must be banned and all accounts are blocked

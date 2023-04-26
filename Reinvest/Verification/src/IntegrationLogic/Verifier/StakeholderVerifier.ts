@@ -1,4 +1,5 @@
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
+import { VerificationEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, Verifier } from 'Verification/Domain/ValueObject/Verifiers';
 import { PartyVerifier } from 'Verification/IntegrationLogic/Verifier/PartyVerifier';
 
@@ -8,6 +9,12 @@ export class StakeholderVerifier extends PartyVerifier implements Verifier {
   constructor(state: VerificationState, accountId: string) {
     super(state);
     this.accountId = accountId;
+    this.makeDecision();
+  }
+
+  handleVerificationEvent(event: VerificationEvent) {
+    super.handleEvent(event, this.availableEventsForDecision);
+    this.makeDecision();
   }
 
   makeDecision(): VerificationDecision {

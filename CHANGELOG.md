@@ -1,5 +1,12 @@
 # REINVEST API CHANGELOG
 
+## 1.11.1 - 04/26/2023
+
+* New Query: `getDocument(documentId)`
+    * it returns link to read the document. The link expires after 60 minutes, but this value can change in the future!
+    * if document is not found, the provided link will return 404 (it does not check if document actually exists in s3!)
+    * use that query at the moment when user actually want to download/display the file, because of expiration time.
+
 ## 1.11.0 - 04/25/2023
 
 * New mutation: `verifyAccount(accountId)`, which verifies all account parties (profile, stakeholders and company
@@ -19,7 +26,8 @@
                 * reasons: list of errors, suggestions what went wrong during verification. Potentially it can be used
                   to display to user what went wrong
             * List of current actions:
-                * `UPDATE_MEMBER`: it means that user must update details of object specified in `onObject` field
+                * `UPDATE_MEMBER` or `UPDATE_MEMBER_AGAIN`: it means that user must update details of object specified
+                  in `onObject` field
                 * `BAN_ACCOUNT`: it means that account must be banned and investment process and all other investments
                   are blocked
                 * `BAN_PROFILE`: it means that profile must be banned and all accounts are blocked

@@ -1,7 +1,10 @@
 import { ExecutionNorthCapitalAdapter } from 'Registration/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import {
+  VerificationAmlResultEvent,
   VerificationEvent,
-  VerificationNorthCapitalEvent,
+  VerificationEvents,
+  VerificationKycResultEvent,
+  VerificationNorthCapitalObjectFailedEvent,
   VerificationResultEvent,
   VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
@@ -39,10 +42,9 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return [
-        <VerificationNorthCapitalEvent>{
+        <VerificationNorthCapitalObjectFailedEvent>{
           date: new Date(),
-          name: 'REQUEST_FAILED',
-          kind: 'VerificationNorthCapitalEvent',
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
         },
@@ -73,10 +75,9 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return [
-        <VerificationNorthCapitalEvent>{
+        <VerificationNorthCapitalObjectFailedEvent>{
           date: new Date(),
-          name: 'REQUEST_FAILED',
-          kind: 'VerificationNorthCapitalEvent',
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
         },
@@ -107,10 +108,9 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return [
-        <VerificationNorthCapitalEvent>{
+        <VerificationNorthCapitalObjectFailedEvent>{
           date: new Date(),
-          name: 'REQUEST_FAILED',
-          kind: 'VerificationNorthCapitalEvent',
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
         },
@@ -144,25 +144,23 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     }
 
     return [
-      <VerificationResultEvent>{
-        kind: 'VerificationResult',
+      <VerificationKycResultEvent>{
+        kind: VerificationEvents.VERIFICATION_KYC_RESULT,
         date: new Date(),
         ncId: partyId,
         reasons: qualifiers,
         source: 'DIRECT',
         status: this.mapVerificationStatus(kycStatus),
-        type: 'KYC',
         eventId: `kyc-${verificationId}`,
         verificationWay: 'AUTOMATIC',
       },
-      <VerificationResultEvent>{
-        kind: 'VerificationResult',
+      <VerificationAmlResultEvent>{
+        kind: VerificationEvents.VERIFICATION_AML_RESULT,
         date: new Date(),
         ncId: partyId,
         reasons: [],
         source: 'DIRECT',
         status: this.mapVerificationStatus(amlStatus),
-        type: 'AML',
         eventId: `aml-${verificationId}`,
         verificationWay: 'AUTOMATIC',
       },
@@ -206,10 +204,9 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return [
-        <VerificationNorthCapitalEvent>{
+        <VerificationNorthCapitalObjectFailedEvent>{
           date: new Date(),
-          name: 'REQUEST_FAILED',
-          kind: 'VerificationNorthCapitalEvent',
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
         },
@@ -217,21 +214,20 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     }
   }
 
-  private mapAMLResponseToVerificationResultEvents(aml: any, partyId: string): VerificationResultEvent[] {
+  private mapAMLResponseToVerificationResultEvents(aml: any, partyId: string): VerificationAmlResultEvent[] {
     const {
       response: { 'id-number': verificationId },
       amlStatus,
     } = aml;
 
     return [
-      <VerificationResultEvent>{
-        kind: 'VerificationResult',
+      <VerificationAmlResultEvent>{
+        kind: VerificationEvents.VERIFICATION_AML_RESULT,
         date: new Date(),
         ncId: partyId,
         reasons: [],
         source: 'DIRECT',
         status: this.mapVerificationStatus(amlStatus),
-        type: 'AML',
         eventId: `aml-${verificationId}`,
         verificationWay: 'AUTOMATIC',
       },
@@ -261,10 +257,9 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return [
-        <VerificationNorthCapitalEvent>{
+        <VerificationNorthCapitalObjectFailedEvent>{
           date: new Date(),
-          name: 'REQUEST_FAILED',
-          kind: 'VerificationNorthCapitalEvent',
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
         },

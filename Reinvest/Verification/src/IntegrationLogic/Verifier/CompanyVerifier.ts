@@ -1,9 +1,44 @@
-import { VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
-import { VerificationStatus } from 'Verification/Domain/ValueObject/VerificationEvents';
-import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
+import { AvailableEventsForDecision, VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
+import { VerificationEvent, VerificationEvents, VerificationStatus } from 'Verification/Domain/ValueObject/VerificationEvents';
+import { VerificationState, Verifier } from 'Verification/Domain/ValueObject/Verifiers';
 import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/AbstractVerifier';
 
 export class CompanyVerifier extends AbstractVerifier implements Verifier {
+  protected availableEventsForDecision: AvailableEventsForDecision = {
+    ANY_TIME: [VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED, VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE],
+    [VerificationDecisionType.REQUEST_AML_VERIFICATION]: [
+      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+    ],
+    [VerificationDecisionType.WAIT_FOR_SUPPORT]: [
+      VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
+      VerificationEvents.VERIFICATION_KYC_RESULT,
+      VerificationEvents.VERIFICATION_AML_RESULT,
+    ],
+    [VerificationDecisionType.ENTITY_UPDATE_REQUIRED]: [VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED],
+    [VerificationDecisionType.ACCOUNT_BANNED]: [VerificationEvents.VERIFICATION_ACCOUNT_UNBANNED_ADMINISTRATIVE],
+    [VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED]: [
+      VerificationEvents.VERIFICATION_KYC_RESULT,
+      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+    ],
+    [VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED]: [
+      VerificationEvents.VERIFICATION_KYC_RESULT,
+      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+    ],
+  };
+
+  constructor(state: VerificationState) {
+    super(state);
+    this.makeDecision();
+  }
+
+  handleVerificationEvent(event: VerificationEvent) {
+    this.handleEvent(event, this.availableEventsForDecision);
+    this.makeDecision();
+  }
+
   makeDecision(): VerificationDecision {
     this.decision = this.makeDecisionForCompany();
 
@@ -17,7 +52,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     };
 
     let decision: VerificationDecisionType = VerificationDecisionType.UNKNOWN;
-    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest } = this.analyzeEvents();
+    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest, objectUpdatesCounter } = this.analyzeEvents();
     let someReasons = reasons;
 
     if (wasFailedRequest) {
@@ -47,7 +82,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       };
     }
 
-    if (kycStatus === VerificationStatus.PENDING && kycCounter === 0) {
+    if (kycStatus === VerificationStatus.PENDING) {
       return {
         decision: VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED,
         onObject,
@@ -55,16 +90,19 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     }
 
     if (kycStatus === VerificationStatus.DISAPPROVED) {
-      if (kycCounter === 1) {
+      // failed once, ask for update
+      if (kycCounter === 1 && objectUpdatesCounter === 0) {
         decision = VerificationDecisionType.ENTITY_UPDATE_REQUIRED;
         someReasons = reasons;
       }
 
-      // if (kycCounter === 1) {
-      //   decision = VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED;
-      //   someReasons = reasons;
-      // }
+      // failed once, object updated, request for another verification
+      if (kycCounter === 1 && objectUpdatesCounter === 1) {
+        decision = VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED;
+        someReasons = reasons;
+      }
 
+      // failed again, ban account
       if (kycCounter > 1) {
         decision = VerificationDecisionType.ACCOUNT_BANNED;
         someReasons = ['Manual KYB verification failed'];
@@ -86,9 +124,16 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       };
     }
 
-    return {
-      decision,
+    console.error('Decision for entity is unknown', {
       onObject,
-    };
+      amlStatus,
+      kycStatus,
+      kycCounter,
+      reasons,
+      wasFailedRequest,
+      objectUpdatesCounter,
+    });
+
+    throw new Error('Unknown decision for entity verification');
   }
 }

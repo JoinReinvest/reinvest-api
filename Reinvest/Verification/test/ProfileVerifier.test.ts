@@ -4,9 +4,12 @@ import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapit
 import { VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
   VerificationEvent,
-  VerificationNorthCapitalEvent,
-  VerificationResultEvent,
+  VerificationEvents,
+  VerificationNorthCapitalObjectFailedEvent,
+  VerificationRecoveredAdministrativeEvent,
+  VerificationKycResultEvent,
   VerificationStatus,
+  VerificationAmlResultEvent,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileVerifier';
@@ -14,34 +17,31 @@ import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileV
 const partyId = 'some-uuid';
 const verificationId = 1;
 
-const amlEvent = <VerificationResultEvent>{
-  kind: 'VerificationResult',
+const amlEvent = <VerificationAmlResultEvent>{
+  kind: VerificationEvents.VERIFICATION_AML_RESULT,
   date: new Date(),
   ncId: partyId,
   reasons: [],
   source: 'DIRECT',
   status: VerificationStatus.APPROVED,
-  type: 'AML',
   eventId: `aml-${verificationId}`,
   verificationWay: 'AUTOMATIC',
 };
 
-const kycEvent = <VerificationResultEvent>{
-  kind: 'VerificationResult',
+const kycEvent = <VerificationKycResultEvent>{
+  kind: VerificationEvents.VERIFICATION_KYC_RESULT,
   date: new Date(),
   ncId: partyId,
   reasons: [],
   source: 'DIRECT',
   status: VerificationStatus.APPROVED,
-  type: 'KYC',
   eventId: `kyc-${verificationId}`,
   verificationWay: 'AUTOMATIC',
 };
 
-const errorEvent = <VerificationNorthCapitalEvent>{
+const errorEvent = <VerificationNorthCapitalObjectFailedEvent>{
   date: new Date(),
-  name: 'REQUEST_FAILED',
-  kind: 'VerificationNorthCapitalEvent',
+  kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
   ncId: partyId,
   reason: 'Error reason',
 };
@@ -81,7 +81,7 @@ context('Given an investor has completed profile and synchronized with North Cap
     const verifier = new ProfileVerifier(cleanVerifierState());
 
     verifier.handleVerificationEvent(kycEvent);
-    verifier.handleVerificationEvent(<VerificationResultEvent>{
+    verifier.handleVerificationEvent(<VerificationAmlResultEvent>{
       ...amlEvent,
       status: VerificationStatus.DISAPPROVED,
     });
@@ -97,7 +97,7 @@ context('Given an investor has completed profile and synchronized with North Cap
 context('Given an investor has completed profile and synchronized with North Capital, but some data is incorrect', () => {
   describe('When the system verifies the investor profile and returns the KYC is DISAPPROVED', async () => {
     const verifier = new ProfileVerifier(cleanVerifierState());
-    verifier.handleVerificationEvent(<VerificationResultEvent>{
+    verifier.handleVerificationEvent(<VerificationKycResultEvent>{
       ...kycEvent,
       status: VerificationStatus.DISAPPROVED,
       reasons: ['Some reason'],
@@ -127,7 +127,11 @@ context('Given an investor has completed profile and synchronized with North Cap
 
     describe('When the admin fixed an error and recovered verification', async () => {
       it('Then expect REQUEST_VERIFICATION decision', async () => {
-        verifier.recover();
+        verifier.handleVerificationEvent(<VerificationRecoveredAdministrativeEvent>{
+          kind: VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
+          date: new Date(),
+          ncId: verifier.getPartyId(),
+        });
         const result = verifier.makeDecision();
         expect(result.decision).to.be.equal(VerificationDecisionType.REQUEST_VERIFICATION);
       });

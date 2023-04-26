@@ -1,3 +1,4 @@
+import { VerificationEvents, VerificationRequestedObjectUpdatedEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 
 export class UserVerificationActions {
@@ -25,8 +26,12 @@ export class UserVerificationActions {
       return false;
     }
 
-    verifier.notifyAboutUpdate();
-    verifier.makeDecision();
+    verifier.handleVerificationEvent(<VerificationRequestedObjectUpdatedEvent>{
+      kind: VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED,
+      date: new Date(),
+      ncId: verifier.getPartyId(),
+    });
+
     await this.verifierRepository.storeVerifiers([verifier]);
 
     return true;

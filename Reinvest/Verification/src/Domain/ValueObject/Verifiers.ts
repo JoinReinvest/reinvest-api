@@ -29,8 +29,4 @@ export interface Verifier {
   handleVerificationEvent(event: VerificationEvent): void;
 
   makeDecision(): VerificationDecision;
-
-  notifyAboutUpdate(): void;
-
-  recover(): void;
 }
