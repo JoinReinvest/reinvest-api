@@ -23,6 +23,7 @@ import { Identity } from 'Reinvest/Identity/src';
 import Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
+import { Verification } from 'Verification/index';
 
 console = logger(SENTRY_CONFIG);
 
@@ -99,6 +100,19 @@ export function boot(): Modules {
       {
         legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    Verification.moduleName,
+    Verification.create(
+      {
+        database: databaseConfig,
+        northCapital: northCapitalConfig,
+      } as Verification.Config,
+      {
+        registration: modules.get(Registration.moduleName) as Registration.Main,
       },
     ),
   );

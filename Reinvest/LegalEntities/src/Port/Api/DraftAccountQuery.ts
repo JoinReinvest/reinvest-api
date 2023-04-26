@@ -11,9 +11,9 @@ import {
   TrustDraftAccount,
 } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
 import { DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
+import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { AvatarOutput, AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
-import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 
 export type CompanyDraftAccountOutput = CompanyDraftAccountDefaultSchema & {
   companyDocuments: { fileName: string; id: string }[];

@@ -38,13 +38,13 @@ export abstract class ExecutionNorthCapitalAdapter {
       const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
 
       return response.data;
-    } catch (error) {
-      // @ts-ignore
+    } catch (error: any) {
       const {
         response: {
           data: { statusCode, statusDesc },
         },
       } = error;
+      console.warn('North capital error', error);
       throw new NorthCapitalException(statusCode, statusDesc);
     }
   }

@@ -4,6 +4,7 @@ import { createRegistrationDatabaseAdapterProvider, RegistrationDatabaseAdapterI
 import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { NorthCapitalDocumentsSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository';
 import { NorthCapitalSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalSynchronizationRepository';
+import { RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 import { VertaloSynchronizationRepository } from 'Registration/Adapter/Database/Repository/VertaloSynchronizationRepository';
 import { LegalEntitiesService } from 'Registration/Adapter/Modules/LegalEntitiesService';
 import { RegistrationDocumentsService } from 'Registration/Adapter/Modules/RegistrationDocumentsService';
@@ -30,7 +31,8 @@ export class AdapterServiceProvider {
       .addSingleton(MappingRegistryRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator, EmailCreator])
       .addSingleton(NorthCapitalSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(NorthCapitalDocumentsSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
-      .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator]);
+      .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
+      .addSingleton(RegistryQueryRepository, [RegistrationDatabaseAdapterInstanceProvider]);
 
     // modules
     container.addSingleton(LegalEntitiesService, ['LegalEntities']).addSingleton(RegistrationDocumentsService, ['Documents']);
