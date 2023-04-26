@@ -1,7 +1,10 @@
 import { ExecutionNorthCapitalAdapter } from 'Registration/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import {
+  VerificationAmlResultEvent,
   VerificationEvent,
-  VerificationNorthCapitalEvent,
+  VerificationEvents,
+  VerificationKycResultEvent,
+  VerificationNorthCapitalObjectFailedEvent,
   VerificationResultEvent,
   VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
@@ -39,10 +42,9 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return [
-        <VerificationNorthCapitalEvent>{
+        <VerificationNorthCapitalObjectFailedEvent>{
           date: new Date(),
-          name: 'REQUEST_FAILED',
-          kind: 'VerificationNorthCapitalEvent',
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
         },
@@ -73,10 +75,42 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return [
-        <VerificationNorthCapitalEvent>{
+        <VerificationNorthCapitalObjectFailedEvent>{
           date: new Date(),
-          name: 'REQUEST_FAILED',
-          kind: 'VerificationNorthCapitalEvent',
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+          ncId: partyId,
+          reason: error.message,
+        },
+      ];
+    }
+  }
+
+  async getAmlVerificationOnly(partyId: string): Promise<VerificationEvent[]> {
+    const endpoint = 'tapiv3/index.php/v3/getKycAmlResponse';
+    const response = await this.postRequest(endpoint, { partyId, type: 'AML Only' });
+    try {
+      const { statusCode, statusDesc } = response;
+      const amlResponse = response['kycamlDetails'];
+      console.log({
+        action: 'Read AML verification status',
+        partyId,
+        statusCode,
+        statusDesc,
+        amlResponse,
+      });
+
+      return this.mapAMLResponseToVerificationResultEvents(amlResponse, partyId);
+    } catch (error: any) {
+      console.error({
+        action: 'North Capital automatic aml verification on entity. Invalid response',
+        partyId,
+        response,
+      });
+
+      return [
+        <VerificationNorthCapitalObjectFailedEvent>{
+          date: new Date(),
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
         },
@@ -93,6 +127,10 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
 
     const qualifiers: string[] = [];
 
+    if (kyc?.response?.results?.key && kyc?.response?.results?.message && kyc?.response?.results?.key !== 'result.match') {
+      qualifiers.push(kyc?.response?.results?.message);
+    }
+
     if (kyc?.response?.qualifiers?.qualifier) {
       const qualifier = kyc?.response?.qualifiers?.qualifier;
 
@@ -106,25 +144,23 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     }
 
     return [
-      <VerificationResultEvent>{
-        kind: 'VerificationResult',
+      <VerificationKycResultEvent>{
+        kind: VerificationEvents.VERIFICATION_KYC_RESULT,
         date: new Date(),
         ncId: partyId,
         reasons: qualifiers,
         source: 'DIRECT',
         status: this.mapVerificationStatus(kycStatus),
-        type: 'KYC',
         eventId: `kyc-${verificationId}`,
         verificationWay: 'AUTOMATIC',
       },
-      <VerificationResultEvent>{
-        kind: 'VerificationResult',
+      <VerificationAmlResultEvent>{
+        kind: VerificationEvents.VERIFICATION_AML_RESULT,
         date: new Date(),
         ncId: partyId,
         reasons: [],
         source: 'DIRECT',
         status: this.mapVerificationStatus(amlStatus),
-        type: 'AML',
         eventId: `aml-${verificationId}`,
         verificationWay: 'AUTOMATIC',
       },
@@ -142,6 +178,92 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
         return VerificationStatus.DISAPPROVED;
       default:
         return VerificationStatus.PENDING;
+    }
+  }
+
+  async verifyEntityAml(partyId: string): Promise<VerificationEvent[]> {
+    const endpoint = 'tapiv3/index.php/v3/performAml';
+    const response = await this.postRequest(endpoint, { partyId });
+    try {
+      const { statusCode, statusDesc } = response;
+      const amlResponse = response['partyDetails'];
+      console.log({
+        action: 'Automatic entity AML verification',
+        partyId,
+        statusCode,
+        statusDesc,
+        amlResponse,
+      });
+
+      return this.mapAMLResponseToVerificationResultEvents(amlResponse, partyId);
+    } catch (error: any) {
+      console.error({
+        action: 'North Capital automatic aml verification on entity. Invalid response',
+        partyId,
+        response,
+      });
+
+      return [
+        <VerificationNorthCapitalObjectFailedEvent>{
+          date: new Date(),
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+          ncId: partyId,
+          reason: error.message,
+        },
+      ];
+    }
+  }
+
+  private mapAMLResponseToVerificationResultEvents(aml: any, partyId: string): VerificationAmlResultEvent[] {
+    const {
+      response: { 'id-number': verificationId },
+      amlStatus,
+    } = aml;
+
+    return [
+      <VerificationAmlResultEvent>{
+        kind: VerificationEvents.VERIFICATION_AML_RESULT,
+        date: new Date(),
+        ncId: partyId,
+        reasons: [],
+        source: 'DIRECT',
+        status: this.mapVerificationStatus(amlStatus),
+        eventId: `aml-${verificationId}`,
+        verificationWay: 'AUTOMATIC',
+      },
+    ];
+  }
+
+  async getEntityVerificationStatus(partyId: string): Promise<VerificationEvent[]> {
+    const endpoint = 'tapiv3/index.php/v3/getKycAml'; // todo how to verify kyb status?
+    const response = await this.postRequest(endpoint, { partyId });
+    try {
+      const { statusCode, statusDesc } = response;
+      // const kycResponse = response['kycamlDetails']['kyc'];
+      // console.log({
+      //   action: 'Read verification status',
+      //   partyId,
+      //   statusCode,
+      //   statusDesc,
+      //   kycResponse,
+      // });
+
+      return [];
+    } catch (error: any) {
+      console.error({
+        action: 'North Capital automatic kyc/aml verification on parties. Invalid response',
+        partyId,
+        response,
+      });
+
+      return [
+        <VerificationNorthCapitalObjectFailedEvent>{
+          date: new Date(),
+          kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+          ncId: partyId,
+          reason: error.message,
+        },
+      ];
     }
   }
 }

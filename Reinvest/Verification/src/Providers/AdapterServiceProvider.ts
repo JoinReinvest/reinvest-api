@@ -1,9 +1,9 @@
 import { ContainerInterface } from 'Container/Container';
 import { createVerificationDatabaseAdapterProvider, VerificationDatabaseAdapterInstanceProvider } from 'Verification/Adapter/Database/DatabaseAdapter';
+import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
-import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
 
 export class AdapterServiceProvider {
   private config: Verification.Config;

@@ -8,9 +8,11 @@ import {
   ListUsersCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import * as bodyParser from 'body-parser';
+import DateTime from 'date-and-time';
 import express from 'express';
 import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
 import { RegistrationDatabase, registrationMappingRegistryTable } from 'Registration/Adapter/Database/DatabaseAdapter';
+import { NorthCapitalMapper } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper';
 import { boot } from 'Reinvest/bootstrap';
 import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from 'Reinvest/config';
 import { IdentityDatabase, userTable } from 'Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter';
@@ -22,11 +24,9 @@ import { VertaloAdapter } from 'Reinvest/Registration/src/Adapter/Vertalo/Vertal
 import serverless from 'serverless-http';
 import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/DatabaseProvider';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
 import { main as postSignUp } from '../postSignUp/handler';
-import { NorthCapitalMapper } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper';
-import DateTime from 'date-and-time';
-import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 // dependencies
 type AllDatabases = IdentityDatabase & LegalEntitiesDatabase & InvestmentAccountsDatabase & RegistrationDatabase;
 const databaseProvider: DatabaseProvider<AllDatabases> = new DatabaseProvider<AllDatabases>(DATABASE_CONFIG as PostgreSQLConfig);
@@ -512,11 +512,14 @@ const northCapitalRouter = () => {
     }
   });
   router.post('/clear-verification', async (req: any, res: any) => {
-    const { partyId } = req.body;
-    await databaseProvider.provide().deleteFrom(verifierRecordsTable).where('ncId', '=', partyId).execute();
+    const { partyIds } = req.body;
+
+    for (const partyId of partyIds) {
+      await databaseProvider.provide().deleteFrom(verifierRecordsTable).where('ncId', '=', partyId).execute();
+    }
 
     res.status(200).json({
-      partyId,
+      partyIds,
     });
   });
 

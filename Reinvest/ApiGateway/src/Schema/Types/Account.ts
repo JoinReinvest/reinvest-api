@@ -66,6 +66,31 @@ const schema = `
         details: TrustAccountDetails
     }
 
+    input UpdateStakeholderForVerificationInput {
+        name: PersonName
+        dateOfBirth: DateOfBirthInput
+        address: AddressInput
+        domicile: SimplifiedDomicileInput
+        """IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request"""
+        idScan: [DocumentFileLinkInput]
+    }
+    
+    input UpdateCompanyForVerificationInput {
+        companyName: CompanyNameInput
+        address: AddressInput
+        companyDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes these documents from s3
+        """
+        removeDocuments: [DocumentFileLinkInput]
+        stakeholders: [StakeholderInput]
+        """
+        IMPORTANT: it removes previously uploaded id scan documents from s3 for this stakeholder
+        """
+        removeStakeholders: [StakeholderIdInput]
+        companyType: CorporateCompanyTypeInput
+    }
+
     type Query {
         """
         Return all accounts overview
