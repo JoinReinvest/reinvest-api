@@ -5,7 +5,7 @@ import {
   VerificationEvents,
   VerificationKycResultEvent,
   VerificationNorthCapitalObjectFailedEvent,
-  VerificationResultEvent,
+  AutomaticVerificationResultEvent,
   VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
@@ -43,6 +43,7 @@ export abstract class AbstractVerifier {
 
   protected analyzeEvents(): {
     amlStatus: VerificationStatus;
+    isKycInPendingState: boolean;
     kycCounter: number;
     kycStatus: VerificationStatus;
     objectUpdatesCounter: number;
@@ -55,19 +56,21 @@ export abstract class AbstractVerifier {
     let kycCounter = 0;
     let someReasons: string[] = [];
     let wasFailedRequest = false;
+    let isKycInPendingState = false;
 
     for (const event of this.events.list) {
       const { kind } = event;
       wasFailedRequest = false;
 
-      if (kind === VerificationEvents.VERIFICATION_KYC_RESULT) {
+      if ([VerificationEvents.VERIFICATION_KYC_RESULT, VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT].includes(kind)) {
+        isKycInPendingState = false; // kyc result event means that kyc is not in pending state anymore
         const { status, reasons } = <VerificationKycResultEvent>event;
         kycStatus = status;
         kycCounter++;
         someReasons = reasons;
       }
 
-      if (kind === VerificationEvents.VERIFICATION_AML_RESULT) {
+      if ([VerificationEvents.VERIFICATION_AML_RESULT, VerificationEvents.MANUAL_VERIFICATION_AML_RESULT].includes(kind)) {
         const { status } = <VerificationAmlResultEvent>event;
         amlStatus = status;
       }
@@ -86,6 +89,10 @@ export abstract class AbstractVerifier {
         wasFailedRequest = false;
         someReasons = [];
       }
+
+      if (kind === VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING) {
+        isKycInPendingState = true;
+      }
     }
 
     return {
@@ -95,6 +102,7 @@ export abstract class AbstractVerifier {
       reasons: someReasons,
       wasFailedRequest,
       objectUpdatesCounter,
+      isKycInPendingState,
     };
   }
 
@@ -107,13 +115,13 @@ export abstract class AbstractVerifier {
       return;
     }
 
-    if (!this.canThisEventBeHandled(event, availableEvents)) {
-      console.error('Wrong verification event in the current state', event, this.decision);
-
+    if (this.wasEventSeen(event)) {
       return;
     }
 
-    if (this.wasEventSeen(event)) {
+    if (!this.canThisEventBeHandled(event, availableEvents)) {
+      console.error('Wrong verification event in the current state', event, this.decision);
+
       return;
     }
 
@@ -135,9 +143,9 @@ export abstract class AbstractVerifier {
 
     // result event with the same id
     if (verificationResultsEvents.includes(newEvent.kind)) {
-      const { eventId } = <VerificationResultEvent>newEvent;
+      const { eventId } = <AutomaticVerificationResultEvent>newEvent;
       const eventExists = this.events.list.find(
-        (event: VerificationEvent) => verificationResultsEvents.includes(event.kind) && (<VerificationResultEvent>event).eventId === eventId,
+        (event: VerificationEvent) => verificationResultsEvents.includes(event.kind) && (<AutomaticVerificationResultEvent>event).eventId === eventId,
       );
 
       return !!eventExists;
@@ -146,8 +154,8 @@ export abstract class AbstractVerifier {
     // administrative or user event with the same name
     const lastEvent = this.events.list[this.events.list.length - 1];
 
-    if (lastEvent && 'name' in newEvent && 'name' in lastEvent) {
-      return lastEvent.name === newEvent.name;
+    if (lastEvent) {
+      return lastEvent.kind === newEvent.kind;
     }
 
     return false;

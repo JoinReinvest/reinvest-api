@@ -26,7 +26,7 @@ export interface Verifier {
 
   getVerificationState(): VerificationState;
 
-  handleVerificationEvent(event: VerificationEvent): void;
+  handleVerificationEvent(event: VerificationEvent | VerificationEvent[]): void;
 
   makeDecision(): VerificationDecision;
 }

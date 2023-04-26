@@ -9,8 +9,12 @@ export class ProfileVerifier extends PartyVerifier implements Verifier {
     this.makeDecision();
   }
 
-  handleVerificationEvent(event: VerificationEvent) {
-    super.handleEvent(event, this.availableEventsForDecision);
+  handleVerificationEvent(events: VerificationEvent | VerificationEvent[]) {
+    const eventsToHandle = !Array.isArray(events) ? [events] : events;
+    eventsToHandle.forEach(event => {
+      super.handleEvent(event, this.availableEventsForDecision);
+    });
+
     this.makeDecision();
   }
 

@@ -34,8 +34,12 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     this.makeDecision();
   }
 
-  handleVerificationEvent(event: VerificationEvent) {
-    this.handleEvent(event, this.availableEventsForDecision);
+  handleVerificationEvent(events: VerificationEvent | VerificationEvent[]) {
+    const eventsToHandle = !Array.isArray(events) ? [events] : events;
+    eventsToHandle.forEach(event => {
+      super.handleEvent(event, this.availableEventsForDecision);
+    });
+
     this.makeDecision();
   }
 

@@ -56,11 +56,11 @@ const page = (apiUrl: string, token: string, isAdmin: boolean) => `
     </script>
         <a href="/explorer${
           isAdmin ? '/admin' : ''
-        }" style="position: fixed;top:60px;right:47px;color:rgba(59, 75, 104, 0.76);font-family:Roboto;font-size:18px;font-weight:500;">Relogin</a>
+        }" style="position: fixed;top:60px;right:47px;color:rgb(180, 0, 0);font-family:Roboto;font-size:18px;font-weight:500;">Relogin</a>
         ${
           isAdmin
-            ? '<a href="/explorer" style="position: fixed;top:86px;right:31px;color:rgba(59, 75, 104, 0.76);font-family:Roboto;font-size:18px;font-weight:500;">User Exp.</a>'
-            : '<a href="/explorer/admin" style="position: fixed;top:86px;right:16px;color:rgba(59, 75, 104, 0.76);font-family:Roboto;font-size:18px;font-weight:500;">Admin Exp.</a>'
+            ? '<a href="/explorer" style="position: fixed;top:86px;right:31px;color:rgb(180, 0, 0);font-family:Roboto;font-size:18px;font-weight:500;">User Exp.</a>'
+            : '<a href="/explorer/admin" style="position: fixed;top:86px;right:16px;color:rgb(180, 0, 0);font-family:Roboto;font-size:18px;font-weight:500;">Admin Exp.</a>'
         }
   </body>
 </html>

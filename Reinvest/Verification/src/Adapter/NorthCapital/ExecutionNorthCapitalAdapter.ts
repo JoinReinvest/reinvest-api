@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import FormData from 'form-data';
-import { NorthCapitalConfig } from 'Verification/Adapter/NorthCapital/NorthCapitalAdapter';
 import NorthCapitalException from 'Verification/Adapter/NorthCapital/NorthCapitalException';
+import { NorthCapitalConfig } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 
 export abstract class ExecutionNorthCapitalAdapter {
   clientId: string;
@@ -20,8 +20,7 @@ export abstract class ExecutionNorthCapitalAdapter {
       const response: AxiosResponse = await axios.put(`${this.url}/${endpoint}`, putData);
 
       return response.data;
-    } catch (error) {
-      // @ts-ignore
+    } catch (error: any) {
       const {
         response: {
           data: { statusCode, statusDesc },
@@ -37,8 +36,7 @@ export abstract class ExecutionNorthCapitalAdapter {
       const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
 
       return response.data;
-    } catch (error) {
-      // @ts-ignore
+    } catch (error: any) {
       const {
         response: {
           data: { statusCode, statusDesc },

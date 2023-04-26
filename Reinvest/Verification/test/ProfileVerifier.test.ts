@@ -25,7 +25,6 @@ const amlEvent = <VerificationAmlResultEvent>{
   source: 'DIRECT',
   status: VerificationStatus.APPROVED,
   eventId: `aml-${verificationId}`,
-  verificationWay: 'AUTOMATIC',
 };
 
 const kycEvent = <VerificationKycResultEvent>{
@@ -36,7 +35,6 @@ const kycEvent = <VerificationKycResultEvent>{
   source: 'DIRECT',
   status: VerificationStatus.APPROVED,
   eventId: `kyc-${verificationId}`,
-  verificationWay: 'AUTOMATIC',
 };
 
 const errorEvent = <VerificationNorthCapitalObjectFailedEvent>{

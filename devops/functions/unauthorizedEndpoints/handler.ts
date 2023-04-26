@@ -7,6 +7,7 @@ import serverless from 'serverless-http';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }) as any);
+app.use(bodyParser.json() as any);
 
 app.post('/incentive-token', async function (req: any, res: any) {
   const modules = boot();
@@ -24,6 +25,12 @@ app.post('/incentive-token', async function (req: any, res: any) {
   const status = await identityModule.isIncentiveTokenValid(token);
   await modules.close();
   res.json({ status });
+});
+
+app.post('/external-vendors/updateParty', async function (req: any, res: any) {
+  console.log(JSON.stringify(req.body));
+
+  res.json({ status: true });
 });
 
 export const main = serverless(app);

@@ -16,25 +16,29 @@ export class PartyVerifier extends AbstractVerifier {
       VerificationEvents.VERIFICATION_AML_RESULT,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
     ],
-    [VerificationDecisionType.WAIT_FOR_SUPPORT]: [
-      VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
-      VerificationEvents.VERIFICATION_KYC_RESULT,
+    [VerificationDecisionType.REQUEST_AML_VERIFICATION]: [
       VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
     ],
+    [VerificationDecisionType.WAIT_FOR_SUPPORT]: [VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE],
     [VerificationDecisionType.UPDATE_REQUIRED]: [VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED],
     [VerificationDecisionType.SECOND_UPDATE_REQUIRED]: [VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED],
     [VerificationDecisionType.PROFILE_BANNED]: [VerificationEvents.VERIFICATION_PROFILE_UNBANNED_ADMINISTRATIVE],
     [VerificationDecisionType.ACCOUNT_BANNED]: [VerificationEvents.VERIFICATION_ACCOUNT_UNBANNED_ADMINISTRATIVE],
     [VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED]: [
-      VerificationEvents.VERIFICATION_KYC_RESULT,
-      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
+      VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+    ],
+    [VerificationDecisionType.SET_KYC_STATUS_TO_PENDING]: [
+      VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
     ],
   };
 
   protected makeDecisionForParty(onObject: VerificationObject): VerificationDecision {
     let decision: VerificationDecisionType = VerificationDecisionType.UNKNOWN;
-    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest, objectUpdatesCounter } = this.analyzeEvents();
+    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest, objectUpdatesCounter, isKycInPendingState } = this.analyzeEvents();
     let someReasons = reasons;
 
     if (wasFailedRequest) {
@@ -75,7 +79,13 @@ export class PartyVerifier extends AbstractVerifier {
 
       // user updated object, so now we must wait for manual kyc review
       if (kycCounter === 2 && objectUpdatesCounter === 2) {
-        decision = VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED;
+        if (isKycInPendingState) {
+          // object is prepared for manual verification
+          decision = VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED;
+        } else {
+          // we need to prepare object for manual verification
+          decision = VerificationDecisionType.SET_KYC_STATUS_TO_PENDING;
+        }
       }
 
       if (kycCounter >= 3) {
@@ -99,8 +109,17 @@ export class PartyVerifier extends AbstractVerifier {
       };
     }
 
-    if (kycStatus === VerificationStatus.PENDING || amlStatus === VerificationStatus.PENDING) {
+    if (kycStatus === VerificationStatus.PENDING) {
       decision = VerificationDecisionType.REQUEST_VERIFICATION;
+
+      return {
+        decision,
+        onObject,
+      };
+    }
+
+    if (amlStatus === VerificationStatus.PENDING) {
+      decision = VerificationDecisionType.REQUEST_AML_VERIFICATION;
 
       return {
         decision,

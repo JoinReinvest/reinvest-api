@@ -15,44 +15,42 @@ export class VerifierExecutor {
 
     if ([VerificationDecisionType.REQUEST_VERIFICATION].includes(decision.decision)) {
       const verificationResult = await this.northCapitalAdapter.verifyParty(verifier.getPartyId());
-
-      verificationResult?.forEach(event => {
-        verifier.handleVerificationEvent(event);
-      });
+      verifier.handleVerificationEvent(verificationResult);
 
       return verifier.makeDecision();
     }
 
-    if ([VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED, VerificationDecisionType.UPDATE_REQUIRED].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.getPartyVerificationStatus(verifier.getPartyId());
+    if ([VerificationDecisionType.SET_KYC_STATUS_TO_PENDING].includes(decision.decision)) {
+      const event = await this.northCapitalAdapter.setPartyKycStatusToPending(verifier.getPartyId());
+      verifier.handleVerificationEvent(event);
 
-      verificationResult?.forEach(event => {
-        verifier.handleVerificationEvent(event);
-      });
+      return verifier.makeDecision();
+    }
+
+    if ([VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED].includes(decision.decision)) {
+      const verificationResult = await this.northCapitalAdapter.getPartyKycAmlStatus(verifier.getPartyId());
+      verifier.handleVerificationEvent(verificationResult);
 
       return verifier.makeDecision();
     }
 
     if ([VerificationDecisionType.REQUEST_AML_VERIFICATION].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.verifyEntityAml(verifier.getPartyId());
-
-      verificationResult?.forEach(event => {
-        verifier.handleVerificationEvent(event);
-      });
+      const verificationResult = await this.northCapitalAdapter.verifyAmlOnly(verifier.getPartyId());
+      verifier.handleVerificationEvent(verificationResult);
 
       return verifier.makeDecision();
     }
 
     // todo revisit manual kyb decisions
-    if ([VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED, VerificationDecisionType.ENTITY_UPDATE_REQUIRED].includes(decision.decision)) {
-      const verificationResult = await this.northCapitalAdapter.getEntityVerificationStatus(verifier.getPartyId());
-
-      verificationResult?.forEach(event => {
-        verifier.handleVerificationEvent(event);
-      });
-
-      return verifier.makeDecision();
-    }
+    // if ([VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED, VerificationDecisionType.ENTITY_UPDATE_REQUIRED].includes(decision.decision)) {
+    //   const verificationResult = await this.northCapitalAdapter.getEntityVerificationStatus(verifier.getPartyId());
+    //
+    //   verificationResult?.forEach(event => {
+    //     verifier.handleVerificationEvent(event);
+    //   });
+    //
+    //   return verifier.makeDecision();
+    // }
 
     return decision;
   }

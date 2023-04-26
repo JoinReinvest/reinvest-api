@@ -7,6 +7,8 @@ export enum VerificationStatus {
 export enum VerificationEvents {
   VERIFICATION_KYC_RESULT = 'VerificationKycResult',
   VERIFICATION_AML_RESULT = 'VerificationAmlResult',
+  MANUAL_VERIFICATION_KYC_RESULT = 'ManualVerificationKycResult',
+  MANUAL_VERIFICATION_AML_RESULT = 'ManualVerificationAmlResult',
   VERIFICATION_RECOVERED_ADMINISTRATIVE = 'VerificationRecoveredAdministrativeEvent',
   VERIFICATION_PROFILE_UNBANNED_ADMINISTRATIVE = 'VerificationProfileUnbannedAdministrativeEvent',
   VERIFICATION_ACCOUNT_UNBANNED_ADMINISTRATIVE = 'VerificationAccountUnbannedAdministrativeEvent',
@@ -14,6 +16,7 @@ export enum VerificationEvents {
   VERIFICATION_REQUESTED_OBJECT_UPDATED = 'VerificationRequestedObjectUpdatedEvent',
   VERIFICATION_USER_OBJECT_UPDATED = 'VerificationUserObjectUpdatedEvent',
   VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED = 'VerificationNorthCapitalRequestFailedEvent',
+  VERIFICATION_KYC_SET_TO_PENDING = 'VerificationKycSetToPendingEvent',
 }
 
 export type VerificationEvent = {
@@ -22,20 +25,37 @@ export type VerificationEvent = {
   ncId: string;
 };
 
-export type VerificationResultEvent = VerificationEvent & {
+export type AutomaticVerificationResultEvent = VerificationEvent & {
   eventId: string;
   reasons: string[];
   source: 'DIRECT' | 'EVENT';
   status: VerificationStatus;
-  verificationWay: 'MANUAL' | 'AUTOMATIC';
 };
 
-export type VerificationKycResultEvent = VerificationResultEvent & {
+export type ManualVerificationResultEvent = VerificationEvent & {
+  reasons: string[];
+  source: 'DIRECT' | 'EVENT';
+  status: VerificationStatus;
+};
+
+export type VerificationKycResultEvent = AutomaticVerificationResultEvent & {
   kind: VerificationEvents.VERIFICATION_KYC_RESULT;
 };
 
-export type VerificationAmlResultEvent = VerificationResultEvent & {
+export type VerificationAmlResultEvent = AutomaticVerificationResultEvent & {
   kind: VerificationEvents.VERIFICATION_AML_RESULT;
+};
+
+export type ManualVerificationKycResult = ManualVerificationResultEvent & {
+  kind: VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT;
+};
+
+export type ManualVerificationAmlResult = ManualVerificationResultEvent & {
+  kind: VerificationEvents.MANUAL_VERIFICATION_AML_RESULT;
+};
+
+export type VerificationKycSetToPendingEvent = VerificationEvent & {
+  kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING;
 };
 
 export type VerificationRecoveredAdministrativeEvent = VerificationEvent & {
