@@ -1,11 +1,11 @@
 import { AvailableEventsForDecision, VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
+  AutomaticVerificationResultEvent,
   VerificationAmlResultEvent,
   VerificationEvent,
   VerificationEvents,
   VerificationKycResultEvent,
   VerificationNorthCapitalObjectFailedEvent,
-  AutomaticVerificationResultEvent,
   VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
@@ -26,26 +26,34 @@ export abstract class AbstractVerifier {
     this.init();
   }
 
-  private init(): void {
-    if (!this.events?.list) {
-      this.events.list = [];
-    }
+  getVerificationState(): VerificationState {
+    return {
+      decision: this.decision,
+      events: this.events,
+      id: this.id,
+      ncId: this.ncId,
+      type: this.type,
+    };
+  }
 
-    if (!this.decision?.decision) {
-      this.decision = {
-        decision: VerificationDecisionType.UNKNOWN,
-        onObject: {
-          type: this.type,
-        },
-      };
-    }
+  getPartyId(): string {
+    return this.ncId;
+  }
+
+  canBeUpdated(): boolean {
+    return [
+      VerificationDecisionType.UPDATE_REQUIRED,
+      VerificationDecisionType.SECOND_UPDATE_REQUIRED,
+      VerificationDecisionType.ENTITY_UPDATE_REQUIRED,
+    ].includes(this.decision.decision);
   }
 
   protected analyzeEvents(): {
     amlStatus: VerificationStatus;
+    failedKycCounter: number;
     isKycInPendingState: boolean;
-    kycCounter: number;
     kycStatus: VerificationStatus;
+    needMoreInfo: boolean;
     objectUpdatesCounter: number;
     reasons: string[];
     wasFailedRequest: boolean;
@@ -53,10 +61,11 @@ export abstract class AbstractVerifier {
     let amlStatus = VerificationStatus.PENDING;
     let kycStatus = VerificationStatus.PENDING;
     let objectUpdatesCounter = 0;
-    let kycCounter = 0;
+    let failedKycCounter = 0;
     let someReasons: string[] = [];
     let wasFailedRequest = false;
     let isKycInPendingState = false;
+    let needMoreInfo = false;
 
     for (const event of this.events.list) {
       const { kind } = event;
@@ -65,24 +74,43 @@ export abstract class AbstractVerifier {
       if ([VerificationEvents.VERIFICATION_KYC_RESULT, VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT].includes(kind)) {
         isKycInPendingState = false; // kyc result event means that kyc is not in pending state anymore
         const { status, reasons } = <VerificationKycResultEvent>event;
-        kycStatus = status;
-        kycCounter++;
+
+        if (status === VerificationStatus.NEED_MORE_INFO) {
+          needMoreInfo = true;
+        } else {
+          kycStatus = status;
+        }
+
         someReasons = reasons;
+
+        if (status === VerificationStatus.DISAPPROVED) {
+          failedKycCounter++;
+        }
       }
 
       if ([VerificationEvents.VERIFICATION_AML_RESULT, VerificationEvents.MANUAL_VERIFICATION_AML_RESULT].includes(kind)) {
-        const { status } = <VerificationAmlResultEvent>event;
-        amlStatus = status;
+        const { status, reasons } = <VerificationAmlResultEvent>event;
+
+        if (status === VerificationStatus.NEED_MORE_INFO) {
+          needMoreInfo = true;
+          someReasons = reasons;
+        } else {
+          amlStatus = status;
+        }
+      }
+
+      if (kind === VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED) {
+        if (needMoreInfo) {
+          needMoreInfo = false;
+        } else {
+          objectUpdatesCounter++;
+        }
       }
 
       if (kind === VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED) {
         const { reason } = <VerificationNorthCapitalObjectFailedEvent>event;
         wasFailedRequest = true;
         someReasons = [reason];
-      }
-
-      if (kind === VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED) {
-        objectUpdatesCounter++;
       }
 
       if (kind === VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE) {
@@ -98,9 +126,10 @@ export abstract class AbstractVerifier {
     return {
       amlStatus,
       kycStatus,
-      kycCounter,
+      failedKycCounter,
       reasons: someReasons,
       wasFailedRequest,
+      needMoreInfo,
       objectUpdatesCounter,
       isKycInPendingState,
     };
@@ -128,16 +157,6 @@ export abstract class AbstractVerifier {
     this.events.list.push(event);
   }
 
-  getVerificationState(): VerificationState {
-    return {
-      decision: this.decision,
-      events: this.events,
-      id: this.id,
-      ncId: this.ncId,
-      type: this.type,
-    };
-  }
-
   protected wasEventSeen(newEvent: VerificationEvent): boolean {
     const verificationResultsEvents = [VerificationEvents.VERIFICATION_KYC_RESULT, VerificationEvents.VERIFICATION_AML_RESULT];
 
@@ -161,16 +180,19 @@ export abstract class AbstractVerifier {
     return false;
   }
 
-  getPartyId(): string {
-    return this.ncId;
-  }
+  private init(): void {
+    if (!this.events?.list) {
+      this.events.list = [];
+    }
 
-  canBeUpdated(): boolean {
-    return [
-      VerificationDecisionType.UPDATE_REQUIRED,
-      VerificationDecisionType.SECOND_UPDATE_REQUIRED,
-      VerificationDecisionType.ENTITY_UPDATE_REQUIRED,
-    ].includes(this.decision.decision);
+    if (!this.decision?.decision) {
+      this.decision = {
+        decision: VerificationDecisionType.UNKNOWN,
+        onObject: {
+          type: this.type,
+        },
+      };
+    }
   }
 
   private canThisEventBeHandled(event: VerificationEvent, availableEvents: AvailableEventsForDecision) {

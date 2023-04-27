@@ -6,7 +6,6 @@ import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/Verifie
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 
 export class VerifyAccount {
-  static getClassName = () => 'VerifyAccount';
   private registrationService: RegistrationService;
   private verifierRepository: VerifierRepository;
   private verifierExecutor: VerifierExecutor;
@@ -17,6 +16,8 @@ export class VerifyAccount {
     this.verifierExecutor = verifierExecutor;
   }
 
+  static getClassName = () => 'VerifyAccount';
+
   async verify(profileId: string, accountId: string): Promise<AccountVerificationDecision> {
     try {
       console.log('verify account id ' + accountId);
@@ -25,7 +26,7 @@ export class VerifyAccount {
       const accountVerifier = new AccountVerifier(profileId, accountId);
       const verifierExecutor = this.verifierExecutor;
 
-      const decisions = await Promise.all(verifiers.map((verifier: Verifier) => verifierExecutor.executeDecision(verifier)));
+      const decisions = await Promise.all(verifiers.map(async (verifier: Verifier) => await verifierExecutor.executeDecision(verifier)));
       await this.verifierRepository.storeVerifiers(verifiers);
 
       return accountVerifier.makeAccountVerificationDecision(decisions);

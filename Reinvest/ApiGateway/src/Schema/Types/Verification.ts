@@ -1,9 +1,7 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
-import { Verification } from 'Verification/index';
-import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
 import { LegalEntities } from 'LegalEntities/index';
-import { CompleteProfileInput } from 'LegalEntities/UseCases/CompleteProfile';
 import { Registration } from 'Registration/index';
+import { Verification } from 'Verification/index';
 
 const schema = `
     #graphql
@@ -131,42 +129,42 @@ export const VerificationSchema = {
         const verificationApi = modules.getApi<Verification.ApiType>(Verification);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
 
-        const canObjectBeUpdate = await verificationApi.canObjectBeUpdated(profileId);
+        const canObjectBeUpdate = await verificationApi.canObjectBeUpdated(stakeholderId);
 
         if (!canObjectBeUpdate) {
           throw new JsonGraphQLError('NO_UPDATE_ALLOWED');
         }
         // const { input } = data;
-        // const errors = await legalEntitiesApi.updateProfileForVerification(input, profileId);
+        // const errors = await legalEntitiesApi.updateProfileForVerification(input, stakeholderId);
 
         // if (errors.length > 0) {
         //   throw new JsonGraphQLError(errors);
         // }
 
-        // const status = await registrationApi.synchronizeProfile(profileId);
+        // const status = await registrationApi.synchronizeProfile(stakeholderId);
 
-        return await verificationApi.notifyAboutUpdate(profileId);
+        return await verificationApi.notifyAboutUpdate(stakeholderId);
       },
       updateCompanyForVerification: async (parent: any, { accountId, input }: any, { profileId, modules }: SessionContext): Promise<boolean> => {
         const legalEntitiesApi = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const verificationApi = modules.getApi<Verification.ApiType>(Verification);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
 
-        const canObjectBeUpdate = await verificationApi.canObjectBeUpdated(profileId);
+        const canObjectBeUpdate = await verificationApi.canObjectBeUpdated(accountId);
 
         if (!canObjectBeUpdate) {
           throw new JsonGraphQLError('NO_UPDATE_ALLOWED');
         }
         // const { input } = data;
-        // const errors = await legalEntitiesApi.updateProfileForVerification(input, profileId);
+        // const errors = await legalEntitiesApi.updateProfileForVerification(input, accountId);
 
         // if (errors.length > 0) {
         //   throw new JsonGraphQLError(errors);
         // }
 
-        // const status = await registrationApi.synchronizeProfile(profileId);
+        // const status = await registrationApi.synchronizeProfile(accountId);
 
-        return await verificationApi.notifyAboutUpdate(profileId);
+        return await verificationApi.notifyAboutUpdate(accountId);
       },
     },
   },

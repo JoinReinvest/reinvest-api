@@ -2,6 +2,7 @@ export enum VerificationStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   DISAPPROVED = 'DISAPPROVED',
+  NEED_MORE_INFO = 'NEED_MORE_INFO',
 }
 
 export enum VerificationEvents {

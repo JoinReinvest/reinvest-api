@@ -38,7 +38,7 @@ export class PartyVerifier extends AbstractVerifier {
 
   protected makeDecisionForParty(onObject: VerificationObject): VerificationDecision {
     let decision: VerificationDecisionType = VerificationDecisionType.UNKNOWN;
-    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest, objectUpdatesCounter, isKycInPendingState } = this.analyzeEvents();
+    const { amlStatus, failedKycCounter, kycStatus, reasons, needMoreInfo, wasFailedRequest, objectUpdatesCounter, isKycInPendingState } = this.analyzeEvents();
     let someReasons = reasons;
 
     if (wasFailedRequest) {
@@ -61,24 +61,32 @@ export class PartyVerifier extends AbstractVerifier {
       };
     }
 
+    if (needMoreInfo) {
+      return {
+        decision: VerificationDecisionType.UPDATE_REQUIRED,
+        onObject,
+        reasons: someReasons,
+      };
+    }
+
     if (kycStatus === VerificationStatus.DISAPPROVED) {
       // must await for update
-      if (kycCounter === 1 && objectUpdatesCounter === 0) {
+      if (failedKycCounter === 1 && objectUpdatesCounter === 0) {
         decision = VerificationDecisionType.UPDATE_REQUIRED;
       }
 
       // user updated object, so we can check it again
-      if (kycCounter === 1 && objectUpdatesCounter === 1) {
+      if (failedKycCounter === 1 && objectUpdatesCounter === 1) {
         decision = VerificationDecisionType.REQUEST_VERIFICATION;
       }
 
       // user updated object, but it failed again - request another update
-      if (kycCounter === 2 && objectUpdatesCounter === 1) {
+      if (failedKycCounter === 2 && objectUpdatesCounter === 1) {
         decision = VerificationDecisionType.SECOND_UPDATE_REQUIRED;
       }
 
       // user updated object, so now we must wait for manual kyc review
-      if (kycCounter === 2 && objectUpdatesCounter === 2) {
+      if (failedKycCounter === 2 && objectUpdatesCounter === 2) {
         if (isKycInPendingState) {
           // object is prepared for manual verification
           decision = VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED;
@@ -88,7 +96,7 @@ export class PartyVerifier extends AbstractVerifier {
         }
       }
 
-      if (kycCounter >= 3) {
+      if (failedKycCounter >= 3) {
         decision = this.isProfile() ? VerificationDecisionType.PROFILE_BANNED : VerificationDecisionType.ACCOUNT_BANNED;
         someReasons = ['Manual KYC verification failed'];
       }
@@ -131,7 +139,7 @@ export class PartyVerifier extends AbstractVerifier {
       onObject,
       amlStatus,
       kycStatus,
-      kycCounter,
+      failedKycCounter: failedKycCounter,
       reasons,
       wasFailedRequest,
       objectUpdatesCounter,

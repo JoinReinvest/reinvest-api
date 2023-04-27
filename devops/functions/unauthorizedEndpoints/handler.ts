@@ -4,6 +4,7 @@ import { boot } from 'Reinvest/bootstrap';
 import { Identity } from 'Reinvest/Identity/src';
 import { IdentityApiType } from 'Reinvest/Identity/src/Port/Api/IdentityApi';
 import serverless from 'serverless-http';
+import { Verification } from 'Verification/index';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }) as any);
@@ -27,10 +28,28 @@ app.post('/incentive-token', async function (req: any, res: any) {
   res.json({ status });
 });
 
+const northCapitalVerificationStatuses = ['Pending', 'Disapproved', 'Manually Approved', 'Auto Approved', 'Need More Info'];
+
 app.post('/external-vendors/updateParty', async function (req: any, res: any) {
   console.log(JSON.stringify(req.body));
+  const { partyId, KYCstatus: kycStatus, AMLstatus: amlStatus } = req.body;
 
-  res.json({ status: true });
+  if (!partyId || !kycStatus || !northCapitalVerificationStatuses.includes(kycStatus)) {
+    console.warn(`No partyId or kycStatus provided`);
+    res.json({ status: false });
+
+    return;
+  }
+
+  const modules = boot();
+  const verificationModule = modules.getApi<Verification.ApiType>(Verification);
+
+  const aml = !amlStatus || !northCapitalVerificationStatuses.includes(amlStatus) ? null : amlStatus;
+  await verificationModule.handleNorthCapitalVerificationEvent(partyId, kycStatus, aml);
+
+  await modules.close();
+
+  res.json({ status: true, partyId, kycStatus, amlStatus });
 });
 
 export const main = serverless(app);
