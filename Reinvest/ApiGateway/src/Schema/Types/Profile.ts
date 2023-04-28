@@ -1,5 +1,4 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
-import { GraphQLError } from 'graphql';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
@@ -108,12 +107,6 @@ const schema = `
         To finish onboarding send field 'verifyAndFinish'
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
-
-        """
-        Open REINVEST Account based on draft.
-        Currently supported: Individual Account
-        """
-        openAccount(draftAccountId: String): Boolean
     }
 `;
 
@@ -147,17 +140,6 @@ export const Profile = {
         }
 
         return api.getProfile(profileId);
-      },
-
-      openAccount: async (parent: any, { draftAccountId }: any, { profileId, modules }: SessionContext) => {
-        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-        const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
-
-        if (error !== null) {
-          throw new GraphQLError(error);
-        }
-
-        return true;
       },
     },
   },

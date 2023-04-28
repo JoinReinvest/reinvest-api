@@ -1,4 +1,5 @@
-import { SessionContext } from 'ApiGateway/index';
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
 
 const schema = `
@@ -74,7 +75,7 @@ const schema = `
         """IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request"""
         idScan: [DocumentFileLinkInput]
     }
-    
+
     input UpdateCompanyForVerificationInput {
         companyName: CompanyNameInput
         address: AddressInput
@@ -91,6 +92,33 @@ const schema = `
         companyType: CorporateCompanyTypeInput
     }
 
+    input BeneficiaryNameInput {
+        firstName: String!
+        lastName: String!
+    }
+
+    type BeneficiaryName{
+        firstName: String!
+        lastName: String!
+    }
+
+    input CreateBeneficiaryInput {
+        name: BeneficiaryNameInput!
+        avatar: AvatarFileLinkInput
+    }
+
+    type BeneficiaryDetails {
+        name: BeneficiaryName
+    }
+
+    type BeneficiaryAccount {
+        id: ID
+        label: String
+        avatar: GetAvatarLink
+        positionTotal: String
+        details: BeneficiaryDetails
+    }
+
     type Query {
         """
         Return all accounts overview
@@ -103,6 +131,11 @@ const schema = `
         """
         getIndividualAccount: IndividualAccount
         """
+        Returns beneficiary account information
+        [PARTIAL_MOCK] Position total is still mocked!!
+        """
+        getBeneficiaryAccount(accountId: String): BeneficiaryAccount
+        """
         Returns corporate account information
         [PARTIAL_MOCK] Position total is still mocked!!
         """
@@ -112,6 +145,19 @@ const schema = `
         [PARTIAL_MOCK] Position total is still mocked!!
         """
         getTrustAccount(accountId: String): TrustAccount
+    }
+
+    type Mutation {
+        """
+        Open REINVEST Account based on draft.
+        Currently supported: Individual Account
+        """
+        openAccount(draftAccountId: String): Boolean
+
+        """
+        Open beneficiary account
+        """
+        openBeneficiaryAccount(individualAccountId: String!, input: CreateBeneficiaryInput!): BeneficiaryAccount
     }
 `;
 
@@ -126,6 +172,15 @@ export const Account = {
         return {
           ...account,
           positionTotal: '$5,560',
+        };
+      },
+      getBeneficiaryAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const account = await api.readBeneficiaryAccount(profileId, accountId);
+
+        return {
+          ...account,
+          positionTotal: '$1,150.25',
         };
       },
       getCorporateAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
@@ -156,6 +211,33 @@ export const Account = {
             positionTotal: '$5,560',
           };
         });
+      },
+    },
+    Mutation: {
+      openAccount: async (parent: any, { draftAccountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
+
+        if (error !== null) {
+          throw new GraphQLError(error);
+        }
+
+        return true;
+      },
+      openBeneficiaryAccount: async (parent: any, { individualAccountId, input: beneficiaryData }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const response = await api.openBeneficiaryAccount(profileId, individualAccountId, beneficiaryData);
+
+        if (!response.status || !response?.accountId) {
+          throw new JsonGraphQLError(response.errors);
+        }
+
+        const account = await api.readBeneficiaryAccount(profileId, response.accountId);
+
+        return {
+          ...account,
+          positionTotal: '$1,150.25',
+        };
       },
     },
   },

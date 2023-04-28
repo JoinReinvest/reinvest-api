@@ -10,10 +10,11 @@ import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { CompanyNameInput, CompanyTypeInput } from 'LegalEntities/Domain/ValueObject/Company';
 import { DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
-import { DomicileType, SimplifiedDomicileType } from 'LegalEntities/Domain/ValueObject/Domicile';
+import { SimplifiedDomicileType } from 'LegalEntities/Domain/ValueObject/Domicile';
 import { PersonalNameInput } from 'LegalEntities/Domain/ValueObject/PersonalName';
 import { EIN, SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { BeneficiaryAccountResponse } from 'LegalEntities/Port/Api/ReadAccountController';
 
 export type IndividualAccountForSynchronization = {
   accountId: string;
@@ -59,12 +60,13 @@ export type StakeholderForSynchronization = StakeholderOutput & {
 };
 
 export class AccountRepository {
-  public static getClassName = (): string => 'AccountRepository';
   private databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
+
+  public static getClassName = (): string => 'AccountRepository';
 
   async createIndividualAccount(account: IndividualAccount): Promise<boolean> {
     const { accountId, profileId, employmentStatus, employer, netIncome, netWorth, avatar } = account.toObject();
@@ -464,5 +466,23 @@ export class AccountRepository {
     } catch (error: any) {
       return null;
     }
+  }
+
+  async findBeneficiaryAccount(profileId: string, accountId: string): Promise<BeneficiaryAccountResponse> {
+    return {
+      id: 'test',
+      label: 'First Last',
+      avatar: {
+        url: null,
+        initials: 'FL',
+        id: 'test-avatar',
+      },
+      details: {
+        name: {
+          firstName: 'First',
+          lastName: 'Last',
+        },
+      },
+    };
   }
 }

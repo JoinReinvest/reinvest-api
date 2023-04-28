@@ -8,7 +8,7 @@ import {
 import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
-import { StakeholderInput, StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { AvatarOutput, AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
 
 export type IndividualAccountResponse = {
@@ -63,6 +63,18 @@ export type CompanyAccountResponse = {
   label: string;
 };
 
+export type BeneficiaryAccountResponse = {
+  avatar: AvatarOutput;
+  details: {
+    name: {
+      firstName: string;
+      lastName: string;
+    };
+  };
+  id: string;
+  label: string;
+};
+
 export type AccountsOverviewResponse = {
   avatar: AvatarOutput;
   id: string;
@@ -71,7 +83,6 @@ export type AccountsOverviewResponse = {
 };
 
 export class ReadAccountController {
-  public static getClassName = (): string => 'ReadAccountController';
   private accountRepository: AccountRepository;
   private avatarQuery: AvatarQuery;
 
@@ -79,6 +90,8 @@ export class ReadAccountController {
     this.accountRepository = accountRepository;
     this.avatarQuery = avatarQuery;
   }
+
+  public static getClassName = (): string => 'ReadAccountController';
 
   public async getIndividualAccount(profileId: string): Promise<IndividualAccountResponse> {
     const account = await this.accountRepository.findIndividualAccount(profileId);
@@ -193,5 +206,28 @@ export class ReadAccountController {
         ),
       },
     };
+  }
+
+  public async readBeneficiaryAccount(profileId: string, accountId: string): Promise<BeneficiaryAccountResponse> {
+    const account = await this.accountRepository.findBeneficiaryAccount(profileId, accountId);
+
+    return account;
+    // if (account === null) {
+    //   return {} as BeneficiaryAccountResponse;
+    // }
+    //
+    // const accountObject = account.toObject();
+    //
+    // return {
+    //   id: accountObject.accountId,
+    //   label: account.getLabel(),
+    //   avatar: await this.avatarQuery.getAvatarForAccount(account),
+    //   details: {
+    //     name: {
+    //       firstName: accountObject.firstName,
+    //       lastName: accountObject.lastName,
+    //     },
+    //   },
+    // };
   }
 }
