@@ -20,7 +20,7 @@ export const UnauthorizedEndpointsFunction = {
     {
       httpApi: {
         method: 'POST',
-        path: '/external-vendors/{proxy+}',
+        path: '/webhooks/{proxy+}',
       },
     },
   ],

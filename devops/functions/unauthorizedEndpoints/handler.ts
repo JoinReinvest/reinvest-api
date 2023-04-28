@@ -30,7 +30,7 @@ app.post('/incentive-token', async function (req: any, res: any) {
 
 const northCapitalVerificationStatuses = ['Pending', 'Disapproved', 'Manually Approved', 'Auto Approved', 'Need More Info'];
 
-app.post('/external-vendors/updateParty', async function (req: any, res: any) {
+app.post('/webhooks/updateParty', async function (req: any, res: any) {
   console.log(JSON.stringify(req.body));
   const { partyId, KYCstatus: kycStatus, AMLstatus: amlStatus } = req.body;
 
@@ -49,7 +49,7 @@ app.post('/external-vendors/updateParty', async function (req: any, res: any) {
 
   await modules.close();
 
-  res.json({ status: true, partyId, kycStatus, amlStatus });
+  res.json({ status: true });
 });
 
 export const main = serverless(app);

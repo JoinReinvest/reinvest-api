@@ -3,6 +3,8 @@
 ## 1.11.2 - 04/26/2023
 
 * `DocumentFileLinkInput` mutation accepts case insensitive `fileName` extension
+* New unauthorized endpoint for webhooks:
+  * `POST /webhooks/updateParty` - it handles events from North Capital regarding updating KYC and AML status
 
 ## 1.11.1 - 04/26/2023
 
@@ -38,7 +40,7 @@
                 * `REQUIRE_MANUAL_REVIEW` or `REQUIRE_ADMIN_SUPPORT`: just information, no action on frontend is
                   required (`canUserContinueTheInvestment` should be set to `true`)
 * Added Admin API and Admin Explorer mode:
-    * to login as admin, add your Cognito user to `Admins` or `Executives` group
+    * to login as admin, add your Cognito user to `Administrators` or `Executives` group
     * Admin API is available at `/api/admin`
     * Admin Explorer is available at `/explorer/admin`
     * Switcher between Admin/User explorer mode was added to the explorer in top right corner
