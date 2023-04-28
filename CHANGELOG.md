@@ -1,5 +1,9 @@
 # REINVEST API CHANGELOG
 
+## 1.11.2 - 04/26/2023
+
+* `DocumentFileLinkInput` mutation accepts case insensitive `fileName` extension
+
 ## 1.11.1 - 04/26/2023
 
 * New Query: `getDocument(documentId)`
