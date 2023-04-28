@@ -9,6 +9,7 @@ const partyId = 'some-uuid';
 
 const cleanVerifierState = () =>
   <VerificationState>{
+    accountId: null,
     decision: {
       decision: VerificationDecisionType.UNKNOWN,
       onObject: {

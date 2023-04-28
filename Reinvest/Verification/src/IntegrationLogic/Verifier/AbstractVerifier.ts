@@ -16,18 +16,21 @@ export abstract class AbstractVerifier {
   protected events: VerificationState['events'];
   protected decision: VerificationDecision;
   protected type: VerifierType;
+  protected accountId: string | null;
 
-  constructor({ ncId, id, events, decision, type }: VerificationState) {
+  constructor({ ncId, id, events, decision, type, accountId }: VerificationState) {
     this.ncId = ncId;
     this.id = id;
     this.events = events;
     this.decision = decision;
     this.type = type;
+    this.accountId = accountId;
     this.init();
   }
 
   getVerificationState(): VerificationState {
     return {
+      accountId: this.accountId,
       decision: this.decision,
       events: this.events,
       id: this.id,

@@ -44,6 +44,7 @@ const errorEvent = <VerificationNorthCapitalObjectFailedEvent>{
 
 const cleanVerifierState = () =>
   <VerificationState>{
+    accountId: null,
     decision: {
       decision: VerificationDecisionType.UNKNOWN,
       onObject: {

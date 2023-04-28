@@ -4,11 +4,8 @@ import { VerificationState, Verifier } from 'Verification/Domain/ValueObject/Ver
 import { PartyVerifier } from 'Verification/IntegrationLogic/Verifier/PartyVerifier';
 
 export class StakeholderVerifier extends PartyVerifier implements Verifier {
-  private readonly accountId: string;
-
-  constructor(state: VerificationState, accountId: string) {
+  constructor(state: VerificationState) {
     super(state);
-    this.accountId = accountId;
     this.makeDecision();
   }
 

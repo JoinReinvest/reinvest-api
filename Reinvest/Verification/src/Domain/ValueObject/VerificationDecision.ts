@@ -38,7 +38,7 @@ export type AvailableEventsForDecision = {
 
 export type VerificationObject = {
   type: VerifierType;
-  accountId?: string;
+  accountId?: string | null;
   profileId?: string;
   stakeholderId?: string;
 };

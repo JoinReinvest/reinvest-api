@@ -43,6 +43,7 @@ const errorEvent = <VerificationNorthCapitalObjectFailedEvent>{
 
 const cleanVerifierState = () =>
   <VerificationState>{
+    accountId,
     decision: {
       decision: VerificationDecisionType.UNKNOWN,
       onObject: {
@@ -59,7 +60,7 @@ const cleanVerifierState = () =>
 context('Given an investor has completed account and synchronized with North Capital and all data is correct', () => {
   describe('When the system verifies the investor  and returns the AML and KYC are approved', async () => {
     it('Then expect APPROVED decision', async () => {
-      const verifier = new StakeholderVerifier(cleanVerifierState(), accountId);
+      const verifier = new StakeholderVerifier(cleanVerifierState());
       verifier.handleVerificationEvent(kycEvent);
       verifier.handleVerificationEvent(amlEvent);
       const result = verifier.makeDecision();
@@ -71,7 +72,7 @@ context('Given an investor has completed account and synchronized with North Cap
 
 context('Given an investor has completed account and synchronized with North Capital, but is on the AML list', () => {
   describe('When the system verifies the investor stakeholder and returns the AML is DISAPPROVED', async () => {
-    const verifier = new StakeholderVerifier(cleanVerifierState(), accountId);
+    const verifier = new StakeholderVerifier(cleanVerifierState());
 
     verifier.handleVerificationEvent(kycEvent);
     verifier.handleVerificationEvent(<VerificationAmlResultEvent>{
@@ -89,7 +90,7 @@ context('Given an investor has completed account and synchronized with North Cap
 
 context('Given an investor has completed account and synchronized with North Capital, but some data is incorrect', () => {
   describe('When the system verifies the investor stakeholder and returns the KYC is DISAPPROVED', async () => {
-    const verifier = new StakeholderVerifier(cleanVerifierState(), accountId);
+    const verifier = new StakeholderVerifier(cleanVerifierState());
 
     verifier.handleVerificationEvent(<VerificationKycResultEvent>{
       ...kycEvent,
@@ -109,7 +110,7 @@ context('Given an investor has completed account and synchronized with North Cap
 
 context('Given an investor has completed account and synchronized with North Capital, but North Capital is unavailable', () => {
   describe('When the system verifies the investor stakeholder and returns an error', async () => {
-    const verifier = new StakeholderVerifier(cleanVerifierState(), accountId);
+    const verifier = new StakeholderVerifier(cleanVerifierState());
 
     verifier.handleVerificationEvent(errorEvent);
     it('Then expect WAIT_FOR_SUPPORT decision', async () => {

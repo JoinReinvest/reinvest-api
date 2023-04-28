@@ -3,6 +3,7 @@ import { Insertable } from 'kysely';
 import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 
 export interface VerifierRecordsTable {
+  accountId: string | null;
   createdDate: Date;
   decisionJson: JSONObject;
   eventsJson: JSONObject;
@@ -12,5 +13,5 @@ export interface VerifierRecordsTable {
   updatedDate: Date;
 }
 
-export type VerifierRecord = Pick<VerifierRecordsTable, 'decisionJson' | 'id' | 'eventsJson' | 'ncId' | 'type' | 'updatedDate'>;
+export type VerifierRecord = Pick<VerifierRecordsTable, 'decisionJson' | 'id' | 'eventsJson' | 'ncId' | 'type' | 'updatedDate' | 'accountId'>;
 export type InsertableVerifierRecord = Insertable<VerifierRecordsTable>;

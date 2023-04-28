@@ -4,19 +4,20 @@ import { InsertableVerifierRecord, VerifierRecord } from 'Verification/Adapter/D
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 
 export class VerificationAdapter {
-  public static getClassName = (): string => 'VerificationAdapter';
   private databaseAdapterProvider: VerificationDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: VerificationDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 
+  public static getClassName = (): string => 'VerificationAdapter';
+
   async findVerifierRecord(id: string): Promise<VerifierRecord | null> {
     try {
       return await this.databaseAdapterProvider
         .provide()
         .selectFrom(verifierRecordsTable)
-        .select(['decisionJson', 'id', 'eventsJson', 'ncId', 'type', 'updatedDate'])
+        .select(['decisionJson', 'id', 'eventsJson', 'ncId', 'type', 'updatedDate', 'accountId'])
         .where(`id`, '=', id)
         .limit(1)
         .$castTo<VerifierRecord>()
@@ -31,7 +32,7 @@ export class VerificationAdapter {
       return await this.databaseAdapterProvider
         .provide()
         .selectFrom(verifierRecordsTable)
-        .select(['decisionJson', 'id', 'eventsJson', 'ncId', 'type', 'updatedDate'])
+        .select(['decisionJson', 'id', 'eventsJson', 'ncId', 'type', 'updatedDate', 'accountId'])
         .where(`ncId`, '=', partyId)
         .limit(1)
         .$castTo<VerifierRecord>()
@@ -41,11 +42,12 @@ export class VerificationAdapter {
     }
   }
 
-  createVerifierRecord(id: string, ncId: string, type: VerifierType): VerifierRecord {
+  createVerifierRecord(id: string, ncId: string, type: VerifierType, accountId: string | null = null): VerifierRecord {
     return <VerifierRecord>{
       id,
       ncId,
       type,
+      accountId,
       eventsJson: {},
       decisionJson: {},
       updatedDate: new Date(),
@@ -62,6 +64,7 @@ export class VerificationAdapter {
         id: record.id,
         ncId: record.ncId,
         type: record.type,
+        accountId: record.accountId,
         eventsJson: record.events as unknown as JSONObject,
         decisionJson: <JSONObject>record.decision,
         updatedDate: new Date(),
@@ -78,6 +81,7 @@ export class VerificationAdapter {
           eventsJson: eb => eb.ref(`excluded.eventsJson`),
           decisionJson: eb => eb.ref(`excluded.decisionJson`),
           updatedDate: eb => eb.ref(`excluded.updatedDate`),
+          accountId: eb => eb.ref(`excluded.accountId`),
         }),
       )
       .execute();

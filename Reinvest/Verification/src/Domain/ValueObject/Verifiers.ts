@@ -12,6 +12,7 @@ export type VerificationEventsList = {
 };
 
 export type VerificationState = {
+  accountId: string | null;
   decision: VerificationDecision;
   events: VerificationEventsList;
   id: string;
