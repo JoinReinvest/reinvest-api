@@ -5,6 +5,7 @@ import { VerifyAccount } from 'Verification/IntegrationLogic/UseCase/VerifyAccou
 import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/VerifierExecutor';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 import { AdminVerificationActions } from 'Verification/Port/Api/AdminVerificationActions';
+import { NorthCapitalVerificationEvents } from 'Verification/Port/Api/NorthCapitalVerificationEvents';
 import { UserVerificationActions } from 'Verification/Port/Api/UserVerificationActions';
 
 export class PortsProvider {
@@ -19,5 +20,6 @@ export class PortsProvider {
     container.addSingleton(AdminVerificationActions, [VerifierRepository]);
     container.addSingleton(UserVerificationActions, [VerifierRepository]);
     container.addSingleton(VerifyAccount, [RegistrationService, VerifierRepository, VerifierExecutor]);
+    container.addSingleton(NorthCapitalVerificationEvents, [VerifierRepository]);
   }
 }

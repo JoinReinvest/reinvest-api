@@ -8,7 +8,7 @@ const schema = `
         "This is @PutFileLink.id"
         id: String!
         "File name should be in format: .pdf, .jpeg, .jpg, .png"
-        fileName: String! @constraint(pattern: ".*.(pdf|jpeg|jpg|png)$")
+        fileName: FileName!
     }
 
     "Avatar link id input"

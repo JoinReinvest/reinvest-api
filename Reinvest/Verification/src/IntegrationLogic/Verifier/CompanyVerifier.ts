@@ -10,21 +10,21 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       VerificationEvents.VERIFICATION_AML_RESULT,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
     ],
-    [VerificationDecisionType.WAIT_FOR_SUPPORT]: [
-      VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
-      VerificationEvents.VERIFICATION_KYC_RESULT,
-      VerificationEvents.VERIFICATION_AML_RESULT,
-    ],
+    [VerificationDecisionType.WAIT_FOR_SUPPORT]: [VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE],
     [VerificationDecisionType.ENTITY_UPDATE_REQUIRED]: [VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED],
     [VerificationDecisionType.ACCOUNT_BANNED]: [VerificationEvents.VERIFICATION_ACCOUNT_UNBANNED_ADMINISTRATIVE],
     [VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED]: [
-      VerificationEvents.VERIFICATION_KYC_RESULT,
-      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
+      VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
     ],
     [VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED]: [
-      VerificationEvents.VERIFICATION_KYC_RESULT,
-      VerificationEvents.VERIFICATION_AML_RESULT,
+      VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
+      VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
+      VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
+    ],
+    [VerificationDecisionType.SET_KYB_STATUS_TO_PENDING]: [
+      VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
     ],
   };
@@ -34,8 +34,12 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     this.makeDecision();
   }
 
-  handleVerificationEvent(event: VerificationEvent) {
-    this.handleEvent(event, this.availableEventsForDecision);
+  handleVerificationEvent(events: VerificationEvent | VerificationEvent[]) {
+    const eventsToHandle = !Array.isArray(events) ? [events] : events;
+    eventsToHandle.forEach(event => {
+      super.handleEvent(event, this.availableEventsForDecision);
+    });
+
     this.makeDecision();
   }
 
@@ -52,7 +56,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     };
 
     let decision: VerificationDecisionType = VerificationDecisionType.UNKNOWN;
-    const { amlStatus, kycCounter, kycStatus, reasons, wasFailedRequest, objectUpdatesCounter } = this.analyzeEvents();
+    const { amlStatus, failedKycCounter, kycStatus, reasons, needMoreInfo, wasFailedRequest, objectUpdatesCounter, isKycInPendingState } = this.analyzeEvents();
     let someReasons = reasons;
 
     if (wasFailedRequest) {
@@ -61,13 +65,6 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       return {
         decision,
         reasons: someReasons,
-        onObject,
-      };
-    }
-
-    if (amlStatus === VerificationStatus.PENDING) {
-      return {
-        decision: VerificationDecisionType.REQUEST_AML_VERIFICATION,
         onObject,
       };
     }
@@ -82,28 +79,36 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       };
     }
 
-    if (kycStatus === VerificationStatus.PENDING) {
+    if (needMoreInfo) {
       return {
-        decision: VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED,
+        decision: VerificationDecisionType.ENTITY_UPDATE_REQUIRED,
         onObject,
+        reasons: someReasons,
       };
     }
 
     if (kycStatus === VerificationStatus.DISAPPROVED) {
       // failed once, ask for update
-      if (kycCounter === 1 && objectUpdatesCounter === 0) {
+      if (failedKycCounter === 1 && objectUpdatesCounter === 0) {
         decision = VerificationDecisionType.ENTITY_UPDATE_REQUIRED;
         someReasons = reasons;
       }
 
       // failed once, object updated, request for another verification
-      if (kycCounter === 1 && objectUpdatesCounter === 1) {
-        decision = VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED;
+      if (failedKycCounter === 1 && objectUpdatesCounter === 1) {
+        if (isKycInPendingState) {
+          // object is prepared for manual verification
+          decision = VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED;
+        } else {
+          // we need to prepare object for manual verification
+          decision = VerificationDecisionType.SET_KYB_STATUS_TO_PENDING;
+        }
+
         someReasons = reasons;
       }
 
       // failed again, ban account
-      if (kycCounter > 1) {
+      if (failedKycCounter > 1) {
         decision = VerificationDecisionType.ACCOUNT_BANNED;
         someReasons = ['Manual KYB verification failed'];
       }
@@ -124,11 +129,33 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       };
     }
 
+    if (amlStatus === VerificationStatus.PENDING) {
+      return {
+        decision: VerificationDecisionType.REQUEST_AML_VERIFICATION,
+        onObject,
+      };
+    }
+
+    if (kycStatus === VerificationStatus.PENDING) {
+      if (isKycInPendingState) {
+        // object is prepared for manual verification
+        decision = VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED;
+      } else {
+        // we need to prepare object for manual verification
+        decision = VerificationDecisionType.SET_KYB_STATUS_TO_PENDING;
+      }
+
+      return {
+        decision,
+        onObject,
+      };
+    }
+
     console.error('Decision for entity is unknown', {
       onObject,
       amlStatus,
       kycStatus,
-      kycCounter,
+      failedKycCounter: failedKycCounter,
       reasons,
       wasFailedRequest,
       objectUpdatesCounter,

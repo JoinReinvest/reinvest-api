@@ -26,6 +26,21 @@ export class VerificationAdapter {
     }
   }
 
+  async findVerifierRecordByPartyId(partyId: string): Promise<VerifierRecord | null> {
+    try {
+      return await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(verifierRecordsTable)
+        .select(['decisionJson', 'id', 'eventsJson', 'ncId', 'type', 'updatedDate'])
+        .where(`ncId`, '=', partyId)
+        .limit(1)
+        .$castTo<VerifierRecord>()
+        .executeTakeFirstOrThrow();
+    } catch (error) {
+      return null;
+    }
+  }
+
   createVerifierRecord(id: string, ncId: string, type: VerifierType): VerifierRecord {
     return <VerifierRecord>{
       id,

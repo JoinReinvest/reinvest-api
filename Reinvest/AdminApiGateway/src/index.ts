@@ -58,7 +58,7 @@ export const app = (modules: Modules) => {
       if (groups.includes('Executives') === true) {
         isExecutive = true;
         isAdmin = true;
-      } else if (groups.includes('Admins') === true) {
+      } else if (groups.includes('Administrators') === true) {
         isAdmin = true;
       } else {
         throw new GraphQLError('Access denied', {

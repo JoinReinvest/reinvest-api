@@ -17,6 +17,12 @@ export const UnauthorizedEndpointsFunction = {
         path: '/incentive-token',
       },
     },
+    {
+      httpApi: {
+        method: 'POST',
+        path: '/webhooks/{proxy+}',
+      },
+    },
   ],
 };
 

@@ -103,6 +103,20 @@ export class VerifierRepository {
       return null;
     }
 
+    return this.mapRecordToVerifier(verifierRecord);
+  }
+
+  async findVerifierByPartyId(partyId: string) {
+    const verifierRecord = await this.verificationAdapter.findVerifierRecordByPartyId(partyId);
+
+    if (!verifierRecord) {
+      return null;
+    }
+
+    return this.mapRecordToVerifier(verifierRecord);
+  }
+
+  private mapRecordToVerifier(verifierRecord: VerifierRecord): Verifier | null {
     const state = this.mapVerifiedRecordToState(verifierRecord);
     switch (state.type) {
       case VerifierType.PROFILE:
