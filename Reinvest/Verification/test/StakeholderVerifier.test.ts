@@ -1,14 +1,11 @@
 import { expect } from 'chai';
-import * as sinon from 'ts-sinon';
-import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
-  VerificationEvent,
-  VerificationEvents,
-  VerificationNorthCapitalObjectFailedEvent,
-  VerificationKycResultEvent,
-  VerificationStatus,
   VerificationAmlResultEvent,
+  VerificationEvents,
+  VerificationKycResultEvent,
+  VerificationNorthCapitalObjectFailedEvent,
+  VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/StakeholderVerifier';
@@ -58,8 +55,6 @@ const cleanVerifierState = () =>
     ncId: partyId,
     type: VerifierType.STAKEHOLDER,
   };
-
-const eventsResolver = (...events: VerificationEvent[]): Promise<VerificationEvent[]> => new Promise(resolve => resolve([...events]));
 
 context('Given an investor has completed account and synchronized with North Capital and all data is correct', () => {
   describe('When the system verifies the investor  and returns the AML and KYC are approved', async () => {

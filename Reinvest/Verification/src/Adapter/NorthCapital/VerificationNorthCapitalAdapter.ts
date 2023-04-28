@@ -1,6 +1,5 @@
 import { ExecutionNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import {
-  AutomaticVerificationResultEvent,
   ManualVerificationAmlResult,
   ManualVerificationKycResult,
   VerificationAmlResultEvent,
@@ -293,12 +292,22 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     }
   }
 
-  private mapKycResponseToVerificationResultEvents(kyc: any, partyId: string): AutomaticVerificationResultEvent[] {
+  private mapKycResponseToVerificationResultEvents(kyc: any, partyId: string): VerificationEvent[] {
     const {
       response: { 'id-number': verificationId },
       kycstatus: kycStatus,
       amlstatus: amlStatus,
     } = kyc;
+
+    if (kycStatus === 'Pending') {
+      return [
+        <VerificationKycSetToPendingEvent>{
+          date: new Date(),
+          kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
+          ncId: partyId,
+        },
+      ];
+    }
 
     const qualifiers: string[] = [];
 

@@ -1,15 +1,13 @@
 import { expect } from 'chai';
-import * as sinon from 'ts-sinon';
-import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
+import { VerificationEventMocks } from 'Reinvest/Verification/test/VerificationEventMocks';
 import { VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
-  VerificationEvent,
+  VerificationAmlResultEvent,
   VerificationEvents,
+  VerificationKycResultEvent,
   VerificationNorthCapitalObjectFailedEvent,
   VerificationRecoveredAdministrativeEvent,
-  VerificationKycResultEvent,
   VerificationStatus,
-  VerificationAmlResultEvent,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileVerifier';
@@ -58,8 +56,6 @@ const cleanVerifierState = () =>
     ncId: partyId,
     type: VerifierType.PROFILE,
   };
-
-const eventsResolver = (...events: VerificationEvent[]): Promise<VerificationEvent[]> => new Promise(resolve => resolve([...events]));
 
 context('Given an investor has completed profile and synchronized with North Capital and all data is correct', () => {
   describe('When the system verifies the investor profile and returns the AML and KYC are approved', async () => {
@@ -134,5 +130,161 @@ context('Given an investor has completed profile and synchronized with North Cap
         expect(result.decision).to.be.equal(VerificationDecisionType.REQUEST_VERIFICATION);
       });
     });
+  });
+});
+
+context('Verification resilient tests', () => {
+  const eventsMocksGenerator = new VerificationEventMocks(partyId);
+
+  describe('Set state: UPDATE_REQUIRED', async () => {
+    const verifier = new ProfileVerifier(cleanVerifierState());
+    verifier.handleVerificationEvent(eventsMocksGenerator.getAutomaticResultsEventsSet());
+    const result = verifier.makeDecision();
+    expect(result.decision).to.be.equal(VerificationDecisionType.UPDATE_REQUIRED);
+
+    it('Run all events suite against verifier, but decision should not change', async () => {
+      const events = eventsMocksGenerator.allEventsSetExceptRequestedObjectUpdated();
+      let decision = { decision: VerificationDecisionType.UNKNOWN };
+
+      for (const event of events) {
+        verifier.handleVerificationEvent(event);
+        decision = verifier.makeDecision();
+      }
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.UPDATE_REQUIRED);
+    });
+  });
+
+  describe('Set state: REQUEST_VERIFICATION', async () => {
+    const verifier = new ProfileVerifier(cleanVerifierState());
+    verifier.handleVerificationEvent(eventsMocksGenerator.getAutomaticResultsEventsSet());
+    verifier.handleVerificationEvent(eventsMocksGenerator.getRequestedObjectUpdated());
+    const result = verifier.makeDecision();
+    expect(result.decision).to.be.equal(VerificationDecisionType.REQUEST_VERIFICATION);
+
+    it('Run all events suite against verifier, but decision should not change', async () => {
+      const events = eventsMocksGenerator.allEventsSetExceptAutomaticResults();
+      let decision = { decision: VerificationDecisionType.UNKNOWN };
+
+      for (const event of events) {
+        verifier.handleVerificationEvent(event);
+        decision = verifier.makeDecision();
+      }
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.REQUEST_VERIFICATION);
+    });
+    it('Run automatic results events suite against verifier multiple times, but decision should change only once to SECOND_UPDATE_REQUIRED', async () => {
+      const events = eventsMocksGenerator.allEventsAndDuplicatedAutomaticResultsEventsSetWithoutRequestedObjectUpdated();
+      let decision = verifier.makeDecision();
+
+      for (const event of events) {
+        verifier.handleVerificationEvent(event);
+        decision = verifier.makeDecision();
+      }
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.SECOND_UPDATE_REQUIRED);
+    });
+  });
+
+  describe('Set state: SET_KYC_STATUS_TO_PENDING', async () => {
+    const verifier = new ProfileVerifier(cleanVerifierState());
+    verifier.handleVerificationEvent(eventsMocksGenerator.getAutomaticResultsEventsSet());
+    verifier.handleVerificationEvent(eventsMocksGenerator.getRequestedObjectUpdated());
+    verifier.handleVerificationEvent(eventsMocksGenerator.getAutomaticResultsEventsSet(2));
+    verifier.handleVerificationEvent(eventsMocksGenerator.getRequestedObjectUpdated());
+
+    const result = verifier.makeDecision();
+    expect(result.decision).to.be.equal(VerificationDecisionType.SET_KYC_STATUS_TO_PENDING);
+
+    it('Run all events suite against verifier, but decision should not change', async () => {
+      const events = eventsMocksGenerator.allEventsExceptVerificationKycSetToPending();
+      let decision = { decision: VerificationDecisionType.UNKNOWN };
+
+      for (const event of events) {
+        verifier.handleVerificationEvent(event);
+        decision = verifier.makeDecision();
+      }
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.SET_KYC_STATUS_TO_PENDING);
+    });
+    it('Send VERIFICATION_KYC_SET_TO_PENDING, state should change to PAID_MANUAL_KYC_REVIEW_REQUIRED', async () => {
+      const event = eventsMocksGenerator.getKycToPending();
+      verifier.handleVerificationEvent(event);
+      const decision = verifier.makeDecision();
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED);
+    });
+
+    it('Run all events suite except manual verification results against verifier again, but decision should not change', async () => {
+      const events = eventsMocksGenerator.allEventsExceptManualVerificationResults();
+      let decision = { decision: VerificationDecisionType.UNKNOWN };
+
+      for (const event of events) {
+        verifier.handleVerificationEvent(event);
+        decision = verifier.makeDecision();
+      }
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED);
+    });
+
+    it('Send KYC disapproved manual result event and profile should be banned', async () => {
+      const events = eventsMocksGenerator.getManualResultsEventsSet(VerificationStatus.DISAPPROVED);
+      verifier.handleVerificationEvent(events);
+      const decision = verifier.makeDecision();
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.PROFILE_BANNED);
+    });
+
+    it('Run all events except profile unbanned and decision should not change', async () => {
+      const events = eventsMocksGenerator.allEventsSetExceptProfileUnbanned();
+      let decision = { decision: VerificationDecisionType.UNKNOWN };
+
+      for (const event of events) {
+        verifier.handleVerificationEvent(event);
+        decision = verifier.makeDecision();
+      }
+
+      expect(decision.decision).to.be.equal(VerificationDecisionType.PROFILE_BANNED);
+    });
+  });
+
+  describe('Testing different results in state: REQUEST_VERIFICATION', async () => {
+    const testCases = {
+      [VerificationStatus.DISAPPROVED]: VerificationDecisionType.UPDATE_REQUIRED,
+      [VerificationStatus.APPROVED]: VerificationDecisionType.APPROVED,
+      [VerificationStatus.PENDING]: VerificationDecisionType.REQUEST_VERIFICATION, // Pending state is initial state, before first automatic results
+      [VerificationStatus.NEED_MORE_INFO]: VerificationDecisionType.UPDATE_REQUIRED,
+    };
+
+    for (const [verificationStatus, verificationDecision] of Object.entries(testCases)) {
+      it(`KYC result with status ${verificationStatus} should return decision ${verificationDecision}`, async () => {
+        const verifier = new ProfileVerifier(cleanVerifierState());
+        verifier.handleVerificationEvent(eventsMocksGenerator.getAutomaticResultsEventsSet(1, verificationStatus as VerificationStatus));
+
+        const result = verifier.makeDecision();
+        expect(result.decision).to.be.equal(verificationDecision);
+      });
+    }
+  });
+
+  describe('Testing different results in state: PAID_MANUAL_KYC_REVIEW_REQUIRED', async () => {
+    const testCases = {
+      [VerificationStatus.DISAPPROVED]: VerificationDecisionType.PROFILE_BANNED,
+      [VerificationStatus.APPROVED]: VerificationDecisionType.APPROVED,
+      // [VerificationStatus.PENDING]: "", // this status should never happen. When NC returns Pending for KYC it should be changed to event VERIFICATION_KYC_SET_TO_PENDING
+      [VerificationStatus.NEED_MORE_INFO]: VerificationDecisionType.UPDATE_REQUIRED,
+    };
+
+    for (const [verificationStatus, verificationDecision] of Object.entries(testCases)) {
+      it(`KYC result with status ${verificationStatus} should return decision ${verificationDecision}`, async () => {
+        const verifier = new ProfileVerifier(cleanVerifierState());
+        eventsMocksGenerator.setPartyVerifierStateToPaidManualKYCRequired(verifier);
+
+        verifier.handleVerificationEvent(eventsMocksGenerator.getManualResultsEventsSet(verificationStatus as VerificationStatus));
+
+        const result = verifier.makeDecision();
+        expect(result.decision).to.be.equal(verificationDecision);
+      });
+    }
   });
 });
