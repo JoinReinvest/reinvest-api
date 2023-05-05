@@ -13,6 +13,7 @@ export type BeneficiarySchema = {
   individualId: string;
   name: BeneficiaryName;
   profileId: string;
+  label?: string;
 };
 
 export type BeneficiaryCompanyOverviewSchema = {
@@ -54,6 +55,7 @@ export class BeneficiaryAccount {
       individualId: this.individualId,
       name: this.name,
       avatar: this.get(this.avatar),
+      label: this.getLabel(),
     };
   }
 
@@ -61,17 +63,16 @@ export class BeneficiaryAccount {
     this.avatar = avatar;
   }
 
-  getAccountOverview(): BeneficiaryCompanyOverviewSchema {
-    return {
-      accountId: this.accountId,
-      accountType: AccountType.BENEFICIARY,
-      avatar: this.get(this.avatar),
-      label: `${this.name.firstName} ${this.name.lastName}`,
-    };
+  getAvatar(): Avatar | null {
+    return this.avatar;
   }
 
   getInitials(): string {
     return `${this.name.firstName[0]}${this.name.lastName[0]}`;
+  }
+
+  private getLabel(): string {
+    return `${this.name.firstName} ${this.name.lastName}`;
   }
 
   private get(value: ToObject | null) {

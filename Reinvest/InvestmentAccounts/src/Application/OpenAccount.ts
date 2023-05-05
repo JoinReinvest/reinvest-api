@@ -1,16 +1,15 @@
 import { AccountType } from 'InvestmentAccounts/Domain/ProfileAggregate/AccountType';
-import Profile from 'InvestmentAccounts/Domain/ProfileAggregate/Profile';
 import { ProfileException } from 'InvestmentAccounts/Domain/ProfileAggregate/ProfileException';
 import { ProfileRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository';
 
 export class OpenAccount {
-  static getClassName = (): string => 'OpenAccount';
-
   private readonly profileRepository: ProfileRepository;
 
   constructor(profileRepository: ProfileRepository) {
     this.profileRepository = profileRepository;
   }
+
+  static getClassName = (): string => 'OpenAccount';
 
   async execute(profileId: string, accountId: string, accountType: AccountType): Promise<void | never> {
     const profile = await this.profileRepository.restore(profileId);
@@ -34,6 +33,9 @@ export class OpenAccount {
         break;
       case AccountType.TRUST:
         events.push(profile.openTrustAccount(accountId));
+        break;
+      case AccountType.BENEFICIARY:
+        events.push(profile.openBeneficiaryAccount(accountId));
         break;
       default:
         ProfileException.throw(`Unknown account type: ${accountType}`);

@@ -1,9 +1,9 @@
 import { Kysely, sql } from 'kysely';
-import { LegalEntitiesDatabase } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
+import { LegalEntitiesDatabase, legalEntitiesProfileTable } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 
 export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
   await db.schema
-    .createTable('legal_entities_profile')
+    .createTable(legalEntitiesProfileTable)
     .addColumn('dateCreated', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .addColumn('profileId', 'uuid', col => col.primaryKey().notNull().unique())
     .addColumn('externalId', 'varchar(36)', col => col.notNull().unique())
@@ -24,5 +24,5 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
 
 export async function down(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
   await db.schema.dropIndex('legal_entities_ssn_index').execute();
-  await db.schema.dropTable('legal_entities_profile').execute();
+  await db.schema.dropTable(legalEntitiesProfileTable).execute();
 }

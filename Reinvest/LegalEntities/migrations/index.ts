@@ -8,3 +8,4 @@ export * as migration_20230328153600_migrate_documents_schema from './legal_enti
 export * as migration_20230405110500_le_create_company_account from './legal_entities_8_create_company_account';
 export * as migration_20230405140700_le_add_company_ein from './legal_entities_9_add_company_ein';
 export * as migration_20230414123600_le_alter_company_ein from './legal_entities_10_alter_company_ein';
+export * as migration_202305051212200_le_beneficiary from './legal_entities_11_add_beneficiary';

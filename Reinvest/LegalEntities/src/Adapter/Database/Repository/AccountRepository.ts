@@ -211,7 +211,7 @@ export class AccountRepository {
     }
   }
 
-  async isAccountAlreadyOpened(accountId: string, table: string): Promise<boolean> {
+  async isAccountAlreadyOpened(accountId: string, table: 'legal_entities_individual_account' | 'legal_entities_company_account'): Promise<boolean> {
     try {
       const result = await this.databaseAdapterProvider
         .provide()

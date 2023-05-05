@@ -1,10 +1,19 @@
 # REINVEST API CHANGELOG
 
+## 1.11.3 - 05/05/2023
+
+* New mutation:
+    * `openBeneficiaryAccount` - it creates and immediately open beneficiary account (no draft required)
+* New query:
+    * `getBeneficiaryAccount(accountId)` - it returns beneficiary account details
+* Updates:
+    * query `getAccountsOverview` - returns also beneficiary account overview
+
 ## 1.11.2 - 04/26/2023
 
 * `DocumentFileLinkInput` mutation accepts case insensitive `fileName` extension
 * New unauthorized endpoint for webhooks:
-  * `POST /webhooks/updateParty` - it handles events from North Capital regarding updating KYC and AML status
+    * `POST /webhooks/updateParty` - it handles events from North Capital regarding updating KYC and AML status
 
 ## 1.11.1 - 04/26/2023
 

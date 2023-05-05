@@ -1,7 +1,12 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { LegalEntitiesDatabase } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
+import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
+import { InvestmentAccountsService } from 'LegalEntities/Adapter/Modules/InvestmentAccountsService';
 import { BeneficiaryAccount, BeneficiaryName, BeneficiarySchema } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
+import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 
 export type CreateBeneficiaryInput = {
   avatar?: {
@@ -15,12 +20,20 @@ export type CreateBeneficiaryInput = {
 
 export class BeneficiaryAccountController {
   private uniqueIdGenerator: IdGeneratorInterface;
+  private beneficiaryRepository: BeneficiaryRepository;
+  private investmentAccountService: InvestmentAccountsService;
+  private transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>;
 
   constructor(
     uniqueIdGenerator: IdGeneratorInterface,
-    // transformDraftIntoAccount: TransformDraftAccountIntoRegularAccount,
+    beneficiaryRepository: BeneficiaryRepository,
+    investmentAccountService: InvestmentAccountsService,
+    transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>,
   ) {
     this.uniqueIdGenerator = uniqueIdGenerator;
+    this.beneficiaryRepository = beneficiaryRepository;
+    this.investmentAccountService = investmentAccountService;
+    this.transactionAdapter = transactionAdapter;
   }
 
   public static getClassName = (): string => 'BeneficiaryAccountController';
@@ -74,14 +87,28 @@ export class BeneficiaryAccountController {
         individualId,
         name: <BeneficiaryName>name,
       };
-
       const beneficiaryAccount = BeneficiaryAccount.create(beneficiarySchema);
-      // TODO 4th of May
-      // add beneficiary account db migration
-      // store beneficiaryAccount in db
-      // open account in individual account
-      // read beneficiary account from db in ReadAccountController
-      // read beneficiary account overview in getAccountsOverview
+
+      const status = await this.transactionAdapter.transaction(`Open beneficiary account for profile ${profileId}`, async () => {
+        await this.beneficiaryRepository.storeBeneficiary(beneficiaryAccount);
+        const accountOpened = await this.investmentAccountService.openAccount(profileId, accountId, AccountType.BENEFICIARY);
+
+        if (!accountOpened) {
+          throw new Error(`CANNOT_OPEN_ANOTHER_ACCOUNT_OF_TYPE_BENEFICIARY`);
+        }
+      });
+
+      if (!status) {
+        return {
+          status: false,
+          errors: [
+            <ValidationErrorType>{
+              type: ValidationErrorEnum.NUMBER_OF_ACCOUNTS_EXCEEDED,
+              field: 'openBeneficiaryAccount',
+            },
+          ],
+        };
+      }
 
       return {
         status: true,
@@ -100,12 +127,4 @@ export class BeneficiaryAccountController {
       };
     }
   }
-
-  // public async transformDraftAccountIntoRegularAccount(profileId: string, draftAccountId: string): Promise<string | null> {
-  //   try {
-  //     return await this.transformDraftIntoAccount.execute(profileId, draftAccountId);
-  //   } catch (error: any) {
-  //     return error.message;
-  //   }
-  // }
 }

@@ -28,7 +28,10 @@ export type StakeholderInput = DefaultStakeholder & {
 };
 
 export type StakeholderOutput = DefaultStakeholder & {
-  idScan: DocumentSchema[];
+  idScan: {
+    fileName: string;
+    id: string;
+  }[];
   ssn: string;
 };
 
@@ -49,6 +52,23 @@ export class Stakeholder implements ToObject {
     this.address = address;
     this.domicile = domicile;
     this.idScan = idScan;
+  }
+
+  static create(stakeholder: StakeholderSchema) {
+    try {
+      const { id, ssn, name, dateOfBirth, address, domicile, idScan } = stakeholder;
+      const idObject = Uuid.create(id);
+      const personalName = PersonalName.create(name);
+      const dateOfBirthObject = DateOfBirth.create(dateOfBirth);
+      const addressObject = Address.create(address);
+      const domicileObject = SimplifiedDomicile.create(domicile);
+      const documents = IdentityDocument.create(idScan);
+      const ssnObject = SSN.create(ssn);
+
+      return new Stakeholder(idObject, ssnObject, personalName, dateOfBirthObject, addressObject, domicileObject, documents);
+    } catch (error: any) {
+      throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, 'stakeholder', error.message);
+    }
   }
 
   isTheSameSSN(ssn: SSN): boolean {
@@ -80,27 +100,6 @@ export class Stakeholder implements ToObject {
     return this.ssn;
   }
 
-  private getHashedSSN(): string {
-    return this.ssn.getHash();
-  }
-
-  static create(stakeholder: StakeholderSchema) {
-    try {
-      const { id, ssn, name, dateOfBirth, address, domicile, idScan } = stakeholder;
-      const idObject = Uuid.create(id);
-      const personalName = PersonalName.create(name);
-      const dateOfBirthObject = DateOfBirth.create(dateOfBirth);
-      const addressObject = Address.create(address);
-      const domicileObject = SimplifiedDomicile.create(domicile);
-      const documents = IdentityDocument.create(idScan);
-      const ssnObject = SSN.create(ssn);
-
-      return new Stakeholder(idObject, ssnObject, personalName, dateOfBirthObject, addressObject, domicileObject, documents);
-    } catch (error: any) {
-      throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, 'stakeholder', error.message);
-    }
-  }
-
   removeDocuments(): LegalEntityDocumentRemoved[] {
     return this.idScan.removeAllDocuments();
   }
@@ -120,6 +119,10 @@ export class Stakeholder implements ToObject {
     });
 
     return documentsToRemove.map((document: DocumentSchema) => getDocumentRemoveEvent(document));
+  }
+
+  private getHashedSSN(): string {
+    return this.ssn.getHash();
   }
 }
 
