@@ -30,3 +30,10 @@ export type TrustAccountOpened = DomainEvent & {
   };
   kind: 'TrustAccountOpened';
 };
+
+export type BeneficiaryAccountOpened = DomainEvent & {
+  data: {
+    beneficiaryAccountId: string;
+  };
+  kind: 'BeneficiaryAccountOpened';
+};

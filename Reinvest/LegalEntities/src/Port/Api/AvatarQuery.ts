@@ -1,8 +1,9 @@
 import { FileLink } from 'Documents/Adapter/S3/FileLinkService';
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
+import { BeneficiaryAccount } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
 import { CompanyAccount, CompanyAccountOverview } from 'LegalEntities/Domain/Accounts/CompanyAccount';
 import { IndividualAccount, IndividualAccountOverview } from 'LegalEntities/Domain/Accounts/IndividualAccount';
-import { DraftAccount, DraftAccountType } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
+import { DraftAccount } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
 import { CompanyName } from 'LegalEntities/Domain/ValueObject/Company';
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { PersonalName } from 'LegalEntities/Domain/ValueObject/PersonalName';
@@ -14,12 +15,13 @@ export type AvatarOutput = {
 };
 
 export class AvatarQuery {
-  public static getClassName = (): string => 'AvatarQuery';
   private documents: DocumentsService;
 
   constructor(documents: DocumentsService) {
     this.documents = documents;
   }
+
+  public static getClassName = (): string => 'AvatarQuery';
 
   async getAvatarForPerson(avatar: Avatar | null, personName: PersonalName) {
     const initials = personName.getInitials();
@@ -52,6 +54,19 @@ export class AvatarQuery {
     return await this.getAvatarUrl(avatar, initials);
   }
 
+  async getAvatarForAccount(
+    account: IndividualAccount | CompanyAccount | IndividualAccountOverview | CompanyAccountOverview | BeneficiaryAccount,
+  ): Promise<AvatarOutput> {
+    const avatar = account.getAvatar();
+    const initials = account.getInitials();
+
+    if (avatar === null) {
+      return this.getEmptyAvatarOutput(initials);
+    }
+
+    return await this.getAvatarUrl(avatar, initials);
+  }
+
   private getEmptyAvatarOutput(initials: string): AvatarOutput {
     return {
       id: null,
@@ -67,16 +82,5 @@ export class AvatarQuery {
       ...avatarFileLink,
       initials,
     };
-  }
-
-  async getAvatarForAccount(account: IndividualAccount | CompanyAccount | IndividualAccountOverview | CompanyAccountOverview): Promise<AvatarOutput> {
-    const avatar = account.getAvatar();
-    const initials = account.getInitials();
-
-    if (avatar === null) {
-      return this.getEmptyAvatarOutput(initials);
-    }
-
-    return await this.getAvatarUrl(avatar, initials);
   }
 }

@@ -7,6 +7,7 @@ import {
   LegalEntitiesDatabaseAdapterProvider,
 } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
@@ -46,6 +47,7 @@ export class AdapterServiceProvider {
       .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
+      .addSingleton(BeneficiaryRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addObjectFactory(
         'LegalEntitiesTransactionalAdapter',
         (databaseProvider: LegalEntitiesDatabaseAdapterProvider) => new TransactionalAdapter<LegalEntitiesDatabase>(databaseProvider),

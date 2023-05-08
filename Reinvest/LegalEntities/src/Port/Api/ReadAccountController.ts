@@ -5,10 +5,12 @@ import {
   IndividualAccountForSynchronization,
   StakeholderForSynchronization,
 } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
 import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
-import { StakeholderInput, StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
+import { StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { AvatarOutput, AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
 
 export type IndividualAccountResponse = {
@@ -63,6 +65,18 @@ export type CompanyAccountResponse = {
   label: string;
 };
 
+export type BeneficiaryAccountResponse = {
+  avatar: AvatarOutput;
+  details: {
+    name: {
+      firstName: string;
+      lastName: string;
+    };
+  };
+  id: string;
+  label?: string;
+};
+
 export type AccountsOverviewResponse = {
   avatar: AvatarOutput;
   id: string;
@@ -71,14 +85,17 @@ export type AccountsOverviewResponse = {
 };
 
 export class ReadAccountController {
-  public static getClassName = (): string => 'ReadAccountController';
   private accountRepository: AccountRepository;
   private avatarQuery: AvatarQuery;
+  private beneficiaryRepository: BeneficiaryRepository;
 
-  constructor(accountRepository: AccountRepository, avatarQuery: AvatarQuery) {
+  constructor(accountRepository: AccountRepository, avatarQuery: AvatarQuery, beneficiaryRepository: BeneficiaryRepository) {
     this.accountRepository = accountRepository;
     this.avatarQuery = avatarQuery;
+    this.beneficiaryRepository = beneficiaryRepository;
   }
+
+  public static getClassName = (): string => 'ReadAccountController';
 
   public async getIndividualAccount(profileId: string): Promise<IndividualAccountResponse> {
     const account = await this.accountRepository.findIndividualAccount(profileId);
@@ -153,6 +170,18 @@ export class ReadAccountController {
       });
     }
 
+    const beneficiaryAccounts = await this.beneficiaryRepository.findBeneficiaryAccounts(profileId);
+
+    for (const beneficiaryAccount of beneficiaryAccounts) {
+      const schema = beneficiaryAccount.toObject();
+      accountsOverview.push(<AccountsOverviewResponse>{
+        id: schema.accountId,
+        type: AccountType.BENEFICIARY,
+        label: schema.label,
+        avatar: await this.avatarQuery.getAvatarForAccount(beneficiaryAccount),
+      });
+    }
+
     return accountsOverview;
   }
 
@@ -184,7 +213,7 @@ export class ReadAccountController {
         stakeholders: accountObject.stakeholders.map(
           (stakeholder: StakeholderSchema): StakeholderOutput => ({
             ...stakeholder,
-            ssn: stakeholder.ssn.anonymized,
+            ssn: (<SensitiveNumberSchema>stakeholder.ssn).anonymized,
             idScan: stakeholder.idScan.map((idScan: DocumentSchema) => ({
               id: idScan.id,
               fileName: idScan.fileName,
@@ -193,5 +222,30 @@ export class ReadAccountController {
         ),
       },
     };
+  }
+
+  public async readBeneficiaryAccount(profileId: string, accountId: string): Promise<BeneficiaryAccountResponse | null> {
+    try {
+      const beneficiaryAccount = await this.beneficiaryRepository.findBeneficiary(profileId, accountId);
+
+      if (!beneficiaryAccount) {
+        return null;
+      }
+
+      const schema = beneficiaryAccount.toObject();
+
+      return {
+        avatar: await this.avatarQuery.getAvatarForAccount(beneficiaryAccount),
+        details: {
+          name: schema.name,
+        },
+        id: schema.accountId,
+        label: schema.label,
+      };
+    } catch (error: any) {
+      console.error(error);
+
+      return null;
+    }
   }
 }
