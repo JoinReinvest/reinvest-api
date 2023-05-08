@@ -1,6 +1,7 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
+import { Registration } from 'Registration/index';
 
 const schema = `
     #graphql
@@ -119,6 +120,33 @@ const schema = `
         details: BeneficiaryDetails
     }
 
+    type BankAccountLink {
+        link: String
+    }
+
+    """ Plaid response"""
+    input FulfillBankAccountInput {
+        """ plaidAccountDetails.refNum"""
+        refNumber: String!
+        """ plaidAccountDetails.account_number"""
+        accountNumber: String!
+        """ plaidAccountDetails.routing_number"""
+        routingNumber: String!
+        """ plaidAccountDetails.account_type"""
+        accountType: String!
+        """ plaidAccountDetails.institutionId"""
+        institutionId: String
+        """ plaidAccountDetails.institution_name"""
+        institutionName: String
+        """ plaidAccountDetails.account_name"""
+        accountName: String
+    }
+
+    type BankAccount {
+        accountNumber: String
+        accountType: String
+    }
+
     type Query {
         """
         Return all accounts overview
@@ -145,6 +173,11 @@ const schema = `
         [PARTIAL_MOCK] Position total is still mocked!!
         """
         getTrustAccount(accountId: String): TrustAccount
+
+        """
+        Returns basic bank account information.
+        """
+        readBankAccount(accountId: String!): BankAccount
     }
 
     type Mutation {
@@ -158,6 +191,26 @@ const schema = `
         Open beneficiary account
         """
         openBeneficiaryAccount(individualAccountId: String!, input: CreateBeneficiaryInput!): BeneficiaryAccount
+
+        """
+        It creates new link to the investor bank account. It works only if the account does not have any bank account linked yet.
+        Every time when the system create new link it cost $1.80 (on prod). Do not call it if it is not necessary.
+        The bank account will not be activated until the investor fulfills the bank account.
+        """
+        createBankAccount(accountId: String!): BankAccountLink
+
+        """
+        It updates the link to the investor bank account. It works only if the account has bank account linked already.
+        Every time when the system create new link it cost $1.80 (on prod). Do not call it if it is not necessary.
+        The bank account will not be activated until the investor fulfills the bank account.
+        """
+        updateBankAccount(accountId: String!): BankAccountLink
+
+        """
+        Provide the response from Plaid here.
+        The bank account will not be activated until the investor fulfills the bank account.
+        """
+        fulfillBankAccount(accountId: String!, input: FulfillBankAccountInput!): Boolean
     }
 `;
 
@@ -212,6 +265,16 @@ export const Account = {
           };
         });
       },
+      readBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const bankAccount = await api.readBankAccount(profileId, accountId);
+
+        if (!bankAccount) {
+          throw new GraphQLError('Bank account not exists');
+        }
+
+        return bankAccount;
+      },
     },
     Mutation: {
       openAccount: async (parent: any, { draftAccountId }: any, { profileId, modules }: SessionContext) => {
@@ -224,6 +287,7 @@ export const Account = {
 
         return true;
       },
+
       openBeneficiaryAccount: async (parent: any, { individualAccountId, input: beneficiaryData }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const response = await api.openBeneficiaryAccount(profileId, individualAccountId, beneficiaryData);
@@ -238,6 +302,39 @@ export const Account = {
           ...account,
           positionTotal: '$1,150.25',
         };
+      },
+
+      createBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const response = await api.createBankAccount(profileId, accountId);
+
+        if (!response.status) {
+          throw new GraphQLError('Failed to create bank account');
+        }
+
+        return response;
+      },
+
+      fulfillBankAccount: async (parent: any, { accountId, input }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const response = await api.fulfillBankAccount(profileId, accountId, input);
+
+        if (!response.status) {
+          throw new GraphQLError('Failed to fulfill bank account');
+        }
+
+        return response.status;
+      },
+
+      updateBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const response = await api.updateBankAccount(profileId, accountId);
+
+        if (!response.status) {
+          throw new GraphQLError('Failed to update bank account');
+        }
+
+        return response;
       },
     },
   },

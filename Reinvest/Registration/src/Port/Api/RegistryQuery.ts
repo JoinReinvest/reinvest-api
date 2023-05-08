@@ -16,12 +16,13 @@ export type NorthCapitalAccountStructure = {
 };
 
 export class RegistryQuery {
-  static getClassName = () => 'RegistryQuery';
   private registryQueryRepository: RegistryQueryRepository;
 
   constructor(registryQueryRepository: RegistryQueryRepository) {
     this.registryQueryRepository = registryQueryRepository;
   }
+
+  static getClassName = () => 'RegistryQuery';
 
   async getNorthCapitalAccountStructure(profileId: string, accountId: string): Promise<NorthCapitalAccountStructure | null> {
     const accountMapping = await this.registryQueryRepository.getNorthCapitalAccountStructure(profileId, accountId);

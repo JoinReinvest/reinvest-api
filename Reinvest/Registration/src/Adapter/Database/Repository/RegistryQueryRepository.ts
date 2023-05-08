@@ -15,12 +15,13 @@ export type NCAccountStructureMapping = {
 };
 
 export class RegistryQueryRepository {
-  public static getClassName = (): string => 'RegistryQueryRepository';
   private databaseAdapterProvider: RegistrationDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: RegistrationDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
+
+  public static getClassName = (): string => 'RegistryQueryRepository';
 
   async getNorthCapitalAccountStructure(profileId: string, accountId: string): Promise<NCAccountStructureMapping[]> {
     try {
@@ -43,6 +44,27 @@ export class RegistryQueryRepository {
       console.warn(`Cannot find account structure for id: ${profileId}/${accountId}`, error.message);
 
       return [];
+    }
+  }
+
+  async findNorthCapitalAccountId(profileId: string, accountId: string): Promise<string | null> {
+    try {
+      const result = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(registrationMappingRegistryTable)
+        .fullJoin(northCapitalSynchronizationTable, `${registrationMappingRegistryTable}.recordId`, `${northCapitalSynchronizationTable}.recordId`)
+        .select([`${northCapitalSynchronizationTable}.northCapitalId`])
+        .where(`${registrationMappingRegistryTable}.profileId`, '=', profileId)
+        .where(`${registrationMappingRegistryTable}.externalId`, '=', accountId)
+        .where(`${registrationMappingRegistryTable}.mappedType`, 'in', [MappedType.INDIVIDUAL_ACCOUNT, MappedType.CORPORATE_ACCOUNT, MappedType.TRUST_ACCOUNT])
+        .castTo<{ northCapitalId: string }>()
+        .executeTakeFirstOrThrow();
+
+      return result.northCapitalId;
+    } catch (error: any) {
+      console.warn(`Cannot find account structure for id: ${profileId}/${accountId}`, error.message);
+
+      return null;
     }
   }
 }

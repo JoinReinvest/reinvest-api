@@ -1,6 +1,13 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
-import { createRegistrationDatabaseAdapterProvider, RegistrationDatabaseAdapterInstanceProvider } from 'Registration/Adapter/Database/DatabaseAdapter';
+import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import {
+  createRegistrationDatabaseAdapterProvider,
+  RegistrationDatabase,
+  RegistrationDatabaseAdapterInstanceProvider,
+  RegistrationDatabaseAdapterProvider,
+} from 'Registration/Adapter/Database/DatabaseAdapter';
+import { BankAccountRepository } from 'Registration/Adapter/Database/Repository/BankAccountRepository';
 import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { NorthCapitalDocumentsSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository';
 import { NorthCapitalSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalSynchronizationRepository';
@@ -32,7 +39,14 @@ export class AdapterServiceProvider {
       .addSingleton(NorthCapitalSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(NorthCapitalDocumentsSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
-      .addSingleton(RegistryQueryRepository, [RegistrationDatabaseAdapterInstanceProvider]);
+      .addSingleton(RegistryQueryRepository, [RegistrationDatabaseAdapterInstanceProvider])
+      .addSingleton(BankAccountRepository, [RegistrationDatabaseAdapterInstanceProvider]);
+
+    container.addObjectFactory(
+      'RegistrationTransactionalAdapter',
+      (databaseProvider: RegistrationDatabaseAdapterProvider) => new TransactionalAdapter<RegistrationDatabase>(databaseProvider),
+      [RegistrationDatabaseAdapterInstanceProvider],
+    );
 
     // modules
     container.addSingleton(LegalEntitiesService, ['LegalEntities']).addSingleton(RegistrationDocumentsService, ['Documents']);
