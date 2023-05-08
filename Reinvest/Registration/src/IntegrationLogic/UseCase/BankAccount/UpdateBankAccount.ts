@@ -1,21 +1,59 @@
+import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { BankAccountRepository } from 'Registration/Adapter/Database/Repository/BankAccountRepository';
-import { RegistryQuery } from 'Registration/Port/Api/RegistryQuery';
+import { NorthCapitalAdapter } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
+import { BankAccount, PlaidLink } from 'Registration/Domain/Model/BankAccount';
 
 export class UpdateBankAccount {
   private bankAccountRepository: BankAccountRepository;
-  private registryQuery: RegistryQuery;
+  private idGenerator: IdGeneratorInterface;
+  private northCapitalAdapter: NorthCapitalAdapter;
 
-  constructor(registryQuery: RegistryQuery, bankAccountRepository: BankAccountRepository) {
-    this.registryQuery = registryQuery;
+  constructor(bankAccountRepository: BankAccountRepository, idGenerator: IdGeneratorInterface, northCapitalAdapter: NorthCapitalAdapter) {
     this.bankAccountRepository = bankAccountRepository;
+    this.idGenerator = idGenerator;
+    this.northCapitalAdapter = northCapitalAdapter;
   }
 
   static getClassName = () => 'UpdateBankAccount';
 
-  async execute(profileId: string, bankAccountId: string): Promise<void> {
-    // find an active bank account for the account
-    // create a new bank account record
-    // call north capital for new plaid url and store the record
-    // return the plaid url and bankAccountId
+  async execute(profileId: string, accountId: string): Promise<PlaidLink | null> {
+    try {
+      const inProgressBankAccount = await this.bankAccountRepository.findInProgressBankAccount(profileId, accountId);
+
+      if (inProgressBankAccount) {
+        return inProgressBankAccount.getPlaidLink();
+      }
+
+      const bankAccount = await this.bankAccountRepository.findActiveBankAccount(profileId, accountId);
+
+      if (!bankAccount) {
+        throw new Error('Bank account not found');
+      }
+
+      const schema = bankAccount.getObject();
+
+      const updatedBankAccount = BankAccount.create({
+        accountId: schema.accountId,
+        plaidUrl: null,
+        profileId: schema.profileId,
+        bankAccountId: this.idGenerator.createUuid(),
+        northCapitalId: schema.northCapitalId,
+        state: 'IN_PROGRESS',
+        bankAccountNumber: null,
+        bankAccountType: null,
+        plaidResult: null,
+      });
+
+      const plaidUrl = await this.northCapitalAdapter.updatePlaidUrl(schema.northCapitalId);
+      updatedBankAccount.setPlaidUrl(plaidUrl);
+
+      await this.bankAccountRepository.createBankAccountRecord(updatedBankAccount);
+
+      return updatedBankAccount.getPlaidLink();
+    } catch (error: any) {
+      console.error(error);
+
+      return null;
+    }
   }
 }

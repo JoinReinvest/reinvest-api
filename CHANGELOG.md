@@ -1,5 +1,24 @@
 # REINVEST API CHANGELOG
 
+## 1.11.4 - 05/08/2023
+
+* Changes:
+    * Providing Plaid link integration for bank account
+        * **Generating Plaid link costs $1.80 every time (on prod). Do not call it if it is not necessary.**
+    * User must go to the Plaid in iframe/webview to fulfill the bank account details
+    * After user choose the bank account, the Plaid will return the response to the REINVEST, which must be provided to
+      the `fulfillBankAccount` mutation
+        * The bank account will not be activated until the investor fulfills the bank account.
+* New mutations:
+    * `createBankAccount(accountId)` - It creates new link to the investor bank account. It works only if the account
+      does not have any bank account linked yet.
+    * `updateBankAccount(accountId)` - It updates the link to the investor bank account. It works only if the account
+      has bank account linked already.
+    * `fulfillBankAccount(accountId, input)` - Provide the response from Plaid here.
+      The bank account will not be activated until the investor fulfills the bank account.
+* New query:
+    * `readBankAccount(accountId)` - Returns basic bank account information
+
 ## 1.11.3 - 05/05/2023
 
 * New mutation:
