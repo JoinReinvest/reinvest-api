@@ -1,4 +1,4 @@
-export type Api = { [apiName: string]: (...rest) => any };
+export type Api = { [apiName: string]: (...rest: any[]) => any };
 export type EventHandler = { [kind: string]: (event: any) => void };
 
 export interface Module {
@@ -27,14 +27,14 @@ export default class Modules {
   }
 
   get(moduleName: string): Module {
-    return this.modules[moduleName];
+    return <Module>this.modules[moduleName];
   }
 
   *iterate(): Iterable<Module> {
     const modulesNames = Object.keys(this.modules);
 
     for (const moduleName of modulesNames) {
-      yield this.modules[moduleName];
+      yield <Module>this.modules[moduleName];
     }
   }
 
@@ -48,7 +48,7 @@ export default class Modules {
     const modulesNames = Object.keys(this.modules);
 
     for (const moduleName of modulesNames) {
-      const module = this.modules[moduleName];
+      const module = <Module>this.modules[moduleName];
       await module.close();
     }
   }

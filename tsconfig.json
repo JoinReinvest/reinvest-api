@@ -15,11 +15,13 @@
       "Logger/*": ["./shared/hkek-logger/*"],
 
       "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
+      "AdminApiGateway/*": ["./Reinvest/AdminApiGateway/src/*"],
       "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],
       "LegalEntities/*": ["./Reinvest/LegalEntities/src/*"],
       "Documents/*": ["./Reinvest/Documents/src/*"],
       "Identity/*": ["./Reinvest/Identity/src/*"],
       "Registration/*": ["./Reinvest/Registration/src/*"],
+      "Verification/*": ["./Reinvest/Verification/src/*"]
     }
   },
   "include": [

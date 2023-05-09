@@ -1,5 +1,4 @@
 import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
-import { NorthCapitalDocumentsSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository';
 
 export class SynchronizationQuery {
   public static getClassName = (): string => 'SynchronizationQuery';

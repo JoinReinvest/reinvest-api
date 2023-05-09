@@ -101,18 +101,6 @@ export const CognitoResources = {
           Name: 'incentive_token',
           Required: false,
         },
-        // {
-        //     AttributeDataType: "String",
-        //     Mutable: false,
-        //     Name: "profile_id",
-        //     Required: false,
-        // },
-        // {
-        //     AttributeDataType: "String",
-        //     Mutable: true,
-        //     Name: "profile_uuid",
-        //     Required: false,
-        // },
       ],
       UserPoolAddOns: {
         AdvancedSecurityMode: 'ENFORCED',
@@ -158,24 +146,24 @@ export const CognitoResources = {
       },
     },
   },
-  // CognitoExecutivesGroup: {
-  //     Type: "AWS::Cognito::UserPoolGroup",
-  //     Properties: {
-  //         Description: "Executives group",
-  //         GroupName: "Executives",
-  //         Precedence: 20,
-  //         UserPoolId: {Ref: "CognitoUserPool"},
-  //     },
-  // },
-  // CognitoAdministratorsGroup: {
-  //     Type: "AWS::Cognito::UserPoolGroup",
-  //     Properties: {
-  //         Description: "Administrators group",
-  //         GroupName: "Administrators",
-  //         Precedence: 10,
-  //         UserPoolId: {Ref: "CognitoUserPool"},
-  //     },
-  // },
+  CognitoExecutivesGroup: {
+    Type: 'AWS::Cognito::UserPoolGroup',
+    Properties: {
+      Description: 'Executives group',
+      GroupName: 'Executives',
+      Precedence: 20,
+      UserPoolId: { Ref: 'CognitoUserPool' },
+    },
+  },
+  CognitoAdministratorsGroup: {
+    Type: 'AWS::Cognito::UserPoolGroup',
+    Properties: {
+      Description: 'Administrators group',
+      GroupName: 'Administrators',
+      Precedence: 10,
+      UserPoolId: { Ref: 'CognitoUserPool' },
+    },
+  },
 };
 export const CognitoOutputs = {
   CognitoUserPoolID: {
@@ -237,7 +225,7 @@ export const CognitoClientResources = {
       RefreshTokenValidity: 30,
       AllowedOAuthFlows: ['implicit'],
       AllowedOAuthScopes: ['profile', 'openid'],
-      CallbackURLs: [margeWithApiGatewayUrl('/set-header')],
+      CallbackURLs: [margeWithApiGatewayUrl('/set-header'), margeWithApiGatewayUrl('/set-header?admin=1')],
       ClientName: 'Website and Mobile Cognito Client',
       EnableTokenRevocation: true,
       PreventUserExistenceErrors: 'ENABLED',
@@ -261,7 +249,7 @@ export const CognitoClientResources = {
       RefreshTokenValidity: 30,
       AllowedOAuthFlows: ['implicit'],
       AllowedOAuthScopes: ['profile', 'openid'],
-      CallbackURLs: [localCallbackUrl],
+      CallbackURLs: [localCallbackUrl, `${localCallbackUrl}?admin=1`],
       ClientName: 'Cognito client for localhost',
       EnableTokenRevocation: true,
       PreventUserExistenceErrors: 'ENABLED',

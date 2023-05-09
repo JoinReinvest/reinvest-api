@@ -14,6 +14,12 @@ export const ExplorerLambdaFunction = {
     {
       httpApi: {
         method: 'GET',
+        path: '/explorer/admin',
+      },
+    },
+    {
+      httpApi: {
+        method: 'GET',
         path: '/explorer',
       },
     },

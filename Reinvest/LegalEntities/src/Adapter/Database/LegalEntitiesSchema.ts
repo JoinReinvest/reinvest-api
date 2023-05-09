@@ -1,4 +1,7 @@
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 import { Insertable } from 'kysely';
+import { BeneficiaryName } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
+import { AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
 
 export interface LegalEntitiesProfile {
   address: string | null;
@@ -51,7 +54,18 @@ export interface LegalEntitiesCompanyAccount {
   stakeholders: string | null;
 }
 
+export interface LegalEntitiesBeneficiary {
+  accountId: string;
+  avatarJson: JSONObjectOf<AvatarInput> | null;
+  individualId: string;
+  label: string;
+  nameJson: JSONObjectOf<BeneficiaryName>;
+  profileId: string;
+  dateCreated?: Date;
+}
+
 export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'ssnObject'];
 
 export type InsertableProfile = Insertable<LegalEntitiesProfile>;
 export type InsertableDraftAccount = Insertable<LegalEntitiesDraftAccount>;
+export type InsertableBeneficiary = Insertable<LegalEntitiesBeneficiary>;

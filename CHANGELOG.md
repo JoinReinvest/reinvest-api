@@ -1,5 +1,102 @@
 # REINVEST API CHANGELOG
 
+## 1.11.4 - 05/08/2023
+
+* Changes:
+    * Providing Plaid link integration for bank account
+        * **Generating Plaid link costs $1.80 every time (on prod). Do not call it if it is not necessary.**
+    * User must go to the Plaid in iframe/webview to fulfill the bank account details
+    * After user choose the bank account, the Plaid will return the response to the REINVEST, which must be provided to
+      the `fulfillBankAccount` mutation
+        * The bank account will not be activated until the investor fulfills the bank account.
+* New mutations:
+    * `createBankAccount(accountId)` - It creates new link to the investor bank account. It works only if the account
+      does not have any bank account linked yet.
+    * `updateBankAccount(accountId)` - It updates the link to the investor bank account. It works only if the account
+      has bank account linked already.
+    * `fulfillBankAccount(accountId, input)` - Provide the response from Plaid here.
+      The bank account will not be activated until the investor fulfills the bank account.
+* New query:
+    * `readBankAccount(accountId)` - Returns basic bank account information
+
+## 1.11.3 - 05/05/2023
+
+* New mutation:
+    * `openBeneficiaryAccount` - it creates and immediately open beneficiary account (no draft required)
+* New query:
+    * `getBeneficiaryAccount(accountId)` - it returns beneficiary account details
+* Updates:
+    * query `getAccountsOverview` - returns also beneficiary account overview
+
+## 1.11.2 - 04/26/2023
+
+* `DocumentFileLinkInput` mutation accepts case insensitive `fileName` extension
+* New unauthorized endpoint for webhooks:
+    * `POST /webhooks/updateParty` - it handles events from North Capital regarding updating KYC and AML status
+
+## 1.11.1 - 04/26/2023
+
+* New Query: `getDocument(documentId)`
+    * it returns link to read the document. The link expires after 60 minutes, but this value can change in the future!
+    * if document is not found, the provided link will return 404 (it does not check if document actually exists in s3!)
+    * use that query at the moment when user actually want to download/display the file, because of expiration time.
+
+## 1.11.0 - 04/25/2023
+
+* New mutation: `verifyAccount(accountId)`, which verifies all account parties (profile, stakeholders and company
+  entity) against KYC/KYB/AML verfications
+    * It returns `VerificationDecisions`:
+        * `isAccountVerified: Boolean`: it tells if all account's parties are verified or not
+        * `canUserContinueTheInvestment: Boolean`: it tells can user continue the investment or not. If not then user
+          must do extra actions to continue the investment
+        * `requiredActions`: list of actions that user must perform to continue the investement.
+            * [IMPORTANT] Some actions ban profile or accounts
+            * Action structure:
+                * action: type of action. Based on that application must do some specific action
+                * onObject: specifies the object that is a subject of an actions. It contains 2 fields:
+                    * type: type of object. It can be one of: `PROFILE`, `STAKEHOLDER`, `COMPANY`
+                    * optional accountId (apply to `STAKEHOLDER` and `COMPANY`)
+                    * optional stakeholderId (apply to `STAKEHOLDER`)
+                * reasons: list of errors, suggestions what went wrong during verification. Potentially it can be used
+                  to display to user what went wrong
+            * List of current actions:
+                * `UPDATE_MEMBER` or `UPDATE_MEMBER_AGAIN`: it means that user must update details of object specified
+                  in `onObject` field
+                * `BAN_ACCOUNT`: it means that account must be banned and investment process and all other investments
+                  are blocked
+                * `BAN_PROFILE`: it means that profile must be banned and all accounts are blocked
+                * `REQUIRE_MANUAL_REVIEW` or `REQUIRE_ADMIN_SUPPORT`: just information, no action on frontend is
+                  required (`canUserContinueTheInvestment` should be set to `true`)
+* Added Admin API and Admin Explorer mode:
+    * to login as admin, add your Cognito user to `Administrators` or `Executives` group
+    * Admin API is available at `/api/admin`
+    * Admin Explorer is available at `/explorer/admin`
+    * Switcher between Admin/User explorer mode was added to the explorer in top right corner
+    * Currently supported mutations:
+        * `recoverVerification(objectId)`: it recovers verification after failure for object specified by `objectId`. It
+          can be `accountId`, `stakeholderId` or `profileId`
+* New [TEST] endpoints added:
+    * `POST /north-capital/set-user-for-verification`: it sets user for verification in North Capital. It accepts
+      parameters:
+        * `partyId` - North Capital id of the party to be updated
+        * `verificationType` - predefined user structure for verification in North Capital Sandbox, based on North
+          Capital test data:
+            * different scenarios for KYC in file: TransactCloud_KYCAMLDummyInfo_JohnSmith_APIResultCodes
+                * https://app.hubspot.com/documents/4042879/view/434536244?accessId=90e4b9
+            * AML fail in file: TransactCloud_AML_SDN_OFAC
+                * https://app.hubspot.com/documents/4042879/view/471825264?accessId=b5b5e4
+            * always pass KYC/AML - first name/last name must be equal to: `John Smith`
+                * https://support.northcapital.com/knowledge/is-there-test-information-for-the-kyc/aml-checks
+            * list of pre-implemented user structures:
+                * `ALL_APPROVED` - approves all verifications
+                * `ADDRESS_NOT_MATCH` - address does not match, but approves all verifications
+                * `SSN_DOES_NOT_MATCH` - SSN does not match, require user update
+                * `AML_FAIL` - AML fail, ban profile or account (depending on object type)
+    * `POST /north-capital/clear-verification`: it clears verification for user on REINVEST side. It accepts
+      parameters:
+        * `partyIds` - North Capital ids of the party to be updated (it allows to clear verification for multiple
+          parties at once)
+
 ## 1.10.1 - 04/20/2023
 
 * Update stakeholder in draft by id:

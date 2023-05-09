@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { BeneficiaryAccountController } from 'LegalEntities/Port/Api/BeneficiaryAccountController';
 import { CompleteProfileController } from 'LegalEntities/Port/Api/CompleteProfileController';
 import { DraftAccountsController } from 'LegalEntities/Port/Api/DraftAccountsController';
 import { GetProfileController } from 'LegalEntities/Port/Api/GetProfileController';
@@ -21,6 +22,8 @@ export type LegalEntitiesApiType = {
   getProfileForSynchronization: GetProfileController['getProfileForSynchronization'];
   getStakeholderForSynchronization: ReadAccountController['getStakeholderForSynchronization'];
   listDrafts: DraftAccountsController['listDrafts'];
+  openBeneficiaryAccount: BeneficiaryAccountController['openBeneficiaryAccount'];
+  readBeneficiaryAccount: ReadAccountController['readBeneficiaryAccount'];
   readDraft: DraftAccountsController['readDraft'];
   removeDraft: DraftAccountsController['removeDraft'];
   transformDraftAccountIntoRegularAccount: DraftAccountsController['transformDraftAccountIntoRegularAccount'];
@@ -47,4 +50,6 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
 
   getCompanyAccount: container.delegateTo(ReadAccountController, 'getCompanyAccount'),
   getAccountsOverview: container.delegateTo(ReadAccountController, 'getAccountsOverview'),
+  openBeneficiaryAccount: container.delegateTo(BeneficiaryAccountController, 'openBeneficiaryAccount'),
+  readBeneficiaryAccount: container.delegateTo(ReadAccountController, 'readBeneficiaryAccount'),
 });

@@ -14,6 +14,7 @@ export enum ValidationErrorEnum {
   NOT_ACTIVE = 'NOT_ACTIVE',
   WRONG_TYPE = 'WRONG_TYPE',
   NOT_FOUND = 'NOT_FOUND',
+  NUMBER_OF_ACCOUNTS_EXCEEDED = 'NUMBER_OF_ACCOUNTS_EXCEEDED',
 }
 
 export type ValidationErrorType = {
@@ -94,11 +95,11 @@ export class Uuid {
     this.uuid = uuid;
   }
 
-  toString(): string {
-    return this.uuid;
-  }
-
   static create(id: string): Uuid {
     return new Uuid(id);
+  }
+
+  toString(): string {
+    return this.uuid;
   }
 }

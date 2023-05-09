@@ -7,7 +7,7 @@ export interface NameProvider {
 export interface ContainerInterface {
   addAsValue(token: string, constant: any): this;
 
-  addObjectFactory(classObject: string | NameProvider, factory: (...rest) => any, injectDependencies: (string | NameProvider)[]): this;
+  addObjectFactory(classObject: string | NameProvider, factory: (...rest: any[]) => any, injectDependencies: (string | NameProvider)[]): this;
 
   addSingleton(singletonClass: NameProvider, injectDependencies?: (string | NameProvider)[]): this;
 
@@ -64,7 +64,7 @@ class Container implements ContainerInterface {
    * @param factory
    * @param injectDependencies
    */
-  addObjectFactory(classObject: string | NameProvider, factory: Function, injectDependencies: (string | NameProvider)[] = []): this {
+  addObjectFactory(classObject: string | NameProvider, factory: (...rest: any[]) => any, injectDependencies: (string | NameProvider)[] = []): this {
     const token = typeof classObject === 'string' ? classObject : classObject.getClassName();
     // @ts-ignore
     factory.inject = this.getTokensToInject(injectDependencies);
@@ -72,6 +72,19 @@ class Container implements ContainerInterface {
     this.container = this.container.provideFactory(token, factory);
 
     return this;
+  }
+
+  delegateTo(tokenizedClass: NameProvider, methodName: string): any {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const containerSelf = this;
+
+    return async function (...rest: any[]) {
+      const controller = containerSelf.getValue(tokenizedClass.getClassName()) as object;
+
+      // @ts-ignore
+      // eslint-disable-next-line security/detect-object-injection
+      return controller[methodName](...rest);
+    };
   }
 
   private getTokensToInject(injectDependencies: (string | NameProvider)[] = []): string[] {
@@ -86,18 +99,6 @@ class Container implements ContainerInterface {
     }
 
     return tokensToInject;
-  }
-
-  delegateTo(tokenizedClass: NameProvider, methodName: string): any {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const containerSelf = this;
-
-    return async function (...rest) {
-      const controller = containerSelf.getValue(tokenizedClass.getClassName()) as object;
-
-      // eslint-disable-next-line security/detect-object-injection
-      return controller[methodName](...rest);
-    };
   }
 }
 
