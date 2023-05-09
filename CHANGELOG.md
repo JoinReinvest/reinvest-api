@@ -1,5 +1,39 @@
 # REINVEST API CHANGELOG
 
+## 1.12.0 - 05/09/2023
+
+* Mock mutations and queries related to the investment flow.
+* Investment flow steps:
+    * Integrate bank account with
+      Plaid (`readBankAccount`, `createBankAccount`, `updateBankAccount`, `fulfillBankAccount`)
+    * Create investment (`createInvestment`)
+    * Sign subscription agreement (`createSubscriptionAgreement`, `signSubscriptionAgreement`)
+    * Opt-in automatic dividend reinvest
+      agreement (`getAccountConfiguration`, `setAutomaticDividendReinvestmentAgreement`)
+    * Show the investment summary + fees (`getInvestmentSummary`, `approveFees`)
+    * start the investment (`startInvestment`)
+* New queries (all are MOCKS!):
+    * `getInvestmentSummary` - It returns the investment summary.
+      Use this method to get info about the investment fees.
+    * `getSubscriptionAgreement` - It returns the subscription agreement.
+    * `getAccountConfiguration` - Return account configuration
+* New mutations (all are MOCKS!):
+    * `setAutomaticDividendReinvestmentAgreement` - Set automatic dividend reinvestment agreement
+    * `createInvestment` -It creates new investment and returns its ID.
+      It requires bank account to be linked to the account.
+      In other case it throws an error.
+    * `createSubscriptionAgreement` - It creates new subscription agreement for the specific investment
+      It returns the content of the agreement that must be rendered on the client side.
+      Client must sign the agreement and call signSubscriptionAgreement mutation.
+    * `signSubscriptionAgreement` - It signs the subscription agreement.
+    * `approveFees` - Approves the fees for the specific investment.
+      In case if extra fee is required for recurring investment and the investment was started automatically by the
+      system, then
+      use this method to approve the fees (it will ask for that on verification step triggered from the notification).
+    * `startInvestment` - It starts the investment.
+      It requires subscription agreement to be signed and fees to be approved.
+      The fees can be approved also by this method (if approveFees is true).
+
 ## 1.11.4 - 05/08/2023
 
 * Changes:
