@@ -8,10 +8,12 @@
       Plaid (`readBankAccount`, `createBankAccount`, `updateBankAccount`, `fulfillBankAccount`)
     * Create investment (`createInvestment`)
     * Sign subscription agreement (`createSubscriptionAgreement`, `signSubscriptionAgreement`)
-    * Opt-in automatic dividend reinvest
+    * Opt-in automatic dividend reinvestment
       agreement (`getAccountConfiguration`, `setAutomaticDividendReinvestmentAgreement`)
+    * Account KYC/AML verification (`verifyAccount`, `updateProfileForVerification`, `updateStakeholderForVerification`,
+      `updateCompanyForVerification`)
     * Show the investment summary + fees (`getInvestmentSummary`, `approveFees`)
-    * start the investment (`startInvestment`)
+    * Start the investment (`startInvestment`)
 * New queries (all are MOCKS!):
     * `getInvestmentSummary` - It returns the investment summary.
       Use this method to get info about the investment fees.
