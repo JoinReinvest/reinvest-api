@@ -106,16 +106,6 @@ const schema = `
         state: String
     }
 
-    input DollarInput {
-        inCents: Int! @constraint(min: 0)
-        formatted: String
-    }
-
-    type Dollar {
-        inCents: Int
-        display: String
-    }
-
     enum DraftAccountType {
         INDIVIDUAL
         CORPORATE
