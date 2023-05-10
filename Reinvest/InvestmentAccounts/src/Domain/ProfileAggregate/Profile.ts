@@ -12,7 +12,7 @@ import { AggregateState, DomainEvent } from 'SimpleAggregator/Types';
 
 const MAX_NUMBER_OF_TRUSTS = 3;
 const MAX_NUMBER_OF_CORPORATES = 3;
-const MAX_NUMBER_OF_BENEFICIARIES = 3;
+const MAX_NUMBER_OF_BENEFICIARIES = 10000; // todo change it to 3 after integration phase
 
 export const ProfileAggregateName = 'Profile';
 export type ProfileState = AggregateState & {
