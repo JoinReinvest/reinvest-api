@@ -1,6 +1,7 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
+import { UpdateProfileForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfileForVerification';
 import { Verification } from 'Verification/index';
 
 const schema = `
@@ -82,6 +83,9 @@ const schema = `
     }
 `;
 
+type UpdateProfileForVerificationDetailsInput = {
+  input: UpdateProfileForVerificationInput;
+};
 export const VerificationSchema = {
   typeDefs: schema,
   resolvers: {
@@ -99,7 +103,11 @@ export const VerificationSchema = {
 
         return api.verifyAccount(profileId, accountId);
       },
-      updateProfileForVerification: async (parent: any, { input }: any, { profileId, modules }: SessionContext): Promise<boolean> => {
+      updateProfileForVerification: async (
+        parent: any,
+        data: UpdateProfileForVerificationDetailsInput,
+        { profileId, modules }: SessionContext,
+      ): Promise<boolean> => {
         const legalEntitiesApi = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const verificationApi = modules.getApi<Verification.ApiType>(Verification);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
@@ -109,12 +117,13 @@ export const VerificationSchema = {
         if (!canObjectBeUpdate) {
           throw new JsonGraphQLError('NO_UPDATE_ALLOWED');
         }
-        // const { input } = data;
-        // const errors = await legalEntitiesApi.updateProfileForVerification(input, profileId);
 
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        const { input } = data;
+        const errors = await legalEntitiesApi.updateProfileForVerification(input, profileId);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
         // const status = await registrationApi.synchronizeProfile(profileId);
 
