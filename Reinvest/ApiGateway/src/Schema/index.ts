@@ -6,6 +6,7 @@ import { FileName } from 'ApiGateway/Schema/Scalars/FileName';
 import { Money } from 'ApiGateway/Schema/Scalars/Money';
 import { ProfileStitcher } from 'ApiGateway/Schema/Stitching/ProfileStitcher';
 import { Account } from 'ApiGateway/Schema/Types/Account';
+import { AccountStats } from 'ApiGateway/Schema/Types/AccountStats';
 import { Configuration } from 'ApiGateway/Schema/Types/Configuration';
 import { DocumentTypes } from 'ApiGateway/Schema/Types/DocumentTypes';
 import { DraftAccount } from 'ApiGateway/Schema/Types/DraftAccount';
@@ -32,6 +33,7 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   Investments.typeDefs,
   RecurringInvestments.typeDefs,
   Configuration.typeDefs,
+  AccountStats.typeDefs,
 ]);
 
 const nonExecutableResolvers = mergeResolvers([
@@ -44,6 +46,7 @@ const nonExecutableResolvers = mergeResolvers([
   Investments.resolvers,
   RecurringInvestments.resolvers,
   Configuration.resolvers,
+  AccountStats.resolvers,
 ]);
 
 let schema = mergeSchemas({
