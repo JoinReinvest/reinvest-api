@@ -70,7 +70,7 @@ const schema = `
     input SimplifiedDomicileInput {
         type: SimplifiedDomicileType!
     }
-    
+
     type SimplifiedDomicile {
         type: SimplifiedDomicileType
     }
@@ -188,6 +188,45 @@ const schema = `
     type Statement {
         type: StatementType,
         details: [String]
+    }
+
+    input USDInput {
+        value: Money!,
+    }
+
+    type USD {
+        value: Money!,
+        formatted: String
+    }
+
+    enum SubscriptionAgreementStatus {
+        WAITING_FOR_SIGNATURE
+        SIGNED
+    }
+
+    type SubscriptionAgreementParagraph {
+        lines: [String!]!
+        bold: Boolean
+        isCheckedOption: Boolean
+    }
+
+    type SubscriptionAgreementSection {
+        header: String
+        paragraphs: [SubscriptionAgreementParagraph!]!
+    }
+
+    enum SubscriptionAgreementType {
+        DIRECT_DEPOSIT
+        RECURRING_INVESTMENT
+    }
+
+    type SubscriptionAgreement {
+        id: ID!
+        type: SubscriptionAgreementType!
+        status: SubscriptionAgreementStatus!
+        createdAt: ISODateTime!
+        signedAt: ISODateTime
+        content: [SubscriptionAgreementSection!]!
     }
 `;
 export const Shared = {

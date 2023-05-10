@@ -3,40 +3,6 @@ import { GraphQLError } from 'graphql';
 
 const schema = `
     #graphql
-    input USDInput {
-        value: Money!,
-    }
-
-    type USD {
-        value: Money!,
-        formatted: String
-    }
-
-    enum SubscriptionAgreementStatus {
-        WAITING_FOR_SIGNATURE
-        SIGNED
-    }
-
-    type SubscriptionAgreementParagraph {
-        lines: [String!]!
-        bold: Boolean
-        isCheckedOption: Boolean
-    }
-
-    type SubscriptionAgreementSection {
-        header: String
-        paragraphs: [SubscriptionAgreementParagraph!]!
-    }
-
-    type SubscriptionAgreement {
-        id: ID!
-        investmentId: ID!
-        status: SubscriptionAgreementStatus!
-        createdAt: ISODateTime!
-        signedAt: ISODateTime
-        content: [SubscriptionAgreementSection!]!
-    }
-
     enum InvestmentStatus {
         WAITING_FOR_SUBSCRIPTION_AGREEMENT
         WAITING_FOR_FEES_APPROVAL
@@ -106,7 +72,7 @@ const schema = `
     }
 `;
 const investmentIdMock = '73e94d4c-f237-4f10-aa05-be8ade282be1';
-const subscriptionAgreementIdMock = 'e04ce44d-eb21-4691-99cc-89fd11c2bfef';
+export const subscriptionAgreementIdMock = 'e04ce44d-eb21-4691-99cc-89fd11c2bfef';
 const investmentSummaryMock = {
   id: investmentIdMock,
   tradeId: '47584',
@@ -123,9 +89,9 @@ const investmentSummaryMock = {
   subscriptionAgreementId: subscriptionAgreementIdMock,
 };
 
-const subscriptionAgreementMock = {
+export const subscriptionAgreementMock = (parentId: string, type: string) => ({
   id: subscriptionAgreementIdMock,
-  investmentId: investmentIdMock,
+  type,
   status: 'WAITING_FOR_SIGNATURE',
   createdAt: '2023-03-24T12:33:12',
   content: [
@@ -223,7 +189,7 @@ const subscriptionAgreementMock = {
       ],
     },
   ],
-};
+});
 
 export const Investments = {
   typeDefs: schema,
@@ -233,7 +199,7 @@ export const Investments = {
         return investmentSummaryMock;
       },
       getSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
-        return subscriptionAgreementMock;
+        return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
       },
     },
     Mutation: {
@@ -251,7 +217,7 @@ export const Investments = {
         return true;
       },
       createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return subscriptionAgreementMock;
+        return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
       },
       signSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
         return true;
