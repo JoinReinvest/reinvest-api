@@ -1,5 +1,13 @@
 # REINVEST API CHANGELOG
 
+## 1.12.2 - 05/10/2023
+
+* Mock for EVS chart
+* New MOCK query:
+    * `getEVSChart` - It returns the EVS chart data for the specific resolution
+    * it returns up to 1000 data points for hard-coded period (2020-01-01 - 2022-09-26)
+    * it works for all resolutions (1D, 1W, 1M, 1Y, 5Y, MAX)
+
 ## 1.12.1 - 05/10/2023
 
 * Mock mutations and queries related to the recurring investment flow.
