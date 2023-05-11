@@ -1,7 +1,7 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
-import { UpdateProfileForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfileForVerification';
+import type { UpdateProfileForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfileForVerification';
 import { Verification } from 'Verification/index';
 
 const schema = `
