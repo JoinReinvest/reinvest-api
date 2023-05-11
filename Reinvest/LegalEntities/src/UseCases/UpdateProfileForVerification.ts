@@ -76,8 +76,6 @@ export class UpdateProfileForVerification {
           case 'domicile':
             profile.setDomicile(Domicile.create(data as DomicileInput));
             break;
-          case 'verifyAndFinish':
-            break;
           default:
             errors.push(<ValidationErrorType>{
               type: ValidationErrorEnum.UNKNOWN_ERROR,
