@@ -1,5 +1,9 @@
 # REINVEST API CHANGELOG
 
+## 1.12.3 - 05/11/2023
+
+* Mock for account stats `getAccountStats` query
+
 ## 1.12.2 - 05/10/2023
 
 * Mock for EVS chart
