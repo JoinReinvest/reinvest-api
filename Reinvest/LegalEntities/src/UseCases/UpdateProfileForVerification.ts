@@ -26,11 +26,11 @@ export class UpdateProfileForVerification {
   }
 
   public async execute(input: UpdateProfileForVerificationInput, profileId: string): Promise<ValidationErrorType[]> {
-    const profile = await this.profileRepository.findOrCreateProfile(profileId);
+    const profile = await this.profileRepository.findProfile(profileId);
     let events: DomainEvent[] = [];
     const errors = [];
 
-    if (!profile.isCompleted()) {
+    if (!profile?.isCompleted()) {
       errors.push(<ValidationErrorType>{
         type: ValidationErrorEnum.NOT_COMPLETED,
         field: 'profile',
@@ -70,7 +70,6 @@ export class UpdateProfileForVerification {
               fileName: document.fileName,
               path: profileId,
             }));
-            console.log(documents, 'TESTTES');
             const removedDocumentsEvents = profile.replaceIdentityDocumentAndReturnRemoved(IdentityDocument.create(documents));
             events = [...events, ...removedDocumentsEvents];
             break;
@@ -96,22 +95,6 @@ export class UpdateProfileForVerification {
             field: step,
           });
         }
-      }
-    }
-
-    if (errors.length === 0 && input.verifyAndFinish) {
-      if (profile.verifyCompletion()) {
-        profile.setAsCompleted();
-        events.push(<LegalProfileCompleted>{
-          id: profileId,
-          kind: 'LegalProfileCompleted',
-        });
-      } else {
-        errors.push(<ValidationErrorType>{
-          type: ValidationErrorEnum.FAILED,
-          field: 'verifyAndFinish',
-          details: profile.getCompletionErrors(),
-        });
       }
     }
 
