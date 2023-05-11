@@ -6,6 +6,7 @@ import { FileName } from 'ApiGateway/Schema/Scalars/FileName';
 import { Money } from 'ApiGateway/Schema/Scalars/Money';
 import { ProfileStitcher } from 'ApiGateway/Schema/Stitching/ProfileStitcher';
 import { Account } from 'ApiGateway/Schema/Types/Account';
+import { AccountStats } from 'ApiGateway/Schema/Types/AccountStats';
 import { Configuration } from 'ApiGateway/Schema/Types/Configuration';
 import { DocumentTypes } from 'ApiGateway/Schema/Types/DocumentTypes';
 import { DraftAccount } from 'ApiGateway/Schema/Types/DraftAccount';
@@ -13,6 +14,7 @@ import { Hello } from 'ApiGateway/Schema/Types/Hello';
 import { PhoneNumberVerification } from 'ApiGateway/Schema/Types/Identity';
 import { Investments } from 'ApiGateway/Schema/Types/Investments';
 import { Profile } from 'ApiGateway/Schema/Types/Profile';
+import { RecurringInvestments } from 'ApiGateway/Schema/Types/RecurringInvestments';
 import { Shared } from 'ApiGateway/Schema/Types/Shared';
 import { VerificationSchema } from 'ApiGateway/Schema/Types/Verification';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
@@ -29,7 +31,9 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   DocumentTypes.typeDefs,
   VerificationSchema.typeDefs,
   Investments.typeDefs,
+  RecurringInvestments.typeDefs,
   Configuration.typeDefs,
+  AccountStats.typeDefs,
 ]);
 
 const nonExecutableResolvers = mergeResolvers([
@@ -40,7 +44,9 @@ const nonExecutableResolvers = mergeResolvers([
   DocumentTypes.resolvers,
   VerificationSchema.resolvers,
   Investments.resolvers,
+  RecurringInvestments.resolvers,
   Configuration.resolvers,
+  AccountStats.resolvers,
 ]);
 
 let schema = mergeSchemas({

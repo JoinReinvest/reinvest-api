@@ -1,5 +1,39 @@
 # REINVEST API CHANGELOG
 
+## 1.12.2 - 05/10/2023
+
+* Mock for EVS chart
+* New MOCK query:
+    * `getEVSChart` - It returns the EVS chart data for the specific resolution
+    * it returns up to 1000 data points for hard-coded period (2020-01-01 - 2022-09-26)
+    * it works for all resolutions (1D, 1W, 1M, 1Y, 5Y, MAX)
+
+## 1.12.1 - 05/10/2023
+
+* Mock mutations and queries related to the recurring investment flow.
+* Recurring investment flow steps:
+    * Create recurring investment (`createRecurringInvestment`, `getScheduleSimulation`)
+    * Sign recurring subscription
+      agreement (`createRecurringSubscriptionAgreement`, `signRecurringInvestmentSubscriptionAgreement`)
+    * Opt-in dividend reinvestment (if required) + verification
+    * Show the recurring investment summary(`getDraftRecurringInvestment`)
+    * Initialize the recurring investment (`initiateRecurringInvestment`)
+* New queries (all are MOCKS!):
+    * `getActiveRecurringInvestment` - It returns the current recurring investment summary.
+    * `getDraftRecurringInvestment` - It returns the created draft recurring investment summary.
+    * `getScheduleSimulation` - Returns the simulation of the recurring investment schedule.
+* New mutations (all are MOCKS!):
+    * `createRecurringInvestment` - It creates new investment and returns its ID.
+      It requires bank account to be linked to the account.
+      In other case it throws an error.
+    * `createRecurringSubscriptionAgreement` - It creates new subscription agreement for the specific recurring
+      investment
+      It returns the content of the agreement that must be rendered on the client side.
+      Client must sign the agreement and call signRecurringInvestmentSubscriptionAgreement mutation.
+    * `signRecurringInvestmentSubscriptionAgreement` - It signs the recurring investment subscription agreement.
+    * `initiateRecurringInvestment` - It STARTS the recurring investment, CANCEL previous recurring investment if exists
+      and schedule the first investment.
+
 ## 1.12.0 - 05/09/2023
 
 * Mock mutations and queries related to the investment flow.
