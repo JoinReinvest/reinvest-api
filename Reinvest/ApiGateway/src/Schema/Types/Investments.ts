@@ -71,9 +71,9 @@ const schema = `
         startInvestment(investmentId: ID!, approveFees: Boolean): Boolean!
 
         """
-        [MOCK] It cancels the investment that haven't been started yet (by startInvestment mutation).
+        [MOCK] It aborts the investment that haven't been started yet (by startInvestment mutation).
         """
-        abandonInvestment(investmentId: ID!): Boolean!
+        abortInvestment(investmentId: ID!): Boolean!
     }
 `;
 const investmentIdMock = '73e94d4c-f237-4f10-aa05-be8ade282be1';
@@ -227,7 +227,7 @@ export const Investments = {
       signSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
         return true;
       },
-      abandonInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
+      abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;
       },
     },

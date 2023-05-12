@@ -81,7 +81,7 @@ export const notificationsMock = (accountId: string, isRead: boolean = false, pa
       notificationType: 'GENERIC_NOTIFICATION',
       header: 'This is some notification',
       body: 'This is generic notification test. Just display it and no other action required.',
-      date: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
+      date: dayjs().subtract(1, 'minute').format('YYYY-MM-DDTHH:mm:ss'),
       isRead,
       isDismissible: true,
       accountId,

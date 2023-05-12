@@ -1,5 +1,64 @@
 # REINVEST API CHANGELOG
 
+## 1.12.3 - 05/12/2023
+
+* Notification mocks:
+    * Flow:
+        * Get all notifications for the given account id
+        * Mark notification as read
+        * Some of the notification are not dismissible (pinned) and cannot be marked as read. They are always first.
+        * Not dismissible notifications will be marked as read by backend automatically after some time or after some
+          action.
+        * Based on notification type, some actions can be required (e.g. reinvest/withdraw dividend, unsuspend recurring
+          investment, etc)
+    * Mock Queries:
+        * `getNotDismissedNotifications` - Get all notifications for the given account id
+          It sorts notifications by date descending. Not dismissible (pinned) notifications are always first.
+    * Mock Mutations:
+        * `markNotificationAsRead` - Mark notification as read
+* Dividends reinvestment/withdrawal mocks
+    * Flow:
+        * Take the dividend id from notification (in the future it will be possible to get it from the dividend list in
+          the account settings)
+        * Reinvest/withdraw dividend
+    * Mock Mutations:
+        * `reinvestDividend` - Reinvest dividend - you can reinvest many dividends in the same time. If one of them is
+          not reinvestable, then all of them will be rejected.
+        * `withdrawDividend` - Withdraw dividend - you can withdraw many dividends in the same time. If one of them is
+          not withdrawable, then all of them will be rejected.
+* Funds withdrawal mocks:
+    * Flow:
+        * Simulate the funds withdrawal with `simulateFundsWithdrawal` query. It returns the simulation of withdrawal
+          without any changes in the system. If there are grace period investments then the funds withdrawal request
+          will be rejected.
+          Investor must cancel grace period investments manually first, before requesting the funds withdrawal.
+        * Create funds withdrawal request with `createFundsWithdrawalRequest` mutation. It locks account, so an investor
+          will not be able to invest as long as the funds withdrawal request is pending.
+        * Create funds withdrawal agreement with `createFundsWithdrawalAgreement` mutation. It prepares the agreement
+          for funds withdrawal file. The investor must download it, print it, sign it and upload it again.
+        * Request the funds withdrawal with `requestFundsWithdrawal` mutation. The investor must sign the agreement
+          first and provide the id of the signed agreement.
+        * If an investor decides to abort the funds withdrawal request, then he can do it with
+          `abortFundsWithdrawalRequest` mutation, but only if the funds withdrawal request is not yet approved or
+          rejected already.
+    * Mock Queries:
+        * `simulateFundsWithdrawal` - Simulate funds withdrawal. It returns the simulation of withdrawal without any
+          changes in the system.
+        * `getFundsWithdrawalRequest` - Get funds withdrawal request. It returns the current status of funds withdrawal
+          request.
+    * Mock Mutations:
+        * `createFundsWithdrawalRequest` - Create funds withdrawal request. It is just a DRAFT. You need to sign the
+          agreement and then request the withdrawal.
+        * `createFundsWithdrawalAgreement` - It prepares the agreement for funds withdrawal file.
+          The investor must download it, print it, sign it and upload it again.
+        * `requestFundsWithdrawal` - It requests the fund's withdrawal. The investor must sign the agreement first. To
+          do
+          that, use createFundsWithdrawalAgreement mutation and ask user to download, print, sign, scan and upload the
+          agreement again.
+        * `abortFundsWithdrawalRequest` - It aborts the funds withdrawal request if it is not yet approved or rejected
+* Extra investment mutation mock for `abortInvestment` mutation
+    * It aborts the investment that haven't been started yet (by startInvestment mutation).
+
 ## 1.12.3 - 05/11/2023
 
 * Mock for account stats `getAccountStats` query
@@ -135,7 +194,8 @@
                   to display to user what went wrong
             * List of current actions:
                 * `UPDATE_MEMBER` or `UPDATE_MEMBER_AGAIN`: it means that user must update details of object specified
-                  in `onObject` field
+                  in `onObject` field (use mutation `updateProfileForVerification`, `updateStakeholderForVerification`
+                  or `updateCompanyForVerification` depending on the object type)
                 * `BAN_ACCOUNT`: it means that account must be banned and investment process and all other investments
                   are blocked
                 * `BAN_PROFILE`: it means that profile must be banned and all accounts are blocked

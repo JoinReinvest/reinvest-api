@@ -5,7 +5,7 @@ const schema = `
     #graphql
     "Avatar link id input"
     input DocumentFileLinkInput {
-        "This is @PutFileLink.id"
+        "This 'id' comes usually from @PutFileLink.id"
         id: String!
         "File name should be in format: .pdf, .jpeg, .jpg, .png"
         fileName: FileName!
