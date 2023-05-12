@@ -1,3 +1,4 @@
+import { SessionContext } from 'ApiGateway/index';
 import dayjs from 'dayjs';
 
 const schema = `
@@ -42,8 +43,6 @@ const schema = `
         onObject: NotificationObject
     }
 
-
-
     type Query {
         """
         [MOCK] Get all notifications for the given account id
@@ -61,7 +60,7 @@ const schema = `
 
 `;
 
-const notificationsMock = (accountId: string, isRead: boolean = false, page: number = 0, perPage: number = 10) => {
+export const notificationsMock = (accountId: string, isRead: boolean = false, page: number = 0, perPage: number = 10) => {
   const notification = [
     {
       id: '2ffb89ce-7ab6-4e05-a20d-ef8cc7f3de8d',
