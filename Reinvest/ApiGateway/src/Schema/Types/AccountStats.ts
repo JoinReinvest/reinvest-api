@@ -54,7 +54,7 @@ export const AccountStats = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      getAccountStats: async (parent: any, { accountId, resolution }: any, { profileId, modules }: SessionContext) => ({
+      getAccountStats: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => ({
         accountValue: '$810.25',
         EVS: '$800.00',
         costOfSharesOwned: '$600.00',
