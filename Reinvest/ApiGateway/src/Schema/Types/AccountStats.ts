@@ -25,11 +25,28 @@ const schema = `
         dataPoints: [EVSChartPoint]
     }
 
+    type AccountStats {
+        accountValue: String!
+        EVS: String!
+        costOfSharesOwned: String!
+        quantityOfShares: String!
+        currentNAVPerShare: String!
+        netReturns: String!
+        dividends: String!
+        appreciation: String!
+        advisorFees: String!
+    }
+
     type Query {
         """
         [MOCK] Get EVS chart data for an account by resolution
         """
         getEVSChart(accountId: String!, resolution: EVSChartResolution!): EVSChart
+
+        """
+        [MOCK] Get account stats
+        """
+        getAccountStats(accountId: String!): AccountStats
     }
 `;
 
@@ -37,6 +54,17 @@ export const AccountStats = {
   typeDefs: schema,
   resolvers: {
     Query: {
+      getAccountStats: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => ({
+        accountValue: '$810.25',
+        EVS: '$800.00',
+        costOfSharesOwned: '$600.00',
+        quantityOfShares: '53.33',
+        currentNAVPerShare: '$15.00',
+        netReturns: '$210.25',
+        dividends: '$22.86',
+        appreciation: '$200.00',
+        advisorFees: '$12.60',
+      }),
       getEVSChart: async (parent: any, { accountId, resolution }: any, { profileId, modules }: SessionContext) => {
         const lastThousandDays = [];
         let currentEVSValue = 0;

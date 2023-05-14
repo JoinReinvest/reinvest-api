@@ -69,6 +69,11 @@ const schema = `
         The fees can be approved also by this method (if approveFees is true).
         """
         startInvestment(investmentId: ID!, approveFees: Boolean): Boolean!
+
+        """
+        [MOCK] It aborts the investment that haven't been started yet (by startInvestment mutation).
+        """
+        abortInvestment(investmentId: ID!): Boolean!
     }
 `;
 const investmentIdMock = '73e94d4c-f237-4f10-aa05-be8ade282be1';
@@ -220,6 +225,9 @@ export const Investments = {
         return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
       },
       signSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
+        return true;
+      },
+      abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;
       },
     },

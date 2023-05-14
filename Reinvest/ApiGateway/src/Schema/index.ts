@@ -13,10 +13,12 @@ import { DraftAccount } from 'ApiGateway/Schema/Types/DraftAccount';
 import { Hello } from 'ApiGateway/Schema/Types/Hello';
 import { PhoneNumberVerification } from 'ApiGateway/Schema/Types/Identity';
 import { Investments } from 'ApiGateway/Schema/Types/Investments';
+import { Notification } from 'ApiGateway/Schema/Types/Notification';
 import { Profile } from 'ApiGateway/Schema/Types/Profile';
 import { RecurringInvestments } from 'ApiGateway/Schema/Types/RecurringInvestments';
 import { Shared } from 'ApiGateway/Schema/Types/Shared';
 import { VerificationSchema } from 'ApiGateway/Schema/Types/Verification';
+import { Withdrawals } from 'ApiGateway/Schema/Types/Withdrawals';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
 
 const executableSchemas = [EmailAddress, FileName, DateScalar, Money, Hello];
@@ -34,6 +36,8 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   RecurringInvestments.typeDefs,
   Configuration.typeDefs,
   AccountStats.typeDefs,
+  Notification.typeDefs,
+  Withdrawals.typeDefs,
 ]);
 
 const nonExecutableResolvers = mergeResolvers([
@@ -47,6 +51,8 @@ const nonExecutableResolvers = mergeResolvers([
   RecurringInvestments.resolvers,
   Configuration.resolvers,
   AccountStats.resolvers,
+  Notification.resolvers,
+  Withdrawals.resolvers,
 ]);
 
 let schema = mergeSchemas({

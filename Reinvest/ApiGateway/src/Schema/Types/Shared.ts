@@ -228,6 +228,14 @@ const schema = `
         signedAt: ISODateTime
         content: [SubscriptionAgreementSection!]!
     }
+
+    """
+    If not provided, default pagination is page: 0, perPage: 10
+    """
+    input Pagination {
+        page: Int! = 0
+        perPage: Int! = 10
+    }
 `;
 export const Shared = {
   typeDefs: schema,
