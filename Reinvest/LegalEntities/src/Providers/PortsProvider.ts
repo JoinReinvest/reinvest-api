@@ -14,11 +14,13 @@ import { DraftAccountQuery } from 'LegalEntities/Port/Api/DraftAccountQuery';
 import { DraftAccountsController } from 'LegalEntities/Port/Api/DraftAccountsController';
 import { GetProfileController } from 'LegalEntities/Port/Api/GetProfileController';
 import { ReadAccountController } from 'LegalEntities/Port/Api/ReadAccountController';
+import { UpdateForVerificationController } from 'LegalEntities/Port/Api/UpdateForVerificationController';
 import { CompleteDraftAccount } from 'LegalEntities/UseCases/CompleteDraftAccount';
 import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 
 export class PortsProvider {
   private config: LegalEntities.Config;
@@ -42,6 +44,7 @@ export class PortsProvider {
         DraftAccountQuery,
         TransformDraftAccountIntoRegularAccount,
         RemoveDraftAccount,
-      ]);
+      ])
+      .addSingleton(UpdateForVerificationController, [UpdateProfileForVerification]);
   }
 }

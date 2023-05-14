@@ -4,6 +4,7 @@ import { CompleteProfileController } from 'LegalEntities/Port/Api/CompleteProfil
 import { DraftAccountsController } from 'LegalEntities/Port/Api/DraftAccountsController';
 import { GetProfileController } from 'LegalEntities/Port/Api/GetProfileController';
 import { ReadAccountController } from 'LegalEntities/Port/Api/ReadAccountController';
+import { UpdateForVerificationController } from 'Reinvest/LegalEntities/src/Port/Api/UpdateForVerificationController';
 
 export type LegalEntitiesApiType = {
   completeCompanyDraftAccount: DraftAccountsController['completeCompanyDraftAccount'];
@@ -27,6 +28,8 @@ export type LegalEntitiesApiType = {
   readDraft: DraftAccountsController['readDraft'];
   removeDraft: DraftAccountsController['removeDraft'];
   transformDraftAccountIntoRegularAccount: DraftAccountsController['transformDraftAccountIntoRegularAccount'];
+
+  updateProfileForVerification: UpdateForVerificationController['updateProfileForVerification'];
 };
 
 export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesApiType => ({
@@ -52,4 +55,6 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   getAccountsOverview: container.delegateTo(ReadAccountController, 'getAccountsOverview'),
   openBeneficiaryAccount: container.delegateTo(BeneficiaryAccountController, 'openBeneficiaryAccount'),
   readBeneficiaryAccount: container.delegateTo(ReadAccountController, 'readBeneficiaryAccount'),
+
+  updateProfileForVerification: container.delegateTo(UpdateForVerificationController, 'updateProfileForVerification'),
 });

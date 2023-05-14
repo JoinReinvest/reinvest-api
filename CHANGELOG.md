@@ -1,5 +1,138 @@
 # REINVEST API CHANGELOG
 
+## 1.12.3 - 05/12/2023
+
+* Notification mocks:
+    * Flow:
+        * Get all notifications for the given account id
+        * Mark notification as read
+        * Some of the notification are not dismissible (pinned) and cannot be marked as read. They are always first.
+        * Not dismissible notifications will be marked as read by backend automatically after some time or after some
+          action.
+        * Based on notification type, some actions can be required (e.g. reinvest/withdraw dividend, unsuspend recurring
+          investment, etc)
+    * Mock Queries:
+        * `getNotDismissedNotifications` - Get all notifications for the given account id
+          It sorts notifications by date descending. Not dismissible (pinned) notifications are always first.
+    * Mock Mutations:
+        * `markNotificationAsRead` - Mark notification as read
+* Dividends reinvestment/withdrawal mocks
+    * Flow:
+        * Take the dividend id from notification (in the future it will be possible to get it from the dividend list in
+          the account settings)
+        * Reinvest/withdraw dividend
+    * Mock Mutations:
+        * `reinvestDividend` - Reinvest dividend - you can reinvest many dividends in the same time. If one of them is
+          not reinvestable, then all of them will be rejected.
+        * `withdrawDividend` - Withdraw dividend - you can withdraw many dividends in the same time. If one of them is
+          not withdrawable, then all of them will be rejected.
+* Funds withdrawal mocks:
+    * Flow:
+        * Simulate the funds withdrawal with `simulateFundsWithdrawal` query. It returns the simulation of withdrawal
+          without any changes in the system. If there are grace period investments then the funds withdrawal request
+          will be rejected.
+          Investor must cancel grace period investments manually first, before requesting the funds withdrawal.
+        * Create funds withdrawal request with `createFundsWithdrawalRequest` mutation. It locks account, so an investor
+          will not be able to invest as long as the funds withdrawal request is pending.
+        * Create funds withdrawal agreement with `createFundsWithdrawalAgreement` mutation. It prepares the agreement
+          for funds withdrawal file. The investor must download it, print it, sign it and upload it again.
+        * Request the funds withdrawal with `requestFundsWithdrawal` mutation. The investor must sign the agreement
+          first and provide the id of the signed agreement.
+        * If an investor decides to abort the funds withdrawal request, then he can do it with
+          `abortFundsWithdrawalRequest` mutation, but only if the funds withdrawal request is not yet approved or
+          rejected already.
+    * Mock Queries:
+        * `simulateFundsWithdrawal` - Simulate funds withdrawal. It returns the simulation of withdrawal without any
+          changes in the system.
+        * `getFundsWithdrawalRequest` - Get funds withdrawal request. It returns the current status of funds withdrawal
+          request.
+    * Mock Mutations:
+        * `createFundsWithdrawalRequest` - Create funds withdrawal request. It is just a DRAFT. You need to sign the
+          agreement and then request the withdrawal.
+        * `createFundsWithdrawalAgreement` - It prepares the agreement for funds withdrawal file.
+          The investor must download it, print it, sign it and upload it again.
+        * `requestFundsWithdrawal` - It requests the fund's withdrawal. The investor must sign the agreement first. To
+          do
+          that, use createFundsWithdrawalAgreement mutation and ask user to download, print, sign, scan and upload the
+          agreement again.
+        * `abortFundsWithdrawalRequest` - It aborts the funds withdrawal request if it is not yet approved or rejected
+* Extra investment mutation mock for `abortInvestment` mutation
+    * It aborts the investment that haven't been started yet (by startInvestment mutation).
+
+## 1.12.3 - 05/11/2023
+
+* Mock for account stats `getAccountStats` query
+
+## 1.12.2 - 05/10/2023
+
+* Mock for EVS chart
+* New MOCK query:
+    * `getEVSChart` - It returns the EVS chart data for the specific resolution
+    * it returns up to 1000 data points for hard-coded period (2020-01-01 - 2022-09-26)
+    * it works for all resolutions (1D, 1W, 1M, 1Y, 5Y, MAX)
+
+## 1.12.1 - 05/10/2023
+
+* Mock mutations and queries related to the recurring investment flow.
+* Recurring investment flow steps:
+    * Create recurring investment (`createRecurringInvestment`, `getScheduleSimulation`)
+    * Sign recurring subscription
+      agreement (`createRecurringSubscriptionAgreement`, `signRecurringInvestmentSubscriptionAgreement`)
+    * Opt-in dividend reinvestment (if required) + verification
+    * Show the recurring investment summary(`getDraftRecurringInvestment`)
+    * Initialize the recurring investment (`initiateRecurringInvestment`)
+* New queries (all are MOCKS!):
+    * `getActiveRecurringInvestment` - It returns the current recurring investment summary.
+    * `getDraftRecurringInvestment` - It returns the created draft recurring investment summary.
+    * `getScheduleSimulation` - Returns the simulation of the recurring investment schedule.
+* New mutations (all are MOCKS!):
+    * `createRecurringInvestment` - It creates new investment and returns its ID.
+      It requires bank account to be linked to the account.
+      In other case it throws an error.
+    * `createRecurringSubscriptionAgreement` - It creates new subscription agreement for the specific recurring
+      investment
+      It returns the content of the agreement that must be rendered on the client side.
+      Client must sign the agreement and call signRecurringInvestmentSubscriptionAgreement mutation.
+    * `signRecurringInvestmentSubscriptionAgreement` - It signs the recurring investment subscription agreement.
+    * `initiateRecurringInvestment` - It STARTS the recurring investment, CANCEL previous recurring investment if exists
+      and schedule the first investment.
+
+## 1.12.0 - 05/09/2023
+
+* Mock mutations and queries related to the investment flow.
+* Investment flow steps:
+    * Integrate bank account with
+      Plaid (`readBankAccount`, `createBankAccount`, `updateBankAccount`, `fulfillBankAccount`)
+    * Create investment (`createInvestment`)
+    * Sign subscription agreement (`createSubscriptionAgreement`, `signSubscriptionAgreement`)
+    * Opt-in automatic dividend reinvestment
+      agreement (`getAccountConfiguration`, `setAutomaticDividendReinvestmentAgreement`)
+    * Account KYC/AML verification (`verifyAccount`, `updateProfileForVerification`, `updateStakeholderForVerification`,
+      `updateCompanyForVerification`)
+    * Show the investment summary + fees (`getInvestmentSummary`, `approveFees`)
+    * Start the investment (`startInvestment`)
+* New queries (all are MOCKS!):
+    * `getInvestmentSummary` - It returns the investment summary.
+      Use this method to get info about the investment fees.
+    * `getSubscriptionAgreement` - It returns the subscription agreement.
+    * `getAccountConfiguration` - Return account configuration
+* New mutations (all are MOCKS!):
+    * `setAutomaticDividendReinvestmentAgreement` - Set automatic dividend reinvestment agreement
+    * `createInvestment` -It creates new investment and returns its ID.
+      It requires bank account to be linked to the account.
+      In other case it throws an error.
+    * `createSubscriptionAgreement` - It creates new subscription agreement for the specific investment
+      It returns the content of the agreement that must be rendered on the client side.
+      Client must sign the agreement and call signSubscriptionAgreement mutation.
+    * `signSubscriptionAgreement` - It signs the subscription agreement.
+    * `approveFees` - Approves the fees for the specific investment.
+      In case if extra fee is required for recurring investment and the investment was started automatically by the
+      system, then
+      use this method to approve the fees (it will ask for that on verification step triggered from the notification).
+    * `startInvestment` - It starts the investment.
+      It requires subscription agreement to be signed and fees to be approved.
+      The fees can be approved also by this method (if approveFees is true).
+
 ## 1.11.4 - 05/08/2023
 
 * Changes:
@@ -61,7 +194,8 @@
                   to display to user what went wrong
             * List of current actions:
                 * `UPDATE_MEMBER` or `UPDATE_MEMBER_AGAIN`: it means that user must update details of object specified
-                  in `onObject` field
+                  in `onObject` field (use mutation `updateProfileForVerification`, `updateStakeholderForVerification`
+                  or `updateCompanyForVerification` depending on the object type)
                 * `BAN_ACCOUNT`: it means that account must be banned and investment process and all other investments
                   are blocked
                 * `BAN_PROFILE`: it means that profile must be banned and all accounts are blocked
