@@ -28,7 +28,7 @@ export class UpdateCompanyForVerification {
     this.accountRepository = accountRepository;
   }
 
-  public async execute(input: UpdateCompanyForVerificationInput, accountId: string, profileId: string): Promise<ValidationErrorType[]> {
+  public async execute(input: UpdateCompanyForVerificationInput, profileId: string, accountId: string): Promise<ValidationErrorType[]> {
     const account = await this.accountRepository.findCompanyAccount(profileId, accountId);
     let events: DomainEvent[] = [];
     const errors = [];

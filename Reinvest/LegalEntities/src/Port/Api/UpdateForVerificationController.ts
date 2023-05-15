@@ -16,6 +16,6 @@ export class UpdateForVerificationController {
   }
 
   public async updateCompanyForVerification(input: UpdateCompanyForVerificationInput, profileId: string, accountId: string) {
-    return this.updateCompanyForVerificationUseCase.execute(input, accountId, profileId);
+    return this.updateCompanyForVerificationUseCase.execute(input, profileId, accountId);
   }
 }
