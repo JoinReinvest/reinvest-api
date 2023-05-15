@@ -65,6 +65,6 @@ export class SynchronizationController {
     const record = await this.mappingRegistryRepository.getCompanyById(profileId, accountId);
     console.log({ recordToSync: record });
 
-    return await this.synchronizeCompanyAccountUseCase.execute(record);
+    return await this.synchronizeCompanyUseCase.execute(record);
   }
 }
