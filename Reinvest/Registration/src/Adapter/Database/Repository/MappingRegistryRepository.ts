@@ -72,6 +72,19 @@ export class MappingRegistryRepository {
     return MappedRecord.create(data);
   }
 
+  async getCompanyById(recordId: string, profileId: string): Promise<MappedRecord> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('recordId', '=', recordId)
+      .where('profileId', '=', profileId)
+      .limit(1)
+      .executeTakeFirstOrThrow()) as SelectableMappedRecord as MappedRecordType;
+
+    return MappedRecord.create(data);
+  }
+
   async lockRecord(record: MappedRecord) {
     const lockedUntil = new Date();
     lockedUntil.setSeconds(lockedUntil.getSeconds() + LOCK_TIME_SECONDS);

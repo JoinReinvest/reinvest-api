@@ -15,7 +15,9 @@ export type RegistrationApiType = {
   listObjectsToSync: SynchronizationQuery['listObjectsToSync'];
   readBankAccount: BankAccountController['readBankAccount'];
   synchronize: SynchronizationController['synchronize'];
+  synchronizeCompany: SynchronizationController['synchronizeCompany'];
   synchronizeDocument: NorthCapitalDocumentSynchronizationController['synchronizeDocument'];
+  synchronizeProfile: SynchronizationController['synchronizeProfile'];
   updateBankAccount: BankAccountController['updateBankAccount'];
 };
 
@@ -24,6 +26,8 @@ export const registrationApi = (container: ContainerInterface): RegistrationApiT
   synchronizeDocument: container.delegateTo(NorthCapitalDocumentSynchronizationController, 'synchronizeDocument'),
   listObjectsToSync: container.delegateTo(SynchronizationQuery, 'listObjectsToSync'),
   synchronize: container.delegateTo(SynchronizationController, 'synchronize'),
+  synchronizeProfile: container.delegateTo(SynchronizationController, 'synchronizeProfile'),
+  synchronizeCompany: container.delegateTo(SynchronizationController, 'synchronizeCompany'),
   getNorthCapitalAccountStructure: container.delegateTo(RegistryQuery, 'getNorthCapitalAccountStructure'),
   createBankAccount: container.delegateTo(BankAccountController, 'createBankAccount'),
   fulfillBankAccount: container.delegateTo(BankAccountController, 'fulfillBankAccount'),
