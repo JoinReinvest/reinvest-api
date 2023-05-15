@@ -1,20 +1,21 @@
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { CompanyAccount } from 'LegalEntities/Domain/Accounts/CompanyAccount';
+import { StakeholderToAccount } from 'LegalEntities/Domain/StakeholderToAccount';
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
-import { CorporateType } from 'LegalEntities/Domain/ValueObject/Company';
-import { IdentityDocument } from 'LegalEntities/Domain/ValueObject/Document';
-import { Domicile, DomicileInput } from 'LegalEntities/Domain/ValueObject/Domicile';
-import { StakeholderInput } from 'LegalEntities/Domain/ValueObject/Stakeholder';
-import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import { Company, CompanyTypeInput, CorporateType } from 'LegalEntities/Domain/ValueObject/Company';
+import { Stakeholder, StakeholderInput } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { Uuid, ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
+type File = { fileName: string; id: string };
+
 export type UpdateCompanyForVerificationInput = {
-  verifyAndFinish: boolean;
   address?: AddressInput;
-  companyDocuments?: { fileName: string; id: string }[];
+  companyDocuments?: File[];
   companyType?: {
     type: CorporateType;
   };
-  removeDocuments?: { fileName: string; id: string }[];
+  removeDocuments?: File[];
   removeStakeholders?: StakeholderInput[];
   stakeholders?: StakeholderInput[];
 };
@@ -35,7 +36,7 @@ export class UpdateCompanyForVerification {
     if (!account) {
       errors.push(<ValidationErrorType>{
         type: ValidationErrorEnum.NOT_COMPLETED,
-        field: 'profile',
+        field: 'account',
       });
 
       return errors;
@@ -59,24 +60,50 @@ export class UpdateCompanyForVerification {
           case 'address':
             account.setAddress(Address.create(data as AddressInput));
             break;
-          case 'idScan':
-            const idScan = data as { fileName: string; id: string }[];
-            const documents = idScan.map((document: { fileName: string; id: string }) => ({
-              id: document.id,
-              fileName: document.fileName,
-              path: profileId,
-            }));
-            console.log(documents, 'TESTTES');
-            const removedDocumentsEvents = account.replaceIdentityDocumentAndReturnRemoved(IdentityDocument.create(documents));
-            events = [...events, ...removedDocumentsEvents];
-            break;
-          case 'domicile':
-            account.setDomicile(Domicile.create(data as DomicileInput));
+          case 'companyType':
+            account.setCompanyType(Company.create(data as CompanyTypeInput));
             break;
           default:
             errors.push(<ValidationErrorType>{
               type: ValidationErrorEnum.UNKNOWN_ERROR,
               field: step,
+            });
+            break;
+          case 'companyDocuments':
+            (data as File[])?.map((document: { fileName: string; id: string }) =>
+              account.addDocument({
+                id: document.id,
+                fileName: document.fileName,
+                path: profileId,
+              }),
+            );
+            break;
+          case 'removeDocuments':
+            (data as File[]).map((document: { fileName: string; id: string }) => {
+              const documentSchema = {
+                id: document.id,
+                fileName: document.fileName,
+                path: profileId,
+              };
+              const removedDocumentEvent = account.removeDocument(documentSchema);
+
+              if (removedDocumentEvent) {
+                events.push(removedDocumentEvent);
+              }
+            });
+            break;
+          case 'stakeholders':
+            const stakeholdersEvents = this.addStakeholder(account, data as StakeholderInput[], profileId);
+            events = [...events, ...stakeholdersEvents];
+            break;
+          case 'removeStakeholders':
+            (data as StakeholderInput[]).map((idToRemove: { id: string }) => {
+              const { id } = idToRemove;
+              const stakeholderRemoveEvents = account.removeStakeholder(Uuid.create(id));
+
+              if (stakeholderRemoveEvents) {
+                events = [...events, ...stakeholderRemoveEvents];
+              }
             });
             break;
         }
@@ -93,8 +120,25 @@ export class UpdateCompanyForVerification {
       }
     }
 
-    await this.accountRepository.storeProfile(account, events);
+    await this.accountRepository.updateCompanyAccount(account, events);
 
     return errors;
+  }
+  private addStakeholder(account: CompanyAccount, data: StakeholderInput[], profileId: string): DomainEvent[] {
+    let events: DomainEvent[] = [];
+
+    const stakeholderData = StakeholderToAccount.getStakeholderDataToAddToAccount(account, data, profileId);
+
+    stakeholderData.map(({ isNewStakeholder, stakeholderSchema }) => {
+      const stakeholderEvents = isNewStakeholder
+        ? account.addStakeholder(Stakeholder.create(stakeholderSchema))
+        : account.updateStakeholder(Stakeholder.create(stakeholderSchema));
+
+      if (stakeholderEvents) {
+        events = [...events, ...stakeholderEvents];
+      }
+    });
+
+    return events;
   }
 }

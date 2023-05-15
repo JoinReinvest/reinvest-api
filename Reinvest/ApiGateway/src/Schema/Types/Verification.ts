@@ -1,6 +1,7 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
+import type { UpdateCompanyForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateCompanyForVerification';
 import type { UpdateProfileForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfileForVerification';
 import { Verification } from 'Verification/index';
 
@@ -86,6 +87,12 @@ const schema = `
 type UpdateProfileForVerificationDetailsInput = {
   input: UpdateProfileForVerificationInput;
 };
+
+type UpdateCompanyForVerificationDetailsInput = {
+  accountId: string;
+  input: UpdateCompanyForVerificationInput;
+};
+
 export const VerificationSchema = {
   typeDefs: schema,
   resolvers: {
@@ -154,7 +161,11 @@ export const VerificationSchema = {
 
         return await verificationApi.notifyAboutUpdate(stakeholderId);
       },
-      updateCompanyForVerification: async (parent: any, { accountId, input }: any, { profileId, modules }: SessionContext): Promise<boolean> => {
+      updateCompanyForVerification: async (
+        parent: any,
+        { accountId, input }: UpdateCompanyForVerificationDetailsInput,
+        { profileId, modules }: SessionContext,
+      ): Promise<boolean> => {
         const legalEntitiesApi = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const verificationApi = modules.getApi<Verification.ApiType>(Verification);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
@@ -164,12 +175,12 @@ export const VerificationSchema = {
         if (!canObjectBeUpdate) {
           throw new JsonGraphQLError('NO_UPDATE_ALLOWED');
         }
-        // const { input } = data;
-        // const errors = await legalEntitiesApi.updateProfileForVerification(input, accountId);
 
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        const errors = await legalEntitiesApi.updateCompanyForVerification(input, profileId, accountId);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
         // const status = await registrationApi.synchronizeProfile(accountId);
 
