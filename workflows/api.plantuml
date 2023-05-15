@@ -1,0 +1,126 @@
+@startuml
+
+participant "GraphQL" as GL
+participant "API" as API
+participant "Module" as M
+participant "UseCase" as UC
+participant "DB" as DB
+participant "Queue" as Q
+participant "Service" as S
+
+opt Investments
+GL -> API: M: createInvestment
+API -> M: Investments
+M -> UC: CreateInvestment
+UC -> DB: table:investments
+
+GL -> API: M: createSubscriptionAgreement
+API -> M: Investments
+M -> UC: CreateSubscriptionAgreement
+UC -> DB: table:subscription_agreements
+
+GL -> API: Q: getSubscriptionAgreement
+API -> M: Investments
+M -> UC: SubscriptionAgreementQuery
+UC -> DB: table:subscription_agreements
+
+GL -> API: M: signSubscriptionAgreement
+API -> M: Investments
+M -> UC: SignSubscriptionAgreement
+UC -> DB: table:subscription_agreements (status: signed)
+UC -> DB: table:investments (status: signed)
+UC -> Q: Event:SubscriptionAgreementSigned
+Q -> M: Investments
+M-> UC: GenerateSubscriptionAgreement
+UC -> M: Documents
+M -> UC: RenderFromTemplate
+
+
+GL -> API: M: abortInvestment
+API -> M: Investments
+M -> UC: AbortInvestment
+UC -> DB: table:investments
+
+GL -> API: Q: getInvestmentSummary
+API -> M: Investments
+M -> UC: InvestmentQuery
+UC -> DB: table:investments
+
+GL -> API: M: startInvestments
+API -> M: Investments
+M -> UC: StartInvestment
+UC -> DB: table:investments
+UC -> DB: table:investment_fees (approve)
+
+GL -> API: M: approveFees
+API -> M: Investments
+M -> UC: ApproveExtraFees
+UC -> DB: table:investment_fees (approve)
+end
+
+opt Account Configuration
+GL -> API: M: setAutomaticDividendReinvestmentAgreement
+API -> M: InvestmentAccounts
+M -> UC: SetAutomaticDividendReinvestmentAgreement
+UC -> DB: table:account_configuration
+
+GL -> API: Q: getAccountConfiguration
+API -> M: InvestmentAccounts
+M -> UC: AccountConfigurationQuery
+UC -> DB: table:account_configuration
+end
+
+opt Recurring Investments
+GL -> API: Q: getScheduleSimulation
+API -> M: Investments
+M -> UC: ScheduleSimulationQuery
+UC -> S: SchedulerInvestmentService
+
+GL -> API: M: createRecurringInvestment
+API -> M: Investments
+M -> UC: CreateRecurringInvestment
+UC -> S: SchedulerInvestmentService (get next date)
+UC -> DB: table:recurring_investments (status: draft)
+
+GL -> API: Q: getDraftRecurringInvestment
+API -> M: Investments
+M -> UC: RecurringInvestmentQuery
+UC -> DB: table:recurring_investments (by status: draft)
+
+GL -> API: Q: getActiveRecurringInvestment
+API -> M: Investments
+M -> UC: RecurringInvestmentQuery
+UC -> DB: table:recurring_investments (by status: active)
+
+GL -> API: M: createRecurringSubscriptionAgreement
+API -> M: Investments
+M -> UC: CreateRecurringSubscriptionAgreement
+UC -> DB: table:recurring_investments_subscription_agreements
+
+GL -> API: M: signRecurringInvestmentSubscriptionAgreement
+API -> M: Investments
+M -> UC: SignRecurringInvestmentSubscriptionAgreement
+UC -> DB: table:recurring_investments_subscription_agreements (status: signed)
+UC -> DB: table:recurring_investments (status: signed)
+UC -> Q: Event:RecurringInvestmentSubscriptionAgreementSigned
+Q -> M: Investments
+M-> UC: GenerateSubscriptionAgreement
+UC -> M: Documents
+M -> UC: RenderFromTemplate
+
+GL -> API: M: initiateRecurringInvestment
+API -> M: Investments
+M -> UC: InitiateRecurringInvestment
+UC -> DB: table:recurring_investments (status: active)
+UC -> DB: table:recurring_investments (deactivate prev one: inactive)
+
+
+GL -> API: M: deactivateRecurringInvestment (add mutation)
+API -> M: Investments
+M -> UC: DeactivateRecurringInvestment
+UC -> DB: table:recurring_investments (status: inactive)
+
+
+end
+
+@enduml
