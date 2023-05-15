@@ -1,0 +1,11 @@
+@startuml
+
+participant "GraphQL" as GL
+participant "API" as API
+participant "Module" as M
+participant "UseCase" as UC
+participant "DB" as DB
+participant "Queue" as Q
+
+
+@enduml
