@@ -2,7 +2,7 @@ import { getDocumentRemoveEvent, LegalEntityDocumentRemoved } from 'LegalEntitie
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DateOfBirth, DateOfBirthInput } from 'LegalEntities/Domain/ValueObject/DateOfBirth';
 import { DocumentSchema, IdentityDocument } from 'LegalEntities/Domain/ValueObject/Document';
-import { SimplifiedDomicile, SimplifiedDomicileInput } from 'LegalEntities/Domain/ValueObject/Domicile';
+import { Domicile, SimplifiedDomicile, SimplifiedDomicileInput } from 'LegalEntities/Domain/ValueObject/Domicile';
 import { PersonalName, PersonalNameInput } from 'LegalEntities/Domain/ValueObject/PersonalName';
 import { SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
@@ -69,6 +69,36 @@ export class Stakeholder implements ToObject {
     } catch (error: any) {
       throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, 'stakeholder', error.message);
     }
+  }
+
+  setName(name: PersonalName) {
+    this.name = name;
+  }
+
+  setDateOfBirth(dateOfBirth: DateOfBirth) {
+    this.dateOfBirth = dateOfBirth;
+  }
+
+  setAddress(address: Address) {
+    this.address = address;
+  }
+
+  setIdentityDocument(idScan: IdentityDocument) {
+    this.idScan = idScan;
+  }
+
+  setDomicile(domicile: SimplifiedDomicile) {
+    this.domicile = domicile;
+  }
+
+  replaceIdentityDocumentAndReturnRemoved(idScan: IdentityDocument): LegalEntityDocumentRemoved[] {
+    if (this.idScan === null) {
+      this.idScan = idScan;
+
+      return [];
+    }
+
+    return this.idScan.replaceDocumentsAndReturnRemoved(idScan);
   }
 
   isTheSameSSN(ssn: SSN): boolean {

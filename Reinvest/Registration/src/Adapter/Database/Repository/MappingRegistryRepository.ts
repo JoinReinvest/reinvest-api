@@ -84,6 +84,7 @@ export class MappingRegistryRepository {
 
     return MappedRecord.create(data);
   }
+
   async getCompanyById(profileId: string, accountId: string): Promise<MappedRecord> {
     const data = (await this.databaseAdapterProvider
       .provide()
@@ -92,6 +93,21 @@ export class MappingRegistryRepository {
       .where('profileId', '=', profileId)
       .where('externalId', '=', accountId)
       .where('mappedType', '=', MappedType.COMPANY)
+      .limit(1)
+      .executeTakeFirstOrThrow()) as SelectableMappedRecord as MappedRecordType;
+
+    return MappedRecord.create(data);
+  }
+
+  async getStakeholderById(profileId: string, accountId: string, stakeholderId: string): Promise<MappedRecord> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('profileId', '=', profileId)
+      .where('externalId', '=', accountId)
+      .where('dependentId', '=', stakeholderId)
+      .where('mappedType', '=', MappedType.STAKEHOLDER)
       .limit(1)
       .executeTakeFirstOrThrow()) as SelectableMappedRecord as MappedRecordType;
 

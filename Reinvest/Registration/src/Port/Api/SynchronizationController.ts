@@ -67,4 +67,11 @@ export class SynchronizationController {
 
     return await this.synchronizeCompanyUseCase.execute(record);
   }
+
+  public async synchronizeStakeholder(profileId: string, accountId: string, stakeholderId: string): Promise<boolean> {
+    const record = await this.mappingRegistryRepository.getStakeholderById(profileId, accountId, stakeholderId);
+    console.log({ recordToSync: record });
+
+    return await this.synchronizeCompanyUseCase.execute(record);
+  }
 }
