@@ -63,12 +63,6 @@ export class UpdateCompanyForVerification {
           case 'companyType':
             account.setCompanyType(Company.create(data as CompanyTypeInput));
             break;
-          default:
-            errors.push(<ValidationErrorType>{
-              type: ValidationErrorEnum.UNKNOWN_ERROR,
-              field: step,
-            });
-            break;
           case 'companyDocuments':
             (data as File[])?.map((document: { fileName: string; id: string }) =>
               account.addDocument({
@@ -104,6 +98,12 @@ export class UpdateCompanyForVerification {
               if (stakeholderRemoveEvents) {
                 events = [...events, ...stakeholderRemoveEvents];
               }
+            });
+            break;
+          default:
+            errors.push(<ValidationErrorType>{
+              type: ValidationErrorEnum.UNKNOWN_ERROR,
+              field: step,
             });
             break;
         }

@@ -289,11 +289,7 @@ export class AccountRepository {
     }
   }
   async updateCompanyAccount(account: CompanyAccount, events: DomainEvent[] = []): Promise<void> {
-    const { profileId, accountId, address, companyType, stakeholders, companyDocuments, einHash } = account.toObject();
-
-    if (einHash === null) {
-      return;
-    }
+    const { profileId, accountId, address, companyType, stakeholders, companyDocuments } = account.toObject();
 
     const values: Partial<LegalEntitiesCompanyAccount> = {
       accountId,
