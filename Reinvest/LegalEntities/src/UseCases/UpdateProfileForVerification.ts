@@ -1,5 +1,4 @@
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
-import { LegalProfileCompleted } from 'LegalEntities/Domain/Events/ProfileEvents';
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DateOfBirth, DateOfBirthInput } from 'LegalEntities/Domain/ValueObject/DateOfBirth';
 import { IdentityDocument } from 'LegalEntities/Domain/ValueObject/Document';
@@ -9,7 +8,6 @@ import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/V
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type UpdateProfileForVerificationInput = {
-  verifyAndFinish: boolean;
   address?: AddressInput;
   dateOfBirth?: DateOfBirthInput;
   domicile?: DomicileInput;

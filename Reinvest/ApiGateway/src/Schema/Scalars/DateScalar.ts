@@ -1,5 +1,5 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import DateTime from 'date-and-time';
+import dayjs from 'dayjs';
 import { GraphQLError, GraphQLScalarType, Kind } from 'graphql';
 
 const DateSchema = `
@@ -9,13 +9,13 @@ const DateSchema = `
 `;
 
 function isValidISODate(value: string) {
-  if (!DateTime.isValid(value, 'YYYY-MM-DD')) {
+  if (!dayjs(value, 'YYYY-MM-DD').isValid()) {
     throw new GraphQLError('The value format must be YYYY-MM-DD');
   }
 }
 
 function isValidISOTime(value: string) {
-  if (!DateTime.isValid(value, 'YYYY-MM-DDThh:mm:ss')) {
+  if (!dayjs(value, 'YYYY-MM-DDThh:mm:ss').isValid()) {
     throw new GraphQLError('The value format must be YYYY-MM-DDThh:mm:ss');
   }
 }

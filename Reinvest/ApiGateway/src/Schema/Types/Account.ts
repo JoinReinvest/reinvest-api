@@ -8,7 +8,7 @@ const schema = `
     type AccountOverview {
         id: String
         label:String
-        type: String
+        type: AccountType
         avatar: GetAvatarLink
         positionTotal: String
     }

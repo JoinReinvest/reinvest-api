@@ -52,7 +52,7 @@ export type CompanyAccountResponse = {
     companyType: {
       type: string;
     };
-    ein: string;
+    ein: string | null;
     industry: {
       value: string;
     };
@@ -201,7 +201,7 @@ export class ReadAccountController {
       details: {
         companyName: accountObject.companyName,
         address: accountObject.address,
-        ein: accountObject.ein.anonymized,
+        ein: accountObject?.ein ? accountObject.ein.anonymized : null,
         annualRevenue: accountObject.annualRevenue,
         numberOfEmployees: accountObject.numberOfEmployees,
         industry: accountObject.industry,
