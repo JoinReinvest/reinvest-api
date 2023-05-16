@@ -3,11 +3,13 @@ import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider'
 import { AggregateTable } from 'SimpleAggregator/Storage/Schema';
 
 import { AccountConfiguration } from '../../Domain/Configuration/AccountConfiguration';
-
+export const investmentAccountConfiguration = 'investment_accounts_configuration';
+export const investmentAccountsProfileAggregate = 'investment_accounts_profile_aggregate';
+export const investmentAccountsProfileQuery = 'investment_accounts_profile_query';
 export interface InvestmentAccountsDatabase {
-  investment_account_configuration: AccountConfiguration;
-  investment_accounts_profile_aggregate: AggregateTable;
-  investment_accounts_profile_query: ProfileQueryTable;
+  [investmentAccountConfiguration]: AccountConfiguration;
+  [investmentAccountsProfileAggregate]: AggregateTable;
+  [investmentAccountsProfileQuery]: ProfileQueryTable;
 }
 
 export const investmentAccountsDatabaseProviderName = 'DatabaseProviderInvestmentAccountsDatabase';

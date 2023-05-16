@@ -1,9 +1,11 @@
+import { JSONObject } from 'HKEKTypes/Generics';
+
 import { ConfigurationTypes } from './ConfigurationTypes';
 
 export type AccountConfiguration = {
   accountId: string;
   configType: ConfigurationTypes;
-  configValueJson: string;
+  configValueJson: JSONObject;
   dateCreated: Date;
   dateUpdated: Date;
   profileId: string;
