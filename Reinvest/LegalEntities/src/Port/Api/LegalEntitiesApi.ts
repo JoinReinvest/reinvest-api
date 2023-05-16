@@ -31,6 +31,7 @@ export type LegalEntitiesApiType = {
 
   updateCompanyForVerification: UpdateForVerificationController['updateCompanyForVerification'];
   updateProfileForVerification: UpdateForVerificationController['updateProfileForVerification'];
+  updateStakeholderForVerification: UpdateForVerificationController['updateStakeholderForVerification'];
 };
 
 export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesApiType => ({
@@ -59,4 +60,5 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
 
   updateCompanyForVerification: container.delegateTo(UpdateForVerificationController, 'updateCompanyForVerification'),
   updateProfileForVerification: container.delegateTo(UpdateForVerificationController, 'updateProfileForVerification'),
+  updateStakeholderForVerification: container.delegateTo(UpdateForVerificationController, 'updateStakeholderForVerification'),
 });

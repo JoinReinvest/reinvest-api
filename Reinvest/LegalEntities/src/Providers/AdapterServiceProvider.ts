@@ -20,6 +20,7 @@ import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
+import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -70,6 +71,7 @@ export class AdapterServiceProvider {
         ProfileRepository,
       ])
       .addSingleton(UpdateProfileForVerification, [ProfileRepository])
-      .addSingleton(UpdateCompanyForVerification, [AccountRepository]);
+      .addSingleton(UpdateCompanyForVerification, [AccountRepository])
+      .addSingleton(UpdateStakeholderForVerification, [AccountRepository]);
   }
 }

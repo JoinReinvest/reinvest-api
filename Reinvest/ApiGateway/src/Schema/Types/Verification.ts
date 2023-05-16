@@ -3,6 +3,7 @@ import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
 import type { UpdateCompanyForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateCompanyForVerification';
 import type { UpdateProfileForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfileForVerification';
+import type { UpdateStakeholderForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateStakeholderForVerification';
 import { Verification } from 'Verification/index';
 
 const schema = `
@@ -93,6 +94,12 @@ type UpdateCompanyForVerificationDetailsInput = {
   input: UpdateCompanyForVerificationInput;
 };
 
+type UpdateStakeholderForVerificationDetailsInput = {
+  accountId: string;
+  input: UpdateStakeholderForVerificationInput;
+  stakeholderId: string;
+};
+
 export const VerificationSchema = {
   typeDefs: schema,
   resolvers: {
@@ -138,7 +145,7 @@ export const VerificationSchema = {
       },
       updateStakeholderForVerification: async (
         parent: any,
-        { accountId, stakeholderId, input }: any,
+        { accountId, stakeholderId, input }: UpdateStakeholderForVerificationDetailsInput,
         { profileId, modules }: SessionContext,
       ): Promise<boolean> => {
         const legalEntitiesApi = modules.getApi<LegalEntities.ApiType>(LegalEntities);
@@ -150,14 +157,15 @@ export const VerificationSchema = {
         if (!canObjectBeUpdate) {
           throw new JsonGraphQLError('NO_UPDATE_ALLOWED');
         }
+
         // const { input } = data;
-        // const errors = await legalEntitiesApi.updateProfileForVerification(input, stakeholderId);
+        const errors = await legalEntitiesApi.updateStakeholderForVerification(input, profileId, accountId, stakeholderId);
 
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
-        // const status = await registrationApi.synchronizeProfile(stakeholderId);
+        const status = await registrationApi.synchronizeStakeholder(profileId, accountId, stakeholderId);
 
         return await verificationApi.notifyAboutUpdate(stakeholderId);
       },
