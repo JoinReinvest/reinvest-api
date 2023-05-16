@@ -68,17 +68,19 @@ const schema = `
         verifyAccount(accountId: String): VerificationDecision
 
         """
-        [WIP] It does not work yet.
+        It updates profile for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
+        For example if investor changed only 'firstName' then provide only field 'name'.
+        The name field expects PersonName type, so it must contain all required data (so 'firstName' and 'lastName' must be provided, even that only firstName changed).
         """
         updateProfileForVerification(input: UpdateProfileForVerificationInput!): Boolean
 
         """
-        [WIP] It does not work yet.
+        It updates stakeholder for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
         """
         updateStakeholderForVerification(accountId: String, stakeholderId: String, input: UpdateStakeholderForVerificationInput!): Boolean
 
         """
-        [WIP] It does not work yet.
+        It updates company for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
         """
         updateCompanyForVerification(accountId: String, input: UpdateCompanyForVerificationInput!): Boolean
     }

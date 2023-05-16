@@ -206,7 +206,6 @@ const schema = `
 
     type SubscriptionAgreementParagraph {
         lines: [String!]!
-        bold: Boolean
         isCheckedOption: Boolean
     }
 
