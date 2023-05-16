@@ -22,6 +22,7 @@ import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
+import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
 
 export class PortsProvider {
   private config: LegalEntities.Config;
@@ -46,6 +47,6 @@ export class PortsProvider {
         TransformDraftAccountIntoRegularAccount,
         RemoveDraftAccount,
       ])
-      .addSingleton(UpdateForVerificationController, [UpdateProfileForVerification, UpdateCompanyForVerification]);
+      .addSingleton(UpdateForVerificationController, [UpdateProfileForVerification, UpdateCompanyForVerification, UpdateStakeholderForVerification]);
   }
 }
