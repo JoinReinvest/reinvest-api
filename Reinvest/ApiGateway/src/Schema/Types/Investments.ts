@@ -54,7 +54,7 @@ const schema = `
         """
         [MOCK] It signs the subscription agreement.
         """
-        signSubscriptionAgreement(subscriptionAgreementId: ID!): Boolean!
+        signSubscriptionAgreement(investmentId: ID!): Boolean!
 
         """
         [MOCK] Approves the fees for the specific investment.
@@ -163,6 +163,7 @@ export const subscriptionAgreementMock = (parentId: string, type: string) => ({
               'Accredited Investor Status is true and correct; or',
           ],
           bold: true,
+          isCheckedOption: false,
         },
         {
           lines: [
@@ -224,7 +225,7 @@ export const Investments = {
       createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
       },
-      signSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
+      signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;
       },
       abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
