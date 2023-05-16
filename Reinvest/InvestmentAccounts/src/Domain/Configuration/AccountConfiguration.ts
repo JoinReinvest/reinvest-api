@@ -1,5 +1,11 @@
+import { ConfigurationTypes } from './ConfigurationTypes';
+
 export type AccountConfiguration = {
-  createdDate: Date;
-  ip: string;
+  accountId: string;
+  configType: ConfigurationTypes;
+  configValueJson: string;
+  dateCreated: Date;
+  dateUpdated: Date;
+  profileId: string;
   signed: boolean;
 };
