@@ -54,4 +54,17 @@ export class SynchronizationController {
         return false;
     }
   }
+  public async synchronizeProfile(profileId: string): Promise<boolean> {
+    const record = await this.mappingRegistryRepository.findByProfile(profileId);
+    console.log({ recordToSync: record });
+
+    return await this.synchronizeProfileUseCase.execute(record);
+  }
+
+  public async synchronizeCompany(profileId: string, accountId: string): Promise<boolean> {
+    const record = await this.mappingRegistryRepository.getCompanyById(profileId, accountId);
+    console.log({ recordToSync: record });
+
+    return await this.synchronizeCompanyUseCase.execute(record);
+  }
 }

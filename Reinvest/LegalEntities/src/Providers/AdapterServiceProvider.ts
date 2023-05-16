@@ -18,6 +18,7 @@ import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
@@ -47,7 +48,7 @@ export class AdapterServiceProvider {
       .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
       .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
-      .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
+      .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(BeneficiaryRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addObjectFactory(
         'LegalEntitiesTransactionalAdapter',
@@ -68,6 +69,7 @@ export class AdapterServiceProvider {
         'LegalEntitiesTransactionalAdapter',
         ProfileRepository,
       ])
-      .addSingleton(UpdateProfileForVerification, [ProfileRepository]);
+      .addSingleton(UpdateProfileForVerification, [ProfileRepository])
+      .addSingleton(UpdateCompanyForVerification, [AccountRepository]);
   }
 }

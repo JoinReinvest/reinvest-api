@@ -72,6 +72,32 @@ export class MappingRegistryRepository {
     return MappedRecord.create(data);
   }
 
+  async findByProfile(profileId: string): Promise<MappedRecord> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('profileId', '=', profileId)
+      .where('mappedType', '=', MappedType.PROFILE)
+      .limit(1)
+      .executeTakeFirstOrThrow()) as SelectableMappedRecord as MappedRecordType;
+
+    return MappedRecord.create(data);
+  }
+  async getCompanyById(profileId: string, accountId: string): Promise<MappedRecord> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('profileId', '=', profileId)
+      .where('externalId', '=', accountId)
+      .where('mappedType', '=', MappedType.COMPANY)
+      .limit(1)
+      .executeTakeFirstOrThrow()) as SelectableMappedRecord as MappedRecordType;
+
+    return MappedRecord.create(data);
+  }
+
   async lockRecord(record: MappedRecord) {
     const lockedUntil = new Date();
     lockedUntil.setSeconds(lockedUntil.getSeconds() + LOCK_TIME_SECONDS);

@@ -20,6 +20,7 @@ import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 
 export class PortsProvider {
@@ -45,6 +46,6 @@ export class PortsProvider {
         TransformDraftAccountIntoRegularAccount,
         RemoveDraftAccount,
       ])
-      .addSingleton(UpdateForVerificationController, [UpdateProfileForVerification]);
+      .addSingleton(UpdateForVerificationController, [UpdateProfileForVerification, UpdateCompanyForVerification]);
   }
 }

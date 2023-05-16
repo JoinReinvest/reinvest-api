@@ -2,19 +2,18 @@ import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { CompanyDraftAccount, DraftAccount, DraftAccountType, IndividualDraftAccount } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
-import { getDocumentRemoveEvent } from 'LegalEntities/Domain/Events/DocumentEvents';
+import { StakeholderToAccount } from 'LegalEntities/Domain/StakeholderToAccount';
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
+import { Company, CompanyName, CompanyNameInput, CompanyTypeInput } from 'LegalEntities/Domain/ValueObject/Company';
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { Employer, EmployerInput } from 'LegalEntities/Domain/ValueObject/Employer';
 import { EmploymentStatus, EmploymentStatusInput } from 'LegalEntities/Domain/ValueObject/EmploymentStatus';
 import { EIN, SensitiveNumberInput } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
-import { Stakeholder, StakeholderInput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
+import { Stakeholder, StakeholderInput } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { Uuid, ValidationError, ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { AnnualRevenue, NetIncome, NetWorth, NumberOfEmployees, ValueRangeInput } from 'LegalEntities/Domain/ValueObject/ValueRange';
 import { Industry, ValueStringInput } from 'LegalEntities/Domain/ValueObject/ValueString';
 import { DomainEvent } from 'SimpleAggregator/Types';
-
-import { Company, CompanyName, CompanyNameInput, CompanyTypeInput } from '../Domain/ValueObject/Company';
 
 export type IndividualDraftAccountInput = {
   avatar?: { id: string };
@@ -267,43 +266,15 @@ export class CompleteDraftAccount {
     return draft;
   }
 
-  private addStakeholder(draft: CompanyDraftAccount, data: StakeholderInput[], profileId: string): DomainEvent[] {
+  private addStakeholder(account: CompanyDraftAccount, data: StakeholderInput[], profileId: string): DomainEvent[] {
     let events: DomainEvent[] = [];
-    data.map((stakeholder: StakeholderInput) => {
-      const stakeholderSchema = { ...stakeholder } as unknown as StakeholderSchema; // mapping stakeholder input to stakeholder schema
-      const { id, idScan } = stakeholder;
-      const isNewStakeholder = !id; // if id is not null, then it is an existing stakeholder
-      const existingStakeholder = !isNewStakeholder ? draft.getStakeholderById(id) : null;
 
-      if (!isNewStakeholder && existingStakeholder === null) {
-        throw new ValidationError(ValidationErrorEnum.NOT_FOUND, 'stakeholder', id);
-      }
+    const stakeholderData = StakeholderToAccount.getStakeholderDataToAddToAccount(account, data, profileId);
 
-      const ssn = stakeholder?.ssn?.ssn ?? null;
-
-      if (ssn === null) {
-        if (isNewStakeholder) {
-          throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, 'ssn');
-        } else {
-          // rewrite previous ssn
-          stakeholderSchema.ssn = (<Stakeholder>existingStakeholder).getRawSSN();
-        }
-      } else {
-        // update ssn
-        stakeholderSchema.ssn = ssn;
-      }
-
-      stakeholderSchema.id = isNewStakeholder ? this.uniqueIdGenerator.createUuid() : id;
-
-      stakeholderSchema.idScan = idScan.map((document: { fileName: string; id: string }) => ({
-        id: document.id,
-        fileName: document.fileName,
-        path: profileId,
-      }));
-
+    stakeholderData.map(({ isNewStakeholder, stakeholderSchema }) => {
       const stakeholderEvents = isNewStakeholder
-        ? draft.addStakeholder(Stakeholder.create(stakeholderSchema))
-        : draft.updateStakeholder(Stakeholder.create(stakeholderSchema));
+        ? account.addStakeholder(Stakeholder.create(stakeholderSchema))
+        : account.updateStakeholder(Stakeholder.create(stakeholderSchema));
 
       if (stakeholderEvents) {
         events = [...events, ...stakeholderEvents];
