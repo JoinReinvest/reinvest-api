@@ -1,7 +1,9 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
+import type { UpdateCompanyForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateCompanyForVerification';
 import type { UpdateProfileForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfileForVerification';
+import type { UpdateStakeholderForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateStakeholderForVerification';
 import { Verification } from 'Verification/index';
 
 const schema = `
@@ -67,17 +69,19 @@ const schema = `
         verifyAccount(accountId: String): VerificationDecision
 
         """
-        [WIP] It does not work yet.
+        It updates profile for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
+        For example if investor changed only 'firstName' then provide only field 'name'.
+        The name field expects PersonName type, so it must contain all required data (so 'firstName' and 'lastName' must be provided, even that only firstName changed).
         """
         updateProfileForVerification(input: UpdateProfileForVerificationInput!): Boolean
 
         """
-        [WIP] It does not work yet.
+        It updates stakeholder for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
         """
         updateStakeholderForVerification(accountId: String, stakeholderId: String, input: UpdateStakeholderForVerificationInput!): Boolean
 
         """
-        [WIP] It does not work yet.
+        It updates company for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
         """
         updateCompanyForVerification(accountId: String, input: UpdateCompanyForVerificationInput!): Boolean
     }
@@ -86,6 +90,18 @@ const schema = `
 type UpdateProfileForVerificationDetailsInput = {
   input: UpdateProfileForVerificationInput;
 };
+
+type UpdateCompanyForVerificationDetailsInput = {
+  accountId: string;
+  input: UpdateCompanyForVerificationInput;
+};
+
+type UpdateStakeholderForVerificationDetailsInput = {
+  accountId: string;
+  input: UpdateStakeholderForVerificationInput;
+  stakeholderId: string;
+};
+
 export const VerificationSchema = {
   typeDefs: schema,
   resolvers: {
@@ -125,13 +141,13 @@ export const VerificationSchema = {
           throw new JsonGraphQLError(errors);
         }
 
-        // const status = await registrationApi.synchronizeProfile(profileId);
+        const status = await registrationApi.synchronizeProfile(profileId);
 
         return await verificationApi.notifyAboutUpdate(profileId);
       },
       updateStakeholderForVerification: async (
         parent: any,
-        { accountId, stakeholderId, input }: any,
+        { accountId, stakeholderId, input }: UpdateStakeholderForVerificationDetailsInput,
         { profileId, modules }: SessionContext,
       ): Promise<boolean> => {
         const legalEntitiesApi = modules.getApi<LegalEntities.ApiType>(LegalEntities);
@@ -143,18 +159,23 @@ export const VerificationSchema = {
         if (!canObjectBeUpdate) {
           throw new JsonGraphQLError('NO_UPDATE_ALLOWED');
         }
+
         // const { input } = data;
-        // const errors = await legalEntitiesApi.updateProfileForVerification(input, stakeholderId);
+        const errors = await legalEntitiesApi.updateStakeholderForVerification(input, profileId, accountId, stakeholderId);
 
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
-        // const status = await registrationApi.synchronizeProfile(stakeholderId);
+        const status = await registrationApi.synchronizeStakeholder(profileId, accountId, stakeholderId);
 
         return await verificationApi.notifyAboutUpdate(stakeholderId);
       },
-      updateCompanyForVerification: async (parent: any, { accountId, input }: any, { profileId, modules }: SessionContext): Promise<boolean> => {
+      updateCompanyForVerification: async (
+        parent: any,
+        { accountId, input }: UpdateCompanyForVerificationDetailsInput,
+        { profileId, modules }: SessionContext,
+      ): Promise<boolean> => {
         const legalEntitiesApi = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const verificationApi = modules.getApi<Verification.ApiType>(Verification);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
@@ -164,14 +185,14 @@ export const VerificationSchema = {
         if (!canObjectBeUpdate) {
           throw new JsonGraphQLError('NO_UPDATE_ALLOWED');
         }
-        // const { input } = data;
-        // const errors = await legalEntitiesApi.updateProfileForVerification(input, accountId);
 
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        const errors = await legalEntitiesApi.updateCompanyForVerification(input, profileId, accountId);
 
-        // const status = await registrationApi.synchronizeProfile(accountId);
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        const status = await registrationApi.synchronizeCompany(profileId, accountId);
 
         return await verificationApi.notifyAboutUpdate(accountId);
       },

@@ -437,8 +437,8 @@ export class CompanyDraftAccount extends DraftAccount {
     return this.stakeholders?.addStakeholder(stakeholder) ?? [];
   }
 
-  updateStakeholder(stakeholder1: Stakeholder): LegalEntityDocumentRemoved[] {
-    return this.stakeholders?.updateStakeholder(stakeholder1) ?? [];
+  updateStakeholder(stakeholder: Stakeholder): LegalEntityDocumentRemoved[] {
+    return this.stakeholders?.updateStakeholder(stakeholder) ?? [];
   }
 
   removeStakeholder(id: Uuid): LegalEntityDocumentRemoved[] {

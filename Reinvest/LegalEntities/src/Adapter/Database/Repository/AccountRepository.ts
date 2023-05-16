@@ -4,6 +4,7 @@ import {
   legalEntitiesIndividualAccountTable,
   legalEntitiesProfileTable,
 } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
+import { LegalEntitiesCompanyAccount } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
 import { CompanyAccount, CompanyAccountOverview, CompanyOverviewSchema, CompanySchema } from 'LegalEntities/Domain/Accounts/CompanyAccount';
 import { IndividualAccount, IndividualAccountOverview, IndividualOverviewSchema, IndividualSchema } from 'LegalEntities/Domain/Accounts/IndividualAccount';
 import { AccountType } from 'LegalEntities/Domain/AccountType';
@@ -15,6 +16,8 @@ import { PersonalNameInput } from 'LegalEntities/Domain/ValueObject/PersonalName
 import { EIN, SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
 import { BeneficiaryAccountResponse } from 'LegalEntities/Port/Api/ReadAccountController';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type IndividualAccountForSynchronization = {
   accountId: string;
@@ -61,9 +64,11 @@ export type StakeholderForSynchronization = StakeholderOutput & {
 
 export class AccountRepository {
   private databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider;
+  private eventsPublisher: SimpleEventBus;
 
-  constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventsPublisher = eventsPublisher;
   }
 
   public static getClassName = (): string => 'AccountRepository';
@@ -283,6 +288,28 @@ export class AccountRepository {
       return false;
     }
   }
+  async updateCompanyAccount(account: CompanyAccount, events: DomainEvent[] = []): Promise<void> {
+    const { profileId, accountId, address, companyType, stakeholders, companyDocuments } = account.toObject();
+
+    const values: Partial<LegalEntitiesCompanyAccount> = {
+      address: JSON.stringify(address),
+      companyType: JSON.stringify(companyType),
+      companyDocuments: JSON.stringify(companyDocuments),
+      stakeholders: JSON.stringify(stakeholders),
+    };
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(legalEntitiesCompanyAccountTable)
+      .set({
+        ...values,
+      })
+      .where('accountId', '=', accountId)
+      .where('profileId', '=', profileId)
+      .execute();
+
+    await this.publishEvents(events);
+  }
 
   async findCompanyAccount(profileId: string, accountId: string): Promise<CompanyAccount | null> {
     try {
@@ -484,5 +511,13 @@ export class AccountRepository {
         },
       },
     };
+  }
+
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
+    }
+
+    await this.eventsPublisher.publishMany(events);
   }
 }

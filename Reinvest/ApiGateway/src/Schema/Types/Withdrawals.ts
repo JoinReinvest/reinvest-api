@@ -1,9 +1,23 @@
 import { SessionContext } from 'ApiGateway/index';
 import { notificationsMock } from 'ApiGateway/Schema/Types/Notification';
 import dayjs from 'dayjs';
+import { GraphQLError } from 'graphql';
 
 const schema = `
     #graphql
+    enum DividendState {
+        PENDING
+        REINVESTED
+        PAID_OUT
+    }
+
+    type Dividend {
+        id: ID!
+        date: ISODateTime!
+        amount: USD!
+        status: DividendState!
+    }
+
     type GracePeriodInvestment {
         investmentId: String!
         amount: USD!
@@ -44,6 +58,8 @@ const schema = `
         [MOCK] Get funds withdrawal request. It returns the current status of funds withdrawal request.
         """
         getFundsWithdrawalRequest(accountId: String!): FundsWithdrawalRequest
+
+        getDividend(dividendId: String!): Dividend!
     }
     type Mutation {
         """
@@ -119,6 +135,23 @@ export const Withdrawals = {
       simulateFundsWithdrawal: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => fundsWithdrawalSimulationMock,
       getFundsWithdrawalRequest: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) =>
         fundsWithdrawalRequestMock('AWAITING_DECISION'),
+      getDividend: async (parent: any, { dividendId }: any, { profileId, modules }: SessionContext) => {
+        const notification = notificationsMock('', false).find(n => n.onObject?.id === dividendId);
+
+        if (!notification) {
+          throw new GraphQLError('Dividend not found');
+        }
+
+        return {
+          id: notification?.onObject?.id,
+          date: notification?.date,
+          amount: {
+            value: 10.0,
+            formatted: '$10.00',
+          },
+          status: 'PENDING',
+        };
+      },
     },
     Mutation: {
       reinvestDividend: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => {

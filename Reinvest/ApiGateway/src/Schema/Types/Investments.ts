@@ -54,7 +54,7 @@ const schema = `
         """
         [MOCK] It signs the subscription agreement.
         """
-        signSubscriptionAgreement(subscriptionAgreementId: ID!): Boolean!
+        signSubscriptionAgreement(investmentId: ID!): Boolean!
 
         """
         [MOCK] Approves the fees for the specific investment.
@@ -103,15 +103,13 @@ export const subscriptionAgreementMock = (parentId: string, type: string) => ({
     {
       paragraphs: [
         {
-          lines: ['Series A123', 'A series of X7653'],
-          bold: true,
+          lines: ['{{Series A123}}', '{{A series of X7653}}'],
         },
         {
           lines: ['Interests are offered through Dalmore Group, LLC, a registered broker-dealer and member of FINRA and SIPC ("Dalmore" or the "BOR").'],
         },
         {
-          lines: ['Subscription Agreement to subscribe for Series A123, a series of X7653'],
-          bold: true,
+          lines: ['Subscription Agreement to subscribe for Series {{A123}}, a series of {{X7653}}'],
         },
       ],
     },
@@ -120,14 +118,13 @@ export const subscriptionAgreementMock = (parentId: string, type: string) => ({
       paragraphs: [
         {
           lines: [
-            'Legal name of Purchaser (Individual or Entity): John Smith',
-            'Date of Agreement: 03/24/2023',
-            'Number of Series A123, Interests subscribed for: John Smith',
-            'Price of Series A123 Interests subscribed for: John Smith',
-            'Telephone Number: +17778887775',
-            'E-mail Address: john.smith@gmail.com',
+            '{{Legal name of Purchaser (Individual or Entity)}}: John Smith',
+            '{{Date of Agreement}}: 03/24/2023',
+            '{{Number of Series A123, Interests subscribed for}}: John Smith',
+            '{{Price of Series A123 Interests subscribed for}}: John Smith',
+            '{{Telephone Number}}: +17778887775',
+            '{{E-mail Address}}: john.smith@gmail.com',
           ],
-          bold: true,
         },
         {
           lines: ['By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound'],
@@ -158,19 +155,18 @@ export const subscriptionAgreementMock = (parentId: string, type: string) => ({
       paragraphs: [
         {
           lines: [
-            '(a) I am an "accredited investor", and have checked the appropriate box on the attached Certificate of\n' +
+            '{{(a) I am an "accredited investor", and have checked the appropriate box on the attached Certificate of\n' +
               'Accredited Investor Status indicating the basis of such accredited investor status, which Certificate of\n' +
-              'Accredited Investor Status is true and correct; or',
+              'Accredited Investor Status is true and correct; or}}',
           ],
-          bold: true,
+          isCheckedOption: false,
         },
         {
           lines: [
-            '(b) The amount set forth on the first page of this Subscription Agreement, together with any previous\n' +
+            '{{(b) The amount set forth on the first page of this Subscription Agreement, together with any previous\n' +
               'investments in securities pursuant to this offering, does not exceed 10% of the greater of my net worth or\n' +
-              'annual income.',
+              'annual income.}}',
           ],
-          bold: true,
           isCheckedOption: true,
         },
         {
@@ -180,16 +176,14 @@ export const subscriptionAgreementMock = (parentId: string, type: string) => ({
               'or the SEC',
             'NO',
           ],
-          bold: true,
         },
         {
           lines: [
             'Are you or anyone in your household or immediate family, or, for any non-natural person, any of its\n' +
-              'directors, trustees, 10% (or more) equity holder, an officer, or member of the board of directors of a publiclytraded company?',
-            'YES',
-            'Traded Company ticker symbols: RDW, TSLA, AAPL',
+              'directors, trustees, 10% (or more) equity holder, an officer, or member of the board of directors of a publicly traded company?',
+            '{{YES}}',
+            '{{Traded Company ticker symbols}}: RDW, TSLA, AAPL',
           ],
-          bold: true,
         },
       ],
     },
@@ -224,7 +218,7 @@ export const Investments = {
       createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
       },
-      signSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
+      signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;
       },
       abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {

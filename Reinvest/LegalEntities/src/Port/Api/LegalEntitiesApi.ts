@@ -29,7 +29,9 @@ export type LegalEntitiesApiType = {
   removeDraft: DraftAccountsController['removeDraft'];
   transformDraftAccountIntoRegularAccount: DraftAccountsController['transformDraftAccountIntoRegularAccount'];
 
+  updateCompanyForVerification: UpdateForVerificationController['updateCompanyForVerification'];
   updateProfileForVerification: UpdateForVerificationController['updateProfileForVerification'];
+  updateStakeholderForVerification: UpdateForVerificationController['updateStakeholderForVerification'];
 };
 
 export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesApiType => ({
@@ -56,5 +58,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   openBeneficiaryAccount: container.delegateTo(BeneficiaryAccountController, 'openBeneficiaryAccount'),
   readBeneficiaryAccount: container.delegateTo(ReadAccountController, 'readBeneficiaryAccount'),
 
+  updateCompanyForVerification: container.delegateTo(UpdateForVerificationController, 'updateCompanyForVerification'),
   updateProfileForVerification: container.delegateTo(UpdateForVerificationController, 'updateProfileForVerification'),
+  updateStakeholderForVerification: container.delegateTo(UpdateForVerificationController, 'updateStakeholderForVerification'),
 });

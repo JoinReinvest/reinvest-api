@@ -178,6 +178,12 @@ export class CompanyAccount {
     return getAccountLabel(this.accountType, this.companyName);
   }
 
+  getStakeholderById(id: string): Stakeholder | null {
+    const stakeholder = this.stakeholders?.getStakeholderById(new Uuid(id));
+
+    return stakeholder ?? null;
+  }
+
   setCompanyName(companyName: CompanyName) {
     this.companyName = companyName;
   }
@@ -234,8 +240,12 @@ export class CompanyAccount {
     this.stakeholders?.addStakeholder(stakeholder);
   }
 
+  updateStakeholder(stakeholder: Stakeholder): LegalEntityDocumentRemoved[] {
+    return this.stakeholders?.updateStakeholder(stakeholder) ?? [];
+  }
+
   removeStakeholder(id: Uuid) {
-    this.stakeholders?.removeStakeholder(id);
+    return this.stakeholders?.removeStakeholder(id);
   }
 
   getAvatar(): Avatar | null {
