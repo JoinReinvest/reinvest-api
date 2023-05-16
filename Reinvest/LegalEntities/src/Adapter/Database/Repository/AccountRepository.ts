@@ -292,8 +292,6 @@ export class AccountRepository {
     const { profileId, accountId, address, companyType, stakeholders, companyDocuments } = account.toObject();
 
     const values: Partial<LegalEntitiesCompanyAccount> = {
-      accountId,
-      profileId,
       address: JSON.stringify(address),
       companyType: JSON.stringify(companyType),
       companyDocuments: JSON.stringify(companyDocuments),
