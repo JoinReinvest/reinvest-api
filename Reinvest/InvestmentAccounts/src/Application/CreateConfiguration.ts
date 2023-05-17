@@ -24,7 +24,9 @@ class CreateConfiguration {
   async execute(profileId: string, accountId: string, automaticDividendReinvestmentAgreement: boolean): Promise<boolean> {
     const lastConfiguration = await this.configurationRepository.getLastConfiguration(profileId, accountId);
 
-    if (lastConfiguration?.configValueJson.value === automaticDividendReinvestmentAgreement) return false;
+    if (!lastConfiguration) return false;
+
+    if (lastConfiguration.isTheSameValue(automaticDividendReinvestmentAgreement)) return false;
 
     const id = this.idGenerator.createUuid();
 

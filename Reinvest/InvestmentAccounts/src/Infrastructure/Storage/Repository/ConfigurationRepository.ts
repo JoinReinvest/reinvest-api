@@ -1,7 +1,6 @@
 import { JSONObject } from 'HKEKTypes/Generics';
 import type { AccountConfigurationCreate } from 'Reinvest/InvestmentAccounts/src/Application/CreateConfiguration';
-import { AccountConfiguration } from 'Reinvest/InvestmentAccounts/src/Domain/Configuration/AccountConfiguration';
-import { ConfigurationTypes } from 'Reinvest/InvestmentAccounts/src/Domain/Configuration/ConfigurationTypes';
+import { AutomaticDividendReinvestmentAgreement } from 'Reinvest/InvestmentAccounts/src/Domain/ValueObject/AutomaticDividendReinvestmentAgreement';
 
 import { investmentAccountConfiguration, InvestmentAccountDbProvider } from '../DatabaseAdapter';
 
@@ -39,17 +38,19 @@ export class ConfigurationRepository {
     }
   }
 
-  async getLastConfiguration(profileId: string, accountId: string): Promise<Omit<AccountConfiguration, 'id' | 'profileId' | 'accountId'> | undefined> {
+  async getLastConfiguration(profileId: string, accountId: string): Promise<AutomaticDividendReinvestmentAgreement | false> {
     const lastConfiguration = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentAccountConfiguration)
-      .select(['configValueJson', 'dateUpdated', 'dateCreated', 'configType'])
+      .select(['id', 'profileId', 'accountId', 'configValueJson', 'dateUpdated', 'dateCreated', 'configType'])
       .where('accountId', '=', accountId)
       .where('profileId', '=', profileId)
       .orderBy('dateUpdated', 'desc')
       .limit(1)
       .executeTakeFirst();
 
-    return lastConfiguration;
+    if (!lastConfiguration) return false;
+
+    return AutomaticDividendReinvestmentAgreement.create(lastConfiguration);
   }
 }
