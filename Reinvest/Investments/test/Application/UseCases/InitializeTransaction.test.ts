@@ -1,21 +1,21 @@
 import { expect } from 'chai';
-import { TransactionRepositoryInterface } from 'Reinvest/Investments/src/Domain/TransactionRepositoryInterface';
+import { InvestorAccountId } from 'Investments/Domain/TransactionModeled/Commons/InvestorAccountId';
+import { PortfolioId } from 'Investments/Domain/TransactionModeled/Commons/PortfolioId';
+import { Result } from 'Investments/Domain/TransactionModeled/Commons/Result';
+import { UniqueId } from 'Investments/Domain/TransactionModeled/Commons/UniqueId';
+import { TransactionRepositoryInterface } from 'Investments/Domain/TransactionModeled/TransactionRepositoryInterface';
+import { Money } from 'Money/Money';
 import * as sinon from 'ts-sinon';
 
 import { UniqueIdGenerator } from '../../../src/Application/Tools/UniqueIdGenerator';
 import { InitializeTransaction } from '../../../src/Application/UseCases/InitializeTransaction';
 import { InitializeTransactionCommand } from '../../../src/Application/UseCases/InitializeTransactionCommand';
-import { InvestorAccountId } from '../../../src/Commons/InvestorAccountId';
-import { Money } from '../../../src/Commons/Money';
-import { PortfolioId } from '../../../src/Commons/PortfolioId';
-import { Result } from '../../../src/Commons/Result';
-import { UniqueId } from '../../../src/Commons/UniqueId';
 
 context('Given the user is an investor', () => {
   const investorAccountId: InvestorAccountId = new InvestorAccountId('123456');
 
   describe('When the user want to invest some money into REIT portfolio', () => {
-    const amountToInvest: Money = new Money(1000.0);
+    const amountToInvest: Money = new Money(100000);
     const portfolioId: PortfolioId = new PortfolioId('1');
     const transactionRepository = sinon.stubInterface<TransactionRepositoryInterface>();
     const idGenerator = sinon.stubInterface<UniqueIdGenerator>();

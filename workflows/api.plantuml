@@ -34,17 +34,20 @@ Q -> M: Investments
 M-> UC: GenerateSubscriptionAgreement
 UC -> M: Documents
 M -> UC: RenderFromTemplate
+UC -> DB: table:subscription_agreements (set pdfDateCreated)
 
 
 GL -> API: M: abortInvestment
 API -> M: Investments
 M -> UC: AbortInvestment
 UC -> DB: table:investments
+UC -> DB: table:investment_fees (status: aborted)
 
 GL -> API: Q: getInvestmentSummary
 API -> M: Investments
 M -> UC: InvestmentQuery
 UC -> DB: table:investments
+UC -> DB: table:investment_fees (read if any not approved)
 
 GL -> API: M: startInvestments
 API -> M: Investments
@@ -95,18 +98,19 @@ UC -> DB: table:recurring_investments (by status: active)
 GL -> API: M: createRecurringSubscriptionAgreement
 API -> M: Investments
 M -> UC: CreateRecurringSubscriptionAgreement
-UC -> DB: table:recurring_investments_subscription_agreements
+UC -> DB: table:subscription_agreements
 
 GL -> API: M: signRecurringInvestmentSubscriptionAgreement
 API -> M: Investments
 M -> UC: SignRecurringInvestmentSubscriptionAgreement
-UC -> DB: table:recurring_investments_subscription_agreements (status: signed)
-UC -> DB: table:recurring_investments (status: signed)
+UC -> DB: table:subscription_agreements (status: signed)
+UC -> DB: table:recurring_investments (status: draft)
 UC -> Q: Event:RecurringInvestmentSubscriptionAgreementSigned
 Q -> M: Investments
 M-> UC: GenerateSubscriptionAgreement
 UC -> M: Documents
 M -> UC: RenderFromTemplate
+UC -> DB: table:subscription_agreements (set pdfDateCreated)
 
 GL -> API: M: initiateRecurringInvestment
 API -> M: Investments

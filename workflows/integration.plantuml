@@ -1,11 +1,17 @@
 @startuml
 
 participant "GraphQL" as GL
-participant "API" as API
-participant "Module" as M
-participant "UseCase" as UC
 participant "DB" as DB
 participant "Queue" as Q
+participant "Module" as M
+participant "North Capital" as NC
 
+opt Create trade
+GL -> DB: createInvestment($100)
+DB -> Q: investmentCreated($100)
+Q -> M: Trading
+M -> NC:
+
+end
 
 @enduml

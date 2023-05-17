@@ -1,17 +1,20 @@
 import { expect } from 'chai';
-import { Counter } from 'Reinvest/Investments/src/Commons/Counter';
-import { DoNothing } from 'Reinvest/Investments/src/Domain/Command/DoNothing';
-import { UnwindTrade } from 'Reinvest/Investments/src/Domain/Command/UnwindTrade';
-import { WaitForAdminManualAction } from 'Reinvest/Investments/src/Domain/Command/WaitForAdminManualAction';
-import { TradeUnwound } from 'Reinvest/Investments/src/Domain/Events/TradeUnwound';
-import { TradeUnwoundFailed } from 'Reinvest/Investments/src/Domain/Events/TradeUnwoundFailed';
-import { TransactionCancelled } from 'Reinvest/Investments/src/Domain/Events/TransactionCancelled';
-import { NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION, TradeUnwindAwaitingTransaction } from 'Reinvest/Investments/src/Domain/States/TradeUnwindAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { FailureCompletionReason } from 'Reinvest/Investments/src/Domain/ValueObject/FailureCompletionReason';
-import { ManualActionReason } from 'Reinvest/Investments/src/Domain/ValueObject/ManualActionReason';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
+import { DoNothing } from 'Investments/Domain/TransactionModeled/Command/DoNothing';
+import { UnwindTrade } from 'Investments/Domain/TransactionModeled/Command/UnwindTrade';
+import { WaitForAdminManualAction } from 'Investments/Domain/TransactionModeled/Command/WaitForAdminManualAction';
+import { Counter } from 'Investments/Domain/TransactionModeled/Commons/Counter';
+import { TradeUnwound } from 'Investments/Domain/TransactionModeled/Events/TradeUnwound';
+import { TradeUnwoundFailed } from 'Investments/Domain/TransactionModeled/Events/TradeUnwoundFailed';
+import { TransactionCancelled } from 'Investments/Domain/TransactionModeled/Events/TransactionCancelled';
+import {
+  NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION,
+  TradeUnwindAwaitingTransaction,
+} from 'Investments/Domain/TransactionModeled/States/TradeUnwindAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { FailureCompletionReason } from 'Investments/Domain/TransactionModeled/ValueObject/FailureCompletionReason';
+import { ManualActionReason } from 'Investments/Domain/TransactionModeled/ValueObject/ManualActionReason';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
 
 context('Given the transaction was cancelled and the system is awaiting for trade unwind', () => {
   const transactionId = new TransactionId('123456');

@@ -1,4 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
+import { TempController } from 'Investments/Infrastructure/Ports/TempController';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 import { Investments } from '../..';
 
@@ -10,6 +12,6 @@ export default class PortsProviders {
   }
 
   public boot(container: ContainerInterface) {
-    console.log('Ports providers boot');
+    container.addSingleton(TempController, [SimpleEventBus]);
   }
 }

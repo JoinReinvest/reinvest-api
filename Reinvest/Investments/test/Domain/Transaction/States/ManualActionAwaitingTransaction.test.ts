@@ -1,16 +1,16 @@
 import { expect } from 'chai';
-import { Counter } from 'Reinvest/Investments/src/Commons/Counter';
-import { DoNothing } from 'Reinvest/Investments/src/Domain/Command/DoNothing';
-import { ResumeLastEvent } from 'Reinvest/Investments/src/Domain/Command/ResumeLastEvent';
-import { UnwindTrade } from 'Reinvest/Investments/src/Domain/Command/UnwindTrade';
-import { TransactionCancelled } from 'Reinvest/Investments/src/Domain/Events/TransactionCancelled';
-import { TransactionForcedToQuit } from 'Reinvest/Investments/src/Domain/Events/TransactionForcedToQuit';
-import { TransactionResumed } from 'Reinvest/Investments/src/Domain/Events/TransactionResumed';
-import { ManualActionAwaitingTransaction } from 'Reinvest/Investments/src/Domain/States/ManualActionAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { FailureCompletionReason } from 'Reinvest/Investments/src/Domain/ValueObject/FailureCompletionReason';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
+import { DoNothing } from 'Investments/Domain/TransactionModeled/Command/DoNothing';
+import { ResumeLastEvent } from 'Investments/Domain/TransactionModeled/Command/ResumeLastEvent';
+import { UnwindTrade } from 'Investments/Domain/TransactionModeled/Command/UnwindTrade';
+import { Counter } from 'Investments/Domain/TransactionModeled/Commons/Counter';
+import { TransactionCancelled } from 'Investments/Domain/TransactionModeled/Events/TransactionCancelled';
+import { TransactionForcedToQuit } from 'Investments/Domain/TransactionModeled/Events/TransactionForcedToQuit';
+import { TransactionResumed } from 'Investments/Domain/TransactionModeled/Events/TransactionResumed';
+import { ManualActionAwaitingTransaction } from 'Investments/Domain/TransactionModeled/States/ManualActionAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { FailureCompletionReason } from 'Investments/Domain/TransactionModeled/ValueObject/FailureCompletionReason';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
 context('Given the transaction is awaiting for manual action', () => {
   const transactionId = new TransactionId('123456');
   const lastTransactionState = TransactionState.PaymentAwaiting;

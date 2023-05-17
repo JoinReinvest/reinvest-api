@@ -1,22 +1,21 @@
 import { expect } from 'chai';
-import { Counter } from 'Reinvest/Investments/src/Commons/Counter';
-import { Currency } from 'Reinvest/Investments/src/Commons/Currency';
-import { Money } from 'Reinvest/Investments/src/Commons/Money';
-import { SignSubscriptionAgreement } from 'Reinvest/Investments/src/Domain/Command/SignSubscriptionAgreement';
-import { TransferFunds } from 'Reinvest/Investments/src/Domain/Command/TransferFunds';
-import { UnwindTrade } from 'Reinvest/Investments/src/Domain/Command/UnwindTrade';
-import { WaitForAdminManualAction } from 'Reinvest/Investments/src/Domain/Command/WaitForAdminManualAction';
-import { SubscriptionAgreementSigned } from 'Reinvest/Investments/src/Domain/Events/SubscriptionAgreementSigned';
-import { SubscriptionAgreementSignFailed } from 'Reinvest/Investments/src/Domain/Events/SubscriptionAgreementSignFailed';
-import { TradeCreated } from 'Reinvest/Investments/src/Domain/Events/TradeCreated';
-import { SubscriptionAgreementAwaitingTransaction } from 'Reinvest/Investments/src/Domain/States/SubscriptionAgreementAwaitingTransaction';
-import { NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION } from 'Reinvest/Investments/src/Domain/States/TradeUnwindAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { FailureCompletionReason } from 'Reinvest/Investments/src/Domain/ValueObject/FailureCompletionReason';
-import { NumberOfShares } from 'Reinvest/Investments/src/Domain/ValueObject/NumberOfShares';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
-import { UnitPrice } from 'Reinvest/Investments/src/Domain/ValueObject/UnitPrice';
+import { SignSubscriptionAgreement } from 'Investments/Domain/TransactionModeled/Command/SignSubscriptionAgreement';
+import { TransferFunds } from 'Investments/Domain/TransactionModeled/Command/TransferFunds';
+import { UnwindTrade } from 'Investments/Domain/TransactionModeled/Command/UnwindTrade';
+import { WaitForAdminManualAction } from 'Investments/Domain/TransactionModeled/Command/WaitForAdminManualAction';
+import { Counter } from 'Investments/Domain/TransactionModeled/Commons/Counter';
+import { SubscriptionAgreementSigned } from 'Investments/Domain/TransactionModeled/Events/SubscriptionAgreementSigned';
+import { SubscriptionAgreementSignFailed } from 'Investments/Domain/TransactionModeled/Events/SubscriptionAgreementSignFailed';
+import { TradeCreated } from 'Investments/Domain/TransactionModeled/Events/TradeCreated';
+import { SubscriptionAgreementAwaitingTransaction } from 'Investments/Domain/TransactionModeled/States/SubscriptionAgreementAwaitingTransaction';
+import { NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION } from 'Investments/Domain/TransactionModeled/States/TradeUnwindAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { FailureCompletionReason } from 'Investments/Domain/TransactionModeled/ValueObject/FailureCompletionReason';
+import { NumberOfShares } from 'Investments/Domain/TransactionModeled/ValueObject/NumberOfShares';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
+import { UnitPrice } from 'Investments/Domain/TransactionModeled/ValueObject/UnitPrice';
+import { Money } from 'Money/Money';
 
 context('Given the trade was created and awaiting for a signing the subscription agreement', () => {
   const transactionId = new TransactionId('123456');
@@ -48,7 +47,7 @@ context('Given the trade was created and awaiting for a signing the subscription
 
   describe('When system re-published a trade created event', () => {
     const numberOfShares = new NumberOfShares(1000);
-    const unitPrice = UnitPrice.fromMoney(new Money(1.0, Currency.USD));
+    const unitPrice = UnitPrice.fromMoney(new Money(100));
     const tradeCreated = new TradeCreated(transactionId, numberOfShares, unitPrice);
 
     it('Then the transaction should initialize again signing the subscription agreement', async () => {

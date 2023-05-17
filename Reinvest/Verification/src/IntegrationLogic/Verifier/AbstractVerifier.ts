@@ -53,6 +53,7 @@ export abstract class AbstractVerifier {
 
   protected analyzeEvents(): {
     amlStatus: VerificationStatus;
+    decisionId: number;
     failedKycCounter: number;
     isKycInPendingState: boolean;
     kycStatus: VerificationStatus;
@@ -69,6 +70,7 @@ export abstract class AbstractVerifier {
     let wasFailedRequest = false;
     let isKycInPendingState = false;
     let needMoreInfo = false;
+    const decisionId = this.events.list.length;
 
     for (const event of this.events.list) {
       const { kind } = event;
@@ -128,6 +130,7 @@ export abstract class AbstractVerifier {
 
     return {
       amlStatus,
+      decisionId,
       kycStatus,
       failedKycCounter,
       reasons: someReasons,

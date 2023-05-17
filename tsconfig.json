@@ -13,6 +13,7 @@
       "IdGenerator/*": ["./shared/hkek-id-generator/*"],
       "HKEKTypes/*": ["./shared/hkek-types/*"],
       "Logger/*": ["./shared/hkek-logger/*"],
+      "Money/*": ["./shared/hkek-money/*"],
 
       "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
       "AdminApiGateway/*": ["./Reinvest/AdminApiGateway/src/*"],
@@ -20,6 +21,7 @@
       "LegalEntities/*": ["./Reinvest/LegalEntities/src/*"],
       "Documents/*": ["./Reinvest/Documents/src/*"],
       "Identity/*": ["./Reinvest/Identity/src/*"],
+      "Investments/*": ["./Reinvest/Investments/src/*"],
       "Registration/*": ["./Reinvest/Registration/src/*"],
       "Verification/*": ["./Reinvest/Verification/src/*"]
     }

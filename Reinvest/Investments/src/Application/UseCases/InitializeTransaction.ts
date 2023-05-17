@@ -1,8 +1,9 @@
-import { Result } from '../../Commons/Result';
-import { TransactionCreated } from '../../Domain/Events/TransactionCreated';
-import { TransactionException } from '../../Domain/TransactionException';
-import { TransactionRepositoryInterface } from '../../Domain/TransactionRepositoryInterface';
-import { TransactionId } from '../../Domain/ValueObject/TransactionId';
+import { Result } from 'Investments/Domain/TransactionModeled/Commons/Result';
+import { TransactionCreated } from 'Investments/Domain/TransactionModeled/Events/TransactionCreated';
+import { TransactionException } from 'Investments/Domain/TransactionModeled/TransactionException';
+import { TransactionRepositoryInterface } from 'Investments/Domain/TransactionModeled/TransactionRepositoryInterface';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+
 import { UniqueIdGenerator } from '../Tools/UniqueIdGenerator';
 import { InitializeTransactionCommand } from './InitializeTransactionCommand';
 
