@@ -12,8 +12,6 @@ export async function up(db: Kysely<InvestmentAccountsDatabase>): Promise<void> 
     .addColumn('configType', 'varchar(255)', col => col.notNull())
     .addColumn('configValueJson', 'json', col => col.notNull())
     .execute();
-
-  await db.schema.createIndex('id').on('investment_accounts_configuration').column('id').execute();
 }
 
 export async function down(db: Kysely<InvestmentAccountsDatabase>): Promise<void> {

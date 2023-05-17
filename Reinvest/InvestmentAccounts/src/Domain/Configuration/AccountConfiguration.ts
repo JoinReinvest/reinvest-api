@@ -8,6 +8,6 @@ export type AccountConfiguration = {
   configValueJson: JSONObject;
   dateCreated: Date;
   dateUpdated: Date;
+  id: string;
   profileId: string;
-  signed: boolean;
 };

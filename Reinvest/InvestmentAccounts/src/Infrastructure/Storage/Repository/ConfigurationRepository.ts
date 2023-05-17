@@ -12,21 +12,27 @@ export class ConfigurationRepository {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 
-  async createConfiguration(configuration: any): Promise<boolean> {
-    await this.databaseAdapterProvider
-      .provide()
-      .insertInto(investmentAccountConfiguration)
-      .values({
-        accountId: 'st',
-        dateCreated: new Date(),
-        dateUpdated: new Date(),
-        profileId: 'sda',
-        signed: false,
-        configType: ConfigurationTypes.AUTOMATIC_DIVIDEND_REINVESTMENT_OPT_IN_OUT,
-        configValueJson: <JSONObject>{ test: 'test' },
-      })
-      .execute();
+  async createConfiguration(id: string, profileId: string, accountId: string, automaticDividendReinvestmentAgreement: boolean): Promise<boolean> {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .insertInto(investmentAccountConfiguration)
+        .values({
+          id,
+          accountId,
+          dateCreated: new Date(),
+          dateUpdated: new Date(),
+          profileId,
+          configType: ConfigurationTypes.AUTOMATIC_DIVIDEND_REINVESTMENT_OPT_IN_OUT,
+          configValueJson: <JSONObject>{ automaticDividendReinvestmentAgreement },
+        })
+        .execute();
 
-    return false;
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot create configuration: ${error.message}`, error);
+
+      return false;
+    }
   }
 }
