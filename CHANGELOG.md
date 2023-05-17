@@ -1,5 +1,9 @@
 # REINVEST API CHANGELOG
 
+## 1.12.5 - 05/17/2023
+
+* `RecurringInvestmentStatus` changes to DRAFT, WAITING_FOR_SIGNING_SUBSCRIPTION_AGREEMENT, ACTIVE, SUSPENDED, INACTIVE
+
 ## 1.12.4 - 05/16/2023
 
 * Subscription agreement changes:
@@ -10,11 +14,15 @@
 * Notification changes:
     * Text to be bold is wrapped in `{{text to be bolder}}`
 * Mutation that are not mocks anymore:
-    * `updateProfileForVerification` - It updates profile for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
+    * `updateProfileForVerification` - It updates profile for verification. Provide only fields that were changed by the
+      investor, but all required to meet the schema definition.
       For example if investor changed only 'firstName' then provide only field 'name'.
-      The name field expects PersonName type, so it must contain all required data (so 'firstName' and 'lastName' must be provided, even that only firstName changed).
-    * `updateCompanyForVerification` - It updates stakeholder for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
-    * `updateStakeholderForVerification` - It updates company for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
+      The name field expects PersonName type, so it must contain all required data (so 'firstName' and 'lastName' must
+      be provided, even that only firstName changed).
+    * `updateCompanyForVerification` - It updates stakeholder for verification. Provide only fields that were changed by
+      the investor, but all required to meet the schema definition.
+    * `updateStakeholderForVerification` - It updates company for verification. Provide only fields that were changed by
+      the investor, but all required to meet the schema definition.
 
 ## 1.12.3 - 05/12/2023
 
