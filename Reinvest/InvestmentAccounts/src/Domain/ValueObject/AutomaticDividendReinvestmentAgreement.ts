@@ -36,8 +36,6 @@ export class AutomaticDividendReinvestmentAgreement implements AccountConfigurat
   }
 
   isTheSameValue(value: boolean): boolean {
-    if (this.configValueJson.value === value) return true;
-
-    return false;
+    return this.configValueJson.value === value;
   }
 }
