@@ -1,5 +1,6 @@
 import { SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
+import { Money } from 'Money/Money';
 
 const schema = `
     #graphql
@@ -203,6 +204,9 @@ export const Investments = {
     },
     Mutation: {
       createInvestment: async (parent: any, { accountId, amount }: any, { profileId, modules }: SessionContext) => {
+        const money = new Money(amount.value);
+        console.log('money', money.getFormattedAmount());
+
         return investmentIdMock;
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {

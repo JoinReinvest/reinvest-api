@@ -1,8 +1,17 @@
 # REINVEST API CHANGELOG
 
+## 1.13 - 05/17/2023
+
+* Type `Money` from now on accepts only integer values instead of strings.
+* All mutations that accept `Money` type/input will accept only integer values instead of strings.
+* The integer should contain the value in the smallest currency unit (e.g. cents for USD).
+    * For example: `100` instead of `1.00`
+    * `1=$0.01`, `1000` = `$10.00`, `10000000` = `$100,000.00`
+
 ## 1.12.5 - 05/17/2023
 
-* `RecurringInvestmentStatus` changes to DRAFT, WAITING_FOR_SIGNING_SUBSCRIPTION_AGREEMENT, ACTIVE, SUSPENDED, INACTIVE
+* `RecurringInvestmentStatus` changes
+  to `DRAFT`, `WAITING_FOR_SIGNING_SUBSCRIPTION_AGREEMENT`, `ACTIVE`, `SUSPENDED`, `INACTIVE`
 
 ## 1.12.4 - 05/16/2023
 
