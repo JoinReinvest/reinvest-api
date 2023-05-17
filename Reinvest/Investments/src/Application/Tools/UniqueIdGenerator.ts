@@ -1,4 +1,4 @@
-import { UniqueId } from '../../Commons/UniqueId';
+import { UniqueId } from 'Investments/Domain/TransactionModeled/Commons/UniqueId';
 
 export interface UniqueIdGenerator {
   create(): UniqueId;

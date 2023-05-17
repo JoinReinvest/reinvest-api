@@ -5,6 +5,7 @@ import {
   InvestmentsDatabaseAdapterInstanceProvider,
 } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
@@ -25,6 +26,7 @@ export default class AdaptersProviders {
     // database
     container
       .addAsValue(InvestmentsDatabaseAdapterInstanceProvider, createInvestmentsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
+      .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
   }
 }

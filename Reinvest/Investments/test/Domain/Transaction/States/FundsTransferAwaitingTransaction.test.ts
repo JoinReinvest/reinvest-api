@@ -1,20 +1,20 @@
 import { expect } from 'chai';
-import { Counter } from 'Reinvest/Investments/src/Commons/Counter';
-import { DoNothing } from 'Reinvest/Investments/src/Domain/Command/DoNothing';
-import { TransferFunds } from 'Reinvest/Investments/src/Domain/Command/TransferFunds';
-import { UnwindTrade } from 'Reinvest/Investments/src/Domain/Command/UnwindTrade';
-import { WaitForManualAction } from 'Reinvest/Investments/src/Domain/Command/WaitForManualAction';
-import { FundsTransferInitializationFailed } from 'Reinvest/Investments/src/Domain/Events/FundsTransferInitializationFailed';
-import { FundsTransferInitialized } from 'Reinvest/Investments/src/Domain/Events/FundsTransferInitialized';
-import { SubscriptionAgreementSigned } from 'Reinvest/Investments/src/Domain/Events/SubscriptionAgreementSigned';
+import { DoNothing } from 'Investments/Domain/TransactionModeled/Command/DoNothing';
+import { TransferFunds } from 'Investments/Domain/TransactionModeled/Command/TransferFunds';
+import { UnwindTrade } from 'Investments/Domain/TransactionModeled/Command/UnwindTrade';
+import { WaitForManualAction } from 'Investments/Domain/TransactionModeled/Command/WaitForManualAction';
+import { Counter } from 'Investments/Domain/TransactionModeled/Commons/Counter';
+import { FundsTransferInitializationFailed } from 'Investments/Domain/TransactionModeled/Events/FundsTransferInitializationFailed';
+import { FundsTransferInitialized } from 'Investments/Domain/TransactionModeled/Events/FundsTransferInitialized';
+import { SubscriptionAgreementSigned } from 'Investments/Domain/TransactionModeled/Events/SubscriptionAgreementSigned';
 import {
   FundsTransferAwaitingTransaction,
   NUMBER_OF_TRIES_BEFORE_MANUAL_ACTION,
-} from 'Reinvest/Investments/src/Domain/States/FundsTransferAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { FailureCompletionReason } from 'Reinvest/Investments/src/Domain/ValueObject/FailureCompletionReason';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
+} from 'Investments/Domain/TransactionModeled/States/FundsTransferAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { FailureCompletionReason } from 'Investments/Domain/TransactionModeled/ValueObject/FailureCompletionReason';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
 
 context('Given the subscription agreement was signed and awaiting for a funds transfer initialization', () => {
   const transactionId = new TransactionId('123456');
