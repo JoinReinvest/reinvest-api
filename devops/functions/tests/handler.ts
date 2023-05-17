@@ -8,16 +8,15 @@ import {
   ListUsersCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import * as bodyParser from 'body-parser';
-import DateTime from 'date-and-time';
 import express from 'express';
 import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
-import { RegistrationDatabase, registrationMappingRegistryTable } from 'Registration/Adapter/Database/DatabaseAdapter';
-import { NorthCapitalMapper } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper';
+import { Investments } from 'Investments/index';
+import { RegistrationDatabase } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { boot } from 'Reinvest/bootstrap';
 import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from 'Reinvest/config';
 import { IdentityDatabase, userTable } from 'Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter';
 import { InvestmentAccountsDatabase } from 'Reinvest/InvestmentAccounts/src/Infrastructure/Storage/DatabaseAdapter';
-import { LegalEntitiesDatabase, legalEntitiesDraftAccountTable } from 'Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter';
+import { LegalEntitiesDatabase } from 'Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter';
 import { Registration } from 'Reinvest/Registration/src';
 import { NorthCapitalAdapter } from 'Reinvest/Registration/src/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloAdapter } from 'Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter';
@@ -642,11 +641,26 @@ const vertaloRouter = () => {
 
   return router;
 };
+const transactionRouter = () => {
+  const router = express.Router({ mergeParams: true });
+  router.post('/create-transaction', async (req: any, res: any) => {
+    const modules = boot();
+    const api = modules.getApi<Investments.ApiType>(Investments);
+    await api.test();
+    await modules.close();
+    res.status(200).json({
+      status: true,
+    });
+  });
+
+  return router;
+};
 
 router.use('/user', userRouter());
 router.use('/north-capital', northCapitalRouter());
 router.use('/vertalo', vertaloRouter());
 router.use('/sync', syncRouter());
+router.use('/transaction', transactionRouter());
 
 app.use('/tests', router);
 export const main = serverless(app);

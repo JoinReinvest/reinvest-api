@@ -1,15 +1,15 @@
 import { expect } from 'chai';
-import { DisburseTrade } from 'Reinvest/Investments/src/Domain/Command/DisburseTrade';
-import { DoNothing } from 'Reinvest/Investments/src/Domain/Command/DoNothing';
-import { GracePeriodEnded } from 'Reinvest/Investments/src/Domain/Events/GracePeriodEnded';
-import { InvestmentVerified } from 'Reinvest/Investments/src/Domain/Events/InvestmentVerified';
-import { InvestorVerified } from 'Reinvest/Investments/src/Domain/Events/InvestorVerified';
-import { VerificationAwaitingTransaction } from 'Reinvest/Investments/src/Domain/States/VerificationAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { GracePeriodStatus } from 'Reinvest/Investments/src/Domain/ValueObject/GracePeriodStatus';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
-import { InvestmentVerificationStatus, InvestorVerificationStatus } from 'Reinvest/Investments/src/Domain/ValueObject/VerificationStatus';
+import { DisburseTrade } from 'Investments/Domain/TransactionModeled/Command/DisburseTrade';
+import { DoNothing } from 'Investments/Domain/TransactionModeled/Command/DoNothing';
+import { GracePeriodEnded } from 'Investments/Domain/TransactionModeled/Events/GracePeriodEnded';
+import { InvestmentVerified } from 'Investments/Domain/TransactionModeled/Events/InvestmentVerified';
+import { InvestorVerified } from 'Investments/Domain/TransactionModeled/Events/InvestorVerified';
+import { VerificationAwaitingTransaction } from 'Investments/Domain/TransactionModeled/States/VerificationAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { GracePeriodStatus } from 'Investments/Domain/TransactionModeled/ValueObject/GracePeriodStatus';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
+import { InvestmentVerificationStatus, InvestorVerificationStatus } from 'Investments/Domain/TransactionModeled/ValueObject/VerificationStatus';
 
 context('Given the payment was successful and awaiting for the verification of the investor and investment', () => {
   const transactionId = new TransactionId('123456');

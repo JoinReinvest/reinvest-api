@@ -1,4 +1,5 @@
 import { SessionContext } from 'ApiGateway/index';
+import { InvestmentAccounts } from 'Reinvest/InvestmentAccounts/src';
 
 const schema = `
     #graphql
@@ -46,7 +47,10 @@ export const Configuration = {
         { accountId, automaticDividendReinvestmentAgreement }: any,
         { profileId, modules }: SessionContext,
       ) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
+        const status = await investmentAccountsApi.createConfiguration(profileId, accountId, automaticDividendReinvestmentAgreement);
+
+        return status;
       },
     },
   },

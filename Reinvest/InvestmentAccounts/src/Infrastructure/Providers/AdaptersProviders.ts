@@ -15,6 +15,8 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { AggregateRepository } from 'SimpleAggregator/Storage/AggregateRepository';
 
+import { ConfigurationRepository } from '../Storage/Repository/ConfigurationRepository';
+
 export default class AdaptersProviders {
   private config: InvestmentAccounts.Config;
 
@@ -40,7 +42,8 @@ export default class AdaptersProviders {
         (databaseProvider: InvestmentAccountDbProvider) => new AggregateRepository<InvestmentAccountDbProvider>(databaseProvider),
         [investmentAccountsDatabaseProviderName],
       )
-      .addSingleton(ProfileRepository, ['ProfileAggregateRepository', 'InvestmentAccountsTransactionalAdapter', SimpleEventBus]);
+      .addSingleton(ProfileRepository, ['ProfileAggregateRepository', 'InvestmentAccountsTransactionalAdapter', SimpleEventBus])
+      .addSingleton(ConfigurationRepository, [investmentAccountsDatabaseProviderName]);
     container
       .addSingleton(ProfileQuery, [investmentAccountsDatabaseProviderName])
       .addSingleton(QueryProfileRepository)

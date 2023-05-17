@@ -1,6 +1,6 @@
-import { InvestorAccountId } from '../../Commons/InvestorAccountId';
-import { Money } from '../../Commons/Money';
-import { PortfolioId } from '../../Commons/PortfolioId';
+import { InvestorAccountId } from 'Investments/Domain/TransactionModeled/Commons/InvestorAccountId';
+import { PortfolioId } from 'Investments/Domain/TransactionModeled/Commons/PortfolioId';
+import { Money } from 'Money/Money';
 
 export class InitializeTransactionCommand {
   private readonly _portfolioId: PortfolioId;

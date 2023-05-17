@@ -8,19 +8,21 @@ const MoneySchema = `
 
 const MoneyResolver = new GraphQLScalarType({
   name: 'Money',
-  description: 'Money value in format 0.00',
+  description: 'Money value as integer. 1=$0.01, 1000 = $10.00, 10000000 = $100,000.00',
   serialize: value => value,
-  parseValue: value => value,
+  parseValue: value => parseInt(value as string, 10),
   parseLiteral: ast => {
-    if (ast.kind !== Kind.STRING) {
-      throw new GraphQLError('The value must be string');
+    if (ast.kind !== Kind.INT) {
+      throw new GraphQLError('The value must be an integer');
     }
 
-    if (!new RegExp('^\\d+\\.\\d{2}$').test(ast.value)) {
-      throw new GraphQLError('The Money must be in format 0.00');
+    const value = parseInt(ast.value, 10);
+
+    if (value < 1) {
+      throw new GraphQLError('The Money must be bigger than 0');
     }
 
-    return ast.value;
+    return value;
   },
 });
 

@@ -1,5 +1,18 @@
 # REINVEST API CHANGELOG
 
+## 1.13 - 05/17/2023
+
+* Type `Money` from now on accepts only integer values instead of strings.
+* All mutations that accept `Money` type/input will accept only integer values instead of strings.
+* The integer should contain the value in the smallest currency unit (e.g. cents for USD).
+    * For example: `100` instead of `1.00`
+    * `1=$0.01`, `1000` = `$10.00`, `10000000` = `$100,000.00`
+
+## 1.12.5 - 05/17/2023
+
+* `RecurringInvestmentStatus` changes
+  to `DRAFT`, `WAITING_FOR_SIGNING_SUBSCRIPTION_AGREEMENT`, `ACTIVE`, `SUSPENDED`, `INACTIVE`
+
 ## 1.12.4 - 05/16/2023
 
 * Subscription agreement changes:
@@ -10,11 +23,15 @@
 * Notification changes:
     * Text to be bold is wrapped in `{{text to be bolder}}`
 * Mutation that are not mocks anymore:
-    * `updateProfileForVerification` - It updates profile for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
+    * `updateProfileForVerification` - It updates profile for verification. Provide only fields that were changed by the
+      investor, but all required to meet the schema definition.
       For example if investor changed only 'firstName' then provide only field 'name'.
-      The name field expects PersonName type, so it must contain all required data (so 'firstName' and 'lastName' must be provided, even that only firstName changed).
-    * `updateCompanyForVerification` - It updates stakeholder for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
-    * `updateStakeholderForVerification` - It updates company for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
+      The name field expects PersonName type, so it must contain all required data (so 'firstName' and 'lastName' must
+      be provided, even that only firstName changed).
+    * `updateCompanyForVerification` - It updates stakeholder for verification. Provide only fields that were changed by
+      the investor, but all required to meet the schema definition.
+    * `updateStakeholderForVerification` - It updates company for verification. Provide only fields that were changed by
+      the investor, but all required to meet the schema definition.
 
 ## 1.12.3 - 05/12/2023
 

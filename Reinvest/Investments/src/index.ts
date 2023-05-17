@@ -1,4 +1,5 @@
 import Container, { ContainerInterface } from 'Container/Container';
+import { InvestmentsDatabaseAdapterInstanceProvider, InvestmentsDatabaseAdapterProvider } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
@@ -10,7 +11,6 @@ import AdaptersProviders from './Infrastructure/Providers/AdaptersProviders';
 import EventBusProvider from './Infrastructure/Providers/EventBusProvider';
 import PortsProviders from './Infrastructure/Providers/PortsProviders';
 import UseCaseProviders from './Infrastructure/Providers/UseCaseProviders';
-import { investmentsDatabaseProviderName, InvestmentsDbProvider } from './Infrastructure/Storage/DatabaseAdapter';
 
 export namespace Investments {
   export const moduleName = 'Investments';
@@ -30,19 +30,6 @@ export namespace Investments {
     constructor(config: Investments.Config) {
       this.config = config;
       this.container = new Container();
-    }
-
-    private boot(): void {
-      if (this.booted) {
-        return;
-      }
-
-      new AdaptersProviders(this.config).boot(this.container);
-      new UseCaseProviders(this.config).boot(this.container);
-      new PortsProviders(this.config).boot(this.container);
-      new EventBusProvider(this.config).boot(this.container);
-
-      this.booted = true;
     }
 
     // public module API
@@ -68,8 +55,21 @@ export namespace Investments {
 
     async close(): Promise<void> {
       if (this.booted) {
-        await this.container.getValue<InvestmentsDbProvider>(investmentsDatabaseProviderName).close();
+        await this.container.getValue<InvestmentsDatabaseAdapterProvider>(InvestmentsDatabaseAdapterInstanceProvider).close();
       }
+    }
+
+    private boot(): void {
+      if (this.booted) {
+        return;
+      }
+
+      new AdaptersProviders(this.config).boot(this.container);
+      new UseCaseProviders(this.config).boot(this.container);
+      new PortsProviders(this.config).boot(this.container);
+      new EventBusProvider(this.config).boot(this.container);
+
+      this.booted = true;
     }
   }
 

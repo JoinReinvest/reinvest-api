@@ -14,7 +14,8 @@ const schema = `
         DRAFT
         WAITING_FOR_SIGNING_SUBSCRIPTION_AGREEMENT
         ACTIVE
-        CANCELLED
+        SUSPENDED
+        INACTIVE
     }
 
     input RecurringInvestmentScheduleInput {

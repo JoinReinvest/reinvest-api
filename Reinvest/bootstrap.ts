@@ -2,6 +2,7 @@ import { Documents } from 'Documents/index';
 import { CognitoConfig } from 'Identity/Adapter/AWS/CognitoService';
 import { SNSConfig } from 'Identity/Adapter/AWS/SmsService';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
+import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { logger } from 'Logger/logger';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
@@ -37,11 +38,6 @@ export function boot(): Modules {
   const queueConfig = SQS_CONFIG as QueueConfig;
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
-  // Investments.boot({
-  //   database: {
-  //     connectionString: "connection-string-test",
-  //   },
-  // } as Investments.Config);
 
   modules.register(
     Documents.moduleName,
@@ -115,6 +111,14 @@ export function boot(): Modules {
         registration: modules.get(Registration.moduleName) as Registration.Main,
       },
     ),
+  );
+
+  modules.register(
+    Investments.moduleName,
+    Investments.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as Investments.Config),
   );
 
   return modules;
