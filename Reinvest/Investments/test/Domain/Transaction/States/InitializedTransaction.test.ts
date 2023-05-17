@@ -1,20 +1,21 @@
 import { expect } from 'chai';
-import { InvestorAccountId } from 'Reinvest/Investments/src/Commons/InvestorAccountId';
-import { Money } from 'Reinvest/Investments/src/Commons/Money';
-import { PortfolioId } from 'Reinvest/Investments/src/Commons/PortfolioId';
-import { CreateTrade } from 'Reinvest/Investments/src/Domain/Command/CreateTrade';
-import { TransactionCreated } from 'Reinvest/Investments/src/Domain/Events/TransactionCreated';
-import { InitializedTransaction } from 'Reinvest/Investments/src/Domain/States/InitializedTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
+import { CreateTrade } from 'Investments/Domain/TransactionModeled/Command/CreateTrade';
+import { InvestorAccountId } from 'Investments/Domain/TransactionModeled/Commons/InvestorAccountId';
+import { PortfolioId } from 'Investments/Domain/TransactionModeled/Commons/PortfolioId';
+import { TransactionCreated } from 'Investments/Domain/TransactionModeled/Events/TransactionCreated';
+import { InitializedTransaction } from 'Investments/Domain/TransactionModeled/States/InitializedTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
+import { Money } from 'Money/Money';
+
 context('Given the transaction was initialized', () => {
   const transactionId = new TransactionId('123456');
   const transaction = new InitializedTransaction(transactionId);
 
   describe('When the system starts the investment process', () => {
     const investorAccountId = new InvestorAccountId('123456');
-    const amountToInvest = new Money(1000.0);
+    const amountToInvest = new Money(100000);
     const portfolioId = new PortfolioId('1');
     const theSameButCreatedSomewhereElseTransactionId = new TransactionId('123456');
 

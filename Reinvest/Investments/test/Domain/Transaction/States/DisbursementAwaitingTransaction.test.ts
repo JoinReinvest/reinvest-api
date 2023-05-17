@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { IssueShares } from 'Reinvest/Investments/src/Domain/Command/IssueShares';
-import { TradeDisbursed } from 'Reinvest/Investments/src/Domain/Events/TradeDisbursed';
-import { DisbursementAwaitingTransaction } from 'Reinvest/Investments/src/Domain/States/DisbursementAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
+import { IssueShares } from 'Investments/Domain/TransactionModeled/Command/IssueShares';
+import { TradeDisbursed } from 'Investments/Domain/TransactionModeled/Events/TradeDisbursed';
+import { DisbursementAwaitingTransaction } from 'Investments/Domain/TransactionModeled/States/DisbursementAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
 
 context('Given the verification success and grace period ended and awaiting for trade disbursement', () => {
   const transactionId = new TransactionId('123456');

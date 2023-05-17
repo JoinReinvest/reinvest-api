@@ -1,15 +1,15 @@
 import { expect } from 'chai';
-import { DoNothing } from 'Reinvest/Investments/src/Domain/Command/DoNothing';
-import { UnwindTrade } from 'Reinvest/Investments/src/Domain/Command/UnwindTrade';
-import { VerifyInvestor } from 'Reinvest/Investments/src/Domain/Command/VerifyInvestor';
-import { FailedPayment } from 'Reinvest/Investments/src/Domain/Events/FailedPayment';
-import { FundsTransferInitialized } from 'Reinvest/Investments/src/Domain/Events/FundsTransferInitialized';
-import { SuccessfulPayment } from 'Reinvest/Investments/src/Domain/Events/SuccessfulPayment';
-import { PaymentAwaitingTransaction } from 'Reinvest/Investments/src/Domain/States/PaymentAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { FailureCompletionReason } from 'Reinvest/Investments/src/Domain/ValueObject/FailureCompletionReason';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
+import { DoNothing } from 'Investments/Domain/TransactionModeled/Command/DoNothing';
+import { UnwindTrade } from 'Investments/Domain/TransactionModeled/Command/UnwindTrade';
+import { VerifyInvestor } from 'Investments/Domain/TransactionModeled/Command/VerifyInvestor';
+import { FailedPayment } from 'Investments/Domain/TransactionModeled/Events/FailedPayment';
+import { FundsTransferInitialized } from 'Investments/Domain/TransactionModeled/Events/FundsTransferInitialized';
+import { SuccessfulPayment } from 'Investments/Domain/TransactionModeled/Events/SuccessfulPayment';
+import { PaymentAwaitingTransaction } from 'Investments/Domain/TransactionModeled/States/PaymentAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { FailureCompletionReason } from 'Investments/Domain/TransactionModeled/ValueObject/FailureCompletionReason';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
 
 context('Given the funds transfer was initiated and awaiting for payment', () => {
   const transactionId = new TransactionId('123456');

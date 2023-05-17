@@ -1,14 +1,14 @@
 import { expect } from 'chai';
-import { SharesId } from 'Reinvest/Investments/src/Commons/SharesId';
-import { DoNothing } from 'Reinvest/Investments/src/Domain/Command/DoNothing';
-import { WaitForAdminManualAction } from 'Reinvest/Investments/src/Domain/Command/WaitForAdminManualAction';
-import { SharesIssuanceFailed } from 'Reinvest/Investments/src/Domain/Events/SharesIssuanceFailed';
-import { SharesWereIssued } from 'Reinvest/Investments/src/Domain/Events/SharesWereIssued';
-import { SharesIssuanceAwaitingTransaction } from 'Reinvest/Investments/src/Domain/States/SharesIssuanceAwaitingTransaction';
-import { TransactionDecision } from 'Reinvest/Investments/src/Domain/TransactionDecision';
-import { ManualActionReason } from 'Reinvest/Investments/src/Domain/ValueObject/ManualActionReason';
-import { TransactionId } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionId';
-import { TransactionState } from 'Reinvest/Investments/src/Domain/ValueObject/TransactionState';
+import { DoNothing } from 'Investments/Domain/TransactionModeled/Command/DoNothing';
+import { WaitForAdminManualAction } from 'Investments/Domain/TransactionModeled/Command/WaitForAdminManualAction';
+import { SharesId } from 'Investments/Domain/TransactionModeled/Commons/SharesId';
+import { SharesIssuanceFailed } from 'Investments/Domain/TransactionModeled/Events/SharesIssuanceFailed';
+import { SharesWereIssued } from 'Investments/Domain/TransactionModeled/Events/SharesWereIssued';
+import { SharesIssuanceAwaitingTransaction } from 'Investments/Domain/TransactionModeled/States/SharesIssuanceAwaitingTransaction';
+import { TransactionDecision } from 'Investments/Domain/TransactionModeled/TransactionDecision';
+import { ManualActionReason } from 'Investments/Domain/TransactionModeled/ValueObject/ManualActionReason';
+import { TransactionId } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionId';
+import { TransactionState } from 'Investments/Domain/TransactionModeled/ValueObject/TransactionState';
 
 context('Given the trade was disbursed and awaiting for shares issuance', () => {
   const transactionId = new TransactionId('123456');
