@@ -38,4 +38,17 @@ export class AutomaticDividendReinvestmentAgreement implements AccountConfigurat
   isTheSameValue(value: boolean): boolean {
     return this.configValueJson.value === value;
   }
+
+  transformIntoConfigurationObject() {
+    switch (this.configType) {
+      case ConfigurationTypes.AUTOMATIC_DIVIDEND_REINVESTMENT_OPT_IN_OUT: {
+        return {
+          automaticDividendReinvestmentAgreement: {
+            signed: this.configValueJson.value,
+            date: this.dateCreated,
+          },
+        };
+      }
+    }
+  }
 }

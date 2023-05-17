@@ -1,4 +1,4 @@
-import { SessionContext } from 'ApiGateway/index';
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { InvestmentAccounts } from 'Reinvest/InvestmentAccounts/src';
 
 const schema = `
@@ -27,24 +27,34 @@ const schema = `
     }
 `;
 
-const accountConfigurationMock = {
-  automaticDividendReinvestmentAgreement: {
-    signed: false,
-  },
+type GetAccountConfiguration = {
+  accountId: string;
+};
+
+type SetAutomaticDividendReinvestmentAgreement = {
+  accountId: string;
+  automaticDividendReinvestmentAgreement: boolean;
 };
 
 export const Configuration = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      getAccountConfiguration: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return accountConfigurationMock;
+      getAccountConfiguration: async (parent: any, { accountId }: GetAccountConfiguration, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
+        const configuration = await investmentAccountsApi.getConfiguration(profileId, accountId);
+
+        if (!configuration) {
+          throw new JsonGraphQLError('CONFIGURATION_NOT_FOUND');
+        }
+
+        return configuration;
       },
     },
     Mutation: {
       setAutomaticDividendReinvestmentAgreement: async (
         parent: any,
-        { accountId, automaticDividendReinvestmentAgreement }: any,
+        { accountId, automaticDividendReinvestmentAgreement }: SetAutomaticDividendReinvestmentAgreement,
         { profileId, modules }: SessionContext,
       ) => {
         const investmentAccountsApi = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
