@@ -1,3 +1,1 @@
-// export * as migration_20230215143410 from './investment_accounts_1_create_profile_aggregate';
-
-export default {};
+export * as migration_20230517094420 from './investments_1_create_investment';
