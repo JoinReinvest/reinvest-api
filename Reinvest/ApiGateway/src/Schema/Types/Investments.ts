@@ -1,6 +1,7 @@
 import { SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
 import { Money } from 'Money/Money';
+import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
 
 const schema = `
     #graphql
@@ -204,10 +205,13 @@ export const Investments = {
     },
     Mutation: {
       createInvestment: async (parent: any, { accountId, amount }: any, { profileId, modules }: SessionContext) => {
-        const money = new Money(amount.value);
-        console.log('money', money.getFormattedAmount());
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
 
-        return investmentIdMock;
+        const money = new Money(amount.value).getAmount();
+
+        const investmentId = investmentAccountsApi.createInvestment(profileId, accountId, money);
+
+        return investmentId;
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
         if (!approveFees) {
