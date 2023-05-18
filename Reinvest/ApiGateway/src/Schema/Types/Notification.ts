@@ -101,7 +101,7 @@ export const notificationsMock = (accountId: string, isRead: boolean = false, pa
       },
     },
     {
-      id: '98c9eb8f-4d51-486c-9e00-506c65a4b3c9',
+      id: '02ff8981-ebc5-42e5-ab36-a71cc3f27b72',
       notificationType: 'INVESTMENT_FAILED',
       header: 'Investment Failed',
       body: "Your recent investment {{3009334}} failed. We'll try to process payment again over the next few days. To process investment., you may need to update your billing details",
