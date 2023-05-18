@@ -12,3 +12,13 @@ export enum ScheduledBy {
   DIRECT = 'DIRECT',
   SCHEDULER = 'SCHEDULER',
 }
+
+export enum AgreementTypes {
+  DIRECT_DEPOSIT = 'DIRECT_DEPOSIT',
+  RECURRING_INVESTMENT = 'RECURRING_INVESTMENT',
+}
+
+export enum SubscriptionAgreementStatus {
+  WAITING_FOR_SIGNATURE = 'WAITING_FOR_SIGNATURE',
+  SIGNED = 'SIGNED',
+}

@@ -228,7 +228,11 @@ export const Investments = {
       approveFees: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;
       },
-      createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
+      createSubscriptionAgreement: async (parent: any, { investmentId, accountId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+
+        const subscriptionAgreement = investmentAccountsApi.createSubscriptionAgreement(profileId, accountId, investmentId);
+
         return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
       },
       signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
