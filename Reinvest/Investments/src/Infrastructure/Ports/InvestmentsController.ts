@@ -1,3 +1,6 @@
+import { Money } from 'Money/Money';
+import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments';
+
 import CreateInvestment from '../UseCases/CreateInvestment';
 
 export class InvestmentsController {
@@ -9,7 +12,9 @@ export class InvestmentsController {
 
   public static getClassName = (): string => 'InvestmentsController';
 
-  public async createInvestment(profileId: string, accountId: string, money: number) {
-    return this.createInvestmentUseCase.execute(profileId, accountId, money);
+  public async createInvestment(profileId: string, accountId: string, money: USDInput) {
+    const amount = new Money(money.value).getAmount();
+
+    return this.createInvestmentUseCase.execute(profileId, accountId, amount);
   }
 }

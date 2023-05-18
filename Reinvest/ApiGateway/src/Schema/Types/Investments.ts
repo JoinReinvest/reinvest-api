@@ -1,6 +1,5 @@
 import { SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
-import { Money } from 'Money/Money';
 import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
 
 const schema = `
@@ -192,6 +191,15 @@ export const subscriptionAgreementMock = (parentId: string, type: string) => ({
   ],
 });
 
+export type USDInput = {
+  value: number;
+};
+
+export type CreateInvestment = {
+  accountId: string;
+  amount: USDInput;
+};
+
 export const Investments = {
   typeDefs: schema,
   resolvers: {
@@ -204,12 +212,9 @@ export const Investments = {
       },
     },
     Mutation: {
-      createInvestment: async (parent: any, { accountId, amount }: any, { profileId, modules }: SessionContext) => {
+      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
-
-        const money = new Money(amount.value).getAmount();
-
-        const investmentId = investmentAccountsApi.createInvestment(profileId, accountId, money);
+        const investmentId = investmentAccountsApi.createInvestment(profileId, accountId, amount);
 
         return investmentId;
       },
