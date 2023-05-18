@@ -28,7 +28,11 @@ export type CreateTradeDecision = TransactionDecision & {
   data: {
     accountId: string;
     amount: number;
+    bankAccountId: string;
     fees: number;
+    ip: string;
+    portfolioId: string;
+    subscriptionAgreementId: string;
   };
   kind: TransactionDecisions.CREATE_TRADE;
 };

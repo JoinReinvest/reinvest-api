@@ -43,7 +43,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
   }
 
   makeDecision(): TransactionDecision {
-    const { lastEvent, amount, fees, accountId } = this.eventsAnalysis();
+    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId } = this.eventsAnalysis();
 
     if (!lastEvent || !this.profileId) {
       return this.decide(TransactionDecisions.AWAITING_INVESTMENT);
@@ -55,45 +55,20 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
       case TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT:
         return this.decide(TransactionDecisions.FINALIZE_INVESTMENT);
       case TransactionEvents.INVESTMENT_FINALIZED:
-        return this.decide(TransactionDecisions.CREATE_TRADE, { accountId, amount, fees });
+        return this.decide(TransactionDecisions.CREATE_TRADE, {
+          accountId,
+          amount,
+          fees,
+          ip,
+          bankAccountId,
+          subscriptionAgreementId,
+          portfolioId,
+        });
       default:
         break;
     }
 
     throw new Error(`Invalid process manager state for investment ${this.investmentId}`);
-  }
-
-  private eventsAnalysis(): {
-    accountId: string | null;
-    amount: number | null;
-    fees: number | null;
-    lastEvent: TransactionEvent | null;
-    subscriptionAgreementId: string | null;
-  } {
-    let amount = null;
-    let fees = null;
-    let subscriptionAgreementId = null;
-    let lastEvent = null;
-    let accountId = null;
-
-    for (const event of this.events) {
-      lastEvent = event;
-      switch (event.kind) {
-        case TransactionEvents.INVESTMENT_CREATED:
-          subscriptionAgreementId = event.data.subscriptionAgreementId;
-          accountId = event.data.accountId;
-          this.profileId = event.data.profileId;
-          break;
-        case TransactionEvents.INVESTMENT_FINALIZED:
-          amount = event.data.amount;
-          fees = event.data.fees;
-          break;
-        default:
-          break;
-      }
-    }
-
-    return { accountId, lastEvent, amount, fees, subscriptionAgreementId };
   }
 
   private decide(decision: TransactionDecisions, data: unknown = {}): TransactionDecision {
@@ -129,5 +104,47 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     }
 
     return lastEvent.kind !== kind;
+  }
+
+  private eventsAnalysis(): {
+    accountId: string | null;
+    amount: number | null;
+    bankAccount: string | null;
+    fees: number | null;
+    ip: string | null;
+    lastEvent: TransactionEvent | null;
+    portfolioId: string | null;
+    subscriptionAgreementId: string | null;
+  } {
+    let amount = null;
+    let fees = null;
+    let subscriptionAgreementId = null;
+    let lastEvent = null;
+    let accountId = null;
+    let ip = null;
+    let bankAccountId = null;
+    let portfolioId = null;
+
+    for (const event of this.events) {
+      lastEvent = event;
+      switch (event.kind) {
+        case TransactionEvents.INVESTMENT_CREATED:
+          accountId = event.data.accountId;
+          this.profileId = event.data.profileId;
+          break;
+        case TransactionEvents.INVESTMENT_FINALIZED:
+          amount = event.data.amount;
+          fees = event.data.fees;
+          ip = event.data.ip;
+          bankAccountId = event.data.bankAccountId;
+          subscriptionAgreementId = event.data.subscriptionAgreementId;
+          portfolioId = event.data.portfolioId;
+          break;
+        default:
+          break;
+      }
+    }
+
+    return { accountId, lastEvent, amount, fees, subscriptionAgreementId, ip, bankAccountId, portfolioId };
   }
 }

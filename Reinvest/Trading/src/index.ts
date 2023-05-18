@@ -4,6 +4,7 @@ import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { TradingDatabaseAdapterInstanceProvider, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { NorthCapitalConfig } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
+import { VertaloConfig } from 'Trading/Adapter/Vertalo/ExecutionVertaloAdapter';
 import { TradingApi, TradingApiType } from 'Trading/Port/Api/TradingApiType';
 import { TradingTechnicalHandler, TradingTechnicalHandlerType } from 'Trading/Port/Queue/TradingTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Trading/Providers/AdapterServiceProvider';
@@ -19,6 +20,7 @@ export namespace Trading {
     database: PostgreSQLConfig;
     northCapital: NorthCapitalConfig;
     queue: QueueConfig;
+    vertalo: VertaloConfig;
   };
 
   export type ApiType = TradingApiType & Api;

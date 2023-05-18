@@ -14,15 +14,22 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
   static getClassName = (): string => 'CreateTradeHandler';
 
   public async handle(event: DomainEvent): Promise<void> {
-    console.log('yep, I am in the trading module');
-    // if (event.kind !== 'VerifyAccountForInvestment') {
-    //   return;
-    // }
-    //
-    // const profileId = event.data.profileId;
-    // const accountId = event.data.accountId;
-    // const decision = await this.verifyAccountUseCase.verify(profileId, accountId);
-    //
+    if (event.kind !== 'CreateTrade') {
+      return;
+    }
+
+    const tradeConfiguration = {
+      accountId: event.data.accountId,
+      profileId: event.data.profileId,
+      amount: event.data.amount,
+      fees: event.data.fees,
+      ip: event.data.ip,
+      investmentId: event.id,
+      bankAccountId: event.data.bankAccountId,
+      subscriptionAgreementId: event.data.subscriptionAgreementId,
+      portfolioId: event.data.portfolioId,
+    };
+    await this.createTradeUseCase.createTrade(tradeConfiguration);
     // if (decision.canUserContinueTheInvestment) {
     //   await this.eventBus.publish({
     //     kind: 'AccountVerifiedForInvestment',
@@ -31,6 +38,5 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
     //     },
     //     id: event.id,
     //   });
-    // }
   }
 }

@@ -28,5 +28,10 @@ export const createTrade = (decision: CreateTradeDecision): DomainEvent => ({
     accountId: decision.data.accountId,
     amount: decision.data.amount,
     fees: decision.data.fees,
+    ip: decision.data.ip,
+    profileId: decision.profileId,
+    bankAccountId: decision.data.bankAccountId,
+    subscriptionAgreementId: decision.data.subscriptionAgreementId,
+    portfolioId: decision.data.portfolioId,
   },
 });

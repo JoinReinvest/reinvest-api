@@ -129,6 +129,7 @@ export function boot(): Modules {
       database: databaseConfig,
       queue: queueConfig,
       northCapital: northCapitalConfig,
+      vertalo: vertaloConfig,
     } as Trading.Config),
   );
 

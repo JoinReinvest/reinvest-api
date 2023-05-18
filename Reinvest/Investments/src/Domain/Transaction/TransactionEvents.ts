@@ -17,7 +17,6 @@ export type InvestmentCreated = TransactionEvent & {
   data: {
     accountId: string;
     profileId: string;
-    subscriptionAgreementId: string;
   };
   kind: TransactionEvents.INVESTMENT_CREATED;
 };
@@ -32,7 +31,11 @@ export type AccountVerifiedForInvestment = TransactionEvent & {
 export type InvestmentFinalized = TransactionEvent & {
   data: {
     amount: number;
+    bankAccountId: string;
     fees: number;
+    ip: string;
+    portfolioId: string;
+    subscriptionAgreementId: string;
   };
   kind: TransactionEvents.INVESTMENT_FINALIZED;
 };

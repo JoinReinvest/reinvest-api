@@ -3,7 +3,11 @@ import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { createTradingDatabaseAdapterProvider, TradingDatabaseAdapterInstanceProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
+import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
+import { DocumentService } from 'Trading/Adapter/Module/DocumentService';
+import { RegistrationService } from 'Trading/Adapter/Module/RegistrationService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
+import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { Trading } from 'Trading/index';
 
 export class AdapterServiceProvider {
@@ -20,9 +24,17 @@ export class AdapterServiceProvider {
       .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
 
     // db
-    container.addAsValue(TradingDatabaseAdapterInstanceProvider, createTradingDatabaseAdapterProvider(this.config.database));
+    container
+      .addAsValue(TradingDatabaseAdapterInstanceProvider, createTradingDatabaseAdapterProvider(this.config.database))
+      .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider]);
+
+    // modules
+    container.addSingleton(RegistrationService).addSingleton(DocumentService);
 
     // north capital
     container.addAsValue('NorthCapitalConfig', this.config.northCapital).addSingleton(TradingNorthCapitalAdapter, ['NorthCapitalConfig']);
+
+    // vertalo
+    container.addAsValue('VertaloConfig', this.config.vertalo).addSingleton(TradingVertaloAdapter, ['VertaloConfig']);
   }
 }
