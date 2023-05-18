@@ -1,4 +1,4 @@
-import { SessionContext } from 'ApiGateway/index';
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
 import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
 
@@ -50,7 +50,7 @@ const schema = `
         It returns the content of the agreement that must be rendered on the client side.
         Client must sign the agreement and call signSubscriptionAgreement mutation.
         """
-        createSubscriptionAgreement(investmentId: ID!): SubscriptionAgreement!
+        createSubscriptionAgreement(investmentId: ID!, accountId: ID!): SubscriptionAgreement!
 
         """
         [MOCK] It signs the subscription agreement.
@@ -231,9 +231,13 @@ export const Investments = {
       createSubscriptionAgreement: async (parent: any, { investmentId, accountId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
 
-        const subscriptionAgreement = investmentAccountsApi.createSubscriptionAgreement(profileId, accountId, investmentId);
+        const subscriptionAgreement = await investmentAccountsApi.createSubscriptionAgreement(profileId, accountId, investmentId);
 
-        return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
+        if (!subscriptionAgreement) {
+          throw new JsonGraphQLError('COULDNT_CREATE_SUBSCRIPTION');
+        }
+
+        return subscriptionAgreement;
       },
       signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;

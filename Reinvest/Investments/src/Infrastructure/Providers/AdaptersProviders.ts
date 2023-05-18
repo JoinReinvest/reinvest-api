@@ -10,6 +10,8 @@ import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
+import { SubscriptionAgreementRepository } from '../Adapters/Repository/SubscriptionAgreementRepository';
+
 export default class AdaptersProviders {
   private config: Investments.Config;
 
@@ -27,6 +29,7 @@ export default class AdaptersProviders {
     container
       .addAsValue(InvestmentsDatabaseAdapterInstanceProvider, createInvestmentsDatabaseAdapterProvider(this.config.database))
       .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider])
-      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
+      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
   }
 }

@@ -66,7 +66,7 @@ export class SubscriptionAgreementRepository {
       .where('investmentId', '=', investmentId)
       .executeTakeFirst();
 
-    if (!subscriptionAgreement) return false;
+    if (!subscriptionAgreement) return null;
 
     return SubscriptionAgreement.create(subscriptionAgreement);
   }

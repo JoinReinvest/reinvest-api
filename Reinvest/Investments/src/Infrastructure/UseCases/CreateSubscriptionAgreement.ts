@@ -40,7 +40,7 @@ class CreateSubscriptionAgreement {
       return false;
     }
 
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, accountId, id);
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, accountId, investmentId);
 
     if (!subscriptionAgreement) {
       return false;
@@ -48,6 +48,7 @@ class CreateSubscriptionAgreement {
 
     return {
       id: subscriptionAgreement.id,
+      type: subscriptionAgreement.agreementType,
       status: subscriptionAgreement.status,
       createdAt: subscriptionAgreement.dateCreated,
       signedAt: subscriptionAgreement.signedAt,

@@ -1,7 +1,6 @@
 import { InvestmentsDatabaseAdapterProvider, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 
 import type { InvestmentCreate } from '../../UseCases/CreateInvestment';
-import { ScheduledBy, Statuses } from '../PostgreSQL/InvestmentsTypes';
 
 export class InvestmentsRepository {
   public static getClassName = (): string => 'InvestmentsRepository';
