@@ -9,7 +9,5 @@ export default class UseCaseProviders {
     this.config = config;
   }
 
-  public boot(container: ContainerInterface) {
-    console.log('Use case providers boot');
-  }
+  public boot(container: ContainerInterface) {}
 }

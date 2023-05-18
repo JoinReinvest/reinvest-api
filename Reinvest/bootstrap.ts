@@ -24,6 +24,7 @@ import { Identity } from 'Reinvest/Identity/src';
 import Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
+import { Trading } from 'Trading/index';
 import { Verification } from 'Verification/index';
 
 console = logger(SENTRY_CONFIG);
@@ -106,6 +107,7 @@ export function boot(): Modules {
       {
         database: databaseConfig,
         northCapital: northCapitalConfig,
+        queue: queueConfig,
       } as Verification.Config,
       {
         registration: modules.get(Registration.moduleName) as Registration.Main,
@@ -119,6 +121,15 @@ export function boot(): Modules {
       database: databaseConfig,
       queue: queueConfig,
     } as Investments.Config),
+  );
+
+  modules.register(
+    Trading.moduleName,
+    Trading.create({
+      database: databaseConfig,
+      queue: queueConfig,
+      northCapital: northCapitalConfig,
+    } as Trading.Config),
   );
 
   return modules;

@@ -23,7 +23,8 @@
       "Identity/*": ["./Reinvest/Identity/src/*"],
       "Investments/*": ["./Reinvest/Investments/src/*"],
       "Registration/*": ["./Reinvest/Registration/src/*"],
-      "Verification/*": ["./Reinvest/Verification/src/*"]
+      "Verification/*": ["./Reinvest/Verification/src/*"],
+      "Trading/*": ["./Reinvest/Trading/src/*"]
     }
   },
   "include": [

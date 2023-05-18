@@ -1,17 +1,49 @@
 @startuml
 
-participant "GraphQL" as GL
-participant "DB" as DB
+participant "User" as U
+participant "Process Manager" as PM
 participant "Queue" as Q
-participant "Module" as M
-participant "North Capital" as NC
 
-opt Create trade
-GL -> DB: createInvestment($100)
-DB -> Q: investmentCreated($100)
-Q -> M: Trading
-M -> NC:
+opt Investment Process
+U -> PM: investment_created
+PM -> Q: verify_account
+opt verified
+ Q -> PM: account_verified
+ PM -> Q: FinalizeInvestment
+ Q -> PM: investment_finalized(amount: $100, fee: $10)
+ PM -> Q: TransferMoney(amount: $100, fee: $10))
+    opt success
+     Q -> PM: money_transfer_initiated
+     PM -> Q: CheckIsMoneyTransferCompleted
+     opt completed
+      Q -> PM: money_transfer_completed
+      PM -> Q: VerifyInvestment
+      opt verified
+        Q -> PM: investment_verified
+        PM -> Q: CheckIsGracePeriodEnded
+        Q -> PM: grace_period_ended
+        PM -> Q: MarkInvestmentAsReadyToDisburse
+        Q -> PM: investment_disbursed
+        PM -> Q: TransferShares
+        Q -> PM: shares_transferred
+        PM -> Q: MarkInvestmentAsCompleted
+      end
+      opt failure
+       Q -> PM: investment_rejected_by_principle
+      end
+     end
+     opt failure
+      Q -> PM: money_transfer_failed
+     end
+    end
+    opt failure
+     Q -> PM: money_transfer_initiation_failed
+    end
 
+end
+opt aborted by user
+U -> PM: investment_aborted
+end
 end
 
 @enduml

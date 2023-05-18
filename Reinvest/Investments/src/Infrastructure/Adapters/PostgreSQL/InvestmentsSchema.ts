@@ -1,3 +1,6 @@
+import { JSONObject } from 'HKEKTypes/Generics';
+import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+
 export interface InvestmentsTable {
   accountId: string;
   amount: number;
@@ -17,4 +20,12 @@ export interface InvestmentsTable {
     | 'FAILED'
     | 'FINISHED';
   subscriptionAgreementId: string | null;
+}
+
+export interface TransactionEventsTable {
+  dateCreated: Date;
+  eventKind: TransactionEvents;
+  eventStateJson: JSONObject;
+  id: string;
+  investmentId: string;
 }

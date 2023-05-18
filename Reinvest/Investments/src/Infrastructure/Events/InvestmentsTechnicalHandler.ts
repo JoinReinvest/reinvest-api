@@ -1,11 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
+import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 
 export type InvestmentsTechnicalHandlerType = {
-  ProfileCreated: () => void;
+  AccountVerifiedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
-  ProfileCreated: (): void => {
-    console.log('profile created testss - investment accounts');
-  },
+  AccountVerifiedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
 });
