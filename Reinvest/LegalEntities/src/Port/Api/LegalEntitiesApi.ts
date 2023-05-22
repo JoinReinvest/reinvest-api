@@ -23,6 +23,7 @@ export type LegalEntitiesApiType = {
   getProfileForSynchronization: GetProfileController['getProfileForSynchronization'];
   getStakeholderForSynchronization: ReadAccountController['getStakeholderForSynchronization'];
   listDrafts: DraftAccountsController['listDrafts'];
+  mapAccountIdToParentAccountIdIfRequired: ReadAccountController['mapAccountIdToParentAccountIdIfRequired'];
   openBeneficiaryAccount: BeneficiaryAccountController['openBeneficiaryAccount'];
   readBeneficiaryAccount: ReadAccountController['readBeneficiaryAccount'];
   readDraft: DraftAccountsController['readDraft'];
@@ -46,7 +47,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   completeIndividualDraftAccount: container.delegateTo(DraftAccountsController, 'completeIndividualDraftAccount'),
   completeCompanyDraftAccount: container.delegateTo(DraftAccountsController, 'completeCompanyDraftAccount'),
   transformDraftAccountIntoRegularAccount: container.delegateTo(DraftAccountsController, 'transformDraftAccountIntoRegularAccount'),
-
+  mapAccountIdToParentAccountIdIfRequired: container.delegateTo(ReadAccountController, 'mapAccountIdToParentAccountIdIfRequired'),
   getIndividualAccount: container.delegateTo(ReadAccountController, 'getIndividualAccount'),
   getIndividualAccountForSynchronization: container.delegateTo(ReadAccountController, 'getIndividualAccountForSynchronization'),
   getCompanyAccountForSynchronization: container.delegateTo(ReadAccountController, 'getCompanyAccountForSynchronization'),

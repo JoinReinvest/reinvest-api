@@ -1,4 +1,5 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { mapAccountIdToParentAccountIdIfRequired } from 'ApiGateway/Schema/Types/Account';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
 import type { UpdateCompanyForVerificationInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateCompanyForVerification';
@@ -115,9 +116,10 @@ export const VerificationSchema = {
         },
         { profileId, modules }: SessionContext,
       ) => {
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const api = modules.getApi<Verification.ApiType>(Verification);
 
-        return api.verifyAccount(profileId, accountId);
+        return api.verifyAccount(profileId, individualAccountId);
       },
       updateProfileForVerification: async (
         parent: any,
