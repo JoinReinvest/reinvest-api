@@ -6,7 +6,7 @@ type Template = {
   header?: string;
 }[];
 
-type DynamicType = { [key: string]: string };
+export type DynamicType = { [key: string]: string };
 
 class TemplateParser {
   private template: Template;
@@ -15,7 +15,7 @@ class TemplateParser {
     this.template = template;
   }
 
-  replace(str: string, data: DynamicType) {
+  private replace(str: string, data: DynamicType) {
     let copyStr = str;
 
     for (const property in data) {
@@ -30,7 +30,7 @@ class TemplateParser {
     return copyStr;
   }
 
-  prepareLines(lines: string[], data: DynamicType) {
+  private prepareLines(lines: string[], data: DynamicType) {
     const replacedLines = lines.map(line => this.replace(line, data));
 
     return {
@@ -39,10 +39,15 @@ class TemplateParser {
   }
 
   parse(data: DynamicType): Template {
-    const template = this.template.map(({ paragraphs }) => {
+    const template = this.template.map(({ paragraphs, header }) => {
+      let updatedHeader = undefined;
       const updatedParagraphs = paragraphs.map(({ lines }) => this.prepareLines(lines, data));
 
-      return { paragraphs: updatedParagraphs };
+      if (header) {
+        updatedHeader = this.replace(header, data);
+      }
+
+      return { header: updatedHeader, paragraphs: updatedParagraphs };
     });
 
     return template;

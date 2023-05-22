@@ -1,7 +1,7 @@
 import { JSONObject } from 'HKEKTypes/Generics';
 
+import { AgreementTypes, SubscriptionAgreementStatus } from '../../Domain/Investments/Types';
 import { SubscriptionAgreementTable } from '../Adapters/PostgreSQL/InvestmentsSchema';
-import { AgreementTypes, SubscriptionAgreementStatus } from '../Adapters/PostgreSQL/InvestmentsTypes';
 
 export class SubscriptionAgreement {
   accountId: string;

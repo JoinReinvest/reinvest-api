@@ -13,8 +13,8 @@ export class SubscriptionAgreementRepository {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 
-  async create(subscription: SubscriptionAgreementCreate) {
-    const { id, accountId, profileId, investmentId, status, agreementType } = subscription;
+  async create(subscription: SubscriptionAgreementCreate): Promise<boolean> {
+    const { id, accountId, profileId, investmentId, status, contentFieldsJson, templateVersion, agreementType } = subscription;
     try {
       await this.databaseAdapterProvider
         .provide()
@@ -30,8 +30,8 @@ export class SubscriptionAgreementRepository {
           signedAt: null,
           signedByIP: null,
           pdfDateCreated: null,
-          templateVersion: 1,
-          contentFieldsJson: <JSONObject>{ value: 'value' },
+          templateVersion,
+          contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
         })
         .execute();
 
@@ -43,7 +43,7 @@ export class SubscriptionAgreementRepository {
     }
   }
 
-  async getSubscriptionAgreement(profileId: string, accountId: string, investmentId: string) {
+  async getSubscriptionAgreement(profileId: string, subscriptionAgreementId: string) {
     const subscriptionAgreement = await this.databaseAdapterProvider
       .provide()
       .selectFrom(subscriptionAgreementTable)
@@ -61,9 +61,8 @@ export class SubscriptionAgreementRepository {
         'templateVersion',
         'contentFieldsJson',
       ])
-      .where('accountId', '=', accountId)
+      .where('id', '=', subscriptionAgreementId)
       .where('profileId', '=', profileId)
-      .where('investmentId', '=', investmentId)
       .executeTakeFirst();
 
     if (!subscriptionAgreement) return null;
