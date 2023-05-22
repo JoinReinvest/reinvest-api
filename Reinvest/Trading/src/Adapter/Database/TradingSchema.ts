@@ -1,12 +1,12 @@
 import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
-import { TradeConfiguration, VendorIdsConfiguration } from 'Trading/Domain/Trade';
+import { FundsMoveState, NorthCapitalTradeState, TradeConfiguration, VendorsConfiguration, VertaloDistributionState } from 'Trading/Domain/Trade';
 
 export interface TradesTable {
-  fundsMoveStateJson: JSONObject | null;
+  fundsMoveStateJson: JSONObjectOf<FundsMoveState> | null;
   investmentId: string;
-  northCapitalTradeStateJson: JSONObject | null;
+  northCapitalTradeStateJson: JSONObjectOf<NorthCapitalTradeState> | null;
   subscriptionAgreementStateJson: JSONObject | null;
   tradeConfigurationJson: JSONObjectOf<TradeConfiguration>;
-  vendorIdsJson: JSONObjectOf<VendorIdsConfiguration> | null;
-  vertaloDistributionStateJson: JSONObject | null;
+  vendorsConfigurationJson: JSONObjectOf<VendorsConfiguration> | null;
+  vertaloDistributionStateJson: JSONObjectOf<VertaloDistributionState> | null;
 }

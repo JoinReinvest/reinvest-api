@@ -29,10 +29,34 @@ export class CreateTrade {
   static getClassName = () => 'CreateTrade';
 
   async createTrade(tradeConfiguration: TradeConfiguration) {
-    const trade = await this.tradesRepository.getOrCreateTradeByInvestmentId(tradeConfiguration.investmentId, tradeConfiguration);
+    const trade = await this.tradesRepository.getOrCreateTradeByInvestmentId(tradeConfiguration);
 
-    const { accountId, portfolioId, bankAccountId } = tradeConfiguration;
-    console.log('yep, I am in the create trade use case');
-    const mappingIds = await this.registrationService.mapInternalIdsToVendorIds(portfolioId, bankAccountId, accountId);
+    if (!trade.isVendorsConfigurationSet()) {
+      const { accountId, portfolioId, bankAccountId } = trade.getInternalIds();
+      const vendorsConfiguration = await this.registrationService.getVendorsConfiguration(portfolioId, bankAccountId, accountId);
+      trade.setVendorsConfiguration(vendorsConfiguration);
+      await this.tradesRepository.updateTrade(trade);
+    }
+
+    if (!trade.isTradeCreated()) {
+      const { offeringId, shares, ip, northCapitalAccountId } = trade.getNorthCapitalTradeConfiguration();
+      const northCapitalTrade = await this.northCapitalAdapter.createTrade(offeringId, northCapitalAccountId, shares, ip);
+      trade.setTradeState(northCapitalTrade);
+      await this.tradesRepository.updateTrade(trade);
+    }
+
+    if (!trade.isVertaloDistributionCreated()) {
+      const { allocationId, investorEmail, numberOfShares } = trade.getVertaloDistributionConfiguration();
+      const vertaloDistribution = await this.vertaloAdapter.createDistribution(allocationId, investorEmail, numberOfShares);
+      trade.setVertaloDistributionState(vertaloDistribution);
+      await this.tradesRepository.updateTrade(trade);
+    }
+
+    if (!trade.isFundsTransferCreated()) {
+      const { accountId, offeringId, tradeId, bankName, amount, ip, investmentId } = trade.getFundsTransferConfiguration();
+      const fundsTransfer = await this.northCapitalAdapter.createFundsTransfer(investmentId, accountId, offeringId, tradeId, bankName, amount, ip);
+      trade.setFundsTransferState(fundsTransfer);
+      await this.tradesRepository.updateTrade(trade);
+    }
   }
 }

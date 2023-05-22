@@ -8,7 +8,7 @@ export async function up(db: Kysely<TradingDatabase>): Promise<void> {
     .addColumn('investmentId', 'uuid', col => col.primaryKey())
     .addColumn('createdDate', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .addColumn('tradeConfigurationJson', 'json', col => col.notNull())
-    .addColumn('vendorIdsJson', 'json', col => col.defaultTo(null))
+    .addColumn('vendorsConfigurationJson', 'json', col => col.defaultTo(null))
     .addColumn('northCapitalTradeStateJson', 'json', col => col.defaultTo(null))
     .addColumn('vertaloDistributionStateJson', 'json', col => col.defaultTo(null))
     .addColumn('subscriptionAgreementStateJson', 'json', col => col.defaultTo(null))
