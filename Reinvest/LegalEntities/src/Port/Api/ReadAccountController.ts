@@ -77,13 +77,6 @@ export type BeneficiaryAccountResponse = {
   label?: string;
 };
 
-export type AccountsOverviewResponse = {
-  avatar: AvatarOutput;
-  id: string;
-  label: string;
-  type: AccountType;
-};
-
 export class ReadAccountController {
   private accountRepository: AccountRepository;
   private avatarQuery: AvatarQuery;
@@ -248,4 +241,21 @@ export class ReadAccountController {
       return null;
     }
   }
+
+  public async mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string): Promise<string> {
+    const account = await this.beneficiaryRepository.findBeneficiary(profileId, accountId);
+
+    if (account === null) {
+      return accountId;
+    }
+
+    return account.getParentAccountId();
+  }
 }
+
+export type AccountsOverviewResponse = {
+  avatar: AvatarOutput;
+  id: string;
+  label: string;
+  type: AccountType;
+};

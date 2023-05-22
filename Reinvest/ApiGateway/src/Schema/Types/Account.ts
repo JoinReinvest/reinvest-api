@@ -2,6 +2,7 @@ import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
+import Modules from 'Reinvest/Modules';
 
 const schema = `
     #graphql
@@ -214,6 +215,12 @@ const schema = `
     }
 `;
 
+export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
+  const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+  return api.mapAccountIdToParentAccountIdIfRequired(profileId, accountId);
+}
+
 export const Account = {
   typeDefs: schema,
   resolvers: {
@@ -266,8 +273,9 @@ export const Account = {
         });
       },
       readBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const api = modules.getApi<Registration.ApiType>(Registration);
-        const bankAccount = await api.readBankAccount(profileId, accountId);
+        const bankAccount = await api.readBankAccount(profileId, individualAccountId);
 
         if (!bankAccount) {
           throw new GraphQLError('Bank account not exists');
@@ -305,8 +313,9 @@ export const Account = {
       },
 
       createBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const api = modules.getApi<Registration.ApiType>(Registration);
-        const response = await api.createBankAccount(profileId, accountId);
+        const response = await api.createBankAccount(profileId, individualAccountId);
 
         if (!response.status) {
           throw new GraphQLError('Failed to create bank account');
@@ -316,8 +325,9 @@ export const Account = {
       },
 
       fulfillBankAccount: async (parent: any, { accountId, input }: any, { profileId, modules }: SessionContext) => {
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const api = modules.getApi<Registration.ApiType>(Registration);
-        const response = await api.fulfillBankAccount(profileId, accountId, input);
+        const response = await api.fulfillBankAccount(profileId, individualAccountId, input);
 
         if (!response.status) {
           throw new GraphQLError('Failed to fulfill bank account');
@@ -327,8 +337,9 @@ export const Account = {
       },
 
       updateBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const api = modules.getApi<Registration.ApiType>(Registration);
-        const response = await api.updateBankAccount(profileId, accountId);
+        const response = await api.updateBankAccount(profileId, individualAccountId);
 
         if (!response.status) {
           throw new GraphQLError('Failed to update bank account');
