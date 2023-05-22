@@ -13,7 +13,7 @@ export class InvestmentsController {
   public static getClassName = (): string => 'InvestmentsController';
 
   public async createInvestment(profileId: string, accountId: string, money: USDInput) {
-    const amount = new Money(money.value).getAmount();
+    const amount = new Money(money.value);
 
     return this.createInvestmentUseCase.execute(profileId, accountId, amount);
   }

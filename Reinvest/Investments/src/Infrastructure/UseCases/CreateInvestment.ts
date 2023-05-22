@@ -1,15 +1,15 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import type { Money } from 'Money/Money';
 
-import { ScheduledBy, Statuses } from '../Adapters/PostgreSQL/InvestmentsTypes';
+import { InvestmentStatus, ScheduledBy } from '../../Domain/Investments/Types';
 import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
 
 export type InvestmentCreate = {
   accountId: string;
-  amount: number;
   id: string;
   profileId: string;
   scheduledBy: ScheduledBy;
-  status: Statuses;
+  status: InvestmentStatus;
 };
 
 class CreateInvestment {
@@ -23,18 +23,17 @@ class CreateInvestment {
     this.idGenerator = idGenerator;
   }
 
-  async execute(profileId: string, accountId: string, money: number) {
+  async execute(profileId: string, accountId: string, money: Money) {
     const id = this.idGenerator.createUuid();
 
     const investment: InvestmentCreate = {
       id,
       profileId,
       accountId,
-      amount: money,
       scheduledBy: ScheduledBy.DIRECT,
-      status: Statuses.IN_PROGRESS,
+      status: InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT,
     };
-    const status = this.investmentsRepository.create(investment);
+    const status = this.investmentsRepository.create(investment, money);
 
     if (!status) {
       return false;
