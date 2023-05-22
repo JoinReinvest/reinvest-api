@@ -6,6 +6,7 @@ import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsReposit
 
 export type InvestmentCreate = {
   accountId: string;
+  bankAccountId: string;
   id: string;
   profileId: string;
   scheduledBy: ScheduledBy;
@@ -23,12 +24,13 @@ class CreateInvestment {
     this.idGenerator = idGenerator;
   }
 
-  async execute(profileId: string, accountId: string, money: Money) {
+  async execute(profileId: string, accountId: string, bankAccountId: string, money: Money) {
     const id = this.idGenerator.createUuid();
 
     const investment: InvestmentCreate = {
       id,
       profileId,
+      bankAccountId,
       accountId,
       scheduledBy: ScheduledBy.DIRECT,
       status: InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT,

@@ -12,9 +12,9 @@ export class InvestmentsController {
 
   public static getClassName = (): string => 'InvestmentsController';
 
-  public async createInvestment(profileId: string, accountId: string, money: USDInput) {
+  public async createInvestment(profileId: string, accountId: string, bankAccountId: string, money: USDInput) {
     const amount = new Money(money.value);
 
-    return this.createInvestmentUseCase.execute(profileId, accountId, amount);
+    return this.createInvestmentUseCase.execute(profileId, accountId, bankAccountId, amount);
   }
 }

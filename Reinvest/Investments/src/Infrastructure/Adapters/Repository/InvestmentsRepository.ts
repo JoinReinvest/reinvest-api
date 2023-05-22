@@ -12,7 +12,7 @@ export class InvestmentsRepository {
   }
 
   async create(investment: InvestmentCreate, money: Money) {
-    const { id, profileId, accountId, scheduledBy, status } = investment;
+    const { id, profileId, accountId, bankAccountId, scheduledBy, status } = investment;
     const amount = money.getAmount();
     try {
       await this.databaseAdapterProvider
@@ -23,6 +23,7 @@ export class InvestmentsRepository {
           profileId,
           amount,
           accountId,
+          bankAccountId,
           dateCreated: new Date(),
           dateUpdated: new Date(),
           subscriptionAgreementId: null,
