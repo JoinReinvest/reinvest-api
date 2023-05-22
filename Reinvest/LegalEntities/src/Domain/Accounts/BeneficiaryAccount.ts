@@ -71,6 +71,10 @@ export class BeneficiaryAccount {
     return `${this.name.firstName[0]}${this.name.lastName[0]}`;
   }
 
+  getParentAccountId() {
+    return this.individualId;
+  }
+
   private getLabel(): string {
     return `${this.name.firstName} ${this.name.lastName}`;
   }

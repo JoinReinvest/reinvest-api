@@ -1,4 +1,4 @@
-import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { SessionContext } from 'ApiGateway/index';
 import { InvestmentAccounts } from 'Reinvest/InvestmentAccounts/src';
 
 const schema = `
@@ -9,14 +9,14 @@ const schema = `
     }
 
     type AccountConfiguration {
-        automaticDividendReinvestmentAgreement: AutomaticDividendReinvestmentAgreement!
+        automaticDividendReinvestmentAgreement: AutomaticDividendReinvestmentAgreement
     }
 
     type Query {
         """
         [MOCK] Return account configuration
         """
-        getAccountConfiguration(accountId: ID!): AccountConfiguration!
+        getAccountConfiguration(accountId: ID!): AccountConfiguration
     }
 
     type Mutation {
@@ -45,7 +45,7 @@ export const Configuration = {
         const configuration = await investmentAccountsApi.getConfiguration(profileId, accountId);
 
         if (!configuration) {
-          throw new JsonGraphQLError('CONFIGURATION_NOT_FOUND');
+          return null;
         }
 
         return configuration;

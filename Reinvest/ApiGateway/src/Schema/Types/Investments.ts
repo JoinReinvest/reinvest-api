@@ -1,6 +1,7 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
 import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
+import { Registration } from 'Reinvest/Registration/src';
 
 const schema = `
     #graphql
@@ -214,7 +215,17 @@ export const Investments = {
     Mutation: {
       createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
-        const investmentId = investmentAccountsApi.createInvestment(profileId, accountId, amount);
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+
+        const bankAccountData = await registrationApi.readBankAccount(profileId, accountId);
+
+        if (!bankAccountData?.bankAccountId) {
+          throw new GraphQLError('CANNOT_FIND_BANK_ACCOUNT_ID');
+        }
+
+        const bankAccountId = bankAccountData.bankAccountId;
+
+        const investmentId = await investmentAccountsApi.createInvestment(profileId, accountId, bankAccountId, amount);
 
         return investmentId;
       },

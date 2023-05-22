@@ -1,17 +1,17 @@
 import { JSONObject } from 'HKEKTypes/Generics';
-
-import { AgreementTypes, ScheduledBy, Statuses, SubscriptionAgreementStatus } from './InvestmentsTypes';
+import { AgreementTypes, InvestmentStatus, ScheduledBy, SubscriptionAgreementStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 
 export interface InvestmentsTable {
   accountId: string;
   amount: number;
+  bankAccountId: string;
   dateCreated: Date;
   dateUpdated: Date;
   id: string;
   profileId: string;
   recurringInvestmentId: string | null;
   scheduledBy: ScheduledBy;
-  status: Statuses;
+  status: InvestmentStatus;
   subscriptionAgreementId: string | null;
 }
 

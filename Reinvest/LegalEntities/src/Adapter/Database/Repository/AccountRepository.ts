@@ -15,7 +15,6 @@ import { SimplifiedDomicileType } from 'LegalEntities/Domain/ValueObject/Domicil
 import { PersonalNameInput } from 'LegalEntities/Domain/ValueObject/PersonalName';
 import { EIN, SensitiveNumberSchema, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { StakeholderOutput, StakeholderSchema } from 'LegalEntities/Domain/ValueObject/Stakeholder';
-import { BeneficiaryAccountResponse } from 'LegalEntities/Port/Api/ReadAccountController';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -288,6 +287,7 @@ export class AccountRepository {
       return false;
     }
   }
+
   async updateCompanyAccount(account: CompanyAccount, events: DomainEvent[] = []): Promise<void> {
     const { profileId, accountId, address, companyType, stakeholders, companyDocuments } = account.toObject();
 
@@ -493,24 +493,6 @@ export class AccountRepository {
     } catch (error: any) {
       return null;
     }
-  }
-
-  async findBeneficiaryAccount(profileId: string, accountId: string): Promise<BeneficiaryAccountResponse> {
-    return {
-      id: 'test',
-      label: 'First Last',
-      avatar: {
-        url: null,
-        initials: 'FL',
-        id: 'test-avatar',
-      },
-      details: {
-        name: {
-          firstName: 'First',
-          lastName: 'Last',
-        },
-      },
-    };
   }
 
   async publishEvents(events: DomainEvent[] = []): Promise<void> {
