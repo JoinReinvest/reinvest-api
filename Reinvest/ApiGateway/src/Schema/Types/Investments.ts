@@ -1,6 +1,8 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
 import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
+import { LegalEntities } from 'Reinvest/LegalEntities/src';
+import type Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
 
 const schema = `
@@ -201,6 +203,12 @@ export type CreateInvestment = {
   amount: USDInput;
 };
 
+export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
+  const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+  return api.mapAccountIdToParentAccountIdIfRequired(profileId, accountId);
+}
+
 export const Investments = {
   typeDefs: schema,
   resolvers: {
@@ -216,8 +224,9 @@ export const Investments = {
       createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
 
-        const bankAccountData = await registrationApi.readBankAccount(profileId, accountId);
+        const bankAccountData = await registrationApi.readBankAccount(profileId, individualAccountId);
 
         if (!bankAccountData?.bankAccountId) {
           throw new GraphQLError('CANNOT_FIND_BANK_ACCOUNT_ID');
@@ -225,7 +234,7 @@ export const Investments = {
 
         const bankAccountId = bankAccountData.bankAccountId;
 
-        const investmentId = await investmentAccountsApi.createInvestment(profileId, accountId, bankAccountId, amount);
+        const investmentId = await investmentAccountsApi.createInvestment(profileId, individualAccountId, bankAccountId, amount);
 
         return investmentId;
       },
