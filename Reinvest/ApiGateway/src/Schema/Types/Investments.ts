@@ -99,14 +99,6 @@ const investmentSummaryMock = {
   subscriptionAgreementId: subscriptionAgreementIdMock,
 };
 
-export const subscriptionAgreementMock = (parentId: string, type: string) => ({
-  id: subscriptionAgreementIdMock,
-  type,
-  status: 'WAITING_FOR_SIGNATURE',
-  createdAt: '2023-03-24T12:33:12',
-  content: subscriptionAgreements[1],
-});
-
 export type USDInput = {
   value: number;
 };
@@ -130,7 +122,15 @@ export const Investments = {
         return investmentSummaryMock;
       },
       getSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
-        return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+
+        const subscriptionAgreement = await investmentAccountsApi.subscriptionAgreementQuery(profileId, subscriptionAgreementId);
+
+        if (!subscriptionAgreement) {
+          throw new GraphQLError('CANNOT_FIND_SUBSCRIPTION_AGREEMENT');
+        }
+
+        return subscriptionAgreement;
       },
     },
     Mutation: {
