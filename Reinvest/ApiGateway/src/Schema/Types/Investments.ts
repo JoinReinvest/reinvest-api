@@ -1,6 +1,10 @@
-import { SessionContext } from 'ApiGateway/index';
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
-import { Money } from 'Money/Money';
+import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
+import { subscriptionAgreements } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
+import { LegalEntities } from 'Reinvest/LegalEntities/src';
+import type Modules from 'Reinvest/Modules';
+import { Registration } from 'Reinvest/Registration/src';
 
 const schema = `
     #graphql
@@ -95,101 +99,20 @@ const investmentSummaryMock = {
   subscriptionAgreementId: subscriptionAgreementIdMock,
 };
 
-export const subscriptionAgreementMock = (parentId: string, type: string) => ({
-  id: subscriptionAgreementIdMock,
-  type,
-  status: 'WAITING_FOR_SIGNATURE',
-  createdAt: '2023-03-24T12:33:12',
-  content: [
-    {
-      paragraphs: [
-        {
-          lines: ['{{Series A123}}', '{{A series of X7653}}'],
-        },
-        {
-          lines: ['Interests are offered through Dalmore Group, LLC, a registered broker-dealer and member of FINRA and SIPC ("Dalmore" or the "BOR").'],
-        },
-        {
-          lines: ['Subscription Agreement to subscribe for Series {{A123}}, a series of {{X7653}}'],
-        },
-      ],
-    },
-    {
-      header: 'SUMMARY',
-      paragraphs: [
-        {
-          lines: [
-            '{{Legal name of Purchaser (Individual or Entity)}}: John Smith',
-            '{{Date of Agreement}}: 03/24/2023',
-            '{{Number of Series A123, Interests subscribed for}}: John Smith',
-            '{{Price of Series A123 Interests subscribed for}}: John Smith',
-            '{{Telephone Number}}: +17778887775',
-            '{{E-mail Address}}: john.smith@gmail.com',
-          ],
-        },
-        {
-          lines: ['By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound'],
-        },
-      ],
-    },
-    {
-      header: 'IMPORTANT',
-      paragraphs: [
-        {
-          lines: [
-            'This Subscription Agreement and the Operating Agreement are legal agreements between you and ____________\n' +
-              '(company name) pertaining to your investment in _________ (series name). Your investment in membership interests\n' +
-              'in ____________ (the "Series (name) Interests") is contingent upon you accepting all of terms and conditions contained\n' +
-              'in this Subscription Agreement and the Operating Agreement. The offering of the Series (name) Interests (the\n' +
-              '"Offering") is described in the Offering Circular which is available at ___________ and at the U.S. Securities and\n' +
-              'Exchange Commission’s EDGAR website located at www.sec.gov. Please carefully read this Subscription Agreement,\n' +
-              'the Operating Agreement and the Offering Circular before making an investment. This Subscription Agreement and\n' +
-              'the Operating Agreement contain certain representations by you and set forth certain rights and obligations\n' +
-              'pertaining to you,_________________, and your investment in ___________. The Offering Circular contains important\n' +
-              'information about the Series _____________ Interests and the terms and conditions of the Offering.',
-          ],
-        },
-      ],
-    },
-    {
-      header: 'Check the applicable box:',
-      paragraphs: [
-        {
-          lines: [
-            '{{(a) I am an "accredited investor", and have checked the appropriate box on the attached Certificate of\n' +
-              'Accredited Investor Status indicating the basis of such accredited investor status, which Certificate of\n' +
-              'Accredited Investor Status is true and correct; or}}',
-          ],
-          isCheckedOption: false,
-        },
-        {
-          lines: [
-            '{{(b) The amount set forth on the first page of this Subscription Agreement, together with any previous\n' +
-              'investments in securities pursuant to this offering, does not exceed 10% of the greater of my net worth or\n' +
-              'annual income.}}',
-          ],
-          isCheckedOption: true,
-        },
-        {
-          lines: [
-            'Are you or anyone in your immediate household, or, for any non-natural person, any officers, directors, or\n' +
-              'any person that owns or controls 5% (or greater) of the quity, associated with a FINRA member, organization,\n' +
-              'or the SEC',
-            'NO',
-          ],
-        },
-        {
-          lines: [
-            'Are you or anyone in your household or immediate family, or, for any non-natural person, any of its\n' +
-              'directors, trustees, 10% (or more) equity holder, an officer, or member of the board of directors of a publicly traded company?',
-            '{{YES}}',
-            '{{Traded Company ticker symbols}}: RDW, TSLA, AAPL',
-          ],
-        },
-      ],
-    },
-  ],
-});
+export type USDInput = {
+  value: number;
+};
+
+export type CreateInvestment = {
+  accountId: string;
+  amount: USDInput;
+};
+
+export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
+  const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+  return api.mapAccountIdToParentAccountIdIfRequired(profileId, accountId);
+}
 
 export const Investments = {
   typeDefs: schema,
@@ -199,15 +122,34 @@ export const Investments = {
         return investmentSummaryMock;
       },
       getSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
-        return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+
+        const subscriptionAgreement = await investmentAccountsApi.subscriptionAgreementQuery(profileId, subscriptionAgreementId);
+
+        if (!subscriptionAgreement) {
+          throw new GraphQLError('CANNOT_FIND_SUBSCRIPTION_AGREEMENT');
+        }
+
+        return subscriptionAgreement;
       },
     },
     Mutation: {
-      createInvestment: async (parent: any, { accountId, amount }: any, { profileId, modules }: SessionContext) => {
-        const money = new Money(amount.value);
-        console.log('money', money.getFormattedAmount());
+      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
 
-        return investmentIdMock;
+        const bankAccountData = await registrationApi.readBankAccount(profileId, individualAccountId);
+
+        if (!bankAccountData?.bankAccountId) {
+          throw new GraphQLError('CANNOT_FIND_BANK_ACCOUNT_ID');
+        }
+
+        const bankAccountId = bankAccountData.bankAccountId;
+
+        const investmentId = await investmentAccountsApi.createInvestment(profileId, individualAccountId, bankAccountId, amount);
+
+        return investmentId;
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
         if (!approveFees) {
@@ -220,7 +162,17 @@ export const Investments = {
         return true;
       },
       createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return subscriptionAgreementMock(investmentIdMock, 'DIRECT_DEPOSIT');
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+
+        const subscriptionAgreementId = await investmentAccountsApi.createSubscriptionAgreement(profileId, investmentId);
+
+        if (!subscriptionAgreementId) {
+          throw new JsonGraphQLError('COULDNT_CREATE_SUBSCRIPTION');
+        }
+
+        const subscriptionAgreement = await investmentAccountsApi.subscriptionAgreementQuery(profileId, subscriptionAgreementId);
+
+        return subscriptionAgreement;
       },
       signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;

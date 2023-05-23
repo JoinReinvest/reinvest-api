@@ -1,6 +1,12 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
+import CreateInvestment from 'Investments/Infrastructure/UseCases/CreateInvestment';
+import CreateSubscriptionAgreement from 'Investments/Infrastructure/UseCases/CreateSubscriptionAgreement';
 
 import { Investments } from '../..';
+import SubscriptionAgreementQuery from '../UseCases/SubscriptionAgreementQuery';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -9,5 +15,11 @@ export default class UseCaseProviders {
     this.config = config;
   }
 
-  public boot(container: ContainerInterface) {}
+  public boot(container: ContainerInterface) {
+    container.addSingleton(IdGenerator);
+
+    container.addSingleton(CreateInvestment, [InvestmentsRepository, IdGenerator]);
+    container.addSingleton(CreateSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, IdGenerator]);
+    container.addSingleton(SubscriptionAgreementQuery, [SubscriptionAgreementRepository]);
+  }
 }

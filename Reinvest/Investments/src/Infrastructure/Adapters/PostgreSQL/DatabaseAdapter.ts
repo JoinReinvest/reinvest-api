@@ -1,12 +1,14 @@
+import { InvestmentsTable, SubscriptionAgreementTable, TransactionEventsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 import { Kysely } from 'kysely';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-import { InvestmentsTable, TransactionEventsTable } from 'Reinvest/Investments/src/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
 export const investmentsTable = 'investments_investments';
 export const transactionEventsTable = 'investments_transaction_events';
+export const subscriptionAgreementTable = 'investments_subscription_agreements';
 
 export interface InvestmentsDatabase {
   [investmentsTable]: InvestmentsTable;
+  [subscriptionAgreementTable]: SubscriptionAgreementTable;
   [transactionEventsTable]: TransactionEventsTable;
 }
 
