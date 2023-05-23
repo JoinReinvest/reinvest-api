@@ -1,11 +1,13 @@
 import { Kysely } from 'kysely';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-import { InvestmentsTable } from 'Reinvest/Investments/src/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { InvestmentsTable, SubscriptionAgreementTable } from 'Reinvest/Investments/src/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
 export const investmentsTable = 'investments_investments';
+export const subscriptionAgreementTable = 'investments_subscription_agreements';
 
 export interface InvestmentsDatabase {
   [investmentsTable]: InvestmentsTable;
+  [subscriptionAgreementTable]: SubscriptionAgreementTable;
 }
 
 export const InvestmentsDatabaseAdapterInstanceProvider = 'InvestmentsDatabaseAdapterProvider';
