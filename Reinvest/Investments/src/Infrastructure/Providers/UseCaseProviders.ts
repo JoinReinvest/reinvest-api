@@ -1,6 +1,9 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
 
 import { Investments } from '../..';
+import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
+import CreateInvestment from '../UseCases/CreateInvestment';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -10,6 +13,8 @@ export default class UseCaseProviders {
   }
 
   public boot(container: ContainerInterface) {
-    console.log('Use case providers boot');
+    container.addSingleton(IdGenerator);
+
+    container.addSingleton(CreateInvestment, [InvestmentsRepository, IdGenerator]);
   }
 }

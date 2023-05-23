@@ -1,6 +1,9 @@
 import { SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
-import { Money } from 'Money/Money';
+import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
+import { LegalEntities } from 'Reinvest/LegalEntities/src';
+import type Modules from 'Reinvest/Modules';
+import { Registration } from 'Reinvest/Registration/src';
 
 const schema = `
     #graphql
@@ -191,6 +194,21 @@ export const subscriptionAgreementMock = (parentId: string, type: string) => ({
   ],
 });
 
+export type USDInput = {
+  value: number;
+};
+
+export type CreateInvestment = {
+  accountId: string;
+  amount: USDInput;
+};
+
+export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
+  const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+  return api.mapAccountIdToParentAccountIdIfRequired(profileId, accountId);
+}
+
 export const Investments = {
   typeDefs: schema,
   resolvers: {
@@ -203,11 +221,22 @@ export const Investments = {
       },
     },
     Mutation: {
-      createInvestment: async (parent: any, { accountId, amount }: any, { profileId, modules }: SessionContext) => {
-        const money = new Money(amount.value);
-        console.log('money', money.getFormattedAmount());
+      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
 
-        return investmentIdMock;
+        const bankAccountData = await registrationApi.readBankAccount(profileId, individualAccountId);
+
+        if (!bankAccountData?.bankAccountId) {
+          throw new GraphQLError('CANNOT_FIND_BANK_ACCOUNT_ID');
+        }
+
+        const bankAccountId = bankAccountData.bankAccountId;
+
+        const investmentId = await investmentAccountsApi.createInvestment(profileId, individualAccountId, bankAccountId, amount);
+
+        return investmentId;
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
         if (!approveFees) {
