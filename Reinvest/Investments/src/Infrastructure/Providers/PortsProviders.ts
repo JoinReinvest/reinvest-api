@@ -7,6 +7,7 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { Investments } from '../..';
 import { SubscriptionAgreementController } from '../Ports/SubscriptionAgreementController';
 import CreateSubscriptionAgreement from '../UseCases/CreateSubscriptionAgreement';
+import InvestmentSummaryQuery from '../UseCases/InvestmentSummaryQuery';
 import SubscriptionAgreementQuery from '../UseCases/SubscriptionAgreementQuery';
 export default class PortsProviders {
   private config: Investments.Config;
@@ -17,7 +18,7 @@ export default class PortsProviders {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(TempController, [SimpleEventBus]);
-    container.addSingleton(InvestmentsController, [CreateInvestment]);
+    container.addSingleton(InvestmentsController, [CreateInvestment, InvestmentSummaryQuery]);
     container.addSingleton(SubscriptionAgreementController, [CreateSubscriptionAgreement, SubscriptionAgreementQuery]);
   }
 }

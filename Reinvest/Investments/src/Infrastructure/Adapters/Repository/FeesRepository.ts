@@ -1,13 +1,10 @@
-import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
+import { InvestmentsDatabaseAdapterProvider, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import type { InvestmentCreate } from 'Investments/Infrastructure/UseCases/CreateInvestment';
 import { Investment } from 'Investments/Infrastructure/ValueObject/Investment';
 import type { Money } from 'Money/Money';
-import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
 
-import { InvestmentSummary } from '../../ValueObject/InvestmentSummary';
-
-export class InvestmentsRepository {
-  public static getClassName = (): string => 'InvestmentsRepository';
+export class FeesRepository {
+  public static getClassName = (): string => 'FeesRepository';
 
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
 
@@ -38,27 +35,6 @@ export class InvestmentsRepository {
     if (!investment) return false;
 
     return Investment.create(investment);
-  }
-
-  async getInvestmentForSummary(investmentId: string) {
-    const investmentSummary = await this.databaseAdapterProvider
-      .provide()
-      .selectFrom(investmentsTable)
-      .fullJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
-      .select([
-        `${investmentsTable}.amount`,
-        `${investmentsTable}.dateCreated`,
-        `${investmentsTable}.id`,
-        `${investmentsTable}.status`,
-        `${investmentsTable}.subscriptionAgreementId`,
-      ])
-      .select([`${investmentsFeesTable}.amount as feeAmount`])
-      .where(`${investmentsTable}.id`, '=', investmentId)
-      .executeTakeFirst();
-
-    if (!investmentSummary) return false;
-
-    return InvestmentSummary.create(investmentSummary as InvestmentSummarySchema);
   }
 
   async create(investment: InvestmentCreate, money: Money) {

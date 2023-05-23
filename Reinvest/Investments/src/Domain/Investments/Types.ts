@@ -22,3 +22,18 @@ export enum SubscriptionAgreementStatus {
   WAITING_FOR_SIGNATURE = 'WAITING_FOR_SIGNATURE',
   SIGNED = 'SIGNED',
 }
+
+export enum InvestmentsFeesStatus {
+  AWAITING = 'AWAITING',
+  APPROVED = 'APPROVED',
+  ABORTED = 'ABORTED',
+}
+
+export type InvestmentSummarySchema = {
+  amount: number;
+  dateCreated: Date;
+  feeAmount: number | null;
+  id: string;
+  status: InvestmentStatus;
+  subscriptionAgreementId: string | null;
+};

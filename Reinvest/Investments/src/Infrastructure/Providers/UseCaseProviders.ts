@@ -6,6 +6,7 @@ import CreateInvestment from 'Investments/Infrastructure/UseCases/CreateInvestme
 import CreateSubscriptionAgreement from 'Investments/Infrastructure/UseCases/CreateSubscriptionAgreement';
 
 import { Investments } from '../..';
+import InvestmentSummaryQuery from '../UseCases/InvestmentSummaryQuery';
 import SubscriptionAgreementQuery from '../UseCases/SubscriptionAgreementQuery';
 
 export default class UseCaseProviders {
@@ -21,5 +22,6 @@ export default class UseCaseProviders {
     container.addSingleton(CreateInvestment, [InvestmentsRepository, IdGenerator]);
     container.addSingleton(CreateSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, IdGenerator]);
     container.addSingleton(SubscriptionAgreementQuery, [SubscriptionAgreementRepository]);
+    container.addSingleton(InvestmentSummaryQuery, [InvestmentsRepository]);
   }
 }
