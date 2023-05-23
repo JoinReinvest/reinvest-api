@@ -1,9 +1,23 @@
 import { TransactionProcessManager } from 'Investments/Application/TransactionProcessManager/TransactionProcessManager';
-import { createTrade, finalizeInvestment, verifyAccountForInvestment } from 'Investments/Domain/Transaction/TransactionCommands';
 import {
+  checkIfGracePeriodEnded,
+  checkIsInvestmentApproved,
+  checkIsInvestmentFunded,
+  createTrade,
+  finalizeInvestment,
+  markFundsAsReadyToDisburse,
+  transferSharesWhenTradeSettled,
+  verifyAccountForInvestment,
+} from 'Investments/Domain/Transaction/TransactionCommands';
+import {
+  CheckIfGracePeriodEndedDecision,
+  CheckIsInvestmentApprovedDecision,
+  CheckIsInvestmentFundedDecision,
   CreateTradeDecision,
   FinalizeInvestmentDecision,
+  MarkFundsAsReadyToDisburseDecision,
   TransactionDecisions,
+  TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
 } from 'Investments/Domain/Transaction/TransactionDecisions';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -35,6 +49,36 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.CREATE_TRADE].includes(decision.kind)) {
       await this.eventBus.publish(createTrade(decision as CreateTradeDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED].includes(decision.kind)) {
+      await this.eventBus.publish(checkIsInvestmentFunded(decision as CheckIsInvestmentFundedDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED].includes(decision.kind)) {
+      await this.eventBus.publish(checkIsInvestmentApproved(decision as CheckIsInvestmentApprovedDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.CHECK_IF_GRACE_PERIOD_ENDED].includes(decision.kind)) {
+      await this.eventBus.publish(checkIfGracePeriodEnded(decision as CheckIfGracePeriodEndedDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.MARK_FUNDS_AS_READY_TO_DISBURSE].includes(decision.kind)) {
+      await this.eventBus.publish(markFundsAsReadyToDisburse(decision as MarkFundsAsReadyToDisburseDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED].includes(decision.kind)) {
+      await this.eventBus.publish(transferSharesWhenTradeSettled(decision as TransferSharesWhenTradeSettledDecision));
 
       return;
     }

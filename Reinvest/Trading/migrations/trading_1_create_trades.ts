@@ -13,6 +13,7 @@ export async function up(db: Kysely<TradingDatabase>): Promise<void> {
     .addColumn('vertaloDistributionStateJson', 'json', col => col.defaultTo(null))
     .addColumn('subscriptionAgreementStateJson', 'json', col => col.defaultTo(null))
     .addColumn('fundsMoveStateJson', 'json', col => col.defaultTo(null))
+    .addColumn('tradeId', 'varchar(36)', col => col.defaultTo(null))
     .execute();
 }
 

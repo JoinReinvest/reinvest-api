@@ -64,6 +64,18 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           subscriptionAgreementId,
           portfolioId,
         });
+      case TransactionEvents.TRADE_CREATED:
+        return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED);
+      case TransactionEvents.INVESTMENT_FUNDED:
+        return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED);
+      case TransactionEvents.INVESTMENT_APPROVED:
+        return this.decide(TransactionDecisions.CHECK_IF_GRACE_PERIOD_ENDED);
+      case TransactionEvents.GRACE_PERIOD_ENDED:
+        return this.decide(TransactionDecisions.MARK_FUNDS_AS_READY_TO_DISBURSE);
+      case TransactionEvents.MARKED_AS_READY_TO_DISBURSE:
+        return this.decide(TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED);
+      case TransactionEvents.INVESTMENT_SHARES_TRANSFERRED:
+        return this.decide(TransactionDecisions.FINISH_INVESTMENT);
       default:
         break;
     }
@@ -91,6 +103,18 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
         return [TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT].includes(kind);
       case TransactionDecisions.FINALIZE_INVESTMENT:
         return [TransactionEvents.INVESTMENT_FINALIZED].includes(kind);
+      case TransactionDecisions.CREATE_TRADE:
+        return [TransactionEvents.TRADE_CREATED].includes(kind);
+      case TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED:
+        return [TransactionEvents.INVESTMENT_FUNDED].includes(kind);
+      case TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED:
+        return [TransactionEvents.INVESTMENT_APPROVED].includes(kind); // TODO RIA-236, also INVESTMENT_REJECTED
+      case TransactionDecisions.CHECK_IF_GRACE_PERIOD_ENDED:
+        return [TransactionEvents.GRACE_PERIOD_ENDED].includes(kind);
+      case TransactionDecisions.MARK_FUNDS_AS_READY_TO_DISBURSE:
+        return [TransactionEvents.MARKED_AS_READY_TO_DISBURSE].includes(kind);
+      case TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED:
+        return [TransactionEvents.INVESTMENT_SHARES_TRANSFERRED].includes(kind);
       default:
         return false;
     }
@@ -109,7 +133,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
   private eventsAnalysis(): {
     accountId: string | null;
     amount: number | null;
-    bankAccount: string | null;
+    bankAccountId: string | null;
     fees: number | null;
     ip: string | null;
     lastEvent: TransactionEvent | null;

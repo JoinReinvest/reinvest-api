@@ -25,14 +25,14 @@ export type NorthCapitalTradeState = {
   tradeId: string;
   tradePrice: string;
   tradeShares: string;
-  tradeStatus: 'CREATED';
+  tradeStatus: 'CREATED' | 'FUNDED';
 };
 
 export type VertaloDistributionState = {
   amount: string;
   createdOn: string;
   distributionId: string;
-  status: string;
+  status: 'drafted' | 'open' | 'closed';
 };
 
 export type FundsMoveState = {
@@ -40,11 +40,25 @@ export type FundsMoveState = {
   status: string;
 };
 
+export type SubscriptionAgreementState = {
+  status: boolean;
+  subscriptionAgreementId: string;
+};
+
+export type TradeSummary = {
+  amount: number;
+  fees: number;
+  shares: string;
+  unitSharePrice: number;
+};
+
 export type TradeSchema = {
   fundsMoveState: FundsMoveState | null;
   investmentId: string;
   northCapitalTradeState: NorthCapitalTradeState | null;
+  subscriptionAgreementState: SubscriptionAgreementState | null;
   tradeConfiguration: TradeConfiguration;
+  tradeId: string | null;
   vendorsConfiguration: VendorsConfiguration | null;
   vertaloDistributionState: VertaloDistributionState | null;
 };
@@ -52,10 +66,11 @@ export type TradeSchema = {
 export class Trade {
   private readonly amount: Money;
   private readonly fees: Money;
+  private tradeSchema: TradeSchema;
   private unitSharePrice: Money | null;
   private shares: string | null;
 
-  constructor(private tradeSchema: TradeSchema) {
+  constructor(tradeSchema: TradeSchema) {
     this.tradeSchema = tradeSchema;
     const { amount, fees } = this.tradeSchema.tradeConfiguration;
     const unitSharePrice = this.tradeSchema.vendorsConfiguration?.unitSharePrice;
@@ -87,6 +102,7 @@ export class Trade {
 
   setTradeState(tradeState: NorthCapitalTradeState) {
     this.tradeSchema.northCapitalTradeState = tradeState;
+    this.tradeSchema.tradeId = tradeState.tradeId;
   }
 
   isVendorsConfigurationSet() {
@@ -177,8 +193,107 @@ export class Trade {
     this.tradeSchema.fundsMoveState = fundsTransfer;
   }
 
+  isSubscriptionAgreementUploaded() {
+    return this.tradeSchema.subscriptionAgreementState !== null;
+  }
+
+  getSubscriptionAgreementConfiguration(): { profileId: string; subscriptionAgreementId: string; tradeId: string } {
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    return {
+      profileId: this.tradeSchema.tradeConfiguration.profileId,
+      subscriptionAgreementId: this.tradeSchema.tradeConfiguration.subscriptionAgreementId,
+      tradeId: this.tradeSchema.northCapitalTradeState.tradeId,
+    };
+  }
+
+  setSubscriptionAgreementState(subscriptionAgreementState: SubscriptionAgreementState) {
+    this.tradeSchema.subscriptionAgreementState = subscriptionAgreementState;
+  }
+
+  isVertaloDistributionDrafted() {
+    if (!this.tradeSchema.vertaloDistributionState) {
+      throw new Error('Vertalo distribution state is not set');
+    }
+
+    return this.tradeSchema.vertaloDistributionState.status === 'drafted';
+  }
+
+  getVertaloDistribution(): { distributionId: string } {
+    if (!this.tradeSchema.vertaloDistributionState) {
+      throw new Error('Vertalo distribution state is not set');
+    }
+
+    return {
+      distributionId: this.tradeSchema.vertaloDistributionState.distributionId,
+    };
+  }
+
+  updateVertaloDistributionStatus(newStatus: 'open' | 'closed') {
+    if (!this.tradeSchema.vertaloDistributionState) {
+      throw new Error('Vertalo distribution state is not set');
+    }
+
+    this.tradeSchema.vertaloDistributionState.status = newStatus;
+  }
+
+  getTradeSummary(): TradeSummary {
+    if (this.isVertaloDistributionDrafted()) {
+      throw new Error('Vertalo distribution is not opened');
+    }
+
+    return {
+      amount: this.amount.getAmount(),
+      fees: this.fees.getAmount(),
+      shares: this.shares!,
+      unitSharePrice: this.unitSharePrice!.getAmount(),
+    };
+  }
+
+  isTradeAwaitingFunding(): boolean {
+    if (this.tradeSchema.northCapitalTradeState === null || this.tradeSchema.fundsMoveState === null) {
+      throw new Error('Trade state is not set');
+    }
+
+    return this.tradeSchema.northCapitalTradeState!.tradeStatus === 'CREATED';
+  }
+
+  getTradeId(): string {
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    return this.tradeSchema.northCapitalTradeState.tradeId;
+  }
+
+  setTradeStatusToFunded() {
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    this.tradeSchema.northCapitalTradeState.tradeStatus = 'FUNDED';
+  }
+
+  isVertaloDistributionOpened(): boolean {
+    if (!this.tradeSchema.vertaloDistributionState) {
+      throw new Error('Vertalo distribution state is not set');
+    }
+
+    return this.tradeSchema.vertaloDistributionState.status === 'open';
+  }
+
+  isTradeFunded(): boolean {
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    return this.tradeSchema.northCapitalTradeState.tradeStatus === 'FUNDED';
+  }
+
   private calculateShares(amount: Money, unitSharePrice: Money): string {
-    const shares = amount.divideByAmount(unitSharePrice, 9);
+    const shares = amount.divideByAmount(unitSharePrice);
 
     return shares.toString();
   }

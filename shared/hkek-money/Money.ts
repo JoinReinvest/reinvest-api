@@ -26,8 +26,8 @@ export class Money {
     return this.value.toUnit();
   }
 
-  divideByAmount(divideBy: Money): string {
-    return (this.toUnit() / divideBy.toUnit()).toString();
+  divideByAmount(divideBy: Money): number {
+    return this.toUnit() / divideBy.toUnit();
   }
 
   add(value: Money) {

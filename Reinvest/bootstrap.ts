@@ -125,12 +125,18 @@ export function boot(): Modules {
 
   modules.register(
     Trading.moduleName,
-    Trading.create({
-      database: databaseConfig,
-      queue: queueConfig,
-      northCapital: northCapitalConfig,
-      vertalo: vertaloConfig,
-    } as Trading.Config),
+    Trading.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+        northCapital: northCapitalConfig,
+        vertalo: vertaloConfig,
+      } as Trading.Config,
+      {
+        registration: modules.get(Registration.moduleName) as Registration.Main,
+        documents: modules.get(Documents.moduleName) as Documents.Main,
+      },
+    ),
   );
 
   return modules;

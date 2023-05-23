@@ -1,5 +1,7 @@
 import Container, { ContainerInterface } from 'Container/Container';
+import { Documents } from 'Documents/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
+import { Registration } from 'Registration/index';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { TradingDatabaseAdapterInstanceProvider, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
@@ -23,6 +25,11 @@ export namespace Trading {
     vertalo: VertaloConfig;
   };
 
+  export type ModulesDependencies = {
+    documents: Documents.Main;
+    registration: Registration.Main;
+  };
+
   export type ApiType = TradingApiType & Api;
   export type TechnicalHandlerType = TradingTechnicalHandlerType & EventHandler;
 
@@ -30,9 +37,11 @@ export namespace Trading {
     private readonly config: Trading.Config;
     private readonly container: ContainerInterface;
     private booted = false;
+    private modules: Trading.ModulesDependencies;
 
-    constructor(config: Trading.Config) {
+    constructor(config: Trading.Config, modules: ModulesDependencies) {
       this.config = config;
+      this.modules = modules;
       this.container = new Container();
     }
 
@@ -68,6 +77,9 @@ export namespace Trading {
         return;
       }
 
+      this.container.addAsValue('Registration', this.modules.registration);
+      this.container.addAsValue('Documents', this.modules.documents);
+
       new AdapterServiceProvider(this.config).boot(this.container);
       new IntegrationServiceProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);
@@ -77,7 +89,7 @@ export namespace Trading {
     }
   }
 
-  export function create(config: Trading.Config): Trading.Main {
-    return new Trading.Main(config);
+  export function create(config: Trading.Config, modules: ModulesDependencies): Trading.Main {
+    return new Trading.Main(config, modules);
   }
 }

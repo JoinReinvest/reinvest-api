@@ -29,14 +29,17 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
       subscriptionAgreementId: event.data.subscriptionAgreementId,
       portfolioId: event.data.portfolioId,
     };
-    await this.createTradeUseCase.createTrade(tradeConfiguration);
-    // if (decision.canUserContinueTheInvestment) {
-    //   await this.eventBus.publish({
-    //     kind: 'AccountVerifiedForInvestment',
-    //     data: {
-    //       accountId: accountId,
-    //     },
-    //     id: event.id,
-    //   });
+    const tradeSummary = await this.createTradeUseCase.createTrade(tradeConfiguration);
+
+    if (tradeSummary) {
+      await this.eventBus.publish({
+        kind: 'TradeCreated',
+        data: {
+          accountId: event.data.accountId,
+          ...tradeSummary,
+        },
+        id: event.id,
+      });
+    }
   }
 }

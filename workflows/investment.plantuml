@@ -11,13 +11,13 @@ opt verified
  Q -> PM: account_verified
  PM -> Q: FinalizeInvestment
  Q -> PM: investment_finalized(amount: $100, fee: $10, ip: "8.8.8.8")
- PM -> Q: TransferMoney(amount: $100, fee: $10, ip: "8.8.8.8"))
+ PM -> Q: CreateTrade(amount: $100, fee: $10, ip: "8.8.8.8"))
     opt success
-     Q -> PM: money_transfer_initiated
-     PM -> Q: CheckIsMoneyTransferCompleted
+     Q -> PM: tradeCreated
+     PM -> Q: CheckIsTradeFunded
      opt completed
-      Q -> PM: money_transfer_completed
-      PM -> Q: VerifyInvestment
+      Q -> PM: tradeFunded
+      PM -> Q: CheckIsTradeApproved
       opt verified
         Q -> PM: investment_verified
         PM -> Q: CheckIsGracePeriodEnded

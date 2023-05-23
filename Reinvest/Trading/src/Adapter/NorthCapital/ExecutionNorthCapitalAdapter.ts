@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import FormData from 'form-data';
+import https from 'https';
 import NorthCapitalException from 'Trading/Adapter/NorthCapital/NorthCapitalException';
 import { NorthCapitalConfig } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 
@@ -12,22 +13,6 @@ export abstract class ExecutionNorthCapitalAdapter {
     this.clientId = clientId;
     this.developerAPIKey = developerAPIKey;
     this.url = url;
-  }
-
-  protected async putRequest(endpoint: string, data: any): Promise<any> {
-    try {
-      const putData = this.extendWithCredentials(data);
-      const response: AxiosResponse = await axios.put(`${this.url}/${endpoint}`, putData);
-
-      return response.data;
-    } catch (error: any) {
-      const {
-        response: {
-          data: { statusCode, statusDesc },
-        },
-      } = error;
-      throw new NorthCapitalException(statusCode, statusDesc);
-    }
   }
 
   protected async postRequest(endpoint: string, data: any): Promise<any> {
@@ -44,6 +29,35 @@ export abstract class ExecutionNorthCapitalAdapter {
       } = error;
       throw new NorthCapitalException(statusCode, statusDesc);
     }
+  }
+
+  protected async sendFilePostRequest(endpoint: string, data: any, fileKey: string, fileUrl: string, fileName: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      try {
+        const formData = this.transformToFormData(data);
+        https.get(fileUrl, async (stream: any) => {
+          try {
+            formData.append(fileKey, stream, fileName);
+
+            const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
+
+            resolve(response.data);
+          } catch (error: any) {
+            const {
+              response: { status },
+            } = error;
+
+            if (status === 404) {
+              reject('FILE_NOT_FOUND');
+            } else {
+              reject(error);
+            }
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   private transformToFormData(data: any): FormData {

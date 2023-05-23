@@ -4,6 +4,7 @@ import { TradesTable } from 'Trading/Adapter/Database/TradingSchema';
 import {
   FundsMoveState,
   NorthCapitalTradeState,
+  SubscriptionAgreementState,
   Trade,
   TradeConfiguration,
   TradeSchema,
@@ -43,6 +44,7 @@ export class TradesRepository {
         'northCapitalTradeStateJson',
         'subscriptionAgreementStateJson',
         'vertaloDistributionStateJson',
+        'tradeId',
       ])
       .where('investmentId', '=', investmentId)
       .executeTakeFirst();
@@ -67,6 +69,7 @@ export class TradesRepository {
         vertaloDistributionStateJson: null,
         subscriptionAgreementStateJson: null,
         fundsMoveStateJson: null,
+        tradeId: null,
       })
       .execute();
 
@@ -88,21 +91,24 @@ export class TradesRepository {
   private mapToTradeSchema(trade: TradesTable): TradeSchema {
     return {
       investmentId: trade.investmentId,
+      tradeId: trade.tradeId,
       tradeConfiguration: trade.tradeConfigurationJson as TradeConfiguration,
       vendorsConfiguration: trade.vendorsConfigurationJson as VendorsConfiguration,
       northCapitalTradeState: trade.northCapitalTradeStateJson as NorthCapitalTradeState,
       vertaloDistributionState: trade.vertaloDistributionStateJson as VertaloDistributionState,
       fundsMoveState: trade.fundsMoveStateJson as FundsMoveState,
+      subscriptionAgreementState: trade.subscriptionAgreementStateJson as SubscriptionAgreementState,
     };
   }
 
   private mapTradeSchemaToTable(schema: TradeSchema): Updateable<TradesTable> {
     return {
+      tradeId: schema.tradeId,
       tradeConfigurationJson: schema.tradeConfiguration,
       vendorsConfigurationJson: schema.vendorsConfiguration,
       fundsMoveStateJson: schema.fundsMoveState,
       northCapitalTradeStateJson: schema.northCapitalTradeState,
-      subscriptionAgreementStateJson: null,
+      subscriptionAgreementStateJson: schema.subscriptionAgreementState,
       vertaloDistributionStateJson: schema.vertaloDistributionState,
     };
   }

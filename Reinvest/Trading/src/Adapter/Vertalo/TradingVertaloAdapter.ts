@@ -32,4 +32,38 @@ export class TradingVertaloAdapter extends ExecutionVertaloAdapter {
 
     return { distributionId, status, createdOn, amount };
   }
+
+  async openDistribution(distributionId: string): Promise<boolean> {
+    return this.updateDistributionState(distributionId, 'open');
+  }
+
+  async closeDistribution(distributionId: string): Promise<boolean> {
+    return this.updateDistributionState(distributionId, 'closed');
+  }
+
+  private async updateDistributionState(distributionId: string, statusToUpdate: 'open' | 'closed'): Promise<boolean> {
+    const mutationQuery = `
+            mutation {
+              updateDistributionById (
+                input: {
+                  id: "${distributionId}"
+                  distributionPatch: {status: "${statusToUpdate}"}
+                }
+              ) {
+                distribution {
+                  id
+                  status
+                }
+              }
+            }
+        `;
+
+    const {
+      updateDistributionById: {
+        distribution: { status },
+      },
+    } = await this.sendRequest(mutationQuery);
+
+    return status === statusToUpdate;
+  }
 }
