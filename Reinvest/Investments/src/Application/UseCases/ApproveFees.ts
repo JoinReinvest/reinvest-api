@@ -13,7 +13,7 @@ class ApproveFees {
     const fee = await this.feesRepository.get(investmentId);
 
     if (!fee) {
-      return false;
+      return true;
     }
 
     fee.approveFee();
