@@ -8,6 +8,10 @@ const extendedProfile = `
     extend type Profile {
         accounts: [AccountOverview]
     }
+
+    extend type NotificationsStats {
+        getNotifications(filter: NotificationFilter, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
+    }
 `;
 
 export const ProfileStitcher = (rootSchema: GraphQLSchema) =>
@@ -24,6 +28,33 @@ export const ProfileStitcher = (rootSchema: GraphQLSchema) =>
               operation: OperationTypeNode.QUERY,
               fieldName: 'getAccountsOverview',
               args,
+              context,
+              info,
+            });
+          },
+        },
+        // completionStatus: {
+        //     resolve(parent: any, args: any, context: SessionContext, info: any) {
+        //         return delegateToSchema({
+        //             schema: rootSchema,
+        //             operation: OperationTypeNode.QUERY,
+        //             fieldName: 'profileCompletionStatus',
+        //             args,
+        //             context,
+        //             info
+        //         })
+        //     }
+        // },
+      },
+      NotificationsStats: {
+        getNotifications: {
+          selectionSet: `{totalCount}`,
+          resolve(parent: any, args, context: SessionContext, info: any) {
+            return delegateToSchema({
+              schema: rootSchema,
+              operation: OperationTypeNode.QUERY,
+              fieldName: 'getNotifications',
+              args: { ...args, accountId: parent.accountId },
               context,
               info,
             });

@@ -5,7 +5,6 @@ import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class CompanyAccountOpenedEventHandler implements EventHandler<DomainEvent> {
-  static getClassName = (): string => 'CompanyAccountOpenedEventHandler';
   private mappingRegistryRepository: MappingRegistryRepository;
   private synchronizeCompanyAccount: SynchronizeCompanyAccount;
 
@@ -13,6 +12,8 @@ export class CompanyAccountOpenedEventHandler implements EventHandler<DomainEven
     this.mappingRegistryRepository = mappingRegistryRepository;
     this.synchronizeCompanyAccount = synchronizeCompanyAccount;
   }
+
+  static getClassName = (): string => 'CompanyAccountOpenedEventHandler';
 
   public async handle(event: DomainEvent): Promise<void> {
     const { id: profileId } = event;

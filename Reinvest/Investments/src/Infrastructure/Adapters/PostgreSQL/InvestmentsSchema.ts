@@ -1,4 +1,5 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import type {
   AgreementTypes,
   InvestmentsFeesStatus,
@@ -47,4 +48,11 @@ export interface InvestmentsFeesTable {
   profileId: string;
   status: InvestmentsFeesStatus;
   verificationFeeId: string;
+}
+export interface TransactionEventsTable {
+  dateCreated: Date;
+  eventKind: TransactionEvents;
+  eventStateJson: JSONObject;
+  id: string;
+  investmentId: string;
 }
