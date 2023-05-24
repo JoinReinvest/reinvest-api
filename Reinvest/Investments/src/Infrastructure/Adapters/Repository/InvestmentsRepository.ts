@@ -121,6 +121,27 @@ export class InvestmentsRepository {
     }
   }
 
+  async startInvestment(investment: Investment) {
+    const { id, status, dateStarted } = investment.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(investmentsTable)
+        .set({
+          dateStarted,
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot start investment: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
   async publishEvents(events: DomainEvent[] = []): Promise<void> {
     if (events.length === 0) {
       return;

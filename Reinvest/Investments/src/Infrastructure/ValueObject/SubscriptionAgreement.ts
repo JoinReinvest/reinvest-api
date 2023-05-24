@@ -83,6 +83,10 @@ export class SubscriptionAgreement {
     this.signedAt = new Date();
   }
 
+  isSigned() {
+    return this.status === SubscriptionAgreementStatus.SIGNED;
+  }
+
   toObject() {
     return {
       id: this.id,

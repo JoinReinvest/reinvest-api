@@ -14,6 +14,7 @@ export class Investment {
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
   tradeId: string;
+  dateStarted: Date | null;
 
   constructor(
     accountId: string,
@@ -28,6 +29,7 @@ export class Investment {
     status: InvestmentStatus,
     subscriptionAgreementId: string | null,
     tradeId: string,
+    dateStarted: Date | null,
   ) {
     this.accountId = accountId;
     this.amount = amount;
@@ -41,6 +43,7 @@ export class Investment {
     this.status = status;
     this.subscriptionAgreementId = subscriptionAgreementId;
     this.tradeId = tradeId;
+    this.dateStarted = dateStarted;
   }
 
   static create(data: InvestmentsTable) {
@@ -57,6 +60,7 @@ export class Investment {
       status,
       subscriptionAgreementId,
       tradeId,
+      dateStarted,
     } = data;
 
     return new Investment(
@@ -72,6 +76,7 @@ export class Investment {
       status,
       subscriptionAgreementId,
       tradeId,
+      dateStarted,
     );
   }
 
@@ -81,6 +86,11 @@ export class Investment {
 
   updateStatus(status: InvestmentStatus) {
     this.status = status;
+  }
+
+  setInvestmentStarted() {
+    this.status = InvestmentStatus.FUNDED;
+    this.dateStarted = new Date();
   }
 
   toObject() {
@@ -96,6 +106,7 @@ export class Investment {
       scheduledBy: this.scheduledBy,
       status: this.status,
       subscriptionAgreementId: this.subscriptionAgreementId,
+      dateStarted: this.dateStarted,
     };
   }
 }

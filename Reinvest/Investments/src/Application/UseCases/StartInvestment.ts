@@ -1,4 +1,3 @@
-import { InvestmentStatus } from '../../Domain/Investments/Types';
 import { InvestmentsRepository } from '../../Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from '../../Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
@@ -25,9 +24,16 @@ class StartInvestment {
     }
 
     const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, investment.subscriptionAgreementId);
-    investment.updateStatus(InvestmentStatus.FUNDED);
 
-    return true;
+    if (!subscriptionAgreement?.isSigned()) {
+      return false;
+    }
+
+    investment.setInvestmentStarted();
+
+    const isStarted = await this.investmentsRepository.startInvestment(investment);
+
+    return isStarted;
   }
 }
 
