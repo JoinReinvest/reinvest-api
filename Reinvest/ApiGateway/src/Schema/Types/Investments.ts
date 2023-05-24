@@ -159,9 +159,18 @@ export const Investments = {
         return investmentId;
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
-        if (!approveFees) {
-          throw new GraphQLError('FEES_NOT_APPROVED');
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        let isApproved;
+
+        if (approveFees) {
+          isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
         }
+
+        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId);
+
+        // if (!approveFees) {
+        //   throw new GraphQLError('FEES_NOT_APPROVED');
+        // }
 
         return true;
       },

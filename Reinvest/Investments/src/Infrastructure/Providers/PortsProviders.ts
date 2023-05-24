@@ -1,16 +1,18 @@
 import { ContainerInterface } from 'Container/Container';
+import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
+import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
+import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
+import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
+import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
+import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
+import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
+import { FeesController } from 'Investments/Infrastructure/Ports/FeesController';
 import { InvestmentsController } from 'Investments/Infrastructure/Ports/InvestmentsController';
+import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
-import CreateInvestment from 'Investments/Infrastructure/UseCases/CreateInvestment';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 import { Investments } from '../..';
-import { SubscriptionAgreementController } from '../Ports/SubscriptionAgreementController';
-import AssignSubscriptionAgreementToInvestment from '../UseCases/AssignSubscriptionAgreementToInvestment';
-import CreateSubscriptionAgreement from '../UseCases/CreateSubscriptionAgreement';
-import InvestmentSummaryQuery from '../UseCases/InvestmentSummaryQuery';
-import SignSubscriptionAgreement from '../UseCases/SignSubscriptionAgreement';
-import SubscriptionAgreementQuery from '../UseCases/SubscriptionAgreementQuery';
 
 export default class PortsProviders {
   private config: Investments.Config;
@@ -23,5 +25,6 @@ export default class PortsProviders {
     container.addSingleton(TempController, [SimpleEventBus]);
     container.addSingleton(InvestmentsController, [CreateInvestment, InvestmentSummaryQuery, AssignSubscriptionAgreementToInvestment]);
     container.addSingleton(SubscriptionAgreementController, [CreateSubscriptionAgreement, SubscriptionAgreementQuery, SignSubscriptionAgreement]);
+    container.addSingleton(FeesController, [ApproveFees]);
   }
 }

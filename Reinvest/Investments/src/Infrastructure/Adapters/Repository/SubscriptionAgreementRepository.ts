@@ -1,6 +1,6 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import type { SubscriptionAgreementCreate } from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import { InvestmentsDatabaseAdapterProvider, subscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-import type { SubscriptionAgreementCreate } from 'Investments/Infrastructure/UseCases/CreateSubscriptionAgreement';
 
 import { SubscriptionAgreement } from '../../ValueObject/SubscriptionAgreement';
 
