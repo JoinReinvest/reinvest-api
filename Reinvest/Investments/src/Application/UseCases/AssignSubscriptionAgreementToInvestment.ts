@@ -1,7 +1,7 @@
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 import { InvestmentStatus } from '../../Domain/Investments/Types';
-import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
+import { InvestmentsRepository } from '../../Infrastructure/Adapters/Repository/InvestmentsRepository';
 
 class AssignSubscriptionAgreementToInvestment {
   static getClassName = (): string => 'AssignSubscriptionAgreementToInvestment';

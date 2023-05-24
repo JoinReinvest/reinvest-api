@@ -1,9 +1,9 @@
 import { Money } from 'Money/Money';
 import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments';
 
-import AssignSubscriptionAgreementToInvestment from '../UseCases/AssignSubscriptionAgreementToInvestment';
-import CreateInvestment from '../UseCases/CreateInvestment';
-import InvestmentSummaryQuery from '../UseCases/InvestmentSummaryQuery';
+import AssignSubscriptionAgreementToInvestment from '../../Application/UseCases/AssignSubscriptionAgreementToInvestment';
+import CreateInvestment from '../../Application/UseCases/CreateInvestment';
+import InvestmentSummaryQuery from '../../Application/UseCases/InvestmentSummaryQuery';
 
 export class InvestmentsController {
   private createInvestmentUseCase: CreateInvestment;
