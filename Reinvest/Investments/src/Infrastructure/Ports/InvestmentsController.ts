@@ -22,6 +22,6 @@ export class InvestmentsController {
   }
 
   public async investmentSummaryQuery(profileId: string, investmentId: string) {
-    return this.investmentSummaryQueryUseCase.execute(profileId, investmentId);
+    return await this.investmentSummaryQueryUseCase.execute(profileId, investmentId);
   }
 }

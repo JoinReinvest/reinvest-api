@@ -46,10 +46,7 @@ export class InvestmentSummary {
 
   getFeeAmount() {
     if (!this.feeAmount) {
-      return {
-        formatted: null,
-        value: null,
-      };
+      return null;
     }
 
     const amount = new Money(this.feeAmount);
