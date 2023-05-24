@@ -1,25 +1,30 @@
-import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from '../Adapters/Repository/SubscriptionAgreementRepository';
 
 class SignSubscriptionAgreement {
   static getClassName = (): string => 'SignSubscriptionAgreement';
 
   private readonly subscriptionAgreementRepository: SubscriptionAgreementRepository;
-  private readonly investmentsRepository: InvestmentsRepository;
 
-  constructor(subscriptionAgreementRepository: SubscriptionAgreementRepository, investmentsRepository: InvestmentsRepository) {
+  constructor(subscriptionAgreementRepository: SubscriptionAgreementRepository) {
     this.subscriptionAgreementRepository = subscriptionAgreementRepository;
-    this.investmentsRepository = investmentsRepository;
   }
 
-  async execute(profileId: string, investmentId: string) {
-    const investment = await this.subscriptionAgreementRepository.signSubscriptionAgreement(profileId, investmentId);
+  async execute(profileId: string, investmentId: string, clientIp: string) {
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, investmentId);
 
-    if (!investment) {
+    if (!subscriptionAgreement) {
       return false;
     }
 
-    return true;
+    subscriptionAgreement.setSignature(clientIp);
+
+    const isSigned = await this.subscriptionAgreementRepository.signSubscriptionAgreement(subscriptionAgreement);
+
+    if (!isSigned) {
+      return false;
+    }
+
+    return subscriptionAgreement.id;
   }
 }
 

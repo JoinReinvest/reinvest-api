@@ -27,7 +27,7 @@ export class SubscriptionAgreementController {
     return await this.subscriptionAgreementQueryUseCase.execute(profileId, subscriptionAgreementId);
   }
 
-  public async signSubscriptionAgreement(profileId: string, investmentId: string) {
-    return await this.signSubscriptionAgreementUseCase.execute(profileId, investmentId);
+  public async signSubscriptionAgreement(profileId: string, investmentId: string, clientIp: string) {
+    return await this.signSubscriptionAgreementUseCase.execute(profileId, investmentId, clientIp);
   }
 }

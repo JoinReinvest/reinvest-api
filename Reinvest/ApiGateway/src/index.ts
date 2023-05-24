@@ -26,7 +26,7 @@ const server = new ApolloServer({
   },
 });
 
-export type SessionContext = { modules: Modules; profileId: string; userId: string };
+export type SessionContext = { clientIp: string; modules: Modules; profileId: string; userId: string };
 
 export const app = (modules: Modules) => {
   return startServerAndCreateLambdaHandler(server, {
@@ -44,6 +44,7 @@ export const app = (modules: Modules) => {
         });
       }
 
+      const clientIp = event?.headers?.['X-Forwarded-For'] ?? '127.0.0.1';
       const userId = authorizer.jwt.claims.sub;
       const api = modules.getApi<Identity.ApiType>(Identity);
       const profileId = await api.getProfileId(userId);
@@ -53,6 +54,7 @@ export const app = (modules: Modules) => {
       }
 
       return <SessionContext>{
+        clientIp,
         userId,
         profileId,
         modules,

@@ -5,9 +5,11 @@ import { InvestmentsController } from './InvestmentsController';
 import { SubscriptionAgreementController } from './SubscriptionAgreementController';
 
 export type InvestmentsApiType = {
+  assignSubscriptionAgreementToInvestment: InvestmentsController['assignSubscriptionAgreementToInvestment'];
   createInvestment: InvestmentsController['createInvestment'];
   createSubscriptionAgreement: SubscriptionAgreementController['createSubscriptionAgreement'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
+  signSubscriptionAgreement: SubscriptionAgreementController['signSubscriptionAgreement'];
   subscriptionAgreementQuery: SubscriptionAgreementController['subscriptionAgreementQuery'];
   test: TempController['handle'];
 };
@@ -16,6 +18,8 @@ export const investmentsApi = (container: ContainerInterface): InvestmentsApiTyp
   test: container.delegateTo(TempController, 'handle'),
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
   investmentSummaryQuery: container.delegateTo(InvestmentsController, 'investmentSummaryQuery'),
+  assignSubscriptionAgreementToInvestment: container.delegateTo(InvestmentsController, 'assignSubscriptionAgreementToInvestment'),
   createSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'createSubscriptionAgreement'),
   subscriptionAgreementQuery: container.delegateTo(SubscriptionAgreementController, 'subscriptionAgreementQuery'),
+  signSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'signSubscriptionAgreement'),
 });

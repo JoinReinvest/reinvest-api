@@ -3,6 +3,8 @@ import type { InvestmentCreate } from 'Investments/Infrastructure/UseCases/Creat
 import { Investment } from 'Investments/Infrastructure/ValueObject/Investment';
 import type { Money } from 'Money/Money';
 import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import type { DomainEvent } from 'SimpleAggregator/Types';
 
 import { InvestmentSummary } from '../../ValueObject/InvestmentSummary';
 
@@ -10,9 +12,11 @@ export class InvestmentsRepository {
   public static getClassName = (): string => 'InvestmentsRepository';
 
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
+  private eventsPublisher: SimpleEventBus;
 
-  constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventsPublisher = eventsPublisher;
   }
 
   async get(investmentId: string) {
@@ -89,5 +93,34 @@ export class InvestmentsRepository {
 
       return false;
     }
+  }
+
+  async assignSubscriptionAgreementAndUpdateStatus(investment: Investment, events?: any) {
+    const { id, status, subscriptionAgreementId } = investment.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(investmentsTable)
+        .set({
+          subscriptionAgreementId,
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot asign subscription agreement to investment and update its status: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
+    }
+
+    await this.eventsPublisher.publishMany(events);
   }
 }

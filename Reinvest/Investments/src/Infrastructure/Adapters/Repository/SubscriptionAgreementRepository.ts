@@ -43,10 +43,6 @@ export class SubscriptionAgreementRepository {
     }
   }
 
-  async signSubscriptionAgreement(profile: string, investmentId: string) {
-    return true;
-  }
-
   async getSubscriptionAgreement(profileId: string, subscriptionAgreementId: string) {
     const subscriptionAgreement = await this.databaseAdapterProvider
       .provide()
@@ -72,5 +68,55 @@ export class SubscriptionAgreementRepository {
     if (!subscriptionAgreement) return null;
 
     return SubscriptionAgreement.create(subscriptionAgreement);
+  }
+
+  async getSubscriptionAgreementByInvestmentId(profileId: string, investmentId: string) {
+    const subscriptionAgreement = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(subscriptionAgreementTable)
+      .select([
+        'id',
+        'profileId',
+        'investmentId',
+        'status',
+        'accountId',
+        'dateCreated',
+        'agreementType',
+        'signedAt',
+        'signedByIP',
+        'pdfDateCreated',
+        'templateVersion',
+        'contentFieldsJson',
+      ])
+      .where('investmentId', '=', investmentId)
+      .where('profileId', '=', profileId)
+      .executeTakeFirst();
+
+    if (!subscriptionAgreement) return null;
+
+    return SubscriptionAgreement.create(subscriptionAgreement);
+  }
+
+  async signSubscriptionAgreement(subscriptionAgreement: SubscriptionAgreement) {
+    const { id, status, signedByIP, signedAt } = subscriptionAgreement.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(subscriptionAgreementTable)
+        .set({
+          id,
+          status,
+          signedByIP,
+          signedAt,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot sign subscription agreement: ${error.message}`, error);
+
+      return false;
+    }
   }
 }

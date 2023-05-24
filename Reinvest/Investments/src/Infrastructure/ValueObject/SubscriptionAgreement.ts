@@ -76,4 +76,27 @@ export class SubscriptionAgreement {
       contentFieldsJson,
     );
   }
+
+  setSignature(ip: string) {
+    this.status = SubscriptionAgreementStatus.SIGNED;
+    this.signedByIP = ip;
+    this.signedAt = new Date();
+  }
+
+  toObject() {
+    return {
+      id: this.id,
+      profileId: this.profileId,
+      investmentId: this.investmentId,
+      status: this.status,
+      accountId: this.accountId,
+      dateCreated: this.dateCreated,
+      agreementType: this.agreementType,
+      signedAt: this.signedAt,
+      signedByIP: this.signedByIP,
+      pdfDateCreated: this.pdfDateCreated,
+      templateVersion: this.templateVersion,
+      contentFieldsJson: this.contentFieldsJson,
+    };
+  }
 }
