@@ -20,6 +20,7 @@ export interface InvestmentsTable {
   scheduledBy: ScheduledBy;
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
+  tradeId: string;
 }
 
 export interface SubscriptionAgreementTable {
