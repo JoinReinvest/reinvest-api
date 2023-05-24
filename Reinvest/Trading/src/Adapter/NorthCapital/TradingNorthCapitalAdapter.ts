@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { Money } from 'Money/Money';
 import NorthCapitalException from 'Registration/Adapter/NorthCapital/NorthCapitalException';
 import { ExecutionNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
@@ -89,6 +90,12 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
   }
 
   async getTradeStatus(tradeId: string): Promise<string> {
+    const { orderStatus } = await this.getCurrentTradeState(tradeId);
+
+    return orderStatus.toLowerCase();
+  }
+
+  async getCurrentTradeState(tradeId: string): Promise<any> {
     const endpoint = 'tapiv3/index.php/v3/getTradeStatus';
     const data = {
       tradeId,
@@ -97,10 +104,26 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     const {
       statusCode,
       statusDesc,
-      tradeDetails: [{ orderStatus }],
+      tradeDetails: [tradeDetails],
     } = response;
 
-    return orderStatus.toLowerCase();
+    return tradeDetails;
+  }
+
+  async markTradeAsReadyToDisburse(tradeId: string): Promise<boolean> {
+    const { orderStatus, accountId, field3 } = await this.getCurrentTradeState(tradeId);
+    const endpoint = 'tapiv3/index.php/v3/updateTradeStatus';
+    const message = `REINVEST: Ready to disburse, ${dayjs().format('MM/DD/YYYY')}`;
+    const data = {
+      orderStatus,
+      accountId,
+      tradeId,
+      field3: message,
+    };
+
+    const response = await this.postRequest(endpoint, data);
+
+    return true;
   }
 
   private async checkIfFileExistsInTrade(northCapitalId: string, documentId: string): Promise<boolean> {

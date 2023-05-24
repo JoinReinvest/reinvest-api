@@ -25,7 +25,7 @@ export type NorthCapitalTradeState = {
   tradeId: string;
   tradePrice: string;
   tradeShares: string;
-  tradeStatus: 'CREATED' | 'FUNDED';
+  tradeStatus: 'CREATED' | 'FUNDED' | 'SETTLED';
 };
 
 export type VertaloDistributionState = {
@@ -52,15 +52,34 @@ export type TradeSummary = {
   unitSharePrice: number;
 };
 
+export type DisbursementState = {
+  completedDate: Date | null;
+  markedDate: Date | null;
+  status: 'MARKED' | 'COMPLETED';
+};
+
+export type SharesTransferState = {
+  holdingId: string;
+  transferDate: Date;
+};
+
+export type VertaloPaymentState = {
+  paymentId: string;
+  paymentMarkedDate: Date;
+};
+
 export type TradeSchema = {
+  disbursementState: DisbursementState | null;
   fundsMoveState: FundsMoveState | null;
   investmentId: string;
   northCapitalTradeState: NorthCapitalTradeState | null;
+  sharesTransferState: SharesTransferState | null;
   subscriptionAgreementState: SubscriptionAgreementState | null;
   tradeConfiguration: TradeConfiguration;
   tradeId: string | null;
   vendorsConfiguration: VendorsConfiguration | null;
   vertaloDistributionState: VertaloDistributionState | null;
+  vertaloPaymentState: VertaloPaymentState | null;
 };
 
 export class Trade {
@@ -231,6 +250,21 @@ export class Trade {
     };
   }
 
+  getVertaloDistributionPaymentDetails(): { amount: string; distributionId: string } {
+    if (!this.tradeSchema.vertaloDistributionState) {
+      throw new Error('Vertalo distribution state is not set');
+    }
+
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    return {
+      distributionId: this.tradeSchema.vertaloDistributionState.distributionId,
+      amount: new Money(this.tradeSchema.tradeConfiguration.amount).toUnit().toString(),
+    };
+  }
+
   updateVertaloDistributionStatus(newStatus: 'open' | 'closed') {
     if (!this.tradeSchema.vertaloDistributionState) {
       throw new Error('Vertalo distribution state is not set');
@@ -290,6 +324,85 @@ export class Trade {
     }
 
     return this.tradeSchema.northCapitalTradeState.tradeStatus === 'FUNDED';
+  }
+
+  isMarkedReadyToDisbursement() {
+    if (!this.tradeSchema.disbursementState) {
+      return false;
+    }
+
+    return this.tradeSchema.disbursementState.status === 'MARKED';
+  }
+
+  setDisbursementStateAsMarked() {
+    this.tradeSchema.disbursementState = {
+      status: 'MARKED',
+      markedDate: new Date(),
+      completedDate: null,
+    };
+  }
+
+  setDisbursementStateAsCompleted() {
+    if (!this.tradeSchema.disbursementState) {
+      throw new Error('Disbursement state is not set');
+    }
+
+    this.tradeSchema.disbursementState.status = 'COMPLETED';
+    this.tradeSchema.disbursementState.completedDate = new Date();
+  }
+
+  isTradeSettled(): boolean {
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    return this.tradeSchema.northCapitalTradeState.tradeStatus === 'SETTLED';
+  }
+
+  setTradeStatusToSettled() {
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    this.tradeSchema.northCapitalTradeState.tradeStatus = 'SETTLED';
+  }
+
+  isPaymentMarkedInVertalo(): boolean {
+    if (!this.tradeSchema.vertaloDistributionState) {
+      throw new Error('Vertalo distribution state is not set');
+    }
+
+    if (this.tradeSchema.vertaloPaymentState === null) {
+      return false;
+    }
+
+    return true;
+  }
+
+  setVertaloPaymentState(paymentId: string) {
+    this.tradeSchema.vertaloPaymentState = {
+      paymentMarkedDate: new Date(),
+      paymentId,
+    };
+  }
+
+  isSharesTransferredInVertalo(): boolean {
+    if (!this.tradeSchema.vertaloPaymentState) {
+      throw new Error('Vertalo payment state is not set');
+    }
+
+    if (!this.tradeSchema.sharesTransferState) {
+      return false;
+    }
+
+    return true;
+  }
+
+  setVertaloSharesTransferState(holdingId: string) {
+    this.tradeSchema.sharesTransferState = {
+      holdingId,
+      transferDate: new Date(),
+    };
   }
 
   private calculateShares(amount: Money, unitSharePrice: Money): string {
