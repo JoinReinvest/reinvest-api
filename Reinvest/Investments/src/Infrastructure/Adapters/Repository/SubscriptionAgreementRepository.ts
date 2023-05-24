@@ -43,6 +43,10 @@ export class SubscriptionAgreementRepository {
     }
   }
 
+  async signSubscriptionAgreement(profile: string, investmentId: string) {
+    return true;
+  }
+
   async getSubscriptionAgreement(profileId: string, subscriptionAgreementId: string) {
     const subscriptionAgreement = await this.databaseAdapterProvider
       .provide()
