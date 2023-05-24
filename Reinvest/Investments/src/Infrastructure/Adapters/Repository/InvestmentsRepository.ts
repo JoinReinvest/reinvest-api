@@ -32,6 +32,7 @@ export class InvestmentsRepository {
         'status',
         'subscriptionAgreementId',
         'tradeId',
+        'dateStarted',
       ])
       .where('id', '=', investmentId)
       .executeTakeFirst();
@@ -77,6 +78,7 @@ export class InvestmentsRepository {
           accountId,
           bankAccountId,
           dateCreated: new Date(),
+          dateStarted: null,
           dateUpdated: new Date(),
           subscriptionAgreementId: null,
           scheduledBy,
