@@ -2,6 +2,7 @@ import Container, { ContainerInterface } from 'Container/Container';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Registration } from 'Registration/index';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
+import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { VerificationDatabaseAdapterInstanceProvider, VerificationDatabaseAdapterProvider } from 'Verification/Adapter/Database/DatabaseAdapter';
 import { NorthCapitalConfig } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { verificationApi, VerificationApiType } from 'Verification/Port/Api/RegistrationApiType';
@@ -18,6 +19,7 @@ export namespace Verification {
   export type Config = {
     database: PostgreSQLConfig;
     northCapital: NorthCapitalConfig;
+    queue: QueueConfig;
   };
 
   export type ModulesDependencies = {
@@ -37,20 +39,6 @@ export namespace Verification {
       this.config = config;
       this.modules = modules;
       this.container = new Container();
-    }
-
-    private boot(): void {
-      if (this.booted) {
-        return;
-      }
-
-      this.container.addAsValue('Registration', this.modules.registration);
-      new AdapterServiceProvider(this.config).boot(this.container);
-      new IntegrationServiceProvider(this.config).boot(this.container);
-      new EventBusProvider(this.config).boot(this.container);
-      new PortsProvider(this.config).boot(this.container);
-
-      this.booted = true;
     }
 
     // public module API
@@ -78,6 +66,20 @@ export namespace Verification {
       if (this.booted) {
         await this.container.getValue<VerificationDatabaseAdapterProvider>(VerificationDatabaseAdapterInstanceProvider).close();
       }
+    }
+
+    private boot(): void {
+      if (this.booted) {
+        return;
+      }
+
+      this.container.addAsValue('Registration', this.modules.registration);
+      new AdapterServiceProvider(this.config).boot(this.container);
+      new IntegrationServiceProvider(this.config).boot(this.container);
+      new PortsProvider(this.config).boot(this.container);
+      new EventBusProvider(this.config).boot(this.container);
+
+      this.booted = true;
     }
   }
 

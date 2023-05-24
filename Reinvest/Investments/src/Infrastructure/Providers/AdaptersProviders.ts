@@ -1,4 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { Investments } from 'Investments/index';
 import {
   createInvestmentsDatabaseAdapterProvider,
@@ -20,6 +22,7 @@ export default class AdaptersProviders {
   }
 
   public boot(container: ContainerInterface) {
+    container.addSingleton(IdGenerator);
     container
       .addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container))
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
@@ -29,7 +32,10 @@ export default class AdaptersProviders {
     container
       .addAsValue(InvestmentsDatabaseAdapterInstanceProvider, createInvestmentsDatabaseAdapterProvider(this.config.database))
       .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider])
-      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
+
+    // process manager
+    container.addSingleton(TransactionExecutor, [SimpleEventBus]);
   }
 }
