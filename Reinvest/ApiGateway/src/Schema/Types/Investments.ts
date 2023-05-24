@@ -170,7 +170,7 @@ export const Investments = {
         }
 
         if (!isApproved) {
-          //   throw new GraphQLError('FEES_NOT_APPROVED');
+          throw new GraphQLError('FEES_NOT_APPROVED');
         }
 
         const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId);
