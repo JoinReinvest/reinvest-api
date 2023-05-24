@@ -146,6 +146,8 @@ const schema = `
     type BankAccount {
         accountNumber: String
         accountType: String
+        """ [MOCK] """
+        bankName: String
     }
 
     type Query {
@@ -281,7 +283,10 @@ export const Account = {
           throw new GraphQLError('Bank account not exists');
         }
 
-        return bankAccount;
+        return {
+          ...bankAccount,
+          bankName: 'Bank of America',
+        };
       },
     },
     Mutation: {
