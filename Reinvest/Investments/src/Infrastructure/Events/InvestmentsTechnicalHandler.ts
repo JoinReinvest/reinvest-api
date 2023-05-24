@@ -1,11 +1,20 @@
 import { ContainerInterface } from 'Container/Container';
+import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 
 export type InvestmentsTechnicalHandlerType = {
-  ProfileCreated: () => void;
+  AccountVerifiedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentApproved: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentFunded: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentMarkedAsReadyToDisburse: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
+  TradeCreated: () => TechnicalToDomainEventsHandler['handle'];
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
-  ProfileCreated: (): void => {
-    console.log('profile created testss - investment accounts');
-  },
+  AccountVerifiedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  TradeCreated: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentFunded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentApproved: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentMarkedAsReadyToDisburse: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentSharesTransferred: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
 });

@@ -110,7 +110,8 @@ export const RecurringInvestments = {
   resolvers: {
     Query: {
       getActiveRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return recurringInvestmentMock('ACTIVE');
+        // return recurringInvestmentMock('ACTIVE');
+        return null;
       },
       getDraftRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         return recurringInvestmentMock('DRAFT');

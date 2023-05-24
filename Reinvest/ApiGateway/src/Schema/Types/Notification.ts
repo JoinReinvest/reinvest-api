@@ -31,6 +31,12 @@ const schema = `
         type: NotificationObjectType
     }
 
+    type NotificationsStats {
+        accountId: String!
+        unreadCount: Int!
+        totalCount: Int!
+    }
+
     type Notification {
         id: ID!
         notificationType: NotificationType!
@@ -43,12 +49,23 @@ const schema = `
         onObject: NotificationObject
     }
 
+    enum NotificationFilter {
+        ALL
+        UNREAD
+    }
+
     type Query {
         """
         [MOCK] Get all notifications for the given account id
         It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
         """
-        getNotDismissedNotifications(accountId: String!, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
+        getNotifications(accountId: String!, filter: NotificationFilter = UNREAD, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
+
+        """
+        [MOCK] Get all notifications for the given account id
+        It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
+        """
+        getNotificationStats(accountId: String!): NotificationsStats!
     }
 
     type Mutation {
@@ -150,8 +167,17 @@ export const Notification = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      getNotDismissedNotifications: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
+      getNotifications: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         return notificationsMock(accountId, false, pagination.page, pagination.perPage);
+      },
+      getNotificationStats: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
+        const listOfNotifications = notificationsMock(accountId, false);
+
+        return {
+          accountId,
+          unreadCount: listOfNotifications.length,
+          totalCount: listOfNotifications.length,
+        };
       },
     },
     Mutation: {

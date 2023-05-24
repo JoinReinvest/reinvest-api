@@ -1,15 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
+import { VerifyAccountForInvestmentHandler } from 'Verification/Port/Queue/EventHandler/VerifyAccountForInvestmentHandler';
 
 export type VerificationTechnicalHandlerType = {
-  // CorporateAccountOpened: CompanyAccountOpenedEventHandler['handle'];
-  // IndividualAccountOpened: IndividualAccountOpenedEventHandler['handle'];
-  // LegalProfileCompleted: ProfileCompletedEventHandler['handle'];
-  // TrustAccountOpened: CompanyAccountOpenedEventHandler['handle'];
+  VerifyAccountForInvestment: VerifyAccountForInvestmentHandler['handle'];
 };
 
 export const verificationTechnicalHandler = (container: ContainerInterface): VerificationTechnicalHandlerType => ({
-  // LegalProfileCompleted: container.delegateTo(ProfileCompletedEventHandler, 'handle'),
-  // IndividualAccountOpened: container.delegateTo(IndividualAccountOpenedEventHandler, 'handle'),
-  // CorporateAccountOpened: container.delegateTo(CompanyAccountOpenedEventHandler, 'handle'),
-  // TrustAccountOpened: container.delegateTo(CompanyAccountOpenedEventHandler, 'handle'),
+  VerifyAccountForInvestment: container.delegateTo(VerifyAccountForInvestmentHandler, 'handle'),
 });
