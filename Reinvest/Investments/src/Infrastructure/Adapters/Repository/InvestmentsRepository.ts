@@ -35,6 +35,7 @@ export class InvestmentsRepository {
         'scheduledBy',
         'status',
         'subscriptionAgreementId',
+        'tradeId',
       ])
       .where('id', '=', investmentId)
       .executeTakeFirst();
@@ -48,13 +49,14 @@ export class InvestmentsRepository {
     const investmentSummary = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
-      .fullJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
+      .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
       .select([
         `${investmentsTable}.amount`,
         `${investmentsTable}.dateCreated`,
         `${investmentsTable}.id`,
         `${investmentsTable}.status`,
         `${investmentsTable}.subscriptionAgreementId`,
+        `${investmentsTable}.tradeId`,
       ])
       .select([`${investmentsFeesTable}.amount as feeAmount`])
       .where(`${investmentsTable}.id`, '=', investmentId)
@@ -66,7 +68,7 @@ export class InvestmentsRepository {
   }
 
   async create(investment: InvestmentCreate, money: Money) {
-    const { id, profileId, accountId, bankAccountId, scheduledBy, status } = investment;
+    const { id, profileId, accountId, bankAccountId, scheduledBy, status, tradeId } = investment;
     const amount = money.getAmount();
     try {
       await this.databaseAdapterProvider
@@ -84,6 +86,7 @@ export class InvestmentsRepository {
           scheduledBy,
           recurringInvestmentId: null,
           status,
+          tradeId,
         })
         .execute();
 

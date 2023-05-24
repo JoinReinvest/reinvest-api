@@ -120,7 +120,7 @@ export const Investments = {
     Query: {
       getInvestmentSummary: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
-        const investmentSummary = investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
+        const investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
 
         if (!investmentSummary) {
           throw new GraphQLError('CANNOT_GET_SUMMARY_FOR_GIVEN_INVESTMENT');

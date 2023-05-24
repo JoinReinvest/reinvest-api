@@ -1,7 +1,5 @@
 import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
 
-const mockedTradeId = '1f34478a-3456-65x7-b670-f9750685e291';
-
 class InvestmentSummaryQuery {
   static getClassName = (): string => 'InvestmentSummaryQuery';
 
@@ -20,7 +18,7 @@ class InvestmentSummaryQuery {
 
     return {
       id: investmentId,
-      tradeId: mockedTradeId,
+      tradeId: investment.tradeId,
       createdAt: investment.dateCreated,
       amount: investment.getInvestmentAmount(),
       status: investment.status,

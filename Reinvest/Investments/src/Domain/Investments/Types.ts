@@ -36,4 +36,5 @@ export type InvestmentSummarySchema = {
   id: string;
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
+  tradeId: string;
 };
