@@ -13,6 +13,7 @@ export interface InvestmentsTable {
   amount: number;
   bankAccountId: string;
   dateCreated: Date;
+  dateStarted: Date | null;
   dateUpdated: Date;
   id: string;
   profileId: string;
