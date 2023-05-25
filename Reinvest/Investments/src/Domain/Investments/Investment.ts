@@ -122,6 +122,7 @@ export class Investment {
       status: this.status,
       subscriptionAgreementId: this.subscriptionAgreementId,
       dateStarted: this.dateStarted,
+      tradeId: this.tradeId,
     };
   }
 

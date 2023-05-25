@@ -24,7 +24,9 @@ class SignSubscriptionAgreement {
       return false;
     }
 
-    return subscriptionAgreement.id;
+    const { id } = subscriptionAgreement.toObject();
+
+    return id;
   }
 }
 

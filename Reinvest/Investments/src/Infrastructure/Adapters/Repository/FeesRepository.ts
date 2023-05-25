@@ -23,13 +23,14 @@ export class FeesRepository {
   }
 
   async approveFee(fee: Fee) {
-    const { id, status } = fee.toObject();
+    const { id, status, approveDate } = fee.toObject();
     try {
       await this.databaseAdapterProvider
         .provide()
         .updateTable(investmentsFeesTable)
         .set({
           status,
+          approveDate,
         })
         .where('id', '=', id)
         .execute();

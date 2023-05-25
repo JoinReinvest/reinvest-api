@@ -1,5 +1,5 @@
 import TemplateParser, { DynamicType } from 'Investments/Application/Service/TemplateParser';
-import { latestSubscriptionAgreementVersion, subscriptionAgreements } from 'Investments/Domain/SubscriptionAgreement';
+import { subscriptionAgreementsTemplate, TemplateVersions } from 'Investments/Domain/SubscriptionAgreement';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class SubscriptionAgreementQuery {
@@ -18,15 +18,18 @@ class SubscriptionAgreementQuery {
       return false;
     }
 
-    const parser = new TemplateParser(subscriptionAgreements[latestSubscriptionAgreementVersion]);
-    const parsed = parser.parse(subscriptionAgreement.contentFieldsJson as DynamicType);
+    const { contentFieldsJson, templateVersion, id, agreementType, status, dateCreated, signedAt } = subscriptionAgreement.toObject();
+
+    const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as TemplateVersions]);
+
+    const parsed = parser.parse(contentFieldsJson as DynamicType);
 
     return {
-      id: subscriptionAgreement.id,
-      type: subscriptionAgreement.agreementType,
-      status: subscriptionAgreement.status,
-      createdAt: subscriptionAgreement.dateCreated,
-      signedAt: subscriptionAgreement.signedAt,
+      id,
+      type: agreementType,
+      status,
+      createdAt: dateCreated,
+      signedAt,
       content: parsed,
     };
   }
