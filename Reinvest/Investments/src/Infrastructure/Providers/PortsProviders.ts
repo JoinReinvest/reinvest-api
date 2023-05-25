@@ -8,13 +8,12 @@ import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
+import { Investments } from 'Investments/index';
 import { FeesController } from 'Investments/Infrastructure/Ports/FeesController';
 import { InvestmentsController } from 'Investments/Infrastructure/Ports/InvestmentsController';
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
-
-import { Investments } from '../..';
 
 export default class PortsProviders {
   private config: Investments.Config;

@@ -1,6 +1,6 @@
-import CreateSubscriptionAgreement from '../../Application/UseCases/CreateSubscriptionAgreement';
-import SignSubscriptionAgreement from '../../Application/UseCases/SignSubscriptionAgreement';
-import type SubscriptionAgreementQuery from '../../Application/UseCases/SubscriptionAgreementQuery';
+import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
+import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
+import type SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
 
 export class SubscriptionAgreementController {
   private createSubscriptionAgreementUseCase: CreateSubscriptionAgreement;

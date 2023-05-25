@@ -1,8 +1,7 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { investmentAccountConfiguration, InvestmentAccountDbProvider } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
 import type { AccountConfigurationCreate } from 'Reinvest/InvestmentAccounts/src/Application/CreateConfiguration';
 import { AutomaticDividendReinvestmentAgreement } from 'Reinvest/InvestmentAccounts/src/Domain/ValueObject/AutomaticDividendReinvestmentAgreement';
-
-import { investmentAccountConfiguration, InvestmentAccountDbProvider } from '../DatabaseAdapter';
 
 export class ConfigurationRepository {
   public static getClassName = (): string => 'ConfigurationRepository';
