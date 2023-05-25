@@ -5,6 +5,7 @@ import { TransactionEventHandler } from 'Investments/Application/DomainEventHand
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { TransactionCommands } from 'Investments/Domain/Transaction/TransactionCommands';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
@@ -12,6 +13,7 @@ import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 import { Investments } from '../..';
+import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/SharesEventHandler';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -22,8 +24,9 @@ export default class EventBusProvider {
 
   public boot(container: ContainerInterface) {
     container
+      .addSingleton(SharesEventHandler, [SharesAndDividendService])
       .addSingleton(TechnicalToDomainEventsHandler, [SimpleEventBus])
-      .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor])
+      .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler])
       .addSingleton(CheckIsGracePeriodEndedEventHandler, [InvestmentsRepository, SimpleEventBus])
       .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsRepository, SimpleEventBus]);
 

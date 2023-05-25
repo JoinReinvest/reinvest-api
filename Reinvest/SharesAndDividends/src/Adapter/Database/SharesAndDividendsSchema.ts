@@ -1,4 +1,5 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export interface SharesTable {
   accountId: string;
@@ -8,12 +9,12 @@ export interface SharesTable {
   dateSettled: Date | null;
   id: string;
   investmentId: string;
-  numberOfShares: number;
+  numberOfShares: number | null;
   portfolioId: string;
   price: number;
   profileId: string;
-  status: 'CREATED' | 'FUNDING' | 'FUNDED' | 'SETTLED' | 'REVOKED';
-  unitPrice: number;
+  status: SharesStatus;
+  unitPrice: number | null;
 }
 
 export interface DividendsDeclarationTable {

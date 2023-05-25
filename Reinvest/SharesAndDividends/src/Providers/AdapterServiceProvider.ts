@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import {
   createSharesAndDividendsDatabaseAdapterProvider,
@@ -17,6 +18,7 @@ export class AdapterServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
+    container.addSingleton(IdGenerator);
     container
       .addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container))
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])

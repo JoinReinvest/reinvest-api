@@ -2,6 +2,7 @@ import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { Investments } from 'Investments/index';
+import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import {
   createInvestmentsDatabaseAdapterProvider,
   InvestmentsDatabaseAdapterInstanceProvider,
@@ -36,6 +37,8 @@ export default class AdaptersProviders {
       .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator]);
+
+    container.addSingleton(SharesAndDividendService, ['SharesAndDividends']);
 
     // process manager
     container.addSingleton(TransactionExecutor, [SimpleEventBus]);

@@ -135,10 +135,15 @@ export function boot(): Modules {
 
   modules.register(
     Investments.moduleName,
-    Investments.create({
-      database: databaseConfig,
-      queue: queueConfig,
-    } as Investments.Config),
+    Investments.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as Investments.Config,
+      {
+        sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+      },
+    ),
   );
 
   modules.register(

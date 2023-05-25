@@ -1,7 +1,7 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
-import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
-import { subscriptionAgreements } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
+import { Portfolio } from 'Portfolio/index';
+import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
 import { LegalEntities } from 'Reinvest/LegalEntities/src';
 import type Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
@@ -119,7 +119,7 @@ export const Investments = {
   resolvers: {
     Query: {
       getInvestmentSummary: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
 
         if (!investmentSummary) {
@@ -129,7 +129,7 @@ export const Investments = {
         return investmentSummary;
       },
       getSubscriptionAgreement: async (parent: any, { subscriptionAgreementId }: any, { profileId, modules }: SessionContext) => {
-        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const subscriptionAgreement = await investmentAccountsApi.subscriptionAgreementQuery(profileId, subscriptionAgreementId);
 
@@ -142,7 +142,8 @@ export const Investments = {
     },
     Mutation: {
       createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
-        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+        const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
         const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
 
@@ -153,8 +154,9 @@ export const Investments = {
         }
 
         const bankAccountId = bankAccountData.bankAccountId;
+        const { portfolioId } = await portfolioApi.getActivePortfolio();
 
-        const investmentId = await investmentAccountsApi.createInvestment(profileId, individualAccountId, bankAccountId, amount);
+        const investmentId = await investmentAccountsApi.createInvestment(portfolioId, profileId, individualAccountId, bankAccountId, amount);
 
         return investmentId;
       },
@@ -162,7 +164,7 @@ export const Investments = {
         // if (!approveFees) {
         //   throw new GraphQLError('FEES_NOT_APPROVED');
         // }
-        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         let isApproved;
 
         if (approveFees) {
@@ -176,7 +178,7 @@ export const Investments = {
         const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId);
 
         if (!isStartedInvestment) {
-          throw new GraphQLError('CANNO_START_INVESTMENT');
+          throw new GraphQLError('CANNOT_START_INVESTMENT');
         }
 
         return isStartedInvestment;
@@ -185,7 +187,7 @@ export const Investments = {
         return true;
       },
       createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const subscriptionAgreementId = await investmentAccountsApi.createSubscriptionAgreement(profileId, investmentId);
 
@@ -198,7 +200,7 @@ export const Investments = {
         return subscriptionAgreement;
       },
       signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules, clientIp }: SessionContext) => {
-        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, investmentId, clientIp);
 

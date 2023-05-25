@@ -1,9 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
+import { SharesController } from 'SharesAndDividends/Port/Api/SharesController';
 
 export type SharesAndDividendsApiType = {
-  // canObjectBeUpdated: UserSharesAndDividendsActions['canObjectBeUpdated'];
+  createShares: SharesController['createShares'];
 };
 
 export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndDividendsApiType => ({
-  // canObjectBeUpdated: container.delegateTo(UserSharesAndDividendsActions, 'canObjectBeUpdated'),
+  createShares: container.delegateTo(SharesController, 'createShares'),
 });

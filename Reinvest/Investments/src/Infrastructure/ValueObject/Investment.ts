@@ -18,6 +18,7 @@ export class Investment {
   tradeId: string;
   dateStarted: Date | null;
   private gracePeriod: GracePeriod;
+  private portfolioId: string;
 
   constructor(
     accountId: string,
@@ -33,6 +34,7 @@ export class Investment {
     subscriptionAgreementId: string | null,
     tradeId: string,
     dateStarted: Date | null,
+    portfolioId: string,
   ) {
     this.accountId = accountId;
     this.amount = amount;
@@ -47,6 +49,7 @@ export class Investment {
     this.subscriptionAgreementId = subscriptionAgreementId;
     this.tradeId = tradeId;
     this.dateStarted = dateStarted;
+    this.portfolioId = portfolioId;
     this.gracePeriod = new GracePeriod(dateStarted);
   }
 
@@ -65,6 +68,7 @@ export class Investment {
       subscriptionAgreementId,
       tradeId,
       dateStarted,
+      portfolioId,
     } = data;
 
     return new Investment(
@@ -81,6 +85,7 @@ export class Investment {
       subscriptionAgreementId,
       tradeId,
       dateStarted,
+      portfolioId,
     );
   }
 
@@ -111,6 +116,7 @@ export class Investment {
       status: this.status,
       subscriptionAgreementId: this.subscriptionAgreementId,
       dateStarted: this.dateStarted,
+      portfolioId: this.portfolioId,
     };
   }
 

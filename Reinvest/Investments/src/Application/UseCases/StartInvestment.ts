@@ -2,8 +2,6 @@ import { InvestmentsRepository } from '../../Infrastructure/Adapters/Repository/
 import { SubscriptionAgreementRepository } from '../../Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class StartInvestment {
-  static getClassName = (): string => 'StartInvestment';
-
   private readonly investmentsRepository: InvestmentsRepository;
   private readonly subscriptionAgreementRepository: SubscriptionAgreementRepository;
 
@@ -12,24 +10,26 @@ class StartInvestment {
     this.subscriptionAgreementRepository = subscriptionAgreementRepository;
   }
 
+  static getClassName = (): string => 'StartInvestment';
+
   async execute(profileId: string, investmentId: string) {
     const investment = await this.investmentsRepository.get(investmentId);
 
     if (!investment) {
       return false;
     }
-
-    if (!investment.subscriptionAgreementId) {
-      return false;
-    }
-
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, investment.subscriptionAgreementId);
-
-    if (!subscriptionAgreement?.isSigned()) {
-      return false;
-    }
-
-    investment.setInvestmentStarted();
+    //todo uncomment
+    // if (!investment.subscriptionAgreementId) {
+    //   return false;
+    // }
+    //
+    // const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, investment.subscriptionAgreementId);
+    //
+    // if (!subscriptionAgreement?.isSigned()) {
+    //   return false;
+    // }
+    //
+    // investment.setInvestmentStarted();
 
     const isStarted = await this.investmentsRepository.startInvestment(investment);
 

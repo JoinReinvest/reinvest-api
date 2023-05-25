@@ -5,6 +5,7 @@ import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment'
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
+import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
 import { FeesController } from 'Investments/Infrastructure/Ports/FeesController';
 import { InvestmentsController } from 'Investments/Infrastructure/Ports/InvestmentsController';
@@ -23,7 +24,7 @@ export default class PortsProviders {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(TempController, [SimpleEventBus]);
-    container.addSingleton(InvestmentsController, [CreateInvestment, InvestmentSummaryQuery, AssignSubscriptionAgreementToInvestment]);
+    container.addSingleton(InvestmentsController, [CreateInvestment, InvestmentSummaryQuery, AssignSubscriptionAgreementToInvestment, StartInvestment]);
     container.addSingleton(SubscriptionAgreementController, [CreateSubscriptionAgreement, SubscriptionAgreementQuery, SignSubscriptionAgreement]);
     container.addSingleton(FeesController, [ApproveFees]);
   }

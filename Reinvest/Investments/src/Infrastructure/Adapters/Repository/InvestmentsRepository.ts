@@ -1,3 +1,4 @@
+import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { Investment } from 'Investments/Infrastructure/ValueObject/Investment';
 import type { Money } from 'Money/Money';
@@ -9,8 +10,6 @@ import type { DomainEvent } from 'SimpleAggregator/Types';
 import { InvestmentSummary } from '../../ValueObject/InvestmentSummary';
 
 export class InvestmentsRepository {
-  public static getClassName = (): string => 'InvestmentsRepository';
-
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
   private eventsPublisher: SimpleEventBus;
 
@@ -18,6 +17,8 @@ export class InvestmentsRepository {
     this.databaseAdapterProvider = databaseAdapterProvider;
     this.eventsPublisher = eventsPublisher;
   }
+
+  public static getClassName = (): string => 'InvestmentsRepository';
 
   async get(investmentId: string) {
     const investment = await this.databaseAdapterProvider
@@ -37,6 +38,7 @@ export class InvestmentsRepository {
         'subscriptionAgreementId',
         'tradeId',
         'dateStarted',
+        'portfolioId',
       ])
       .where('id', '=', investmentId)
       .executeTakeFirst();
@@ -69,7 +71,7 @@ export class InvestmentsRepository {
   }
 
   async create(investment: InvestmentCreate, money: Money) {
-    const { id, profileId, accountId, bankAccountId, scheduledBy, status, tradeId } = investment;
+    const { id, profileId, accountId, bankAccountId, scheduledBy, status, tradeId, portfolioId } = investment;
     const amount = money.getAmount();
     try {
       await this.databaseAdapterProvider
@@ -89,6 +91,7 @@ export class InvestmentsRepository {
           recurringInvestmentId: null,
           status,
           tradeId,
+          portfolioId,
         })
         .execute();
 
@@ -122,8 +125,22 @@ export class InvestmentsRepository {
   }
 
   async startInvestment(investment: Investment) {
-    const { id, status, dateStarted } = investment.toObject();
+    const { id, status, dateStarted, accountId, profileId, amount, portfolioId } = investment.toObject();
     try {
+      await this.publishEvents([
+        <InvestmentCreated>{
+          id,
+          kind: TransactionEvents.INVESTMENT_CREATED,
+          date: new Date(),
+          data: {
+            profileId,
+            accountId,
+            portfolioId,
+            amount,
+          },
+        },
+      ]);
+
       await this.databaseAdapterProvider
         .provide()
         .updateTable(investmentsTable)
