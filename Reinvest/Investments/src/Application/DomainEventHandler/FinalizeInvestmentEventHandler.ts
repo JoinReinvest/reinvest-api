@@ -17,10 +17,6 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
   async handle(event: TransactionEvent): Promise<void> {
     const investmentId = event.id;
 
-    // TODO remove it when pdf creation is implemented
-    // const subscriptionAgreementId = '1aff4de0-bed6-4b4d-8a10-98aac94d9d74';
-    // const bankAccountId = '69953c8b-34fe-4d0b-aec3-1a8a426827a8';
-
     const investmentDetails = await this.investmentsQueryRepository.getInvestmentDetailsForTransaction(investmentId);
 
     if (!investmentDetails) {

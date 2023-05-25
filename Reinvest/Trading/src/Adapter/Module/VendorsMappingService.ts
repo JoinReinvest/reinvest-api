@@ -1,7 +1,7 @@
 import { VendorsConfiguration } from 'Trading/Domain/Trade';
 
-export class RegistrationService {
-  static getClassName = () => 'RegistrationService';
+export class VendorsMappingService {
+  static getClassName = () => 'VendorsMappingService';
 
   async getVendorsConfiguration(portfolioId: string, bankAccountId: string, accountId: string): Promise<VendorsConfiguration> {
     // TODO: get mapping configuration from the registration module

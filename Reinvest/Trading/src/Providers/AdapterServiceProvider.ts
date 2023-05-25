@@ -4,8 +4,8 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { createTradingDatabaseAdapterProvider, TradingDatabaseAdapterInstanceProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
-import { RegistrationService } from 'Trading/Adapter/Module/RegistrationService';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
+import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { Trading } from 'Trading/index';
@@ -29,7 +29,7 @@ export class AdapterServiceProvider {
       .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider]);
 
     // modules
-    container.addSingleton(RegistrationService, ['Registration']).addSingleton(TradingDocumentService, ['Documents']);
+    container.addSingleton(VendorsMappingService, ['Registration']).addSingleton(TradingDocumentService, ['Documents']);
 
     // north capital
     container.addAsValue('NorthCapitalConfig', this.config.northCapital).addSingleton(TradingNorthCapitalAdapter, ['NorthCapitalConfig']);
