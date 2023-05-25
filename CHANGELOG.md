@@ -10,6 +10,7 @@
     * `getSubscriptionAgreement`
     * `createInvestment`
     * `createSubscriptionAgreement`
+    * `getInvestmentSummary`
 
 ## 1.13.1 - 05/23/2023
 
