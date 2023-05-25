@@ -7,6 +7,7 @@ import { sadSharesTable, SharesAndDividendsDatabase } from 'SharesAndDividends/A
  *   profileId: string;
  *   accountId: string;
  *   investmentId: string;
+ *   portfolioId: string;
  *   dateCreated: Date;
  *   dateFunded: Date | null;
  *   dateSettled: Date | null;
@@ -25,6 +26,7 @@ export async function up(db: Kysely<SharesAndDividendsDatabase>): Promise<void> 
     .addColumn('profileId', 'uuid', col => col.notNull())
     .addColumn('accountId', 'uuid', col => col.notNull())
     .addColumn('investmentId', 'uuid', col => col.notNull())
+    .addColumn('portfolioId', 'uuid', col => col.notNull())
     .addColumn('dateCreated', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .addColumn('dateFunded', 'timestamp', col => col.notNull().defaultTo(null))
     .addColumn('dateSettled', 'timestamp', col => col.notNull().defaultTo(null))
