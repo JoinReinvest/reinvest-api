@@ -20,7 +20,7 @@ export class InvestmentsRepository {
 
   public static getClassName = (): string => 'InvestmentsRepository';
 
-  async get(investmentId: string) {
+  async get(investmentId: string): Promise<Investment | null> {
     const investment = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
@@ -43,7 +43,9 @@ export class InvestmentsRepository {
       .where('id', '=', investmentId)
       .executeTakeFirst();
 
-    if (!investment) return false;
+    if (!investment) {
+      return null;
+    }
 
     return Investment.create(investment);
   }

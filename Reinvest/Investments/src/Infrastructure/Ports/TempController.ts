@@ -11,7 +11,7 @@ export class TempController {
   public static getClassName = (): string => 'TempController';
 
   public async handle(): Promise<boolean> {
-    const investmentId = 'c147ef0c-1bf5-48eb-9e37-9a1131ea39bc';
+    const investmentId = 'a7463e35-9b20-4d41-8cb0-861b0f4487a4';
     const accountId = '6a7dd75b-8c65-41dd-af2d-9e6479e1b5c2';
     const profileId = 'aeb8cfdd-67fb-44ee-a562-0113d5e4fec5'; //lukasz@devkick.pl
     await this.eventBus.publish(<InvestmentCreated>{
@@ -21,8 +21,8 @@ export class TempController {
       data: {
         profileId,
         accountId,
-        portfolioId: 'b1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d',
-        amount: 50000,
+        portfolioId: '34ccfe14-dc18-40df-a1d6-04f33b9fa7f4',
+        amount: 100000,
       },
     });
 

@@ -7,6 +7,7 @@ import {
   createInvestmentsDatabaseAdapterProvider,
   InvestmentsDatabaseAdapterInstanceProvider,
 } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
+import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
@@ -36,7 +37,8 @@ export default class AdaptersProviders {
       .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
-      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator]);
+      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
+      .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
 
     container.addSingleton(SharesAndDividendService, ['SharesAndDividends']);
 
