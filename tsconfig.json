@@ -26,6 +26,7 @@
       "Verification/*": ["./Reinvest/Verification/src/*"],
       "Trading/*": ["./Reinvest/Trading/src/*"],
       "SharesAndDividends/*": ["./Reinvest/SharesAndDividends/src/*"],
+      "Portfolio/*": ["./Reinvest/Portfolio/src/*"],
     }
   },
   "include": [

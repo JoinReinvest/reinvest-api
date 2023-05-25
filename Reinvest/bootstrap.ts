@@ -5,6 +5,7 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { logger } from 'Logger/logger';
+import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
@@ -47,6 +48,14 @@ export function boot(): Modules {
       database: databaseConfig,
       s3: s3Config,
     } as Documents.Config),
+  );
+
+  modules.register(
+    Portfolio.moduleName,
+    Portfolio.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as Portfolio.Config),
   );
 
   modules.register(
