@@ -1,22 +1,24 @@
 import { GracePeriod } from 'Investments/Domain/Investments/GracePeriod';
+import { InvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
-import { InvestmentStatus, ScheduledBy } from '../../Domain/Investments/Types';
-import { InvestmentsTable } from '../Adapters/PostgreSQL/InvestmentsSchema';
+import { InvestmentStatus, ScheduledBy } from './Types';
+
+type InvestmentSchema = InvestmentsTable;
 
 export class Investment {
-  accountId: string;
-  amount: number;
-  bankAccountId: string;
-  dateCreated: Date;
-  dateUpdated: Date;
-  id: string;
-  profileId: string;
-  recurringInvestmentId: string | null;
-  scheduledBy: ScheduledBy;
-  status: InvestmentStatus;
-  subscriptionAgreementId: string | null;
-  tradeId: string;
-  dateStarted: Date | null;
+  private accountId: string;
+  private amount: number;
+  private bankAccountId: string;
+  private dateCreated: Date;
+  private dateUpdated: Date;
+  private id: string;
+  private profileId: string;
+  private recurringInvestmentId: string | null;
+  private scheduledBy: ScheduledBy;
+  private status: InvestmentStatus;
+  private subscriptionAgreementId: string | null;
+  private tradeId: string;
+  private dateStarted: Date | null;
   private gracePeriod: GracePeriod;
 
   constructor(
@@ -50,7 +52,7 @@ export class Investment {
     this.gracePeriod = new GracePeriod(dateStarted);
   }
 
-  static create(data: InvestmentsTable) {
+  static create(data: InvestmentSchema) {
     const {
       accountId,
       amount,
@@ -92,9 +94,18 @@ export class Investment {
     this.status = status;
   }
 
-  setInvestmentStarted() {
+  getSubscriptionAgreementId() {
+    return this.subscriptionAgreementId;
+  }
+
+  startInvestment() {
     this.dateStarted = new Date();
     this.gracePeriod = new GracePeriod(this.dateStarted);
+    this.status = InvestmentStatus.IN_PROGRESS;
+  }
+
+  isStartedInvestment() {
+    return this.status === InvestmentStatus.IN_PROGRESS && this.dateStarted !== null;
   }
 
   toObject() {

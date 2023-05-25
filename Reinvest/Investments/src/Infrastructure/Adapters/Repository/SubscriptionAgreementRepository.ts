@@ -1,9 +1,7 @@
 import { JSONObject } from 'HKEKTypes/Generics';
 import type { SubscriptionAgreementCreate } from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import { InvestmentsDatabaseAdapterProvider, subscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-
-import { SubscriptionAgreement } from '../../ValueObject/SubscriptionAgreement';
-
+import { SubscriptionAgreement } from 'Reinvest/Investments/src/Domain/Investments/SubscriptionAgreement';
 export class SubscriptionAgreementRepository {
   public static getClassName = (): string => 'SubscriptionAgreementRepository';
 

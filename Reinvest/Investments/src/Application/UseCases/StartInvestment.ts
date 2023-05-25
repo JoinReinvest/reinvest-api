@@ -1,5 +1,5 @@
-import { InvestmentsRepository } from '../../Infrastructure/Adapters/Repository/InvestmentsRepository';
-import { SubscriptionAgreementRepository } from '../../Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
+import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class StartInvestment {
   static getClassName = (): string => 'StartInvestment';
@@ -19,17 +19,23 @@ class StartInvestment {
       return false;
     }
 
-    if (!investment.subscriptionAgreementId) {
+    if (investment.isStartedInvestment()) {
+      return true;
+    }
+
+    const subscriptionAgreementId = investment.getSubscriptionAgreementId();
+
+    if (!subscriptionAgreementId) {
       return false;
     }
 
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, investment.subscriptionAgreementId);
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, subscriptionAgreementId);
 
     if (!subscriptionAgreement?.isSigned()) {
       return false;
     }
 
-    investment.setInvestmentStarted();
+    investment.startInvestment();
 
     const isStarted = await this.investmentsRepository.startInvestment(investment);
 

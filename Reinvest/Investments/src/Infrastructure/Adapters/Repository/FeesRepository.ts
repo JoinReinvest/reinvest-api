@@ -1,7 +1,5 @@
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-
-import { Fee } from '../../ValueObject/Fee';
-
+import { Fee } from 'Reinvest/Investments/src/Domain/Investments/Fee';
 export class FeesRepository {
   public static getClassName = (): string => 'FeesRepository';
 

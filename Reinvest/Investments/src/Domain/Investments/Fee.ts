@@ -1,5 +1,8 @@
-import { InvestmentsFeesStatus } from '../../Domain/Investments/Types';
-import { InvestmentsFeesTable } from '../Adapters/PostgreSQL/InvestmentsSchema';
+import type { InvestmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+
+import { InvestmentsFeesStatus } from './Types';
+
+type FeeSchema = InvestmentsFeesTable;
 
 export class Fee {
   accountId: string;
@@ -37,7 +40,7 @@ export class Fee {
     this.verificationFeeId = verificationFeeId;
   }
 
-  static create(data: InvestmentsFeesTable) {
+  static create(data: FeeSchema) {
     const { accountId, amount, approveDate, approvedByIP, dateCreated, id, investmentId, profileId, status, verificationFeeId } = data;
 
     return new Fee(accountId, amount, approveDate, approvedByIP, dateCreated, id, investmentId, profileId, status, verificationFeeId);
@@ -45,6 +48,10 @@ export class Fee {
 
   approveFee() {
     this.status = InvestmentsFeesStatus.APPROVED;
+  }
+
+  isApproved() {
+    return this.status === InvestmentsFeesStatus.APPROVED;
   }
 
   toObject() {

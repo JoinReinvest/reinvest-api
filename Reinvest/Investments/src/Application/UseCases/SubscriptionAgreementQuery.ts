@@ -1,6 +1,6 @@
 import TemplateParser, { DynamicType } from '../../Application/Service/TemplateParser';
 import { latestSubscriptionAgreementVersion, subscriptionAgreements } from '../../Domain/SubscriptionAgreement';
-import { SubscriptionAgreementRepository } from '../Adapters/Repository/SubscriptionAgreementRepository';
+import { SubscriptionAgreementRepository } from '../../Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class SubscriptionAgreementQuery {
   static getClassName = (): string => 'SubscriptionAgreementQuery';

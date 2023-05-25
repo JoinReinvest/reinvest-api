@@ -3,8 +3,8 @@ import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import type { DynamicType } from '../../Application/Service/TemplateParser';
 import { AgreementTypes, SubscriptionAgreementStatus } from '../../Domain/Investments/Types';
 import { latestSubscriptionAgreementVersion } from '../../Domain/SubscriptionAgreement';
-import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
-import { SubscriptionAgreementRepository } from '../Adapters/Repository/SubscriptionAgreementRepository';
+import { InvestmentsRepository } from '../../Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { SubscriptionAgreementRepository } from '../../Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 export type SubscriptionAgreementCreate = {
   accountId: string;

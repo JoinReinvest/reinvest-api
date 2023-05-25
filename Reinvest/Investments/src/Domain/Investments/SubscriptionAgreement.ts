@@ -1,7 +1,8 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
+import { SubscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
-import { AgreementTypes, SubscriptionAgreementStatus } from '../../Domain/Investments/Types';
-import { SubscriptionAgreementTable } from '../Adapters/PostgreSQL/InvestmentsSchema';
+type SubscriptionAgreementSchema = SubscriptionAgreementTable;
 
 export class SubscriptionAgreement {
   accountId: string;
@@ -45,7 +46,7 @@ export class SubscriptionAgreement {
     this.templateVersion = templateVersion;
   }
 
-  static create(data: SubscriptionAgreementTable) {
+  static create(data: SubscriptionAgreementSchema) {
     const {
       id,
       profileId,

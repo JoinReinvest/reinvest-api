@@ -1,6 +1,5 @@
+import type { InvestmentStatus, InvestmentSummarySchema } from 'Investments/Domain/Investments/Types';
 import { Money } from 'Money/Money';
-
-import { InvestmentStatus, InvestmentSummarySchema } from '../../Domain/Investments/Types';
 
 export class InvestmentSummary {
   amount: number;
