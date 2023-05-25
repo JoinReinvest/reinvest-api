@@ -1,0 +1,27 @@
+@startuml
+
+participant "Trigger" as T
+participant "By" as B
+
+participant "Module" as M
+participant "API" as API
+participant "DB" as DB
+
+opt Dividend declaration
+T -> B: Admin API
+B -> M: SharesAndDividends
+M -> API: declareDividend(declaredOnDate, amount)
+API -> DB: table:declared_dividends
+end
+
+opt Calculate dividends
+T -> B: Cronjob
+B -> M: SharesAndDividends
+M -> API: CalculateDividends
+DB -> API: table:declared_dividends
+DB -> API: table:shares
+
+end
+
+
+@enduml

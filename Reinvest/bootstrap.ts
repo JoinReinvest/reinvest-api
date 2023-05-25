@@ -24,6 +24,7 @@ import { Identity } from 'Reinvest/Identity/src';
 import Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 import { Trading } from 'Trading/index';
 import { Verification } from 'Verification/index';
 
@@ -46,6 +47,14 @@ export function boot(): Modules {
       database: databaseConfig,
       s3: s3Config,
     } as Documents.Config),
+  );
+
+  modules.register(
+    SharesAndDividends.moduleName,
+    SharesAndDividends.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as SharesAndDividends.Config),
   );
 
   modules.register(
