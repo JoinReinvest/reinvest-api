@@ -5,22 +5,39 @@ participant "By" as B
 
 participant "Module" as M
 participant "API" as API
-participant "DB" as DB
+participant "DB(sad)" as DB
 
 opt Dividend declaration
 T -> B: Admin API
 B -> M: SharesAndDividends
-M -> API: declareDividend(declaredOnDate, amount)
-API -> DB: table:declared_dividends
+M -> API: M:declareDividend(declaredOnDate, amount)
+API -> DB: table:dividends_declaration
 end
 
 opt Calculate dividends
 T -> B: Cronjob
 B -> M: SharesAndDividends
-M -> API: CalculateDividends
-DB -> API: table:declared_dividends
-DB -> API: table:shares
+M -> API: calculateDividends
+DB -> API: table:shares(!REVOKED)
+DB -> API: table:dividends_declaration(CALCULATING)
+API -> DB: table:calculated_dividends(AWAITING_DISTRIBUTION/LOCKED)
+API -> DB: table:dividends_declaration(CALCULATED)
+end
 
+opt Distribute dividends
+T -> B: Admin API
+B -> M: SharesAndDividends
+M -> API: M:addDividendsDistribution(date)
+API -> DB: table:dividend_distribution(DISTRIBUTING)
+
+T -> B: Cronjob
+B -> M: SharesAndDividends
+M -> API: distributeDividends(date)
+DB -> API: table:calculated_dividends(AWAITING_DISTRIBUTION)
+DB -> API: table:dividend_distribution(DISTRIBUTING)
+API -> DB: table:investor_dividends(AWAITING_ACTION)
+API -> M: Notifications(Notify investor)
+API -> DB: table:dividend_distribution(DISTRIBUTED)
 end
 
 
