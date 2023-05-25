@@ -181,8 +181,18 @@ export const Investments = {
 
         return subscriptionAgreement;
       },
-      signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+      signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules, clientIp }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+
+        const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, investmentId, clientIp);
+
+        if (!subscriptionAgreementId) {
+          throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
+        }
+
+        const isAssigned = investmentAccountsApi.assignSubscriptionAgreementToInvestment(investmentId, subscriptionAgreementId);
+
+        return isAssigned;
       },
       abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;

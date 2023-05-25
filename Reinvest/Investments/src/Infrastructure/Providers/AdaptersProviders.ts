@@ -32,12 +32,10 @@ export default class AdaptersProviders {
     // database
     container
       .addAsValue(InvestmentsDatabaseAdapterInstanceProvider, createInvestmentsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider])
-      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
-      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
-      .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
+      .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator]);
 
     // process manager
     container.addSingleton(TransactionExecutor, [SimpleEventBus]);

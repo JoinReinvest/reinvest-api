@@ -79,6 +79,30 @@ export class Investment {
     );
   }
 
+  assignSubscriptionAgreement(id: string) {
+    this.subscriptionAgreementId = id;
+  }
+
+  updateStatus(status: InvestmentStatus) {
+    this.status = status;
+  }
+
+  toObject() {
+    return {
+      accountId: this.accountId,
+      amount: this.amount,
+      bankAccountId: this.bankAccountId,
+      dateCreated: this.dateCreated,
+      dateUpdated: this.dateUpdated,
+      id: this.id,
+      profileId: this.profileId,
+      recurringInvestmentId: this.recurringInvestmentId,
+      scheduledBy: this.scheduledBy,
+      status: this.status,
+      subscriptionAgreementId: this.subscriptionAgreementId,
+    };
+  }
+
   isGracePeriodEnded() {
     return this.gracePeriod.isGracePeriodEnded();
   }
