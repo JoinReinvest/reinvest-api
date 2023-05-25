@@ -3,6 +3,7 @@ import type { Money } from 'Money/Money';
 
 import { InvestmentStatus, ScheduledBy } from '../../Domain/Investments/Types';
 import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
+import TradeId from '../ValueObject/TradeId';
 
 export type InvestmentCreate = {
   accountId: string;
@@ -11,6 +12,7 @@ export type InvestmentCreate = {
   profileId: string;
   scheduledBy: ScheduledBy;
   status: InvestmentStatus;
+  tradeId: string;
 };
 
 class CreateInvestment {
@@ -27,6 +29,8 @@ class CreateInvestment {
   async execute(profileId: string, accountId: string, bankAccountId: string, money: Money) {
     const id = this.idGenerator.createUuid();
 
+    const tradeIdSize = TradeId.getTradeIdSize();
+
     const investment: InvestmentCreate = {
       id,
       profileId,
@@ -34,6 +38,7 @@ class CreateInvestment {
       accountId,
       scheduledBy: ScheduledBy.DIRECT,
       status: InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT,
+      tradeId: this.idGenerator.createNumericId(tradeIdSize),
     };
     const status = this.investmentsRepository.create(investment, money);
 
