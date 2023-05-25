@@ -18,18 +18,18 @@ class StartInvestment {
     if (!investment) {
       return false;
     }
-    //todo uncomment
-    // if (!investment.subscriptionAgreementId) {
-    //   return false;
-    // }
-    //
-    // const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, investment.subscriptionAgreementId);
-    //
-    // if (!subscriptionAgreement?.isSigned()) {
-    //   return false;
-    // }
-    //
-    // investment.setInvestmentStarted();
+
+    if (!investment.subscriptionAgreementId) {
+      return false;
+    }
+
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, investment.subscriptionAgreementId);
+
+    if (!subscriptionAgreement?.isSigned()) {
+      return false;
+    }
+
+    investment.setInvestmentStarted();
 
     const isStarted = await this.investmentsRepository.startInvestment(investment);
 
