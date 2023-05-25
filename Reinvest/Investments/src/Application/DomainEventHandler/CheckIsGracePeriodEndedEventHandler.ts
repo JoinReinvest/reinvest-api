@@ -21,12 +21,15 @@ export class CheckIsGracePeriodEndedEventHandler implements EventHandler<Transac
     }
 
     const investmentId = event.id;
-    // TODO read investment from repository
+    const investment = await this.investmentRepository.get(investmentId);
+    // TODO - uncomment it to add grace period validation
+    // if (investment && investment.isGracePeriodEnded()) {
     await this.eventBus.publish(<GracePeriodEnded>{
       kind: TransactionEvents.GRACE_PERIOD_ENDED,
       id: investmentId,
       date: new Date(),
       data: {},
     });
+    // }
   }
 }

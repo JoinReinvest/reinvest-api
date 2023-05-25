@@ -1,6 +1,7 @@
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
+import { Trade } from 'Trading/Domain/Trade';
 
 export class TransferSharesWhenTradeSettled {
   private tradesRepository: TradesRepository;
@@ -19,20 +20,84 @@ export class TransferSharesWhenTradeSettled {
     try {
       const trade = await this.tradesRepository.getTradeByInvestmentId(investmentId);
 
-      // CHECK_IF_FUNDS_WERE_DISBURSED
-      // -> record payment in vertalo
-      // -> transfer shares to investor
       if (!trade) {
-        throw new Error(`Trade ${investmentId} is not awaiting funding`);
+        throw new Error(`Trade ${investmentId} not exists`);
       }
 
-      console.info(`[Trade ${investmentId}]`, '[MOCK] TransferSharesWhenTradeSettled');
+      console.info(`[Trade ${investmentId}]`, 'Transfer shares when trade is settled started');
+
+      const tradeStatus = await this.verifyTradeStatus(trade);
+
+      if (!tradeStatus || !trade.isTradeSettled()) {
+        console.info(`[Trade ${investmentId}]`, 'Trade is not settled yet');
+
+        return false;
+      }
+
+      const isPaymentMarked = await this.markPaymentInVertalo(trade);
+
+      if (!isPaymentMarked) {
+        console.info(`[Trade ${investmentId}]`, 'Mark payment in Vertalo failed');
+
+        return false;
+      }
+
+      await this.transferSharesInVertalo(trade);
+
+      console.info(`[Trade ${investmentId}]`, 'Transfer shares when trade is settled success');
 
       return true;
     } catch (error) {
-      console.error(`[Trade ${investmentId}]`, 'TransferSharesWhenTradeSettled failed', error);
+      console.error(`[Trade ${investmentId}]`, 'Transfer shares when trade is settled failed', error);
 
       return false;
     }
+  }
+
+  private async verifyTradeStatus(trade: Trade): Promise<boolean> {
+    const tradeId = trade.getTradeId();
+
+    if (!trade.isTradeSettled()) {
+      const tradeStatus = await this.northCapitalAdapter.getTradeStatus(tradeId);
+
+      if (tradeStatus !== 'settled') {
+        return false;
+      }
+
+      console.info(`[Trade ${trade.getInvestmentId()}]`, 'Transfer settled in North Capital');
+      trade.setDisbursementStateAsCompleted();
+      trade.setTradeStatusToSettled();
+      await this.tradesRepository.updateTrade(trade);
+    }
+
+    return true;
+  }
+
+  private async markPaymentInVertalo(trade: Trade): Promise<boolean> {
+    if (trade.isPaymentMarkedInVertalo()) {
+      return true;
+    }
+
+    const { distributionId, amount } = trade.getVertaloDistributionPaymentDetails();
+    const { paymentId } = await this.vertaloAdapter.markPayment(distributionId, amount);
+    trade.setVertaloPaymentState(paymentId);
+    await this.tradesRepository.updateTrade(trade);
+    console.info(`[Trade ${trade.getInvestmentId()}]`, 'Payment marked in Vertalo');
+
+    return true;
+  }
+
+  private async transferSharesInVertalo(trade: Trade): Promise<boolean> {
+    if (trade.isSharesTransferredInVertalo()) {
+      return true;
+    }
+
+    const { distributionId } = trade.getVertaloDistributionPaymentDetails();
+    const { holdingId } = await this.vertaloAdapter.issueShares(distributionId);
+    trade.setVertaloSharesTransferState(holdingId);
+    await this.tradesRepository.updateTrade(trade);
+    console.info(`[Trade ${trade.getInvestmentId()}]`, 'Shares transferred in Vertalo, holdingId:', holdingId);
+
+    return true;
   }
 }
