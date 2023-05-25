@@ -9,6 +9,7 @@ export interface SharesTable {
   id: string;
   investmentId: string;
   numberOfShares: number;
+  portfolioId: string;
   price: number;
   profileId: string;
   status: 'CREATED' | 'FUNDING' | 'FUNDED' | 'SETTLED' | 'REVOKED';
@@ -22,6 +23,7 @@ export interface DividendsDeclarationTable {
   id: string;
   numberOfDays: number;
   numberOfShares: number;
+  portfolioId: string;
   status: 'CALCULATING' | 'CALCULATED';
   totalDividendAmount: number;
   unitAmountPerSharePerDay: number;

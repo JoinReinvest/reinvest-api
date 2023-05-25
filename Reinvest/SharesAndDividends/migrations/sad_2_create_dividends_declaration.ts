@@ -4,6 +4,7 @@ import { sadDividendsDeclarationsTable, SharesAndDividendsDatabase } from 'Share
 /**
  * export interface DividendsDeclarationTable {
  *   id: string;
+ *   portfolioId: string;
  *   calculatedFromDate: Date;
  *   calculatedToDate: Date;
  *   createdDate: Date;
@@ -19,6 +20,7 @@ export async function up(db: Kysely<SharesAndDividendsDatabase>): Promise<void> 
   await db.schema
     .createTable(sadDividendsDeclarationsTable)
     .addColumn('id', 'uuid', col => col.primaryKey())
+    .addColumn('portfolioId', 'uuid', col => col.notNull())
     .addColumn('calculatedFromDate', 'timestamp', col => col.notNull())
     .addColumn('calculatedToDate', 'timestamp', col => col.notNull())
     .addColumn('createdDate', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
