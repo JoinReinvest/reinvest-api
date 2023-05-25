@@ -13,6 +13,7 @@ export class Investment {
   scheduledBy: ScheduledBy;
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
+  tradeId: string;
 
   constructor(
     accountId: string,
@@ -26,6 +27,7 @@ export class Investment {
     scheduledBy: ScheduledBy,
     status: InvestmentStatus,
     subscriptionAgreementId: string | null,
+    tradeId: string,
   ) {
     this.accountId = accountId;
     this.amount = amount;
@@ -38,11 +40,24 @@ export class Investment {
     this.scheduledBy = scheduledBy;
     this.status = status;
     this.subscriptionAgreementId = subscriptionAgreementId;
+    this.tradeId = tradeId;
   }
 
   static create(data: InvestmentsTable) {
-    const { accountId, amount, bankAccountId, dateCreated, dateUpdated, id, profileId, recurringInvestmentId, scheduledBy, status, subscriptionAgreementId } =
-      data;
+    const {
+      accountId,
+      amount,
+      bankAccountId,
+      dateCreated,
+      dateUpdated,
+      id,
+      profileId,
+      recurringInvestmentId,
+      scheduledBy,
+      status,
+      subscriptionAgreementId,
+      tradeId,
+    } = data;
 
     return new Investment(
       accountId,
@@ -56,6 +71,7 @@ export class Investment {
       scheduledBy,
       status,
       subscriptionAgreementId,
+      tradeId,
     );
   }
 }
