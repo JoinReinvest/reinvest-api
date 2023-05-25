@@ -1,3 +1,5 @@
+import { GracePeriod } from 'Investments/Domain/Investments/GracePeriod';
+
 import { InvestmentStatus, ScheduledBy } from '../../Domain/Investments/Types';
 import { InvestmentsTable } from '../Adapters/PostgreSQL/InvestmentsSchema';
 
@@ -13,6 +15,7 @@ export class Investment {
   scheduledBy: ScheduledBy;
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
+  private gracePeriod: GracePeriod;
   tradeId: string;
 
   constructor(
@@ -41,6 +44,7 @@ export class Investment {
     this.status = status;
     this.subscriptionAgreementId = subscriptionAgreementId;
     this.tradeId = tradeId;
+    this.gracePeriod = new GracePeriod(dateCreated);
   }
 
   static create(data: InvestmentsTable) {
@@ -97,5 +101,9 @@ export class Investment {
       status: this.status,
       subscriptionAgreementId: this.subscriptionAgreementId,
     };
+  }
+
+  isGracePeriodEnded() {
+    return this.gracePeriod.isGracePeriodEnded();
   }
 }

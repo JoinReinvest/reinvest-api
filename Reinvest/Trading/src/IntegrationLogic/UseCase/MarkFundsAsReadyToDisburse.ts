@@ -16,11 +16,19 @@ export class MarkFundsAsReadyToDisburse {
     try {
       const trade = await this.tradesRepository.getTradeByInvestmentId(investmentId);
 
+      console.info(`[Trade ${investmentId}]`, 'Mark trade to be ready to disburse');
+
       if (!trade) {
-        throw new Error(`Trade ${investmentId} is not awaiting funding`);
+        throw new Error(`Trade ${investmentId} not exists`);
       }
 
-      console.info(`[Trade ${investmentId}]`, 'Mark trade to be ready to disburse');
+      if (trade.isMarkedReadyToDisbursement()) {
+        return true;
+      }
+
+      await this.northCapitalAdapter.markTradeAsReadyToDisburse(trade.getTradeId());
+      trade.setDisbursementStateAsMarked();
+      await this.tradesRepository.updateTrade(trade);
 
       return true;
     } catch (error) {

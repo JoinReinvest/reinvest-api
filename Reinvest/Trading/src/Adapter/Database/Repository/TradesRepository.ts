@@ -2,14 +2,17 @@ import { Updateable } from 'kysely';
 import { tradesTable, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { TradesTable } from 'Trading/Adapter/Database/TradingSchema';
 import {
+  DisbursementState,
   FundsMoveState,
   NorthCapitalTradeState,
+  SharesTransferState,
   SubscriptionAgreementState,
   Trade,
   TradeConfiguration,
   TradeSchema,
   VendorsConfiguration,
   VertaloDistributionState,
+  VertaloPaymentState,
 } from 'Trading/Domain/Trade';
 
 export class TradesRepository {
@@ -44,7 +47,10 @@ export class TradesRepository {
         'northCapitalTradeStateJson',
         'subscriptionAgreementStateJson',
         'vertaloDistributionStateJson',
+        'sharesTransferJson',
+        'disbursementJson',
         'tradeId',
+        'vertaloPaymentJson',
       ])
       .where('investmentId', '=', investmentId)
       .executeTakeFirst();
@@ -69,7 +75,10 @@ export class TradesRepository {
         vertaloDistributionStateJson: null,
         subscriptionAgreementStateJson: null,
         fundsMoveStateJson: null,
+        sharesTransferJson: null,
+        disbursementJson: null,
         tradeId: null,
+        vertaloPaymentJson: null,
       })
       .execute();
 
@@ -98,6 +107,9 @@ export class TradesRepository {
       vertaloDistributionState: trade.vertaloDistributionStateJson as VertaloDistributionState,
       fundsMoveState: trade.fundsMoveStateJson as FundsMoveState,
       subscriptionAgreementState: trade.subscriptionAgreementStateJson as SubscriptionAgreementState,
+      disbursementState: trade.disbursementJson as unknown as DisbursementState,
+      sharesTransferState: trade.sharesTransferJson as unknown as SharesTransferState,
+      vertaloPaymentState: trade.vertaloPaymentJson as unknown as VertaloPaymentState,
     };
   }
 
@@ -110,6 +122,12 @@ export class TradesRepository {
       northCapitalTradeStateJson: schema.northCapitalTradeState,
       subscriptionAgreementStateJson: schema.subscriptionAgreementState,
       vertaloDistributionStateJson: schema.vertaloDistributionState,
+      // @ts-ignore
+      disbursementJson: schema.disbursementState,
+      // @ts-ignore
+      sharesTransferJson: schema.sharesTransferState,
+      // @ts-ignore
+      vertaloPaymentJson: schema.vertaloPaymentState,
     };
   }
 }
