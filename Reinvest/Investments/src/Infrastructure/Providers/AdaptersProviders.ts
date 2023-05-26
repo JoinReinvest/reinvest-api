@@ -10,6 +10,7 @@ import {
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
@@ -37,7 +38,8 @@ export default class AdaptersProviders {
       .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
-      .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
+      .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
 
     container.addSingleton(SharesAndDividendService, ['SharesAndDividends']);
 

@@ -4,12 +4,15 @@ import { InvestmentsController } from 'Investments/Infrastructure/Ports/Investme
 import { ScheduleSimulationController } from 'Investments/Infrastructure/Ports/ScheduleSimulationController';
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
+import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrastructure/Ports/RecurringInvestmentsController';
 
 export type InvestmentsApiType = {
   approveFees: FeesController['approveFees'];
   assignSubscriptionAgreementToInvestment: InvestmentsController['assignSubscriptionAgreementToInvestment'];
   createInvestment: InvestmentsController['createInvestment'];
+  createRecurringInvestment: RecurringInvestmentsController['createRecurringInvestment'];
   createSubscriptionAgreement: SubscriptionAgreementController['createSubscriptionAgreement'];
+  getRecurringInvestment: RecurringInvestmentsController['getRecurringInvestment'];
   getScheduleSimulation: ScheduleSimulationController['getScheduleSimulation'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
   isFeesApproved: FeesController['isFeesApproved'];
@@ -22,6 +25,8 @@ export type InvestmentsApiType = {
 export const investmentsApi = (container: ContainerInterface): InvestmentsApiType => ({
   test: container.delegateTo(TempController, 'handle'),
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
+  createRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createRecurringInvestment'),
+  getRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'getRecurringInvestment'),
   getScheduleSimulation: container.delegateTo(ScheduleSimulationController, 'getScheduleSimulation'),
   startInvestment: container.delegateTo(InvestmentsController, 'startInvestment'),
   approveFees: container.delegateTo(FeesController, 'approveFees'),

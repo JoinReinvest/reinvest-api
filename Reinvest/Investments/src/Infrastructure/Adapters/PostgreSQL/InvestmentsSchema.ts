@@ -4,6 +4,8 @@ import type {
   AgreementTypes,
   InvestmentsFeesStatus,
   InvestmentStatus,
+  RecurringInvestmentFrequency,
+  RecurringInvestmentStatus,
   ScheduledBy,
   SubscriptionAgreementStatus,
 } from 'Reinvest/Investments/src/Domain/Investments/Types';
@@ -59,4 +61,17 @@ export interface TransactionEventsTable {
   eventStateJson: JSONObject;
   id: string;
   investmentId: string;
+}
+
+export interface RecurringInvestmentsTable {
+  accountId: string;
+  amount: number;
+  dateCreated: Date;
+  frequency: RecurringInvestmentFrequency;
+  id: string;
+  portfolioId: string;
+  profileId: string;
+  startDate: string | null;
+  status: RecurringInvestmentStatus;
+  subscriptionAgreementId: string | null;
 }

@@ -1,8 +1,11 @@
 import { SessionContext } from 'ApiGateway/index';
 import { subscriptionAgreementIdMock } from 'ApiGateway/Schema/Types/Investments';
-import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
-import type { ScheduleSimulationFrequency } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
+import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { subscriptionAgreementsTemplate } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
+import { LegalEntities } from 'Reinvest/LegalEntities/src';
+import Modules from 'Reinvest/Modules';
+import { Portfolio } from 'Reinvest/Portfolio/src';
 
 const subscriptionAgreementMock = (parentId: string, type: string) => ({
   id: subscriptionAgreementIdMock,
@@ -109,10 +112,16 @@ const recurringInvestmentMock = (status: string) => ({
 
 export type GetScheduleSimulation = {
   schedule: {
-    frequency: ScheduleSimulationFrequency;
+    frequency: RecurringInvestmentFrequency;
     startDate: string;
   };
 };
+
+export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
+  const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+  return api.mapAccountIdToParentAccountIdIfRequired(profileId, accountId);
+}
 
 export const RecurringInvestments = {
   typeDefs: schema,
@@ -126,7 +135,7 @@ export const RecurringInvestments = {
         return recurringInvestmentMock('DRAFT');
       },
       getScheduleSimulation: async (parent: any, { schedule }: GetScheduleSimulation, { profileId, modules }: SessionContext) => {
-        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const { startDate, frequency } = schedule;
         const simulation = await investmentAccountsApi.getScheduleSimulation(startDate, frequency);
@@ -136,7 +145,19 @@ export const RecurringInvestments = {
     },
     Mutation: {
       createRecurringInvestment: async (parent: any, { accountId, amount, schedule }: any, { profileId, modules }: SessionContext) => {
-        return recurringInvestmentMock('DRAFT');
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+        const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+
+        const { portfolioId } = await portfolioApi.getActivePortfolio();
+        const recurringInvestmentId = await investmentAccountsApi.createRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+
+        console.log(recurringInvestmentId);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+        console.log(recurringInvestment);
+
+        return recurringInvestment;
       },
       createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         return subscriptionAgreementMock(recurringInvestmentIdMock, 'RECURRING_INVESTMENT');

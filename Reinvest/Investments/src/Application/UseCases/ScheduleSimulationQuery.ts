@@ -1,10 +1,10 @@
 import ScheduleInvestmentService from 'Investments/Application/Service/ScheduleInvestmentService';
-import type { ScheduleSimulationFrequency } from 'Investments/Domain/Investments/Types';
+import type { RecurringInvestmentFrequency } from 'Investments/Domain/Investments/Types';
 
 class ScheduleSimulationQuery {
   static getClassName = (): string => 'ScheduleSimulationQuery';
 
-  async execute(startDate: string, frequency: ScheduleSimulationFrequency) {
+  async execute(startDate: string, frequency: RecurringInvestmentFrequency) {
     const scheduleSimulation = new ScheduleInvestmentService(startDate, frequency);
 
     const simulation = scheduleSimulation.getSimulation();

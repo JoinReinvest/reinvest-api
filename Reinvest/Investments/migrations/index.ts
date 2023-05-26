@@ -5,3 +5,4 @@ export * as migration_20230523143500_create_transaction from './investments_4_cr
 export * as migration_20230524104015_create_fees from './investments_5_fees';
 export * as migration_20230524150120_add_tradeId_and_startedDate from './investments_6_tradeId_and_startedDate';
 export * as migration_20230525161210_portfolio_id from './investments_7_portfolio_id';
+export * as migration_20230526141112_recurring_investments from './investments_8_recurring_investments';

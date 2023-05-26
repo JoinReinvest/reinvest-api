@@ -1,13 +1,13 @@
 import dayjs from 'dayjs';
-import { ScheduleSimulationFrequency } from 'Investments/Domain/Investments/Types';
+import { RecurringInvestmentFrequency } from 'Investments/Domain/Investments/Types';
 
 const SIMULATION_DATES_QUANTITY = 8;
 
 class ScheduleInvestmentService {
   private startDate: string;
-  private frequency: ScheduleSimulationFrequency;
+  private frequency: RecurringInvestmentFrequency;
 
-  constructor(startDate: string, frequency: ScheduleSimulationFrequency) {
+  constructor(startDate: string, frequency: RecurringInvestmentFrequency) {
     this.startDate = startDate;
     this.frequency = frequency;
   }
@@ -28,22 +28,22 @@ class ScheduleInvestmentService {
 
   private getTypeAndValueToMultiplyer(): { multiplyer: number; type: 'week' | 'month' } {
     switch (this.frequency) {
-      case ScheduleSimulationFrequency.WEEKLY:
+      case RecurringInvestmentFrequency.WEEKLY:
         return {
           multiplyer: 1,
           type: 'week',
         };
-      case ScheduleSimulationFrequency.BI_WEEKLY:
+      case RecurringInvestmentFrequency.BI_WEEKLY:
         return {
           multiplyer: 2,
           type: 'week',
         };
-      case ScheduleSimulationFrequency.MONTHLY:
+      case RecurringInvestmentFrequency.MONTHLY:
         return {
           multiplyer: 1,
           type: 'month',
         };
-      case ScheduleSimulationFrequency.QUARTERLY:
+      case RecurringInvestmentFrequency.QUARTERLY:
         return {
           multiplyer: 3,
           type: 'month',

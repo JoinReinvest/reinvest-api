@@ -3,6 +3,7 @@ import { IdGenerator } from 'IdGenerator/IdGenerator';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
+import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
@@ -13,7 +14,9 @@ import SubscriptionAgreementQuery from 'Investments/Application/UseCases/Subscri
 import { Investments } from 'Investments/index';
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
+import GetRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/GetRecurringInvestment';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -35,5 +38,7 @@ export default class UseCaseProviders {
     container.addSingleton(StartInvestment, [InvestmentsRepository, SubscriptionAgreementRepository]);
     container.addSingleton(IsFeeApproved, [FeesRepository]);
     container.addSingleton(ScheduleSimulationQuery);
+    container.addSingleton(CreateRecurringInvestment, [RecurringInvestmentsRepository, IdGenerator]);
+    container.addSingleton(GetRecurringInvestment, [RecurringInvestmentsRepository]);
   }
 }
