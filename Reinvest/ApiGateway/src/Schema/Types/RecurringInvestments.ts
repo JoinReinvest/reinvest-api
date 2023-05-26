@@ -1,5 +1,7 @@
 import { SessionContext } from 'ApiGateway/index';
 import { subscriptionAgreementIdMock } from 'ApiGateway/Schema/Types/Investments';
+import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
+import type { ScheduleSimulationFrequency } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { subscriptionAgreementsTemplate } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
 
 const subscriptionAgreementMock = (parentId: string, type: string) => ({
@@ -105,6 +107,13 @@ const recurringInvestmentMock = (status: string) => ({
   status,
 });
 
+export type GetScheduleSimulation = {
+  schedule: {
+    frequency: ScheduleSimulationFrequency;
+    startDate: string;
+  };
+};
+
 export const RecurringInvestments = {
   typeDefs: schema,
   resolvers: {
@@ -116,8 +125,13 @@ export const RecurringInvestments = {
       getDraftRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         return recurringInvestmentMock('DRAFT');
       },
-      getScheduleSimulation: async (parent: any, { schedule }: any, { profileId, modules }: SessionContext) => {
-        return ['2023-06-01', '2023-07-01', '2023-08-01', '2023-09-01'];
+      getScheduleSimulation: async (parent: any, { schedule }: GetScheduleSimulation, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+
+        const { startDate, frequency } = schedule;
+        const simulation = await investmentAccountsApi.getScheduleSimulation(startDate, frequency);
+
+        return simulation;
       },
     },
     Mutation: {

@@ -38,3 +38,10 @@ export type InvestmentSummarySchema = {
   subscriptionAgreementId: string | null;
   tradeId: string;
 };
+
+export enum ScheduleSimulationFrequency {
+  WEEKLY = 'WEEKLY',
+  BI_WEEKLY = 'BI_WEEKLY',
+  MONTHLY = 'MONTHLY',
+  QUARTERLY = 'QUARTERLY',
+}
