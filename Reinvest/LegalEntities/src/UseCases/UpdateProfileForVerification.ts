@@ -16,12 +16,13 @@ export type UpdateProfileForVerificationInput = {
 };
 
 export class UpdateProfileForVerification {
-  public static getClassName = (): string => 'UpdateProfileForVerification';
   private profileRepository: ProfileRepository;
 
   constructor(profileRepository: ProfileRepository) {
     this.profileRepository = profileRepository;
   }
+
+  public static getClassName = (): string => 'UpdateProfileForVerification';
 
   public async execute(input: UpdateProfileForVerificationInput, profileId: string): Promise<ValidationErrorType[]> {
     const profile = await this.profileRepository.findProfile(profileId);

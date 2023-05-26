@@ -1,5 +1,6 @@
 import Container, { ContainerInterface } from 'Container/Container';
 import { Documents } from 'Documents/index';
+import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Registration } from 'Registration/index';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
@@ -27,6 +28,7 @@ export namespace Trading {
 
   export type ModulesDependencies = {
     documents: Documents.Main;
+    portfolio: Portfolio.Main;
     registration: Registration.Main;
   };
 
@@ -78,6 +80,7 @@ export namespace Trading {
       }
 
       this.container.addAsValue('Registration', this.modules.registration);
+      this.container.addAsValue('Portfolio', this.modules.portfolio);
       this.container.addAsValue('Documents', this.modules.documents);
 
       new AdapterServiceProvider(this.config).boot(this.container);

@@ -29,7 +29,7 @@ export class AdapterServiceProvider {
       .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider]);
 
     // modules
-    container.addSingleton(VendorsMappingService, ['Registration']).addSingleton(TradingDocumentService, ['Documents']);
+    container.addSingleton(VendorsMappingService, ['Registration', 'Portfolio']).addSingleton(TradingDocumentService, ['Documents']);
 
     // north capital
     container.addAsValue('NorthCapitalConfig', this.config.northCapital).addSingleton(TradingNorthCapitalAdapter, ['NorthCapitalConfig']);

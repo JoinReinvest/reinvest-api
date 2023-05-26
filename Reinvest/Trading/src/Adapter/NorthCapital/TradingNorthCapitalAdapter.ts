@@ -111,14 +111,14 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
   }
 
   async markTradeAsReadyToDisburse(tradeId: string): Promise<boolean> {
-    const { orderStatus, accountId, field3 } = await this.getCurrentTradeState(tradeId);
+    const { orderStatus, accountId } = await this.getCurrentTradeState(tradeId);
     const endpoint = 'tapiv3/index.php/v3/updateTradeStatus';
     const message = `REINVEST: Ready to disburse, ${dayjs().format('MM/DD/YYYY')}`;
     const data = {
       orderStatus,
       accountId,
       tradeId,
-      field3: message,
+      field2: message,
     };
 
     const response = await this.postRequest(endpoint, data);

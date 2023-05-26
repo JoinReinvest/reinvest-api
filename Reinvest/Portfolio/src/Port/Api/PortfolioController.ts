@@ -12,7 +12,10 @@ export class PortfolioController {
     return this.getActivePortfolio();
   }
 
-  async getPortfolioVendorsConfiguration(): Promise<{ ncOfferingId: string; vertaloAllocationId: string }> {
+  async getPortfolioVendorsConfiguration(portfolioId: string): Promise<{
+    ncOfferingId: string;
+    vertaloAllocationId: string;
+  }> {
     return {
       ncOfferingId: '1290029',
       vertaloAllocationId: '6a03167e-28d1-4378-b881-a5ade307b81b',

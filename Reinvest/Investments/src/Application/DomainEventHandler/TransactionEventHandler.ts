@@ -21,9 +21,8 @@ export class TransactionEventHandler implements EventHandler<TransactionEvent> {
     try {
       const transaction = await this.transactionRepository.restoreTransaction(event.id);
 
-      await this.sharesEventHandler.handle(event);
-
       if (transaction.handleEvent(event)) {
+        await this.sharesEventHandler.handle(event);
         await this.transactionRepository.saveEvent(event);
       }
 

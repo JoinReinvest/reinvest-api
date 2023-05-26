@@ -30,4 +30,20 @@ export class BankAccountQuery {
       accountType: schema.bankAccountType,
     };
   }
+
+  async getBankAccountMapping(bankAccountId: string): Promise<{
+    bankAccountNickName: string | null;
+  } | null> {
+    const bankAccount = await this.bankAccountRepository.getBankAccount(bankAccountId);
+
+    if (!bankAccount) {
+      return null;
+    }
+
+    const bankAccountNickName = bankAccount.getNickName();
+
+    return {
+      bankAccountNickName,
+    };
+  }
 }
