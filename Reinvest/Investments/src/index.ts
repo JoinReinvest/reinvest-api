@@ -3,6 +3,7 @@ import { InvestmentsDatabaseAdapterInstanceProvider, InvestmentsDatabaseAdapterP
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 import * as InvestmentsMigrations from '../migrations';
 import { investmentsTechnicalHandler, InvestmentsTechnicalHandlerType } from './Infrastructure/Events/InvestmentsTechnicalHandler';
@@ -19,6 +20,10 @@ export namespace Investments {
     queue: QueueConfig;
   };
 
+  export type ModulesDependencies = {
+    sharesAndDividends: SharesAndDividends.Main;
+  };
+
   export type ApiType = InvestmentsApiType & Api;
   export type TechnicalHandlerType = InvestmentsTechnicalHandlerType & EventHandler;
 
@@ -26,9 +31,11 @@ export namespace Investments {
     private readonly config: Investments.Config;
     private readonly container: ContainerInterface;
     private booted = false;
+    private modules: Investments.ModulesDependencies;
 
-    constructor(config: Investments.Config) {
+    constructor(config: Investments.Config, modules: Investments.ModulesDependencies) {
       this.config = config;
+      this.modules = modules;
       this.container = new Container();
     }
 
@@ -64,6 +71,7 @@ export namespace Investments {
         return;
       }
 
+      this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
       new AdaptersProviders(this.config).boot(this.container);
       new UseCaseProviders(this.config).boot(this.container);
       new PortsProviders(this.config).boot(this.container);
@@ -73,7 +81,7 @@ export namespace Investments {
     }
   }
 
-  export function create(config: Investments.Config) {
-    return new Investments.Main(config);
+  export function create(config: Investments.Config, modules: Investments.ModulesDependencies) {
+    return new Investments.Main(config, modules);
   }
 }

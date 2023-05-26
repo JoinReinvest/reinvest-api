@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { BankAccountQuery } from 'Registration/IntegrationLogic/UseCase/BankAccount/BankAccountQuery';
 import { BankAccountController } from 'Registration/Port/Api/BankAccountController';
 import { NorthCapitalDocumentSynchronizationController } from 'Registration/Port/Api/NorthCapitalDocumentSynchronizationController';
 import { RegistryQuery } from 'Registration/Port/Api/RegistryQuery';
@@ -10,6 +11,8 @@ import { NorthCapitalDocumentSynchronizationQuery } from './NorthCapitalDocument
 export type RegistrationApiType = {
   createBankAccount: BankAccountController['createBankAccount'];
   fulfillBankAccount: BankAccountController['fulfillBankAccount'];
+  getAccountMapping: RegistryQuery['getAccountMapping'];
+  getBankAccountMapping: BankAccountQuery['getBankAccountMapping'];
   getNorthCapitalAccountStructure: RegistryQuery['getNorthCapitalAccountStructure'];
   listDocumentsToSynchronize: NorthCapitalDocumentSynchronizationQuery['listDocumentsToSynchronize'];
   listObjectsToSync: SynchronizationQuery['listObjectsToSync'];
@@ -35,4 +38,6 @@ export const registrationApi = (container: ContainerInterface): RegistrationApiT
   fulfillBankAccount: container.delegateTo(BankAccountController, 'fulfillBankAccount'),
   readBankAccount: container.delegateTo(BankAccountController, 'readBankAccount'),
   updateBankAccount: container.delegateTo(BankAccountController, 'updateBankAccount'),
+  getAccountMapping: container.delegateTo(RegistryQuery, 'getAccountMapping'),
+  getBankAccountMapping: container.delegateTo(BankAccountQuery, 'getBankAccountMapping'),
 });

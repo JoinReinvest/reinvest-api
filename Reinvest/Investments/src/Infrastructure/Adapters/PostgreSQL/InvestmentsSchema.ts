@@ -16,6 +16,7 @@ export interface InvestmentsTable {
   dateStarted: Date | null;
   dateUpdated: Date;
   id: string;
+  portfolioId: string;
   profileId: string;
   recurringInvestmentId: string | null;
   scheduledBy: ScheduledBy;
@@ -51,6 +52,7 @@ export interface InvestmentsFeesTable {
   status: InvestmentsFeesStatus;
   verificationFeeId: string;
 }
+
 export interface TransactionEventsTable {
   dateCreated: Date;
   eventKind: TransactionEvents;

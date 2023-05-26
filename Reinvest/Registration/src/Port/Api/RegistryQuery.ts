@@ -24,6 +24,21 @@ export class RegistryQuery {
 
   static getClassName = () => 'RegistryQuery';
 
+  async getAccountMapping(accountId: string): Promise<{ accountEmail: string; northCapitalAccountId: string } | null> {
+    const data = await this.registryQueryRepository.getAccountMapping(accountId);
+
+    if (!data) {
+      return null;
+    }
+
+    const { email, northCapitalId } = data;
+
+    return {
+      northCapitalAccountId: northCapitalId,
+      accountEmail: email,
+    };
+  }
+
   async getNorthCapitalAccountStructure(profileId: string, accountId: string): Promise<NorthCapitalAccountStructure | null> {
     const accountMapping = await this.registryQueryRepository.getNorthCapitalAccountStructure(profileId, accountId);
     const accountStructure = <NorthCapitalAccountStructure>{};

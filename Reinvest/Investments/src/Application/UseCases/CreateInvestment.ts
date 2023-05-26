@@ -8,6 +8,7 @@ export type InvestmentCreate = {
   accountId: string;
   bankAccountId: string;
   id: string;
+  portfolioId: string;
   profileId: string;
   scheduledBy: ScheduledBy;
   status: InvestmentStatus;
@@ -15,8 +16,6 @@ export type InvestmentCreate = {
 };
 
 class CreateInvestment {
-  static getClassName = (): string => 'CreateInvestment';
-
   private readonly investmentsRepository: InvestmentsRepository;
   private idGenerator: IdGeneratorInterface;
 
@@ -25,13 +24,16 @@ class CreateInvestment {
     this.idGenerator = idGenerator;
   }
 
-  async execute(profileId: string, accountId: string, bankAccountId: string, money: Money) {
+  static getClassName = (): string => 'CreateInvestment';
+
+  async execute(portfolioId: string, profileId: string, accountId: string, bankAccountId: string, money: Money) {
     const id = this.idGenerator.createUuid();
 
     const tradeIdSize = TradeId.getTradeIdSize();
 
     const investment: InvestmentCreate = {
       id,
+      portfolioId,
       profileId,
       bankAccountId,
       accountId,

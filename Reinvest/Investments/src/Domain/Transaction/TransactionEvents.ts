@@ -22,6 +22,8 @@ export type TransactionEvent = DomainEvent & {
 export type InvestmentCreated = TransactionEvent & {
   data: {
     accountId: string;
+    amount: number;
+    portfolioId: string;
     profileId: string;
   };
   kind: TransactionEvents.INVESTMENT_CREATED;

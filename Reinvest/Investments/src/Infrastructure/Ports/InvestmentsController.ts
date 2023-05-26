@@ -25,10 +25,10 @@ export class InvestmentsController {
 
   public static getClassName = (): string => 'InvestmentsController';
 
-  public async createInvestment(profileId: string, accountId: string, bankAccountId: string, money: USDInput) {
+  public async createInvestment(portfolioId: string, profileId: string, accountId: string, bankAccountId: string, money: USDInput) {
     const amount = new Money(money.value);
 
-    return this.createInvestmentUseCase.execute(profileId, accountId, bankAccountId, amount);
+    return this.createInvestmentUseCase.execute(portfolioId, profileId, accountId, bankAccountId, amount);
   }
 
   public async investmentSummaryQuery(profileId: string, investmentId: string) {

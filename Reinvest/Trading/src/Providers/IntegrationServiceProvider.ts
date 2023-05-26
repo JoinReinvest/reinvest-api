@@ -1,7 +1,7 @@
 import { ContainerInterface } from 'Container/Container';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
-import { RegistrationService } from 'Trading/Adapter/Module/RegistrationService';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
+import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { Trading } from 'Trading/index';
@@ -19,7 +19,7 @@ export class IntegrationServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(CreateTrade, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter, RegistrationService, TradingDocumentService]);
+    container.addSingleton(CreateTrade, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter, VendorsMappingService, TradingDocumentService]);
     container.addSingleton(CheckIsTradeFunded, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter]);
     container.addSingleton(CheckIsTradeApproved, [TradesRepository, TradingNorthCapitalAdapter]);
     container.addSingleton(MarkFundsAsReadyToDisburse, [TradesRepository, TradingNorthCapitalAdapter]);

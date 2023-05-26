@@ -2,8 +2,6 @@ import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repos
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class StartInvestment {
-  static getClassName = (): string => 'StartInvestment';
-
   private readonly investmentsRepository: InvestmentsRepository;
   private readonly subscriptionAgreementRepository: SubscriptionAgreementRepository;
 
@@ -11,6 +9,8 @@ class StartInvestment {
     this.investmentsRepository = investmentsRepository;
     this.subscriptionAgreementRepository = subscriptionAgreementRepository;
   }
+
+  static getClassName = (): string => 'StartInvestment';
 
   async execute(profileId: string, investmentId: string) {
     const investment = await this.investmentsRepository.get(investmentId);
