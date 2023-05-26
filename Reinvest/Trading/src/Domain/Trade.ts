@@ -406,7 +406,7 @@ export class Trade {
   }
 
   private calculateShares(amount: Money, unitSharePrice: Money): string {
-    const shares = amount.divideByAmount(unitSharePrice);
+    const shares = amount.divideByMoney(unitSharePrice);
 
     return shares.toString();
   }

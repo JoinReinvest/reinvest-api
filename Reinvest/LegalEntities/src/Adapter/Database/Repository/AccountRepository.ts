@@ -261,7 +261,7 @@ export class AccountRepository {
       await this.databaseAdapterProvider
         .provide()
         .insertInto(legalEntitiesCompanyAccountTable)
-        .values({
+        .values(<LegalEntitiesCompanyAccount>{
           accountId,
           profileId,
           companyName: JSON.stringify(companyName),

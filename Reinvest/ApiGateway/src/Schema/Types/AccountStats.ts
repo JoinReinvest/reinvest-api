@@ -1,5 +1,6 @@
 import { SessionContext } from 'ApiGateway/index';
 import DateTime from 'date-and-time';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 const schema = `
     #graphql
@@ -54,17 +55,11 @@ export const AccountStats = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      getAccountStats: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => ({
-        accountValue: '$810.25',
-        EVS: '$800.00',
-        costOfSharesOwned: '$600.00',
-        quantityOfShares: '53.33',
-        currentNAVPerShare: '$15.00',
-        netReturns: '$210.25',
-        dividends: '$22.86',
-        appreciation: '$200.00',
-        advisorFees: '$12.60',
-      }),
+      getAccountStats: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+
+        return api.getAccountStats(profileId, accountId);
+      },
       getEVSChart: async (parent: any, { accountId, resolution }: any, { profileId, modules }: SessionContext) => {
         const lastThousandDays = [];
         let currentEVSValue = 0;

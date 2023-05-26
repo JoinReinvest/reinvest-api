@@ -17,6 +17,8 @@ export interface SharesTable {
   unitPrice: number | null;
 }
 
+export type SharesAndTheirPricesSelection = Pick<SharesTable, 'numberOfShares' | 'price' | 'unitPrice' | 'portfolioId'>;
+
 export interface DividendsDeclarationTable {
   calculatedFromDate: Date;
   calculatedToDate: Date;
@@ -61,6 +63,8 @@ export interface InvestorDividendsTable {
   totalDividendAmount: number;
   totalFeeAmount: number;
 }
+
+export type DividendsSelection = Pick<InvestorDividendsTable, 'totalDividendAmount' | 'totalFeeAmount'>;
 
 export interface UnpaidFeesTable {
   accountId: string;
