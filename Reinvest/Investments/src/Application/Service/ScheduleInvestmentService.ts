@@ -14,7 +14,7 @@ class ScheduleInvestmentService {
 
   getSimulation() {
     const dates = [];
-    const { multiplyer, type } = this.getTypeAndValueToAdd();
+    const { multiplyer, type } = this.getTypeAndValueToMultiplyer();
 
     for (let i = 1; i <= SIMULATION_DATES_QUANTITY; i++) {
       const date = dayjs(this.startDate)
@@ -26,7 +26,7 @@ class ScheduleInvestmentService {
     return dates;
   }
 
-  private getTypeAndValueToAdd(): { multiplyer: number; type: 'week' | 'month' } {
+  private getTypeAndValueToMultiplyer(): { multiplyer: number; type: 'week' | 'month' } {
     switch (this.frequency) {
       case ScheduleSimulationFrequency.WEEKLY:
         return {
