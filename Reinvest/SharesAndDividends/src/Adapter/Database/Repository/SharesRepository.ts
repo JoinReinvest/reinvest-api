@@ -2,7 +2,7 @@ import { Money } from 'Money/Money';
 import { sadSharesTable, SharesAndDividendsDatabaseAdapterProvider } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { SharesAndTheirPricesSelection, SharesTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
 import { SharesAndTheirPrices } from 'SharesAndDividends/Domain/AccountStatsCalculationService';
-import { Shares, SharesStatus } from 'SharesAndDividends/Domain/Shares';
+import { Shares, SharesSchema, SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export class SharesRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -71,5 +71,35 @@ export class SharesRepository {
     });
 
     return sharesPerPortfolio;
+  }
+
+  async getSharesByInvestmentId(investmentId: string): Promise<Shares | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .select([
+        'accountId',
+        'dateCreated',
+        'dateFunded',
+        'dateRevoked',
+        'dateSettled',
+        'id',
+        'investmentId',
+        'numberOfShares',
+        'portfolioId',
+        'price',
+        'profileId',
+        'status',
+        'unitPrice',
+      ])
+      .where('investmentId', '=', investmentId)
+      .castTo<SharesSchema>()
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return Shares.restore(data);
   }
 }

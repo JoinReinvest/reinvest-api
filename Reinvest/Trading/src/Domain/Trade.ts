@@ -48,7 +48,7 @@ export type SubscriptionAgreementState = {
 export type TradeSummary = {
   amount: number;
   fees: number;
-  shares: string;
+  shares: number;
   unitSharePrice: number;
 };
 
@@ -87,7 +87,7 @@ export class Trade {
   private readonly fees: Money;
   private tradeSchema: TradeSchema;
   private unitSharePrice: Money | null;
-  private shares: string | null;
+  private shares: number | null;
 
   constructor(tradeSchema: TradeSchema) {
     this.tradeSchema = tradeSchema;
@@ -154,7 +154,7 @@ export class Trade {
       ip: this.tradeSchema.tradeConfiguration.ip,
       northCapitalAccountId: this.tradeSchema.vendorsConfiguration!.northCapitalAccountId,
       offeringId: this.tradeSchema.vendorsConfiguration!.offeringId,
-      shares: this.shares,
+      shares: this.shares.toString(),
     };
   }
 
@@ -405,10 +405,10 @@ export class Trade {
     };
   }
 
-  private calculateShares(amount: Money, unitSharePrice: Money): string {
+  private calculateShares(amount: Money, unitSharePrice: Money): number {
     const shares = amount.divideByMoney(unitSharePrice);
 
-    return shares.toString();
+    return shares;
   }
 
   private getTotalTransferAmount(): Money {
