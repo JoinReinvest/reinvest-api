@@ -1,4 +1,4 @@
-import { SubscriptionAgreementRepository } from '../Adapters/Repository/SubscriptionAgreementRepository';
+import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class SignSubscriptionAgreement {
   static getClassName = (): string => 'SignSubscriptionAgreement';
@@ -24,7 +24,9 @@ class SignSubscriptionAgreement {
       return false;
     }
 
-    return subscriptionAgreement.id;
+    const { id } = subscriptionAgreement.toObject();
+
+    return id;
   }
 }
 

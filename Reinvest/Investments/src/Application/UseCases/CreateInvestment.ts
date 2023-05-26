@@ -1,9 +1,8 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { InvestmentStatus, ScheduledBy } from 'Investments/Domain/Investments/Types';
+import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import TradeId from 'Investments/Infrastructure/ValueObject/TradeId';
 import type { Money } from 'Money/Money';
-
-import { InvestmentStatus, ScheduledBy } from '../../Domain/Investments/Types';
-import { InvestmentsRepository } from '../../Infrastructure/Adapters/Repository/InvestmentsRepository';
-import TradeId from '../../Infrastructure/ValueObject/TradeId';
 
 export type InvestmentCreate = {
   accountId: string;

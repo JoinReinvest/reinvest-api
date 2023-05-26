@@ -1,13 +1,13 @@
 import { SessionContext } from 'ApiGateway/index';
 import { subscriptionAgreementIdMock } from 'ApiGateway/Schema/Types/Investments';
-import { subscriptionAgreements } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
+import { subscriptionAgreementsTemplate } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
 
 const subscriptionAgreementMock = (parentId: string, type: string) => ({
   id: subscriptionAgreementIdMock,
   type,
   status: 'WAITING_FOR_SIGNATURE',
   createdAt: '2023-03-24T12:33:12',
-  content: subscriptionAgreements[1],
+  content: subscriptionAgreementsTemplate[1],
 });
 
 const schema = `

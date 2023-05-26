@@ -1,6 +1,10 @@
-export const latestSubscriptionAgreementVersion = 1;
+import type { Template } from 'Investments/Application/Service/TemplateParser';
 
-export const subscriptionAgreements = {
+export type TemplateVersions = 1;
+
+export const latestSubscriptionAgreementVersion: TemplateVersions = 1;
+
+export const subscriptionAgreementsTemplate: Record<TemplateVersions, Template> = {
   1: [
     {
       paragraphs: [

@@ -7,15 +7,14 @@ import {
   createInvestmentsDatabaseAdapterProvider,
   InvestmentsDatabaseAdapterInstanceProvider,
 } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
+import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
-
-import { FeesRepository } from '../Adapters/Repository/FeesRepository';
-import { SubscriptionAgreementRepository } from '../Adapters/Repository/SubscriptionAgreementRepository';
 
 export default class AdaptersProviders {
   private config: Investments.Config;

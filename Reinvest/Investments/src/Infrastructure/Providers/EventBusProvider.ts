@@ -6,6 +6,7 @@ import { TransactionEventHandler } from 'Investments/Application/DomainEventHand
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { TransactionCommands } from 'Investments/Domain/Transaction/TransactionCommands';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { Investments } from 'Investments/index';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
@@ -13,8 +14,6 @@ import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repos
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
-
-import { Investments } from '../..';
 
 export default class EventBusProvider {
   private config: Investments.Config;

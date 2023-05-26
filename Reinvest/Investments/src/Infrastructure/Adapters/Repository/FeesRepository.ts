@@ -1,7 +1,5 @@
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-
-import { Fee } from '../../ValueObject/Fee';
-
+import { Fee } from 'Reinvest/Investments/src/Domain/Investments/Fee';
 export class FeesRepository {
   public static getClassName = (): string => 'FeesRepository';
 
@@ -25,13 +23,14 @@ export class FeesRepository {
   }
 
   async approveFee(fee: Fee) {
-    const { id, status } = fee.toObject();
+    const { id, status, approveDate } = fee.toObject();
     try {
       await this.databaseAdapterProvider
         .provide()
         .updateTable(investmentsFeesTable)
         .set({
           status,
+          approveDate,
         })
         .where('id', '=', id)
         .execute();

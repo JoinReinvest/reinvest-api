@@ -1,13 +1,12 @@
 import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-import { Investment } from 'Investments/Infrastructure/ValueObject/Investment';
+import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
 import type { Money } from 'Money/Money';
 import type { InvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateInvestment';
+import { Investment } from 'Reinvest/Investments/src/Domain/Investments/Investment';
 import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
-
-import { InvestmentSummary } from '../../ValueObject/InvestmentSummary';
 
 export class InvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
