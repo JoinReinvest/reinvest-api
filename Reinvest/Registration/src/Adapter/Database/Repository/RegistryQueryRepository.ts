@@ -67,4 +67,25 @@ export class RegistryQueryRepository {
       return null;
     }
   }
+
+  async getAccountMapping(accountId: string): Promise<{ email: string; northCapitalId: string } | null> {
+    try {
+      const result = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(registrationMappingRegistryTable)
+        .fullJoin(northCapitalSynchronizationTable, `${registrationMappingRegistryTable}.recordId`, `${northCapitalSynchronizationTable}.recordId`)
+        .select([`${northCapitalSynchronizationTable}.northCapitalId`])
+        .select([`${registrationMappingRegistryTable}.email`])
+        .where(`${registrationMappingRegistryTable}.externalId`, '=', accountId)
+        .where(`${registrationMappingRegistryTable}.mappedType`, 'in', [MappedType.INDIVIDUAL_ACCOUNT, MappedType.CORPORATE_ACCOUNT, MappedType.TRUST_ACCOUNT])
+        .castTo<{ email: string; northCapitalId: string }>()
+        .executeTakeFirstOrThrow();
+
+      return result;
+    } catch (error: any) {
+      console.warn(`Cannot find account mapping for id: ${accountId}`, error.message);
+
+      return null;
+    }
+  }
 }

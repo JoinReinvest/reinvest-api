@@ -139,4 +139,8 @@ export class BankAccount {
   getNorthCapitalId(): string {
     return this.northCapitalId;
   }
+
+  getNickName(): string | null {
+    return this.plaidResult?.accountNickName || null;
+  }
 }

@@ -1,13 +1,14 @@
+import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { InvestmentFinalized, TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
-import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 
 export class FinalizeInvestmentEventHandler implements EventHandler<TransactionEvent> {
-  private investmentRepository: InvestmentsRepository;
+  private investmentsQueryRepository: InvestmentsQueryRepository;
   private eventBus: EventBus;
 
-  constructor(investmentRepository: InvestmentsRepository, eventBus: EventBus) {
-    this.investmentRepository = investmentRepository;
+  constructor(investmentsQueryRepository: InvestmentsQueryRepository, eventBus: EventBus) {
+    this.investmentsQueryRepository = investmentsQueryRepository;
     this.eventBus = eventBus;
   }
 
@@ -15,19 +16,40 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
 
   async handle(event: TransactionEvent): Promise<void> {
     const investmentId = event.id;
-    // todo read investment from repository
-    // send some notification if needed
-    // if everything is fine then send finalization event
-    const subscriptionAgreementId = '1aff4de0-bed6-4b4d-8a10-98aac94d9d74';
-    const portfolioId = 'b3979627-8371-4452-a3a2-27b73df04dab';
-    const bankAccountId = '69953c8b-34fe-4d0b-aec3-1a8a426827a8';
+
+    const investmentDetails = await this.investmentsQueryRepository.getInvestmentDetailsForTransaction(investmentId);
+
+    if (!investmentDetails) {
+      console.error(`[FinalizeInvestmentEventHandler] Investment with id ${investmentId} not found`);
+
+      return;
+    }
+
+    const { ip, status, subscriptionAgreementPdfDateCreated, subscriptionAgreementId, portfolioId, bankAccountId, investmentAmount, feeAmount } =
+      investmentDetails;
+
+    if (status !== InvestmentStatus.IN_PROGRESS) {
+      console.warn(`[FinalizeInvestmentEventHandler] Investment with id ${investmentId} is not in progress. Current status: ${status}`);
+    }
+
+    if (!subscriptionAgreementId) {
+      console.error(`[FinalizeInvestmentEventHandler] Subscription agreement id for investment with id ${investmentId} not found or signed`);
+
+      return;
+    }
+
+    // TODO - uncomment it when pdf creation is implemented
+    // if (!subscriptionAgreementPdfDateCreated || !ip) {
+    // console.warn(`[FinalizeInvestmentEventHandler] Subscription agreement PDF date created or ip is not set for investment ${investmentId}}`);
+    //   // TODO - send command to generate pdf
+    // }
 
     await this.eventBus.publish(<InvestmentFinalized>{
       kind: TransactionEvents.INVESTMENT_FINALIZED,
       data: {
-        amount: 10000,
-        fees: 700,
-        ip: '8.8.8.8',
+        amount: investmentAmount,
+        fees: !feeAmount ? 0 : feeAmount,
+        ip: '8.8.8.8', // TODO - get ip from subscription agreement when implemented
         bankAccountId,
         subscriptionAgreementId,
         portfolioId,

@@ -1,6 +1,6 @@
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
-import { RegistrationService } from 'Trading/Adapter/Module/RegistrationService';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
+import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { TradeConfiguration, TradeSummary } from 'Trading/Domain/Trade';
@@ -9,14 +9,14 @@ export class CreateTrade {
   private tradesRepository: TradesRepository;
   private northCapitalAdapter: TradingNorthCapitalAdapter;
   private vertaloAdapter: TradingVertaloAdapter;
-  private registrationService: RegistrationService;
+  private registrationService: VendorsMappingService;
   private documentService: TradingDocumentService;
 
   constructor(
     tradesRepository: TradesRepository,
     northCapitalAdapter: TradingNorthCapitalAdapter,
     vertaloAdapter: TradingVertaloAdapter,
-    registrationService: RegistrationService,
+    registrationService: VendorsMappingService,
     documentService: TradingDocumentService,
   ) {
     this.tradesRepository = tradesRepository;
@@ -60,15 +60,16 @@ export class CreateTrade {
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'Vertalo distribution created', vertaloDistribution);
       }
 
+      // TODO uncomment it when subscription agreement will be ready
       // upload subscription agreement to north capital trade
-      if (!trade.isSubscriptionAgreementUploaded()) {
+      /** if (!trade.isSubscriptionAgreementUploaded()) {
         const { tradeId, subscriptionAgreementId, profileId } = trade.getSubscriptionAgreementConfiguration();
         const { url } = await this.documentService.getDocumentFileLink(subscriptionAgreementId, profileId);
         const subscriptionAgreementState = await this.northCapitalAdapter.uploadSubscriptionAgreementToTrade(tradeId, url, subscriptionAgreementId);
         trade.setSubscriptionAgreementState({ subscriptionAgreementId, status: subscriptionAgreementState });
         await this.tradesRepository.updateTrade(trade);
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'Subscription agreement uploaded', subscriptionAgreementId);
-      }
+      }**/
 
       // init funds transfer
       if (!trade.isFundsTransferCreated()) {
