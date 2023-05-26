@@ -1,7 +1,6 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql';
 import { Investments as InvestmentsApi } from 'Reinvest/Investments/src';
-import { subscriptionAgreements } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
 import { LegalEntities } from 'Reinvest/LegalEntities/src';
 import type Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
@@ -159,11 +158,30 @@ export const Investments = {
         return investmentId;
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
-        if (!approveFees) {
-          throw new GraphQLError('FEES_NOT_APPROVED');
+        const investmentAccountsApi = modules.getApi<InvestmentsApi.ApiType>(InvestmentsApi);
+        let isApproved = true;
+
+        if (approveFees) {
+          isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
+        } else {
+          const isFeeApproved = await investmentAccountsApi.isFeesApproved(investmentId);
+
+          if (!isFeeApproved) {
+            throw new GraphQLError('FEE_NOT_APPROVED');
+          }
         }
 
-        return true;
+        if (!isApproved) {
+          throw new GraphQLError('ERROR_OCCURED_DURING_APPROVING_FEE');
+        }
+
+        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId);
+
+        if (!isStartedInvestment) {
+          throw new GraphQLError('CANNOT_START_INVESTMENT');
+        }
+
+        return isStartedInvestment;
       },
       approveFees: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;

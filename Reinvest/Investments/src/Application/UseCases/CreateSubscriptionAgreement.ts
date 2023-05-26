@@ -1,10 +1,9 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-
-import type { DynamicType } from '../../Application/Service/TemplateParser';
-import { AgreementTypes, SubscriptionAgreementStatus } from '../../Domain/Investments/Types';
-import { latestSubscriptionAgreementVersion } from '../../Domain/SubscriptionAgreement';
-import { InvestmentsRepository } from '../Adapters/Repository/InvestmentsRepository';
-import { SubscriptionAgreementRepository } from '../Adapters/Repository/SubscriptionAgreementRepository';
+import type { DynamicType } from 'Investments/Application/Service/TemplateParser';
+import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
+import { latestSubscriptionAgreementVersion } from 'Investments/Domain/SubscriptionAgreement';
+import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 export type SubscriptionAgreementCreate = {
   accountId: string;
@@ -50,9 +49,11 @@ class CreateSubscriptionAgreement {
       return false;
     }
 
+    const { accountId } = investment.toObject();
+
     const subscription: SubscriptionAgreementCreate = {
       id,
-      accountId: investment.accountId,
+      accountId: accountId,
       profileId,
       investmentId,
       status: SubscriptionAgreementStatus.WAITING_FOR_SIGNATURE,

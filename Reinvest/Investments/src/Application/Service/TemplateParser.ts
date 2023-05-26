@@ -1,4 +1,4 @@
-type Template = {
+export type Template = {
   paragraphs: {
     lines: string[];
     isCheckedOption?: boolean;

@@ -1,22 +1,25 @@
 import { GracePeriod } from 'Investments/Domain/Investments/GracePeriod';
+import { InvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
-import { InvestmentStatus, ScheduledBy } from '../../Domain/Investments/Types';
-import { InvestmentsTable } from '../Adapters/PostgreSQL/InvestmentsSchema';
+import { InvestmentStatus, ScheduledBy } from './Types';
+
+type InvestmentSchema = InvestmentsTable;
 
 export class Investment {
-  accountId: string;
-  amount: number;
-  bankAccountId: string;
-  dateCreated: Date;
-  dateUpdated: Date;
-  id: string;
-  profileId: string;
-  recurringInvestmentId: string | null;
-  scheduledBy: ScheduledBy;
-  status: InvestmentStatus;
-  subscriptionAgreementId: string | null;
+  private accountId: string;
+  private amount: number;
+  private bankAccountId: string;
+  private dateCreated: Date;
+  private dateUpdated: Date;
+  private id: string;
+  private profileId: string;
+  private recurringInvestmentId: string | null;
+  private scheduledBy: ScheduledBy;
+  private status: InvestmentStatus;
+  private subscriptionAgreementId: string | null;
+  private tradeId: string;
+  private dateStarted: Date | null;
   private gracePeriod: GracePeriod;
-  tradeId: string;
 
   constructor(
     accountId: string,
@@ -31,6 +34,7 @@ export class Investment {
     status: InvestmentStatus,
     subscriptionAgreementId: string | null,
     tradeId: string,
+    dateStarted: Date | null,
   ) {
     this.accountId = accountId;
     this.amount = amount;
@@ -44,10 +48,11 @@ export class Investment {
     this.status = status;
     this.subscriptionAgreementId = subscriptionAgreementId;
     this.tradeId = tradeId;
-    this.gracePeriod = new GracePeriod(dateCreated);
+    this.dateStarted = dateStarted;
+    this.gracePeriod = new GracePeriod(dateStarted);
   }
 
-  static create(data: InvestmentsTable) {
+  static create(data: InvestmentSchema) {
     const {
       accountId,
       amount,
@@ -61,6 +66,7 @@ export class Investment {
       status,
       subscriptionAgreementId,
       tradeId,
+      dateStarted,
     } = data;
 
     return new Investment(
@@ -76,6 +82,7 @@ export class Investment {
       status,
       subscriptionAgreementId,
       tradeId,
+      dateStarted,
     );
   }
 
@@ -85,6 +92,20 @@ export class Investment {
 
   updateStatus(status: InvestmentStatus) {
     this.status = status;
+  }
+
+  getSubscriptionAgreementId() {
+    return this.subscriptionAgreementId;
+  }
+
+  startInvestment() {
+    this.dateStarted = new Date();
+    this.gracePeriod = new GracePeriod(this.dateStarted);
+    this.status = InvestmentStatus.IN_PROGRESS;
+  }
+
+  isStartedInvestment() {
+    return this.status === InvestmentStatus.IN_PROGRESS && this.dateStarted !== null;
   }
 
   toObject() {
@@ -100,6 +121,8 @@ export class Investment {
       scheduledBy: this.scheduledBy,
       status: this.status,
       subscriptionAgreementId: this.subscriptionAgreementId,
+      dateStarted: this.dateStarted,
+      tradeId: this.tradeId,
     };
   }
 
