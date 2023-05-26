@@ -1,21 +1,22 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
+import { SubscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
-import { AgreementTypes, SubscriptionAgreementStatus } from '../../Domain/Investments/Types';
-import { SubscriptionAgreementTable } from '../Adapters/PostgreSQL/InvestmentsSchema';
+type SubscriptionAgreementSchema = SubscriptionAgreementTable;
 
 export class SubscriptionAgreement {
-  accountId: string;
-  agreementType: AgreementTypes;
-  contentFieldsJson: JSONObject;
-  dateCreated: Date;
-  id: string;
-  investmentId: string | null;
-  pdfDateCreated: Date | null;
-  profileId: string;
-  signedAt: Date | null;
-  signedByIP: string | null;
-  status: SubscriptionAgreementStatus;
-  templateVersion: number;
+  private accountId: string;
+  private agreementType: AgreementTypes;
+  private contentFieldsJson: JSONObject;
+  private dateCreated: Date;
+  private id: string;
+  private investmentId: string | null;
+  private pdfDateCreated: Date | null;
+  private profileId: string;
+  private signedAt: Date | null;
+  private signedByIP: string | null;
+  private status: SubscriptionAgreementStatus;
+  private templateVersion: number;
 
   constructor(
     id: string,
@@ -45,7 +46,7 @@ export class SubscriptionAgreement {
     this.templateVersion = templateVersion;
   }
 
-  static create(data: SubscriptionAgreementTable) {
+  static create(data: SubscriptionAgreementSchema) {
     const {
       id,
       profileId,

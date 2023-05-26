@@ -1,7 +1,7 @@
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 
-class ApproveFees {
-  static getClassName = (): string => 'ApproveFees';
+class IsFeeApproved {
+  static getClassName = (): string => 'IsFeeApproved';
 
   private readonly feesRepository: FeesRepository;
 
@@ -9,19 +9,15 @@ class ApproveFees {
     this.feesRepository = feesRepository;
   }
 
-  async execute(profileId: string, investmentId: string) {
+  async execute(investmentId: string) {
     const fee = await this.feesRepository.get(investmentId);
 
     if (!fee || fee.isApproved()) {
       return true;
     }
 
-    fee.approveFee();
-
-    const isApproved = await this.feesRepository.approveFee(fee);
-
-    return isApproved;
+    return false;
   }
 }
 
-export default ApproveFees;
+export default IsFeeApproved;

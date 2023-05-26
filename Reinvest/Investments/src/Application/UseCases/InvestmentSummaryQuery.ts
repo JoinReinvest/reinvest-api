@@ -1,4 +1,4 @@
-import { InvestmentsRepository } from '../../Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 
 class InvestmentSummaryQuery {
   static getClassName = (): string => 'InvestmentSummaryQuery';
