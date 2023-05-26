@@ -1,4 +1,5 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export interface SharesTable {
@@ -93,7 +94,7 @@ export interface FinancialOperationsTable {
   createdDate: Date;
   dataJson: JSONObject;
   id: string;
-  operationType: 'INVESTMENT' | 'REINVESTMENT' | 'WITHDRAWAL' | 'REVOKED';
+  operationType: FinancialOperationType;
   profileId: string;
 }
 
@@ -101,5 +102,5 @@ export interface GlobalFinancialOperationsTable {
   createdDate: Date;
   dataJson: JSONObject;
   id: string;
-  operationType: 'NAV_CHANGED';
+  operationType: GlobalFinancialOperationType;
 }

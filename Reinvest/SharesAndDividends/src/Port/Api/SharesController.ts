@@ -13,7 +13,11 @@ export class SharesController {
   static getClassName = () => 'SharesController';
 
   async createShares(portfolioId: string, profileId: string, accountId: string, investmentId: string, amount: number): Promise<void> {
-    await this.createSharesUseCase.execute(portfolioId, profileId, accountId, investmentId, amount);
+    try {
+      await this.createSharesUseCase.execute(portfolioId, profileId, accountId, investmentId, amount);
+    } catch (error: any) {
+      console.error('[SharesController] createShares', { investmentId, accountId }, error);
+    }
   }
 
   async setSharesToFundingState(investmentId: string, shares: number, unitSharePrice: number): Promise<void> {
