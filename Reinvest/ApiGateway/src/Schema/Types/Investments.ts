@@ -211,7 +211,7 @@ export const Investments = {
           throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
         }
 
-        const isAssigned = investmentAccountsApi.assignSubscriptionAgreementToInvestment(investmentId, subscriptionAgreementId);
+        const isAssigned = await investmentAccountsApi.assignSubscriptionAgreementToInvestment(investmentId, subscriptionAgreementId);
 
         return isAssigned;
       },

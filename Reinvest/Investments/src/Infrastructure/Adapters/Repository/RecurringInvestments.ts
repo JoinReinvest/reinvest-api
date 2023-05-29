@@ -2,12 +2,16 @@ import { InvestmentsDatabaseAdapterProvider, recurringInvestmentsTable } from 'I
 import type { RecurringInvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateRecurringInvestment';
 import { RecurringInvestment } from 'Reinvest/Investments/src/Domain/Investments/RecurringInvestment';
 import { RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import type { DomainEvent } from 'SimpleAggregator/Types';
 
 export class RecurringInvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
+  private eventsPublisher: SimpleEventBus;
 
-  constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventsPublisher = eventsPublisher;
   }
 
   public static getClassName = (): string => 'RecurringInvestmentsRepository';
@@ -73,5 +77,33 @@ export class RecurringInvestmentsRepository {
 
       return false;
     }
+  }
+
+  async assignSubscriptionAgreementAndUpdateStatus(investment: RecurringInvestment, events?: any) {
+    const { id, subscriptionAgreementId } = investment.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(recurringInvestmentsTable)
+        .set({
+          subscriptionAgreementId,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot asign subscription agreement to recurring investment and update its status: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
+    }
+
+    await this.eventsPublisher.publishMany(events);
   }
 }

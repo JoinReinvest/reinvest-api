@@ -56,6 +56,14 @@ export class RecurringInvestment {
     };
   }
 
+  assignSubscriptionAgreement(id: string) {
+    this.subscriptionAgreementId = id;
+  }
+
+  updateStatus(status: RecurringInvestmentStatus) {
+    this.status = status;
+  }
+
   getSchedule() {
     const { frequency, startDate } = this.schedule.toObject();
 

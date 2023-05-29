@@ -39,7 +39,7 @@ export default class AdaptersProviders {
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider])
-      .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
+      .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus]);
 
     container.addSingleton(SharesAndDividendService, ['SharesAndDividends']);
 

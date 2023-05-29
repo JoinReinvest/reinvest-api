@@ -9,6 +9,7 @@ import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrast
 export type InvestmentsApiType = {
   approveFees: FeesController['approveFees'];
   assignSubscriptionAgreementToInvestment: InvestmentsController['assignSubscriptionAgreementToInvestment'];
+  assignSubscriptionAgreementToRecurringInvestment: RecurringInvestmentsController['assignSubscriptionAgreementToRecurringInvestment'];
   createInvestment: InvestmentsController['createInvestment'];
   createRecurringInvestment: RecurringInvestmentsController['createRecurringInvestment'];
   createRecurringSubscriptionAgreement: SubscriptionAgreementController['createRecurringSubscriptionAgreement'];
@@ -29,6 +30,7 @@ export const investmentsApi = (container: ContainerInterface): InvestmentsApiTyp
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
   createRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createRecurringInvestment'),
   getRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'getRecurringInvestment'),
+  assignSubscriptionAgreementToRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'assignSubscriptionAgreementToRecurringInvestment'),
   deleteRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'deleteRecurringInvestment'),
   getScheduleSimulation: container.delegateTo(ScheduleSimulationController, 'getScheduleSimulation'),
   startInvestment: container.delegateTo(InvestmentsController, 'startInvestment'),

@@ -196,8 +196,24 @@ export const RecurringInvestments = {
 
         return subscriptionAgreement;
       },
-      signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+      signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, clientIp }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        if (!recurringInvestment) {
+          return;
+        }
+
+        const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, recurringInvestment.id, clientIp);
+
+        if (!subscriptionAgreementId) {
+          throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
+        }
+
+        const isAssigned = await investmentAccountsApi.assignSubscriptionAgreementToRecurringInvestment(accountId, subscriptionAgreementId);
+
+        return isAssigned;
       },
       initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         return true;
