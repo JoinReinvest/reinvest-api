@@ -1,14 +1,18 @@
-import { NotificationsType } from 'Notifications/Domain/Notification';
-import { CreateNotification } from 'Notifications/UseCase/CreateNotification';
-import { DismissNotifications } from 'Notifications/UseCase/DismissNotifications';
+import { Pagination } from 'Notifications/Application/Pagination';
+import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
+import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
+import { NotificationFilter, NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
+import { NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
 
 export class NotificationsController {
   private createNotificationUseCase: CreateNotification;
   private dismissNotificationsUseCase: DismissNotifications;
+  private notificationQuery: NotificationQuery;
 
-  constructor(createNotificationUseCase: CreateNotification, dismissNotificationsUseCase: DismissNotifications) {
+  constructor(createNotificationUseCase: CreateNotification, dismissNotificationsUseCase: DismissNotifications, notificationQuery: NotificationQuery) {
     this.createNotificationUseCase = createNotificationUseCase;
     this.dismissNotificationsUseCase = dismissNotificationsUseCase;
+    this.notificationQuery = notificationQuery;
   }
 
   static getClassName = () => 'NotificationsController';
@@ -59,5 +63,16 @@ export class NotificationsController {
 
       return false;
     }
+  }
+
+  async getNotifications(
+    profileId: string,
+    accountId: string,
+    notificationFilter: NotificationFilter,
+    paginationInput: Pagination,
+  ): Promise<NotificationView[]> {
+    const pagination = !paginationInput.page || !paginationInput.perPage ? { page: 0, perPage: 10 } : paginationInput;
+
+    return this.notificationQuery.getNotifications(profileId, accountId, notificationFilter, pagination);
   }
 }

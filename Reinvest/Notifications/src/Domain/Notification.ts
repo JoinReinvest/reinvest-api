@@ -76,7 +76,7 @@ export class Notification {
     return new Notification(notificationSchema);
   }
 
-  restore(notificationSchema: NotificationSchema) {
+  static restore(notificationSchema: NotificationSchema) {
     return new Notification(notificationSchema);
   }
 

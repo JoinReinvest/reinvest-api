@@ -60,7 +60,7 @@ const schema = `
         [MOCK] Get all notifications for the given account id
         It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
         """
-        getNotifications(accountId: String!, filter: NotificationFilter = UNREAD, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
+        getNotifications(accountId: String!, filter: NotificationFilter = ALL, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
 
         """
         [MOCK] Get all notifications for the given account id
@@ -103,20 +103,6 @@ export const notificationsMock = (accountId: string, isRead: boolean = false, pa
       isRead,
       isDismissible: true,
       accountId,
-    },
-    {
-      id: 'f1795a6c-34d8-4b6c-9be6-ff0bcfb94c47',
-      notificationType: 'REWARD_DIVIDEND_RECEIVED',
-      header: 'Referral Reward',
-      body: 'You earned {{$10}} for inviting friends and family. Reinvest or withdraw your reward.',
-      date: dayjs().subtract(1, 'day').format('YYYY-MM-DDTHH:mm:ss'),
-      isRead,
-      isDismissible: false,
-      accountId,
-      onObject: {
-        id: 'f38b8983-e2a8-43e9-bfe4-93e00255deca',
-        type: 'DIVIDEND',
-      },
     },
     {
       id: '02ff8981-ebc5-42e5-ab36-a71cc3f27b72',
@@ -168,8 +154,12 @@ export const Notification = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      getNotifications: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
-        return notificationsMock(accountId, false, pagination.page, pagination.perPage);
+      getNotifications: async (parent: any, { accountId, filter, pagination }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Notifications.ApiType>(Notifications);
+        const listOfNotifications = notificationsMock(accountId, false);
+        const notifications = await api.getNotifications(profileId, accountId, filter, pagination);
+
+        return [...notifications, ...listOfNotifications];
       },
       getNotificationStats: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         const listOfNotifications = notificationsMock(accountId, false);

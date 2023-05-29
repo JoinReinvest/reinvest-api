@@ -1,9 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
+import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
+import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
+import { NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
 import { Notifications } from 'Notifications/index';
-import { CreateNotification } from 'Notifications/UseCase/CreateNotification';
-import { DismissNotifications } from 'Notifications/UseCase/DismissNotifications';
 
 export class UseCaseProvider {
   private config: Notifications.Config;
@@ -15,5 +16,6 @@ export class UseCaseProvider {
   public boot(container: ContainerInterface) {
     container.addSingleton(CreateNotification, [NotificationsRepository, IdGenerator]);
     container.addSingleton(DismissNotifications, [NotificationsRepository]);
+    container.addSingleton(NotificationQuery, [NotificationsRepository]);
   }
 }
