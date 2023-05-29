@@ -1,11 +1,17 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import {
   createSharesAndDividendsDatabaseAdapterProvider,
+  SharesAndDividendsDatabase,
   SharesAndDividendsDatabaseAdapterInstanceProvider,
+  SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
+import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
+import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
+import { PortfolioService } from 'SharesAndDividends/Adapter/Modules/PortfolioService';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
@@ -27,6 +33,14 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(SharesAndDividendsDatabaseAdapterInstanceProvider, createSharesAndDividendsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(SharesRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider]);
+      .addSingleton(SharesRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
+      .addSingleton(FinancialOperationsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
+      .addSingleton(DividendsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
+      .addObjectFactory(
+        'SharesAndDividendsTransactionalAdapter',
+        (databaseProvider: SharesAndDividendsDatabaseAdapterProvider) => new TransactionalAdapter<SharesAndDividendsDatabase>(databaseProvider),
+        [SharesAndDividendsDatabaseAdapterInstanceProvider],
+      );
+    container.addSingleton(PortfolioService, ['Portfolio']);
   }
 }
