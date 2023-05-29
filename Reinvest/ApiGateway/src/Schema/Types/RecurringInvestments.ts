@@ -126,11 +126,26 @@ export const RecurringInvestments = {
   resolvers: {
     Query: {
       getActiveRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        // return recurringInvestmentMock('ACTIVE');
-        return null;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.ACTIVE);
+
+        if (!recurringInvestment) {
+          return null;
+        }
+
+        return recurringInvestment;
       },
       getDraftRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return recurringInvestmentMock('DRAFT');
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        if (!recurringInvestment) {
+          return null;
+        }
+
+        return recurringInvestment;
       },
       getScheduleSimulation: async (parent: any, { schedule }: GetScheduleSimulation, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
