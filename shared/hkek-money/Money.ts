@@ -7,6 +7,10 @@ export class Money {
     this.value = DineroFactory({ amount: this.amount, currency, precision: 2 });
   }
 
+  static zero(): Money {
+    return new Money(0);
+  }
+
   // returns dinero object
   getValue(): DineroFactory.Dinero {
     return this.value;
@@ -26,13 +30,21 @@ export class Money {
     return this.value.toUnit();
   }
 
-  divideByAmount(divideBy: Money): number {
-    return this.toUnit() / divideBy.toUnit();
+  divideByMoney(divisor: Money): number {
+    return this.toUnit() / divisor.toUnit();
   }
 
-  add(value: Money) {
-    const sum = this.value.add(value.getValue());
+  add(addend: Money) {
+    const sum = this.value.add(addend.getValue());
 
     return new Money(sum.getAmount());
+  }
+
+  multiply(multiplier: number): Money {
+    return new Money(this.value.multiply(multiplier).getAmount());
+  }
+
+  subtract(subtrahend: Money): Money {
+    return new Money(this.value.subtract(subtrahend.getValue()).getAmount());
   }
 }

@@ -14,6 +14,12 @@ export class CreateShares {
   static getClassName = () => 'CreateShares';
 
   async execute(portfolioId: string, profileId: string, accountId: string, investmentId: string, price: number): Promise<void> {
+    const existingShares = await this.sharesRepository.getSharesByInvestmentId(investmentId);
+
+    if (existingShares) {
+      throw new Error(`Shares with investmentId ${investmentId} already exists`);
+    }
+
     const id = this.idGenerator.createUuid();
     const shares = Shares.create(id, portfolioId, profileId, accountId, investmentId, price);
 

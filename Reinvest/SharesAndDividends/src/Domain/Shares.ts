@@ -47,7 +47,56 @@ export class Shares {
     });
   }
 
+  static restore(data: SharesSchema): Shares {
+    const { accountId, dateCreated, dateFunded, dateRevoked, dateSettled, id, investmentId, numberOfShares, portfolioId, price, profileId, status, unitPrice } =
+      data;
+
+    return new Shares({
+      accountId,
+      dateCreated,
+      dateFunded,
+      dateRevoked,
+      dateSettled,
+      id,
+      investmentId,
+      numberOfShares,
+      portfolioId,
+      price,
+      profileId,
+      status,
+      unitPrice,
+    });
+  }
+
   toObject(): SharesSchema {
     return this.sharesSchema;
+  }
+
+  setFundingState(shares: number, unitPrice: number) {
+    if (this.sharesSchema.status !== SharesStatus.CREATED) {
+      throw new Error('Shares status must be CREATED');
+    }
+
+    this.sharesSchema.status = SharesStatus.FUNDING;
+    this.sharesSchema.numberOfShares = shares;
+    this.sharesSchema.unitPrice = unitPrice;
+  }
+
+  setFundedState() {
+    if (this.sharesSchema.status !== SharesStatus.FUNDING) {
+      throw new Error('Shares status must be FUNDING');
+    }
+
+    this.sharesSchema.status = SharesStatus.FUNDED;
+    this.sharesSchema.dateFunded = new Date();
+  }
+
+  setSettledState() {
+    if (this.sharesSchema.status !== SharesStatus.FUNDED) {
+      throw new Error('Shares status must be FUNDED');
+    }
+
+    this.sharesSchema.status = SharesStatus.SETTLED;
+    this.sharesSchema.dateSettled = new Date();
   }
 }

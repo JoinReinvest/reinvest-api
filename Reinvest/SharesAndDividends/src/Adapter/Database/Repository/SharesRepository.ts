@@ -1,6 +1,8 @@
+import { Money } from 'Money/Money';
 import { sadSharesTable, SharesAndDividendsDatabaseAdapterProvider } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
-import { SharesTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
-import { Shares } from 'SharesAndDividends/Domain/Shares';
+import { SharesAndTheirPricesSelection, SharesTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
+import { SharesAndTheirPrices } from 'SharesAndDividends/Domain/AccountStatsCalculationService';
+import { Shares, SharesSchema, SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export class SharesRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -29,5 +31,75 @@ export class SharesRepository {
         }),
       )
       .execute();
+  }
+
+  async getNotRevokedSharesAndTheirPrice(
+    profileId: string,
+    accountId: string,
+  ): Promise<{
+    [portfolioId: string]: SharesAndTheirPrices[];
+  }> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .select(['numberOfShares', 'price', 'unitPrice', 'portfolioId'])
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', '!=', SharesStatus.REVOKED)
+      .castTo<SharesAndTheirPricesSelection>()
+      .execute();
+
+    const sharesPerPortfolio: { [portfolioId: string]: SharesAndTheirPrices[] } = {};
+
+    if (!data) {
+      return sharesPerPortfolio;
+    }
+
+    data.map((sharesAndTheirPrices: SharesAndTheirPricesSelection) => {
+      const { portfolioId, numberOfShares, unitPrice, price } = sharesAndTheirPrices;
+
+      if (!sharesPerPortfolio[portfolioId]) {
+        sharesPerPortfolio[portfolioId] = [];
+      }
+
+      // @ts-ignore
+      sharesPerPortfolio[portfolioId].push({
+        numberOfShares,
+        unitPrice: unitPrice ? new Money(unitPrice) : null,
+        price: new Money(price),
+      });
+    });
+
+    return sharesPerPortfolio;
+  }
+
+  async getSharesByInvestmentId(investmentId: string): Promise<Shares | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .select([
+        'accountId',
+        'dateCreated',
+        'dateFunded',
+        'dateRevoked',
+        'dateSettled',
+        'id',
+        'investmentId',
+        'numberOfShares',
+        'portfolioId',
+        'price',
+        'profileId',
+        'status',
+        'unitPrice',
+      ])
+      .where('investmentId', '=', investmentId)
+      .castTo<SharesSchema>()
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return Shares.restore(data);
   }
 }

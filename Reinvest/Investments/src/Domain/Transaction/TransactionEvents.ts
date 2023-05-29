@@ -53,7 +53,7 @@ export type TradeCreated = TransactionEvent & {
     accountId: string;
     amount: number;
     fees: number;
-    shares: string;
+    shares: number;
     unitSharePrice: number;
   };
   kind: TransactionEvents.TRADE_CREATED;
