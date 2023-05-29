@@ -5,6 +5,7 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { logger } from 'Logger/logger';
+import { Notifications } from 'Notifications/index';
 import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
@@ -41,6 +42,14 @@ export function boot(): Modules {
   const queueConfig = SQS_CONFIG as QueueConfig;
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
+
+  modules.register(
+    Notifications.moduleName,
+    Notifications.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as Notifications.Config),
+  );
 
   modules.register(
     Documents.moduleName,
