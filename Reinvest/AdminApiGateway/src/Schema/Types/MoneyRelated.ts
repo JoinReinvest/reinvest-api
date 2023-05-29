@@ -57,17 +57,18 @@ export const MoneyRelatedSchema = {
         const { profileId: inviterProfileId } = inviterProfile;
         const { profileId: inviteeProfileId } = inviteeProfile;
 
-        let status = true;
+        let inviterStatus = false;
+        let inviteeStatus = false;
 
         if (whoShouldGetTheReward === 'INVITER' || whoShouldGetTheReward === 'BOTH') {
-          status = status && (await api.createManuallyIncentiveReward(inviterProfileId, inviteeProfileId, RewardType.INVITER));
+          inviterStatus = await api.createManuallyIncentiveReward(inviterProfileId, inviteeProfileId, RewardType.INVITER);
         }
 
         if (whoShouldGetTheReward === 'INVITEE' || whoShouldGetTheReward === 'BOTH') {
-          status = status && (await api.createManuallyIncentiveReward(inviterProfileId, inviteeProfileId, RewardType.INVITEE));
+          inviteeStatus = await api.createManuallyIncentiveReward(inviterProfileId, inviteeProfileId, RewardType.INVITEE);
         }
 
-        return status;
+        return inviterStatus || inviteeStatus;
       },
     },
   },
