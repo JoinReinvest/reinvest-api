@@ -3,6 +3,7 @@ import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
+import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import DeleteRecurringInvestment from 'Investments/Application/UseCases/DeleteRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
@@ -31,7 +32,12 @@ export default class PortsProviders {
   public boot(container: ContainerInterface) {
     container.addSingleton(TempController, [SimpleEventBus]);
     container.addSingleton(InvestmentsController, [CreateInvestment, InvestmentSummaryQuery, AssignSubscriptionAgreementToInvestment, StartInvestment]);
-    container.addSingleton(SubscriptionAgreementController, [CreateSubscriptionAgreement, SubscriptionAgreementQuery, SignSubscriptionAgreement]);
+    container.addSingleton(SubscriptionAgreementController, [
+      CreateSubscriptionAgreement,
+      SubscriptionAgreementQuery,
+      SignSubscriptionAgreement,
+      CreateRecurringSubscriptionAgreement,
+    ]);
     container.addSingleton(FeesController, [ApproveFees, IsFeeApproved]);
     container.addSingleton(ScheduleSimulationController, [ScheduleSimulationQuery]);
     container.addSingleton(RecurringInvestmentsController, [CreateRecurringInvestment, RecurringInvestmentQuery, DeleteRecurringInvestment]);

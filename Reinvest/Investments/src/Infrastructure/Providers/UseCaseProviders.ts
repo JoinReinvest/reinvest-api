@@ -4,6 +4,7 @@ import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
+import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import DeleteRecurringInvestment from 'Investments/Application/UseCases/DeleteRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
@@ -42,5 +43,6 @@ export default class UseCaseProviders {
     container.addSingleton(CreateRecurringInvestment, [RecurringInvestmentsRepository, IdGenerator]);
     container.addSingleton(RecurringInvestmentQuery, [RecurringInvestmentsRepository]);
     container.addSingleton(DeleteRecurringInvestment, [RecurringInvestmentsRepository, SubscriptionAgreementRepository]);
+    container.addSingleton(CreateRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, IdGenerator]);
   }
 }

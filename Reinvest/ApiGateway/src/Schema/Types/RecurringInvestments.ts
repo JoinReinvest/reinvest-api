@@ -2,19 +2,9 @@ import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { subscriptionAgreementIdMock, USDInput } from 'ApiGateway/Schema/Types/Investments';
 import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
 import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
-import { subscriptionAgreementsTemplate } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
 import { LegalEntities } from 'Reinvest/LegalEntities/src';
 import Modules from 'Reinvest/Modules';
 import { Portfolio } from 'Reinvest/Portfolio/src';
-
-const subscriptionAgreementMock = (parentId: string, type: string) => ({
-  id: subscriptionAgreementIdMock,
-  type,
-  status: 'WAITING_FOR_SIGNATURE',
-  createdAt: '2023-03-24T12:33:12',
-  content: subscriptionAgreementsTemplate[1],
-});
-
 const schema = `
     #graphql
     enum RecurringInvestmentFrequency {
@@ -179,7 +169,17 @@ export const RecurringInvestments = {
         return recurringInvestment;
       },
       createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return subscriptionAgreementMock(recurringInvestmentIdMock, 'RECURRING_INVESTMENT');
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const subscriptionAgreementId = await investmentAccountsApi.createRecurringSubscriptionAgreement(profileId, accountId);
+
+        if (!subscriptionAgreementId) {
+          throw new JsonGraphQLError('COULDNT_CREATE_SUBSCRIPTION');
+        }
+
+        const subscriptionAgreement = await investmentAccountsApi.subscriptionAgreementQuery(profileId, subscriptionAgreementId);
+
+        return subscriptionAgreement;
       },
       signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         return true;
