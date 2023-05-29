@@ -60,10 +60,15 @@ export function boot(): Modules {
 
   modules.register(
     SharesAndDividends.moduleName,
-    SharesAndDividends.create({
-      database: databaseConfig,
-      queue: queueConfig,
-    } as SharesAndDividends.Config),
+    SharesAndDividends.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as SharesAndDividends.Config,
+      {
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+      },
+    ),
   );
 
   modules.register(

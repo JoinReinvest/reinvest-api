@@ -1,4 +1,5 @@
 import Container, { ContainerInterface } from 'Container/Container';
+import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
@@ -25,6 +26,10 @@ export namespace SharesAndDividends {
     queue: QueueConfig;
   };
 
+  export type ModulesDependencies = {
+    portfolio: Portfolio.Main;
+  };
+
   export type ApiType = SharesAndDividendsApiType & Api;
   export type TechnicalHandlerType = SharesAndDividendsTechnicalHandlerType & EventHandler;
 
@@ -32,9 +37,11 @@ export namespace SharesAndDividends {
     private readonly config: SharesAndDividends.Config;
     private readonly container: ContainerInterface;
     private booted = false;
+    private modules: SharesAndDividends.ModulesDependencies;
 
-    constructor(config: SharesAndDividends.Config) {
+    constructor(config: SharesAndDividends.Config, modules: ModulesDependencies) {
       this.config = config;
+      this.modules = modules;
       this.container = new Container();
     }
 
@@ -70,6 +77,7 @@ export namespace SharesAndDividends {
         return;
       }
 
+      this.container.addAsValue('Portfolio', this.modules.portfolio);
       new AdapterServiceProvider(this.config).boot(this.container);
       new UseCaseProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);
@@ -79,7 +87,7 @@ export namespace SharesAndDividends {
     }
   }
 
-  export function create(config: SharesAndDividends.Config): SharesAndDividends.Main {
-    return new SharesAndDividends.Main(config);
+  export function create(config: SharesAndDividends.Config, modules: SharesAndDividends.ModulesDependencies): SharesAndDividends.Main {
+    return new SharesAndDividends.Main(config, modules);
   }
 }

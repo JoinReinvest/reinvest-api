@@ -1,4 +1,5 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export interface SharesTable {
@@ -16,6 +17,8 @@ export interface SharesTable {
   status: SharesStatus;
   unitPrice: number | null;
 }
+
+export type SharesAndTheirPricesSelection = Pick<SharesTable, 'numberOfShares' | 'price' | 'unitPrice' | 'portfolioId'>;
 
 export interface DividendsDeclarationTable {
   calculatedFromDate: Date;
@@ -62,6 +65,8 @@ export interface InvestorDividendsTable {
   totalFeeAmount: number;
 }
 
+export type DividendsSelection = Pick<InvestorDividendsTable, 'totalDividendAmount' | 'totalFeeAmount'>;
+
 export interface UnpaidFeesTable {
   accountId: string;
   assignedDate: Date | null;
@@ -89,7 +94,7 @@ export interface FinancialOperationsTable {
   createdDate: Date;
   dataJson: JSONObject;
   id: string;
-  operationType: 'INVESTMENT' | 'REINVESTMENT' | 'WITHDRAWAL' | 'REVOKED';
+  operationType: FinancialOperationType;
   profileId: string;
 }
 
@@ -97,5 +102,5 @@ export interface GlobalFinancialOperationsTable {
   createdDate: Date;
   dataJson: JSONObject;
   id: string;
-  operationType: 'NAV_CHANGED';
+  operationType: GlobalFinancialOperationType;
 }
