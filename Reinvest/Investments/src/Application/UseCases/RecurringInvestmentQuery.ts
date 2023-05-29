@@ -1,14 +1,15 @@
+import ScheduleInvestmentService from 'Investments/Application/Service/ScheduleInvestmentService';
 import type { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 
-class GetRecurringInvestment {
+class RecurringInvestmentQuery {
   private readonly recurringInvestmentsRepository: RecurringInvestmentsRepository;
 
   constructor(recurringInvestmentsRepository: RecurringInvestmentsRepository) {
     this.recurringInvestmentsRepository = recurringInvestmentsRepository;
   }
 
-  static getClassName = (): string => 'GetRecurringInvestment';
+  static getClassName = (): string => 'RecurringInvestmentQuery';
 
   async execute(accountId: string, status1: RecurringInvestmentStatus) {
     const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, status1);
@@ -17,7 +18,11 @@ class GetRecurringInvestment {
       return false;
     }
 
-    const { id, startDate, frequency, subscriptionAgreementId, status } = recurringInvestment.toObject();
+    const { id, subscriptionAgreementId, status } = recurringInvestment.toObject();
+
+    const { startDate, frequency } = recurringInvestment.getSchedule();
+
+    const scheduleInvestmentService = new ScheduleInvestmentService(startDate, frequency);
 
     return {
       id,
@@ -25,6 +30,7 @@ class GetRecurringInvestment {
         startDate,
         frequency,
       },
+      nextInvestmentDate: scheduleInvestmentService.getNextInvestmentDate(),
       amount: recurringInvestment.getAmount(),
       subscriptionAgreementId,
       status,
@@ -32,4 +38,4 @@ class GetRecurringInvestment {
   }
 }
 
-export default GetRecurringInvestment;
+export default RecurringInvestmentQuery;

@@ -2,6 +2,7 @@ import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { Money } from 'Money/Money';
+import type { Schedule } from 'Reinvest/ApiGateway/src/Schema/Types/RecurringInvestments';
 
 export type RecurringInvestmentCreate = {
   accountId: string;
@@ -25,7 +26,7 @@ class CreateRecurringInvestment {
 
   static getClassName = (): string => 'CreateRecurringInvestment';
 
-  async execute(portfolioId: string, profileId: string, accountId: string, money: Money, schedule: any) {
+  async execute(portfolioId: string, profileId: string, accountId: string, money: Money, schedule: Schedule) {
     const id = this.idGenerator.createUuid();
 
     const recurringInvestment: RecurringInvestmentCreate = {
@@ -44,7 +45,7 @@ class CreateRecurringInvestment {
       return false;
     }
 
-    return id;
+    return true;
   }
 }
 

@@ -1,5 +1,5 @@
-import { SessionContext } from 'ApiGateway/index';
-import { subscriptionAgreementIdMock } from 'ApiGateway/Schema/Types/Investments';
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { subscriptionAgreementIdMock, USDInput } from 'ApiGateway/Schema/Types/Investments';
 import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
 import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { subscriptionAgreementsTemplate } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
@@ -110,11 +110,19 @@ const recurringInvestmentMock = (status: string) => ({
   status,
 });
 
+export type Schedule = {
+  frequency: RecurringInvestmentFrequency;
+  startDate: string;
+};
+
 export type GetScheduleSimulation = {
-  schedule: {
-    frequency: RecurringInvestmentFrequency;
-    startDate: string;
-  };
+  schedule: Schedule;
+};
+
+export type CreateRecurringInvestmentInput = {
+  accountId: string;
+  amount: USDInput;
+  schedule: Schedule;
 };
 
 export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
@@ -144,18 +152,29 @@ export const RecurringInvestments = {
       },
     },
     Mutation: {
-      createRecurringInvestment: async (parent: any, { accountId, amount, schedule }: any, { profileId, modules }: SessionContext) => {
+      createRecurringInvestment: async (
+        parent: any,
+        { accountId, amount, schedule }: CreateRecurringInvestmentInput,
+        { profileId, modules }: SessionContext,
+      ) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
         const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
 
-        const { portfolioId } = await portfolioApi.getActivePortfolio();
-        const recurringInvestmentId = await investmentAccountsApi.createRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+        const alreadyExistedRecurringInvestmentDraft = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
 
-        console.log(recurringInvestmentId);
+        if (alreadyExistedRecurringInvestmentDraft) {
+          await investmentAccountsApi.deleteRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
+        }
+
+        const { portfolioId } = await portfolioApi.getActivePortfolio();
+        const status = await investmentAccountsApi.createRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+
+        if (!status) {
+          throw new JsonGraphQLError('COULDNT_CREATE_RECURRING_INVESTMENT');
+        }
 
         const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-        console.log(recurringInvestment);
 
         return recurringInvestment;
       },

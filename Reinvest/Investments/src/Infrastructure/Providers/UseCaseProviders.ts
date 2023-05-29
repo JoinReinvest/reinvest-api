@@ -5,8 +5,10 @@ import AssignSubscriptionAgreementToInvestment from 'Investments/Application/Use
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
+import DeleteRecurringInvestment from 'Investments/Application/UseCases/DeleteRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
+import RecurringInvestmentQuery from 'Investments/Application/UseCases/RecurringInvestmentQuery';
 import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
@@ -16,7 +18,6 @@ import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/F
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
-import GetRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/GetRecurringInvestment';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -39,6 +40,7 @@ export default class UseCaseProviders {
     container.addSingleton(IsFeeApproved, [FeesRepository]);
     container.addSingleton(ScheduleSimulationQuery);
     container.addSingleton(CreateRecurringInvestment, [RecurringInvestmentsRepository, IdGenerator]);
-    container.addSingleton(GetRecurringInvestment, [RecurringInvestmentsRepository]);
+    container.addSingleton(RecurringInvestmentQuery, [RecurringInvestmentsRepository]);
+    container.addSingleton(DeleteRecurringInvestment, [RecurringInvestmentsRepository, SubscriptionAgreementRepository]);
   }
 }
