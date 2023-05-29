@@ -1,17 +1,25 @@
 import { AdminSessionContext } from 'AdminApiGateway/index';
 import { GraphQLError } from 'graphql';
 import { Identity } from 'Identity/index';
+import { RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 
 const schema = `
     #graphql
+    enum RewardType {
+        INVITER
+        INVITEE
+        BOTH
+    }
 
     type Mutation {
         """
         @access: Executive
-        Manually creates inventive reward. User can get only one incentive reward, so every additional reward will be ignored.
+        Manually creates inventive reward for inviterEmail
+        User can get many INVITER rewards.
+        INVITER reward - when someone registers with INVITER invite link.
         """
-        giveInventiveRewardByHand(email: EmailAddress): Boolean
+        giveIncentiveRewardByHand(inviterEmail: EmailAddress, inviteeEmail: EmailAddress, whoShouldGetTheReward: RewardType): Boolean
     }
 `;
 
@@ -20,22 +28,46 @@ export const MoneyRelatedSchema = {
   resolvers: {
     Query: {},
     Mutation: {
-      giveInventiveRewardByHand: async (parent: any, { email }: { email: string }, { modules, isExecutive }: AdminSessionContext) => {
+      giveIncentiveRewardByHand: async (
+        parent: any,
+        {
+          inviterEmail,
+          inviteeEmail,
+          whoShouldGetTheReward,
+        }: {
+          inviteeEmail: string;
+          inviterEmail: string;
+          whoShouldGetTheReward: 'INVITER' | 'INVITEE' | 'BOTH';
+        },
+        { modules, isExecutive }: AdminSessionContext,
+      ) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
         const identityApi = modules.getApi<Identity.ApiType>(Identity);
-        const profile = await identityApi.getProfileByEmail(email);
+        const inviterProfile = await identityApi.getProfileByEmail(inviterEmail);
+        const inviteeProfile = await identityApi.getProfileByEmail(inviteeEmail);
 
-        if (!profile) {
-          throw new GraphQLError('Profile not found');
+        if (!inviterProfile || !inviteeProfile) {
+          throw new GraphQLError('Inviter or invitee not found');
         }
 
-        const { profileId } = profile;
+        const { profileId: inviterProfileId } = inviterProfile;
+        const { profileId: inviteeProfileId } = inviteeProfile;
 
-        return api.createIncentiveReward(profileId);
+        let status = true;
+
+        if (whoShouldGetTheReward === 'INVITER' || whoShouldGetTheReward === 'BOTH') {
+          status = status && (await api.createManuallyIncentiveReward(inviterProfileId, inviteeProfileId, RewardType.INVITER));
+        }
+
+        if (whoShouldGetTheReward === 'INVITEE' || whoShouldGetTheReward === 'BOTH') {
+          status = status && (await api.createManuallyIncentiveReward(inviterProfileId, inviteeProfileId, RewardType.INVITEE));
+        }
+
+        return status;
       },
     },
   },

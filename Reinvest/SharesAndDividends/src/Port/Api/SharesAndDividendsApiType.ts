@@ -4,7 +4,7 @@ import { SharesController } from 'SharesAndDividends/Port/Api/SharesController';
 import { StatsController } from 'SharesAndDividends/Port/Api/StatsController';
 
 export type SharesAndDividendsApiType = {
-  createIncentiveReward: IncentiveRewardController['createManualIncentiveReward'];
+  createManuallyIncentiveReward: IncentiveRewardController['createManuallyIncentiveReward'];
   createShares: SharesController['createShares'];
   getAccountStats: StatsController['getAccountStats'];
   getEVSChart: StatsController['getEVSChart'];
@@ -20,5 +20,5 @@ export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndD
   setSharesToFundingState: container.delegateTo(SharesController, 'setSharesToFundingState'),
   setSharesToSettledState: container.delegateTo(SharesController, 'setSharesToSettledState'),
   getEVSChart: container.delegateTo(StatsController, 'getEVSChart'),
-  createIncentiveReward: container.delegateTo(IncentiveRewardController, 'createManualIncentiveReward'),
+  createManuallyIncentiveReward: container.delegateTo(IncentiveRewardController, 'createManuallyIncentiveReward'),
 });

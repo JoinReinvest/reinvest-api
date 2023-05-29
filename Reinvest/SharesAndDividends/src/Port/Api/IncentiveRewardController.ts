@@ -1,21 +1,30 @@
+import { RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { CreateIncentiveReward } from 'SharesAndDividends/UseCase/CreateIncentiveReward';
 
 export class IncentiveRewardController {
-  private createIncentiveRewardUseCase: CreateIncentiveReward;
+  private createIncentiveReward: CreateIncentiveReward;
 
   constructor(createIncentiveRewardUseCase: CreateIncentiveReward) {
-    this.createIncentiveRewardUseCase = createIncentiveRewardUseCase;
+    this.createIncentiveReward = createIncentiveRewardUseCase;
   }
 
   static getClassName = () => 'IncentiveRewardController';
 
-  async createManualIncentiveReward(profileId: string): Promise<boolean> {
+  async createManuallyIncentiveReward(inviterProfileId: string, inviteeProfileId: string, whoShouldGetTheReward: RewardType): Promise<boolean> {
     try {
-      await this.createIncentiveRewardUseCase.execute(profileId);
+      await this.createIncentiveReward.execute(inviterProfileId, inviteeProfileId, whoShouldGetTheReward);
 
       return true;
     } catch (error: any) {
-      console.warn('[IncentiveRewardController] createManualIncentiveReward', { profileId }, error);
+      console.warn(
+        '[IncentiveRewardController] createManuallyIncentiveReward',
+        {
+          inviterProfileId,
+          inviteeProfileId,
+          whoShouldGetTheReward,
+        },
+        error,
+      );
 
       return false;
     }

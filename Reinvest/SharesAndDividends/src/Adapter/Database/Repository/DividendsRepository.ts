@@ -6,7 +6,7 @@ import {
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { DividendsSelection, InvestorIncentiveDividendTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
 import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/DividendsCalculationService';
-import { IncentiveReward, IncentiveRewardSchema } from 'SharesAndDividends/Domain/IncentiveReward';
+import { IncentiveReward, IncentiveRewardSchema, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 
 export class DividendsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -40,12 +40,14 @@ export class DividendsRepository {
     });
   }
 
-  async getIncentiveReward(profileId: string) {
+  async getIncentiveReward(profileId: string, theOtherProfileId: string, rewardType: RewardType): Promise<IncentiveReward | null> {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(sadInvestorIncentiveDividendTable)
-      .select(['actionDate', 'amount', 'createdDate', 'status', 'id', 'profileId', 'accountId'])
+      .select(['actionDate', 'amount', 'createdDate', 'status', 'id', 'profileId', 'accountId', 'rewardType', 'theOtherProfileId'])
       .where('profileId', '=', profileId)
+      .where('theOtherProfileId', '=', theOtherProfileId)
+      .where('rewardType', '=', rewardType)
       .limit(1)
       .castTo<IncentiveRewardSchema>()
       .executeTakeFirst();
@@ -64,7 +66,7 @@ export class DividendsRepository {
       .provide()
       .insertInto(sadInvestorIncentiveDividendTable)
       .values(values)
-      .onConflict(oc => oc.column('profileId').doNothing())
+      .onConflict(oc => oc.constraint('unique_incentive_reward').doNothing())
       .execute();
   }
 }

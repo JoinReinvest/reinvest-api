@@ -1,6 +1,6 @@
 import { JSONObject } from 'HKEKTypes/Generics';
 import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
-import { IncentiveRewardStatus } from 'SharesAndDividends/Domain/IncentiveReward';
+import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export interface SharesTable {
@@ -87,7 +87,9 @@ export interface InvestorIncentiveDividendTable {
   createdDate: Date;
   id: string;
   profileId: string;
+  rewardType: RewardType;
   status: IncentiveRewardStatus;
+  theOtherProfileId: string;
 }
 
 export interface FinancialOperationsTable {
