@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { RecurringInvestmentFrequency } from 'Investments/Domain/Investments/Types';
 
-const SIMULATION_DATES_QUANTITY = 8;
+const DATES_TO_CREATE = 7;
 
 class ScheduleInvestmentService {
   private startDate: string;
@@ -13,10 +13,10 @@ class ScheduleInvestmentService {
   }
 
   getSimulation() {
-    const dates = [];
+    const dates = [this.startDate];
     const { multiplyer, type } = this.getTypeAndValueToMultiplyer();
 
-    for (let i = 1; i <= SIMULATION_DATES_QUANTITY; i++) {
+    for (let i = 1; i <= DATES_TO_CREATE; i++) {
       const date = dayjs(this.startDate)
         .add(i * multiplyer, type)
         .format('YYYY-MM-DD');
