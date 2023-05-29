@@ -124,7 +124,7 @@ export const notificationsMock = (accountId: string, isRead: boolean = false, pa
       body: "Your recent investment {{3009334}} failed. We'll try to process payment again over the next few days. To process investment., you may need to update your billing details",
       date: dayjs().subtract(10000, 'minutes').format('YYYY-MM-DDTHH:mm:ss'),
       isRead,
-      isDismissible: true,
+      isDismissible: false,
       accountId,
       onObject: {
         id: '7c0d0826-d0fb-41e7-b23f-f89c44748e15',
