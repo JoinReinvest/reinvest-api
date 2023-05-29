@@ -2,6 +2,7 @@ import { ContainerInterface } from 'Container/Container';
 import { Notifications } from 'Notifications/index';
 import { NotificationsController } from 'Notifications/Port/Api/NotificationsController';
 import { CreateNotification } from 'Notifications/UseCase/CreateNotification';
+import { DismissNotifications } from 'Notifications/UseCase/DismissNotifications';
 
 export class PortsProvider {
   private config: Notifications.Config;
@@ -12,6 +13,6 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     // api
-    container.addSingleton(NotificationsController, [CreateNotification]);
+    container.addSingleton(NotificationsController, [CreateNotification, DismissNotifications]);
   }
 }

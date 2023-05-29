@@ -76,6 +76,7 @@ export function boot(): Modules {
       } as SharesAndDividends.Config,
       {
         portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        notifications: modules.get(Notifications.moduleName) as Notifications.Main,
       },
     ),
   );

@@ -1,14 +1,17 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
+import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 import { IncentiveReward, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 
 export class CreateIncentiveReward {
   private dividendsRepository: DividendsRepository;
   private idGenerator: IdGeneratorInterface;
+  private notificationService: NotificationService;
 
-  constructor(dividendsRepository: DividendsRepository, idGenerator: IdGeneratorInterface) {
+  constructor(dividendsRepository: DividendsRepository, idGenerator: IdGeneratorInterface, notificationService: NotificationService) {
     this.dividendsRepository = dividendsRepository;
     this.idGenerator = idGenerator;
+    this.notificationService = notificationService;
   }
 
   static getClassName = () => 'CreateIncentiveReward';
@@ -26,5 +29,6 @@ export class CreateIncentiveReward {
     const reward = IncentiveReward.createReward(id, profileId, theOtherProfileId, rewardType);
 
     await this.dividendsRepository.createIncentiveReward(reward);
+    await this.notificationService.createRewardDividendReceivedNotification(profileId, reward);
   }
 }

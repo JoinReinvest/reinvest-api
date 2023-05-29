@@ -75,6 +75,14 @@ export class IncentiveReward {
     this.setStatus(IncentiveRewardStatus.REINVESTED, new Date(), accountId);
   }
 
+  getNotification() {
+    return {
+      amount: this.amount.getFormattedAmount(),
+      id: this.id,
+      rewardType: this.rewardType,
+    };
+  }
+
   toObject(): IncentiveRewardSchema {
     return {
       id: this.id,

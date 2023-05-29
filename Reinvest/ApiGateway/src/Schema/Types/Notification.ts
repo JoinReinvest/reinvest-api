@@ -1,5 +1,6 @@
 import { SessionContext } from 'ApiGateway/index';
 import dayjs from 'dayjs';
+import { Notifications } from 'Notifications/index';
 
 const schema = `
     #graphql
@@ -45,7 +46,7 @@ const schema = `
         date: ISODateTime!
         isRead: Boolean!
         isDismissible: Boolean!
-        accountId: String!
+        accountId: String
         onObject: NotificationObject
     }
 
@@ -181,10 +182,10 @@ export const Notification = {
       },
     },
     Mutation: {
-      markNotificationAsRead: async (parent: any, { accountId, notificationId }: any, { profileId, modules }: SessionContext) => {
-        const notification = notificationsMock(accountId, false).find(n => n.id === notificationId);
+      markNotificationAsRead: async (parent: any, { notificationId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Notifications.ApiType>(Notifications);
 
-        return !notification || !notification.isDismissible ? false : true;
+        return api.dismissNotifications(profileId, [notificationId]);
       },
     },
   },

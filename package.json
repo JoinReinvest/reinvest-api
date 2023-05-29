@@ -119,7 +119,9 @@
       "@typescript-eslint/ban-ts-comment": 1,
       "@typescript-eslint/no-explicit-any": 1,
       "no-return-await": 1,
-      "@typescript-eslint/no-empty-interface": 1
+      "@typescript-eslint/no-empty-interface": 1,
+      "security/detect-object-injection": 0,
+      "@typescript-eslint/no-non-null-assertion": 0
     }
   },
   "prettier": "@hookooekoo/eslint-config/prettier.json"
