@@ -8,3 +8,4 @@ export * as migration_20230525094806_sad_create_investor_incentive_dividend from
 export * as migration_20230525094807_sad_create_financial_operations from './sad_8_create_financial_operations';
 export * as migration_20230525094808_sad_create_global_financial_operations from './sad_9_create_global_financial_operations';
 export * as migration_20230525170700_sad_update_shares from './sad_10_update_shares';
+export * as migration_20230529112500_update_incentive_reward from './sad_11_update_incentive_reward';

@@ -1,7 +1,12 @@
 import { Money } from 'Money/Money';
-import { sadInvestorDividendsTable, SharesAndDividendsDatabaseAdapterProvider } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
-import { DividendsSelection } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
+import {
+  sadInvestorDividendsTable,
+  sadInvestorIncentiveDividendTable,
+  SharesAndDividendsDatabaseAdapterProvider,
+} from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
+import { DividendsSelection, InvestorIncentiveDividendTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
 import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/DividendsCalculationService';
+import { IncentiveReward, IncentiveRewardSchema, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 
 export class DividendsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -33,5 +38,35 @@ export class DividendsRepository {
         fee: new Money(dividendsSelection.totalFeeAmount),
       };
     });
+  }
+
+  async getIncentiveReward(profileId: string, theOtherProfileId: string, rewardType: RewardType): Promise<IncentiveReward | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadInvestorIncentiveDividendTable)
+      .select(['actionDate', 'amount', 'createdDate', 'status', 'id', 'profileId', 'accountId', 'rewardType', 'theOtherProfileId'])
+      .where('profileId', '=', profileId)
+      .where('theOtherProfileId', '=', theOtherProfileId)
+      .where('rewardType', '=', rewardType)
+      .limit(1)
+      .castTo<IncentiveRewardSchema>()
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return IncentiveReward.restore(data);
+  }
+
+  async createIncentiveReward(reward: IncentiveReward) {
+    const values = <InvestorIncentiveDividendTable>reward.toObject();
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadInvestorIncentiveDividendTable)
+      .values(values)
+      .onConflict(oc => oc.constraint('unique_incentive_reward').doNothing())
+      .execute();
   }
 }

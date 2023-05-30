@@ -4,12 +4,13 @@ import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/U
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 
 export class UserRepository {
-  public static getClassName = (): string => 'UserRepository';
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
+
+  public static getClassName = (): string => 'UserRepository';
 
   async registerUser(
     id: string,
@@ -38,7 +39,7 @@ export class UserRepository {
   }
 
   public async getUserProfileId(cognitoUserId: string): Promise<string | null> {
-    const doesUserExist = await this.databaseAdapterProvider
+    const user = await this.databaseAdapterProvider
       .provide()
       .selectFrom(userTable)
       .select('profileId')
@@ -46,6 +47,12 @@ export class UserRepository {
       .limit(1)
       .executeTakeFirst();
 
-    return doesUserExist ? doesUserExist.profileId : null;
+    return user ? user.profileId : null;
+  }
+
+  public async getUserProfileByEmail(email: string): Promise<string | null> {
+    const user = await this.databaseAdapterProvider.provide().selectFrom(userTable).select('profileId').where('email', '=', email).limit(1).executeTakeFirst();
+
+    return user ? user.profileId : null;
   }
 }

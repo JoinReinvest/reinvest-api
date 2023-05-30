@@ -1,5 +1,6 @@
 import { JSONObject } from 'HKEKTypes/Generics';
 import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
+import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export interface SharesTable {
@@ -80,13 +81,15 @@ export interface UnpaidFeesTable {
 }
 
 export interface InvestorIncentiveDividendTable {
-  accountId: string;
+  accountId: string | null;
   actionDate: Date | null;
   amount: number;
   createdDate: Date;
   id: string;
   profileId: string;
-  status: 'AWAITING_ACTION' | 'REINVESTED' | 'WITHDRAWN';
+  rewardType: RewardType;
+  status: IncentiveRewardStatus;
+  theOtherProfileId: string;
 }
 
 export interface FinancialOperationsTable {
