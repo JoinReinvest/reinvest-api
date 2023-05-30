@@ -1,7 +1,7 @@
 import { Pagination } from 'Notifications/Application/Pagination';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
-import { NotificationFilter, NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
+import { NotificationFilter, NotificationQuery, NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
 import { NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
 
 export class NotificationsController {
@@ -74,5 +74,9 @@ export class NotificationsController {
     const pagination = !paginationInput.page || !paginationInput.perPage ? { page: 0, perPage: 10 } : paginationInput;
 
     return this.notificationQuery.getNotifications(profileId, accountId, notificationFilter, pagination);
+  }
+
+  async getNotificationsStats(profileId: string, accountId: string): Promise<NotificationsStats> {
+    return this.notificationQuery.getNotificationsStats(profileId, accountId);
   }
 }

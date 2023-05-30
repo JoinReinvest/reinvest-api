@@ -1,6 +1,7 @@
 import { NotificationsDatabaseAdapterProvider, notificationsTable } from 'Notifications/Adapter/Database/DatabaseAdapter';
 import { NotificationsTable } from 'Notifications/Adapter/Database/NotificationsSchema';
 import { Pagination } from 'Notifications/Application/Pagination';
+import { NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
 import { Notification, NotificationSchema } from 'Notifications/Domain/Notification';
 
 export class NotificationsRepository {
@@ -49,6 +50,33 @@ export class NotificationsRepository {
     const results = await queryBuilder.execute();
 
     return results.map((result: NotificationSchema) => Notification.restore(result));
+  }
+
+  async getNotificationsStats(profileId: string, accountId: string): Promise<NotificationsStats> {
+    const stats = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(notificationsTable)
+      .select(({ fn }) => ['isRead', fn.count('id').as('counter')])
+      .where(`profileId`, '=', profileId)
+      .where(qb => qb.where('accountId', '=', accountId).orWhere('accountId', 'is', null))
+      .groupBy('isRead')
+      .execute();
+
+    let totalCount = 0;
+    let unreadCount = 0;
+
+    stats.map((stat: any) => {
+      totalCount += parseInt(stat.counter);
+
+      if (stat.isRead === false) {
+        unreadCount += parseInt(stat.counter);
+      }
+    });
+
+    return {
+      totalCount,
+      unreadCount,
+    };
   }
 
   private buildFindNotificationsQuery(profileId: string, accountId: string, pagination: Pagination, isRead: boolean | null): any {

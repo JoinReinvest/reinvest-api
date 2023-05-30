@@ -7,6 +7,11 @@ export enum NotificationFilter {
   ALL = 'ALL',
 }
 
+export type NotificationsStats = {
+  totalCount: number;
+  unreadCount: number;
+};
+
 export class NotificationQuery {
   private notificationsRepository: NotificationsRepository;
 
@@ -23,5 +28,9 @@ export class NotificationQuery {
         : await this.notificationsRepository.findAllNotifications(profileId, accountId, pagination);
 
     return notifications.map((notification: Notification) => notification.getView());
+  }
+
+  async getNotificationsStats(profileId: string, accountId: string): Promise<NotificationsStats> {
+    return this.notificationsRepository.getNotificationsStats(profileId, accountId);
   }
 }
