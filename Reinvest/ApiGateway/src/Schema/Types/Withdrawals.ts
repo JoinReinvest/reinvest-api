@@ -67,7 +67,7 @@ const schema = `
     }
     type Mutation {
         """
-        [MOCK] Reinvest dividend - you can reinvest many dividends in the same time. If one of them is not reinvestable, then all of them will be rejected.
+        Reinvest dividend - you can reinvest many dividends in the same time. If one of them is not reinvestable, then all of them will be rejected.
         """
         reinvestDividend(accountId: String!, dividendIds: [String!]): Boolean!
 
