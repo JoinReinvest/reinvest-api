@@ -41,6 +41,14 @@ class CreateSubscriptionAgreement {
   }
 
   async execute(profileId: string, investmentId: string) {
+    const alreadyCreatedSubscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, investmentId);
+
+    if (alreadyCreatedSubscriptionAgreement) {
+      const id = alreadyCreatedSubscriptionAgreement.getId();
+
+      return id;
+    }
+
     const id = this.idGenerator.createUuid();
 
     const investment = await this.investmentsRepository.get(investmentId);
