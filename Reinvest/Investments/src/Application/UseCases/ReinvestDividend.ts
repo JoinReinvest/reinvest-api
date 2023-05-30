@@ -16,9 +16,7 @@ export class ReinvestDividend {
   async execute(profileId: string, accountId: string, portfolioId: string, dividendId: string): Promise<boolean> {
     const dividend = await this.sharesAndDividendsService.getDividend(profileId, dividendId);
 
-    // todo uncomment it!
-    if (!dividend) {
-      // || dividend.status !== 'PENDING') {
+    if (!dividend || dividend.status !== 'PENDING') {
       return false;
     }
 
