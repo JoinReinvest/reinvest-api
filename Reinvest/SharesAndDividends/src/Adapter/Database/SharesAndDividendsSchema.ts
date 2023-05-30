@@ -61,7 +61,7 @@ export interface InvestorDividendsTable {
   dividendAmount: number;
   id: string;
   profileId: string;
-  status: 'AWAITING_ACTION' | 'REINVESTED' | 'WITHDRAWN' | 'ZEROED';
+  status: 'AWAITING_ACTION' | 'REINVESTED' | 'WITHDRAWN' | 'ZEROED' | 'WITHDRAWING';
   totalDividendAmount: number;
   totalFeeAmount: number;
 }

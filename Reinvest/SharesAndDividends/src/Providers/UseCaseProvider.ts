@@ -9,6 +9,7 @@ import { SharesAndDividends } from 'SharesAndDividends/index';
 import { ChangeSharesState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import { CreateIncentiveReward } from 'SharesAndDividends/UseCase/CreateIncentiveReward';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
+import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 
 export class UseCaseProvider {
@@ -22,6 +23,7 @@ export class UseCaseProvider {
     container.addSingleton(CreateShares, [SharesRepository, IdGenerator]);
     container.addSingleton(ChangeSharesState, [SharesRepository, IdGenerator, FinancialOperationsRepository, 'SharesAndDividendsTransactionalAdapter']);
     container.addSingleton(StatsQuery, [SharesRepository, PortfolioService, DividendsRepository, FinancialOperationsRepository]);
+    container.addSingleton(DividendsQuery, [DividendsRepository]);
     container.addSingleton(CreateIncentiveReward, [DividendsRepository, IdGenerator, NotificationService]);
   }
 }

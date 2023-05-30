@@ -2,6 +2,9 @@ import { SessionContext } from 'ApiGateway/index';
 import { notificationsMock } from 'ApiGateway/Schema/Types/Notification';
 import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
+import { Investments } from 'Investments/index';
+import { Portfolio } from 'Portfolio/index';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 const schema = `
     #graphql
@@ -9,6 +12,7 @@ const schema = `
         PENDING
         REINVESTED
         PAID_OUT
+        WITHDRAWING
     }
 
     type Dividend {
@@ -65,12 +69,12 @@ const schema = `
         """
         [MOCK] Reinvest dividend - you can reinvest many dividends in the same time. If one of them is not reinvestable, then all of them will be rejected.
         """
-        reinvestDividend(dividendIds: [String!]): Boolean!
+        reinvestDividend(accountId: String!, dividendIds: [String!]): Boolean!
 
         """
         [MOCK] Withdraw dividend - you can withdraw many dividends in the same time. If one of them is not withdrawable, then all of them will be rejected.
         """
-        withdrawDividend(dividendIds: [String!]): Boolean!
+        withdrawDividend(accountId: String!, dividendIds: [String!]): Boolean!
 
         """
         [MOCK] Create funds withdrawal request. It is just a DRAFT. You need to sign the agreement and then request the withdrawal.
@@ -136,32 +140,24 @@ export const Withdrawals = {
       getFundsWithdrawalRequest: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) =>
         fundsWithdrawalRequestMock('AWAITING_DECISION'),
       getDividend: async (parent: any, { dividendId }: any, { profileId, modules }: SessionContext) => {
-        const notification = notificationsMock('', false).find(n => n.onObject?.id === dividendId);
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
 
-        if (!notification) {
+        const dividend = api.getDividend(profileId, dividendId);
+
+        if (!dividend) {
           throw new GraphQLError('Dividend not found');
         }
 
-        return {
-          id: notification?.onObject?.id,
-          date: notification?.date,
-          amount: {
-            value: 10.0,
-            formatted: '$10.00',
-          },
-          status: 'PENDING',
-        };
+        return dividend;
       },
     },
     Mutation: {
-      reinvestDividend: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => {
-        let decision = true;
-        dividendIds.map((id: string) => {
-          const dividend = notificationsMock('', false).find(n => n.onObject?.id === id);
-          decision = decision && !!dividend;
-        });
+      reinvestDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Investments.ApiType>(Investments);
+        const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const { portfolioId } = await portfolioApi.getActivePortfolio();
 
-        return decision;
+        return api.reinvestDividends(profileId, accountId, portfolioId, dividendIds);
       },
       withdrawDividend: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => {
         let decision = true;

@@ -69,4 +69,30 @@ export class DividendsRepository {
       .onConflict(oc => oc.constraint('unique_incentive_reward').doNothing())
       .execute();
   }
+
+  async findDividend(
+    profileId: string,
+    dividendId: string,
+  ): Promise<{
+    amount: number;
+    createdDate: Date;
+    id: string;
+    status: 'AWAITING_ACTION' | 'REINVESTED' | 'WITHDRAWN' | 'ZEROED' | 'WITHDRAWING';
+  } | null> {
+    const db = this.databaseAdapterProvider.provide();
+    const data = await db
+      .selectFrom(sadInvestorDividendsTable)
+      .select(['id', 'totalDividendAmount as amount', 'createdDate', 'status'])
+      .union(db.selectFrom(sadInvestorIncentiveDividendTable).select(['id', 'amount', 'createdDate', 'status']))
+      .where('profileId', '=', profileId)
+      .where('id', '=', dividendId)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return data;
+  }
 }

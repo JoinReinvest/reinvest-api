@@ -6,13 +6,16 @@ import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment'
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
+import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
 import { Investments } from 'Investments/index';
+import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -33,5 +36,6 @@ export default class UseCaseProviders {
     container.addSingleton(ApproveFees, [FeesRepository]);
     container.addSingleton(StartInvestment, [InvestmentsRepository, SubscriptionAgreementRepository]);
     container.addSingleton(IsFeeApproved, [FeesRepository]);
+    container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
   }
 }

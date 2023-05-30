@@ -1,5 +1,6 @@
 import { SharesServiceInterface } from 'Investments/Application/DomainEventHandler/SharesServiceInterface';
 import { SharesAndDividends } from 'SharesAndDividends/index';
+import { DividendDetails } from 'Investments/Domain/Reinvestments/Dividends';
 
 export class SharesAndDividendService implements SharesServiceInterface {
   private sharesAndDividendsModule: SharesAndDividends.Main;
@@ -24,5 +25,9 @@ export class SharesAndDividendService implements SharesServiceInterface {
 
   async sharesSettled(investmentId: string): Promise<void> {
     await this.sharesAndDividendsModule.api().setSharesToSettledState(investmentId);
+  }
+
+  async getDividend(profileId: string, dividendId: string): Promise<DividendDetails | null> {
+    return this.sharesAndDividendsModule.api().getDividend(profileId, dividendId);
   }
 }

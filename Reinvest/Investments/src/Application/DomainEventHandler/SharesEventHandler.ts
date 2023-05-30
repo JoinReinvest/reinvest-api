@@ -1,4 +1,5 @@
 import { SharesServiceInterface } from 'Investments/Application/DomainEventHandler/SharesServiceInterface';
+import { ReinvestmentEvent } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 
 export class SharesEventHandler {
@@ -10,7 +11,7 @@ export class SharesEventHandler {
 
   static getClassName = (): string => 'SharesEventHandler';
 
-  async handle(event: TransactionEvent): Promise<void> {
+  async handle(event: TransactionEvent | ReinvestmentEvent): Promise<void> {
     const investmentId = event.id;
 
     switch (event.kind) {

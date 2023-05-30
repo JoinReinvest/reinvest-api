@@ -10,6 +10,7 @@ export async function migrate(command: 'migrateLatest' | 'migrateUp' | 'migrateD
   const modules: Modules = boot();
   let allMigrations = {} as Promise<Record<string, Migration>>;
 
+  // @ts-ignore
   for (const module of modules.iterate()) {
     if ('migration' in module) {
       try {
