@@ -110,6 +110,22 @@ export class BankAccountRepository {
     }
   }
 
+  async getBankAccount(bankAccountId: string) {
+    try {
+      const data = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(registrationBankAccountTable)
+        .select(['accountId', 'bankAccountId', 'northCapitalId', 'profileId', 'plaidUrl', 'plaidJson', 'bankAccountNumber', 'bankAccountType', 'state'])
+        .where('bankAccountId', '=', bankAccountId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      return this.bankAccountRecordToBankAccount(data);
+    } catch (error: any) {
+      return null;
+    }
+  }
+
   private bankAccountToBankAccountRecord(bankAccount: BankAccount): RegistrationBankAccountTable {
     const schema = bankAccount.getObject();
 

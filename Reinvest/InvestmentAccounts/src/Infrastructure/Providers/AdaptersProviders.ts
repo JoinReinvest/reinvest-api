@@ -7,6 +7,7 @@ import {
   investmentAccountsDatabaseProviderName,
 } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
 import { ProfileQuery } from 'InvestmentAccounts/Infrastructure/Storage/Queries/ProfileQuery';
+import { ConfigurationRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ConfigurationRepository';
 import { ProfileRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository';
 import ProfileQueryService, { QueryProfileRepository } from 'InvestmentAccounts/ProfileQueryService';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
@@ -14,8 +15,6 @@ import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { AggregateRepository } from 'SimpleAggregator/Storage/AggregateRepository';
-
-import { ConfigurationRepository } from '../Storage/Repository/ConfigurationRepository';
 
 export default class AdaptersProviders {
   private config: InvestmentAccounts.Config;

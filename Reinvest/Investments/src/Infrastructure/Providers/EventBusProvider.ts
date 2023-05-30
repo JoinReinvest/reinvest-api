@@ -1,10 +1,19 @@
 import { ContainerInterface } from 'Container/Container';
-import { InvestmentCreatedHandler } from 'Investments/Application/DomainEventHandler/InvestmentCreatedHandler';
+import { CheckIsGracePeriodEndedEventHandler } from 'Investments/Application/DomainEventHandler/CheckIsGracePeriodEndedEventHandler';
+import { FinalizeInvestmentEventHandler } from 'Investments/Application/DomainEventHandler/FinalizeInvestmentEventHandler';
+import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/SharesEventHandler';
+import { TransactionEventHandler } from 'Investments/Application/DomainEventHandler/TransactionEventHandler';
+import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
+import { TransactionCommands } from 'Investments/Domain/Transaction/TransactionCommands';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { Investments } from 'Investments/index';
+import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
+import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
+import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
+import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
-
-import { Investments } from '../..';
+import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -14,10 +23,39 @@ export default class EventBusProvider {
   }
 
   public boot(container: ContainerInterface) {
+    container
+      .addSingleton(SharesEventHandler, [SharesAndDividendService])
+      .addSingleton(TechnicalToDomainEventsHandler, [SimpleEventBus])
+      .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler])
+      .addSingleton(CheckIsGracePeriodEndedEventHandler, [InvestmentsRepository, SimpleEventBus])
+      .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus]);
+
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
+    eventBus
+      // input events
+      .subscribeHandlerForKinds(TransactionEventHandler.getClassName(), [
+        TransactionEvents.INVESTMENT_CREATED,
+        TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT,
+        TransactionEvents.INVESTMENT_FINALIZED,
+        TransactionEvents.TRADE_CREATED,
+        TransactionEvents.INVESTMENT_FUNDED,
+        TransactionEvents.INVESTMENT_APPROVED,
+        TransactionEvents.GRACE_PERIOD_ENDED,
+        TransactionEvents.MARKED_AS_READY_TO_DISBURSE,
+        TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
+      ])
 
-    container.addSingleton(InvestmentCreatedHandler, [TransactionRepository]);
-
-    eventBus.subscribe(TransactionEvents.INVESTMENT_CREATED, InvestmentCreatedHandler.getClassName());
+      // output commands
+      // TODO handle finish investment decision
+      .subscribe(TransactionCommands.FinalizeInvestment, FinalizeInvestmentEventHandler.getClassName())
+      .subscribe(TransactionCommands.CheckIsGracePeriodEnded, CheckIsGracePeriodEndedEventHandler.getClassName())
+      .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+        TransactionCommands.VerifyAccountForInvestment,
+        TransactionCommands.CreateTrade,
+        TransactionCommands.CheckIsInvestmentFunded,
+        TransactionCommands.CheckIsInvestmentApproved,
+        TransactionCommands.MarkFundsAsReadyToDisburse,
+        TransactionCommands.TransferSharesWhenTradeSettled,
+      ]);
   }
 }

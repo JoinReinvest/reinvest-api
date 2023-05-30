@@ -1,5 +1,41 @@
 # REINVEST API CHANGELOG
 
+## 1.14 - 05/24/2023
+
+* add `bankName` filed in `readBankAccount` query
+* update query `getNotDismissedNotifications` name to `getNotifications`
+    * add filter UNREAD/ALL instead
+* add [MOCK] query: getNotificationsStats that returns the number of unread/total notifications for the given account id
+* Queries/Mutations that are no longer MOCKS:
+    * `getSubscriptionAgreement`
+    * `createInvestment`
+    * `createSubscriptionAgreement`
+    * `getInvestmentSummary`
+
+## 1.13.1 - 05/23/2023
+
+* Implementing investment process manager
+* Investment process manager includes steps:
+    * VerifyAccountForInvestment: Verify account for investment (KYC, AML). Confirm if all were verified
+    * FinalizeInvestment: [MOCK] Generate subscription agreement, confirm fees
+    * CreateTrade:
+        * Create trade in North Capital
+        * Create drafted distribution in Vertalo
+        * Upload subscription agreement to North Capital trade
+        * Initiate funds transfer from external bank account to REINVEST escrow account
+        * Open Vertalo distribution (waiting for funds transfer)
+    * CheckIsInvestmentFunded:
+        * Check if funds transfer is completed in North Capital
+        * Close Vertalo distribution (funds transfer completed)
+    * CheckIsInvestmentApproved: [MOCK] Check trade RR Approval status by Dalmore
+    * CheckIsGracePeriodEnded: Check if grace period is ended
+    * MarkFundsAsReadyToDisburse: Mark funds as ready to disburse
+    * TransferSharesWhenTradeSettled:
+        * Verify if trade is settled
+        * Mark payment as completed in Vertalo
+        * Transfer shares from REINVEST to investor in Vertalo
+    * FinishInvestment: [MOCK] Finish investment
+
 ## 1.13 - 05/17/2023
 
 * Type `Money` from now on accepts only integer values instead of strings.

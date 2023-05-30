@@ -1,0 +1,27 @@
+@startuml
+
+participant "World" as W
+participant "Queue" as Q
+participant "Use Case" as UC
+participant "North Capital" as NC
+participant "Vertalo" as V
+
+opt Initiate Trading Process
+    opt Success
+        W -> Q: CreateTrade command
+        Q -> UC: CreateTrade
+        UC -> NC: createTrade
+        UC -> V: createDraftDistribution
+        UC -> NC: uploadSubscriptionAgreement
+        UC -> NC: initFundsTransfer
+        UC -> V: openDistribution
+        UC -> Q: TradeInitiated
+    end
+    opt Failure
+        W -> Q: CreateTrade command
+        Q -> UC: CreateTrade
+        UC -> Q: TradeInitiationFailed
+    end
+end
+
+@enduml

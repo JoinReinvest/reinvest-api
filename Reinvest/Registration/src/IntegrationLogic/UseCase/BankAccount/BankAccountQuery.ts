@@ -3,6 +3,7 @@ import { BankAccountRepository } from 'Registration/Adapter/Database/Repository/
 export type CurrentActiveBankAccount = {
   accountNumber: string | null;
   accountType: string | null;
+  bankAccountId: string | null;
 };
 
 export class BankAccountQuery {
@@ -24,8 +25,25 @@ export class BankAccountQuery {
     const schema = bankAccount.getObject();
 
     return {
+      bankAccountId: schema.bankAccountId,
       accountNumber: bankAccount.getMaskedAccountNumber(),
       accountType: schema.bankAccountType,
+    };
+  }
+
+  async getBankAccountMapping(bankAccountId: string): Promise<{
+    bankAccountNickName: string | null;
+  } | null> {
+    const bankAccount = await this.bankAccountRepository.getBankAccount(bankAccountId);
+
+    if (!bankAccount) {
+      return null;
+    }
+
+    const bankAccountNickName = bankAccount.getNickName();
+
+    return {
+      bankAccountNickName,
     };
   }
 }

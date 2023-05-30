@@ -125,6 +125,7 @@ export class SimplifiedDomicile implements ToObject {
     try {
       let { type } = domicile;
 
+      // @ts-ignore
       if (type === 'GREEN_CARD' || type === 'VISA') {
         type = SimplifiedDomicileType.RESIDENT; // backward compatibility
       }

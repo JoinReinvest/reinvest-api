@@ -5,6 +5,7 @@ import { ProfileController } from 'Identity/Port/Api/ProfileController';
 import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationController';
 
 export type IdentityApiType = {
+  getProfileByEmail: ProfileController['getProfileByEmail'];
   getProfileId: ProfileController['getProfileId'];
   getUserInvitationLink: IncentiveTokenController['getUserInvitationLink'];
   isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
@@ -26,4 +27,5 @@ export const identityApi = (container: ContainerInterface): IdentityApiType => (
   setPhoneNumber: container.delegateTo(PhoneController, 'setPhoneNumber'),
   verifyPhoneNumber: container.delegateTo(PhoneController, 'verifyPhoneNumber'),
   isPhoneNumberCompleted: container.delegateTo(PhoneController, 'isPhoneNumberCompleted'),
+  getProfileByEmail: container.delegateTo(ProfileController, 'getProfileByEmail'),
 });

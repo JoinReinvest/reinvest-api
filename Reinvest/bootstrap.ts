@@ -5,6 +5,8 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { logger } from 'Logger/logger';
+import { Notifications } from 'Notifications/index';
+import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
@@ -24,6 +26,8 @@ import { Identity } from 'Reinvest/Identity/src';
 import Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
+import { SharesAndDividends } from 'SharesAndDividends/index';
+import { Trading } from 'Trading/index';
 import { Verification } from 'Verification/index';
 
 console = logger(SENTRY_CONFIG);
@@ -40,11 +44,41 @@ export function boot(): Modules {
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
 
   modules.register(
+    Notifications.moduleName,
+    Notifications.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as Notifications.Config),
+  );
+
+  modules.register(
     Documents.moduleName,
     Documents.create({
       database: databaseConfig,
       s3: s3Config,
     } as Documents.Config),
+  );
+
+  modules.register(
+    Portfolio.moduleName,
+    Portfolio.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as Portfolio.Config),
+  );
+
+  modules.register(
+    SharesAndDividends.moduleName,
+    SharesAndDividends.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as SharesAndDividends.Config,
+      {
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        notifications: modules.get(Notifications.moduleName) as Notifications.Main,
+      },
+    ),
   );
 
   modules.register(
@@ -106,6 +140,7 @@ export function boot(): Modules {
       {
         database: databaseConfig,
         northCapital: northCapitalConfig,
+        queue: queueConfig,
       } as Verification.Config,
       {
         registration: modules.get(Registration.moduleName) as Registration.Main,
@@ -115,10 +150,32 @@ export function boot(): Modules {
 
   modules.register(
     Investments.moduleName,
-    Investments.create({
-      database: databaseConfig,
-      queue: queueConfig,
-    } as Investments.Config),
+    Investments.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as Investments.Config,
+      {
+        sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    Trading.moduleName,
+    Trading.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+        northCapital: northCapitalConfig,
+        vertalo: vertaloConfig,
+      } as Trading.Config,
+      {
+        registration: modules.get(Registration.moduleName) as Registration.Main,
+        documents: modules.get(Documents.moduleName) as Documents.Main,
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+      },
+    ),
   );
 
   return modules;
