@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { DividendsController } from 'Investments/Infrastructure/Ports/DividendsController';
 import { FeesController } from 'Investments/Infrastructure/Ports/FeesController';
 import { InvestmentsController } from 'Investments/Infrastructure/Ports/InvestmentsController';
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
@@ -11,6 +12,7 @@ export type InvestmentsApiType = {
   createSubscriptionAgreement: SubscriptionAgreementController['createSubscriptionAgreement'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
   isFeesApproved: FeesController['isFeesApproved'];
+  reinvestDividends: DividendsController['reinvestDividends'];
   signSubscriptionAgreement: SubscriptionAgreementController['signSubscriptionAgreement'];
   startInvestment: InvestmentsController['startInvestment'];
   subscriptionAgreementQuery: SubscriptionAgreementController['subscriptionAgreementQuery'];
@@ -28,4 +30,5 @@ export const investmentsApi = (container: ContainerInterface): InvestmentsApiTyp
   createSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'createSubscriptionAgreement'),
   subscriptionAgreementQuery: container.delegateTo(SubscriptionAgreementController, 'subscriptionAgreementQuery'),
   signSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'signSubscriptionAgreement'),
+  reinvestDividends: container.delegateTo(DividendsController, 'reinvestDividends'),
 });

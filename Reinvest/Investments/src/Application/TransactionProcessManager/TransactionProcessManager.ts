@@ -12,10 +12,6 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     this.events = events;
   }
 
-  canBeUpdated(): boolean {
-    return true;
-  }
-
   handleEvent(event: TransactionEvent): boolean {
     const { kind, id } = event;
 
