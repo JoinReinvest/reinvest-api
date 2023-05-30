@@ -24,8 +24,6 @@ export type DividendReinvestmentRequested = ReinvestmentEvent & {
 
 export type SharesTransferredForReinvestment = ReinvestmentEvent & {
   data: {
-    accountId: string;
-    amount: number;
     numberOfShares: number;
     unitPrice: number;
   };

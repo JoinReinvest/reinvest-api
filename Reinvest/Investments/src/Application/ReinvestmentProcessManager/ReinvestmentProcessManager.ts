@@ -48,6 +48,8 @@ export class ReinvestmentProcessManager implements ReinvestmentProcessManagerTyp
     switch (lastEvent.kind) {
       case ReinvestmentEvents.DIVIDEND_REINVESTMENT_REQUESTED:
         return this.decide(ReinvestmentDecisions.TRANSFER_SHARES_FOR_REINVESTMENT, { accountId, amount, portfolioId });
+      case ReinvestmentEvents.SHARES_TRANSFERRED_FOR_REINVESTMENT:
+        return this.decide(ReinvestmentDecisions.REINVESTMENT_COMPLETED);
       default:
         break;
     }

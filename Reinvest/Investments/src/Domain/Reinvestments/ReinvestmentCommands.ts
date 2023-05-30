@@ -2,11 +2,11 @@ import { TransferReinvestmentSharesDecision } from 'Investments/Domain/Reinvestm
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export enum ReinvestmentCommands {
-  transferSharesForReinvestment = 'transferSharesForReinvestment',
+  TransferSharesForReinvestment = 'TransferSharesForReinvestment',
 }
 
 export const transferSharesForReinvestment = (decision: TransferReinvestmentSharesDecision): DomainEvent => ({
-  kind: ReinvestmentCommands.transferSharesForReinvestment,
+  kind: ReinvestmentCommands.TransferSharesForReinvestment,
   data: {
     accountId: decision.data.accountId,
     profileId: decision.profileId,

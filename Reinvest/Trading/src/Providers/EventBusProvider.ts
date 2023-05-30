@@ -6,11 +6,13 @@ import { CheckIsTradeApproved } from 'Trading/IntegrationLogic/UseCase/CheckIsTr
 import { CheckIsTradeFunded } from 'Trading/IntegrationLogic/UseCase/CheckIsTradeFunded';
 import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 import { MarkFundsAsReadyToDisburse } from 'Trading/IntegrationLogic/UseCase/MarkFundsAsReadyToDisburse';
+import { TransferSharesForReinvestment } from 'Trading/IntegrationLogic/UseCase/TransferSharesForReinvestment';
 import { TransferSharesWhenTradeSettled } from 'Trading/IntegrationLogic/UseCase/TransferSharesWhenTradeSettled';
 import { CheckIsInvestmentApprovedHandler } from 'Trading/Port/Queue/EventHandler/CheckIsInvestmentApprovedHandler';
 import { CheckIsInvestmentFundedHandler } from 'Trading/Port/Queue/EventHandler/CheckIsInvestmentFundedHandler';
 import { CreateTradeHandler } from 'Trading/Port/Queue/EventHandler/CreateTradeHandler';
 import { MarkFundsAsReadyToDisburseHandler } from 'Trading/Port/Queue/EventHandler/MarkFundsAsReadyToDisburseHandler';
+import { TransferSharesForReinvestmentHandler } from 'Trading/Port/Queue/EventHandler/TransferSharesForReinvestmentHandler';
 import { TransferSharesWhenTradeSettledHandler } from 'Trading/Port/Queue/EventHandler/TransferSharesWhenTradeSettledHandler';
 
 export default class EventBusProvider {
@@ -26,6 +28,7 @@ export default class EventBusProvider {
     container.addSingleton(CheckIsInvestmentApprovedHandler, [CheckIsTradeApproved, SimpleEventBus]);
     container.addSingleton(MarkFundsAsReadyToDisburseHandler, [MarkFundsAsReadyToDisburse, SimpleEventBus]);
     container.addSingleton(TransferSharesWhenTradeSettledHandler, [TransferSharesWhenTradeSettled, SimpleEventBus]);
+    container.addSingleton(TransferSharesForReinvestmentHandler, [TransferSharesForReinvestment, SimpleEventBus]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
@@ -34,6 +37,7 @@ export default class EventBusProvider {
       'InvestmentApproved',
       'InvestmentMarkedAsReadyToDisburse',
       'InvestmentSharesTransferred',
+      'ReinvestmentSharesTransferred',
     ]);
   }
 }

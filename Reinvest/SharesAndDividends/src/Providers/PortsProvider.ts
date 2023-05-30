@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 import { DividendsController } from 'SharesAndDividends/Port/Api/DividendsController';
 import { IncentiveRewardController } from 'SharesAndDividends/Port/Api/IncentiveRewardController';
@@ -22,6 +23,6 @@ export class PortsProvider {
     container.addSingleton(SharesController, [CreateShares, ChangeSharesState]);
     container.addSingleton(StatsController, [StatsQuery]);
     container.addSingleton(IncentiveRewardController, [CreateIncentiveReward]);
-    container.addSingleton(DividendsController, [DividendsQuery]);
+    container.addSingleton(DividendsController, [DividendsQuery, DividendsRepository]);
   }
 }

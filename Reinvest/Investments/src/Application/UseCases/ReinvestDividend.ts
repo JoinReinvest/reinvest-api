@@ -1,3 +1,4 @@
+import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
@@ -15,12 +16,14 @@ export class ReinvestDividend {
   async execute(profileId: string, accountId: string, portfolioId: string, dividendId: string): Promise<boolean> {
     const dividend = await this.sharesAndDividendsService.getDividend(profileId, dividendId);
 
-    if (!dividend || dividend.status !== 'PENDING') {
+    // todo uncomment it!
+    if (!dividend) {
+      // || dividend.status !== 'PENDING') {
       return false;
     }
 
     await this.eventBus.publish({
-      kind: 'DIVIDEND_REINVESTMENT_REQUESTED',
+      kind: ReinvestmentEvents.DIVIDEND_REINVESTMENT_REQUESTED,
       id: dividend.id,
       data: {
         profileId: profileId,

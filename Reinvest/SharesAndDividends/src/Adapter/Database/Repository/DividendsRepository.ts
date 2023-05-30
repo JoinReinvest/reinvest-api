@@ -6,7 +6,7 @@ import {
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { DividendsSelection, InvestorIncentiveDividendTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
 import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/DividendsCalculationService';
-import { IncentiveReward, IncentiveRewardSchema, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
+import { IncentiveReward, IncentiveRewardSchema, IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 
 export class DividendsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -94,5 +94,15 @@ export class DividendsRepository {
     }
 
     return data;
+  }
+
+  async markIncentiveDividendReinvested(profileId: string, accountId: string, dividendId: string): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorIncentiveDividendTable)
+      .set({ status: IncentiveRewardStatus.REINVESTED, accountId: accountId, actionDate: new Date() })
+      .where('profileId', '=', profileId)
+      .where('id', '=', dividendId)
+      .execute();
   }
 }

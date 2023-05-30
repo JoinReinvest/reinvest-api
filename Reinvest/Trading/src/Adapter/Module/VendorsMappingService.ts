@@ -1,5 +1,6 @@
 import { Portfolio } from 'Portfolio/index';
 import { Registration } from 'Registration/index';
+import { ReinvestmentVendorsConfiguration } from 'Trading/Domain/ReinvestmentTrade';
 import { VendorsConfiguration } from 'Trading/Domain/Trade';
 
 export class VendorsMappingService {
@@ -23,6 +24,17 @@ export class VendorsMappingService {
       allocationId,
       bankAccountName,
       northCapitalAccountId,
+      unitSharePrice,
+      accountEmail,
+    };
+  }
+
+  async getReinvestmentVendorsConfiguration(portfolioId: string, accountId: string): Promise<ReinvestmentVendorsConfiguration> {
+    const { allocationId, unitSharePrice } = await this.getPortfolioMapping(portfolioId);
+    const { accountEmail } = await this.getAccountMapping(accountId);
+
+    return {
+      allocationId,
       unitSharePrice,
       accountEmail,
     };

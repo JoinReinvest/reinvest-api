@@ -6,6 +6,7 @@ import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/S
 import { TransactionEventHandler } from 'Investments/Application/DomainEventHandler/TransactionEventHandler';
 import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
+import { ReinvestmentCommands } from 'Investments/Domain/Reinvestments/ReinvestmentCommands';
 import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionCommands } from 'Investments/Domain/Transaction/TransactionCommands';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
@@ -66,6 +67,7 @@ export default class EventBusProvider {
         TransactionCommands.CheckIsInvestmentApproved,
         TransactionCommands.MarkFundsAsReadyToDisburse,
         TransactionCommands.TransferSharesWhenTradeSettled,
+        ReinvestmentCommands.TransferSharesForReinvestment,
       ]);
   }
 }

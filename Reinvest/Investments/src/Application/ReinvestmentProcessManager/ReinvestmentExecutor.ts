@@ -1,4 +1,6 @@
 import { ReinvestmentProcessManager } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentProcessManager';
+import { transferSharesForReinvestment } from 'Investments/Domain/Reinvestments/ReinvestmentCommands';
+import { ReinvestmentDecisions, TransferReinvestmentSharesDecision } from 'Investments/Domain/Reinvestments/ReinvestmentDecisions';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class ReinvestmentExecutor {
@@ -14,52 +16,10 @@ export class ReinvestmentExecutor {
     const decision = reinvestment.makeDecision();
     console.log(decision);
 
-    // if ([TransactionDecisions.VERIFY_ACCOUNT].includes(decision.kind)) {
-    //   await this.eventBus.publish(verifyAccountForInvestment(decision as VerifyAccountDecision));
-    //
-    //   return;
-    // }
-    //
-    // if ([TransactionDecisions.FINALIZE_INVESTMENT].includes(decision.kind)) {
-    //   await this.eventBus.publish(finalizeInvestment(decision as FinalizeInvestmentDecision));
-    //
-    //   return;
-    // }
-    //
-    // if ([TransactionDecisions.CREATE_TRADE].includes(decision.kind)) {
-    //   await this.eventBus.publish(createTrade(decision as CreateTradeDecision));
-    //
-    //   return;
-    // }
-    //
-    // if ([TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED].includes(decision.kind)) {
-    //   await this.eventBus.publish(checkIsInvestmentFunded(decision as CheckIsInvestmentFundedDecision));
-    //
-    //   return;
-    // }
-    //
-    // if ([TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED].includes(decision.kind)) {
-    //   await this.eventBus.publish(checkIsInvestmentApproved(decision as CheckIsInvestmentApprovedDecision));
-    //
-    //   return;
-    // }
-    //
-    // if ([TransactionDecisions.CHECK_IF_GRACE_PERIOD_ENDED].includes(decision.kind)) {
-    //   await this.eventBus.publish(checkIfGracePeriodEnded(decision as CheckIfGracePeriodEndedDecision));
-    //
-    //   return;
-    // }
-    //
-    // if ([TransactionDecisions.MARK_FUNDS_AS_READY_TO_DISBURSE].includes(decision.kind)) {
-    //   await this.eventBus.publish(markFundsAsReadyToDisburse(decision as MarkFundsAsReadyToDisburseDecision));
-    //
-    //   return;
-    // }
-    //
-    // if ([TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED].includes(decision.kind)) {
-    //   await this.eventBus.publish(transferSharesWhenTradeSettled(decision as TransferSharesWhenTradeSettledDecision));
-    //
-    //   return;
-    // }
+    if ([ReinvestmentDecisions.TRANSFER_SHARES_FOR_REINVESTMENT].includes(decision.kind)) {
+      await this.eventBus.publish(transferSharesForReinvestment(decision as TransferReinvestmentSharesDecision));
+
+      return;
+    }
   }
 }
