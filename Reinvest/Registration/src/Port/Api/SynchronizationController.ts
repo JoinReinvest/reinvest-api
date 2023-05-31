@@ -1,5 +1,6 @@
 import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
+import { ImmediateSynchronize } from 'Registration/IntegrationLogic/UseCase/ImmediateSynchronize';
 import { SynchronizeCompany } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompany';
 import { SynchronizeCompanyAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount';
 import { SynchronizeIndividualAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount';
@@ -7,13 +8,13 @@ import { SynchronizeProfile } from 'Registration/IntegrationLogic/UseCase/Synchr
 import { SynchronizeStakeholder } from 'Registration/IntegrationLogic/UseCase/SynchronizeStakeholder';
 
 export class SynchronizationController {
-  public static getClassName = (): string => 'SynchronizationController';
   private mappingRegistryRepository: MappingRegistryRepository;
   private synchronizeProfileUseCase: SynchronizeProfile;
   private synchronizeIndividualAccountUseCase: SynchronizeIndividualAccount;
   private synchronizeCompanyAccountUseCase: SynchronizeCompanyAccount;
   private synchronizeCompanyUseCase: SynchronizeCompany;
   private synchronizeStakeholderUseCase: SynchronizeStakeholder;
+  private immediateSynchronizeUseCase: ImmediateSynchronize;
 
   constructor(
     mappingRegistryRepository: MappingRegistryRepository,
@@ -22,6 +23,7 @@ export class SynchronizationController {
     synchronizeCompanyAccountUseCase: SynchronizeCompanyAccount,
     synchronizeCompanyUseCase: SynchronizeCompany,
     synchronizeStakeholderUseCase: SynchronizeStakeholder,
+    immediateSynchronizeUseCase: ImmediateSynchronize,
   ) {
     this.synchronizeProfileUseCase = synchronizeProfileUseCase;
     this.synchronizeIndividualAccountUseCase = synchronizeIndividualAccountUseCase;
@@ -29,7 +31,10 @@ export class SynchronizationController {
     this.mappingRegistryRepository = mappingRegistryRepository;
     this.synchronizeCompanyUseCase = synchronizeCompanyUseCase;
     this.synchronizeStakeholderUseCase = synchronizeStakeholderUseCase;
+    this.immediateSynchronizeUseCase = immediateSynchronizeUseCase;
   }
+
+  public static getClassName = (): string => 'SynchronizationController';
 
   public async synchronize(recordId: string): Promise<boolean> {
     const record = await this.mappingRegistryRepository.getRecordById(recordId);
@@ -54,6 +59,7 @@ export class SynchronizationController {
         return false;
     }
   }
+
   public async synchronizeProfile(profileId: string): Promise<boolean> {
     const record = await this.mappingRegistryRepository.findByProfile(profileId);
     console.log({ recordToSync: record });
@@ -73,5 +79,13 @@ export class SynchronizationController {
     console.log({ recordToSync: record });
 
     return await this.synchronizeCompanyUseCase.execute(record);
+  }
+
+  public async immediatelySynchronizeAccount(profileId: string, accountId: string): Promise<boolean> {
+    return this.immediateSynchronizeUseCase.immediatelySynchronizeAccount(profileId, accountId);
+  }
+
+  public async immediatelySynchronizeAllAccountStructure(profileId: string, accountId: string): Promise<boolean> {
+    return this.immediateSynchronizeUseCase.immediatelySynchronizeAllAccountStructure(profileId, accountId);
   }
 }

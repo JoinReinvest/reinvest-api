@@ -8,6 +8,7 @@ import { BankAccountQuery } from 'Registration/IntegrationLogic/UseCase/BankAcco
 import { FulfillBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/FulfillBankAccount';
 import { InitializeBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/InitializeBankAccount';
 import { UpdateBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/UpdateBankAccount';
+import { ImmediateSynchronize } from 'Registration/IntegrationLogic/UseCase/ImmediateSynchronize';
 import { SynchronizeCompany } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompany';
 import { SynchronizeCompanyAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount';
 import { SynchronizeIndividualAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount';
@@ -34,6 +35,16 @@ export class PortsProvider {
     // api
     container
       .addSingleton(SynchronizationQuery, [MappingRegistryRepository])
+      .addSingleton(RegistryQuery, [RegistryQueryRepository])
+      .addSingleton(ImmediateSynchronize, [
+        MappingRegistryRepository,
+        SynchronizeProfile,
+        SynchronizeIndividualAccount,
+        SynchronizeCompanyAccount,
+        SynchronizeCompany,
+        SynchronizeStakeholder,
+        RegistryQuery,
+      ])
       .addSingleton(SynchronizationController, [
         MappingRegistryRepository,
         SynchronizeProfile,
@@ -41,16 +52,16 @@ export class PortsProvider {
         SynchronizeCompanyAccount,
         SynchronizeCompany,
         SynchronizeStakeholder,
+        ImmediateSynchronize,
       ])
       .addSingleton(NorthCapitalDocumentSynchronizationQuery, [NorthCapitalDocumentsSynchronizationRepository])
       .addSingleton(NorthCapitalDocumentSynchronizationController, [NorthCapitalSynchronizer])
-      .addSingleton(RegistryQuery, [RegistryQueryRepository])
-      .addSingleton(BankAccountController, [InitializeBankAccount, FulfillBankAccount, BankAccountQuery, UpdateBankAccount]);
+      .addSingleton(BankAccountController, [InitializeBankAccount, FulfillBankAccount, BankAccountQuery, UpdateBankAccount, ImmediateSynchronize]);
 
     // event handlers
     container
       .addSingleton(ProfileCompletedEventHandler, [MappingRegistryRepository, SynchronizeProfile])
       .addSingleton(IndividualAccountOpenedEventHandler, [MappingRegistryRepository, SynchronizeIndividualAccount])
-      .addSingleton(CompanyAccountOpenedEventHandler, [MappingRegistryRepository, SynchronizeCompanyAccount]);
+      .addSingleton(CompanyAccountOpenedEventHandler, [MappingRegistryRepository, SynchronizeCompanyAccount, ImmediateSynchronize]);
   }
 }

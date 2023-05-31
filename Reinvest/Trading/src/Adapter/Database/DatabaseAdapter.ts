@@ -1,9 +1,11 @@
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-import { TradesTable } from 'Trading/Adapter/Database/TradingSchema';
+import { ReinvestmentTradesTable, TradesTable } from 'Trading/Adapter/Database/TradingSchema';
 
 export const tradesTable = 'trading_trades';
+export const reinvestmentTradesTable = 'trading_reinvestment_trades';
 
 export interface TradingDatabase {
+  [reinvestmentTradesTable]: ReinvestmentTradesTable;
   [tradesTable]: TradesTable;
 }
 

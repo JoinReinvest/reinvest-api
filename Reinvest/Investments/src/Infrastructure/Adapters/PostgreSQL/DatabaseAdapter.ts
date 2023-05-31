@@ -6,15 +6,18 @@ import type {
   SubscriptionAgreementTable,
   TransactionEventsTable,
 } from 'Reinvest/Investments/src/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { ReinvestmentEventsTable } from 'Reinvest/Investments/src/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
 export const investmentsTable = 'investments_investments';
 export const transactionEventsTable = 'investments_transaction_events';
+export const reinvestmentEventsTable = 'investments_reinvestment_events';
 export const subscriptionAgreementTable = 'investments_subscription_agreements';
 export const investmentsFeesTable = 'investments_investments_fees';
 
 export interface InvestmentsDatabase {
   [investmentsFeesTable]: InvestmentsFeesTable;
   [investmentsTable]: InvestmentsTable;
+  [reinvestmentEventsTable]: ReinvestmentEventsTable;
   [subscriptionAgreementTable]: SubscriptionAgreementTable;
   [transactionEventsTable]: TransactionEventsTable;
 }

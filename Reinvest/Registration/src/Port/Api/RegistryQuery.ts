@@ -4,6 +4,7 @@ import { MappedRecordStatus, MappedType } from 'Registration/Domain/Model/Mappin
 export type IdToNCId = {
   id: string;
   ncId: string;
+  recordId: string;
   syncStatus: boolean;
 };
 
@@ -47,6 +48,7 @@ export class RegistryQuery {
       if (record.mappedType === MappedType.PROFILE) {
         accountStructure.profile = {
           id: profileId,
+          recordId: record.recordId,
           ncId: record.northCapitalId,
           syncStatus: record.status === MappedRecordStatus.CLEAN,
         };
@@ -55,6 +57,7 @@ export class RegistryQuery {
       if ([MappedType.INDIVIDUAL_ACCOUNT, MappedType.CORPORATE_ACCOUNT, MappedType.TRUST_ACCOUNT].includes(record.mappedType)) {
         accountStructure.account = {
           id: record.externalId,
+          recordId: record.recordId,
           ncId: record.northCapitalId,
           syncStatus: record.status === MappedRecordStatus.CLEAN,
         };
@@ -64,6 +67,7 @@ export class RegistryQuery {
       if (record.mappedType === MappedType.COMPANY) {
         accountStructure.company = {
           id: record.externalId,
+          recordId: record.recordId,
           ncId: record.northCapitalId,
           syncStatus: record.status === MappedRecordStatus.CLEAN,
         };
@@ -73,6 +77,7 @@ export class RegistryQuery {
         accountStructure.stakeholders = accountStructure.stakeholders || [];
         accountStructure.stakeholders.push({
           id: record.dependentId,
+          recordId: record.recordId,
           ncId: record.northCapitalId,
           syncStatus: record.status === MappedRecordStatus.CLEAN,
         });

@@ -69,14 +69,23 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       checkNumber: tradeId,
       createdIpAddress: ipAddress,
     };
-    const response = await this.postRequest(endpoint, data);
-    const {
-      statusCode,
-      statusDesc,
-      TradeFinancialDetails: [{ RefNum, fundStatus }],
-    } = response;
+    try {
+      const response = await this.postRequest(endpoint, data);
+      const {
+        statusCode,
+        statusDesc,
+        TradeFinancialDetails: [{ fundStatus }],
+      } = response;
 
-    return { referenceNumber: RefNum, status: fundStatus };
+      return { status: fundStatus };
+    } catch (error: any) {
+      if (error.statusCode && error.statusCode === '150') {
+        // External Fund Move Already in Process for this trade.
+        return { status: 'Pending' };
+      } else {
+        throw new Error(error.message);
+      }
+    }
   }
 
   async uploadSubscriptionAgreementToTrade(tradeId: string, url: string, subscriptionAgreementId: string): Promise<boolean> {

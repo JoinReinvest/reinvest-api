@@ -36,7 +36,6 @@ export type VertaloDistributionState = {
 };
 
 export type FundsMoveState = {
-  referenceNumber: string;
   status: string;
 };
 

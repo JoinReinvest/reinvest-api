@@ -1,3 +1,4 @@
+import { ReinvestmentEvents, SharesTransferredForReinvestment } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
@@ -62,6 +63,17 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
           kind: TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
           date: new Date(),
           data: {},
+          id: event.id,
+        });
+        break;
+      case 'ReinvestmentSharesTransferred':
+        await this.eventBus.publish(<SharesTransferredForReinvestment>{
+          kind: ReinvestmentEvents.SHARES_TRANSFERRED_FOR_REINVESTMENT,
+          date: new Date(),
+          data: {
+            numberOfShares: event.data.shares,
+            unitPrice: event.data.unitSharePrice,
+          },
           id: event.id,
         });
         break;

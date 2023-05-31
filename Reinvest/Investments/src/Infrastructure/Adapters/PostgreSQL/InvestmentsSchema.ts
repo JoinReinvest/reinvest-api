@@ -1,4 +1,5 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import type {
   AgreementTypes,
@@ -59,4 +60,12 @@ export interface TransactionEventsTable {
   eventStateJson: JSONObject;
   id: string;
   investmentId: string;
+}
+
+export interface ReinvestmentEventsTable {
+  dateCreated: Date;
+  dividendId: string;
+  eventKind: ReinvestmentEvents;
+  eventStateJson: JSONObject;
+  id: string;
 }

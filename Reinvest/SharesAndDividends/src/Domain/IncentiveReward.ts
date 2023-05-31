@@ -19,6 +19,7 @@ export enum IncentiveRewardStatus {
   AWAITING_ACTION = 'AWAITING_ACTION',
   REINVESTED = 'REINVESTED',
   WITHDRAWN = 'WITHDRAWN',
+  WITHDRAWING = 'WITHDRAWING',
 }
 
 export enum RewardType {
