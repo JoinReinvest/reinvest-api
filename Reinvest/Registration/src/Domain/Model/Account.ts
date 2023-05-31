@@ -23,6 +23,17 @@ export type IndividualAccountForSynchronization = {
   title?: string;
 };
 
+export type BeneficiaryAccountForSynchronization = {
+  accountId: string;
+  ownerName: {
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+  };
+  parentId: string;
+  profileId: string;
+};
+
 export type StakeholderForSynchronization = {
   accountId: string;
   accountType: AccountType;

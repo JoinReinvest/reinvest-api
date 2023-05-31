@@ -28,6 +28,7 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
       bankAccountId: event.data.bankAccountId,
       subscriptionAgreementId: event.data.subscriptionAgreementId,
       portfolioId: event.data.portfolioId,
+      parentId: event.data.parentId,
     };
     const tradeSummary = await this.createTradeUseCase.createTrade(tradeConfiguration);
 

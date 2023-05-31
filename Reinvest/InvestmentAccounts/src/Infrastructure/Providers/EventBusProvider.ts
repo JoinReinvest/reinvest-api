@@ -18,6 +18,11 @@ export default class EventBusProvider {
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     // eventBus
     //     .subscribe('ProfileSnapshotChanged', ProfileQueryEventHandler.getClassName())
-    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), ['IndividualAccountOpened', 'CorporateAccountOpened', 'TrustAccountOpened']);
+    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+      'IndividualAccountOpened',
+      'CorporateAccountOpened',
+      'TrustAccountOpened',
+      'BeneficiaryAccountOpened',
+    ]);
   }
 }
