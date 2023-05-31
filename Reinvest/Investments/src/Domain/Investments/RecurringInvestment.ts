@@ -64,6 +64,14 @@ export class RecurringInvestment {
     this.status = status;
   }
 
+  getStatus() {
+    return this.status;
+  }
+
+  getId() {
+    return this.id;
+  }
+
   getSchedule() {
     const { frequency, startDate } = this.schedule.toObject();
 
