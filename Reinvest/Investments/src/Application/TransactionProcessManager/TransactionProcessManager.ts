@@ -39,7 +39,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
   }
 
   makeDecision(): TransactionDecision {
-    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId } = this.eventsAnalysis();
+    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId, parentId } = this.eventsAnalysis();
 
     if (!lastEvent || !this.profileId) {
       return this.decide(TransactionDecisions.AWAITING_INVESTMENT);
@@ -47,7 +47,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
 
     switch (lastEvent.kind) {
       case TransactionEvents.INVESTMENT_CREATED:
-        return this.decide(TransactionDecisions.VERIFY_ACCOUNT, { accountId });
+        return this.decide(TransactionDecisions.VERIFY_ACCOUNT, { accountId: parentId! });
       case TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT:
         return this.decide(TransactionDecisions.FINALIZE_INVESTMENT);
       case TransactionEvents.INVESTMENT_FINALIZED:
@@ -59,6 +59,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           bankAccountId,
           subscriptionAgreementId,
           portfolioId,
+          parentId,
         });
       case TransactionEvents.TRADE_CREATED:
         return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED);
@@ -133,6 +134,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     fees: number | null;
     ip: string | null;
     lastEvent: TransactionEvent | null;
+    parentId: string | null;
     portfolioId: string | null;
     subscriptionAgreementId: string | null;
   } {
@@ -144,12 +146,14 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     let ip = null;
     let bankAccountId = null;
     let portfolioId = null;
+    let parentId = null;
 
     for (const event of this.events) {
       lastEvent = event;
       switch (event.kind) {
         case TransactionEvents.INVESTMENT_CREATED:
           accountId = event.data.accountId;
+          parentId = event.data.parentId ?? accountId;
           this.profileId = event.data.profileId;
           break;
         case TransactionEvents.INVESTMENT_FINALIZED:
@@ -165,6 +169,6 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
       }
     }
 
-    return { accountId, lastEvent, amount, fees, subscriptionAgreementId, ip, bankAccountId, portfolioId };
+    return { accountId, lastEvent, amount, fees, subscriptionAgreementId, ip, bankAccountId, portfolioId, parentId };
   }
 }

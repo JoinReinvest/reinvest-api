@@ -142,7 +142,7 @@ export const Withdrawals = {
       getDividend: async (parent: any, { dividendId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
 
-        const dividend = api.getDividend(profileId, dividendId);
+        const dividend = await api.getDividend(profileId, dividendId);
 
         if (!dividend) {
           throw new GraphQLError('Dividend not found');

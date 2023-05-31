@@ -9,6 +9,7 @@ import { FulfillBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAc
 import { InitializeBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/InitializeBankAccount';
 import { UpdateBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/UpdateBankAccount';
 import { ImmediateSynchronize } from 'Registration/IntegrationLogic/UseCase/ImmediateSynchronize';
+import { SynchronizeBeneficiaryAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeBeneficiaryAccount';
 import { SynchronizeCompany } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompany';
 import { SynchronizeCompanyAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount';
 import { SynchronizeIndividualAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount';
@@ -20,6 +21,7 @@ import { NorthCapitalDocumentSynchronizationQuery } from 'Registration/Port/Api/
 import { RegistryQuery } from 'Registration/Port/Api/RegistryQuery';
 import { SynchronizationController } from 'Registration/Port/Api/SynchronizationController';
 import { SynchronizationQuery } from 'Registration/Port/Api/SynchronizationQuery';
+import { BeneficiaryAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/BeneficiaryAccountOpenedEventHandler';
 import { CompanyAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/CompanyAccountOpenedEventHandler';
 import { IndividualAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler';
 import { ProfileCompletedEventHandler } from 'Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler';
@@ -62,6 +64,7 @@ export class PortsProvider {
     container
       .addSingleton(ProfileCompletedEventHandler, [MappingRegistryRepository, SynchronizeProfile])
       .addSingleton(IndividualAccountOpenedEventHandler, [MappingRegistryRepository, SynchronizeIndividualAccount])
+      .addSingleton(BeneficiaryAccountOpenedEventHandler, [MappingRegistryRepository, SynchronizeBeneficiaryAccount])
       .addSingleton(CompanyAccountOpenedEventHandler, [MappingRegistryRepository, SynchronizeCompanyAccount, ImmediateSynchronize]);
   }
 }
