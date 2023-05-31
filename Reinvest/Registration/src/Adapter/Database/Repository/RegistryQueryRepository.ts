@@ -11,6 +11,7 @@ export type NCAccountStructureMapping = {
   externalId: string;
   mappedType: MappedType;
   northCapitalId: string;
+  recordId: string;
   status: string;
 };
 
@@ -30,6 +31,7 @@ export class RegistryQueryRepository {
         .selectFrom(registrationMappingRegistryTable)
         .fullJoin(northCapitalSynchronizationTable, `${registrationMappingRegistryTable}.recordId`, `${northCapitalSynchronizationTable}.recordId`)
         .select([
+          `${registrationMappingRegistryTable}.recordId`,
           `${registrationMappingRegistryTable}.externalId`,
           `${registrationMappingRegistryTable}.mappedType`,
           `${registrationMappingRegistryTable}.status`,
