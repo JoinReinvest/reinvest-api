@@ -35,8 +35,8 @@ export class CreateTrade {
 
       // map reinvest ids to vendors ids
       if (!trade.isVendorsConfigurationSet()) {
-        const { accountId, portfolioId, bankAccountId } = trade.getInternalIds();
-        const vendorsConfiguration = await this.registrationService.getVendorsConfiguration(portfolioId, bankAccountId, accountId);
+        const { accountId, portfolioId, bankAccountId, parentId } = trade.getInternalIds();
+        const vendorsConfiguration = await this.registrationService.getVendorsConfiguration(portfolioId, bankAccountId, accountId, parentId);
         trade.setVendorsConfiguration(vendorsConfiguration);
         await this.tradesRepository.updateTrade(trade);
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'Vendors configuration set', vendorsConfiguration);

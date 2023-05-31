@@ -17,6 +17,7 @@ export interface InvestmentsTable {
   dateStarted: Date | null;
   dateUpdated: Date;
   id: string;
+  parentId: string | null;
   portfolioId: string;
   profileId: string;
   recurringInvestmentId: string | null;

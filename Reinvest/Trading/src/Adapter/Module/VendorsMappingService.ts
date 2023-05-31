@@ -14,9 +14,18 @@ export class VendorsMappingService {
 
   static getClassName = () => 'VendorsMappingService';
 
-  async getVendorsConfiguration(portfolioId: string, bankAccountId: string, accountId: string): Promise<VendorsConfiguration> {
+  async getVendorsConfiguration(portfolioId: string, bankAccountId: string, accountId: string, parentId: string): Promise<VendorsConfiguration> {
     const { offeringId, allocationId, unitSharePrice } = await this.getPortfolioMapping(portfolioId);
     const { accountEmail, northCapitalAccountId } = await this.getAccountMapping(accountId);
+    let parentEmail = accountEmail;
+    let northCapitalParentAccountId = northCapitalAccountId as string;
+
+    if (accountId !== parentId) {
+      const parentMapping = await this.getAccountMapping(parentId);
+      parentEmail = parentMapping.accountEmail;
+      northCapitalParentAccountId = parentMapping.northCapitalAccountId as string;
+    }
+
     const { bankAccountName } = await this.getBankAccountMapping(bankAccountId);
 
     return {
@@ -26,6 +35,8 @@ export class VendorsMappingService {
       northCapitalAccountId,
       unitSharePrice,
       accountEmail,
+      parentEmail,
+      northCapitalParentAccountId,
     };
   }
 

@@ -83,7 +83,13 @@ export class DividendsRepository {
     const data = await db
       .selectFrom(sadInvestorDividendsTable)
       .select(['id', 'totalDividendAmount as amount', 'createdDate', 'status'])
-      .union(db.selectFrom(sadInvestorIncentiveDividendTable).select(['id', 'amount', 'createdDate', 'status']))
+      .union(
+        db
+          .selectFrom(sadInvestorIncentiveDividendTable)
+          .select(['id', 'amount', 'createdDate', 'status'])
+          .where('profileId', '=', profileId)
+          .where('id', '=', dividendId),
+      )
       .where('profileId', '=', profileId)
       .where('id', '=', dividendId)
       .limit(1)

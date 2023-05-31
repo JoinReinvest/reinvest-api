@@ -70,17 +70,22 @@ export class RegistryQueryRepository {
     }
   }
 
-  async getAccountMapping(accountId: string): Promise<{ email: string; northCapitalId: string } | null> {
+  async getAccountMapping(accountId: string): Promise<{ email: string; northCapitalId: string | null } | null> {
     try {
       const result = await this.databaseAdapterProvider
         .provide()
         .selectFrom(registrationMappingRegistryTable)
-        .fullJoin(northCapitalSynchronizationTable, `${registrationMappingRegistryTable}.recordId`, `${northCapitalSynchronizationTable}.recordId`)
+        .leftJoin(northCapitalSynchronizationTable, `${registrationMappingRegistryTable}.recordId`, `${northCapitalSynchronizationTable}.recordId`)
         .select([`${northCapitalSynchronizationTable}.northCapitalId`])
         .select([`${registrationMappingRegistryTable}.email`])
         .where(`${registrationMappingRegistryTable}.externalId`, '=', accountId)
-        .where(`${registrationMappingRegistryTable}.mappedType`, 'in', [MappedType.INDIVIDUAL_ACCOUNT, MappedType.CORPORATE_ACCOUNT, MappedType.TRUST_ACCOUNT])
-        .castTo<{ email: string; northCapitalId: string }>()
+        .where(`${registrationMappingRegistryTable}.mappedType`, 'in', [
+          MappedType.INDIVIDUAL_ACCOUNT,
+          MappedType.CORPORATE_ACCOUNT,
+          MappedType.TRUST_ACCOUNT,
+          MappedType.BENEFICIARY_ACCOUNT,
+        ])
+        .castTo<{ email: string; northCapitalId: string | null }>()
         .executeTakeFirstOrThrow();
 
       return result;

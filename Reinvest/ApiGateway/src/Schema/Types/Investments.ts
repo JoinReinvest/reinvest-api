@@ -156,7 +156,14 @@ export const Investments = {
         const bankAccountId = bankAccountData.bankAccountId;
         const { portfolioId } = await portfolioApi.getActivePortfolio();
 
-        const investmentId = await investmentAccountsApi.createInvestment(portfolioId, profileId, individualAccountId, bankAccountId, amount);
+        const investmentId = await investmentAccountsApi.createInvestment(
+          portfolioId,
+          profileId,
+          accountId,
+          bankAccountId,
+          amount,
+          accountId === individualAccountId ? null : individualAccountId,
+        );
 
         return investmentId;
       },

@@ -25,7 +25,10 @@ export class RegistryQuery {
 
   static getClassName = () => 'RegistryQuery';
 
-  async getAccountMapping(accountId: string): Promise<{ accountEmail: string; northCapitalAccountId: string } | null> {
+  async getAccountMapping(accountId: string): Promise<{
+    accountEmail: string;
+    northCapitalAccountId: string | null;
+  } | null> {
     const data = await this.registryQueryRepository.getAccountMapping(accountId);
 
     if (!data) {
