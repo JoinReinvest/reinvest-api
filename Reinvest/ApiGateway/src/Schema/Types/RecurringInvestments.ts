@@ -218,6 +218,12 @@ export const RecurringInvestments = {
       initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        if (!recurringInvestment) {
+          throw new JsonGraphQLError('NO_INVESTMENT_TO_INITIATE');
+        }
+
         await investmentAccountsApi.deactivateRecurringInvestment(accountId);
 
         const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
