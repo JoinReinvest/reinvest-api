@@ -1,6 +1,5 @@
 import { InvestmentsDatabaseAdapterProvider, recurringInvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import type { RecurringInvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateRecurringInvestment';
-import { RecurringInvestmentInitiate } from 'Reinvest/Investments/src/Application/UseCases/InitiateRecurringInvestment';
 import { RecurringInvestment } from 'Reinvest/Investments/src/Domain/Investments/RecurringInvestment';
 import { RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -100,7 +99,7 @@ export class RecurringInvestmentsRepository {
     }
   }
 
-  async deactivate(id: string, status: RecurringInvestmentStatus) {
+  async updateStatus(id: string, status: RecurringInvestmentStatus) {
     try {
       await this.databaseAdapterProvider
         .provide()
@@ -113,36 +112,7 @@ export class RecurringInvestmentsRepository {
 
       return true;
     } catch (error: any) {
-      console.error(`Cannot create recurring investment: ${error.message}`, error);
-
-      return false;
-    }
-  }
-
-  async initiate(recurringInvestment: RecurringInvestmentInitiate) {
-    const { id, accountId, profileId, portfolioId, dateCreated, subscriptionAgreementId, amount, startDate, frequency, status } = recurringInvestment;
-
-    try {
-      await this.databaseAdapterProvider
-        .provide()
-        .insertInto(recurringInvestmentsTable)
-        .values({
-          accountId,
-          amount,
-          dateCreated,
-          frequency,
-          id,
-          portfolioId,
-          profileId,
-          startDate: new Date(startDate),
-          status,
-          subscriptionAgreementId,
-        })
-        .execute();
-
-      return true;
-    } catch (error: any) {
-      console.error(`Cannot create recurring investment: ${error.message}`, error);
+      console.error(`Cannot update status of recurring investment: ${error.message}`, error);
 
       return false;
     }

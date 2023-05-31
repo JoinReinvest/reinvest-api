@@ -1,28 +1,11 @@
-import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
+import { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
-import { Money } from 'Money/Money';
-
-export type RecurringInvestmentInitiate = {
-  accountId: string;
-  amount: number;
-  dateCreated: Date;
-  frequency: RecurringInvestmentFrequency;
-  id: string;
-  portfolioId: string;
-  profileId: string;
-  startDate: string;
-  status: RecurringInvestmentStatus;
-  subscriptionAgreementId: string | null;
-};
 
 class InitiateRecurringInvestment {
   private readonly recurringInvestmentsRepository: RecurringInvestmentsRepository;
-  private idGenerator: IdGeneratorInterface;
 
-  constructor(recurringInvestmentsRepository: RecurringInvestmentsRepository, idGenerator: IdGeneratorInterface) {
+  constructor(recurringInvestmentsRepository: RecurringInvestmentsRepository) {
     this.recurringInvestmentsRepository = recurringInvestmentsRepository;
-    this.idGenerator = idGenerator;
   }
 
   static getClassName = (): string => 'InitiateRecurringInvestment';
@@ -34,32 +17,17 @@ class InitiateRecurringInvestment {
       return false;
     }
 
-    recurringInvestment?.updateStatus(RecurringInvestmentStatus.ACTIVE);
-
-    const id = this.idGenerator.createUuid();
-
-    const { portfolioId, profileId, schedule, amount, subscriptionAgreementId, dateCreated } = recurringInvestment.toObject();
+    const subscriptionAgreementId = recurringInvestment.getSubscriptionAgreeementId();
 
     if (!subscriptionAgreementId) {
       return false;
     }
 
-    const { startDate, frequency } = schedule.toObject();
+    recurringInvestment?.updateStatus(RecurringInvestmentStatus.ACTIVE);
 
-    const data: RecurringInvestmentInitiate = {
-      id,
-      portfolioId,
-      profileId,
-      accountId,
-      amount,
-      startDate,
-      frequency,
-      subscriptionAgreementId,
-      dateCreated,
-      status: RecurringInvestmentStatus.ACTIVE,
-    };
+    const id = recurringInvestment.getId();
 
-    const status = await this.recurringInvestmentsRepository.initiate(data);
+    const status = await this.recurringInvestmentsRepository.updateStatus(id, RecurringInvestmentStatus.ACTIVE);
 
     if (!status) {
       return false;

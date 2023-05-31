@@ -48,7 +48,7 @@ export default class UseCaseProviders {
     container.addSingleton(DeleteRecurringInvestment, [RecurringInvestmentsRepository, SubscriptionAgreementRepository]);
     container.addSingleton(CreateRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, IdGenerator]);
     container.addSingleton(AssignSubscriptionAgreementToRecurringInvestment, [RecurringInvestmentsRepository]);
-    container.addSingleton(InitiateRecurringInvestment, [RecurringInvestmentsRepository, IdGenerator]);
+    container.addSingleton(InitiateRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(DeactivateRecurringInvestment, [RecurringInvestmentsRepository]);
   }
 }

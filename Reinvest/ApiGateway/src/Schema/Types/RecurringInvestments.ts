@@ -218,13 +218,13 @@ export const RecurringInvestments = {
       initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
+        await investmentAccountsApi.deactivateRecurringInvestment(accountId);
+
         const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
 
         if (!status) {
           return false;
         }
-
-        await investmentAccountsApi.deactivateRecurringInvestment(accountId);
 
         return status;
       },
