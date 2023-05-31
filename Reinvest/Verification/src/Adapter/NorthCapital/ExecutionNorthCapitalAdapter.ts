@@ -32,6 +32,7 @@ export abstract class ExecutionNorthCapitalAdapter {
 
   protected async postRequest(endpoint: string, data: any): Promise<any> {
     try {
+      console.log('Verification NC, post request', endpoint, data);
       const formData = this.transformToFormData(data);
       const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
       console.log('Verification NC, post request', endpoint, data, JSON.stringify(response));
