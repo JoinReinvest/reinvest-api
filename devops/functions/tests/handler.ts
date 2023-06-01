@@ -25,7 +25,7 @@ import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/Datab
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
-import { main as postSignUp } from '../postSignUp/handler';
+import { main as postSignUp } from '../postSignUp/handler'; // dependencies
 // dependencies
 type AllDatabases = IdentityDatabase & LegalEntitiesDatabase & InvestmentAccountsDatabase & RegistrationDatabase;
 const databaseProvider: DatabaseProvider<AllDatabases> = new DatabaseProvider<AllDatabases>(DATABASE_CONFIG as PostgreSQLConfig);
@@ -371,6 +371,24 @@ const syncRouter = () => {
 
       res.status(200).json({
         statuses,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
+  router.post('/push-transaction', async (req: any, res: any) => {
+    try {
+      const { transactionId } = req.body;
+      const modules = boot();
+      const investmentApi = modules.getApi<Investments.ApiType>(Investments);
+      await investmentApi.pushTransaction(transactionId);
+
+      res.status(200).json({
+        status: true,
       });
     } catch (e: any) {
       console.log(e);

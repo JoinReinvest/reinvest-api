@@ -1,5 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
+import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 import { ApiLambdaFunction, ApiLambdaResources } from './devops/functions/api/api-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cronDocumentSync/cron-document-sync-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cronVendorsSync/cron-vendors-sync-config';
@@ -7,7 +8,7 @@ import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functi
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
 import { cognitoPreSignUpFunction, CognitoPreSignUpResources } from './devops/functions/preSignUp/preSignUp-config';
-import { QueueFunction, QueueOutputs, QueueResources } from './devops/functions/queue/queue-config';
+import { QueueFunction, QueueResources } from './devops/functions/queue/queue-config';
 import { TestsFunction, TestsLambdaResources } from './devops/functions/tests/tests-config';
 import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } from './devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config';
 import { CognitoAuthorizerName, CognitoClientResources, CognitoOutputs, CognitoResources } from './devops/serverless/cognito';
@@ -15,13 +16,12 @@ import { S3Resources } from './devops/serverless/s3';
 import { ProviderEnvironment } from './devops/serverless/serverless-common';
 import { SesResources } from './devops/serverless/ses';
 import { VpcResources } from './devops/serverless/vpc';
-import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-local',
   frameworkVersion: '3',
   useDotenv: true,
-  plugins: ['serverless-dotenv-plugin', 'serverless-offline-sqs', 'serverless-offline', 'serverless-offline-watcher', 'serverless-esbuild'],
+  plugins: ['serverless-dotenv-plugin', 'serverless-offline-sqs', 'serverless-offline', 'serverless-esbuild'], //  'serverless-offline-watcher',
   provider: {
     name: 'aws',
     runtime: 'nodejs18.x',
@@ -118,12 +118,12 @@ const serverlessConfiguration: AWS = {
       useChildProcesses: true,
       noPrependStageInUrl: true,
     },
-    'serverless-offline-watcher': [
-      {
-        path: ['Reinvest', 'devops', 'shared'],
-        command: `echo "Source files modified"`,
-      },
-    ],
+    // 'serverless-offline-watcher': [
+    //   {
+    //     path: ['Reinvest', 'devops', 'shared'],
+    //     command: `echo "Source files modified"`,
+    //   },
+    // ],
   },
 };
 

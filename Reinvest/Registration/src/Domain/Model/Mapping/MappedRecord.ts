@@ -64,6 +64,10 @@ export class MappedRecord {
     return this.mappedType === MappedType.INDIVIDUAL_ACCOUNT;
   }
 
+  isBeneficiaryAccount() {
+    return this.mappedType === MappedType.BENEFICIARY_ACCOUNT;
+  }
+
   isCompanyAccount() {
     return this.mappedType === MappedType.CORPORATE_ACCOUNT || this.mappedType === MappedType.TRUST_ACCOUNT;
   }

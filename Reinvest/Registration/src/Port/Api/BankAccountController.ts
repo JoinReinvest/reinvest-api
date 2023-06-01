@@ -3,28 +3,33 @@ import { BankAccountQuery, CurrentActiveBankAccount } from 'Registration/Integra
 import { FulfillBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/FulfillBankAccount';
 import { InitializeBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/InitializeBankAccount';
 import { UpdateBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/UpdateBankAccount';
+import { ImmediateSynchronize } from 'Registration/IntegrationLogic/UseCase/ImmediateSynchronize';
 
 export class BankAccountController {
   private initializeBankAccountUseCase: InitializeBankAccount;
   private fulfillBankAccountUseCase: FulfillBankAccount;
   private bankAccountQuery: BankAccountQuery;
   private updateBankAccountUseCase: UpdateBankAccount;
+  private immediateSynchronize: ImmediateSynchronize;
 
   constructor(
     initializeBankAccountUseCase: InitializeBankAccount,
     fulfillBankAccountUseCase: FulfillBankAccount,
     bankAccountQuery: BankAccountQuery,
     updateBankAccountUseCase: UpdateBankAccount,
+    immediateSynchronize: ImmediateSynchronize,
   ) {
     this.initializeBankAccountUseCase = initializeBankAccountUseCase;
     this.fulfillBankAccountUseCase = fulfillBankAccountUseCase;
     this.bankAccountQuery = bankAccountQuery;
     this.updateBankAccountUseCase = updateBankAccountUseCase;
+    this.immediateSynchronize = immediateSynchronize;
   }
 
   public static getClassName = (): string => 'BankAccountController';
 
   public async createBankAccount(profileId: string, accountId: string) {
+    await this.immediateSynchronize.immediatelySynchronizeAccount(profileId, accountId);
     const link = await this.initializeBankAccountUseCase.execute(profileId, accountId);
 
     if (!link) {

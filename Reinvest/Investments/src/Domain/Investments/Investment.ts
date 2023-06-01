@@ -21,6 +21,7 @@ export class Investment {
   private dateStarted: Date | null;
   private gracePeriod: GracePeriod;
   private portfolioId: string;
+  private parentId: string | null;
 
   constructor(
     accountId: string,
@@ -37,6 +38,7 @@ export class Investment {
     tradeId: string,
     dateStarted: Date | null,
     portfolioId: string,
+    parentId: string | null,
   ) {
     this.accountId = accountId;
     this.amount = amount;
@@ -52,6 +54,7 @@ export class Investment {
     this.tradeId = tradeId;
     this.dateStarted = dateStarted;
     this.portfolioId = portfolioId;
+    this.parentId = parentId;
     this.gracePeriod = new GracePeriod(dateStarted);
   }
 
@@ -71,6 +74,7 @@ export class Investment {
       tradeId,
       dateStarted,
       portfolioId,
+      parentId,
     } = data;
 
     return new Investment(
@@ -88,6 +92,7 @@ export class Investment {
       tradeId,
       dateStarted,
       portfolioId,
+      parentId,
     );
   }
 
@@ -129,6 +134,7 @@ export class Investment {
       dateStarted: this.dateStarted,
       tradeId: this.tradeId,
       portfolioId: this.portfolioId,
+      parentId: this.parentId,
     };
   }
 
