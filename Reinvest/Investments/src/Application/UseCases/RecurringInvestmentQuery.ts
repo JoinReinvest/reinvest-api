@@ -11,8 +11,8 @@ class RecurringInvestmentQuery {
 
   static getClassName = (): string => 'RecurringInvestmentQuery';
 
-  async execute(accountId: string, status1: RecurringInvestmentStatus) {
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, status1);
+  async execute(accountId: string, recurringInvestmentStatus: RecurringInvestmentStatus) {
+    const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, recurringInvestmentStatus);
 
     if (!recurringInvestment) {
       return false;
