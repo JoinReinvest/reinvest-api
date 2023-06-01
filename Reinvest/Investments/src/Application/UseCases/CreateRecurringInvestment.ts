@@ -39,7 +39,7 @@ class CreateRecurringInvestment {
       frequency: schedule.frequency,
       status: RecurringInvestmentStatus.DRAFT,
     };
-    const status = this.recurringInvestmentsRepository.create(recurringInvestment);
+    const status = await this.recurringInvestmentsRepository.create(recurringInvestment);
 
     if (!status) {
       return false;

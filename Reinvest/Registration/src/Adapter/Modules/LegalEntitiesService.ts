@@ -1,5 +1,6 @@
 import { LegalEntities } from 'LegalEntities/index';
 import {
+  BeneficiaryAccountForSynchronization,
   CompanyAccountForSynchronization,
   CompanyForSynchronization,
   IndividualAccountForSynchronization,
@@ -11,12 +12,13 @@ import { ProfileForSynchronization } from 'Registration/Domain/Model/Profile';
  * Legal Entities Module ACL
  */
 export class LegalEntitiesService {
-  public static getClassName = () => 'LegalEntitiesService';
   private legalEntitiesModule: LegalEntities.Main;
 
   constructor(legalEntitiesModule: LegalEntities.Main) {
     this.legalEntitiesModule = legalEntitiesModule;
   }
+
+  public static getClassName = () => 'LegalEntitiesService';
 
   async getProfile(profileId: string): Promise<ProfileForSynchronization | never> {
     const api = this.legalEntitiesModule.api();
@@ -72,5 +74,19 @@ export class LegalEntitiesService {
     }
 
     return stakeholder;
+  }
+
+  async getBeneficiaryAccount(profileId: string, beneficiaryAccountId: string): Promise<BeneficiaryAccountForSynchronization | never> {
+    const api = this.legalEntitiesModule.api();
+    const beneficiaryAccount = (await api.getBeneficiaryAccountForSynchronization(
+      profileId,
+      beneficiaryAccountId,
+    )) as BeneficiaryAccountForSynchronization | null;
+
+    if (beneficiaryAccount === null) {
+      throw new Error(`Beneficiary account not found, profileId: ${profileId}, accountId: ${beneficiaryAccountId}`);
+    }
+
+    return beneficiaryAccount;
   }
 }

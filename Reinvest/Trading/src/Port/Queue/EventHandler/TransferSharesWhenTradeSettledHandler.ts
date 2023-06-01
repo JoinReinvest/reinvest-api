@@ -1,14 +1,14 @@
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { MarkFundsAsReadyToDisburse } from 'Trading/IntegrationLogic/UseCase/MarkFundsAsReadyToDisburse';
+import { TransferSharesWhenTradeSettled } from 'Trading/IntegrationLogic/UseCase/TransferSharesWhenTradeSettled';
 
 export class TransferSharesWhenTradeSettledHandler implements EventHandler<DomainEvent> {
   private eventBus: EventBus;
-  private markFundsAsReadyToDisburseUseCase: MarkFundsAsReadyToDisburse;
+  private transferSharesWhenTradeSettled: TransferSharesWhenTradeSettled;
 
-  constructor(markFundsAsReadyToDisburseUseCase: MarkFundsAsReadyToDisburse, eventBus: EventBus) {
+  constructor(transferSharesWhenTradeSettled: TransferSharesWhenTradeSettled, eventBus: EventBus) {
     this.eventBus = eventBus;
-    this.markFundsAsReadyToDisburseUseCase = markFundsAsReadyToDisburseUseCase;
+    this.transferSharesWhenTradeSettled = transferSharesWhenTradeSettled;
   }
 
   static getClassName = (): string => 'TransferSharesWhenTradeSettledHandler';
@@ -20,7 +20,7 @@ export class TransferSharesWhenTradeSettledHandler implements EventHandler<Domai
 
     const investmentId = event.id;
 
-    if (await this.markFundsAsReadyToDisburseUseCase.execute(investmentId)) {
+    if (await this.transferSharesWhenTradeSettled.execute(investmentId)) {
       await this.eventBus.publish({
         kind: 'InvestmentSharesTransferred',
         id: investmentId,

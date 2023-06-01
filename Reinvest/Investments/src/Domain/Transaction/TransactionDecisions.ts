@@ -37,6 +37,7 @@ export type CreateTradeDecision = TransactionDecision & {
     bankAccountId: string;
     fees: number;
     ip: string;
+    parentId: string;
     portfolioId: string;
     subscriptionAgreementId: string;
   };

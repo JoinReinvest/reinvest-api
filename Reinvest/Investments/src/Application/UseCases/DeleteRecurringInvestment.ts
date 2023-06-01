@@ -33,7 +33,7 @@ class DeleteRecurringInvestment {
       await this.subscriptionAgreementRepository.delete(accountId, subscriptionAgreementId);
     }
 
-    const isDeleted = await this.recurringInvestmentsRepository.delete(accountId, profileId);
+    const isDeleted = await this.recurringInvestmentsRepository.delete(accountId, profileId, recurringInvestment?.getId());
 
     return isDeleted;
   }

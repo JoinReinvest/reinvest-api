@@ -1,5 +1,6 @@
 import { SessionContext } from 'ApiGateway/index';
 import dayjs from 'dayjs';
+import { GraphQLError } from 'graphql';
 import { Notifications } from 'Notifications/index';
 
 const schema = `
@@ -157,6 +158,10 @@ export const Notification = {
   resolvers: {
     Query: {
       getNotifications: async (parent: any, { accountId, filter, pagination }: any, { profileId, modules }: SessionContext) => {
+        if (accountId.length === 0) {
+          throw new GraphQLError('Account id is required');
+        }
+
         const api = modules.getApi<Notifications.ApiType>(Notifications);
         const listOfNotifications = notificationsMock(accountId, false);
         const notifications = await api.getNotifications(profileId, accountId, filter, pagination);
@@ -164,6 +169,10 @@ export const Notification = {
         return [...notifications, ...listOfNotifications];
       },
       getNotificationStats: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
+        if (accountId.length === 0) {
+          throw new GraphQLError('Account id is required');
+        }
+
         const api = modules.getApi<Notifications.ApiType>(Notifications);
         const { unreadCount, totalCount } = await api.getNotificationsStats(profileId, accountId);
 

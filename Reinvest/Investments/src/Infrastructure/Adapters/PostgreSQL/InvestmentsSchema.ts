@@ -1,4 +1,5 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import type {
   AgreementTypes,
@@ -18,6 +19,7 @@ export interface InvestmentsTable {
   dateStarted: Date | null;
   dateUpdated: Date;
   id: string;
+  parentId: string | null;
   portfolioId: string;
   profileId: string;
   recurringInvestmentId: string | null;
@@ -74,4 +76,12 @@ export interface RecurringInvestmentsTable {
   startDate: Date;
   status: RecurringInvestmentStatus;
   subscriptionAgreementId: string | null;
+}
+
+export interface ReinvestmentEventsTable {
+  dateCreated: Date;
+  dividendId: string;
+  eventKind: ReinvestmentEvents;
+  eventStateJson: JSONObject;
+  id: string;
 }

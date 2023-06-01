@@ -3,6 +3,7 @@ import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { createTradingDatabaseAdapterProvider, TradingDatabaseAdapterInstanceProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
+import { ReinvestmentRepository } from 'Trading/Adapter/Database/Repository/ReinvestmentRepository';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
 import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
@@ -26,7 +27,8 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(TradingDatabaseAdapterInstanceProvider, createTradingDatabaseAdapterProvider(this.config.database))
-      .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider]);
+      .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider])
+      .addSingleton(ReinvestmentRepository, [TradingDatabaseAdapterInstanceProvider]);
 
     // modules
     container.addSingleton(VendorsMappingService, ['Registration', 'Portfolio']).addSingleton(TradingDocumentService, ['Documents']);

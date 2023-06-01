@@ -1,4 +1,4 @@
-import { CompanyAccountForSynchronization, IndividualAccountForSynchronization } from 'Registration/Domain/Model/Account';
+import { BeneficiaryAccountForSynchronization, CompanyAccountForSynchronization, IndividualAccountForSynchronization } from 'Registration/Domain/Model/Account';
 import { VertaloAccount } from 'Registration/Domain/VendorModel/Vertalo/VertaloAccount';
 
 export class VertaloMapper {
@@ -8,5 +8,9 @@ export class VertaloMapper {
 
   static mapCompanyAccount(companyAccount: CompanyAccountForSynchronization, email: string): VertaloAccount {
     return VertaloAccount.createAccount(companyAccount.ownerName, email);
+  }
+
+  static mapBeneficiaryAccount(beneficiaryAccount: BeneficiaryAccountForSynchronization, email: string) {
+    return VertaloAccount.createAccount(beneficiaryAccount.ownerName, email);
   }
 }
