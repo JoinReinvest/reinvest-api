@@ -41,7 +41,7 @@ export default class AdaptersProviders {
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider])
-      .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(ReinvestmentRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
 

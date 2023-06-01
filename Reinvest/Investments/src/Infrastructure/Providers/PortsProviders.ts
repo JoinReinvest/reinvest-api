@@ -1,6 +1,7 @@
 import { ContainerInterface } from 'Container/Container';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
+import AssignSubscriptionAgreementToRecurringInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToRecurringInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
@@ -44,6 +45,12 @@ export default class PortsProviders {
     ]);
     container.addSingleton(FeesController, [ApproveFees, IsFeeApproved]);
     container.addSingleton(ScheduleSimulationController, [ScheduleSimulationQuery]);
+    container.addSingleton(RecurringInvestmentsController, [
+      CreateRecurringInvestment,
+      RecurringInvestmentQuery,
+      DeleteRecurringInvestment,
+      AssignSubscriptionAgreementToRecurringInvestment,
+    ]);
     container.addSingleton(RecurringInvestmentsController, [CreateRecurringInvestment, RecurringInvestmentQuery, DeleteRecurringInvestment]);
     container.addSingleton(DividendsController, [ReinvestDividend]);
     container.addSingleton(TransactionController, [PushTransaction]);

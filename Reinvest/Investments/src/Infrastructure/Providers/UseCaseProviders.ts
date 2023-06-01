@@ -3,6 +3,7 @@ import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
+import AssignSubscriptionAgreementToRecurringInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToRecurringInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
@@ -50,6 +51,7 @@ export default class UseCaseProviders {
     container.addSingleton(RecurringInvestmentQuery, [RecurringInvestmentsRepository]);
     container.addSingleton(DeleteRecurringInvestment, [RecurringInvestmentsRepository, SubscriptionAgreementRepository]);
     container.addSingleton(CreateRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, IdGenerator]);
+    container.addSingleton(AssignSubscriptionAgreementToRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
   }
