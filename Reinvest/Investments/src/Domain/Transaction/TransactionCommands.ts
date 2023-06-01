@@ -47,6 +47,7 @@ export const createTrade = (decision: CreateTradeDecision): DomainEvent => ({
     bankAccountId: decision.data.bankAccountId,
     subscriptionAgreementId: decision.data.subscriptionAgreementId,
     portfolioId: decision.data.portfolioId,
+    parentId: decision.data.parentId,
   },
 });
 

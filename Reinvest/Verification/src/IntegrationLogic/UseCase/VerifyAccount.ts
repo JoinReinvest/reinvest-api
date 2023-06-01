@@ -21,6 +21,7 @@ export class VerifyAccount {
   async verify(profileId: string, accountId: string): Promise<AccountVerificationDecision> {
     try {
       console.log('verify account id ' + accountId);
+      await this.registrationService.immediatelySynchronizeAllAccountStructure(profileId, accountId);
       const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
       const verifiers = await this.verifierRepository.createVerifiersFromAccountStructure(accountStructure);
       const accountVerifier = new AccountVerifier(profileId, accountId);

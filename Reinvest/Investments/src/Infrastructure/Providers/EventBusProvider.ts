@@ -1,15 +1,20 @@
 import { ContainerInterface } from 'Container/Container';
 import { CheckIsGracePeriodEndedEventHandler } from 'Investments/Application/DomainEventHandler/CheckIsGracePeriodEndedEventHandler';
 import { FinalizeInvestmentEventHandler } from 'Investments/Application/DomainEventHandler/FinalizeInvestmentEventHandler';
+import { ReinvestmentEventHandler } from 'Investments/Application/DomainEventHandler/ReinvestmentEventHandler';
 import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/SharesEventHandler';
 import { TransactionEventHandler } from 'Investments/Application/DomainEventHandler/TransactionEventHandler';
+import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
+import { ReinvestmentCommands } from 'Investments/Domain/Reinvestments/ReinvestmentCommands';
+import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionCommands } from 'Investments/Domain/Transaction/TransactionCommands';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { Investments } from 'Investments/index';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -27,6 +32,7 @@ export default class EventBusProvider {
       .addSingleton(SharesEventHandler, [SharesAndDividendService])
       .addSingleton(TechnicalToDomainEventsHandler, [SimpleEventBus])
       .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler])
+      .addSingleton(ReinvestmentEventHandler, [ReinvestmentRepository, ReinvestmentExecutor, SharesEventHandler])
       .addSingleton(CheckIsGracePeriodEndedEventHandler, [InvestmentsRepository, SimpleEventBus])
       .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus]);
 
@@ -45,6 +51,11 @@ export default class EventBusProvider {
         TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
       ])
 
+      .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [
+        ReinvestmentEvents.DIVIDEND_REINVESTMENT_REQUESTED,
+        ReinvestmentEvents.SHARES_TRANSFERRED_FOR_REINVESTMENT,
+      ])
+
       // output commands
       // TODO handle finish investment decision
       .subscribe(TransactionCommands.FinalizeInvestment, FinalizeInvestmentEventHandler.getClassName())
@@ -56,6 +67,7 @@ export default class EventBusProvider {
         TransactionCommands.CheckIsInvestmentApproved,
         TransactionCommands.MarkFundsAsReadyToDisburse,
         TransactionCommands.TransferSharesWhenTradeSettled,
+        ReinvestmentCommands.TransferSharesForReinvestment,
       ]);
   }
 }
