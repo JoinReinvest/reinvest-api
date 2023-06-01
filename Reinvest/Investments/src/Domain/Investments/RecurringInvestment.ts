@@ -1,42 +1,40 @@
+import { RecurringInvestmentSchedule } from 'Investments/Domain/ValueObject/RecuringInvestmentSchedule';
 import { RecurringInvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 import { Money } from 'Money/Money';
 
-import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from './Types';
+import { RecurringInvestmentStatus } from './Types';
 
 type RecurringInvestmentSchema = RecurringInvestmentsTable;
 
 export class RecurringInvestment {
+  private schedule: RecurringInvestmentSchedule;
   private accountId: string;
   private amount: number;
   private dateCreated: Date;
-  private frequency: RecurringInvestmentFrequency;
   private id: string;
   private portfolioId: string;
   private profileId: string;
-  private startDate: string | null;
   private status: RecurringInvestmentStatus;
   private subscriptionAgreementId: string | null;
 
   constructor(
+    schedule: RecurringInvestmentSchedule,
     accountId: string,
     amount: number,
     dateCreated: Date,
-    frequency: RecurringInvestmentFrequency,
     id: string,
     portfolioId: string,
     profileId: string,
-    startDate: string | null,
     status: RecurringInvestmentStatus,
     subscriptionAgreementId: string | null,
   ) {
+    this.schedule = schedule;
     this.accountId = accountId;
     this.amount = amount;
     this.dateCreated = dateCreated;
-    this.frequency = frequency;
     this.id = id;
     this.portfolioId = portfolioId;
     this.profileId = profileId;
-    this.startDate = startDate;
     this.status = status;
     this.subscriptionAgreementId = subscriptionAgreementId;
   }
@@ -44,7 +42,9 @@ export class RecurringInvestment {
   static create(data: RecurringInvestmentSchema) {
     const { accountId, amount, dateCreated, frequency, id, portfolioId, profileId, startDate, status, subscriptionAgreementId } = data;
 
-    return new RecurringInvestment(accountId, amount, dateCreated, frequency, id, portfolioId, profileId, startDate, status, subscriptionAgreementId);
+    const schedule = RecurringInvestmentSchedule.create({ startDate, frequency });
+
+    return new RecurringInvestment(schedule, accountId, amount, dateCreated, id, portfolioId, profileId, status, subscriptionAgreementId);
   }
 
   getAmount() {
@@ -56,16 +56,28 @@ export class RecurringInvestment {
     };
   }
 
+  getSchedule() {
+    const { frequency, startDate } = this.schedule.toObject();
+
+    return {
+      frequency,
+      startDate,
+    };
+  }
+
+  getSubscriptionAgreeementId() {
+    return this.subscriptionAgreementId;
+  }
+
   toObject() {
     return {
       accountId: this.accountId,
       amount: this.amount,
       dateCreated: this.dateCreated,
-      frequency: this.frequency,
+      schedule: this.schedule,
       id: this.id,
       portfolioId: this.portfolioId,
       profileId: this.profileId,
-      startDate: this.startDate,
       status: this.status,
       subscriptionAgreementId: this.subscriptionAgreementId,
     };

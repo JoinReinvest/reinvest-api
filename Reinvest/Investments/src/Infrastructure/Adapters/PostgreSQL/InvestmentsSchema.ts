@@ -73,7 +73,7 @@ export interface RecurringInvestmentsTable {
   id: string;
   portfolioId: string;
   profileId: string;
-  startDate: string | null;
+  startDate: Date;
   status: RecurringInvestmentStatus;
   subscriptionAgreementId: string | null;
 }

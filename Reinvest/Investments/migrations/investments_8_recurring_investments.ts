@@ -12,7 +12,7 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
     .addColumn('dateCreated', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .addColumn('subscriptionAgreementId', 'uuid', col => col.defaultTo(null))
     .addColumn('amount', 'integer', col => col.notNull())
-    .addColumn('startDate', 'varchar(36)', col => col.notNull())
+    .addColumn('startDate', 'timestamp', col => col.notNull())
     .addColumn('frequency', 'varchar(36)', col => col.notNull())
     .addColumn('status', 'varchar(36)', col => col.notNull())
     .execute();

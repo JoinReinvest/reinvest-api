@@ -6,11 +6,13 @@ import AssignSubscriptionAgreementToInvestment from 'Investments/Application/Use
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
+import DeleteRecurringInvestment from 'Investments/Application/UseCases/DeleteRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
-import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
+import RecurringInvestmentQuery from 'Investments/Application/UseCases/RecurringInvestmentQuery';
 import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
+import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
@@ -20,7 +22,6 @@ import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/F
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
-import GetRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/GetRecurringInvestment';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
@@ -45,7 +46,8 @@ export default class UseCaseProviders {
     container.addSingleton(IsFeeApproved, [FeesRepository]);
     container.addSingleton(ScheduleSimulationQuery);
     container.addSingleton(CreateRecurringInvestment, [RecurringInvestmentsRepository, IdGenerator]);
-    container.addSingleton(GetRecurringInvestment, [RecurringInvestmentsRepository]);
+    container.addSingleton(RecurringInvestmentQuery, [RecurringInvestmentsRepository]);
+    container.addSingleton(DeleteRecurringInvestment, [RecurringInvestmentsRepository, SubscriptionAgreementRepository]);
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
   }

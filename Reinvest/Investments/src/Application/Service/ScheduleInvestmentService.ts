@@ -26,6 +26,14 @@ class ScheduleInvestmentService {
     return dates;
   }
 
+  getNextInvestmentDate() {
+    const { multiplyer, type } = this.getTypeAndValueToMultiplyer();
+
+    return dayjs(this.startDate)
+      .add(1 * multiplyer, type)
+      .format('YYYY-MM-DD');
+  }
+
   private getTypeAndValueToMultiplyer(): { multiplyer: number; type: 'week' | 'month' } {
     switch (this.frequency) {
       case RecurringInvestmentFrequency.WEEKLY:

@@ -4,11 +4,12 @@ import AssignSubscriptionAgreementToInvestment from 'Investments/Application/Use
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
+import DeleteRecurringInvestment from 'Investments/Application/UseCases/DeleteRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
-import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
 import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
+import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
@@ -20,8 +21,8 @@ import { RecurringInvestmentsController } from 'Investments/Infrastructure/Ports
 import { ScheduleSimulationController } from 'Investments/Infrastructure/Ports/ScheduleSimulationController';
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
-import GetDraftRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/GetRecurringInvestment';
 import { TransactionController } from 'Investments/Infrastructure/Ports/TransactionController';
+import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export default class PortsProviders {
@@ -37,7 +38,7 @@ export default class PortsProviders {
     container.addSingleton(SubscriptionAgreementController, [CreateSubscriptionAgreement, SubscriptionAgreementQuery, SignSubscriptionAgreement]);
     container.addSingleton(FeesController, [ApproveFees, IsFeeApproved]);
     container.addSingleton(ScheduleSimulationController, [ScheduleSimulationQuery]);
-    container.addSingleton(RecurringInvestmentsController, [CreateRecurringInvestment, GetDraftRecurringInvestment]);
+    container.addSingleton(RecurringInvestmentsController, [CreateRecurringInvestment, RecurringInvestmentQuery, DeleteRecurringInvestment]);
     container.addSingleton(DividendsController, [ReinvestDividend]);
     container.addSingleton(TransactionController, [PushTransaction]);
   }

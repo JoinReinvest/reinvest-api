@@ -14,6 +14,7 @@ export type InvestmentsApiType = {
   createInvestment: InvestmentsController['createInvestment'];
   createRecurringInvestment: RecurringInvestmentsController['createRecurringInvestment'];
   createSubscriptionAgreement: SubscriptionAgreementController['createSubscriptionAgreement'];
+  deleteRecurringInvestment: RecurringInvestmentsController['deleteRecurringInvestment'];
   getRecurringInvestment: RecurringInvestmentsController['getRecurringInvestment'];
   getScheduleSimulation: ScheduleSimulationController['getScheduleSimulation'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
@@ -31,6 +32,7 @@ export const investmentsApi = (container: ContainerInterface): InvestmentsApiTyp
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
   createRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createRecurringInvestment'),
   getRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'getRecurringInvestment'),
+  deleteRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'deleteRecurringInvestment'),
   getScheduleSimulation: container.delegateTo(ScheduleSimulationController, 'getScheduleSimulation'),
   startInvestment: container.delegateTo(InvestmentsController, 'startInvestment'),
   approveFees: container.delegateTo(FeesController, 'approveFees'),

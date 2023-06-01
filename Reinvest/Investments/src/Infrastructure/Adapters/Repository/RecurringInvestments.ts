@@ -44,7 +44,7 @@ export class RecurringInvestmentsRepository {
           id,
           portfolioId,
           profileId,
-          startDate,
+          startDate: new Date(startDate),
           status,
           subscriptionAgreementId: null,
         })
@@ -53,6 +53,23 @@ export class RecurringInvestmentsRepository {
       return true;
     } catch (error: any) {
       console.error(`Cannot create recurring investment: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async delete(accountId: string, profileId: string) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .deleteFrom(recurringInvestmentsTable)
+        .where('accountId', '=', accountId)
+        .where('profileId', '=', profileId)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot delete recurring investment: ${error.message}`, error);
 
       return false;
     }
