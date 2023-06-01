@@ -1,15 +1,10 @@
-import { SessionContext } from 'ApiGateway/index';
-import { subscriptionAgreementIdMock } from 'ApiGateway/Schema/Types/Investments';
-import { subscriptionAgreementsTemplate } from 'Reinvest/Investments/src/Domain/SubscriptionAgreement';
-
-const subscriptionAgreementMock = (parentId: string, type: string) => ({
-  id: subscriptionAgreementIdMock,
-  type,
-  status: 'WAITING_FOR_SIGNATURE',
-  createdAt: '2023-03-24T12:33:12',
-  content: subscriptionAgreementsTemplate[1],
-});
-
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { subscriptionAgreementIdMock, USDInput } from 'ApiGateway/Schema/Types/Investments';
+import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
+import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { LegalEntities } from 'Reinvest/LegalEntities/src';
+import Modules from 'Reinvest/Modules';
+import { Portfolio } from 'Reinvest/Portfolio/src';
 const schema = `
     #graphql
     enum RecurringInvestmentFrequency {
@@ -105,33 +100,139 @@ const recurringInvestmentMock = (status: string) => ({
   status,
 });
 
+export type Schedule = {
+  frequency: RecurringInvestmentFrequency;
+  startDate: string;
+};
+
+export type GetScheduleSimulation = {
+  schedule: Schedule;
+};
+
+export type CreateRecurringInvestmentInput = {
+  accountId: string;
+  amount: USDInput;
+  schedule: Schedule;
+};
+
+export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
+  const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+  return api.mapAccountIdToParentAccountIdIfRequired(profileId, accountId);
+}
+
 export const RecurringInvestments = {
   typeDefs: schema,
   resolvers: {
     Query: {
       getActiveRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        // return recurringInvestmentMock('ACTIVE');
-        return null;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.ACTIVE);
+
+        if (!recurringInvestment) {
+          return null;
+        }
+
+        return recurringInvestment;
       },
       getDraftRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return recurringInvestmentMock('DRAFT');
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        if (!recurringInvestment) {
+          return null;
+        }
+
+        return recurringInvestment;
       },
-      getScheduleSimulation: async (parent: any, { schedule }: any, { profileId, modules }: SessionContext) => {
-        return ['2023-06-01', '2023-07-01', '2023-08-01', '2023-09-01'];
+      getScheduleSimulation: async (parent: any, { schedule }: GetScheduleSimulation, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const { startDate, frequency } = schedule;
+        const simulation = await investmentAccountsApi.getScheduleSimulation(startDate, frequency);
+
+        return simulation;
       },
     },
     Mutation: {
-      createRecurringInvestment: async (parent: any, { accountId, amount, schedule }: any, { profileId, modules }: SessionContext) => {
-        return recurringInvestmentMock('DRAFT');
+      createRecurringInvestment: async (
+        parent: any,
+        { accountId, amount, schedule }: CreateRecurringInvestmentInput,
+        { profileId, modules }: SessionContext,
+      ) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+        const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+
+        const alreadyExistedRecurringInvestmentDraft = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        if (alreadyExistedRecurringInvestmentDraft) {
+          await investmentAccountsApi.deleteRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
+        }
+
+        const { portfolioId } = await portfolioApi.getActivePortfolio();
+        const status = await investmentAccountsApi.createRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+
+        if (!status) {
+          throw new JsonGraphQLError('COULDNT_CREATE_RECURRING_INVESTMENT');
+        }
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        return recurringInvestment;
       },
       createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return subscriptionAgreementMock(recurringInvestmentIdMock, 'RECURRING_INVESTMENT');
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const subscriptionAgreementId = await investmentAccountsApi.createRecurringSubscriptionAgreement(profileId, accountId);
+
+        if (!subscriptionAgreementId) {
+          throw new JsonGraphQLError('COULDNT_CREATE_SUBSCRIPTION');
+        }
+
+        const subscriptionAgreement = await investmentAccountsApi.subscriptionAgreementQuery(profileId, subscriptionAgreementId);
+
+        return subscriptionAgreement;
       },
-      signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+      signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, clientIp }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        if (!recurringInvestment) {
+          return;
+        }
+
+        const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, recurringInvestment.id, clientIp);
+
+        if (!subscriptionAgreementId) {
+          throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
+        }
+
+        const isAssigned = await investmentAccountsApi.assignSubscriptionAgreementToRecurringInvestment(accountId, subscriptionAgreementId);
+
+        return isAssigned;
       },
       initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+
+        if (!recurringInvestment) {
+          throw new JsonGraphQLError('NO_INVESTMENT_TO_INITIATE');
+        }
+
+        await investmentAccountsApi.deactivateRecurringInvestment(accountId);
+
+        const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
+
+        if (!status) {
+          return false;
+        }
+
+        return status;
       },
     },
   },

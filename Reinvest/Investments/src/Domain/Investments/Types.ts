@@ -38,3 +38,18 @@ export type InvestmentSummarySchema = {
   subscriptionAgreementId: string | null;
   tradeId: string;
 };
+
+export enum RecurringInvestmentFrequency {
+  WEEKLY = 'WEEKLY',
+  BI_WEEKLY = 'BI_WEEKLY',
+  MONTHLY = 'MONTHLY',
+  QUARTERLY = 'QUARTERLY',
+}
+
+export enum RecurringInvestmentStatus {
+  DRAFT = 'DRAFT',
+  WAITING_FOR_SIGNING_SUBSCRIPTION_AGREEMENT = 'WAITING_FOR_SIGNING_SUBSCRIPTION_AGREEMENT',
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  INACTIVE = 'INACTIVE',
+}
