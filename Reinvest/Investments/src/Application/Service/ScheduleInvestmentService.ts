@@ -14,11 +14,11 @@ class ScheduleInvestmentService {
 
   getSimulation() {
     const dates = [this.startDate];
-    const { multiplyer, type } = this.getTypeAndValueToMultiplyer();
+    const { multiplier, type } = this.getTypeAndValueToMultiplier();
 
     for (let i = 1; i <= DATES_TO_CREATE; i++) {
       const date = dayjs(this.startDate)
-        .add(i * multiplyer, type)
+        .add(i * multiplier, type)
         .format('YYYY-MM-DD');
       dates.push(date);
     }
@@ -27,33 +27,39 @@ class ScheduleInvestmentService {
   }
 
   getNextInvestmentDate() {
-    const { multiplyer, type } = this.getTypeAndValueToMultiplyer();
+    const { multiplier, type } = this.getTypeAndValueToMultiplier();
+    const startDate = dayjs(this.startDate);
 
-    return dayjs(this.startDate)
-      .add(1 * multiplyer, type)
-      .format('YYYY-MM-DD');
+    const now = dayjs(dayjs().format('YYYY-MM-DD'));
+    let nextDate = startDate;
+
+    while (nextDate.isBefore(now)) {
+      nextDate = nextDate.add(multiplier, type);
+    }
+
+    return nextDate.format('YYYY-MM-DD');
   }
 
-  private getTypeAndValueToMultiplyer(): { multiplyer: number; type: 'week' | 'month' } {
+  private getTypeAndValueToMultiplier(): { multiplier: number; type: 'week' | 'month' } {
     switch (this.frequency) {
       case RecurringInvestmentFrequency.WEEKLY:
         return {
-          multiplyer: 1,
+          multiplier: 1,
           type: 'week',
         };
       case RecurringInvestmentFrequency.BI_WEEKLY:
         return {
-          multiplyer: 2,
+          multiplier: 2,
           type: 'week',
         };
       case RecurringInvestmentFrequency.MONTHLY:
         return {
-          multiplyer: 1,
+          multiplier: 1,
           type: 'month',
         };
       case RecurringInvestmentFrequency.QUARTERLY:
         return {
-          multiplyer: 3,
+          multiplier: 3,
           type: 'month',
         };
     }

@@ -146,7 +146,6 @@ const schema = `
     type BankAccount {
         accountNumber: String
         accountType: String
-        """ [MOCK] """
         bankName: String
     }
 
@@ -285,7 +284,6 @@ export const Account = {
 
         return {
           ...bankAccount,
-          bankName: 'Bank of America',
         };
       },
     },

@@ -5,6 +5,7 @@ import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Reinves
 import { LegalEntities } from 'Reinvest/LegalEntities/src';
 import Modules from 'Reinvest/Modules';
 import { Portfolio } from 'Reinvest/Portfolio/src';
+
 const schema = `
     #graphql
     enum RecurringInvestmentFrequency {

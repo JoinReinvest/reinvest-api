@@ -62,11 +62,12 @@ export class RecurringInvestmentsRepository {
     }
   }
 
-  async delete(accountId: string, profileId: string) {
+  async delete(accountId: string, profileId: string, recurringInvestmentId: string) {
     try {
       await this.databaseAdapterProvider
         .provide()
         .deleteFrom(recurringInvestmentsTable)
+        .where('id', '=', recurringInvestmentId)
         .where('accountId', '=', accountId)
         .where('profileId', '=', profileId)
         .execute();
