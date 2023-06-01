@@ -5,7 +5,7 @@ import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { VerificationDatabaseAdapterInstanceProvider, VerificationDatabaseAdapterProvider } from 'Verification/Adapter/Database/DatabaseAdapter';
 import { NorthCapitalConfig } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
-import { verificationApi, VerificationApiType } from 'Verification/Port/Api/RegistrationApiType';
+import { verificationApi, VerificationApiType } from 'Verification/Port/Api/VerificationApiType';
 import { verificationTechnicalHandler, VerificationTechnicalHandlerType } from 'Verification/Port/Queue/VerificationTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Verification/Providers/AdapterServiceProvider';
 import EventBusProvider from 'Verification/Providers/EventBusProvider';

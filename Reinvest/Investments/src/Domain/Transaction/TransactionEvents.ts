@@ -23,6 +23,7 @@ export type InvestmentCreated = TransactionEvent & {
   data: {
     accountId: string;
     amount: number;
+    parentId: string | null;
     portfolioId: string;
     profileId: string;
   };

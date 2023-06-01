@@ -123,7 +123,7 @@ export const CognitoResources = {
       AccountTakeoverRiskConfiguration: {
         Actions: {
           HighAction: {
-            EventAction: 'BLOCK',
+            EventAction: 'MFA_REQUIRED',
             Notify: true,
           },
           MediumAction: {
@@ -138,7 +138,7 @@ export const CognitoResources = {
       },
       CompromisedCredentialsRiskConfiguration: {
         Actions: {
-          EventAction: 'BLOCK',
+          EventAction: 'NO_ACTION',
         },
       },
       UserPoolId: {
