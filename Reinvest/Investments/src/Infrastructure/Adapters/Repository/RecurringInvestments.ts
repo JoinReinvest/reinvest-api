@@ -99,6 +99,25 @@ export class RecurringInvestmentsRepository {
     }
   }
 
+  async updateStatus(id: string, status: RecurringInvestmentStatus) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(recurringInvestmentsTable)
+        .set({
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot update status of recurring investment: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
   async publishEvents(events: DomainEvent[] = []): Promise<void> {
     if (events.length === 0) {
       return;

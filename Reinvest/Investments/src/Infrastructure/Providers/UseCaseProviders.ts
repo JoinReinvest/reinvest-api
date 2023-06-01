@@ -8,7 +8,9 @@ import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment'
 import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
+import DeactivateRecurringInvestment from 'Investments/Application/UseCases/DeactivateRecurringInvestment';
 import DeleteRecurringInvestment from 'Investments/Application/UseCases/DeleteRecurringInvestment';
+import InitiateRecurringInvestment from 'Investments/Application/UseCases/InitiateRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
@@ -52,6 +54,8 @@ export default class UseCaseProviders {
     container.addSingleton(DeleteRecurringInvestment, [RecurringInvestmentsRepository, SubscriptionAgreementRepository]);
     container.addSingleton(CreateRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, IdGenerator]);
     container.addSingleton(AssignSubscriptionAgreementToRecurringInvestment, [RecurringInvestmentsRepository]);
+    container.addSingleton(InitiateRecurringInvestment, [RecurringInvestmentsRepository]);
+    container.addSingleton(DeactivateRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
   }

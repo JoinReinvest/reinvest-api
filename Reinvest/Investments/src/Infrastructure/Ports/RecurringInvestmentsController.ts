@@ -6,22 +6,31 @@ import { Money } from 'Money/Money';
 import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments';
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 
+import DeactivateRecurringInvestment from '../../Application/UseCases/DeactivateRecurringInvestment';
+import InitiateRecurringInvestment from '../../Application/UseCases/InitiateRecurringInvestment';
+
 export class RecurringInvestmentsController {
   private createRecurringInvestmentUseCase: CreateRecurringInvestment;
   private getRecurringInvestmentQueryUseCase: RecurringInvestmentQuery;
   private deleteRecurringInvestmentUseCase: DeleteRecurringInvestment;
   private assignSubscriptionAgreementToRecurringInvestmentUseCase: AssignSubscriptionAgreementToRecurringInvestment;
+  private initiateRecurringInvestmentUseCase: InitiateRecurringInvestment;
+  private deactivateRecurringInvestmentUseCase: DeactivateRecurringInvestment;
 
   constructor(
     createRecurringInvestmentUseCase: CreateRecurringInvestment,
     getRecurringInvestmentQueryUseCase: RecurringInvestmentQuery,
     deleteRecurringInvestmentUseCase: DeleteRecurringInvestment,
     assignSubscriptionAgreementToRecurringInvestmentUseCase: AssignSubscriptionAgreementToRecurringInvestment,
+    initiateRecurringInvestmentUseCase: InitiateRecurringInvestment,
+    deactivateRecurringInvestmentUseCase: DeactivateRecurringInvestment,
   ) {
     this.createRecurringInvestmentUseCase = createRecurringInvestmentUseCase;
     this.getRecurringInvestmentQueryUseCase = getRecurringInvestmentQueryUseCase;
     this.deleteRecurringInvestmentUseCase = deleteRecurringInvestmentUseCase;
     this.assignSubscriptionAgreementToRecurringInvestmentUseCase = assignSubscriptionAgreementToRecurringInvestmentUseCase;
+    this.initiateRecurringInvestmentUseCase = initiateRecurringInvestmentUseCase;
+    this.deactivateRecurringInvestmentUseCase = deactivateRecurringInvestmentUseCase;
   }
 
   public static getClassName = (): string => 'RecurringInvestmentsController';
@@ -42,5 +51,13 @@ export class RecurringInvestmentsController {
 
   public async deleteRecurringInvestment(profileId: string, accountId: string, status: RecurringInvestmentStatus) {
     return await this.deleteRecurringInvestmentUseCase.execute(profileId, accountId, status);
+  }
+
+  public async initiateRecurringInvestment(accountId: string) {
+    return await this.initiateRecurringInvestmentUseCase.execute(accountId);
+  }
+
+  public async deactivateRecurringInvestment(accountId: string) {
+    return await this.deactivateRecurringInvestmentUseCase.execute(accountId);
   }
 }
