@@ -8,3 +8,4 @@ export * as migration_20230525161210_portfolio_id from './investments_7_portfoli
 export * as migration_20230530130700_create_reinvestment from './investments_8_create_reinvestment';
 export * as migration_20230531143100_add_parent_id from './investments_9_add_parent_id';
 export * as migration_20230601084800_recurring_investments from './investments_10_recurring_investments';
+export * as migration_20230601154000_subscription_agreement_unique from './investments_11_subscription_agreement_unique';
