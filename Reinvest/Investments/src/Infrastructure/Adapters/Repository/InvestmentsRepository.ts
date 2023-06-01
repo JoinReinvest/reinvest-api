@@ -38,6 +38,7 @@ export class InvestmentsRepository {
         'tradeId',
         'dateStarted',
         'portfolioId',
+        'parentId',
       ])
       .where('id', '=', investmentId)
       .executeTakeFirst();
@@ -72,7 +73,7 @@ export class InvestmentsRepository {
   }
 
   async create(investment: InvestmentCreate, money: Money) {
-    const { id, profileId, accountId, bankAccountId, scheduledBy, status, tradeId, portfolioId } = investment;
+    const { id, profileId, accountId, bankAccountId, scheduledBy, status, tradeId, portfolioId, parentId } = investment;
     const amount = money.getAmount();
     try {
       await this.databaseAdapterProvider
@@ -93,6 +94,7 @@ export class InvestmentsRepository {
           status,
           tradeId,
           portfolioId,
+          parentId,
         })
         .execute();
 
@@ -126,7 +128,7 @@ export class InvestmentsRepository {
   }
 
   async startInvestment(investment: Investment) {
-    const { id, status, dateStarted, accountId, profileId, amount, portfolioId } = investment.toObject();
+    const { id, status, dateStarted, accountId, profileId, amount, portfolioId, parentId } = investment.toObject();
     try {
       await this.publishEvents([
         <InvestmentCreated>{
@@ -137,6 +139,7 @@ export class InvestmentsRepository {
             profileId,
             accountId,
             portfolioId,
+            parentId,
             amount,
           },
         },

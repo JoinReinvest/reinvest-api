@@ -1,5 +1,6 @@
 import {
   AccountRepository,
+  BeneficiaryAccountForSynchronization,
   CompanyAccountForSynchronization,
   CompanyForSynchronization,
   IndividualAccountForSynchronization,
@@ -124,6 +125,10 @@ export class ReadAccountController {
 
   public async getIndividualAccountForSynchronization(profileId: string, accountId: string): Promise<IndividualAccountForSynchronization | null> {
     return this.accountRepository.getIndividualAccountForSynchronization(profileId, accountId);
+  }
+
+  public async getBeneficiaryAccountForSynchronization(profileId: string, accountId: string): Promise<BeneficiaryAccountForSynchronization | null> {
+    return this.accountRepository.getBeneficiaryAccountForSynchronization(profileId, accountId);
   }
 
   public async getCompanyAccountForSynchronization(profileId: string, accountId: string): Promise<CompanyAccountForSynchronization | null> {

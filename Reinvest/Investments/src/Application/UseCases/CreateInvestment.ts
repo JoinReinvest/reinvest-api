@@ -8,6 +8,7 @@ export type InvestmentCreate = {
   accountId: string;
   bankAccountId: string;
   id: string;
+  parentId: string | null;
   portfolioId: string;
   profileId: string;
   scheduledBy: ScheduledBy;
@@ -26,7 +27,7 @@ class CreateInvestment {
 
   static getClassName = (): string => 'CreateInvestment';
 
-  async execute(portfolioId: string, profileId: string, accountId: string, bankAccountId: string, money: Money) {
+  async execute(portfolioId: string, profileId: string, accountId: string, bankAccountId: string, money: Money, parentId: string | null) {
     const id = this.idGenerator.createUuid();
 
     const tradeIdSize = TradeId.getTradeIdSize();
@@ -40,6 +41,7 @@ class CreateInvestment {
       scheduledBy: ScheduledBy.DIRECT,
       status: InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT,
       tradeId: this.idGenerator.createNumericId(tradeIdSize),
+      parentId,
     };
     const status = this.investmentsRepository.create(investment, money);
 

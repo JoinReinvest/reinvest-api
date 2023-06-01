@@ -5,11 +5,16 @@ import { AccountStructure } from 'Verification/Domain/ValueObject/AccountStructu
  * Registration Module ACL
  */
 export class RegistrationService {
-  public static getClassName = () => 'RegistrationService';
   private registrationModule: Registration.Main;
 
   constructor(registrationModule: Registration.Main) {
     this.registrationModule = registrationModule;
+  }
+
+  public static getClassName = () => 'RegistrationService';
+
+  async immediatelySynchronizeAllAccountStructure(profileId: string, accountId: string): Promise<boolean> {
+    return this.registrationModule.api().immediatelySynchronizeAllAccountStructure(profileId, accountId);
   }
 
   async getNorthCapitalAccountStructure(profileId: string, accountId: string) {
