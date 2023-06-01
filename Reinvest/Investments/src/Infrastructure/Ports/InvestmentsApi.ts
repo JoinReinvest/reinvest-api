@@ -5,10 +5,11 @@ import { InvestmentsController } from 'Investments/Infrastructure/Ports/Investme
 import { ScheduleSimulationController } from 'Investments/Infrastructure/Ports/ScheduleSimulationController';
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
-import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrastructure/Ports/RecurringInvestmentsController';
 import { TransactionController } from 'Investments/Infrastructure/Ports/TransactionController';
+import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrastructure/Ports/RecurringInvestmentsController';
 
 export type InvestmentsApiType = {
+  abortInvestment: InvestmentsController['abortInvestment'];
   approveFees: FeesController['approveFees'];
   assignSubscriptionAgreementToInvestment: InvestmentsController['assignSubscriptionAgreementToInvestment'];
   assignSubscriptionAgreementToRecurringInvestment: RecurringInvestmentsController['assignSubscriptionAgreementToRecurringInvestment'];
@@ -34,6 +35,7 @@ export type InvestmentsApiType = {
 export const investmentsApi = (container: ContainerInterface): InvestmentsApiType => ({
   test: container.delegateTo(TempController, 'handle'),
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
+  abortInvestment: container.delegateTo(InvestmentsController, 'abortInvestment'),
   createRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createRecurringInvestment'),
   getRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'getRecurringInvestment'),
   deactivateRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'deactivateRecurringInvestment'),

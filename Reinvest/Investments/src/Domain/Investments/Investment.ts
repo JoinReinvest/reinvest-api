@@ -104,6 +104,10 @@ export class Investment {
     this.status = status;
   }
 
+  abort() {
+    this.status = InvestmentStatus.FINISHED;
+  }
+
   getSubscriptionAgreementId() {
     return this.subscriptionAgreementId;
   }

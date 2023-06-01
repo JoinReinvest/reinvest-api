@@ -127,6 +127,26 @@ export class InvestmentsRepository {
     }
   }
 
+  async updateStatus(investment: Investment) {
+    const { id, status } = investment.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(investmentsTable)
+        .set({
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot update status of investment: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
   async startInvestment(investment: Investment) {
     const { id, status, dateStarted, accountId, profileId, amount, portfolioId, parentId } = investment.toObject();
     try {
