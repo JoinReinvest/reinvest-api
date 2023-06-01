@@ -55,7 +55,6 @@ export default class PortsProviders {
       InitiateRecurringInvestment,
       DeactivateRecurringInvestment,
     ]);
-    container.addSingleton(RecurringInvestmentsController, [CreateRecurringInvestment, RecurringInvestmentQuery, DeleteRecurringInvestment]);
     container.addSingleton(DividendsController, [ReinvestDividend]);
     container.addSingleton(TransactionController, [PushTransaction]);
   }
