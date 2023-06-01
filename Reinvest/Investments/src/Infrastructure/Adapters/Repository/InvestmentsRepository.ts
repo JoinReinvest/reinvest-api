@@ -1,0 +1,173 @@
+import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
+import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
+import type { Money } from 'Money/Money';
+import type { InvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateInvestment';
+import { Investment } from 'Reinvest/Investments/src/Domain/Investments/Investment';
+import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import type { DomainEvent } from 'SimpleAggregator/Types';
+
+export class InvestmentsRepository {
+  private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
+  private eventsPublisher: SimpleEventBus;
+
+  constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
+    this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventsPublisher = eventsPublisher;
+  }
+
+  public static getClassName = (): string => 'InvestmentsRepository';
+
+  async get(investmentId: string): Promise<Investment | null> {
+    const investment = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(investmentsTable)
+      .select([
+        'accountId',
+        'amount',
+        'bankAccountId',
+        'dateCreated',
+        'dateUpdated',
+        'id',
+        'profileId',
+        'recurringInvestmentId',
+        'scheduledBy',
+        'status',
+        'subscriptionAgreementId',
+        'tradeId',
+        'dateStarted',
+        'portfolioId',
+        'parentId',
+      ])
+      .where('id', '=', investmentId)
+      .executeTakeFirst();
+
+    if (!investment) {
+      return null;
+    }
+
+    return Investment.create(investment);
+  }
+
+  async getInvestmentForSummary(investmentId: string) {
+    const investmentSummary = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(investmentsTable)
+      .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
+      .select([
+        `${investmentsTable}.amount`,
+        `${investmentsTable}.dateCreated`,
+        `${investmentsTable}.id`,
+        `${investmentsTable}.status`,
+        `${investmentsTable}.subscriptionAgreementId`,
+        `${investmentsTable}.tradeId`,
+      ])
+      .select([`${investmentsFeesTable}.amount as feeAmount`])
+      .where(`${investmentsTable}.id`, '=', investmentId)
+      .executeTakeFirst();
+
+    if (!investmentSummary) return false;
+
+    return InvestmentSummary.create(investmentSummary as InvestmentSummarySchema);
+  }
+
+  async create(investment: InvestmentCreate, money: Money) {
+    const { id, profileId, accountId, bankAccountId, scheduledBy, status, tradeId, portfolioId, parentId } = investment;
+    const amount = money.getAmount();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .insertInto(investmentsTable)
+        .values({
+          id,
+          profileId,
+          amount,
+          accountId,
+          bankAccountId,
+          dateCreated: new Date(),
+          dateStarted: null,
+          dateUpdated: new Date(),
+          subscriptionAgreementId: null,
+          scheduledBy,
+          recurringInvestmentId: null,
+          status,
+          tradeId,
+          portfolioId,
+          parentId,
+        })
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot create investment: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async assignSubscriptionAgreementAndUpdateStatus(investment: Investment, events?: any) {
+    const { id, status, subscriptionAgreementId } = investment.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(investmentsTable)
+        .set({
+          subscriptionAgreementId,
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot asign subscription agreement to investment and update its status: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async startInvestment(investment: Investment) {
+    const { id, status, dateStarted, accountId, profileId, amount, portfolioId, parentId } = investment.toObject();
+    try {
+      await this.publishEvents([
+        <InvestmentCreated>{
+          id,
+          kind: TransactionEvents.INVESTMENT_CREATED,
+          date: new Date(),
+          data: {
+            profileId,
+            accountId,
+            portfolioId,
+            parentId,
+            amount,
+          },
+        },
+      ]);
+
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(investmentsTable)
+        .set({
+          dateStarted,
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot start investment: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
+    }
+
+    await this.eventsPublisher.publishMany(events);
+  }
+}

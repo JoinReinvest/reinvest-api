@@ -10,6 +10,7 @@ import {
 import * as bodyParser from 'body-parser';
 import express from 'express';
 import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
+import { Investments } from 'Investments/index';
 import { RegistrationDatabase } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { boot } from 'Reinvest/bootstrap';
 import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from 'Reinvest/config';
@@ -22,8 +23,9 @@ import { VertaloAdapter } from 'Reinvest/Registration/src/Adapter/Vertalo/Vertal
 import serverless from 'serverless-http';
 import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/DatabaseProvider';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
-import { main as postSignUp } from '../postSignUp/handler';
+import { main as postSignUp } from '../postSignUp/handler'; // dependencies
 // dependencies
 type AllDatabases = IdentityDatabase & LegalEntitiesDatabase & InvestmentAccountsDatabase & RegistrationDatabase;
 const databaseProvider: DatabaseProvider<AllDatabases> = new DatabaseProvider<AllDatabases>(DATABASE_CONFIG as PostgreSQLConfig);
@@ -378,6 +380,24 @@ const syncRouter = () => {
       });
     }
   });
+  router.post('/push-transaction', async (req: any, res: any) => {
+    try {
+      const { transactionId } = req.body;
+      const modules = boot();
+      const investmentApi = modules.getApi<Investments.ApiType>(Investments);
+      await investmentApi.pushTransaction(transactionId);
+
+      res.status(200).json({
+        status: true,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
 
   return router;
 };
@@ -508,6 +528,89 @@ const northCapitalRouter = () => {
       });
     }
   });
+  router.post('/clear-verification', async (req: any, res: any) => {
+    const { partyIds } = req.body;
+
+    for (const partyId of partyIds) {
+      await databaseProvider.provide().deleteFrom(verifierRecordsTable).where('ncId', '=', partyId).execute();
+    }
+
+    res.status(200).json({
+      partyIds,
+    });
+  });
+
+  router.post('/set-user-for-verification', async (req: any, res: any) => {
+    try {
+      const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+
+      const { partyId, verificationType } = req.body;
+      const defaultUser = {
+        firstName: 'JOHN',
+        lastName: 'SMITH',
+        dob: '02-28-1975',
+        primAddress1: '222333 PEACHTREE PLACE',
+        primCity: 'ATLANTA',
+        primState: 'GA',
+        primZip: '30318',
+        primCountry: 'USA',
+        socialSecurityNumber: '112-22-3333',
+        AMLstatus: 'Pending',
+        KYCstatus: 'Pending',
+      };
+
+      let toUpdate = null;
+      switch (verificationType) {
+        case 'ALL_APPROVED':
+          toUpdate = defaultUser;
+          break;
+        case 'ADDRESS_NOT_MATCH':
+          toUpdate = {
+            ...defaultUser,
+            primAddress1: '2240 MAGNOLIA',
+          };
+          break;
+        case 'SSN_DOES_NOT_MATCH':
+          toUpdate = {
+            ...defaultUser,
+            socialSecurityNumber: '112-22-3345',
+          };
+          break;
+        case 'AML_FAIL':
+          toUpdate = {
+            firstName: 'Joseph',
+            lastName: 'Gilbert',
+            dob: '04-08-1943',
+            primAddress1: '123 Main Street',
+            primCity: 'MASSACHUSETTS',
+            primState: 'MA',
+            primZip: '02116',
+            primCountry: 'USA',
+            socialSecurityNumber: '666-00-0001',
+            AMLstatus: 'Pending',
+            KYCstatus: 'Pending',
+          };
+          break;
+        default:
+          throw new Error('Unknown verification type');
+      }
+
+      const status = await ncAdapter.updateParty(partyId, toUpdate);
+
+      res.status(200).json({
+        verificationType,
+        partyId,
+        status,
+        user: toUpdate,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
 
   return router;
 };
@@ -556,11 +659,26 @@ const vertaloRouter = () => {
 
   return router;
 };
+const transactionRouter = () => {
+  const router = express.Router({ mergeParams: true });
+  router.post('/create-transaction', async (req: any, res: any) => {
+    const modules = boot();
+    const api = modules.getApi<Investments.ApiType>(Investments);
+    await api.test();
+    await modules.close();
+    res.status(200).json({
+      status: true,
+    });
+  });
+
+  return router;
+};
 
 router.use('/user', userRouter());
 router.use('/north-capital', northCapitalRouter());
 router.use('/vertalo', vertaloRouter());
 router.use('/sync', syncRouter());
+router.use('/transaction', transactionRouter());
 
 app.use('/tests', router);
 export const main = serverless(app);

@@ -1,5 +1,4 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
-import { GraphQLError } from 'graphql';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
@@ -76,6 +75,23 @@ const schema = `
         verifyAndFinish: Boolean
     }
 
+    input UpdateProfileForVerificationInput {
+        "An investor name"
+        name: PersonName
+        "Date of Birth in format YYYY-MM-DD"
+        dateOfBirth: DateOfBirthInput
+        "Is the investor US. Citizen or US. Resident with Green Card or Visa"
+        domicile: DomicileInput
+        "Permanent address of an investor"
+        address: AddressInput
+        """
+        ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
+        Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
+        IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
+        """
+        idScan: [DocumentFileLinkInput]
+    }
+
     type Query {
         """Get user profile"""
         getProfile: Profile
@@ -91,12 +107,6 @@ const schema = `
         To finish onboarding send field 'verifyAndFinish'
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
-
-        """
-        Open REINVEST Account based on draft.
-        Currently supported: Individual Account
-        """
-        openAccount(draftAccountId: String): Boolean
     }
 `;
 
@@ -130,17 +140,6 @@ export const Profile = {
         }
 
         return api.getProfile(profileId);
-      },
-
-      openAccount: async (parent: any, { draftAccountId }: any, { profileId, modules }: SessionContext) => {
-        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-        const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
-
-        if (error !== null) {
-          throw new GraphQLError(error);
-        }
-
-        return true;
       },
     },
   },

@@ -16,8 +16,6 @@ export interface EventBus {
 }
 
 export class SimpleEventBus implements EventBus {
-  static getClassName = (): string => 'EventBus';
-
   private handlers: {
     [kind: string]: string[];
   } = {};
@@ -27,6 +25,8 @@ export class SimpleEventBus implements EventBus {
     this.container = container;
   }
 
+  static getClassName = (): string => 'EventBus';
+
   public async publish(event: DomainEvent): Promise<void> {
     const kind = event.kind;
 
@@ -34,7 +34,7 @@ export class SimpleEventBus implements EventBus {
       return;
     }
 
-    const handlersForKind = this.handlers[kind];
+    const handlersForKind = this.handlers[kind] as string[];
 
     for (const handlerName of handlersForKind) {
       const handler = this.container.getValue(handlerName) as EventHandler<any>;
@@ -71,6 +71,7 @@ export class SimpleEventBus implements EventBus {
       this.handlers[forKind] = [];
     }
 
+    // @ts-ignore
     this.handlers[forKind].push(handler);
   }
 }

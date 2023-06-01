@@ -1,12 +1,18 @@
 import { AccountType } from 'InvestmentAccounts/Domain/ProfileAggregate/AccountType';
-import { CorporateAccountOpened, IndividualAccountOpened, ProfileCreated, TrustAccountOpened } from 'InvestmentAccounts/Domain/ProfileAggregate/ProfileEvents';
+import {
+  BeneficiaryAccountOpened,
+  CorporateAccountOpened,
+  IndividualAccountOpened,
+  ProfileCreated,
+  TrustAccountOpened,
+} from 'InvestmentAccounts/Domain/ProfileAggregate/ProfileEvents';
 import { ProfileException } from 'InvestmentAccounts/Domain/ProfileAggregate/ProfileException';
 import { SimpleAggregate } from 'SimpleAggregator/SimpleAggregate';
 import { AggregateState, DomainEvent } from 'SimpleAggregator/Types';
 
 const MAX_NUMBER_OF_TRUSTS = 3;
 const MAX_NUMBER_OF_CORPORATES = 3;
-const MAX_NUMBER_OF_BENEFICIARIES = 3;
+const MAX_NUMBER_OF_BENEFICIARIES = 10000; // todo change it to 3 after integration phase
 
 export const ProfileAggregateName = 'Profile';
 export type ProfileState = AggregateState & {
@@ -105,6 +111,29 @@ class Profile extends SimpleAggregate {
     return this.apply(event);
   }
 
+  openBeneficiaryAccount(accountId: string) {
+    const beneficiaryAccountIds = this.getState('beneficiaryAccountIds', []);
+    const isAlreadyOpened = beneficiaryAccountIds.includes(accountId);
+
+    if (isAlreadyOpened) {
+      ProfileException.throw('THE_ACCOUNT_ALREADY_OPENED');
+    }
+
+    if (!this.canOpenBeneficiaryAccount()) {
+      ProfileException.throw('CANNOT_OPEN_ACCOUNT');
+    }
+
+    const event = <BeneficiaryAccountOpened>{
+      id: this.getId(),
+      kind: 'BeneficiaryAccountOpened',
+      data: {
+        beneficiaryAccountId: accountId,
+      },
+    };
+
+    return this.apply(event);
+  }
+
   listAccountTypesUserCanOpen(): AccountType[] {
     const availableAccountTypes = [];
 
@@ -125,6 +154,30 @@ class Profile extends SimpleAggregate {
     }
 
     return availableAccountTypes;
+  }
+
+  apply<Event extends DomainEvent>(event: Event) {
+    switch (event.kind) {
+      case 'CorporateAccountOpened':
+        const corporateAccountIds = [...this.getState('corporateAccountIds', [])];
+        corporateAccountIds.push(event.data.corporateAccountId);
+        this.setState('corporateAccountIds', corporateAccountIds);
+        break;
+      case 'TrustAccountOpened':
+        const trustAccountIds = [...this.getState('trustAccountIds', [])];
+        trustAccountIds.push(event.data.trustAccountId);
+        this.setState('trustAccountIds', trustAccountIds);
+        break;
+      case 'BeneficiaryAccountOpened':
+        const beneficiaryAccountIds = [...this.getState('beneficiaryAccountIds', [])];
+        beneficiaryAccountIds.push(event.data.beneficiaryAccountId);
+        this.setState('beneficiaryAccountIds', beneficiaryAccountIds);
+        break;
+      default:
+        return super.apply(event);
+    }
+
+    return event;
   }
 
   private canOpenIndividualAccount(): boolean {
@@ -154,25 +207,6 @@ class Profile extends SimpleAggregate {
     const trustAccountIds = this.getState('trustAccountIds', []);
 
     return trustAccountIds.length < MAX_NUMBER_OF_TRUSTS;
-  }
-
-  apply<Event extends DomainEvent>(event: Event) {
-    switch (event.kind) {
-      case 'CorporateAccountOpened':
-        const corporateAccountIds = [...this.getState('corporateAccountIds', [])];
-        corporateAccountIds.push(event.data.corporateAccountId);
-        this.setState('corporateAccountIds', corporateAccountIds);
-        break;
-      case 'TrustAccountOpened':
-        const trustAccountIds = [...this.getState('trustAccountIds', [])];
-        trustAccountIds.push(event.data.trustAccountId);
-        this.setState('trustAccountIds', trustAccountIds);
-        break;
-      default:
-        return super.apply(event);
-    }
-
-    return event;
   }
 }
 

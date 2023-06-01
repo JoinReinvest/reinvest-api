@@ -1,17 +1,12 @@
-import axios, { AxiosResponse } from 'axios';
-import FormData from 'form-data';
 import { DictionaryType } from 'HKEKTypes/Generics';
 import { ExecutionNorthCapitalAdapter } from 'Registration/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import NorthCapitalException from 'Registration/Adapter/NorthCapital/NorthCapitalException';
+import { PlaidResponse, PlaidResult } from 'Registration/Domain/Model/BankAccount';
 import {
-  NorthCapitalIndividualAccountStructure,
-  NorthCapitalIndividualExtendedMainPartyStructure,
   NorthCapitalLinkConfiguration,
   NorthCapitalObjectType,
   NorthCapitalUploadedDocument,
 } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
-
-import { MainParty } from '../../Domain/VendorModel/NorthCapital/MainParty';
 
 export type NorthCapitalConfig = {
   API_URL: string;
@@ -37,7 +32,7 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     return partyId;
   }
 
-  async updateParty(northCapitalId: string, toUpdate: DictionaryType): Promise<void | never> {
+  async updateParty(northCapitalId: string, toUpdate: DictionaryType): Promise<string | never> {
     const endpoint = 'tapiv3/index.php/v3/updateParty';
     const data = {
       partyId: northCapitalId,
@@ -51,6 +46,8 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       partyDetails: [status],
     } = response;
     console.log({ action: 'Update north capital party', northCapitalId, statusCode, statusDesc, status });
+
+    return status;
   }
 
   async getParty(partyId: string): Promise<object | never> {
@@ -333,5 +330,67 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     console.log({ action: 'Get north capital entity', partyId, statusCode, statusDesc });
 
     return entity;
+  }
+
+  async getPlaidUrl(ncAccountId: string): Promise<string> {
+    const endpoint = 'tapiv3/index.php/v3/linkExternalAccount';
+    const data = {
+      accountId: ncAccountId,
+    };
+
+    const { statusCode, statusDesc, accountDetails: integrationLink } = await this.postRequest(endpoint, data);
+
+    return integrationLink;
+  }
+
+  async updatePlaidUrl(ncAccountId: string): Promise<string> {
+    const endpoint = 'tapiv3/index.php/v3/updateLinkExternalAccount';
+    const data = {
+      accountId: ncAccountId,
+    };
+    const result = await this.postRequest(endpoint, data);
+    const { statusCode, statusDesc, accountDetails: integrationLink } = result;
+
+    return integrationLink;
+  }
+
+  async getPlaidAccount(northCapitalId: string, plaidResponse: PlaidResponse): Promise<PlaidResult> {
+    const endpoint = 'tapiv3/index.php/v3/getExternalAccount';
+    const data = {
+      accountId: northCapitalId,
+      types: 'Account',
+    };
+    const result = await this.postRequest(endpoint, data);
+    const {
+      statusCode,
+      statusDesc: {
+        AccountName: accountName,
+        AccountNickName: accountNickName,
+        AccountRoutingNumber: accountRoutingNumber,
+        AccountNumber: accountNumber,
+        accountType: accountType,
+      },
+    } = result;
+
+    return <PlaidResult>{
+      accountNickName: accountNickName,
+      accountNumber: accountNumber ?? this.getPlaidValue<string>(plaidResponse, 'accountNumber'),
+      accountType: accountType ?? this.getPlaidValue<string>(plaidResponse, 'accountType'),
+      refNumber: this.getPlaidValue<string>(plaidResponse, 'refNumber'),
+      routingNumber: accountRoutingNumber ?? this.getPlaidValue<string>(plaidResponse, 'routingNumber'),
+      accountName: accountName ?? this.getPlaidValue<string>(plaidResponse, 'accountName'),
+      institutionId: this.getPlaidValue<string>(plaidResponse, 'institutionId'),
+      institutionName: this.getPlaidValue<string>(plaidResponse, 'institutionName'),
+    };
+  }
+
+  private getPlaidValue<Result>(plaidResponse: PlaidResponse, key: keyof PlaidResponse) {
+    const value = plaidResponse[key];
+
+    if (value === undefined) {
+      return null;
+    }
+
+    return value as Result;
   }
 }

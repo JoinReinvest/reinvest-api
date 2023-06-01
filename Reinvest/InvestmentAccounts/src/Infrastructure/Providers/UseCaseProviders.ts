@@ -1,7 +1,11 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
+import CreateConfiguration from 'InvestmentAccounts/Application/CreateConfiguration';
 import CreateProfile from 'InvestmentAccounts/Application/CreateProfile';
+import GetConfiguration from 'InvestmentAccounts/Application/GetConfiguration';
 import { OpenAccount } from 'InvestmentAccounts/Application/OpenAccount';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
+import { ConfigurationRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ConfigurationRepository';
 import { ProfileRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository';
 
 export default class UseCaseProviders {
@@ -12,6 +16,12 @@ export default class UseCaseProviders {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(OpenAccount, [ProfileRepository]).addSingleton(CreateProfile, [ProfileRepository]);
+    container.addSingleton(IdGenerator);
+
+    container
+      .addSingleton(OpenAccount, [ProfileRepository])
+      .addSingleton(CreateProfile, [ProfileRepository])
+      .addSingleton(CreateConfiguration, [ConfigurationRepository, IdGenerator])
+      .addSingleton(GetConfiguration, [ConfigurationRepository]);
   }
 }

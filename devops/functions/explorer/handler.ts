@@ -4,10 +4,10 @@ import serverless from 'serverless-http';
 const hostedUI = process.env.ExplorerHostedUI;
 const apiEndpoint = process.env.ApiUrl;
 
-const page = `
+const page = (apiUrl: string, token: string, isAdmin: boolean) => `
 <html lang="en">
   <head>
-    <title>GraphiQL Explorer</title>
+    <title>${isAdmin ? 'Admin ' : ''}GraphiQL Explorer</title>
     <style>
       body {
         height: 100%;
@@ -35,7 +35,6 @@ const page = `
   </head>
 
   <body>
-        <a href="/explorer" style="position: fixed;top:60px;right:46px;color:rgba(59, 75, 104, 0.76);font-family:Roboto;font-size:18px;font-weight:500;">Relogin</a>
     <div id="graphiql">Loading...</div>
     <script
       src="https://unpkg.com/graphiql/graphiql.min.js"
@@ -45,21 +44,29 @@ const page = `
       ReactDOM.render(
         React.createElement(GraphiQL, {
           fetcher: GraphiQL.createFetcher({
-            url: '${apiEndpoint}',
+            url: "${apiUrl}",
             headers: {
-                Authorization: "Bearer <put_your_jwt_here>"
+                Authorization: "Bearer ${token}"
             } 
           }),
-          defaultEditorToolsVisibility: true,
+          defaultEditorToolsVisibility: true
         }),
-        document.getElementById('graphiql'),
+        document.getElementById("graphiql")
       );
     </script>
+        <a href="/explorer${
+          isAdmin ? '/admin' : ''
+        }" style="position: fixed;top:60px;right:47px;color:rgb(180, 0, 0);font-family:Roboto;font-size:18px;font-weight:500;">Relogin</a>
+        ${
+          isAdmin
+            ? '<a href="/explorer" style="position: fixed;top:86px;right:31px;color:rgb(180, 0, 0);font-family:Roboto;font-size:18px;font-weight:500;">User Exp.</a>'
+            : '<a href="/explorer/admin" style="position: fixed;top:86px;right:16px;color:rgb(180, 0, 0);font-family:Roboto;font-size:18px;font-weight:500;">Admin Exp.</a>'
+        }
   </body>
 </html>
 `;
 
-const handleToken = `
+const handleToken = (adminHostedUI = '', adminPath = '') => `
 <html>
     <script>
             const dictionary = {};
@@ -73,9 +80,9 @@ const handleToken = `
                 }
             }
             if (dictionary['access_token']) {
-                window.location.href = '/explorer?access_token=' + dictionary['access_token'];
+                window.location.href = '/explorer${adminPath}?access_token=' + dictionary['access_token'];
             } else {
-                document.write('Missing Access token in the URL!<br/><a href="${hostedUI}">Try to Login again</a>');
+                document.write('Missing Access token in the URL!<br/><a href="${hostedUI}${adminHostedUI}">Try to Login again</a>');
             }
     </script>
 </html>
@@ -84,7 +91,13 @@ const handleToken = `
 const app = express();
 
 app.get('/set-header', (req: Request, res: any) => {
-  res.send(handleToken);
+  if (req.query.admin) {
+    res.send(handleToken('?admin=1', '/admin'));
+
+    return;
+  }
+
+  res.send(handleToken());
 });
 
 app.get('/explorer', (req: any, res: any) => {
@@ -94,8 +107,16 @@ app.get('/explorer', (req: any, res: any) => {
     return;
   }
 
-  const pageWithAuth = page.replace('<put_your_jwt_here>', req.query.access_token);
-  res.send(pageWithAuth);
+  res.send(page(apiEndpoint as string, req.query.access_token, false));
+});
+app.get('/explorer/admin', (req: any, res: any) => {
+  if (!req.query.access_token) {
+    res.redirect(hostedUI + '?admin=1');
+
+    return;
+  }
+
+  res.send(page(apiEndpoint + '/admin', req.query.access_token, true));
 });
 
 export const main = serverless(app);

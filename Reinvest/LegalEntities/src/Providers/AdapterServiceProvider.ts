@@ -7,6 +7,7 @@ import {
   LegalEntitiesDatabaseAdapterProvider,
 } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
@@ -17,6 +18,9 @@ import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
+import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
+import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -45,7 +49,8 @@ export class AdapterServiceProvider {
       .addAsValue(LegalEntitiesDatabaseAdapterInstanceProvider, createLegalEntitiesDatabaseAdapterProvider(this.config.database))
       .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
-      .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
+      .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(BeneficiaryRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addObjectFactory(
         'LegalEntitiesTransactionalAdapter',
         (databaseProvider: LegalEntitiesDatabaseAdapterProvider) => new TransactionalAdapter<LegalEntitiesDatabase>(databaseProvider),
@@ -64,6 +69,9 @@ export class AdapterServiceProvider {
         AccountRepository,
         'LegalEntitiesTransactionalAdapter',
         ProfileRepository,
-      ]);
+      ])
+      .addSingleton(UpdateProfileForVerification, [ProfileRepository])
+      .addSingleton(UpdateCompanyForVerification, [AccountRepository])
+      .addSingleton(UpdateStakeholderForVerification, [AccountRepository]);
   }
 }

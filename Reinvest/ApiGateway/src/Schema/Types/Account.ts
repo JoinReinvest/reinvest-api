@@ -1,12 +1,15 @@
-import { SessionContext } from 'ApiGateway/index';
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
+import { Registration } from 'Registration/index';
+import Modules from 'Reinvest/Modules';
 
 const schema = `
     #graphql
     type AccountOverview {
         id: String
         label:String
-        type: String
+        type: AccountType
         avatar: GetAvatarLink
         positionTotal: String
     }
@@ -66,6 +69,87 @@ const schema = `
         details: TrustAccountDetails
     }
 
+    input UpdateStakeholderForVerificationInput {
+        name: PersonName
+        dateOfBirth: DateOfBirthInput
+        address: AddressInput
+        domicile: SimplifiedDomicileInput
+        """IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request"""
+        idScan: [DocumentFileLinkInput]
+    }
+
+    input UpdateCompanyForVerificationInput {
+        companyName: CompanyNameInput
+        address: AddressInput
+        companyDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes these documents from s3
+        """
+        removeDocuments: [DocumentFileLinkInput]
+        stakeholders: [StakeholderInput]
+        """
+        IMPORTANT: it removes previously uploaded id scan documents from s3 for this stakeholder
+        """
+        removeStakeholders: [StakeholderIdInput]
+        companyType: CorporateCompanyTypeInput
+    }
+
+    input BeneficiaryNameInput {
+        firstName: String!
+        lastName: String!
+    }
+
+    type BeneficiaryName{
+        firstName: String!
+        lastName: String!
+    }
+
+    input CreateBeneficiaryInput {
+        name: BeneficiaryNameInput!
+        avatar: AvatarFileLinkInput
+    }
+
+    type BeneficiaryDetails {
+        name: BeneficiaryName
+    }
+
+    type BeneficiaryAccount {
+        id: ID
+        label: String
+        avatar: GetAvatarLink
+        positionTotal: String
+        details: BeneficiaryDetails
+    }
+
+    type BankAccountLink {
+        link: String
+    }
+
+    """ Plaid response"""
+    input FulfillBankAccountInput {
+        """ plaidAccountDetails.refNum"""
+        refNumber: String!
+        """ plaidAccountDetails.account_number"""
+        accountNumber: String!
+        """ plaidAccountDetails.routing_number"""
+        routingNumber: String!
+        """ plaidAccountDetails.account_type"""
+        accountType: String!
+        """ plaidAccountDetails.institutionId"""
+        institutionId: String
+        """ plaidAccountDetails.institution_name"""
+        institutionName: String
+        """ plaidAccountDetails.account_name"""
+        accountName: String
+    }
+
+    type BankAccount {
+        accountNumber: String
+        accountType: String
+        """ [MOCK] """
+        bankName: String
+    }
+
     type Query {
         """
         Return all accounts overview
@@ -78,6 +162,11 @@ const schema = `
         """
         getIndividualAccount: IndividualAccount
         """
+        Returns beneficiary account information
+        [PARTIAL_MOCK] Position total is still mocked!!
+        """
+        getBeneficiaryAccount(accountId: String): BeneficiaryAccount
+        """
         Returns corporate account information
         [PARTIAL_MOCK] Position total is still mocked!!
         """
@@ -87,8 +176,52 @@ const schema = `
         [PARTIAL_MOCK] Position total is still mocked!!
         """
         getTrustAccount(accountId: String): TrustAccount
+
+        """
+        Returns basic bank account information.
+        """
+        readBankAccount(accountId: String!): BankAccount
+    }
+
+    type Mutation {
+        """
+        Open REINVEST Account based on draft.
+        Currently supported: Individual Account
+        """
+        openAccount(draftAccountId: String): Boolean
+
+        """
+        Open beneficiary account
+        """
+        openBeneficiaryAccount(individualAccountId: String!, input: CreateBeneficiaryInput!): BeneficiaryAccount
+
+        """
+        It creates new link to the investor bank account. It works only if the account does not have any bank account linked yet.
+        Every time when the system create new link it cost $1.80 (on prod). Do not call it if it is not necessary.
+        The bank account will not be activated until the investor fulfills the bank account.
+        """
+        createBankAccount(accountId: String!): BankAccountLink
+
+        """
+        It updates the link to the investor bank account. It works only if the account has bank account linked already.
+        Every time when the system create new link it cost $1.80 (on prod). Do not call it if it is not necessary.
+        The bank account will not be activated until the investor fulfills the bank account.
+        """
+        updateBankAccount(accountId: String!): BankAccountLink
+
+        """
+        Provide the response from Plaid here.
+        The bank account will not be activated until the investor fulfills the bank account.
+        """
+        fulfillBankAccount(accountId: String!, input: FulfillBankAccountInput!): Boolean
     }
 `;
+
+export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
+  const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+  return api.mapAccountIdToParentAccountIdIfRequired(profileId, accountId);
+}
 
 export const Account = {
   typeDefs: schema,
@@ -101,6 +234,15 @@ export const Account = {
         return {
           ...account,
           positionTotal: '$5,560',
+        };
+      },
+      getBeneficiaryAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const account = await api.readBeneficiaryAccount(profileId, accountId);
+
+        return {
+          ...account,
+          positionTotal: '$1,150.25',
         };
       },
       getCorporateAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
@@ -131,6 +273,84 @@ export const Account = {
             positionTotal: '$5,560',
           };
         });
+      },
+      readBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const bankAccount = await api.readBankAccount(profileId, parentAccountId);
+
+        if (!bankAccount) {
+          throw new GraphQLError('Bank account not exists');
+        }
+
+        return {
+          ...bankAccount,
+          bankName: 'Bank of America',
+        };
+      },
+    },
+    Mutation: {
+      openAccount: async (parent: any, { draftAccountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const error = await api.transformDraftAccountIntoRegularAccount(profileId, draftAccountId);
+
+        if (error !== null) {
+          throw new GraphQLError(error);
+        }
+
+        return true;
+      },
+
+      openBeneficiaryAccount: async (parent: any, { individualAccountId, input: beneficiaryData }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const response = await api.openBeneficiaryAccount(profileId, individualAccountId, beneficiaryData);
+
+        if (!response.status || !response?.accountId) {
+          throw new JsonGraphQLError(response.errors);
+        }
+
+        const account = await api.readBeneficiaryAccount(profileId, response.accountId);
+
+        return {
+          ...account,
+          positionTotal: '$1,150.25',
+        };
+      },
+
+      createBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const response = await api.createBankAccount(profileId, parentAccountId);
+
+        if (!response.status) {
+          throw new GraphQLError('Failed to create bank account');
+        }
+
+        return response;
+      },
+
+      fulfillBankAccount: async (parent: any, { accountId, input }: any, { profileId, modules }: SessionContext) => {
+        const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const response = await api.fulfillBankAccount(profileId, parentAccountId, input);
+
+        if (!response.status) {
+          throw new GraphQLError('Failed to fulfill bank account');
+        }
+
+        return response.status;
+      },
+
+      updateBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        const api = modules.getApi<Registration.ApiType>(Registration);
+        const response = await api.updateBankAccount(profileId, parentAccountId);
+
+        if (!response.status) {
+          throw new GraphQLError('Failed to update bank account');
+        }
+
+        return response;
       },
     },
   },

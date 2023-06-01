@@ -1,5 +1,7 @@
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 import { Insertable } from 'kysely';
 import { NorthCapitalEntityType, NorthCapitalSynchronizationRecordType } from 'Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord';
+import { PlaidResult } from 'Registration/Domain/Model/BankAccount';
 import { MappedRecordType } from 'Registration/Domain/Model/Mapping/MappedRecord';
 import { MappedRecordStatus, MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 import { DocumentSyncState, NorthCapitalObjectType } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
@@ -52,6 +54,19 @@ export interface VertaloSynchronizationTable {
   updatedDate: Date;
   version: number;
   vertaloIds: VertaloIds | string;
+}
+
+export interface RegistrationBankAccountTable {
+  accountId: string;
+  bankAccountId: string;
+  bankAccountNumber: string | null;
+  bankAccountType: string | null;
+  northCapitalId: string;
+  plaidJson: JSONObjectOf<PlaidResult>;
+  plaidUrl: string | null;
+  profileId: string;
+  state: 'ACTIVE' | 'INACTIVE' | 'IN_PROGRESS';
+  createdDate?: Date;
 }
 
 export type InsertableMappingRegistry = Insertable<MappingRegistryTable>;

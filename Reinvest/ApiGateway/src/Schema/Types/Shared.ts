@@ -70,7 +70,7 @@ const schema = `
     input SimplifiedDomicileInput {
         type: SimplifiedDomicileType!
     }
-    
+
     type SimplifiedDomicile {
         type: SimplifiedDomicileType
     }
@@ -104,16 +104,6 @@ const schema = `
         zip: String
         country: String
         state: String
-    }
-
-    input DollarInput {
-        inCents: Int! @constraint(min: 0)
-        formatted: String
-    }
-
-    type Dollar {
-        inCents: Int
-        display: String
     }
 
     enum DraftAccountType {
@@ -198,6 +188,52 @@ const schema = `
     type Statement {
         type: StatementType,
         details: [String]
+    }
+
+    input USDInput {
+        value: Money!,
+    }
+
+    type USD {
+        value: Money!,
+        formatted: String
+    }
+
+    enum SubscriptionAgreementStatus {
+        WAITING_FOR_SIGNATURE
+        SIGNED
+    }
+
+    type SubscriptionAgreementParagraph {
+        lines: [String!]!
+        isCheckedOption: Boolean
+    }
+
+    type SubscriptionAgreementSection {
+        header: String
+        paragraphs: [SubscriptionAgreementParagraph!]!
+    }
+
+    enum SubscriptionAgreementType {
+        DIRECT_DEPOSIT
+        RECURRING_INVESTMENT
+    }
+
+    type SubscriptionAgreement {
+        id: ID!
+        type: SubscriptionAgreementType!
+        status: SubscriptionAgreementStatus!
+        createdAt: ISODateTime!
+        signedAt: ISODateTime
+        content: [SubscriptionAgreementSection!]!
+    }
+
+    """
+    If not provided, default pagination is page: 0, perPage: 10
+    """
+    input Pagination {
+        page: Int! = 0
+        perPage: Int! = 10
     }
 `;
 export const Shared = {

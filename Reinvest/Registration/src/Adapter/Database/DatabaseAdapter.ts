@@ -4,6 +4,7 @@ import {
   MappingRegistryTable,
   NorthCapitalDocumentsSynchronizationTable,
   NorthCapitalSynchronizationTable,
+  RegistrationBankAccountTable,
   VertaloSynchronizationTable,
 } from 'Registration/Adapter/Database/RegistrationSchema';
 
@@ -11,10 +12,12 @@ export const registrationMappingRegistryTable = 'registration_mapping_registry';
 export const northCapitalSynchronizationTable = 'registration_north_capital_synchronization';
 export const northCapitalDocumentsSynchronizationTable = 'registration_north_capital_documents_synchronization';
 export const vertaloSynchronizationTable = 'registration_vertalo_synchronization';
+export const registrationBankAccountTable = 'registration_bank_account';
 
 export interface RegistrationDatabase {
   [northCapitalDocumentsSynchronizationTable]: NorthCapitalDocumentsSynchronizationTable;
   [northCapitalSynchronizationTable]: NorthCapitalSynchronizationTable;
+  [registrationBankAccountTable]: RegistrationBankAccountTable;
   [registrationMappingRegistryTable]: MappingRegistryTable;
   [vertaloSynchronizationTable]: VertaloSynchronizationTable;
 }
