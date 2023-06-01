@@ -4,6 +4,7 @@ export type CurrentActiveBankAccount = {
   accountNumber: string | null;
   accountType: string | null;
   bankAccountId: string | null;
+  bankName: string | null;
 };
 
 export class BankAccountQuery {
@@ -28,6 +29,7 @@ export class BankAccountQuery {
       bankAccountId: schema.bankAccountId,
       accountNumber: bankAccount.getMaskedAccountNumber(),
       accountType: schema.bankAccountType,
+      bankName: bankAccount.getBankName(),
     };
   }
 

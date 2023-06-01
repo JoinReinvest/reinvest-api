@@ -143,4 +143,8 @@ export class BankAccount {
   getNickName(): string | null {
     return this.plaidResult?.accountNickName || null;
   }
+
+  getBankName(): string {
+    return this.plaidResult?.institutionName || '';
+  }
 }

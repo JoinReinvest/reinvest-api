@@ -78,6 +78,10 @@ export class SubscriptionAgreement {
     );
   }
 
+  getId() {
+    return this.id;
+  }
+
   setSignature(ip: string) {
     this.status = SubscriptionAgreementStatus.SIGNED;
     this.signedByIP = ip;
