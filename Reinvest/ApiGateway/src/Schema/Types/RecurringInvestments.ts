@@ -203,7 +203,7 @@ export const RecurringInvestments = {
         const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
 
         if (!recurringInvestment) {
-          return;
+          return false;
         }
 
         const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, recurringInvestment.id, clientIp);
