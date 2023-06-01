@@ -1,11 +1,11 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import type { DynamicType } from 'Investments/Application/Service/TemplateParser';
-import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
+import { AgreementTypes, RecurringInvestmentStatus, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
 import { latestSubscriptionAgreementVersion } from 'Investments/Domain/SubscriptionAgreement';
-import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
-export type SubscriptionAgreementCreate = {
+export type RecurringInvestmentSubscriptionAgreementCreate = {
   accountId: string;
   agreementType: AgreementTypes;
   contentFieldsJson: DynamicType;
@@ -23,49 +23,41 @@ const mockedContentFieldsJson = {
   telephoneNumber: '+17778887775',
 };
 
-class CreateSubscriptionAgreement {
-  static getClassName = (): string => 'CreateSubscriptionAgreement';
+class CreateRecurringSubscriptionAgreement {
+  static getClassName = (): string => 'CreateRecurringSubscriptionAgreement';
 
   private readonly subscriptionAgreementRepository: SubscriptionAgreementRepository;
-  private readonly investmentsRepository: InvestmentsRepository;
+  private readonly recurringInvestmentsRepository: RecurringInvestmentsRepository;
   private idGenerator: IdGeneratorInterface;
 
   constructor(
     subscriptionAgreementRepository: SubscriptionAgreementRepository,
-    investmentsRepository: InvestmentsRepository,
+    recurringInvestmentsRepository: RecurringInvestmentsRepository,
     idGenerator: IdGeneratorInterface,
   ) {
     this.subscriptionAgreementRepository = subscriptionAgreementRepository;
-    this.investmentsRepository = investmentsRepository;
+    this.recurringInvestmentsRepository = recurringInvestmentsRepository;
     this.idGenerator = idGenerator;
   }
 
-  async execute(profileId: string, investmentId: string) {
-    const alreadyCreatedSubscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, investmentId);
-
-    if (alreadyCreatedSubscriptionAgreement) {
-      const id = alreadyCreatedSubscriptionAgreement.getId();
-
-      return id;
-    }
-
+  async execute(profileId: string, accountId: string) {
     const id = this.idGenerator.createUuid();
 
-    const investment = await this.investmentsRepository.get(investmentId);
+    const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, RecurringInvestmentStatus.DRAFT);
 
-    if (!investment) {
+    if (!recurringInvestment) {
       return false;
     }
 
-    const { accountId } = investment.toObject();
+    const { id: investmentId } = recurringInvestment.toObject();
 
-    const subscription: SubscriptionAgreementCreate = {
+    const subscription: RecurringInvestmentSubscriptionAgreementCreate = {
       id,
-      accountId: accountId,
+      accountId,
       profileId,
       investmentId,
       status: SubscriptionAgreementStatus.WAITING_FOR_SIGNATURE,
-      agreementType: AgreementTypes.DIRECT_DEPOSIT,
+      agreementType: AgreementTypes.RECURRING_INVESTMENT,
       contentFieldsJson: mockedContentFieldsJson,
       templateVersion: latestSubscriptionAgreementVersion,
     };
@@ -80,4 +72,4 @@ class CreateSubscriptionAgreement {
   }
 }
 
-export default CreateSubscriptionAgreement;
+export default CreateRecurringSubscriptionAgreement;

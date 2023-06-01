@@ -117,4 +117,21 @@ export class SubscriptionAgreementRepository {
       return false;
     }
   }
+
+  async delete(accountId: string, subscriptionAgreementId: string) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .deleteFrom(subscriptionAgreementTable)
+        .where('id', '=', subscriptionAgreementId)
+        .where('accountId', '=', accountId)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot delete subscription agreement: ${error.message}`, error);
+
+      return false;
+    }
+  }
 }
