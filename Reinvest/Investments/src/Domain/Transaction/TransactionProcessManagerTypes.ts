@@ -2,8 +2,6 @@ import { TransactionDecision } from 'Investments/Domain/Transaction/TransactionD
 import { TransactionEvent } from 'Investments/Domain/Transaction/TransactionEvents';
 
 export interface TransactionProcessManagerTypes {
-  canBeUpdated(): boolean;
-
   handleEvent(event: TransactionEvent): void;
 
   makeDecision(): TransactionDecision;

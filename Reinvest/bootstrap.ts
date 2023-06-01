@@ -5,6 +5,7 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { logger } from 'Logger/logger';
+import { Notifications } from 'Notifications/index';
 import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
@@ -43,6 +44,14 @@ export function boot(): Modules {
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
 
   modules.register(
+    Notifications.moduleName,
+    Notifications.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as Notifications.Config),
+  );
+
+  modules.register(
     Documents.moduleName,
     Documents.create({
       database: databaseConfig,
@@ -67,6 +76,7 @@ export function boot(): Modules {
       } as SharesAndDividends.Config,
       {
         portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        notifications: modules.get(Notifications.moduleName) as Notifications.Main,
       },
     ),
   );

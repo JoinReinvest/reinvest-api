@@ -10,6 +10,7 @@ const schema = `
 
     type Mutation {
         """
+        @access: Admin, Executive
         Recover verification of an object after failed request manually
         """
         recoverVerification(objectId: String): Boolean

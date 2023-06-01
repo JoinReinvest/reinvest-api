@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { ReinvestmentRepository } from 'Trading/Adapter/Database/Repository/ReinvestmentRepository';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
 import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
@@ -9,6 +10,7 @@ import { CheckIsTradeApproved } from 'Trading/IntegrationLogic/UseCase/CheckIsTr
 import { CheckIsTradeFunded } from 'Trading/IntegrationLogic/UseCase/CheckIsTradeFunded';
 import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 import { MarkFundsAsReadyToDisburse } from 'Trading/IntegrationLogic/UseCase/MarkFundsAsReadyToDisburse';
+import { TransferSharesForReinvestment } from 'Trading/IntegrationLogic/UseCase/TransferSharesForReinvestment';
 import { TransferSharesWhenTradeSettled } from 'Trading/IntegrationLogic/UseCase/TransferSharesWhenTradeSettled';
 
 export class IntegrationServiceProvider {
@@ -24,5 +26,6 @@ export class IntegrationServiceProvider {
     container.addSingleton(CheckIsTradeApproved, [TradesRepository, TradingNorthCapitalAdapter]);
     container.addSingleton(MarkFundsAsReadyToDisburse, [TradesRepository, TradingNorthCapitalAdapter]);
     container.addSingleton(TransferSharesWhenTradeSettled, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter]);
+    container.addSingleton(TransferSharesForReinvestment, [ReinvestmentRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter, VendorsMappingService]);
   }
 }

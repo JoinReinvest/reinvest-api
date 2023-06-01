@@ -1,4 +1,5 @@
 import {
+  legalEntitiesBeneficiaryTable,
   legalEntitiesCompanyAccountTable,
   LegalEntitiesDatabaseAdapterProvider,
   legalEntitiesIndividualAccountTable,
@@ -29,6 +30,13 @@ export type IndividualAccountForSynchronization = {
   netIncome?: string | null;
   netWorth?: string | null;
   title?: string | null;
+};
+
+export type BeneficiaryAccountForSynchronization = {
+  accountId: string;
+  ownerName: PersonalNameInput;
+  parentId: string;
+  profileId: string;
 };
 
 export type CompanyAccountForSynchronization = {
@@ -192,6 +200,30 @@ export class AccountRepository {
         netWorth: account.netWorth?.range,
         //@ts-ignore
         netIncome: account.netIncome?.range,
+      };
+    } catch (error: any) {
+      return null;
+    }
+  }
+
+  async getBeneficiaryAccountForSynchronization(profileId: string, accountId: string): Promise<BeneficiaryAccountForSynchronization | null> {
+    try {
+      const account = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesBeneficiaryTable)
+        .fullJoin(legalEntitiesProfileTable, `${legalEntitiesProfileTable}.profileId`, `${legalEntitiesBeneficiaryTable}.profileId`)
+        .select([`${legalEntitiesBeneficiaryTable}.accountId`, `${legalEntitiesBeneficiaryTable}.profileId`, `${legalEntitiesBeneficiaryTable}.individualId`])
+        .select([`${legalEntitiesProfileTable}.name`])
+        .where(`${legalEntitiesBeneficiaryTable}.accountId`, '=', accountId)
+        .where(`${legalEntitiesBeneficiaryTable}.profileId`, '=', profileId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      return {
+        accountId: account.accountId as string,
+        profileId: account.profileId as string,
+        ownerName: account.name as unknown as PersonalNameInput,
+        parentId: account.individualId as string,
       };
     } catch (error: any) {
       return null;

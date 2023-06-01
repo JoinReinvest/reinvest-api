@@ -7,6 +7,7 @@ export type TradeConfiguration = {
   fees: number;
   investmentId: string;
   ip: string;
+  parentId: string;
   portfolioId: string;
   profileId: string;
   subscriptionAgreementId: string;
@@ -15,8 +16,10 @@ export type VendorsConfiguration = {
   accountEmail: string;
   allocationId: string;
   bankAccountName: string;
-  northCapitalAccountId: string;
+  northCapitalAccountId: string | null; // can be null if beneficiary
+  northCapitalParentAccountId: string;
   offeringId: string;
+  parentEmail: string;
   unitSharePrice: number;
 };
 
@@ -36,7 +39,6 @@ export type VertaloDistributionState = {
 };
 
 export type FundsMoveState = {
-  referenceNumber: string;
   status: string;
 };
 
@@ -110,6 +112,7 @@ export class Trade {
       accountId: this.tradeSchema.tradeConfiguration.accountId,
       portfolioId: this.tradeSchema.tradeConfiguration.portfolioId,
       bankAccountId: this.tradeSchema.tradeConfiguration.bankAccountId,
+      parentId: this.tradeSchema.tradeConfiguration.parentId,
     };
   }
 
@@ -152,7 +155,7 @@ export class Trade {
 
     return {
       ip: this.tradeSchema.tradeConfiguration.ip,
-      northCapitalAccountId: this.tradeSchema.vendorsConfiguration!.northCapitalAccountId,
+      northCapitalAccountId: this.tradeSchema.vendorsConfiguration!.northCapitalParentAccountId,
       offeringId: this.tradeSchema.vendorsConfiguration!.offeringId,
       shares: this.shares.toString(),
     };
@@ -199,7 +202,7 @@ export class Trade {
 
     return {
       investmentId: this.tradeSchema.investmentId,
-      accountId: this.tradeSchema.vendorsConfiguration!.northCapitalAccountId,
+      accountId: this.tradeSchema.vendorsConfiguration!.northCapitalParentAccountId,
       offeringId: this.tradeSchema.vendorsConfiguration!.offeringId,
       tradeId: this.tradeSchema.northCapitalTradeState.tradeId,
       bankName: this.tradeSchema.vendorsConfiguration!.bankAccountName,
