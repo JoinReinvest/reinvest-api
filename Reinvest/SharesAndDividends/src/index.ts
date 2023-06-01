@@ -1,4 +1,5 @@
 import Container, { ContainerInterface } from 'Container/Container';
+import { Notifications } from 'Notifications/index';
 import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
@@ -27,6 +28,7 @@ export namespace SharesAndDividends {
   };
 
   export type ModulesDependencies = {
+    notifications: Notifications.Main;
     portfolio: Portfolio.Main;
   };
 
@@ -78,6 +80,8 @@ export namespace SharesAndDividends {
       }
 
       this.container.addAsValue('Portfolio', this.modules.portfolio);
+      this.container.addAsValue('Notifications', this.modules.notifications);
+
       new AdapterServiceProvider(this.config).boot(this.container);
       new UseCaseProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);
