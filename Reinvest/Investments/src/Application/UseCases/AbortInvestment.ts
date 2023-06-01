@@ -23,10 +23,6 @@ class AbortInvestment {
       return false;
     }
 
-    if (investment.isStartedInvestment()) {
-      return false;
-    }
-
     investment.abort();
 
     const status = await this.transactionAdapter.transaction(`Abort investment ${investmentId} with related fee if exist`, async () => {
