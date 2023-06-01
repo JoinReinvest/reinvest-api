@@ -7,10 +7,13 @@ import CreateSubscriptionAgreement from 'Investments/Application/UseCases/Create
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
 import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
+import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
+import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
 import { Investments } from 'Investments/index';
+import { DividendsController } from 'Investments/Infrastructure/Ports/DividendsController';
 import { FeesController } from 'Investments/Infrastructure/Ports/FeesController';
 import { InvestmentsController } from 'Investments/Infrastructure/Ports/InvestmentsController';
 import { RecurringInvestmentsController } from 'Investments/Infrastructure/Ports/RecurringInvestmentsController';
@@ -18,6 +21,7 @@ import { ScheduleSimulationController } from 'Investments/Infrastructure/Ports/S
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
 import GetDraftRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/GetRecurringInvestment';
+import { TransactionController } from 'Investments/Infrastructure/Ports/TransactionController';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export default class PortsProviders {
@@ -34,5 +38,7 @@ export default class PortsProviders {
     container.addSingleton(FeesController, [ApproveFees, IsFeeApproved]);
     container.addSingleton(ScheduleSimulationController, [ScheduleSimulationQuery]);
     container.addSingleton(RecurringInvestmentsController, [CreateRecurringInvestment, GetDraftRecurringInvestment]);
+    container.addSingleton(DividendsController, [ReinvestDividend]);
+    container.addSingleton(TransactionController, [PushTransaction]);
   }
 }

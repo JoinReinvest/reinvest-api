@@ -44,6 +44,7 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
     //   // TODO - send command to generate pdf
     // }
 
+    // TODO add info if the investment is for beneficiary
     await this.eventBus.publish(<InvestmentFinalized>{
       kind: TransactionEvents.INVESTMENT_FINALIZED,
       data: {
