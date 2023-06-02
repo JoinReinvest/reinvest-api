@@ -28,12 +28,14 @@ export type InvestmentsApiType = {
   startInvestment: InvestmentsController['startInvestment'];
   subscriptionAgreementQuery: SubscriptionAgreementController['subscriptionAgreementQuery'];
   test: TempController['handle'];
+  unsuspendRecurringInvestment: RecurringInvestmentsController['unsuspendRecurringInvestment'];
 };
 
 export const investmentsApi = (container: ContainerInterface): InvestmentsApiType => ({
   test: container.delegateTo(TempController, 'handle'),
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
   createDraftRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createDraftRecurringInvestment'),
+  unsuspendRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'unsuspendRecurringInvestment'),
   abortInvestment: container.delegateTo(InvestmentsController, 'abortInvestment'),
   getRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'getRecurringInvestment'),
   deactivateRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'deactivateRecurringInvestment'),

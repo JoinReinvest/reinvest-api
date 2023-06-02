@@ -18,6 +18,7 @@ import SignRecurringSubscriptionAgreement from 'Investments/Application/UseCases
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
+import UnsuspendRecurringInvestment from 'Investments/Application/UseCases/UnsuspendRecurringInvestment';
 import { Investments } from 'Investments/index';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import {
@@ -70,6 +71,7 @@ export default class UseCaseProviders {
     container.addSingleton(CreateRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, IdGenerator]);
     container.addSingleton(InitiateRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(DeactivateRecurringInvestment, [RecurringInvestmentsRepository]);
+    container.addSingleton(UnsuspendRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
     container.addSingleton(AbortInvestment, [RecurringInvestmentsRepository, FeesRepository, 'InvestmentsDatabaseAdapter']);

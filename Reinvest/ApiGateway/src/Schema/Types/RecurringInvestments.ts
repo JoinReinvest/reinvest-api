@@ -83,6 +83,12 @@ const schema = `
         [MOCK] It STARTS the recurring investment, CANCEL previous recurring investment if exists and schedule the first investment.
         """
         initiateRecurringInvestment(accountId: ID!): Boolean!
+
+        """
+        deactivateRecurringInvestment(accountId: ID!): Boolean!
+
+        """
+        unsuspendRecurringInvestment(accountId: ID!): Boolean!
     }
 `;
 const recurringInvestmentIdMock = '89e94d4c-f237-4f10-aa05-be8ade28123';
@@ -205,6 +211,20 @@ export const RecurringInvestments = {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
+
+        return status;
+      },
+      deactivateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.deactivateRecurringInvestment(accountId);
+
+        return status;
+      },
+      unsuspendRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.unsuspendRecurringInvestment(accountId);
 
         return status;
       },
