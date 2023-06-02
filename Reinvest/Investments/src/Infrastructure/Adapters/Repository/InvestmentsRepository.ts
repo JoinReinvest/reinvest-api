@@ -3,7 +3,7 @@ import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTa
 import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
 import type { Money } from 'Money/Money';
 import type { InvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateInvestment';
-import { Investment } from 'Reinvest/Investments/src/Domain/Investments/Investment';
+import { Investment, InvestmentWithFee } from 'Reinvest/Investments/src/Domain/Investments/Investment';
 import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
@@ -23,24 +23,36 @@ export class InvestmentsRepository {
     const investment = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
+      .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
       .select([
-        'accountId',
-        'amount',
-        'bankAccountId',
-        'dateCreated',
-        'dateUpdated',
-        'id',
-        'profileId',
-        'recurringInvestmentId',
-        'scheduledBy',
-        'status',
-        'subscriptionAgreementId',
-        'tradeId',
-        'dateStarted',
-        'portfolioId',
-        'parentId',
+        `${investmentsTable}.accountId`,
+        `${investmentsTable}.amount`,
+        `${investmentsTable}.bankAccountId`,
+        `${investmentsTable}.dateCreated`,
+        `${investmentsTable}.dateUpdated`,
+        `${investmentsTable}.id`,
+        `${investmentsTable}.profileId`,
+        `${investmentsTable}.recurringInvestmentId`,
+        `${investmentsTable}.scheduledBy`,
+        `${investmentsTable}.status`,
+        `${investmentsTable}.subscriptionAgreementId`,
+        `${investmentsTable}.tradeId`,
+        `${investmentsTable}.dateStarted`,
+        `${investmentsTable}.portfolioId`,
+        `${investmentsTable}.parentId`,
       ])
-      .where('id', '=', investmentId)
+      .select([
+        `${investmentsFeesTable}.amount as feeAmount`,
+        `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.approvedByIP`,
+        `${investmentsFeesTable}.dateCreated as feeDateCreated`,
+        `${investmentsFeesTable}.id as feeId`,
+        `${investmentsFeesTable}.investmentId`,
+        `${investmentsFeesTable}.status as feeStatus`,
+        `${investmentsFeesTable}.verificationFeeId`,
+      ])
+      .castTo<InvestmentWithFee>()
+      .where(`${investmentsTable}.id`, '=', investmentId)
       .executeTakeFirst();
 
     if (!investment) {

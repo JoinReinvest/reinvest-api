@@ -44,15 +44,16 @@ export class FeesRepository {
     }
   }
 
-  async abortFeeForGivenInvestment(investmentId: string) {
+  async updateStatus(fee: Fee) {
+    const { id, status } = fee.toObject();
     try {
       await this.databaseAdapterProvider
         .provide()
         .updateTable(investmentsFeesTable)
         .set({
-          status: InvestmentsFeesStatus.ABORTED,
+          status,
         })
-        .where('investmentId', '=', investmentId)
+        .where('id', '=', id)
         .execute();
 
       return true;

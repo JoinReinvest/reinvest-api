@@ -25,10 +25,14 @@ class AbortInvestment {
 
     investment.abort();
 
+    const fee = investment.getFee();
+
     const status = await this.transactionAdapter.transaction(`Abort investment ${investmentId} with related fee if exist`, async () => {
       await this.investmentsRepository.updateStatus(investment);
 
-      await this.feesRepository.abortFeeForGivenInvestment(investmentId);
+      if (fee) {
+        await this.feesRepository.updateStatus(fee);
+      }
     });
 
     return status;
