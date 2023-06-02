@@ -152,6 +152,18 @@ export class Investment {
     }
   }
 
+  hasFee() {
+    return !!this.fee;
+  }
+
+  approveFee() {
+    this.fee?.approveFee();
+  }
+
+  isFeeApproved() {
+    return this.fee?.isApproved();
+  }
+
   getSubscriptionAgreementId() {
     return this.subscriptionAgreementId;
   }
