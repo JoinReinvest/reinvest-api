@@ -85,8 +85,12 @@ const schema = `
         initiateRecurringInvestment(accountId: ID!): Boolean!
 
         """
+        [MOCK] It DEACTIVATE the recurring investment.
+        """
         deactivateRecurringInvestment(accountId: ID!): Boolean!
 
+        """
+        [MOCK] It UNSUSPEND the recurring investment.
         """
         unsuspendRecurringInvestment(accountId: ID!): Boolean!
     }
