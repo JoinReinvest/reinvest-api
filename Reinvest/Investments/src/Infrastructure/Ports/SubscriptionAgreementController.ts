@@ -1,5 +1,6 @@
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
+import SignRecurringSubscriptionAgreement from 'Investments/Application/UseCases/SignRecurringSubscriptionAgreement';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import type SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
 
@@ -7,17 +8,20 @@ export class SubscriptionAgreementController {
   private createSubscriptionAgreementUseCase: CreateSubscriptionAgreement;
   private subscriptionAgreementQueryUseCase: SubscriptionAgreementQuery;
   private signSubscriptionAgreementUseCase: SignSubscriptionAgreement;
+  private signRecurringSubscriptionAgreementUseCase: SignRecurringSubscriptionAgreement;
   private createRecurringSubscriptionAgreementUseCase: CreateRecurringSubscriptionAgreement;
 
   constructor(
     createSubscriptionAgreementUseCase: CreateSubscriptionAgreement,
     subscriptionAgreementQueryUseCase: SubscriptionAgreementQuery,
     signSubscriptionAgreementUseCase: SignSubscriptionAgreement,
+    signRecurringSubscriptionAgreementUseCase: SignRecurringSubscriptionAgreement,
     createRecurringSubscriptionAgreementUseCase: CreateRecurringSubscriptionAgreement,
   ) {
     this.createSubscriptionAgreementUseCase = createSubscriptionAgreementUseCase;
     this.subscriptionAgreementQueryUseCase = subscriptionAgreementQueryUseCase;
     this.signSubscriptionAgreementUseCase = signSubscriptionAgreementUseCase;
+    this.signRecurringSubscriptionAgreementUseCase = signRecurringSubscriptionAgreementUseCase;
     this.createRecurringSubscriptionAgreementUseCase = createRecurringSubscriptionAgreementUseCase;
   }
 
@@ -37,5 +41,9 @@ export class SubscriptionAgreementController {
 
   public async signSubscriptionAgreement(profileId: string, investmentId: string, clientIp: string) {
     return await this.signSubscriptionAgreementUseCase.execute(profileId, investmentId, clientIp);
+  }
+
+  public async signRecurringSubscriptionAgreement(profileId: string, accountId: string, clientIp: string) {
+    return await this.signRecurringSubscriptionAgreementUseCase.execute(profileId, accountId, clientIp);
   }
 }

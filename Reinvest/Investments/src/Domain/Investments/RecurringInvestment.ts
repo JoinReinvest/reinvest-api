@@ -60,8 +60,12 @@ export class RecurringInvestment {
     this.subscriptionAgreementId = id;
   }
 
-  updateStatus(status: RecurringInvestmentStatus) {
-    this.status = status;
+  deactivate() {
+    this.status = RecurringInvestmentStatus.INACTIVE;
+  }
+
+  activate() {
+    this.status = RecurringInvestmentStatus.ACTIVE;
   }
 
   getStatus() {
@@ -83,6 +87,10 @@ export class RecurringInvestment {
 
   getSubscriptionAgreeementId() {
     return this.subscriptionAgreementId;
+  }
+
+  isReadyToActivate() {
+    return !!this.subscriptionAgreementId;
   }
 
   toObject() {

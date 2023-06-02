@@ -1,19 +1,16 @@
 import { ContainerInterface } from 'Container/Container';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
-import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
-import AssignSubscriptionAgreementToRecurringInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToRecurringInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
-import CreateRecurringInvestment from 'Investments/Application/UseCases/CreateRecurringInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import DeactivateRecurringInvestment from 'Investments/Application/UseCases/DeactivateRecurringInvestment';
-import DeleteRecurringInvestment from 'Investments/Application/UseCases/DeleteRecurringInvestment';
 import InitiateRecurringInvestment from 'Investments/Application/UseCases/InitiateRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
 import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
 import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
+import SignRecurringSubscriptionAgreement from 'Investments/Application/UseCases/SignRecurringSubscriptionAgreement';
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
@@ -26,6 +23,7 @@ import { ScheduleSimulationController } from 'Investments/Infrastructure/Ports/S
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
 import { TransactionController } from 'Investments/Infrastructure/Ports/TransactionController';
+import CreateRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
@@ -38,11 +36,12 @@ export default class PortsProviders {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(TempController, [SimpleEventBus]);
-    container.addSingleton(InvestmentsController, [CreateInvestment, InvestmentSummaryQuery, AssignSubscriptionAgreementToInvestment, StartInvestment]);
+    container.addSingleton(InvestmentsController, [CreateInvestment, InvestmentSummaryQuery, StartInvestment]);
     container.addSingleton(SubscriptionAgreementController, [
       CreateSubscriptionAgreement,
       SubscriptionAgreementQuery,
       SignSubscriptionAgreement,
+      SignRecurringSubscriptionAgreement,
       CreateRecurringSubscriptionAgreement,
     ]);
     container.addSingleton(FeesController, [ApproveFees, IsFeeApproved]);
@@ -50,8 +49,6 @@ export default class PortsProviders {
     container.addSingleton(RecurringInvestmentsController, [
       CreateRecurringInvestment,
       RecurringInvestmentQuery,
-      DeleteRecurringInvestment,
-      AssignSubscriptionAgreementToRecurringInvestment,
       InitiateRecurringInvestment,
       DeactivateRecurringInvestment,
     ]);
