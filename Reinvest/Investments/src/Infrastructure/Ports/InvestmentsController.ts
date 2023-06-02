@@ -1,3 +1,4 @@
+import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
@@ -8,11 +9,18 @@ export class InvestmentsController {
   private createInvestmentUseCase: CreateInvestment;
   private investmentSummaryQueryUseCase: InvestmentSummaryQuery;
   private startInvestmentUseCase: StartInvestment;
+  private abortInvestmentUseCase: AbortInvestment;
 
-  constructor(createInvestmentUseCase: CreateInvestment, investmentSummaryQueryUseCase: InvestmentSummaryQuery, startInvestmentUseCase: StartInvestment) {
+  constructor(
+    createInvestmentUseCase: CreateInvestment,
+    investmentSummaryQueryUseCase: InvestmentSummaryQuery,
+    startInvestmentUseCase: StartInvestment,
+    abortInvestmentUseCase: AbortInvestment,
+  ) {
     this.createInvestmentUseCase = createInvestmentUseCase;
     this.investmentSummaryQueryUseCase = investmentSummaryQueryUseCase;
     this.startInvestmentUseCase = startInvestmentUseCase;
+    this.abortInvestmentUseCase = abortInvestmentUseCase;
   }
 
   public static getClassName = (): string => 'InvestmentsController';
@@ -29,5 +37,9 @@ export class InvestmentsController {
 
   public async startInvestment(profileId: string, investmentId: string) {
     return await this.startInvestmentUseCase.execute(profileId, investmentId);
+  }
+
+  public async abortInvestment(profileId: string, investmentId: string) {
+    return await this.abortInvestmentUseCase.execute(profileId, investmentId);
   }
 }

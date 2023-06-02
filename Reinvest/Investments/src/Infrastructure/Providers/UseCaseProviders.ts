@@ -1,6 +1,7 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
+import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
@@ -71,5 +72,6 @@ export default class UseCaseProviders {
     container.addSingleton(DeactivateRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
+    container.addSingleton(AbortInvestment, [RecurringInvestmentsRepository, FeesRepository, 'InvestmentsDatabaseAdapter']);
   }
 }

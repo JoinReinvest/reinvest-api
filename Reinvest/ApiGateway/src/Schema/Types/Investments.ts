@@ -221,7 +221,11 @@ export const Investments = {
         return isSigned;
       },
       abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.abortInvestment(profileId, investmentId);
+
+        return status;
       },
     },
   },

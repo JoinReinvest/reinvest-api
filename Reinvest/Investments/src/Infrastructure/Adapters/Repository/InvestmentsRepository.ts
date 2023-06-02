@@ -3,7 +3,7 @@ import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTa
 import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
 import type { Money } from 'Money/Money';
 import type { InvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateInvestment';
-import { Investment } from 'Reinvest/Investments/src/Domain/Investments/Investment';
+import { Investment, InvestmentWithFee } from 'Reinvest/Investments/src/Domain/Investments/Investment';
 import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
@@ -23,23 +23,35 @@ export class InvestmentsRepository {
     const investment = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
+      .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
       .select([
-        'accountId',
-        'amount',
-        'bankAccountId',
-        'dateCreated',
-        'dateUpdated',
-        'id',
-        'profileId',
-        'recurringInvestmentId',
-        'scheduledBy',
-        'status',
-        'subscriptionAgreementId',
-        'tradeId',
-        'dateStarted',
-        'portfolioId',
-        'parentId',
+        `${investmentsTable}.accountId`,
+        `${investmentsTable}.amount`,
+        `${investmentsTable}.bankAccountId`,
+        `${investmentsTable}.dateCreated`,
+        `${investmentsTable}.dateUpdated`,
+        `${investmentsTable}.id`,
+        `${investmentsTable}.profileId`,
+        `${investmentsTable}.recurringInvestmentId`,
+        `${investmentsTable}.scheduledBy`,
+        `${investmentsTable}.status`,
+        `${investmentsTable}.subscriptionAgreementId`,
+        `${investmentsTable}.tradeId`,
+        `${investmentsTable}.dateStarted`,
+        `${investmentsTable}.portfolioId`,
+        `${investmentsTable}.parentId`,
       ])
+      .select([
+        `${investmentsFeesTable}.amount as feeAmount`,
+        `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.approvedByIP`,
+        `${investmentsFeesTable}.dateCreated as feeDateCreated`,
+        `${investmentsFeesTable}.id as feeId`,
+        `${investmentsFeesTable}.investmentId`,
+        `${investmentsFeesTable}.status as feeStatus`,
+        `${investmentsFeesTable}.verificationFeeId`,
+      ])
+      .castTo<InvestmentWithFee>()
       .where('id', '=', investmentId)
       .executeTakeFirst();
 
@@ -122,6 +134,26 @@ export class InvestmentsRepository {
       return true;
     } catch (error: any) {
       console.error(`Cannot asign subscription agreement to investment and update its status: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async updateStatus(investment: Investment) {
+    const { id, status } = investment.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(investmentsTable)
+        .set({
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot update status of investment: ${error.message}`, error);
 
       return false;
     }

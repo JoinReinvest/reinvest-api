@@ -9,6 +9,7 @@ import { TransactionController } from 'Investments/Infrastructure/Ports/Transact
 import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrastructure/Ports/RecurringInvestmentsController';
 
 export type InvestmentsApiType = {
+  abortInvestment: InvestmentsController['abortInvestment'];
   approveFees: FeesController['approveFees'];
   createDraftRecurringInvestment: RecurringInvestmentsController['createDraftRecurringInvestment'];
   createInvestment: InvestmentsController['createInvestment'];
@@ -33,6 +34,7 @@ export const investmentsApi = (container: ContainerInterface): InvestmentsApiTyp
   test: container.delegateTo(TempController, 'handle'),
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
   createDraftRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createDraftRecurringInvestment'),
+  abortInvestment: container.delegateTo(InvestmentsController, 'abortInvestment'),
   getRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'getRecurringInvestment'),
   deactivateRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'deactivateRecurringInvestment'),
   initiateRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'initiateRecurringInvestment'),

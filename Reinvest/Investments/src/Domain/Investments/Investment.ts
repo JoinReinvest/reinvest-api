@@ -1,9 +1,21 @@
 import { GracePeriod } from 'Investments/Domain/Investments/GracePeriod';
 import { InvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
-import { InvestmentStatus, ScheduledBy } from './Types';
+import { Fee, FeeSchema } from './Fee';
+import { InvestmentsFeesStatus, InvestmentStatus, ScheduledBy } from './Types';
 
 type InvestmentSchema = InvestmentsTable;
+
+export type InvestmentWithFee = InvestmentSchema & {
+  approveDate: Date | null;
+  approvedByIP: string | null;
+  feeAmount: number | null;
+  feeDateCreated: Date | null;
+  feeId: string | null;
+  feeStatus: InvestmentsFeesStatus | null;
+  investmentId: string;
+  verificationFeeId: string;
+};
 
 export class Investment {
   private accountId: string;
@@ -22,6 +34,7 @@ export class Investment {
   private gracePeriod: GracePeriod;
   private portfolioId: string;
   private parentId: string | null;
+  private fee: Fee | null;
 
   constructor(
     accountId: string,
@@ -56,9 +69,10 @@ export class Investment {
     this.portfolioId = portfolioId;
     this.parentId = parentId;
     this.gracePeriod = new GracePeriod(dateStarted);
+    this.fee = null;
   }
 
-  static create(data: InvestmentSchema) {
+  static create(investmentData: InvestmentWithFee) {
     const {
       accountId,
       amount,
@@ -75,9 +89,10 @@ export class Investment {
       dateStarted,
       portfolioId,
       parentId,
-    } = data;
+      feeId,
+    } = investmentData;
 
-    return new Investment(
+    const investment = new Investment(
       accountId,
       amount,
       bankAccountId,
@@ -94,6 +109,31 @@ export class Investment {
       portfolioId,
       parentId,
     );
+
+    if (feeId) {
+      const feeData = {
+        approveDate: investmentData.approveDate,
+        approvedByIP: investmentData.approvedByIP,
+        amount: investmentData.feeAmount,
+        dateCreated: investmentData.feeDateCreated,
+        id: investmentData.feeId,
+        status: investmentData.feeStatus,
+        investmentId: investmentData.investmentId,
+        verificationFeeId: investmentData.verificationFeeId,
+      } as FeeSchema;
+
+      investment.setFee(Fee.create(feeData));
+    }
+
+    return investment;
+  }
+
+  setFee(fee: Fee) {
+    this.fee = fee;
+  }
+
+  getFee() {
+    return this.fee;
   }
 
   assignSubscriptionAgreement(id: string) {
@@ -102,6 +142,14 @@ export class Investment {
 
   updateStatus(status: InvestmentStatus) {
     this.status = status;
+  }
+
+  abort() {
+    this.status = InvestmentStatus.FINISHED;
+
+    if (this.fee) {
+      this.fee.abort();
+    }
   }
 
   getSubscriptionAgreementId() {

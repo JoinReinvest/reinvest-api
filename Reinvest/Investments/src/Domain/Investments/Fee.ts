@@ -2,7 +2,7 @@ import type { InvestmentsFeesTable } from 'Investments/Infrastructure/Adapters/P
 
 import { InvestmentsFeesStatus } from './Types';
 
-type FeeSchema = InvestmentsFeesTable;
+export type FeeSchema = InvestmentsFeesTable;
 
 export class Fee {
   private accountId: string;
@@ -49,6 +49,14 @@ export class Fee {
   approveFee() {
     this.approveDate = new Date();
     this.status = InvestmentsFeesStatus.APPROVED;
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  abort() {
+    this.status = InvestmentsFeesStatus.ABORTED;
   }
 
   isApproved() {
