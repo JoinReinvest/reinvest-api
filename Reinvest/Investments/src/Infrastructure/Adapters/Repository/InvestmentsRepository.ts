@@ -52,7 +52,7 @@ export class InvestmentsRepository {
         `${investmentsFeesTable}.verificationFeeId`,
       ])
       .castTo<InvestmentWithFee>()
-      .where('id', '=', investmentId)
+      .where(`${investmentsTable}.id`, '=', investmentId)
       .executeTakeFirst();
 
     if (!investment) {
