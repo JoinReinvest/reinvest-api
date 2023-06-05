@@ -34,7 +34,7 @@ const schema = `
     }
 
     type NotificationsStats {
-        accountId: String!
+        accountId: ID!
         unreadCount: Int!
         totalCount: Int!
     }
@@ -61,20 +61,20 @@ const schema = `
         [MOCK] Get all notifications for the given account id
         It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
         """
-        getNotifications(accountId: String!, filter: NotificationFilter = ALL, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
+        getNotifications(accountId: ID!, filter: NotificationFilter = ALL, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
 
         """
         [MOCK] Get all notifications for the given account id
         It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
         """
-        getNotificationStats(accountId: String!): NotificationsStats!
+        getNotificationStats(accountId: ID!): NotificationsStats!
     }
 
     type Mutation {
         """
         [MOCK] Mark notification as read
         """
-        markNotificationAsRead(notificationId: String!): Boolean!
+        markNotificationAsRead(notificationId: ID!): Boolean!
     }
 
 `;

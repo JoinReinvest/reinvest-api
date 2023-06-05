@@ -62,12 +62,15 @@ export class InvestmentsRepository {
         `${investmentsTable}.status`,
         `${investmentsTable}.subscriptionAgreementId`,
         `${investmentsTable}.tradeId`,
+        `${investmentsTable}.bankAccountId`,
       ])
       .select([`${investmentsFeesTable}.amount as feeAmount`])
       .where(`${investmentsTable}.id`, '=', investmentId)
       .executeTakeFirst();
 
-    if (!investmentSummary) return false;
+    if (!investmentSummary) {
+      return null;
+    }
 
     return InvestmentSummary.create(investmentSummary as InvestmentSummarySchema);
   }

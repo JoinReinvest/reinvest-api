@@ -1,13 +1,13 @@
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 
 class InvestmentSummaryQuery {
-  static getClassName = (): string => 'InvestmentSummaryQuery';
-
   private readonly investmentsRepository: InvestmentsRepository;
 
   constructor(investmentsRepository: InvestmentsRepository) {
     this.investmentsRepository = investmentsRepository;
   }
+
+  static getClassName = (): string => 'InvestmentSummaryQuery';
 
   async execute(profileId: string, investmentId: string) {
     const investment = await this.investmentsRepository.getInvestmentForSummary(investmentId);
@@ -24,6 +24,7 @@ class InvestmentSummaryQuery {
       status: investment.status,
       investmentFees: investment.getFeeAmount(),
       subscriptionAgreementId: investment.subscriptionAgreementId,
+      bankAccountId: investment.bankAccountId,
     };
   }
 }

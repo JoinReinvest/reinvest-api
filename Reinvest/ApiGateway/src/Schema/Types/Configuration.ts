@@ -28,11 +28,11 @@ const schema = `
 `;
 
 type GetAccountConfiguration = {
-  accountId: string;
+  accountId: ID;
 };
 
 type SetAutomaticDividendReinvestmentAgreement = {
-  accountId: string;
+  accountId: ID;
   automaticDividendReinvestmentAgreement: boolean;
 };
 
