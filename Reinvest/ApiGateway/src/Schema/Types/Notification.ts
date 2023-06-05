@@ -163,10 +163,9 @@ export const Notification = {
         }
 
         const api = modules.getApi<Notifications.ApiType>(Notifications);
-        const listOfNotifications = notificationsMock(accountId, false);
         const notifications = await api.getNotifications(profileId, accountId, filter, pagination);
 
-        return [...notifications, ...listOfNotifications];
+        return [...notifications];
       },
       getNotificationStats: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         if (accountId.length === 0) {
@@ -176,12 +175,10 @@ export const Notification = {
         const api = modules.getApi<Notifications.ApiType>(Notifications);
         const { unreadCount, totalCount } = await api.getNotificationsStats(profileId, accountId);
 
-        const listOfNotifications = notificationsMock(accountId, false);
-
         return {
           accountId,
-          unreadCount: unreadCount + listOfNotifications.length,
-          totalCount: totalCount + listOfNotifications.length,
+          unreadCount: unreadCount,
+          totalCount: totalCount,
         };
       },
     },
