@@ -8,6 +8,7 @@ import { StatsController } from 'SharesAndDividends/Port/Api/StatsController';
 import { ChangeSharesState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import { CreateIncentiveReward } from 'SharesAndDividends/UseCase/CreateIncentiveReward';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
+import { DeclareDividend } from 'SharesAndDividends/UseCase/DeclareDividend';
 import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 
@@ -23,6 +24,6 @@ export class PortsProvider {
     container.addSingleton(SharesController, [CreateShares, ChangeSharesState]);
     container.addSingleton(StatsController, [StatsQuery]);
     container.addSingleton(IncentiveRewardController, [CreateIncentiveReward]);
-    container.addSingleton(DividendsController, [DividendsQuery, DividendsRepository]);
+    container.addSingleton(DividendsController, [DividendsQuery, DividendsRepository, DeclareDividend]);
   }
 }

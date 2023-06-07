@@ -47,4 +47,8 @@ export class Money {
   subtract(subtrahend: Money): Money {
     return new Money(this.value.subtract(subtrahend.getValue()).getAmount());
   }
+
+  divideBy(numberOfDays: number): Money {
+    return new Money(this.value.divide(numberOfDays).getAmount());
+  }
 }

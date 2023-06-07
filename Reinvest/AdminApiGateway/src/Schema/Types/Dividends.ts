@@ -1,6 +1,8 @@
 import { AdminSessionContext } from 'AdminApiGateway/index';
+import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Identity } from 'Identity/index';
+import { Portfolio } from 'Portfolio/index';
 import { RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 
@@ -12,6 +14,33 @@ const schema = `
         BOTH
     }
 
+    enum DividendDeclarationStatus {
+        CALCULATING
+        CALCULATED
+    }
+
+    type NumberOfSharesPerDay {
+        date: ISODate
+        numberOfShares: Float
+    }
+
+    type DividendsDeclaration {
+        id: ID
+        calculatingFromDate: ISODate
+        declarationDate: ISODate
+        createdDate: ISODateTime
+        calculationFinishedDate: ISODateTime
+        amount: String
+        numberOfDays: Int
+        numberOfSharesPerDay: [NumberOfSharesPerDay]
+        unitAmountPerDay: String
+        status: DividendDeclarationStatus
+    }
+
+    type Query {
+        listDividendsDeclarations: [DividendsDeclaration]
+    }
+
     type Mutation {
         """
         @access: Executive
@@ -20,13 +49,29 @@ const schema = `
         INVITER reward - when someone registers with INVITER invite link.
         """
         giveIncentiveRewardByHand(inviterEmail: EmailAddress, inviteeEmail: EmailAddress, whoShouldGetTheReward: RewardType): Boolean
+
+        """
+        @access: Executive
+        Declare the dividend from the LAST declarationDate to the CURRENT declarationDate
+        """
+        declareDividend(amount: Int!, declarationDate: ISODate!): DividendsDeclaration
     }
 `;
 
-export const MoneyRelatedSchema = {
+export const DividendsSchema = {
   typeDefs: schema,
   resolvers: {
-    Query: {},
+    Query: {
+      listDividendsDeclarations: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+        if (!isExecutive) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+
+        return api.getDividendDeclarations();
+      },
+    },
     Mutation: {
       giveIncentiveRewardByHand: async (
         parent: any,
@@ -69,6 +114,28 @@ export const MoneyRelatedSchema = {
         }
 
         return inviterStatus || inviteeStatus;
+      },
+      declareDividend: async (
+        parent: any,
+        { amount, declarationDate }: { amount: number; declarationDate: string },
+        { modules, isExecutive }: AdminSessionContext,
+      ) => {
+        if (!isExecutive) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const date = dayjs(declarationDate).toDate();
+        const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const { portfolioId } = await portfolioApi.getActivePortfolio();
+
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+        const error = await api.declareDividend(portfolioId, amount, date);
+
+        if (error) {
+          throw new GraphQLError(error);
+        }
+
+        return api.getDividendDeclarationByDate(date);
       },
     },
   },

@@ -7,8 +7,11 @@ import { StatsController } from 'SharesAndDividends/Port/Api/StatsController';
 export type SharesAndDividendsApiType = {
   createManuallyIncentiveReward: IncentiveRewardController['createManuallyIncentiveReward'];
   createShares: SharesController['createShares'];
+  declareDividend: DividendsController['declareDividend'];
   getAccountStats: StatsController['getAccountStats'];
   getDividend: DividendsController['getDividend'];
+  getDividendDeclarationByDate: DividendsController['getDividendDeclarationByDate'];
+  getDividendDeclarations: DividendsController['getDividendDeclarations'];
   getEVSChart: StatsController['getEVSChart'];
   markDividendReinvested: DividendsController['markDividendReinvested'];
   setSharesToFundedState: SharesController['setSharesToFundedState'];
@@ -26,4 +29,7 @@ export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndD
   createManuallyIncentiveReward: container.delegateTo(IncentiveRewardController, 'createManuallyIncentiveReward'),
   getDividend: container.delegateTo(DividendsController, 'getDividend'),
   markDividendReinvested: container.delegateTo(DividendsController, 'markDividendReinvested'),
+  declareDividend: container.delegateTo(DividendsController, 'declareDividend'),
+  getDividendDeclarations: container.delegateTo(DividendsController, 'getDividendDeclarations'),
+  getDividendDeclarationByDate: container.delegateTo(DividendsController, 'getDividendDeclarationByDate'),
 });

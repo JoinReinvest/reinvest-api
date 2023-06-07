@@ -79,7 +79,7 @@
     "express": "^4.18.2",
     "graphql": "^16.6.0",
     "graphql-constraint-directive": "^5.0.0",
-    "kysely": "^0.24.2",
+    "kysely": "0.25.0",
     "pg": "^8.10.0",
     "postgres": "^3.3.4",
     "serverless-http": "^3.2.0",

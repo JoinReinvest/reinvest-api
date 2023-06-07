@@ -1,4 +1,5 @@
-import { JSONObject } from 'HKEKTypes/Generics';
+import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
+import { NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
 import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
 import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
@@ -24,14 +25,15 @@ export type SharesAndTheirPricesSelection = Pick<SharesTable, 'numberOfShares' |
 export interface DividendsDeclarationTable {
   calculatedFromDate: Date;
   calculatedToDate: Date;
+  calculationFinishedDate: Date | null;
   createdDate: Date;
   id: string;
   numberOfDays: number;
-  numberOfShares: number;
+  numberOfSharesJson: JSONObjectOf<NumberOfSharesPerDay>;
   portfolioId: string;
   status: 'CALCULATING' | 'CALCULATED';
   totalDividendAmount: number;
-  unitAmountPerSharePerDay: number;
+  unitAmountPerDay: number;
 }
 
 export interface CalculatedDividendsTable {
