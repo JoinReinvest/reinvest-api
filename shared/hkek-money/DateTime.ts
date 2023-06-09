@@ -16,7 +16,7 @@ export class DateTime {
   }
 
   static fromIsoDate(date: Date | string): DateTime {
-    return new DateTime(dayjs(date, 'YYYY-MM-DD'));
+    return new DateTime(dayjs(dayjs(date).format('YYYY-MM-DD')));
   }
 
   toDate(): Date {

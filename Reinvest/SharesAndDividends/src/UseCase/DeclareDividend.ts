@@ -1,25 +1,25 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
-import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
+import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
 import { DividendDeclaration } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
 
 export class DeclareDividend {
-  private dividendRepository: DividendsRepository;
+  private dividendsCalculationRepository: DividendsCalculationRepository;
   private sharesRepository: SharesRepository;
   private idGenerator: IdGeneratorInterface;
 
-  constructor(idGenerator: IdGeneratorInterface, dividendRepository: DividendsRepository, sharesRepository: SharesRepository) {
+  constructor(idGenerator: IdGeneratorInterface, dividendsCalculationRepository: DividendsCalculationRepository, sharesRepository: SharesRepository) {
     this.idGenerator = idGenerator;
-    this.dividendRepository = dividendRepository;
+    this.dividendsCalculationRepository = dividendsCalculationRepository;
     this.sharesRepository = sharesRepository;
   }
 
   static getClassName = () => 'DeclareDividend';
 
   async execute(portfolioId: string, amount: Money, declarationDate: DateTime): Promise<void> {
-    const lastDate = await this.dividendRepository.getLastDeclarationDate();
+    const lastDate = await this.dividendsCalculationRepository.getLastDeclarationDate();
 
     const firstSharesCreatedDate = !lastDate ? await this.sharesRepository.getFirstSharesCreatedDate() : null;
     const calculatedFromDate = lastDate ? lastDate.addDays(1) : firstSharesCreatedDate;
@@ -38,6 +38,6 @@ export class DeclareDividend {
     const numberOfSharesPerDay = await this.sharesRepository.getAccumulativeNumberOfSharesPerDay(portfolioId, calculatedFromDate, calculatedToDate);
     const dividendDeclaration = DividendDeclaration.create(id, portfolioId, amount, numberOfSharesPerDay, calculatedFromDate, calculatedToDate);
 
-    await this.dividendRepository.storeDividendDeclaration(dividendDeclaration);
+    await this.dividendsCalculationRepository.storeDividendDeclaration(dividendDeclaration);
   }
 }

@@ -23,6 +23,7 @@ import { VertaloAdapter } from 'Reinvest/Registration/src/Adapter/Vertalo/Vertal
 import serverless from 'serverless-http';
 import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/DatabaseProvider';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { SharesAndDividends } from 'SharesAndDividends/index'; // dependencies
 import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
 import { main as postSignUp } from '../postSignUp/handler'; // dependencies
@@ -674,11 +675,27 @@ const transactionRouter = () => {
   return router;
 };
 
+const calculationRouter = () => {
+  const router = express.Router({ mergeParams: true });
+  router.post('/next-dividends-batch', async (req: any, res: any) => {
+    const modules = boot();
+    const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+    const sharesToCalculate = await api.getNextSharesToCalculate();
+    await modules.close();
+    res.status(200).json({
+      status: true,
+    });
+  });
+
+  return router;
+};
+
 router.use('/user', userRouter());
 router.use('/north-capital', northCapitalRouter());
 router.use('/vertalo', vertaloRouter());
 router.use('/sync', syncRouter());
 router.use('/transaction', transactionRouter());
+router.use('/calculate', calculationRouter());
 
 app.use('/tests', router);
 export const main = serverless(app);

@@ -2,8 +2,12 @@ import type { AWS } from '@serverless/typescript';
 
 import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 import { ApiLambdaFunction, ApiLambdaResources } from './devops/functions/api/api-config';
-import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cronDocumentSync/cron-document-sync-config';
-import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cronVendorsSync/cron-vendors-sync-config';
+import {
+  CronDividendsCalculationFunction,
+  CronDividendsCalculationResources,
+} from './devops/functions/cron/dividendsCalculation/cron-dividends-calculation-config';
+import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
+import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
@@ -13,7 +17,7 @@ import { TestsFunction, TestsLambdaResources } from './devops/functions/tests/te
 import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } from './devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config';
 import { CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs, CognitoEnvs } from './devops/serverless/cognito';
 import { margeWithApiGatewayUrl, ProviderEnvironment } from './devops/serverless/serverless-common';
-import { getAttribute, getResourceName, importOutput } from './devops/serverless/utils';
+import { getAttribute, importOutput } from './devops/serverless/utils';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
@@ -76,6 +80,7 @@ const serverlessConfiguration: AWS = {
     queue: QueueFunction,
     cronDocumentsSync: CronDocumentSyncFunction,
     cronVendorsSync: CronVendorsSyncFunction,
+    cronDividendsCalculation: CronDividendsCalculationFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
@@ -95,6 +100,7 @@ const serverlessConfiguration: AWS = {
       ...TestsLambdaResources,
       ...CronDocumentSyncResources,
       ...CronVendorsSyncResources,
+      ...CronDividendsCalculationResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,

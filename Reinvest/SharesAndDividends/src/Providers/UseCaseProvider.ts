@@ -1,5 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
@@ -10,7 +11,9 @@ import { ChangeSharesState } from 'SharesAndDividends/UseCase/ChangeSharesState'
 import { CreateIncentiveReward } from 'SharesAndDividends/UseCase/CreateIncentiveReward';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
 import { DeclareDividend } from 'SharesAndDividends/UseCase/DeclareDividend';
+import { DividendsCalculationQuery } from 'SharesAndDividends/UseCase/DividendsCalculationQuery';
 import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
+import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 
 export class UseCaseProvider {
@@ -21,11 +24,16 @@ export class UseCaseProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(CreateShares, [SharesRepository, IdGenerator]);
-    container.addSingleton(ChangeSharesState, [SharesRepository, IdGenerator, FinancialOperationsRepository, 'SharesAndDividendsTransactionalAdapter']);
+    // queries
     container.addSingleton(StatsQuery, [SharesRepository, PortfolioService, DividendsRepository, FinancialOperationsRepository]);
     container.addSingleton(DividendsQuery, [DividendsRepository]);
+    container.addSingleton(DividendsCalculationQuery, [DividendsCalculationRepository]);
+
+    // use cases
+    container.addSingleton(CreateShares, [SharesRepository, IdGenerator]);
+    container.addSingleton(ChangeSharesState, [SharesRepository, IdGenerator, FinancialOperationsRepository, 'SharesAndDividendsTransactionalAdapter']);
     container.addSingleton(CreateIncentiveReward, [DividendsRepository, IdGenerator, NotificationService]);
     container.addSingleton(DeclareDividend, [IdGenerator, DividendsRepository, SharesRepository]);
+    container.addSingleton(MarkDividendAsReinvested, [DividendsRepository]);
   }
 }

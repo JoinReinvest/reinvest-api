@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { DividendsCalculationController } from 'SharesAndDividends/Port/Api/DividendsCalculationController';
 import { DividendsController } from 'SharesAndDividends/Port/Api/DividendsController';
 import { IncentiveRewardController } from 'SharesAndDividends/Port/Api/IncentiveRewardController';
 import { SharesController } from 'SharesAndDividends/Port/Api/SharesController';
@@ -7,12 +8,13 @@ import { StatsController } from 'SharesAndDividends/Port/Api/StatsController';
 export type SharesAndDividendsApiType = {
   createManuallyIncentiveReward: IncentiveRewardController['createManuallyIncentiveReward'];
   createShares: SharesController['createShares'];
-  declareDividend: DividendsController['declareDividend'];
+  declareDividend: DividendsCalculationController['declareDividend'];
   getAccountStats: StatsController['getAccountStats'];
   getDividend: DividendsController['getDividend'];
-  getDividendDeclarationByDate: DividendsController['getDividendDeclarationByDate'];
-  getDividendDeclarations: DividendsController['getDividendDeclarations'];
+  getDividendDeclarationByDate: DividendsCalculationController['getDividendDeclarationByDate'];
+  getDividendDeclarations: DividendsCalculationController['getDividendDeclarations'];
   getEVSChart: StatsController['getEVSChart'];
+  getNextSharesToCalculate: DividendsCalculationController['getNextSharesToCalculate'];
   markDividendReinvested: DividendsController['markDividendReinvested'];
   setSharesToFundedState: SharesController['setSharesToFundedState'];
   setSharesToFundingState: SharesController['setSharesToFundingState'];
@@ -29,7 +31,8 @@ export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndD
   createManuallyIncentiveReward: container.delegateTo(IncentiveRewardController, 'createManuallyIncentiveReward'),
   getDividend: container.delegateTo(DividendsController, 'getDividend'),
   markDividendReinvested: container.delegateTo(DividendsController, 'markDividendReinvested'),
-  declareDividend: container.delegateTo(DividendsController, 'declareDividend'),
-  getDividendDeclarations: container.delegateTo(DividendsController, 'getDividendDeclarations'),
-  getDividendDeclarationByDate: container.delegateTo(DividendsController, 'getDividendDeclarationByDate'),
+  declareDividend: container.delegateTo(DividendsCalculationController, 'declareDividend'),
+  getDividendDeclarations: container.delegateTo(DividendsCalculationController, 'getDividendDeclarations'),
+  getDividendDeclarationByDate: container.delegateTo(DividendsCalculationController, 'getDividendDeclarationByDate'),
+  getNextSharesToCalculate: container.delegateTo(DividendsCalculationController, 'getNextSharesToCalculate'),
 });

@@ -71,7 +71,7 @@ export class DividendDeclaration {
       this.portfolioId = schema.portfolioId;
       this.calculatedFromDate = DateTime.fromIsoDate(schema.calculatedFromDate);
       this.calculatedToDate = DateTime.fromIsoDate(schema.calculatedToDate);
-      this.createdDate = DateTime.fromIsoDate(schema.createdDate);
+      this.createdDate = DateTime.from(schema.createdDate);
       this.calculationFinishedDate = schema.calculationFinishedDate ? DateTime.fromIsoDate(schema.calculationFinishedDate) : null;
       this.amount = new Money(schema.totalDividendAmount);
       this.numberOfShares = schema.numberOfShares;
