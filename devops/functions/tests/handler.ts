@@ -706,6 +706,36 @@ const calculationRouter = () => {
       await modules.close();
     }
   });
+  router.post('/distribute-dividends', async (req: any, res: any) => {
+    const modules = boot();
+    const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+    try {
+      const accountIdsToDistributeDividends = await api.getAccountsForDividendDistribution();
+
+      if (!accountIdsToDistributeDividends) {
+        res.status(200).json({
+          status: true,
+          accountIdsToDistributeDividends: null,
+        });
+
+        return;
+      }
+
+      const { distributionId, accountIds } = accountIdsToDistributeDividends;
+      await api.distributeDividends(distributionId, accountIds);
+      res.status(200).json({
+        status: true,
+        accountIdsToDistributeDividends,
+      });
+    } catch (e: any) {
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    } finally {
+      await modules.close();
+    }
+  });
 
   return router;
 };

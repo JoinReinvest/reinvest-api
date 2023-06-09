@@ -50,6 +50,17 @@ const schema = `
         TOTAL: DeclarationStats
     }
 
+    enum DividendDistributionStatus {
+        DISTRIBUTING
+        DISTRIBUTED
+    }
+
+    type DividendDistribution {
+        id: ID
+        distributeToDate: ISODate
+        status: DividendDistributionStatus
+    }
+
     type Query {
         listDividendsDeclarations: [DividendsDeclaration]
 
@@ -70,6 +81,12 @@ const schema = `
         Declare the dividend from the LAST declarationDate to the CURRENT declarationDate
         """
         declareDividend(amount: Int!, declarationDate: ISODate!): DividendsDeclaration
+
+        """
+        @access: Executive
+        Distributes all AWAITING_DISTRIBUTION status until now
+        """
+        distributeDividends: DividendDistribution
     }
 `;
 
@@ -161,6 +178,20 @@ export const DividendsSchema = {
         }
 
         return api.getDividendDeclarationByDate(date);
+      },
+      distributeDividends: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+        if (!isExecutive) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+        const id = await api.createDividendDistribution();
+
+        if (!id) {
+          throw new GraphQLError('Cannot create dividend distribution');
+        }
+
+        return api.getDividendDistributionById(id);
       },
     },
   },

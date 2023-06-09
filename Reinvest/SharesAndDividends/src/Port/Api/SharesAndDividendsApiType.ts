@@ -7,14 +7,18 @@ import { StatsController } from 'SharesAndDividends/Port/Api/StatsController';
 
 export type SharesAndDividendsApiType = {
   calculateDividendsForShares: DividendsCalculationController['calculateDividendsForShares'];
+  createDividendDistribution: DividendsCalculationController['createDividendDistribution'];
   createManuallyIncentiveReward: IncentiveRewardController['createManuallyIncentiveReward'];
   createShares: SharesController['createShares'];
   declareDividend: DividendsCalculationController['declareDividend'];
+  distributeDividends: DividendsCalculationController['distributeDividends'];
   getAccountStats: StatsController['getAccountStats'];
+  getAccountsForDividendDistribution: DividendsCalculationController['getAccountsForDividendDistribution'];
   getDividend: DividendsController['getDividend'];
   getDividendDeclarationByDate: DividendsCalculationController['getDividendDeclarationByDate'];
   getDividendDeclarationStats: DividendsCalculationController['getDividendDeclarationStats'];
   getDividendDeclarations: DividendsCalculationController['getDividendDeclarations'];
+  getDividendDistributionById: DividendsCalculationController['getDividendDistributionById'];
   getEVSChart: StatsController['getEVSChart'];
   getNextSharesToCalculate: DividendsCalculationController['getNextSharesToCalculate'];
   markDividendReinvested: DividendsController['markDividendReinvested'];
@@ -39,4 +43,8 @@ export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndD
   getNextSharesToCalculate: container.delegateTo(DividendsCalculationController, 'getNextSharesToCalculate'),
   calculateDividendsForShares: container.delegateTo(DividendsCalculationController, 'calculateDividendsForShares'),
   getDividendDeclarationStats: container.delegateTo(DividendsCalculationController, 'getDividendDeclarationStats'),
+  distributeDividends: container.delegateTo(DividendsCalculationController, 'distributeDividends'),
+  getDividendDistributionById: container.delegateTo(DividendsCalculationController, 'getDividendDistributionById'),
+  getAccountsForDividendDistribution: container.delegateTo(DividendsCalculationController, 'getAccountsForDividendDistribution'),
+  createDividendDistribution: container.delegateTo(DividendsCalculationController, 'createDividendDistribution'),
 });

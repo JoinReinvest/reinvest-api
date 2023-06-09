@@ -27,6 +27,12 @@ export type SharesToCalculate = {
   sharesIds: UUID[];
 };
 
+export type DividendDistributionResponse = {
+  distributeToDate: string;
+  id: UUID;
+  status: 'DISTRIBUTING' | 'DISTRIBUTED';
+};
+
 export type DividendDeclarationStatsResponse = {
   AWAITING_DISTRIBUTION: {
     inDividends: string;
@@ -144,6 +150,45 @@ export class DividendsCalculationQuery {
     };
 
     return response;
+  }
+
+  async getDividendDistributionById(id: UUID): Promise<DividendDistributionResponse | null> {
+    const dividendDistribution = await this.dividendsCalculationRepository.getDividendDistributionById(id);
+
+    if (!dividendDistribution) {
+      return null;
+    }
+
+    const { distributeToDate, status } = dividendDistribution.toObject();
+
+    return {
+      id,
+      distributeToDate: DateTime.from(distributeToDate).toIsoDate(),
+      status,
+    };
+  }
+
+  async getAccountsForDividendDistribution(): Promise<null | {
+    accountIds: UUID[];
+    distributionId: UUID;
+  }> {
+    const dividendDistribution = await this.dividendsCalculationRepository.getLastPendingDividendDistribution();
+
+    if (!dividendDistribution) {
+      return null;
+    }
+
+    const { distributionId, distributeToDate } = dividendDistribution.forFindingAccountsToDistributeDividend();
+    const accountIds = await this.dividendsCalculationRepository.getAccountsForDividendDistribution(distributeToDate);
+
+    if (accountIds.length === 0) {
+      return null;
+    }
+
+    return {
+      accountIds,
+      distributionId,
+    };
   }
 
   private mapDividendDeclarationToResponse(declaration: DividendDeclaration): DividendDeclarationResponse {

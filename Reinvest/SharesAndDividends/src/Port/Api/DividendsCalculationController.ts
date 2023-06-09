@@ -2,10 +2,13 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { CalculateDividends } from 'SharesAndDividends/UseCase/CalculateDividends';
+import { CreateDividendDistribution } from 'SharesAndDividends/UseCase/CreateDividendDistribution';
 import { DeclareDividend } from 'SharesAndDividends/UseCase/DeclareDividend';
+import { DistributeDividends } from 'SharesAndDividends/UseCase/DistributeDividends';
 import {
   DividendDeclarationResponse,
   DividendDeclarationStatsResponse,
+  DividendDistributionResponse,
   DividendsCalculationQuery,
   SharesToCalculate,
 } from 'SharesAndDividends/UseCase/DividendsCalculationQuery';
@@ -16,11 +19,21 @@ export class DividendsCalculationController {
   private dividendsCalculationQuery: DividendsCalculationQuery;
   private declareDividendUseCase: DeclareDividend;
   private calculateDividendsUseCase: CalculateDividends;
+  private createDividendDistributionUseCase: CreateDividendDistribution;
+  private distributeDividendsUseCase: DistributeDividends;
 
-  constructor(dividendsCalculationQuery: DividendsCalculationQuery, declareDividendUseCase: DeclareDividend, calculateDividendsUseCase: CalculateDividends) {
+  constructor(
+    dividendsCalculationQuery: DividendsCalculationQuery,
+    declareDividendUseCase: DeclareDividend,
+    calculateDividendsUseCase: CalculateDividends,
+    createDividendDistributionUseCase: CreateDividendDistribution,
+    distributeDividendsUseCase: DistributeDividends,
+  ) {
     this.dividendsCalculationQuery = dividendsCalculationQuery;
     this.declareDividendUseCase = declareDividendUseCase;
     this.calculateDividendsUseCase = calculateDividendsUseCase;
+    this.createDividendDistributionUseCase = createDividendDistributionUseCase;
+    this.distributeDividendsUseCase = distributeDividendsUseCase;
   }
 
   static getClassName = () => 'DividendsCalculationController';
@@ -55,5 +68,24 @@ export class DividendsCalculationController {
 
   async calculateDividendsForShares(sharesToCalculate: SharesToCalculate): Promise<void> {
     await this.calculateDividendsUseCase.execute(sharesToCalculate);
+  }
+
+  async createDividendDistribution(): Promise<null | UUID> {
+    return this.createDividendDistributionUseCase.execute();
+  }
+
+  async getAccountsForDividendDistribution(): Promise<null | {
+    accountIds: UUID[];
+    distributionId: UUID;
+  }> {
+    return this.dividendsCalculationQuery.getAccountsForDividendDistribution();
+  }
+
+  async distributeDividends(distributionId: UUID, accountIds: UUID[]): Promise<void> {
+    await this.distributeDividendsUseCase.execute(distributionId, accountIds);
+  }
+
+  async getDividendDistributionById(id: UUID): Promise<null | DividendDistributionResponse> {
+    return this.dividendsCalculationQuery.getDividendDistributionById(id);
   }
 }

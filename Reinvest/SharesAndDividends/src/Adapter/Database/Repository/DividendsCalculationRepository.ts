@@ -1,7 +1,9 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { sql } from 'kysely';
 import { DateTime } from 'Money/DateTime';
 import {
   sadCalculatedDividendsTable,
+  sadDividendDistributionTable,
   sadDividendsDeclarationsTable,
   sadSharesTable,
   SharesAndDividendsDatabaseAdapterProvider,
@@ -9,6 +11,7 @@ import {
 import { CalculatedDividendsTable, DividendsDeclarationTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
 import { CalculatedDividend } from 'SharesAndDividends/Domain/Dividends/CalculatedDividend';
 import { DividendDeclaration, DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
+import { DividendDistribution, DividendDistributionStatus, DividendsDistributionSchema } from 'SharesAndDividends/Domain/Dividends/DividendDistribution';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export class DividendsCalculationRepository {
@@ -149,6 +152,52 @@ export class DividendsCalculationRepository {
       .where('declarationId', '=', <any>declarationId)
       .groupBy('status')
       .execute();
+  }
+
+  async getAccountsForDividendDistribution(createdBeforeDate: DateTime): Promise<UUID[]> {
+    const accounts = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadCalculatedDividendsTable)
+      .select(['accountId'])
+      .where('status', '=', 'AWAITING_DISTRIBUTION')
+      .where(sql`"calculationDate"::date <= ${createdBeforeDate.toIsoDate()}`)
+      .groupBy('accountId')
+      .limit(1000)
+      .execute();
+
+    return accounts.map((account: { accountId: string }) => account.accountId);
+  }
+
+  async getLastPendingDividendDistribution(): Promise<DividendDistribution | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadDividendDistributionTable)
+      .selectAll()
+      .where('status', '=', DividendDistributionStatus.DISTRIBUTING)
+      .executeTakeFirst();
+
+    return data ? DividendDistribution.restore(<DividendsDistributionSchema>data) : null;
+  }
+
+  async createDividendDistribution(dividendDistribution: DividendDistribution): Promise<void> {
+    const values = dividendDistribution.toObject();
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadDividendDistributionTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.column('id').doUpdateSet({
+          status: values.status,
+        }),
+      )
+      .execute();
+  }
+
+  async getDividendDistributionById(id: UUID): Promise<DividendDistribution | null> {
+    const data = await this.databaseAdapterProvider.provide().selectFrom(sadDividendDistributionTable).selectAll().where('id', '=', id).executeTakeFirst();
+
+    return data ? DividendDistribution.restore(<DividendsDistributionSchema>data) : null;
   }
 
   private restoreDividendDeclaration(data: DividendsDeclarationTable): DividendDeclaration | null {

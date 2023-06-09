@@ -1,5 +1,6 @@
-import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
+import { JSONObject, JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
+import { DividendDistributionStatus } from 'SharesAndDividends/Domain/Dividends/DividendDistribution';
 import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
 import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
@@ -52,8 +53,8 @@ export interface CalculatedDividendsTable {
 
 export interface DividendDistributionTable {
   distributeToDate: Date;
-  id: string;
-  status: 'DISTRIBUTING' | 'DISTRIBUTED';
+  id: UUID;
+  status: DividendDistributionStatus;
 }
 
 export interface InvestorDividendsTable {
