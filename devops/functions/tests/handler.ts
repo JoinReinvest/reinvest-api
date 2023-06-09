@@ -680,11 +680,31 @@ const calculationRouter = () => {
   router.post('/next-dividends-batch', async (req: any, res: any) => {
     const modules = boot();
     const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
-    const sharesToCalculate = await api.getNextSharesToCalculate();
-    await modules.close();
-    res.status(200).json({
-      status: true,
-    });
+    try {
+      const sharesToCalculate = await api.getNextSharesToCalculate();
+
+      if (!sharesToCalculate) {
+        res.status(200).json({
+          status: true,
+          sharesToCalculate: null,
+        });
+
+        return;
+      }
+
+      await api.calculateDividendsForShares(sharesToCalculate);
+      res.status(200).json({
+        status: true,
+        sharesToCalculate,
+      });
+    } catch (e: any) {
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    } finally {
+      await modules.close();
+    }
   });
 
   return router;

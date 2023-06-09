@@ -36,7 +36,7 @@ export class AccountStatsCalculationService {
     for (const record of this.shares) {
       const { numberOfShares, price } = record;
       this.costOfSharesOwned = this.costOfSharesOwned.add(price);
-      const unitEVS = !numberOfShares ? price : unitSharePrice.multiply(numberOfShares);
+      const unitEVS = !numberOfShares ? price : unitSharePrice.multiplyBy(numberOfShares);
       this.EVS = this.EVS.add(unitEVS);
 
       if (numberOfShares) {

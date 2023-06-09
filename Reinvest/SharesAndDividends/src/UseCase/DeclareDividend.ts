@@ -21,15 +21,23 @@ export class DeclareDividend {
   async execute(portfolioId: string, amount: Money, declarationDate: DateTime): Promise<void> {
     const lastDate = await this.dividendsCalculationRepository.getLastDeclarationDate();
 
-    const firstSharesCreatedDate = !lastDate ? await this.sharesRepository.getFirstSharesCreatedDate() : null;
-    const calculatedFromDate = lastDate ? lastDate.addDays(1) : firstSharesCreatedDate;
+    const firstSharesFundingDate = !lastDate ? await this.sharesRepository.getFirstSharesFundingDate() : null;
+    const calculatedFromDate = lastDate ? lastDate.addDays(1) : firstSharesFundingDate;
     const calculatedToDate = declarationDate;
+
+    if (calculatedToDate.isToday()) {
+      throw new Error('Dividend declaration date must be an ended day (not today)');
+    }
+
+    if (calculatedToDate.isFuture()) {
+      throw new Error('Dividend declaration date must be a past day (not in the future)');
+    }
 
     if (!calculatedFromDate) {
       throw new Error('No shares created yet, so not able to specify dividend calculation start date');
     }
 
-    if (calculatedToDate.isBeforeOrEqual(calculatedFromDate)) {
+    if (calculatedToDate.isBeforeOrEqual(lastDate ? lastDate! : firstSharesFundingDate!)) {
       throw new Error('Dividend declaration date must be after the last dividend declaration date or the first shares created date');
     }
 

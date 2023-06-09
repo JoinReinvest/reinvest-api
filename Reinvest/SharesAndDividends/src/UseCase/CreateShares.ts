@@ -1,4 +1,5 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { Money } from 'Money/Money';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
 import { Shares } from 'SharesAndDividends/Domain/Shares';
 
@@ -13,7 +14,7 @@ export class CreateShares {
 
   static getClassName = () => 'CreateShares';
 
-  async execute(portfolioId: string, profileId: string, accountId: string, investmentId: string, price: number): Promise<void> {
+  async execute(portfolioId: string, profileId: string, accountId: string, investmentId: string, price: Money): Promise<void> {
     const existingShares = await this.sharesRepository.getSharesByInvestmentId(investmentId);
 
     if (existingShares) {

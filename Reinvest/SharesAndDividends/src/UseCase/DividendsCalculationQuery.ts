@@ -1,6 +1,8 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
-import { DividendDeclaration } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
+import { DividendDeclaration, DividendDeclarationStatus } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
 
 export type NumberOfSharesPerDayResponse = {
   date: string;
@@ -13,11 +15,39 @@ export type DividendDeclarationResponse = {
   calculationFinishedDate: string | null;
   createdDate: string;
   declarationDate: string;
-  id: string;
+  id: UUID;
   numberOfDays: number;
   numberOfSharesPerDay: NumberOfSharesPerDayResponse[];
-  status: 'CALCULATING' | 'CALCULATED';
+  status: DividendDeclarationStatus;
   unitAmountPerDay: string;
+};
+
+export type SharesToCalculate = {
+  declarationId: UUID;
+  sharesIds: UUID[];
+};
+
+export type DividendDeclarationStatsResponse = {
+  AWAITING_DISTRIBUTION: {
+    inDividends: string;
+    inFees: string;
+  };
+  DISTRIBUTED: {
+    inDividends: string;
+    inFees: string;
+  };
+  LOCKED: {
+    inDividends: string;
+    inFees: string;
+  };
+  REVOKED: {
+    inDividends: string;
+    inFees: string;
+  };
+  TOTAL: {
+    inDividends: string;
+    inFees: string;
+  };
 };
 
 export class DividendsCalculationQuery {
@@ -39,6 +69,81 @@ export class DividendsCalculationQuery {
     const declaration = await this.dividendsCalculationRepository.getDividendDeclarationByDate(DateTime.from(declarationDate));
 
     return declaration ? this.mapDividendDeclarationToResponse(declaration) : null;
+  }
+
+  async getNextSharesToCalculate(): Promise<null | SharesToCalculate> {
+    const pendingDeclaration = await this.dividendsCalculationRepository.getPendingDeclaration();
+
+    if (!pendingDeclaration) {
+      return null;
+    }
+
+    const { portfolioId, declarationId, toDate } = pendingDeclaration.forFindingSharesToCalculate();
+    const sharesIds = await this.dividendsCalculationRepository.getSharesIdsToCalculate(portfolioId, declarationId, toDate);
+
+    if (!sharesIds.length) {
+      return null;
+    }
+
+    return {
+      declarationId,
+      sharesIds,
+    };
+  }
+
+  async getDividendDeclarationStats(declarationId: UUID): Promise<DividendDeclarationStatsResponse | null> {
+    const declarationStats = await this.dividendsCalculationRepository.getDividendDeclarationStats(declarationId);
+
+    if (!declarationStats) {
+      return null;
+    }
+
+    const response = {
+      AWAITING_DISTRIBUTION: {
+        inDividends: Money.zero().getFormattedAmount(),
+        inFees: Money.zero().getFormattedAmount(),
+      },
+      DISTRIBUTED: {
+        inDividends: Money.zero().getFormattedAmount(),
+        inFees: Money.zero().getFormattedAmount(),
+      },
+      LOCKED: {
+        inDividends: Money.zero().getFormattedAmount(),
+        inFees: Money.zero().getFormattedAmount(),
+      },
+      REVOKED: {
+        inDividends: Money.zero().getFormattedAmount(),
+        inFees: Money.zero().getFormattedAmount(),
+      },
+      TOTAL: {
+        inDividends: Money.zero().getFormattedAmount(),
+        inFees: Money.zero().getFormattedAmount(),
+      },
+    };
+
+    let totalDividend = Money.zero();
+    let totalFee = Money.zero();
+
+    for (const record of declarationStats) {
+      const { status, inDividends, inFees } = record;
+      const dividend = Money.lowPrecision(parseInt(<string>inDividends));
+      const fee = Money.lowPrecision(parseInt(<string>inFees));
+
+      response[status] = {
+        inDividends: dividend.getFormattedAmount(),
+        inFees: fee.getFormattedAmount(),
+      };
+
+      totalDividend = totalDividend.add(dividend);
+      totalFee = totalFee.add(fee);
+    }
+
+    response.TOTAL = {
+      inDividends: totalDividend.getFormattedAmount(),
+      inFees: totalFee.getFormattedAmount(),
+    };
+
+    return response;
   }
 
   private mapDividendDeclarationToResponse(declaration: DividendDeclaration): DividendDeclarationResponse {

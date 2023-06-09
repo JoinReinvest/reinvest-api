@@ -1,3 +1,5 @@
+import { UUID } from 'HKEKTypes/Generics';
+import { sql } from 'kysely';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { sadSharesTable, SharesAndDividendsDatabaseAdapterProvider } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
@@ -25,6 +27,7 @@ export class SharesRepository {
       .onConflict(oc =>
         oc.column('investmentId').doUpdateSet({
           dateFunded: eb => eb.ref(`excluded.dateFunded`),
+          dateFunding: eb => eb.ref(`excluded.dateFunding`),
           dateRevoked: eb => eb.ref(`excluded.dateRevoked`),
           dateSettled: eb => eb.ref(`excluded.dateSettled`),
           numberOfShares: eb => eb.ref(`excluded.numberOfShares`),
@@ -105,16 +108,16 @@ export class SharesRepository {
     return Shares.restore(data);
   }
 
-  async getFirstSharesCreatedDate(): Promise<DateTime | null> {
+  async getFirstSharesFundingDate(): Promise<DateTime | null> {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(sadSharesTable)
-      .select(['dateCreated'])
-      .orderBy('dateCreated', 'asc')
+      .select(['dateFunding'])
+      .orderBy('dateFunding', 'asc')
       .limit(1)
       .executeTakeFirst();
 
-    return !data ? null : DateTime.fromIsoDate(data.dateCreated);
+    return !data ? null : DateTime.fromIsoDate(data.dateFunding!);
   }
 
   async getAccumulativeNumberOfSharesPerDay(portfolioId: string, calculatedFromDate: DateTime, calculatedToDate: DateTime): Promise<NumberOfSharesPerDay> {
@@ -150,7 +153,7 @@ export class SharesRepository {
       .selectFrom(sadSharesTable)
       .select(eb => [eb.fn.sum('numberOfShares').as('shares')])
       .where('portfolioId', '=', portfolioId)
-      .where('dateCreated', '<', <any>calculatedFromDate.toIsoDate())
+      .where('dateFunding', '<', <any>calculatedFromDate.toIsoDate())
       .where('status', '!=', SharesStatus.REVOKED)
       .executeTakeFirst();
 
@@ -167,10 +170,10 @@ export class SharesRepository {
     const sharesInPeriod = await this.databaseAdapterProvider
       .provide()
       .selectFrom(sadSharesTable)
-      .select(eb => [eb.fn('to_char', ['dateCreated', eb.val('yyyy-mm-dd')]).as('isoDate'), eb.fn.sum('numberOfShares').as('shares')])
+      .select(eb => [eb.fn('to_char', ['dateFunding', eb.val('yyyy-mm-dd')]).as('isoDate'), eb.fn.sum('numberOfShares').as('shares')])
       .where('portfolioId', '=', portfolioId)
-      .where('dateCreated', '>=', <any>calculatedFromDate.toIsoDate())
-      .where('dateCreated', '<=', <any>calculatedToDate.toIsoDate())
+      .where(sql`"dateFunding"::date >= ${calculatedFromDate.toIsoDate()}`)
+      .where(sql`"dateFunding"::date <= ${calculatedToDate.toIsoDate()}`)
       .groupBy('isoDate')
       .orderBy('isoDate', 'asc')
       .execute();
@@ -179,10 +182,26 @@ export class SharesRepository {
     sharesInPeriod.map(record => {
       const index = <string>record.isoDate;
       // @ts-ignore
-      days[index] = record.shares;
+      days[index] = record?.shares ? record?.shares : 0;
     });
 
     return days;
+  }
+
+  async getSharesByIds(sharesIds: UUID[]): Promise<Shares[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .selectAll()
+      .where('id', 'in', sharesIds)
+      .castTo<SharesSchema>()
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(Shares.restore);
   }
 
   private async getRevokedSharesPerDay(

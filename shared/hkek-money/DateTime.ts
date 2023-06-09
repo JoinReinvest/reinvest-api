@@ -31,6 +31,10 @@ export class DateTime {
     return this.date.isBefore(other.getInstance()) || this.date.isSame(other.getInstance());
   }
 
+  isBefore(other: DateTime): boolean {
+    return this.date.isBefore(other.getInstance());
+  }
+
   addDays(days: number): DateTime {
     return new DateTime(this.date.add(days, 'day'));
   }
@@ -45,5 +49,13 @@ export class DateTime {
 
   toIsoDateTime() {
     return this.date.format('YYYY-MM-DDTHH:mm:ss');
+  }
+
+  isToday() {
+    return this.date.isSame(dayjs(), 'day');
+  }
+
+  isFuture() {
+    return this.date.isAfter(dayjs(), 'day');
   }
 }

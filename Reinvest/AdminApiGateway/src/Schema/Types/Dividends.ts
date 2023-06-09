@@ -37,8 +37,23 @@ const schema = `
         status: DividendDeclarationStatus
     }
 
+    type DeclarationStats {
+        inDividends: String
+        inFees: String
+    }
+
+    type DividendsDeclarationStats {
+        AWAITING_DISTRIBUTION: DeclarationStats
+        DISTRIBUTED: DeclarationStats
+        LOCKED: DeclarationStats
+        REVOKED: DeclarationStats
+        TOTAL: DeclarationStats
+    }
+
     type Query {
         listDividendsDeclarations: [DividendsDeclaration]
+
+        getDividendDeclarationStats(declarationId: ID!): DividendsDeclarationStats
     }
 
     type Mutation {
@@ -70,6 +85,16 @@ export const DividendsSchema = {
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
 
         return api.getDividendDeclarations();
+      },
+
+      getDividendDeclarationStats: async (parent: any, { declarationId }: { declarationId: string }, { modules, isExecutive }: AdminSessionContext) => {
+        if (!isExecutive) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+
+        return api.getDividendDeclarationStats(declarationId);
       },
     },
     Mutation: {

@@ -1,5 +1,5 @@
 import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
-import { NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
+import { DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
 import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
 import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
@@ -8,6 +8,7 @@ export interface SharesTable {
   accountId: string;
   dateCreated: Date;
   dateFunded: Date | null;
+  dateFunding: Date | null;
   dateRevoked: Date | null;
   dateSettled: Date | null;
   id: string;
@@ -31,7 +32,7 @@ export interface DividendsDeclarationTable {
   numberOfDays: number;
   numberOfSharesJson: JSONObjectOf<NumberOfSharesPerDay>;
   portfolioId: string;
-  status: 'CALCULATING' | 'CALCULATED';
+  status: DividendDeclarationStatus;
   totalDividendAmount: number;
   unitAmountPerDay: number;
 }
@@ -43,6 +44,7 @@ export interface CalculatedDividendsTable {
   dividendAmount: number;
   feeAmount: number;
   id: string;
+  numberOfDaysInvestorOwnsShares: number;
   profileId: string;
   sharesId: string;
   status: 'AWAITING_DISTRIBUTION' | 'DISTRIBUTED' | 'LOCKED' | 'REVOKED';
