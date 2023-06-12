@@ -22,7 +22,7 @@ export class AdapterServiceProvider {
     container
       .addAsValue('S3Config', this.config.s3)
       .addSingleton(S3Adapter, ['S3Config'])
-      .addSingleton(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()])
-      .addSingleton(PdfService, [S3Adapter.getClassName()]);
+      .addSingleton(FileLinkService, [S3Adapter, IdGenerator])
+      .addSingleton(PdfService, [S3Adapter]);
   }
 }
