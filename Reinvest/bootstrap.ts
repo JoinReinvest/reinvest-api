@@ -56,6 +56,7 @@ export function boot(): Modules {
     Documents.create({
       database: databaseConfig,
       s3: s3Config,
+      chromiumEndpoint: process.env.CHROMIUM_ENDPOINT ?? 'http://localhost:3000',
     } as Documents.Config),
   );
 

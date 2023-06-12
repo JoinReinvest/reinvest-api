@@ -1,14 +1,26 @@
-import { PdfService } from 'Documents/Adapter/S3/PdfService';
+import { GeneratePdf } from 'Documents/UseCases/GeneratePdf';
+
+export type Template = {
+  paragraphs: {
+    lines: string[];
+    isCheckedOption?: boolean;
+  }[];
+  header?: string;
+}[];
+
+export enum PdfTypes {
+  AGREEMENT = 'AGREEMENT',
+}
 
 export class PdfController {
   public static getClassName = (): string => 'PdfController';
-  private pdfService: PdfService;
+  private generatePdfUseCase: GeneratePdf;
 
-  constructor(pdfService: PdfService) {
-    this.pdfService = pdfService;
+  constructor(generatePdf: GeneratePdf) {
+    this.generatePdfUseCase = generatePdf;
   }
-  public async generatePdf(catalog: string, fileName: string) {
-    const response = await this.pdfService.uploadBufferPdf(catalog, fileName);
+  public async generatePdf(catalog: string, fileName: string, template: Template, type: PdfTypes) {
+    const response = await this.generatePdfUseCase.execute(catalog, fileName, template, type);
 
     return response;
   }

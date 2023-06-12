@@ -1,8 +1,14 @@
+import TemplateParser, { DynamicType } from 'Investments/Application/Service/TemplateParser';
 import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
+import { subscriptionAgreementsTemplate, TemplateVersions } from 'Investments/Domain/SubscriptionAgreement';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { DomainEvent } from 'SimpleAggregator/Types';
+
+export enum PdfTypes {
+  AGREEMENT = 'AGREEMENT',
+}
 
 class SignSubscriptionAgreement {
   static getClassName = (): string => 'SignSubscriptionAgreement';
@@ -51,7 +57,13 @@ class SignSubscriptionAgreement {
     const isAssigned = await this.investmentsRepository.assignSubscriptionAgreementAndUpdateStatus(investment);
 
     if (isAssigned) {
-      await this.documentsService.generatePdf(profileId, id);
+      const { contentFieldsJson, templateVersion } = subscriptionAgreement.getDataForParser();
+
+      const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as TemplateVersions]);
+
+      const parsed = parser.parse(contentFieldsJson as DynamicType);
+
+      await this.documentsService.generatePdf(profileId, id, parsed, PdfTypes.AGREEMENT);
 
       events.push({
         id,
