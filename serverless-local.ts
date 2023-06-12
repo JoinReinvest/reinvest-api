@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 import { ApiLambdaFunction, ApiLambdaResources } from './devops/functions/api/api-config';
+import { ChromiumFunction, ChromiumLambdaResources } from './devops/functions/chromium/chromium-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cronDocumentSync/cron-document-sync-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cronVendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
@@ -59,6 +60,7 @@ const serverlessConfiguration: AWS = {
     explorer: ExplorerLambdaFunction,
     migration: MigrationLambdaFunction,
     queue: QueueFunction,
+    chromium: ChromiumFunction,
     cronDocumentsSync: CronDocumentSyncFunction,
     cronVendorsSync: CronVendorsSyncFunction,
     cognitoPostSignUpFunction,
@@ -77,6 +79,7 @@ const serverlessConfiguration: AWS = {
       ...AdminLambdaResources,
       ...ApiLambdaResources,
       ...ExplorerLambdaResources,
+      ...ChromiumLambdaResources,
       ...MigrationLambdaResources,
       ...UnauthorizedEndpointsLambdaResources,
       ...QueueResources,

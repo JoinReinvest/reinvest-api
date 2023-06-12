@@ -1,10 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
 import { DatabaseAdapterInstance, DatabaseAdapterProvider } from 'Documents/Adapter/Database/DatabaseAdapter';
 import { FileLinkService } from 'Documents/Adapter/S3/FileLinkService';
+import { PdfService } from 'Documents/Adapter/S3/PdfService';
 import { S3Adapter } from 'Documents/Adapter/S3/S3Adapter';
 import { Documents } from 'Documents/index';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
-
 export class AdapterServiceProvider {
   private config: Documents.Config;
 
@@ -22,6 +22,7 @@ export class AdapterServiceProvider {
     container
       .addAsValue('S3Config', this.config.s3)
       .addSingleton(S3Adapter, ['S3Config'])
-      .addSingleton(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()]);
+      .addSingleton(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()])
+      .addSingleton(PdfService, [S3Adapter.getClassName()]);
   }
 }

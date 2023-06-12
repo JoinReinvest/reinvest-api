@@ -3,6 +3,7 @@ import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { Investments } from 'Investments/index';
+import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import {
   createInvestmentsDatabaseAdapterProvider,
@@ -45,7 +46,7 @@ export default class AdaptersProviders {
       .addSingleton(ReinvestmentRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
 
-    container.addSingleton(SharesAndDividendService, ['SharesAndDividends']);
+    container.addSingleton(SharesAndDividendService, ['SharesAndDividends']).addSingleton(DocumentsService, ['Documents']);
 
     // process manager
     container.addSingleton(TransactionExecutor, [SimpleEventBus]);

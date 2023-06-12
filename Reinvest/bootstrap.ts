@@ -157,6 +157,7 @@ export function boot(): Modules {
       } as Investments.Config,
       {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+        documents: modules.get(Documents.moduleName) as Documents.Main,
       },
     ),
   );
