@@ -57,7 +57,7 @@ export default class UseCaseProviders {
     container.addSingleton(SubscriptionAgreementQuery, [SubscriptionAgreementRepository]);
     container.addSingleton(InvestmentSummaryQuery, [InvestmentsRepository]);
     container.addSingleton(SignSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, DocumentsService]);
-    container.addSingleton(SignRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository]);
+    container.addSingleton(SignRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, DocumentsService]);
     container.addSingleton(ApproveFees, [FeesRepository]);
     container.addSingleton(StartInvestment, [InvestmentsRepository, SubscriptionAgreementRepository, FeesRepository]);
     container.addSingleton(IsFeeApproved, [FeesRepository]);

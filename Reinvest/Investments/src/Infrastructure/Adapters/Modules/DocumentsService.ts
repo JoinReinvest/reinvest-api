@@ -1,6 +1,5 @@
 import { Documents } from 'Documents/index';
-import { Template } from 'Investments/Application/Service/TemplateParser';
-import type { PdfTypes } from 'Investments/Application/UseCases/SignSubscriptionAgreement';
+import type { PdfTypes, Template } from 'Investments/Domain/SubscriptionAgreements/types';
 
 /**
  * Documents Module ACL
