@@ -46,21 +46,21 @@ export class S3Adapter {
       region: this.config.region,
     });
 
-    const pass = new Stream.PassThrough();
+    const stream = new Stream.PassThrough();
 
     const parallelUploads3 = new Upload({
       client,
       params: {
         Bucket: this.config.documentsBucket,
         Key: `${catalog}/${fileName}`,
-        Body: pass,
+        Body: stream,
         ContentType: 'application/pdf',
         ACL: 'private',
       },
     });
-    buffer.pipe(pass);
+    buffer.pipe(stream);
 
-    const res = await parallelUploads3.done();
+    await parallelUploads3.done();
 
     return true;
   }
