@@ -195,7 +195,7 @@
       Client must sign the agreement and call signSubscriptionAgreement mutation.
     * `signSubscriptionAgreement` - It signs the subscription agreement.
     * `approveFees` - Approves the fees for the specific investment.
-      In case if extra fee is required for recurring investment and the investment was started automatically by the
+      In case if extra totalFeeAmount is required for recurring investment and the investment was started automatically by the
       system, then
       use this method to approve the fees (it will ask for that on verification step triggered from the notification).
     * `startInvestment` - It starts the investment.

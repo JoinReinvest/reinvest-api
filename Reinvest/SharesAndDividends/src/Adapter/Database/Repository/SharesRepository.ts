@@ -4,9 +4,9 @@ import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { sadSharesTable, SharesAndDividendsDatabaseAdapterProvider } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { SharesAndTheirPricesSelection, SharesTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
-import { SharesAndTheirPrices } from 'SharesAndDividends/Domain/AccountStatsCalculationService';
-import { NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
+import { NumberOfSharesPerDay } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDeclaration';
 import { Shares, SharesSchema, SharesStatus } from 'SharesAndDividends/Domain/Shares';
+import { SharesAndTheirPrices } from 'SharesAndDividends/Domain/Stats/AccountStatsCalculationService';
 
 export class SharesRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -202,6 +202,23 @@ export class SharesRepository {
     }
 
     return data.map(Shares.restore);
+  }
+
+  async getCostOfSharesOwned(accountId: UUID, toDate: DateTime): Promise<Money> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .select(eb => [eb.fn.sum('price').as('costOfSharesOwned')])
+      .where('accountId', '=', accountId)
+      .where(sql`"dateFunding"::date <= ${toDate.toIsoDate()}`)
+      .where('status', '!=', SharesStatus.REVOKED)
+      .executeTakeFirst();
+
+    if (!data?.costOfSharesOwned) {
+      return Money.zero();
+    }
+
+    return Money.lowPrecision(parseInt(<string>data.costOfSharesOwned));
   }
 
   private async getRevokedSharesPerDay(

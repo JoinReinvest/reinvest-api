@@ -129,6 +129,28 @@ export class CalculatedDividend {
     };
   }
 
+  getProfileId(): UUID {
+    return this.profileId;
+  }
+
+  forCalculatingInvestorDividend(): {
+    calculatedDividendId: UUID;
+    dividend: Money;
+    fee: Money;
+    numberOfDays: number;
+  } {
+    return {
+      dividend: this.dividendAmount,
+      fee: this.feeAmount,
+      numberOfDays: this.numberOfDaysInvestorOwnsShares,
+      calculatedDividendId: this.id,
+    };
+  }
+
+  markAsDistributed(): void {
+    this.status = CalculatedDividendStatus.DISTRIBUTED;
+  }
+
   private mapSharesStatusToCalculatedDividendStatus(sharesStatus: SharesStatus): CalculatedDividendStatus {
     if (this.status === CalculatedDividendStatus.DISTRIBUTED) {
       return this.status;

@@ -94,4 +94,16 @@ export class Money {
   divideBy(divisor: number): Money {
     return new Money(this.value.divide(divisor).getAmount(), this.currency, this.precision);
   }
+
+  isGreaterThan(money: Money): boolean {
+    return this.value.greaterThan(money.getValue());
+  }
+
+  isZero(): boolean {
+    return this.value.isZero();
+  }
+
+  isNegative(): boolean {
+    return this.value.isNegative();
+  }
 }

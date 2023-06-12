@@ -1,9 +1,10 @@
 import { JSONObject, JSONObjectOf, UUID } from 'HKEKTypes/Generics';
-import { DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
-import { DividendDistributionStatus } from 'SharesAndDividends/Domain/Dividends/DividendDistribution';
-import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
+import { DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDeclaration';
+import { DividendDistributionStatus } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDistribution';
 import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
+import { CalculatedDividendsList, InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
+import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 
 export interface SharesTable {
   accountId: string;
@@ -58,15 +59,16 @@ export interface DividendDistributionTable {
 }
 
 export interface InvestorDividendsTable {
-  accountId: string;
+  accountId: UUID;
   actionDate: Date | null;
-  calculatedDividends: JSONObject;
+  calculatedDividendsJson: JSONObjectOf<CalculatedDividendsList>;
   createdDate: Date;
-  distributionId: string;
+  distributionId: UUID;
   dividendAmount: number;
-  id: string;
-  profileId: string;
-  status: 'AWAITING_ACTION' | 'REINVESTED' | 'WITHDRAWN' | 'ZEROED' | 'WITHDRAWING';
+  feesCoveredByDividendId: UUID | null;
+  id: UUID;
+  profileId: UUID;
+  status: InvestorDividendStatus;
   totalDividendAmount: number;
   totalFeeAmount: number;
 }

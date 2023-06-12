@@ -2,7 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
-import { DividendDeclaration, DividendDeclarationStatus } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
+import { DividendDeclaration, DividendDeclarationStatus } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDeclaration';
 
 export type NumberOfSharesPerDayResponse = {
   date: string;

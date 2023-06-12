@@ -61,4 +61,8 @@ export class DividendDistribution {
       distributeToDate: this.distributeToDate,
     };
   }
+
+  getDistributeToDate(): DateTime {
+    return this.distributeToDate;
+  }
 }

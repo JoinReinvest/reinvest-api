@@ -1,7 +1,7 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
-import { CalculatedDividend } from 'SharesAndDividends/Domain/Dividends/CalculatedDividend';
+import { CalculatedDividend } from 'SharesAndDividends/Domain/CalculatingDividends/CalculatedDividend';
 import { SharesToCalculate } from 'SharesAndDividends/UseCase/DividendsCalculationQuery';
 
 export class CalculateDividends {

@@ -39,7 +39,13 @@ export class UseCaseProvider {
     container.addSingleton(DeclareDividend, [IdGenerator, DividendsCalculationRepository, SharesRepository]);
     container.addSingleton(CalculateDividends, [IdGenerator, DividendsCalculationRepository, SharesRepository]);
     container.addSingleton(CreateDividendDistribution, [IdGenerator, DividendsCalculationRepository]);
-    container.addSingleton(DistributeDividends, [IdGenerator, DividendsCalculationRepository]);
+    container.addSingleton(DistributeDividends, [
+      IdGenerator,
+      DividendsCalculationRepository,
+      SharesRepository,
+      'SharesAndDividendsTransactionalAdapter',
+      NotificationService,
+    ]);
     container.addSingleton(MarkDividendAsReinvested, [DividendsRepository]);
   }
 }

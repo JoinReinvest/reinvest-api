@@ -2,7 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DateTime } from 'Money/DateTime';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
-import { DividendDistribution } from 'SharesAndDividends/Domain/Dividends/DividendDistribution';
+import { DividendDistribution } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDistribution';
 
 export class CreateDividendDistribution {
   private dividendsCalculationRepository: DividendsCalculationRepository;
@@ -25,7 +25,7 @@ export class CreateDividendDistribution {
     const id = this.idGenerator.createUuid();
     const dividendDistribution = DividendDistribution.create(id, DateTime.now());
 
-    await this.dividendsCalculationRepository.createDividendDistribution(dividendDistribution);
+    await this.dividendsCalculationRepository.storeDividendDistribution(dividendDistribution);
 
     return id;
   }

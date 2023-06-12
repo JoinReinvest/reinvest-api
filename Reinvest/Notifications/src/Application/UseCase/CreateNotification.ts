@@ -30,7 +30,7 @@ export class CreateNotification {
     const notificationInput = {
       ...newNotificationInput,
       id,
-      dismissId: id, // newNotificationInput.dismissId ?? id, // thanks to that we can dismiss all types of notifications
+      dismissId: newNotificationInput.dismissId ?? id,
     };
 
     const notification = Notification.create(notificationInput);

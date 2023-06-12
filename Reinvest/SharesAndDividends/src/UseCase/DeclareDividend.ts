@@ -3,7 +3,7 @@ import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
-import { DividendDeclaration } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
+import { DividendDeclaration } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDeclaration';
 
 export class DeclareDividend {
   private dividendsCalculationRepository: DividendsCalculationRepository;

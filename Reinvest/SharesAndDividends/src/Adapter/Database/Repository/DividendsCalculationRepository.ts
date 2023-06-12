@@ -1,17 +1,23 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { sql } from 'kysely';
 import { DateTime } from 'Money/DateTime';
 import {
   sadCalculatedDividendsTable,
   sadDividendDistributionTable,
   sadDividendsDeclarationsTable,
+  sadInvestorDividendsTable,
   sadSharesTable,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
-import { CalculatedDividendsTable, DividendsDeclarationTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
-import { CalculatedDividend } from 'SharesAndDividends/Domain/Dividends/CalculatedDividend';
-import { DividendDeclaration, DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/Dividends/DividendDeclaration';
-import { DividendDistribution, DividendDistributionStatus, DividendsDistributionSchema } from 'SharesAndDividends/Domain/Dividends/DividendDistribution';
+import { CalculatedDividendsTable, DividendsDeclarationTable, InvestorDividendsTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
+import { CalculatedDividend, CalculatedDividendSchema } from 'SharesAndDividends/Domain/CalculatingDividends/CalculatedDividend';
+import { DividendDeclaration, DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDeclaration';
+import {
+  DividendDistribution,
+  DividendDistributionStatus,
+  DividendsDistributionSchema,
+} from 'SharesAndDividends/Domain/CalculatingDividends/DividendDistribution';
+import { CalculatedDividendsList, InvestorDividend, InvestorDividendSchema, InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
 export class DividendsCalculationRepository {
@@ -140,7 +146,11 @@ export class DividendsCalculationRepository {
       .provide()
       .insertInto(sadCalculatedDividendsTable)
       .values(recordsToStore)
-      .onConflict(oc => oc.column('id').doNothing())
+      .onConflict(oc =>
+        oc.column('id').doUpdateSet({
+          status: eb => eb.ref(`excluded.status`),
+        }),
+      )
       .execute();
   }
 
@@ -179,7 +189,7 @@ export class DividendsCalculationRepository {
     return data ? DividendDistribution.restore(<DividendsDistributionSchema>data) : null;
   }
 
-  async createDividendDistribution(dividendDistribution: DividendDistribution): Promise<void> {
+  async storeDividendDistribution(dividendDistribution: DividendDistribution): Promise<void> {
     const values = dividendDistribution.toObject();
 
     await this.databaseAdapterProvider
@@ -200,6 +210,57 @@ export class DividendsCalculationRepository {
     return data ? DividendDistribution.restore(<DividendsDistributionSchema>data) : null;
   }
 
+  async getDividendsCalculationForAccount(accountId: UUID, distributeToDate: DateTime): Promise<CalculatedDividend[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadCalculatedDividendsTable)
+      .selectAll()
+      .where('accountId', '=', accountId)
+      .where(sql`"calculationDate"::date <= ${distributeToDate.toIsoDate()}`)
+      .where('status', '=', 'AWAITING_DISTRIBUTION')
+      .execute();
+
+    return data.map(
+      (calculatedDividend: CalculatedDividendsTable): CalculatedDividend => CalculatedDividend.restore(<CalculatedDividendSchema>calculatedDividend),
+    );
+  }
+
+  async getDividendWithNoCoveredFee(accountId: UUID): Promise<InvestorDividend | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadInvestorDividendsTable)
+      .selectAll()
+      .where('accountId', '=', accountId)
+      .where('status', '=', <any>InvestorDividendStatus.FEES_NOT_COVERED)
+      .executeTakeFirst();
+
+    return this.restoreInvestorDividend(<InvestorDividendsTable>data);
+  }
+
+  async storeInvestorDividend(investorDividend: InvestorDividend): Promise<void> {
+    const { calculatedDividends, ...schema } = investorDividend.toObject();
+    const values = <InvestorDividendsTable>{
+      calculatedDividendsJson: <JSONObjectOf<CalculatedDividendsList>>calculatedDividends,
+      ...schema,
+    };
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadInvestorDividendsTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.column('id').doUpdateSet({
+          status: values.status,
+          totalDividendAmount: values.totalDividendAmount,
+          totalFeeAmount: values.totalFeeAmount,
+          dividendAmount: values.dividendAmount,
+          actionDate: values.actionDate,
+          feesCoveredByDividendId: values.feesCoveredByDividendId,
+        }),
+      )
+      .execute();
+  }
+
   private restoreDividendDeclaration(data: DividendsDeclarationTable): DividendDeclaration | null {
     if (!data) {
       return null;
@@ -211,5 +272,19 @@ export class DividendsCalculationRepository {
       ...schema,
       numberOfShares: <NumberOfSharesPerDay>numberOfSharesJson,
     });
+  }
+
+  private restoreInvestorDividend(data: InvestorDividendsTable): InvestorDividend | null {
+    if (!data) {
+      return null;
+    }
+
+    const { calculatedDividendsJson, ...schema } = data;
+    const investorDividendSchema = <InvestorDividendSchema>{
+      calculatedDividends: calculatedDividendsJson,
+      ...schema,
+    };
+
+    return InvestorDividend.restore(investorDividendSchema);
   }
 }

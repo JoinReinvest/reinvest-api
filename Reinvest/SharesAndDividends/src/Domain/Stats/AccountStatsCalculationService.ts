@@ -1,5 +1,5 @@
 import { Money } from 'Money/Money';
-import { AccountStats } from 'SharesAndDividends/Domain/AccountStats';
+import { AccountStats } from 'SharesAndDividends/Domain/Stats/AccountStats';
 
 export type SharesAndTheirPrices = {
   numberOfShares: number | null;
