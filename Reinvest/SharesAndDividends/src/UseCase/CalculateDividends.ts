@@ -65,6 +65,8 @@ export class CalculateDividends {
     }
 
     // store calculated dividends in db
-    await this.dividendsCalculationRepository.storeCalculatedDividends(calculatedDividends);
+    if (calculatedDividends.length) {
+      await this.dividendsCalculationRepository.storeCalculatedDividends(calculatedDividends);
+    }
   }
 }

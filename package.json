@@ -46,6 +46,8 @@
     "local": "NODE_ENV=development SLS_DEBUG=* serverless offline start -s development --ignoreJWTSignature --noTimeout --reloadHandler --config serverless-local.ts",
     "local:prod": "NODE_ENV=development serverless offline start -s development --ignoreJWTSignature --config serverless-local.ts",
     "local:invoke:postSignUp": "NODE_ENV=development sls invoke local -s development --function cognitoPostSignUpFunction --path ./devops/local/postSignUpRequest.json --config serverless-local.ts",
+    "local:invoke:cronDividendsCalculation": "NODE_ENV=development sls invoke local -s development --function cronDividendsCalculation --config serverless-local.ts",
+    "local:invoke:cronDividendsDistribution": "NODE_ENV=development sls invoke local -s development --function cronDividendsDistribution --config serverless-local.ts",
     "local:invoke:migrateUp": "NODE_ENV=development sls invoke local -s development --function migration --config serverless-local.ts",
     "local:invoke:migrateDown": "NODE_ENV=development sls invoke local -s development --function migration --data 'down' --config serverless-local.ts",
     "local:server": "docker-compose -f docker-compose.yml up",

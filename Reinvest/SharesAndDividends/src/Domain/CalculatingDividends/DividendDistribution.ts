@@ -65,4 +65,8 @@ export class DividendDistribution {
   getDistributeToDate(): DateTime {
     return this.distributeToDate;
   }
+
+  finishDistribution(): void {
+    this.status = DividendDistributionStatus.DISTRIBUTED;
+  }
 }

@@ -12,6 +12,8 @@ import {
   DividendsCalculationQuery,
   SharesToCalculate,
 } from 'SharesAndDividends/UseCase/DividendsCalculationQuery';
+import { FinishDividendsCalculation } from 'SharesAndDividends/UseCase/FinishDividendsCalculation';
+import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDividendsDistribution';
 
 type DeclarationError = string;
 
@@ -21,6 +23,8 @@ export class DividendsCalculationController {
   private calculateDividendsUseCase: CalculateDividends;
   private createDividendDistributionUseCase: CreateDividendDistribution;
   private distributeDividendsUseCase: DistributeDividends;
+  private finishDividendsCalculationUseCase: FinishDividendsCalculation;
+  private finishDividendsDistributionUseCase: FinishDividendsDistribution;
 
   constructor(
     dividendsCalculationQuery: DividendsCalculationQuery,
@@ -28,12 +32,16 @@ export class DividendsCalculationController {
     calculateDividendsUseCase: CalculateDividends,
     createDividendDistributionUseCase: CreateDividendDistribution,
     distributeDividendsUseCase: DistributeDividends,
+    finishDividendsCalculationUseCase: FinishDividendsCalculation,
+    finishDividendsDistributionUseCase: FinishDividendsDistribution,
   ) {
     this.dividendsCalculationQuery = dividendsCalculationQuery;
     this.declareDividendUseCase = declareDividendUseCase;
     this.calculateDividendsUseCase = calculateDividendsUseCase;
     this.createDividendDistributionUseCase = createDividendDistributionUseCase;
     this.distributeDividendsUseCase = distributeDividendsUseCase;
+    this.finishDividendsCalculationUseCase = finishDividendsCalculationUseCase;
+    this.finishDividendsDistributionUseCase = finishDividendsDistributionUseCase;
   }
 
   static getClassName = () => 'DividendsCalculationController';
@@ -64,6 +72,14 @@ export class DividendsCalculationController {
 
   async getNextSharesToCalculate(): Promise<null | SharesToCalculate> {
     return this.dividendsCalculationQuery.getNextSharesToCalculate();
+  }
+
+  async calculationsCompleted(declarationId: UUID): Promise<void> {
+    await this.finishDividendsCalculationUseCase.execute(declarationId);
+  }
+
+  async distributionsCompleted(distributionId: UUID): Promise<void> {
+    await this.finishDividendsDistributionUseCase.execute(distributionId);
   }
 
   async calculateDividendsForShares(sharesToCalculate: SharesToCalculate): Promise<void> {

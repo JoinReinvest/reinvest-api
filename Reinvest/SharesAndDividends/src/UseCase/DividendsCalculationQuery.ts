@@ -87,10 +87,6 @@ export class DividendsCalculationQuery {
     const { portfolioId, declarationId, toDate } = pendingDeclaration.forFindingSharesToCalculate();
     const sharesIds = await this.dividendsCalculationRepository.getSharesIdsToCalculate(portfolioId, declarationId, toDate);
 
-    if (!sharesIds.length) {
-      return null;
-    }
-
     return {
       declarationId,
       sharesIds,
@@ -180,10 +176,6 @@ export class DividendsCalculationQuery {
 
     const { distributionId, distributeToDate } = dividendDistribution.forFindingAccountsToDistributeDividend();
     const accountIds = await this.dividendsCalculationRepository.getAccountsForDividendDistribution(distributeToDate);
-
-    if (accountIds.length === 0) {
-      return null;
-    }
 
     return {
       accountIds,

@@ -177,6 +177,11 @@ export class DividendDeclaration {
     };
   }
 
+  finishCalculation() {
+    this.status = DividendDeclarationStatus.CALCULATED;
+    this.calculationFinishedDate = DateTime.now();
+  }
+
   private calculateNumberOfDays(): number {
     return this.calculatedToDate.numberOfDaysBetween(this.calculatedFromDate) + 1; // including start date also
   }

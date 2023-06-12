@@ -48,7 +48,17 @@ export class DividendsCalculationRepository {
       numberOfSharesJson,
     };
 
-    await this.databaseAdapterProvider.provide().insertInto(sadDividendsDeclarationsTable).values(values).execute();
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadDividendsDeclarationsTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.column('id').doUpdateSet({
+          status: eb => eb.ref(`excluded.status`),
+          calculationFinishedDate: eb => eb.ref(`excluded.calculationFinishedDate`),
+        }),
+      )
+      .execute();
   }
 
   async getDividendDeclarations(): Promise<DividendDeclaration[]> {

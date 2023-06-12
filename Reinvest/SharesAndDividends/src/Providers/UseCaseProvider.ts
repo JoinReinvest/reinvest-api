@@ -16,6 +16,8 @@ import { DeclareDividend } from 'SharesAndDividends/UseCase/DeclareDividend';
 import { DistributeDividends } from 'SharesAndDividends/UseCase/DistributeDividends';
 import { DividendsCalculationQuery } from 'SharesAndDividends/UseCase/DividendsCalculationQuery';
 import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
+import { FinishDividendsCalculation } from 'SharesAndDividends/UseCase/FinishDividendsCalculation';
+import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDividendsDistribution';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 
@@ -39,6 +41,8 @@ export class UseCaseProvider {
     container.addSingleton(DeclareDividend, [IdGenerator, DividendsCalculationRepository, SharesRepository]);
     container.addSingleton(CalculateDividends, [IdGenerator, DividendsCalculationRepository, SharesRepository]);
     container.addSingleton(CreateDividendDistribution, [IdGenerator, DividendsCalculationRepository]);
+    container.addSingleton(FinishDividendsCalculation, [DividendsCalculationRepository]);
+    container.addSingleton(FinishDividendsDistribution, [DividendsCalculationRepository]);
     container.addSingleton(DistributeDividends, [
       IdGenerator,
       DividendsCalculationRepository,
