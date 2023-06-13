@@ -3,6 +3,7 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
 import { CompleteProfileInput } from 'LegalEntities/UseCases/CompleteProfile';
+import type { UpdateProfileInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfile';
 
 const schema = `
     #graphql
@@ -150,6 +151,10 @@ type CompleteProfileDetailsInput = {
   input: CompleteProfileInput;
 };
 
+type UpdateProfileForDetailsInput = {
+  input: UpdateProfileInput;
+};
+
 export const Profile = {
   typeDefs: schema,
   resolvers: {
@@ -178,14 +183,14 @@ export const Profile = {
         return api.getProfile(profileId);
       },
 
-      updateProfile: async (parent: any, data: any, { profileId, modules }: SessionContext): Promise<ProfileResponse> => {
+      updateProfile: async (parent: any, data: UpdateProfileForDetailsInput, { profileId, modules }: SessionContext): Promise<ProfileResponse> => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const { input } = data;
-        // const errors = await api.completeProfile(input, profileId);
+        const errors = await api.updateProfile(input, profileId);
 
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
         return api.getProfile(profileId);
       },
