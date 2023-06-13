@@ -1,4 +1,5 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { Money } from 'Money/Money';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { SharesAndDividendsDatabase } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
@@ -50,7 +51,7 @@ export class ChangeSharesState {
       if (state === SharesChangeState.FUNDING && data !== undefined) {
         const { profileId, accountId, portfolioId } = shares.toObject();
         await this.transactionAdapter.transaction(`Update shares record for investment ${investmentId} in account ${accountId} to FUNDING state`, async () => {
-          shares.setFundingState(data.shares, data.unitPrice);
+          shares.setFundingState(data.shares, Money.lowPrecision(data.unitPrice));
           const financialOperationId = this.idGenerator.createUuid();
           await this.financialOperationRepository.addInvestmentOperation(
             financialOperationId,

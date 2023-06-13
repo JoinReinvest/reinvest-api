@@ -1,12 +1,16 @@
-import { JSONObject } from 'HKEKTypes/Generics';
-import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
+import { JSONObject, JSONObjectOf, UUID } from 'HKEKTypes/Generics';
+import { DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDeclaration';
+import { DividendDistributionStatus } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDistribution';
 import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
+import { CalculatedDividendsList, InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
+import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 
 export interface SharesTable {
   accountId: string;
   dateCreated: Date;
   dateFunded: Date | null;
+  dateFunding: Date | null;
   dateRevoked: Date | null;
   dateSettled: Date | null;
   id: string;
@@ -24,14 +28,15 @@ export type SharesAndTheirPricesSelection = Pick<SharesTable, 'numberOfShares' |
 export interface DividendsDeclarationTable {
   calculatedFromDate: Date;
   calculatedToDate: Date;
+  calculationFinishedDate: Date | null;
   createdDate: Date;
   id: string;
   numberOfDays: number;
-  numberOfShares: number;
+  numberOfSharesJson: JSONObjectOf<NumberOfSharesPerDay>;
   portfolioId: string;
-  status: 'CALCULATING' | 'CALCULATED';
+  status: DividendDeclarationStatus;
   totalDividendAmount: number;
-  unitAmountPerSharePerDay: number;
+  unitAmountPerDay: number;
 }
 
 export interface CalculatedDividendsTable {
@@ -41,6 +46,7 @@ export interface CalculatedDividendsTable {
   dividendAmount: number;
   feeAmount: number;
   id: string;
+  numberOfDaysInvestorOwnsShares: number;
   profileId: string;
   sharesId: string;
   status: 'AWAITING_DISTRIBUTION' | 'DISTRIBUTED' | 'LOCKED' | 'REVOKED';
@@ -48,20 +54,21 @@ export interface CalculatedDividendsTable {
 
 export interface DividendDistributionTable {
   distributeToDate: Date;
-  id: string;
-  status: 'DISTRIBUTING' | 'DISTRIBUTED';
+  id: UUID;
+  status: DividendDistributionStatus;
 }
 
 export interface InvestorDividendsTable {
-  accountId: string;
+  accountId: UUID;
   actionDate: Date | null;
-  calculatedDividends: JSONObject;
+  calculatedDividendsJson: JSONObjectOf<CalculatedDividendsList>;
   createdDate: Date;
-  distributionId: string;
+  distributionId: UUID;
   dividendAmount: number;
-  id: string;
-  profileId: string;
-  status: 'AWAITING_ACTION' | 'REINVESTED' | 'WITHDRAWN' | 'ZEROED' | 'WITHDRAWING';
+  feesCoveredByDividendId: UUID | null;
+  id: UUID;
+  profileId: UUID;
+  status: InvestorDividendStatus;
   totalDividendAmount: number;
   totalFeeAmount: number;
 }

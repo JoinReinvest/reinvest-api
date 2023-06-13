@@ -1,3 +1,7 @@
+import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
+
 export enum SharesStatus {
   CREATED = 'CREATED',
   FUNDING = 'FUNDING',
@@ -7,17 +11,18 @@ export enum SharesStatus {
 }
 
 export type SharesSchema = {
-  accountId: string;
+  accountId: UUID;
   dateCreated: Date;
   dateFunded: Date | null;
+  dateFunding: Date | null;
   dateRevoked: Date | null;
   dateSettled: Date | null;
-  id: string;
-  investmentId: string;
+  id: UUID;
+  investmentId: UUID;
   numberOfShares: number | null;
-  portfolioId: string;
+  portfolioId: UUID;
   price: number;
-  profileId: string;
+  profileId: UUID;
   status: SharesStatus;
   unitPrice: number | null;
 };
@@ -29,10 +34,11 @@ export class Shares {
     this.sharesSchema = sharesSchema;
   }
 
-  static create(id: string, portfolioId: string, profileId: string, accountId: string, investmentId: string, price: number): Shares {
+  static create(id: string, portfolioId: string, profileId: string, accountId: string, investmentId: string, price: Money): Shares {
     return new Shares({
       accountId,
       dateCreated: new Date(),
+      dateFunding: null,
       dateFunded: null,
       dateRevoked: null,
       dateSettled: null,
@@ -40,7 +46,7 @@ export class Shares {
       investmentId,
       numberOfShares: null,
       portfolioId,
-      price,
+      price: price.getAmount(),
       profileId,
       status: SharesStatus.CREATED,
       unitPrice: null,
@@ -48,12 +54,27 @@ export class Shares {
   }
 
   static restore(data: SharesSchema): Shares {
-    const { accountId, dateCreated, dateFunded, dateRevoked, dateSettled, id, investmentId, numberOfShares, portfolioId, price, profileId, status, unitPrice } =
-      data;
+    const {
+      accountId,
+      dateCreated,
+      dateFunding,
+      dateFunded,
+      dateRevoked,
+      dateSettled,
+      id,
+      investmentId,
+      numberOfShares,
+      portfolioId,
+      price,
+      profileId,
+      status,
+      unitPrice,
+    } = data;
 
     return new Shares({
       accountId,
       dateCreated,
+      dateFunding,
       dateFunded,
       dateRevoked,
       dateSettled,
@@ -72,14 +93,15 @@ export class Shares {
     return this.sharesSchema;
   }
 
-  setFundingState(shares: number, unitPrice: number) {
+  setFundingState(shares: number, unitPrice: Money) {
     if (this.sharesSchema.status !== SharesStatus.CREATED) {
       throw new Error('Shares status must be CREATED');
     }
 
     this.sharesSchema.status = SharesStatus.FUNDING;
+    this.sharesSchema.dateFunding = new Date();
     this.sharesSchema.numberOfShares = shares;
-    this.sharesSchema.unitPrice = unitPrice;
+    this.sharesSchema.unitPrice = unitPrice.getAmount();
   }
 
   setFundedState() {
@@ -98,5 +120,41 @@ export class Shares {
 
     this.sharesSchema.status = SharesStatus.SETTLED;
     this.sharesSchema.dateSettled = new Date();
+  }
+
+  forDividendCalculation(): {
+    accountId: UUID;
+    dateFunding: DateTime;
+    numberOfShares: number;
+    profileId: UUID;
+    sharesId: UUID;
+    sharesStatus: SharesStatus;
+  } {
+    return {
+      numberOfShares: this.sharesSchema.numberOfShares!,
+      dateFunding: DateTime.fromIsoDate(this.sharesSchema.dateFunding!),
+      sharesId: this.sharesSchema.id,
+      accountId: this.sharesSchema.accountId,
+      profileId: this.sharesSchema.profileId,
+      sharesStatus: this.sharesSchema.status,
+    };
+  }
+
+  getId(): UUID {
+    return this.sharesSchema.id;
+  }
+
+  calculateFeeAmountForShares(numberOfDaysInvestorOwnsShares: number): Money {
+    if (numberOfDaysInvestorOwnsShares === 0) {
+      return Money.zero();
+    }
+
+    const DAYS_IN_YEAR = 365;
+    const ONE_PERCENT = 0.01;
+
+    const price = Money.lowPrecision(this.sharesSchema.price).increasePrecision();
+    const onePercentOfPricePerYear = price.multiplyBy(ONE_PERCENT).divideBy(DAYS_IN_YEAR);
+
+    return onePercentOfPricePerYear.multiplyBy(numberOfDaysInvestorOwnsShares).decreasePrecision();
   }
 }
