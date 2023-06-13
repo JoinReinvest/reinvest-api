@@ -8,9 +8,10 @@ export type IdentityApiType = {
   getProfileByEmail: ProfileController['getProfileByEmail'];
   getProfileId: ProfileController['getProfileId'];
   getUserInvitationLink: IncentiveTokenController['getUserInvitationLink'];
-  isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
 
+  isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
   isPhoneNumberCompleted: PhoneController['isPhoneNumberCompleted'];
+
   registerUser: UserRegistrationController['registerUser'];
 
   setPhoneNumber: PhoneController['setPhoneNumber'];

@@ -1,7 +1,7 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import type { DynamicType } from 'Investments/Application/Service/TemplateParser';
 import { AgreementTypes, RecurringInvestmentStatus, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
-import { latestSubscriptionAgreementVersion } from 'Investments/Domain/SubscriptionAgreement';
+import { latestSubscriptionAgreementVersion } from 'Investments/Domain/SubscriptionAgreements/subscriptionAgreementsTemplates';
+import type { DynamicType } from 'Investments/Domain/SubscriptionAgreements/types';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 

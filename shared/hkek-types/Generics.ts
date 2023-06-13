@@ -11,3 +11,5 @@ export interface JSONObject {
 export interface JSONObjectOf<Type> {
   [x: string]: JSONValue;
 }
+
+export type UUID = string;

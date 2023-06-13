@@ -1,14 +1,14 @@
-import { CloudwatchPolicies } from '../../serverless/cloudwatch';
-import { S3PoliciesWithImport } from '../../serverless/s3';
-import { getAttribute, getResourceName } from '../../serverless/utils';
-import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
+import { CloudwatchPolicies } from '../../../serverless/cloudwatch';
+import { S3PoliciesWithImport } from '../../../serverless/s3';
+import { getAttribute, getResourceName } from '../../../serverless/utils';
+import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../../serverless/vpc';
 
-export const CronVendorsSyncFunction = {
-  handler: `devops/functions/cronVendorsSync/handler.main`,
-  role: 'CronVendorsSyncRole',
-  timeout: 30,
+export const CronDocumentSyncFunction = {
+  handler: `devops/functions/cron/documentSync/handler.main`,
+  role: 'CronDocumentSyncRole',
+  timeout: 60,
   vpc: {
-    securityGroupIds: [getAttribute('CronVendorsSyncSecurityGroup', 'GroupId')],
+    securityGroupIds: [getAttribute('CronDocumentSyncSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
   },
   events: [
@@ -18,8 +18,8 @@ export const CronVendorsSyncFunction = {
   ],
 };
 
-export const CronVendorsSyncResources = {
-  CronVendorsSyncRole: {
+export const CronDocumentSyncResources = {
+  CronDocumentSyncRole: {
     Type: 'AWS::IAM::Role',
     Properties: {
       AssumeRolePolicyDocument: {
@@ -52,11 +52,11 @@ export const CronVendorsSyncResources = {
       ],
     },
   },
-  CronVendorsSyncSecurityGroup: {
+  CronDocumentSyncSecurityGroup: {
     Type: 'AWS::EC2::SecurityGroup',
     Properties: {
-      GroupName: getResourceName('sg-cronVendorsSync-lambda'),
-      GroupDescription: getResourceName('sg-cronVendorsSync-lambda'),
+      GroupName: getResourceName('sg-cronDocumentSync-lambda'),
+      GroupDescription: getResourceName('sg-cronDocumentSync-lambda'),
       SecurityGroupIngress: SecurityGroupIngressRules,
       SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),

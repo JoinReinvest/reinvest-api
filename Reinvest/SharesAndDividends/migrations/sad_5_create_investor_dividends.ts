@@ -7,7 +7,7 @@ import { sadInvestorDividendsTable, SharesAndDividendsDatabase } from 'SharesAnd
  *   profileId: string;
  *   accountId: string;
  *   distributionId: string;
- *   calculatedDividends: JSONObject;
+ *   calculatedDividendsList: JSONObject;
  *   createdDate: Date;
  *   actionDate: Date | null;
  *   dividendAmount: number;

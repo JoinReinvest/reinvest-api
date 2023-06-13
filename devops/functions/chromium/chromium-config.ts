@@ -1,27 +1,30 @@
 import { CloudwatchPolicies } from '../../serverless/cloudwatch';
-import { S3PoliciesWithImport } from '../../serverless/s3';
 import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
 
-export const CronDocumentSyncFunction = {
-  handler: `devops/functions/cronDocumentSync/handler.main`,
-  role: 'CronDocumentSyncRole',
-  timeout: 60,
+export const ChromiumFunction = {
+  handler: `devops/functions/chromium/handler.main`,
+  role: 'chromiumLambdaRole',
+  timeout: 10,
   vpc: {
-    securityGroupIds: [getAttribute('CronDocumentSyncSecurityGroup', 'GroupId')],
+    securityGroupIds: [getAttribute('chromiumSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
   },
   events: [
     {
-      schedule: 'rate(1 hour)',
+      httpApi: {
+        method: 'ANY',
+        path: '/chromium/{proxy+}',
+      },
     },
   ],
 };
 
-export const CronDocumentSyncResources = {
-  CronDocumentSyncRole: {
+export const ChromiumLambdaResources = {
+  chromiumLambdaRole: {
     Type: 'AWS::IAM::Role',
     Properties: {
+      RoleName: getResourceName('chromiumLambdaRole'),
       AssumeRolePolicyDocument: {
         Statement: [
           {
@@ -35,28 +38,19 @@ export const CronDocumentSyncResources = {
       },
       Policies: [
         {
-          PolicyName: 'QueuePolicy',
+          PolicyName: 'chromiumLambdaPolicy',
           PolicyDocument: {
-            Statement: [
-              ...CloudwatchPolicies,
-              ...EniPolicies,
-              ...S3PoliciesWithImport,
-              {
-                Effect: 'Allow',
-                Action: ['lambda:InvokeFunction'],
-                Resource: '*',
-              },
-            ],
+            Statement: [...CloudwatchPolicies, ...EniPolicies],
           },
         },
       ],
     },
   },
-  CronDocumentSyncSecurityGroup: {
+  chromiumSecurityGroup: {
     Type: 'AWS::EC2::SecurityGroup',
     Properties: {
-      GroupName: getResourceName('sg-cronDocumentSync-lambda'),
-      GroupDescription: getResourceName('sg-cronDocumentSync-lambda'),
+      GroupName: getResourceName('sg-chromium-lambda'),
+      GroupDescription: getResourceName('sg-chromium-lambda'),
       SecurityGroupIngress: SecurityGroupIngressRules,
       SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),

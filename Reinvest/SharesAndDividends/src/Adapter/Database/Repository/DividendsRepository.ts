@@ -5,8 +5,9 @@ import {
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { DividendsSelection, InvestorIncentiveDividendTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
-import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/DividendsCalculationService';
 import { IncentiveReward, IncentiveRewardSchema, IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
+import { InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
+import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/Stats/StatsDividendsCalculationService';
 
 export class DividendsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -24,7 +25,7 @@ export class DividendsRepository {
       .select(['totalDividendAmount', 'totalFeeAmount'])
       .where('profileId', '=', profileId)
       .where('accountId', '=', accountId)
-      .where('status', '=', 'AWAITING_ACTION')
+      .where('status', '=', <any>'AWAITING_ACTION')
       .castTo<DividendsSelection>()
       .execute();
 
@@ -77,18 +78,19 @@ export class DividendsRepository {
     amount: number;
     createdDate: Date;
     id: string;
-    status: 'AWAITING_ACTION' | 'REINVESTED' | 'WITHDRAWN' | 'ZEROED' | 'WITHDRAWING';
+    status: IncentiveRewardStatus | InvestorDividendStatus;
   } | null> {
     const db = this.databaseAdapterProvider.provide();
     const data = await db
       .selectFrom(sadInvestorDividendsTable)
-      .select(['id', 'totalDividendAmount as amount', 'createdDate', 'status'])
+      .select(['id', 'dividendAmount as amount', 'createdDate', 'status'])
       .union(
+        // @ts-ignore
         db
           .selectFrom(sadInvestorIncentiveDividendTable)
           .select(['id', 'amount', 'createdDate', 'status'])
-          .where('profileId', '=', profileId)
-          .where('id', '=', dividendId),
+          .where('profileId', '=', <any>profileId)
+          .where('id', '=', <any>dividendId),
       )
       .where('profileId', '=', profileId)
       .where('id', '=', dividendId)

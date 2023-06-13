@@ -15,6 +15,7 @@ import SignRecurringSubscriptionAgreement from 'Investments/Application/UseCases
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
+import UnsuspendRecurringInvestment from 'Investments/Application/UseCases/UnsuspendRecurringInvestment';
 import { Investments } from 'Investments/index';
 import { DividendsController } from 'Investments/Infrastructure/Ports/DividendsController';
 import { FeesController } from 'Investments/Infrastructure/Ports/FeesController';
@@ -52,6 +53,7 @@ export default class PortsProviders {
       RecurringInvestmentQuery,
       InitiateRecurringInvestment,
       DeactivateRecurringInvestment,
+      UnsuspendRecurringInvestment,
     ]);
     container.addSingleton(DividendsController, [ReinvestDividend]);
     container.addSingleton(TransactionController, [PushTransaction]);
