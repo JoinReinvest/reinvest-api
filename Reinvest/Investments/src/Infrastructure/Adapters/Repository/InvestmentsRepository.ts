@@ -8,12 +8,16 @@ import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investm
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
 
+import { FeesRepository } from './FeesRepository';
+
 export class InvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
+  private feesRepository: FeesRepository;
   private eventsPublisher: SimpleEventBus;
 
-  constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
+  constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider, feesRepository: FeesRepository, eventsPublisher: SimpleEventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.feesRepository = feesRepository;
     this.eventsPublisher = eventsPublisher;
   }
 
@@ -162,7 +166,7 @@ export class InvestmentsRepository {
     }
   }
 
-  async startInvestment(investment: Investment) {
+  async updateInvestment(investment: Investment, approveFee: boolean) {
     const { id, status, dateStarted, accountId, profileId, amount, portfolioId, parentId } = investment.toObject();
     try {
       await this.publishEvents([
@@ -189,6 +193,11 @@ export class InvestmentsRepository {
         })
         .where('id', '=', id)
         .execute();
+
+      if (approveFee) {
+        const fee = investment.getFee();
+        fee && (await this.feesRepository.approveFee(fee));
+      }
 
       return true;
     } catch (error: any) {

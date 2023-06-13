@@ -36,7 +36,7 @@ export default class AdaptersProviders {
     // database
     container
       .addAsValue(InvestmentsDatabaseAdapterInstanceProvider, createInvestmentsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, FeesRepository, SimpleEventBus])
       .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])

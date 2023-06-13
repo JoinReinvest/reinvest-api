@@ -159,17 +159,16 @@ export class Investment {
       this.status === InvestmentStatus.WAITING_FOR_INVESTMENT_START
     );
   }
-
-  hasFee() {
-    return !!this.fee;
-  }
-
   approveFee() {
     this.fee?.approveFee();
   }
 
   isFeeApproved() {
-    return this.fee?.isApproved();
+    if (!this.fee) {
+      return true;
+    }
+
+    return this.fee.isApproved();
   }
 
   getSubscriptionAgreementId() {
@@ -177,9 +176,15 @@ export class Investment {
   }
 
   startInvestment() {
+    if (!this.isFeeApproved()) {
+      return false;
+    }
+
     this.dateStarted = new Date();
     this.gracePeriod = new GracePeriod(this.dateStarted);
     this.status = InvestmentStatus.IN_PROGRESS;
+
+    return true;
   }
 
   isStartedInvestment() {
