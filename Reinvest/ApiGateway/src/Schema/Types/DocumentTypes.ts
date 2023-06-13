@@ -6,7 +6,7 @@ const schema = `
     "Avatar link id input"
     input DocumentFileLinkInput {
         "This 'id' comes usually from @PutFileLink.id"
-        id: String!
+        id: ID!
         "File name should be in format: .pdf, .jpeg, .jpg, .png"
         fileName: FileName!
     }
@@ -14,62 +14,37 @@ const schema = `
     "Avatar link id input"
     input AvatarFileLinkInput {
         "This is @PutFileLink.id"
-        id: String!
+        id: ID!
     }
 
     "Link id"
     type DocumentFileLinkId {
-        id: String
+        id: ID
         fileName: String
     }
 
     "Link id + url to read the avatar"
     type GetAvatarLink {
-        id: String
+        id: ID
         url: String
         initials: String
     }
 
     "Link id + url to read the document"
     type GetDocumentLink {
-        id: String
+        id: ID
         url: String
     }
 
     "Link id + PUT url to store resource in the storage"
     type PutFileLink {
-        id: String
+        id: ID
         url: String
     }
 
-    input GenericFieldInput {
-        name: String!
-        value: String!
-    }
-
-    enum TemplateName {
-        SUBSCRIPTION_AGREEMENT
-        AUTO_REINVESTMENT_AGREEMENT
-    }
-
-    type Template {
-        templateName: TemplateName
-        content: String
-        fields: [String]
-    }
-
-    type SignatureId {
-        signatureId: String
-    }
-
     type Query {
-        """
-        [WIP]
-        """
-        getTemplate(templateName: TemplateName): Template
-
         "Returns document link by id"
-        getDocument(documentId: String!): GetDocumentLink
+        getDocument(documentId: ID!): GetDocumentLink
     }
 
     type Mutation {
@@ -90,15 +65,6 @@ const schema = `
         Use "id" wherever system needs the reference to the avatar file.
         """
         createAvatarFileLink: PutFileLink
-
-        """
-        [WIP]
-        """
-        signDocumentFromTemplate(
-            templateId: TemplateName!,
-            fields: [GenericFieldInput]!
-            signature: String!
-        ): SignatureId
     }
 `;
 
@@ -106,11 +72,6 @@ export const DocumentTypes = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      getTemplate: async (parent: any, { templateName }: { templateName: string }, { modules }: SessionContext) => {
-        const api = modules.getApi<Documents.ApiType>(Documents);
-
-        return api.getTemplate(templateName);
-      },
       getDocument: async (parent: any, { documentId }: { documentId: string }, { modules, profileId }: SessionContext) => {
         const api = modules.getApi<Documents.ApiType>(Documents);
 
@@ -122,15 +83,6 @@ export const DocumentTypes = {
         const api = modules.getApi<Documents.ApiType>(Documents);
 
         return api.createDocumentsFileLinks(numberOfLinks, profileId);
-      },
-      signDocumentFromTemplate: async (
-        parent: any,
-        { templateId, fields, signature }: { fields: any; signature: string; templateId: string },
-        { profileId, modules }: SessionContext,
-      ) => {
-        const api = modules.getApi<Documents.ApiType>(Documents);
-
-        return api.signDocumentFromTemplate(templateId, fields, '8.8.8.8', new Date().getTime(), 'my name', profileId);
       },
       createAvatarFileLink: async (parent: any, args: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Documents.ApiType>(Documents);

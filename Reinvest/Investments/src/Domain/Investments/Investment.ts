@@ -152,6 +152,14 @@ export class Investment {
     }
   }
 
+  checkIfCanBeAborted() {
+    return (
+      this.status === InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT ||
+      this.status === InvestmentStatus.WAITING_FOR_FEES_APPROVAL ||
+      this.status === InvestmentStatus.WAITING_FOR_INVESTMENT_START
+    );
+  }
+
   hasFee() {
     return !!this.fee;
   }

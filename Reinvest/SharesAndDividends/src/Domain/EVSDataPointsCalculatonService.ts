@@ -47,12 +47,6 @@ export class EVSDataPointsCalculationService {
       const createdDate = dayjs(financialOperation.createdDate);
       const dateKey = createdDate.format('YYYY-MM-DD');
 
-      if (startDate === null) {
-        const theDayBeforeFirstDate = createdDate.subtract(1, 'day').format('YYYY-MM-DD');
-        startDate = theDayBeforeFirstDate;
-        mainDataPoints[theDayBeforeFirstDate] = 0;
-      }
-
       const { unitPrice, portfolioId, numberOfShares } = financialOperation.dataJson;
       // @ts-ignore
       const pricePerShare = new Money(parseInt(unitPrice));
@@ -64,6 +58,16 @@ export class EVSDataPointsCalculationService {
           numberOfShares: 0,
           pricePerShare: pricePerShare,
         };
+      }
+
+      if (startDate === null && financialOperation.operationType === GlobalFinancialOperationType.NAV_CHANGED) {
+        continue; // skip first NAV_CHANGED
+      }
+
+      if (startDate === null) {
+        const theDayBeforeFirstDate = createdDate.subtract(1, 'day').format('YYYY-MM-DD');
+        startDate = theDayBeforeFirstDate;
+        mainDataPoints[theDayBeforeFirstDate] = 0;
       }
 
       switch (financialOperation.operationType) {

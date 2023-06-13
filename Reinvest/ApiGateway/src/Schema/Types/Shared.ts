@@ -199,19 +199,19 @@ const schema = `
         formatted: String
     }
 
-    enum SubscriptionAgreementStatus {
+    enum AgreementStatus {
         WAITING_FOR_SIGNATURE
         SIGNED
     }
 
-    type SubscriptionAgreementParagraph {
+    type AgreementParagraph {
         lines: [String!]!
         isCheckedOption: Boolean
     }
 
-    type SubscriptionAgreementSection {
+    type AgreementSection {
         header: String
-        paragraphs: [SubscriptionAgreementParagraph!]!
+        paragraphs: [AgreementParagraph!]!
     }
 
     enum SubscriptionAgreementType {
@@ -222,10 +222,10 @@ const schema = `
     type SubscriptionAgreement {
         id: ID!
         type: SubscriptionAgreementType!
-        status: SubscriptionAgreementStatus!
+        status: AgreementStatus!
         createdAt: ISODateTime!
         signedAt: ISODateTime
-        content: [SubscriptionAgreementSection!]!
+        content: [AgreementSection!]!
     }
 
     """
