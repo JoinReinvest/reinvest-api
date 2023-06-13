@@ -17,12 +17,9 @@ class DeactivateRecurringInvestment {
       return false;
     }
 
-    recurringInvestment?.updateStatus(RecurringInvestmentStatus.INACTIVE);
+    recurringInvestment?.deactivate();
 
-    const id = recurringInvestment.getId();
-    const recurringStatus = recurringInvestment.getStatus();
-
-    const status = await this.recurringInvestmentsRepository.updateStatus(id, recurringStatus);
+    const status = await this.recurringInvestmentsRepository.updateStatus(recurringInvestment);
 
     if (!status) {
       return false;

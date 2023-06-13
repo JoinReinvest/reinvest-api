@@ -1,3 +1,4 @@
+import { Money } from 'Money/Money';
 import { ChangeSharesState, SharesChangeState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
 
@@ -14,7 +15,7 @@ export class SharesController {
 
   async createShares(portfolioId: string, profileId: string, accountId: string, investmentId: string, amount: number): Promise<void> {
     try {
-      await this.createSharesUseCase.execute(portfolioId, profileId, accountId, investmentId, amount);
+      await this.createSharesUseCase.execute(portfolioId, profileId, accountId, investmentId, Money.lowPrecision(amount));
     } catch (error: any) {
       console.error('[SharesController] createShares', { investmentId, accountId }, error);
     }

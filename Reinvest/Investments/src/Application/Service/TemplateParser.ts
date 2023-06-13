@@ -1,12 +1,4 @@
-export type Template = {
-  paragraphs: {
-    lines: string[];
-    isCheckedOption?: boolean;
-  }[];
-  header?: string;
-}[];
-
-export type DynamicType = { [key: string]: string };
+import type { DynamicType, Template } from 'Investments/Domain/SubscriptionAgreements/types';
 
 class TemplateParser {
   private template: Template;
@@ -33,15 +25,23 @@ class TemplateParser {
   private prepareLines(lines: string[], data: DynamicType) {
     const replacedLines = lines.map(line => this.replace(line, data));
 
-    return {
-      lines: replacedLines,
-    };
+    return replacedLines;
   }
 
   parse(data: DynamicType): Template {
     const template = this.template.map(({ paragraphs, header }) => {
       let updatedHeader = undefined;
-      const updatedParagraphs = paragraphs.map(({ lines }) => this.prepareLines(lines, data));
+      const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
+        const obj = {
+          lines: this.prepareLines(lines, data),
+        };
+
+        if (isCheckedOption !== undefined) {
+          Object.assign(obj, { isCheckedOption });
+        }
+
+        return obj;
+      });
 
       if (header) {
         updatedHeader = this.replace(header, data);

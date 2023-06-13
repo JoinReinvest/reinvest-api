@@ -1,12 +1,12 @@
 import { Money } from 'Money/Money';
-import { AccountStats } from 'SharesAndDividends/Domain/AccountStats';
+import { AccountStats } from 'SharesAndDividends/Domain/Stats/AccountStats';
 
 export type UnpaidDividendsAndFees = {
   dividend: Money;
   fee: Money;
 };
 
-export class DividendsCalculationService {
+export class StatsDividendsCalculationService {
   public static updateAccountStatsForDividendsAndFees(accountStats: AccountStats, dividendsAndFees: UnpaidDividendsAndFees[]): AccountStats {
     let unpaidDividends = Money.zero();
     let unpaidFees = Money.zero();

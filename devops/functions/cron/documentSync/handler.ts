@@ -1,9 +1,9 @@
-import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
+import { Registration } from 'Registration/index';
 import { boot } from 'Reinvest/bootstrap';
-import { LAMBDA_CONFIG } from 'Reinvest/config';
-import { Registration } from 'Reinvest/Registration/src';
 
-export const main = async (event: any, context: any, callback: (...rest) => any) => {
+import { selfInvoker } from '../selfInvoker';
+
+export const main = async (event: any, context: any, callback: (...rest: any[]) => any) => {
   if (event.syncDocumentId) {
     await synchronizeDocument(event.syncDocumentId);
   } else {
@@ -33,30 +33,9 @@ async function invokeSynchronization(functionName: string) {
     return;
   }
 
-  const lambdaConfig = { region: LAMBDA_CONFIG.region };
-
-  if (LAMBDA_CONFIG.isLocal) {
-    // @ts-ignore
-    lambdaConfig.endpoint = 'http://localhost:3002';
-  }
-
-  const client = new LambdaClient(lambdaConfig);
-  const invoker = selfInvoker(client, functionName);
+  const invoker = selfInvoker(functionName);
 
   for (const documentId of documentIds) {
-    await invoker(documentId);
+    await invoker({ syncDocumentId: documentId });
   }
-}
-
-function selfInvoker(client: LambdaClient, functionName: string): Function {
-  return async (syncDocumentId: string): Promise<any> => {
-    const command = new InvokeCommand({
-      FunctionName: functionName,
-      InvocationType: 'Event',
-      // @ts-ignore
-      Payload: JSON.stringify({ syncDocumentId }),
-    });
-
-    return client.send(command);
-  };
 }

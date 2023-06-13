@@ -92,6 +92,13 @@ export class SubscriptionAgreement {
     return this.status === SubscriptionAgreementStatus.SIGNED;
   }
 
+  getDataForParser() {
+    return {
+      templateVersion: this.templateVersion,
+      contentFieldsJson: this.contentFieldsJson,
+    };
+  }
+
   toObject() {
     return {
       id: this.id,

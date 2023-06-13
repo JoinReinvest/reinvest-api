@@ -83,6 +83,16 @@ const schema = `
         [MOCK] It STARTS the recurring investment, CANCEL previous recurring investment if exists and schedule the first investment.
         """
         initiateRecurringInvestment(accountId: ID!): Boolean!
+
+        """
+        [MOCK] It DEACTIVATE the recurring investment.
+        """
+        deactivateRecurringInvestment(accountId: ID!): Boolean!
+
+        """
+        [MOCK] It UNSUSPEND the recurring investment.
+        """
+        unsuspendRecurringInvestment(accountId: ID!): Boolean!
     }
 `;
 const recurringInvestmentIdMock = '89e94d4c-f237-4f10-aa05-be8ade28123';
@@ -165,16 +175,10 @@ export const RecurringInvestments = {
       ) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const individualAccountId = accountId; // await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules); TODO no need for now - remember to add parent id on beneficiary when implementing cron job
-
-        const alreadyExistedRecurringInvestmentDraft = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-
-        if (alreadyExistedRecurringInvestmentDraft) {
-          await investmentAccountsApi.deleteRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
-        }
-
+        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const { portfolioId } = await portfolioApi.getActivePortfolio();
-        const status = await investmentAccountsApi.createRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+
+        const status = await investmentAccountsApi.createDraftRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
 
         if (!status) {
           throw new JsonGraphQLError('COULDNT_CREATE_RECURRING_INVESTMENT');
@@ -199,39 +203,32 @@ export const RecurringInvestments = {
       },
       signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, clientIp }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+        const isSigned = await investmentAccountsApi.signRecurringSubscriptionAgreement(profileId, accountId, clientIp);
 
-        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-
-        if (!recurringInvestment) {
-          return false;
+        if (!isSigned) {
+          throw new JsonGraphQLError('CANNOT_SIGN_RECURRING_SUBSCRIPTION_AGREEMENT');
         }
 
-        const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, recurringInvestment.id, clientIp);
-
-        if (!subscriptionAgreementId) {
-          throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
-        }
-
-        const isAssigned = await investmentAccountsApi.assignSubscriptionAgreementToRecurringInvestment(accountId, subscriptionAgreementId);
-
-        return isAssigned;
+        return isSigned;
       },
       initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-
-        if (!recurringInvestment) {
-          throw new JsonGraphQLError('NO_INVESTMENT_TO_INITIATE');
-        }
-
-        await investmentAccountsApi.deactivateRecurringInvestment(accountId);
-
         const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
 
-        if (!status) {
-          return false;
-        }
+        return status;
+      },
+      deactivateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.deactivateRecurringInvestment(accountId);
+
+        return status;
+      },
+      unsuspendRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.unsuspendRecurringInvestment(accountId);
 
         return status;
       },

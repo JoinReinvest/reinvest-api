@@ -1,4 +1,5 @@
 import Container, { ContainerInterface } from 'Container/Container';
+import { Documents } from 'Documents/index';
 import { InvestmentsDatabaseAdapterInstanceProvider, InvestmentsDatabaseAdapterProvider } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
@@ -21,6 +22,7 @@ export namespace Investments {
   };
 
   export type ModulesDependencies = {
+    documents: Documents.Main;
     sharesAndDividends: SharesAndDividends.Main;
   };
 
@@ -72,6 +74,7 @@ export namespace Investments {
       }
 
       this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
+      this.container.addAsValue('Documents', this.modules.documents);
       new AdaptersProviders(this.config).boot(this.container);
       new UseCaseProviders(this.config).boot(this.container);
       new PortsProviders(this.config).boot(this.container);

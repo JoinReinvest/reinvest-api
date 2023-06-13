@@ -11,6 +11,7 @@ import { Api, EventHandler, Module } from 'Reinvest/Modules';
 export namespace Documents {
   export const moduleName = 'Documents';
   export type Config = {
+    chromiumEndpoint: string;
     database: PostgreSQLConfig;
     s3: S3Config;
   };

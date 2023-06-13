@@ -2,6 +2,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
+export const CHROMIUM_ENDPOINT = process.env.CHROMIUM_ENDPOINT ?? 'https://reinvest-chromium-upload-bucket.s3.amazonaws.com/chromium-v114.0.0-pack.tar';
+
 export const NORTH_CAPITAL_CONFIG = {
   CLIENT_ID: process.env.NORTH_CAPITAL_CLIENT_ID as string,
   DEVELOPER_API_KEY: process.env.NORTH_CAPITAL_DEVELOPER_API_KEY as string,
