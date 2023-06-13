@@ -1,6 +1,6 @@
 import { Money } from 'Money/Money';
 import { Portfolio } from 'Portfolio/index';
-import { CurrentNav } from 'SharesAndDividends/Domain/AccountStatsCalculationService';
+import { CurrentNav } from 'SharesAndDividends/Domain/Stats/AccountStatsCalculationService';
 
 export class PortfolioService {
   private portfolioModule: Portfolio.Main;

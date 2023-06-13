@@ -1,5 +1,5 @@
-import { AccountStatsView } from 'SharesAndDividends/Domain/AccountStats';
-import { EVSChartResolution } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
+import { AccountStatsView } from 'SharesAndDividends/Domain/Stats/AccountStats';
+import { EVSChartResolution } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 
 export class StatsController {

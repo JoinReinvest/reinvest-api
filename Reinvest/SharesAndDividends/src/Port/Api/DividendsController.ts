@@ -1,13 +1,13 @@
-import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { DividendDetails, DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
+import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 
 export class DividendsController {
   private dividendsQuery: DividendsQuery;
-  private dividendsRepository: DividendsRepository;
+  private markDividendAsReinvestedUseCase: MarkDividendAsReinvested;
 
-  constructor(dividendsQuery: DividendsQuery, dividendsRepository: DividendsRepository) {
+  constructor(dividendsQuery: DividendsQuery, markDividendAsReinvestedUseCase: MarkDividendAsReinvested) {
     this.dividendsQuery = dividendsQuery;
-    this.dividendsRepository = dividendsRepository;
+    this.markDividendAsReinvestedUseCase = markDividendAsReinvestedUseCase;
   }
 
   static getClassName = () => 'DividendsController';
@@ -17,7 +17,6 @@ export class DividendsController {
   }
 
   async markDividendReinvested(profileId: string, accountId: string, dividendId: string): Promise<void> {
-    // TODO include regular investor dividend - do it on the domain side, not on db side!!
-    await this.dividendsRepository.markIncentiveDividendReinvested(profileId, accountId, dividendId);
+    await this.markDividendAsReinvestedUseCase.execute(profileId, accountId, dividendId);
   }
 }

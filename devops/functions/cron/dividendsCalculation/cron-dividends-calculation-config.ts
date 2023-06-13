@@ -1,14 +1,13 @@
-import { CloudwatchPolicies } from '../../serverless/cloudwatch';
-import { S3PoliciesWithImport } from '../../serverless/s3';
-import { getAttribute, getResourceName } from '../../serverless/utils';
-import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
+import { CloudwatchPolicies } from '../../../serverless/cloudwatch';
+import { getAttribute, getResourceName } from '../../../serverless/utils';
+import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../../serverless/vpc';
 
-export const CronVendorsSyncFunction = {
-  handler: `devops/functions/cronVendorsSync/handler.main`,
-  role: 'CronVendorsSyncRole',
-  timeout: 30,
+export const CronDividendsCalculationFunction = {
+  handler: `devops/functions/cron/dividendsCalculation/handler.main`,
+  role: 'CronDividendsCalculationRole',
+  timeout: 60,
   vpc: {
-    securityGroupIds: [getAttribute('CronVendorsSyncSecurityGroup', 'GroupId')],
+    securityGroupIds: [getAttribute('CronDividendsCalculationSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
   },
   events: [
@@ -18,8 +17,8 @@ export const CronVendorsSyncFunction = {
   ],
 };
 
-export const CronVendorsSyncResources = {
-  CronVendorsSyncRole: {
+export const CronDividendsCalculationResources = {
+  CronDividendsCalculationRole: {
     Type: 'AWS::IAM::Role',
     Properties: {
       AssumeRolePolicyDocument: {
@@ -35,12 +34,11 @@ export const CronVendorsSyncResources = {
       },
       Policies: [
         {
-          PolicyName: 'QueuePolicy',
+          PolicyName: 'DividendsCalculationPolicy',
           PolicyDocument: {
             Statement: [
               ...CloudwatchPolicies,
               ...EniPolicies,
-              ...S3PoliciesWithImport,
               {
                 Effect: 'Allow',
                 Action: ['lambda:InvokeFunction'],
@@ -52,11 +50,11 @@ export const CronVendorsSyncResources = {
       ],
     },
   },
-  CronVendorsSyncSecurityGroup: {
+  CronDividendsCalculationSecurityGroup: {
     Type: 'AWS::EC2::SecurityGroup',
     Properties: {
-      GroupName: getResourceName('sg-cronVendorsSync-lambda'),
-      GroupDescription: getResourceName('sg-cronVendorsSync-lambda'),
+      GroupName: getResourceName('sg-cronDividendsCalculation-lambda'),
+      GroupDescription: getResourceName('sg-cronDividendsCalculation-lambda'),
       SecurityGroupIngress: SecurityGroupIngressRules,
       SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),
