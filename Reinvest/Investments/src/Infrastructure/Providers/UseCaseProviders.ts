@@ -20,6 +20,7 @@ import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
 import UnsuspendRecurringInvestment from 'Investments/Application/UseCases/UnsuspendRecurringInvestment';
 import { Investments } from 'Investments/index';
+import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import {
   InvestmentsDatabase,
@@ -55,8 +56,8 @@ export default class UseCaseProviders {
     container.addSingleton(CreateSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, IdGenerator]);
     container.addSingleton(SubscriptionAgreementQuery, [SubscriptionAgreementRepository]);
     container.addSingleton(InvestmentSummaryQuery, [InvestmentsRepository]);
-    container.addSingleton(SignSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository]);
-    container.addSingleton(SignRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository]);
+    container.addSingleton(SignSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, DocumentsService]);
+    container.addSingleton(SignRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, DocumentsService]);
     container.addSingleton(ApproveFees, [FeesRepository]);
     container.addSingleton(StartInvestment, [InvestmentsRepository]);
     container.addSingleton(IsFeeApproved, [FeesRepository]);

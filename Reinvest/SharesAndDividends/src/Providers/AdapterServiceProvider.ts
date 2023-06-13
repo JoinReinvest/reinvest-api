@@ -8,6 +8,7 @@ import {
   SharesAndDividendsDatabaseAdapterInstanceProvider,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
+import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
@@ -37,6 +38,7 @@ export class AdapterServiceProvider {
       .addSingleton(SharesRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
       .addSingleton(FinancialOperationsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
       .addSingleton(DividendsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
+      .addSingleton(DividendsCalculationRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
       .addObjectFactory(
         'SharesAndDividendsTransactionalAdapter',
         (databaseProvider: SharesAndDividendsDatabaseAdapterProvider) => new TransactionalAdapter<SharesAndDividendsDatabase>(databaseProvider),
