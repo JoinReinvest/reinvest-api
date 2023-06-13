@@ -11,12 +11,13 @@ export type S3Config = {
 };
 
 export class S3Adapter {
-  public static getClassName = (): string => 'S3Adapter';
   private config: S3Config;
 
   constructor(config: S3Config) {
     this.config = config;
   }
+
+  public static getClassName = (): string => 'S3Adapter';
 
   public async generatePutSignedUrlForAvatar(catalog: string, fileName: string): Promise<string> {
     return this.generatePutSignedUrl(this.config.avatarsBucket, catalog, fileName);
@@ -24,21 +25,6 @@ export class S3Adapter {
 
   public async generatePutSignedUrlForDocument(catalog: string, fileName: string): Promise<string> {
     return this.generatePutSignedUrl(this.config.documentsBucket, catalog, fileName);
-  }
-
-  private async generatePutSignedUrl(bucketName: string, catalog: string, fileName: string): Promise<string> {
-    const client = new S3Client({
-      region: this.config.region,
-    });
-
-    const putInput: PutObjectCommandInput = {
-      Bucket: bucketName,
-      Key: `${catalog}/${fileName}`,
-      ACL: 'private',
-    };
-    const putCommand = new PutObjectCommand(putInput);
-
-    return getSignedUrl(client, putCommand, { expiresIn: 3600 });
   }
 
   async uploadBufferPdf(catalog: string, fileName: string, buffer: any) {
@@ -95,5 +81,20 @@ export class S3Adapter {
     await client.send(command);
 
     return true;
+  }
+
+  private async generatePutSignedUrl(bucketName: string, catalog: string, fileName: string): Promise<string> {
+    const client = new S3Client({
+      region: this.config.region,
+    });
+
+    const putInput: PutObjectCommandInput = {
+      Bucket: bucketName,
+      Key: `${catalog}/${fileName}`,
+      ACL: 'private',
+    };
+    const putCommand = new PutObjectCommand(putInput);
+
+    return getSignedUrl(client, putCommand, { expiresIn: 3600 });
   }
 }

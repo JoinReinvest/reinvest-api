@@ -1,43 +1,14 @@
-import axios, { AxiosResponse } from 'axios';
+import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer';
 
 export class PdfGenerator {
   private chromiumEndpoint: string;
-  public static getClassName = (): string => 'PdfGenerator';
 
   constructor(chromiumEndpoint: string) {
     this.chromiumEndpoint = chromiumEndpoint;
   }
 
-  private getPDFBuffer = async (html: string, options: any): Promise<any> => {
-    let browser = null;
-    try {
-      const chromiumPath: AxiosResponse<{ path: string }> = await axios.get(`${this.chromiumEndpoint}`);
-
-      const path = chromiumPath.data.path;
-
-      browser = await puppeteer.launch({
-        args: puppeteer.defaultArgs(),
-        executablePath: path,
-        headless: 'new',
-      });
-
-      const page = await browser.newPage();
-
-      const loaded = page.waitForNavigation({
-        waitUntil: 'load',
-      });
-
-      await page.setContent(html);
-      await loaded;
-
-      await page.pdf(options);
-
-      return await page.createPDFStream(options);
-    } catch (error) {
-      return error;
-    }
-  };
+  public static getClassName = (): string => 'PdfGenerator';
 
   generatePdfFromHtml = async (html: string) => {
     try {
@@ -60,6 +31,32 @@ export class PdfGenerator {
           message: 'Something went wrong',
         }),
       };
+    }
+  };
+
+  private getPDFBuffer = async (html: string, options: any): Promise<any> => {
+    let browser = null;
+    try {
+      browser = await puppeteer.launch({
+        args: puppeteer.defaultArgs(),
+        executablePath: await chromium.executablePath(this.chromiumEndpoint),
+        headless: 'new',
+      });
+
+      const page = await browser.newPage();
+
+      const loaded = page.waitForNavigation({
+        waitUntil: 'load',
+      });
+
+      await page.setContent(html);
+      await loaded;
+
+      await page.pdf(options);
+
+      return await page.createPDFStream(options);
+    } catch (error) {
+      return error;
     }
   };
 }

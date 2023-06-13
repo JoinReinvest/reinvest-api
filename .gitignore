@@ -11,3 +11,5 @@ yarn-error.log
 .serverless
 .esbuild
 .current-aws-profile
+chromium-*.zip
+chromium-*.tar

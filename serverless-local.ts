@@ -2,7 +2,6 @@ import type { AWS } from '@serverless/typescript';
 
 import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 import { ApiLambdaFunction, ApiLambdaResources } from './devops/functions/api/api-config';
-import { ChromiumFunction, ChromiumLambdaResources } from './devops/functions/chromium/chromium-config';
 import {
   CronDividendsCalculationFunction,
   CronDividendsCalculationResources,
@@ -68,7 +67,6 @@ const serverlessConfiguration: AWS = {
     explorer: ExplorerLambdaFunction,
     migration: MigrationLambdaFunction,
     queue: QueueFunction,
-    chromium: ChromiumFunction,
     cronDocumentsSync: CronDocumentSyncFunction,
     cronVendorsSync: CronVendorsSyncFunction,
     cronDividendsCalculation: CronDividendsCalculationFunction,
@@ -89,7 +87,6 @@ const serverlessConfiguration: AWS = {
       ...AdminLambdaResources,
       ...ApiLambdaResources,
       ...ExplorerLambdaResources,
-      ...ChromiumLambdaResources,
       ...MigrationLambdaResources,
       ...UnauthorizedEndpointsLambdaResources,
       ...QueueResources,
