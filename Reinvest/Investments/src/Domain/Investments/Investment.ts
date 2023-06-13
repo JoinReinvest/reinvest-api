@@ -145,14 +145,18 @@ export class Investment {
   }
 
   abort() {
-    this.status = InvestmentStatus.FINISHED;
+    if (this.checkIfCanBeAborted()) {
+      this.status = InvestmentStatus.FINISHED;
 
-    if (this.fee) {
-      this.fee.abort();
+      if (this.fee) {
+        this.fee.abort();
+      }
+    } else {
+      throw new Error('INVESTMENT_CANNOT_BE_ABORTED');
     }
   }
 
-  checkIfCanBeAborted() {
+  private checkIfCanBeAborted() {
     return (
       this.status === InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT ||
       this.status === InvestmentStatus.WAITING_FOR_FEES_APPROVAL ||
