@@ -1,5 +1,100 @@
 # REINVEST API CHANGELOG
 
+## 1.16 - 06/13/2023
+
+* **!BREAKING CHANGE! - everywhere "id" was represented by `string` type in the API, has changed to `ID` type!**
+* New MOCKS:
+    * Queries:
+        * `getAccountActivity` - list account activities. The list of potential activities is listed in
+          the `AccountActivity`
+          enum
+        * `listBeneficiaries`
+        * `listInvestments` - List of all investments history
+        * `listDividends` - List of all dividends history
+    * Mutations:
+        * `updateProfile`
+        * `updateIndividualAccount`
+        * `updateCorporateAccount`
+        * `updateTrustAccount`
+        * `updateBeneficiaryAccount`
+        * `archiveBeneficiaryAccount`
+        * `updateEmailAddress`
+        * `cancelInvestment` - it cancels investment process, but only if the investment HAS BEEN started already and
+          the Grace Period has not ended yet
+        * `getFundsWithdrawalAgreement` - it returns funds withdrawal agreement in the same template format as for
+          subscription agreement
+        * `signFundsWithdrawalAgreement` - it signs funds withdrawal agreement
+* API Changes:
+    * `readBankAccount` query returns new field: `bankAccountStatus` - it returns the status of the bank account (
+      active/inactive/draft)
+    * `getInvestmentSummary` query returns also `BankAccount` type information
+    * `positionTotal` field was removed
+      from `AccountOverview`, `IndividualAccount`, `CorporateAccount`, `TrustAccount`
+      types. Right now this field is present only in `AccountStats` type as `accountValue`
+        * Queries/Mutations:  `getTemplate`, `signDocumentFromTemplate` were removed from the API
+    * Updating type names:
+        * `SubscriptionAgreementStatus` -> `AgreementStatus`
+        * `SubscriptionAgreementParagraph` -> `AgreementParagraph`
+        * `SubscriptionAgreementSection` -> `AgreementSection`
+    * Updating MOCKS for `FundsWithdrawalAgreement`
+        * After consulting with Transfer Agent, the API will return the same template as for subscription agreement for
+          funds withdrawal agreement
+        * the investor does not have to download/print/sign/upload anything.
+        * **The process of signing funds withdrawal agreement is the same as for subscription agreement**
+        * See changes in the API for
+          mutations: `createFundsWithdrawalAgreement`, `signFundsWithdrawalAgreement`, `requestFundsWithdrawal`
+* No MOCKS anymore:
+    * `abortInvestment` - it aborts investment process, but only if the investment HAS NOT BEEN started yet
+    * `deactivateRecurringInvestment` - it deactivates (soft delete) recurring investment
+    * `unsuspendRecurringInvestment`  - it activates recurring investment if went to SUSPENDED state (because of failed
+      transactions)
+
+* Backend changes:
+    * Added dividends implementation
+        * [ADMIN] Added dividend declaration process
+        * [CRON] Dividends calculation
+        * [ADMIN] Added dividend distribution process
+        * [CRON]  Distribute dividends to investors and send notifications
+    * After signing subscription agreement, the PDF file is actually generated and stored in S3
+
+## 1.15  05/26/2023 - 06/19/2023
+
+* No MOCKS anymore:
+    * For account settings
+        * `getAccountConfiguration`
+        * `setAutomaticDividendReinvestmentAgreement`
+    * For investment process
+        * `signSubscriptionAgreement`
+        * `startInvestment`
+    * For recurring investment process
+        * `getScheduleSimulation`
+        * `createRecurringInvestment`
+        * `createRecurringSubscriptionAgreement`
+        * `signRecurringInvestmentSubscriptionAgreement`
+        * `initiateRecurringInvestment`
+        * `getActiveRecurringInvestment`
+        * `getDraftRecurringInvestment`
+    * For account stats
+        * `getAccountStats`
+        * `getEVSChart`
+        * `getNotifications`
+        * `markNotificationAsRead`
+    * For dividends
+        * `reinvestDividend`
+
+* New Queries:
+    * `getNotificationStats` - provides info about the number of unread/total notifications for the given account id
+        * it allows to retrieve notifications directly in the same query
+
+* ADMIN:
+    * new mutation for Executives: `giveIncentiveRewardByHand` that allow to give the user incentive reward by hand
+
+* Changes:
+    * Notifications with `isDismissible` = `false` are not dismissible anymore. They are always first in the list.
+        * notification is dismissed automatically after some time or after some action
+    * Dividends reinvestment actually triggers shares transfer from REINVEST to investor in Vertalo (sandbox)
+    * Investing for beneficiaries works the same as for regular account
+
 ## 1.14 - 05/24/2023
 
 * add `bankName` filed in `readBankAccount` query
@@ -35,6 +130,8 @@
         * Mark payment as completed in Vertalo
         * Transfer shares from REINVEST to investor in Vertalo
     * FinishInvestment: [MOCK] Finish investment
+    * [FOR TESTS PURPOSE] Next states of process are triggered by changes the state of trade in North Capital
+        * trade CREATED -> FUNDED -> SETTLED
 
 ## 1.13 - 05/17/2023
 
@@ -195,7 +292,8 @@
       Client must sign the agreement and call signSubscriptionAgreement mutation.
     * `signSubscriptionAgreement` - It signs the subscription agreement.
     * `approveFees` - Approves the fees for the specific investment.
-      In case if extra fee is required for recurring investment and the investment was started automatically by the
+      In case if extra totalFeeAmount is required for recurring investment and the investment was started automatically
+      by the
       system, then
       use this method to approve the fees (it will ask for that on verification step triggered from the notification).
     * `startInvestment` - It starts the investment.

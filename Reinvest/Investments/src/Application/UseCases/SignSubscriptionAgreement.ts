@@ -1,14 +1,11 @@
-import TemplateParser, { DynamicType } from 'Investments/Application/Service/TemplateParser';
+import TemplateParser from 'Investments/Application/Service/TemplateParser';
 import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
-import { subscriptionAgreementsTemplate, TemplateVersions } from 'Investments/Domain/SubscriptionAgreement';
+import { subscriptionAgreementsTemplate } from 'Investments/Domain/SubscriptionAgreements/subscriptionAgreementsTemplates';
+import { DynamicType, PdfTypes, SubscriptionAgreementTemplateVersions } from 'Investments/Domain/SubscriptionAgreements/types';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { DomainEvent } from 'SimpleAggregator/Types';
-
-export enum PdfTypes {
-  AGREEMENT = 'AGREEMENT',
-}
 
 class SignSubscriptionAgreement {
   static getClassName = (): string => 'SignSubscriptionAgreement';
@@ -59,7 +56,7 @@ class SignSubscriptionAgreement {
     if (isAssigned) {
       const { contentFieldsJson, templateVersion } = subscriptionAgreement.getDataForParser();
 
-      const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as TemplateVersions]);
+      const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as SubscriptionAgreementTemplateVersions]);
 
       const parsed = parser.parse(contentFieldsJson as DynamicType);
 

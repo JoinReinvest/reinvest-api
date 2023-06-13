@@ -1,10 +1,10 @@
-import { CloudwatchPolicies } from '../../serverless/cloudwatch';
-import { S3PoliciesWithImport } from '../../serverless/s3';
-import { getAttribute, getResourceName } from '../../serverless/utils';
-import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
+import { CloudwatchPolicies } from '../../../serverless/cloudwatch';
+import { S3PoliciesWithImport } from '../../../serverless/s3';
+import { getAttribute, getResourceName } from '../../../serverless/utils';
+import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../../serverless/vpc';
 
 export const CronDocumentSyncFunction = {
-  handler: `devops/functions/cronDocumentSync/handler.main`,
+  handler: `devops/functions/cron/documentSync/handler.main`,
   role: 'CronDocumentSyncRole',
   timeout: 60,
   vpc: {

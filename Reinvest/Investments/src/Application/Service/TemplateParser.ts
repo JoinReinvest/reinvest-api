@@ -1,12 +1,4 @@
-export type Template = {
-  paragraphs: {
-    lines: string[];
-    isCheckedOption?: boolean;
-  }[];
-  header?: string;
-}[];
-
-export type DynamicType = { [key: string]: string };
+import type { DynamicType, Template } from 'Investments/Domain/SubscriptionAgreements/types';
 
 class TemplateParser {
   private template: Template;
