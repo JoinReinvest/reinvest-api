@@ -11,29 +11,30 @@ class InitiateRecurringInvestment {
   static getClassName = (): string => 'InitiateRecurringInvestment';
 
   async execute(accountId: string) {
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, RecurringInvestmentStatus.DRAFT);
+    const recurringInvestmentDraft = await this.recurringInvestmentsRepository.get(accountId, RecurringInvestmentStatus.DRAFT);
 
-    if (!recurringInvestment) {
+    if (!recurringInvestmentDraft) {
       return false;
     }
 
-    const subscriptionAgreementId = recurringInvestment.getSubscriptionAgreeementId();
+    const isReady = recurringInvestmentDraft.isReadyToActivate();
 
-    if (!subscriptionAgreementId) {
+    if (!isReady) {
       return false;
     }
 
-    recurringInvestment?.updateStatus(RecurringInvestmentStatus.ACTIVE);
+    const activeRecurringInvestment = await this.recurringInvestmentsRepository.get(accountId, RecurringInvestmentStatus.ACTIVE);
 
-    const id = recurringInvestment.getId();
+    if (activeRecurringInvestment) {
+      activeRecurringInvestment.deactivate();
 
-    const status = await this.recurringInvestmentsRepository.updateStatus(id, RecurringInvestmentStatus.ACTIVE);
-
-    if (!status) {
-      return false;
+      await this.recurringInvestmentsRepository.updateStatus(activeRecurringInvestment);
     }
 
-    return true;
+    recurringInvestmentDraft?.activate();
+    const status = await this.recurringInvestmentsRepository.updateStatus(recurringInvestmentDraft);
+
+    return status;
   }
 }
 

@@ -212,23 +212,8 @@ export const Investments = {
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-        let isApproved = true;
 
-        if (approveFees) {
-          isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
-        } else {
-          const isFeeApproved = await investmentAccountsApi.isFeesApproved(investmentId);
-
-          if (!isFeeApproved) {
-            throw new GraphQLError('FEE_NOT_APPROVED');
-          }
-        }
-
-        if (!isApproved) {
-          throw new GraphQLError('ERROR_OCCURED_DURING_APPROVING_FEE');
-        }
-
-        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId);
+        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId, approveFees);
 
         if (!isStartedInvestment) {
           throw new GraphQLError('CANNOT_START_INVESTMENT');
@@ -255,18 +240,20 @@ export const Investments = {
       signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules, clientIp }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, investmentId, clientIp);
+        const isSigned = await investmentAccountsApi.signSubscriptionAgreement(profileId, investmentId, clientIp);
 
-        if (!subscriptionAgreementId) {
-          throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
+        if (!isSigned) {
+          throw new JsonGraphQLError('CANNOT_SIGN_SUBSCRIPTION_AGREEMENT');
         }
 
-        const isAssigned = await investmentAccountsApi.assignSubscriptionAgreementToInvestment(investmentId, subscriptionAgreementId);
-
-        return isAssigned;
+        return isSigned;
       },
       abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.abortInvestment(profileId, investmentId);
+
+        return status;
       },
       cancelInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;

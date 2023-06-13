@@ -64,6 +64,7 @@
     "@aws-sdk/client-s3": "^3.303.0",
     "@aws-sdk/client-sns": "^3.303.0",
     "@aws-sdk/client-sqs": "^3.303.0",
+    "@aws-sdk/lib-storage": "^3.350.0",
     "@aws-sdk/s3-request-presigner": "^3.303.0",
     "@graphql-tools/delegate": "^9.0.28",
     "@graphql-tools/merge": "^8.4.0",
@@ -82,8 +83,10 @@
     "graphql": "^16.6.0",
     "graphql-constraint-directive": "^5.0.0",
     "kysely": "0.25.0",
+    "handlebars": "^4.7.7",
     "pg": "^8.10.0",
     "postgres": "^3.3.4",
+    "puppeteer": "20.1.0",
     "serverless-http": "^3.2.0",
     "typed-inject": "^3.0.1",
     "uuid": "^9.0.0"

@@ -1,6 +1,8 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { FileType } from 'Documents/Adapter/S3/FileLinkService';
+import { Stream } from 'stream';
 
 export type S3Config = {
   avatarsBucket: string;
@@ -37,6 +39,30 @@ export class S3Adapter {
     const putCommand = new PutObjectCommand(putInput);
 
     return getSignedUrl(client, putCommand, { expiresIn: 3600 });
+  }
+
+  async uploadBufferPdf(catalog: string, fileName: string, buffer: any) {
+    const client = new S3Client({
+      region: this.config.region,
+    });
+
+    const stream = new Stream.PassThrough();
+
+    const parallelUploads3 = new Upload({
+      client,
+      params: {
+        Bucket: this.config.documentsBucket,
+        Key: `${catalog}/${fileName}`,
+        Body: stream,
+        ContentType: 'application/pdf',
+        ACL: 'private',
+      },
+    });
+    buffer.pipe(stream);
+
+    await parallelUploads3.done();
+
+    return true;
   }
 
   public async getSignedGetUrl(type: FileType, catalog: string, fileName: string) {

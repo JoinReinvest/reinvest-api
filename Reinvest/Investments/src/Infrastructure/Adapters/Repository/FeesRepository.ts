@@ -1,5 +1,6 @@
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { Fee } from 'Reinvest/Investments/src/Domain/Investments/Fee';
+import { InvestmentsFeesStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 export class FeesRepository {
   public static getClassName = (): string => 'FeesRepository';
 
@@ -38,6 +39,26 @@ export class FeesRepository {
       return true;
     } catch (error: any) {
       console.error(`Cannot update fee's status: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async updateStatus(fee: Fee) {
+    const { id, status } = fee.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(investmentsFeesTable)
+        .set({
+          status,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot update status of fee: ${error.message}`, error);
 
       return false;
     }
