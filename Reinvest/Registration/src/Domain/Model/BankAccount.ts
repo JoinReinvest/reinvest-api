@@ -147,4 +147,8 @@ export class BankAccount {
   getBankName(): string {
     return this.plaidResult?.institutionName || '';
   }
+
+  getStatus() {
+    return this.state === 'IN_PROGRESS' ? 'DRAFT' : this.state;
+  }
 }
