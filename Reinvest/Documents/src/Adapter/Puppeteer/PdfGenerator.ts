@@ -12,7 +12,7 @@ export class PdfGenerator {
   private getPDFBuffer = async (html: string, options: any): Promise<any> => {
     let browser = null;
     try {
-      const chromiumPath: AxiosResponse<{ path: string }> = await axios.get(`${this.chromiumEndpoint}/chromium`);
+      const chromiumPath: AxiosResponse<{ path: string }> = await axios.get(`${this.chromiumEndpoint}`);
 
       const path = chromiumPath.data.path;
 
@@ -45,7 +45,6 @@ export class PdfGenerator {
         format: 'A4',
         printBackground: true,
         margin: { top: '1in', right: '1in', bottom: '1in', left: '1in' },
-        path: 'test.pdf',
       };
 
       const pdf = await this.getPDFBuffer(html, options);

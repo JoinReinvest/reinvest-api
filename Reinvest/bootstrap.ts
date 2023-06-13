@@ -11,6 +11,7 @@ import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
 import {
+  CHROMIUM_ENDPOINT,
   COGNITO_CONFIG,
   DATABASE_CONFIG,
   EMAIL_DOMAIN,
@@ -56,7 +57,7 @@ export function boot(): Modules {
     Documents.create({
       database: databaseConfig,
       s3: s3Config,
-      chromiumEndpoint: process.env.CHROMIUM_ENDPOINT ?? 'http://localhost:3000',
+      chromiumEndpoint: CHROMIUM_ENDPOINT,
     } as Documents.Config),
   );
 
