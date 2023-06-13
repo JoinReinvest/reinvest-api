@@ -23,7 +23,11 @@ class AbortInvestment {
       return false;
     }
 
-    investment.abort();
+    if (investment.checkIfCanBeAborted()) {
+      investment.abort();
+    } else {
+      return false;
+    }
 
     const fee = investment.getFee();
 
