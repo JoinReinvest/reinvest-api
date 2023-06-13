@@ -24,6 +24,7 @@ export class UpdateBankAccount {
         return inProgressBankAccount.getPlaidLink();
       }
 
+      // TODO should search any bank account!
       const bankAccount = await this.bankAccountRepository.findActiveBankAccount(profileId, accountId);
 
       if (!bankAccount) {

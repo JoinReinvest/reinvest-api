@@ -145,23 +145,34 @@ export class Investment {
   }
 
   abort() {
-    this.status = InvestmentStatus.FINISHED;
+    if (this.checkIfCanBeAborted()) {
+      this.status = InvestmentStatus.FINISHED;
 
-    if (this.fee) {
-      this.fee.abort();
+      if (this.fee) {
+        this.fee.abort();
+      }
+    } else {
+      throw new Error('INVESTMENT_CANNOT_BE_ABORTED');
     }
   }
 
-  hasFee() {
-    return !!this.fee;
+  private checkIfCanBeAborted() {
+    return (
+      this.status === InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT ||
+      this.status === InvestmentStatus.WAITING_FOR_FEES_APPROVAL ||
+      this.status === InvestmentStatus.WAITING_FOR_INVESTMENT_START
+    );
   }
-
   approveFee() {
     this.fee?.approveFee();
   }
 
   isFeeApproved() {
-    return this.fee?.isApproved();
+    if (!this.fee) {
+      return true;
+    }
+
+    return this.fee.isApproved();
   }
 
   getSubscriptionAgreementId() {
@@ -169,9 +180,15 @@ export class Investment {
   }
 
   startInvestment() {
+    if (!this.isFeeApproved()) {
+      return false;
+    }
+
     this.dateStarted = new Date();
     this.gracePeriod = new GracePeriod(this.dateStarted);
     this.status = InvestmentStatus.IN_PROGRESS;
+
+    return true;
   }
 
   isStartedInvestment() {

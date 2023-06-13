@@ -34,10 +34,15 @@ const schema = `
         This action will set the phone number in the user Cognito profile and allow to use 2FA with phone number
         """
         verifyPhoneNumber(countryCode: String, phoneNumber: String, authCode: String): Boolean
+
+        """
+        [MOCK] It updates email address in the Cognito and in the REINVEST system
+        """
+        updateEmailAddress(email: EmailAddress): Boolean
     }
 `;
 
-export const PhoneNumberVerification = {
+export const IdentitySchema = {
   typeDefs: schema,
   resolvers: {
     Query: {
@@ -75,6 +80,12 @@ export const PhoneNumberVerification = {
         const api = modules.getApi<Identity.ApiType>(Identity);
 
         return api.verifyPhoneNumber(userId, countryCode, phoneNumber, authCode);
+      },
+      // TODO This is MOCK
+      updateEmailAddress: async (parent: any, { email }: { email: string }, { userId, modules }: SessionContext) => {
+        const api = modules.getApi<Identity.ApiType>(Identity);
+
+        return true;
       },
     },
   },
