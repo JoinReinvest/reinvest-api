@@ -1,5 +1,5 @@
 import { PlaidResponse } from 'Registration/Domain/Model/BankAccount';
-import { BankAccountQuery, CurrentActiveBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/BankAccountQuery';
+import { BankAccountQuery, BankAccountResponse } from 'Registration/IntegrationLogic/UseCase/BankAccount/BankAccountQuery';
 import { FulfillBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/FulfillBankAccount';
 import { InitializeBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/InitializeBankAccount';
 import { UpdateBankAccount } from 'Registration/IntegrationLogic/UseCase/BankAccount/UpdateBankAccount';
@@ -83,8 +83,12 @@ export class BankAccountController {
     }
   }
 
-  public async readBankAccount(profileId: string, accountId: string): Promise<CurrentActiveBankAccount | null> {
+  public async readBankAccount(profileId: string, accountId: string): Promise<BankAccountResponse | null> {
     return this.bankAccountQuery.readActiveBankAccount(profileId, accountId);
+  }
+
+  public async getBankAccount(profileId: string, bankAccountId: string): Promise<BankAccountResponse | null> {
+    return this.bankAccountQuery.readBankAccountById(profileId, bankAccountId);
   }
 
   private getValue<Result>(input: any, key: string, throwIfUndefined = true) {

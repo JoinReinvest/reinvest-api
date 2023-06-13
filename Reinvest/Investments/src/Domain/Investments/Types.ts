@@ -31,6 +31,7 @@ export enum InvestmentsFeesStatus {
 
 export type InvestmentSummarySchema = {
   amount: number;
+  bankAccountId: string | null;
   dateCreated: Date;
   feeAmount: number | null;
   id: string;

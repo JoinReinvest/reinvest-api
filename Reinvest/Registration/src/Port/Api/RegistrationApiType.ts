@@ -12,6 +12,7 @@ export type RegistrationApiType = {
   createBankAccount: BankAccountController['createBankAccount'];
   fulfillBankAccount: BankAccountController['fulfillBankAccount'];
   getAccountMapping: RegistryQuery['getAccountMapping'];
+  getBankAccount: BankAccountController['getBankAccount'];
   getBankAccountMapping: BankAccountQuery['getBankAccountMapping'];
   getNorthCapitalAccountStructure: RegistryQuery['getNorthCapitalAccountStructure'];
   immediatelySynchronizeAccount: SynchronizationController['immediatelySynchronizeAccount'];
@@ -39,6 +40,7 @@ export const registrationApi = (container: ContainerInterface): RegistrationApiT
   createBankAccount: container.delegateTo(BankAccountController, 'createBankAccount'),
   fulfillBankAccount: container.delegateTo(BankAccountController, 'fulfillBankAccount'),
   readBankAccount: container.delegateTo(BankAccountController, 'readBankAccount'),
+  getBankAccount: container.delegateTo(BankAccountController, 'getBankAccount'),
   updateBankAccount: container.delegateTo(BankAccountController, 'updateBankAccount'),
   getAccountMapping: container.delegateTo(RegistryQuery, 'getAccountMapping'),
   getBankAccountMapping: container.delegateTo(BankAccountQuery, 'getBankAccountMapping'),

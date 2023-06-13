@@ -11,7 +11,7 @@ import { Configuration } from 'ApiGateway/Schema/Types/Configuration';
 import { DocumentTypes } from 'ApiGateway/Schema/Types/DocumentTypes';
 import { DraftAccount } from 'ApiGateway/Schema/Types/DraftAccount';
 import { Hello } from 'ApiGateway/Schema/Types/Hello';
-import { PhoneNumberVerification } from 'ApiGateway/Schema/Types/Identity';
+import { IdentitySchema } from 'ApiGateway/Schema/Types/Identity';
 import { Investments } from 'ApiGateway/Schema/Types/Investments';
 import { Notification } from 'ApiGateway/Schema/Types/Notification';
 import { Profile } from 'ApiGateway/Schema/Types/Profile';
@@ -29,7 +29,7 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   Account.typeDefs,
   ...DraftAccount.typeDefs,
   Profile.typeDefs,
-  PhoneNumberVerification.typeDefs,
+  IdentitySchema.typeDefs,
   DocumentTypes.typeDefs,
   VerificationSchema.typeDefs,
   Investments.typeDefs,
@@ -44,7 +44,7 @@ const nonExecutableResolvers = mergeResolvers([
   Account.resolvers,
   DraftAccount.resolvers,
   Profile.resolvers,
-  PhoneNumberVerification.resolvers,
+  IdentitySchema.resolvers,
   DocumentTypes.resolvers,
   VerificationSchema.resolvers,
   Investments.resolvers,
