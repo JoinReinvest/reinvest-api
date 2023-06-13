@@ -17,29 +17,31 @@ class AbortInvestment {
   static getClassName = (): string => 'AbortInvestment';
 
   async execute(profileId: string, investmentId: string) {
-    const investment = await this.investmentsRepository.get(investmentId);
+    try {
+      const investment = await this.investmentsRepository.get(investmentId);
 
-    if (!investment) {
-      return false;
-    }
-
-    if (investment.checkIfCanBeAborted()) {
-      investment.abort();
-    } else {
-      return false;
-    }
-
-    const fee = investment.getFee();
-
-    const status = await this.transactionAdapter.transaction(`Abort investment ${investmentId} with related fee if exist`, async () => {
-      await this.investmentsRepository.updateStatus(investment);
-
-      if (fee) {
-        await this.feesRepository.updateStatus(fee);
+      if (!investment) {
+        return false;
       }
-    });
 
-    return status;
+      investment.abort();
+
+      const fee = investment.getFee();
+
+      const status = await this.transactionAdapter.transaction(`Abort investment ${investmentId} with related fee if exist`, async () => {
+        await this.investmentsRepository.updateStatus(investment);
+
+        if (fee) {
+          await this.feesRepository.updateStatus(fee);
+        }
+      });
+
+      return status;
+    } catch (e) {
+      console.log(e);
+
+      return false;
+    }
   }
 }
 
