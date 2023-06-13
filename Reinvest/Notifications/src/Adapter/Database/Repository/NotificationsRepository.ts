@@ -119,7 +119,6 @@ export class NotificationsRepository {
     }
 
     return query
-      .orderBy('isDismissible', 'desc')
       .orderBy('dateCreated', 'desc')
       .limit(pagination.perPage)
       .offset(pagination.perPage * pagination.page);

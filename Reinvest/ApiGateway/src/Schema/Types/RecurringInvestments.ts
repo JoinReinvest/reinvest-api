@@ -165,7 +165,7 @@ export const RecurringInvestments = {
       ) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        const individualAccountId = accountId; // await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules); TODO no need for now - remember to add parent id on beneficiary when implementing cron job
 
         const alreadyExistedRecurringInvestmentDraft = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
 
@@ -203,7 +203,7 @@ export const RecurringInvestments = {
         const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
 
         if (!recurringInvestment) {
-          return;
+          return false;
         }
 
         const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, recurringInvestment.id, clientIp);

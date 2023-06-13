@@ -2,14 +2,15 @@ import { JSONObject } from 'HKEKTypes/Generics';
 import type { SubscriptionAgreementCreate } from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import { InvestmentsDatabaseAdapterProvider, subscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { SubscriptionAgreement } from 'Reinvest/Investments/src/Domain/Investments/SubscriptionAgreement';
-export class SubscriptionAgreementRepository {
-  public static getClassName = (): string => 'SubscriptionAgreementRepository';
 
+export class SubscriptionAgreementRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
 
   constructor(databaseAdapterProvider: InvestmentsDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
+
+  public static getClassName = (): string => 'SubscriptionAgreementRepository';
 
   async create(subscription: SubscriptionAgreementCreate): Promise<boolean> {
     const { id, accountId, profileId, investmentId, status, contentFieldsJson, templateVersion, agreementType } = subscription;
@@ -31,7 +32,19 @@ export class SubscriptionAgreementRepository {
           templateVersion,
           contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
         })
-        .execute();
+        .onConflict(oc =>
+          oc.constraint('investment_id_unique').doUpdateSet({
+            id,
+            status,
+            dateCreated: new Date(),
+            signedAt: null,
+            signedByIP: null,
+            pdfDateCreated: null,
+            templateVersion,
+            contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
+          }),
+        )
+        .executeTakeFirst();
 
       return true;
     } catch (error: any) {

@@ -9,6 +9,7 @@ export class InvestmentSummary {
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
   tradeId: string;
+  bankAccountId: string | null;
 
   constructor(
     id: string,
@@ -18,6 +19,7 @@ export class InvestmentSummary {
     subscriptionAgreementId: string | null,
     feeAmount: number | null,
     tradeId: string,
+    bankAccountId: string | null,
   ) {
     this.id = id;
     this.status = status;
@@ -26,12 +28,13 @@ export class InvestmentSummary {
     this.subscriptionAgreementId = subscriptionAgreementId;
     this.feeAmount = feeAmount;
     this.tradeId = tradeId;
+    this.bankAccountId = bankAccountId;
   }
 
   static create(data: InvestmentSummarySchema) {
-    const { id, status, dateCreated, amount, subscriptionAgreementId, feeAmount, tradeId } = data;
+    const { id, status, dateCreated, amount, subscriptionAgreementId, feeAmount, tradeId, bankAccountId } = data;
 
-    return new InvestmentSummary(id, status, dateCreated, amount, subscriptionAgreementId, feeAmount, tradeId);
+    return new InvestmentSummary(id, status, dateCreated, amount, subscriptionAgreementId, feeAmount, tradeId, bankAccountId);
   }
 
   getInvestmentAmount() {
