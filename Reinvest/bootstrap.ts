@@ -11,6 +11,7 @@ import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
 import {
+  CHROMIUM_ENDPOINT,
   COGNITO_CONFIG,
   DATABASE_CONFIG,
   EMAIL_DOMAIN,
@@ -56,6 +57,7 @@ export function boot(): Modules {
     Documents.create({
       database: databaseConfig,
       s3: s3Config,
+      chromiumEndpoint: CHROMIUM_ENDPOINT,
     } as Documents.Config),
   );
 
@@ -157,6 +159,7 @@ export function boot(): Modules {
       } as Investments.Config,
       {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+        documents: modules.get(Documents.moduleName) as Documents.Main,
       },
     ),
   );

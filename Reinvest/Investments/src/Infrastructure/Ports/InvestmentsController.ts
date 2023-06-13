@@ -1,5 +1,4 @@
 import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
-import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
@@ -9,20 +8,17 @@ import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments'
 export class InvestmentsController {
   private createInvestmentUseCase: CreateInvestment;
   private investmentSummaryQueryUseCase: InvestmentSummaryQuery;
-  private assignSubscriptionAgreementToInvestmentUseCase: AssignSubscriptionAgreementToInvestment;
   private startInvestmentUseCase: StartInvestment;
   private abortInvestmentUseCase: AbortInvestment;
 
   constructor(
     createInvestmentUseCase: CreateInvestment,
     investmentSummaryQueryUseCase: InvestmentSummaryQuery,
-    assignSubscriptionAgreementToInvestmentUseCase: AssignSubscriptionAgreementToInvestment,
     startInvestmentUseCase: StartInvestment,
     abortInvestmentUseCase: AbortInvestment,
   ) {
     this.createInvestmentUseCase = createInvestmentUseCase;
     this.investmentSummaryQueryUseCase = investmentSummaryQueryUseCase;
-    this.assignSubscriptionAgreementToInvestmentUseCase = assignSubscriptionAgreementToInvestmentUseCase;
     this.startInvestmentUseCase = startInvestmentUseCase;
     this.abortInvestmentUseCase = abortInvestmentUseCase;
   }
@@ -39,12 +35,8 @@ export class InvestmentsController {
     return await this.investmentSummaryQueryUseCase.execute(profileId, investmentId);
   }
 
-  public async assignSubscriptionAgreementToInvestment(investmentId: string, subscriptionAgreementId: string) {
-    return await this.assignSubscriptionAgreementToInvestmentUseCase.execute(investmentId, subscriptionAgreementId);
-  }
-
-  public async startInvestment(profileId: string, investmentId: string) {
-    return await this.startInvestmentUseCase.execute(profileId, investmentId);
+  public async startInvestment(profileId: string, investmentId: string, approveFees: boolean) {
+    return await this.startInvestmentUseCase.execute(profileId, investmentId, approveFees);
   }
 
   public async abortInvestment(profileId: string, investmentId: string) {

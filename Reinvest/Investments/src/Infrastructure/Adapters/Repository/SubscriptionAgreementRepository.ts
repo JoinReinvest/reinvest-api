@@ -131,6 +131,17 @@ export class SubscriptionAgreementRepository {
     }
   }
 
+  async findByInvestmentIdAndDelete(accountId: string, investmentId: string) {
+    await this.databaseAdapterProvider
+      .provide()
+      .deleteFrom(subscriptionAgreementTable)
+      .where('investmentId', '=', investmentId)
+      .where('accountId', '=', accountId)
+      .execute();
+
+    return true;
+  }
+
   async delete(accountId: string, subscriptionAgreementId: string) {
     try {
       await this.databaseAdapterProvider

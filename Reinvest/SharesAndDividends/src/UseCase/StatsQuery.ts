@@ -3,10 +3,10 @@ import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Reposit
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
 import { PortfolioService } from 'SharesAndDividends/Adapter/Modules/PortfolioService';
-import { AccountStats, AccountStatsView } from 'SharesAndDividends/Domain/AccountStats';
-import { AccountStatsCalculationService, SharesAndTheirPrices } from 'SharesAndDividends/Domain/AccountStatsCalculationService';
-import { DividendsCalculationService } from 'SharesAndDividends/Domain/DividendsCalculationService';
-import { EVSChartResolution, EVSDataPointsCalculationService } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
+import { AccountStats, AccountStatsView } from 'SharesAndDividends/Domain/Stats/AccountStats';
+import { AccountStatsCalculationService, SharesAndTheirPrices } from 'SharesAndDividends/Domain/Stats/AccountStatsCalculationService';
+import { EVSChartResolution, EVSDataPointsCalculationService } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
+import { StatsDividendsCalculationService } from 'SharesAndDividends/Domain/Stats/StatsDividendsCalculationService';
 
 export class StatsQuery {
   private sharesRepository: SharesRepository;
@@ -41,7 +41,7 @@ export class StatsQuery {
       totalAccountStats = totalAccountStats.sum(accountStatsCalculationService.calculateAccountStats());
     }
 
-    totalAccountStats = DividendsCalculationService.updateAccountStatsForDividendsAndFees(totalAccountStats, unpaidDividendsAndFees);
+    totalAccountStats = StatsDividendsCalculationService.updateAccountStatsForDividendsAndFees(totalAccountStats, unpaidDividendsAndFees);
 
     return totalAccountStats.calculateAccountValue().calculateAppreciation().calculateNetReturns().getAccountStatsView();
   }

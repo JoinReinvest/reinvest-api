@@ -2,6 +2,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
+export const CHROMIUM_ENDPOINT = process.env.CHROMIUM_ENDPOINT ?? 'http://localhost:3000/chromium';
+
 export const NORTH_CAPITAL_CONFIG = {
   CLIENT_ID: process.env.NORTH_CAPITAL_CLIENT_ID as string,
   DEVELOPER_API_KEY: process.env.NORTH_CAPITAL_DEVELOPER_API_KEY as string,
