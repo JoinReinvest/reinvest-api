@@ -28,10 +28,12 @@ export class PdfGenerator {
 
   private getPDFBuffer = async (html: string, options: any): Promise<Buffer> => {
     let browser = null;
+    console.log('default puppeteer args: ', puppeteer.defaultArgs());
     browser = await puppeteer.launch({
-      args: puppeteer.defaultArgs(),
+      // args: puppeteer.defaultArgs(),
+      args: ['--no-sandbox'],
       executablePath: await chromium.executablePath(this.chromiumEndpoint),
-      headless: 'new',
+      headless: true,
     });
 
     const page = await browser.newPage();
@@ -44,7 +46,5 @@ export class PdfGenerator {
     await loaded;
 
     return page.pdf(options);
-
-    // return await page.createPDFStream(options);
   };
 }
