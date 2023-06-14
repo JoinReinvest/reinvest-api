@@ -243,11 +243,6 @@ const schema = `
         """
         fulfillBankAccount(accountId: ID!, input: FulfillBankAccountInput!): Boolean
 
-        """
-        [MOCK] It deactivates bank account, so no active bank account is available
-        """
-        deactivateBankAccount(accountId: ID!): BankAccount
-
         "Update individual account"
         updateIndividualAccount(accountId: ID!, input: IndividualAccountInput): IndividualAccount
 
@@ -404,21 +399,6 @@ export const Account = {
         return response;
       },
 
-      // TODO this is MOCK!
-      deactivateBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
-        const api = modules.getApi<Registration.ApiType>(Registration);
-        const bankAccount = await api.readBankAccount(profileId, parentAccountId);
-
-        if (!bankAccount) {
-          throw new GraphQLError('Bank account not exists');
-        }
-
-        return {
-          ...bankAccount,
-          bankAccountStatus: 'INACTIVE',
-        };
-      },
       updateIndividualAccount: async (parent: any, data: UpdateIndividualAccountDetailsInput, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const { input, accountId } = data;

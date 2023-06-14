@@ -24,6 +24,7 @@
 * No MOCKS anymore:
     * `updateIndividualAccount` query
     * `updateProfile` query
+* `deactivateBankAccount` mock mutation was removed
 
 ## 1.16 - 06/13/2023
 
