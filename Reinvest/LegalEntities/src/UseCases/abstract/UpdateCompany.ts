@@ -125,7 +125,7 @@ abstract class UpdateCompany {
       console.error(error);
       errors.push(<ValidationErrorType>{
         type: ValidationErrorEnum.UNKNOWN_ERROR,
-        field: 'draft',
+        field: 'companyAccount',
       });
     }
 
