@@ -1,5 +1,6 @@
 // @ts-nocheck
 import {
+  AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
   AdminDeleteUserCommand,
   AdminSetUserPasswordCommand,
@@ -196,6 +197,14 @@ const userRouter = () => {
       });
       const changePasswordResult = await client.send(changePasswordCommand);
 
+      const addUserToExecutiveGroupCommand = new AdminAddUserToGroupCommand({
+        GroupName: 'Executives',
+        UserPoolId: COGNITO_CONFIG.userPoolID,
+        Username: email,
+      });
+
+      const userAddedToExecutiveGroup = client.send(addUserToExecutiveGroupCommand);
+
       const SignInCommand = new InitiateAuthCommand({
         ClientId: COGNITO_CONFIG.localClientId,
         AuthFlow: 'USER_PASSWORD_AUTH',
@@ -211,6 +220,7 @@ const userRouter = () => {
         createUserResult,
         postSignUpResult,
         changePasswordResult,
+        userAddedToExecutiveGroup,
         signInResult,
       });
     } catch (e: any) {
@@ -495,6 +505,55 @@ const northCapitalRouter = () => {
       });
     }
   });
+  router.post('/set-bank-account', async (req: any, res: any) => {
+    try {
+      const { accountId, accountNumber, routingNumber, accountType, institutionName, accountName } = req.body;
+      const profileId = await getProfileIdFromAccessToken(req.headers.authorization);
+      const mappedRecord = await databaseProvider
+        .provide()
+        .selectFrom('registration_mapping_registry')
+        .select(['profileId', 'recordId', 'externalId', 'mappedType', 'email', 'status', 'version', 'createdDate', 'updatedDate'])
+        .where('profileId', '=', profileId)
+        .where('externalId', '=', accountId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncSyncRecord = await databaseProvider
+        .provide()
+        .selectFrom('registration_north_capital_synchronization')
+        .select(['northCapitalId', 'recordId', 'type', 'crc', 'links', 'version', 'createdDate', 'updatedDate'])
+        .where('recordId', '=', mappedRecord.recordId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+      await ncAdapter.createExternalAchAccountForTests(
+        ncSyncRecord.northCapitalId,
+        accountName,
+        `${accountName} - ${institutionName}`,
+        institutionName,
+        routingNumber,
+        accountNumber,
+        accountType,
+      );
+
+      res.status(200).json({
+        accountName,
+        nickName: `${accountName} - ${institutionName}`,
+        institutionName,
+        routingNumber,
+        accountNumber,
+        accountType,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
+
   router.post('/sync-documents', async (req: any, res: any) => {
     try {
       const modules = boot();
