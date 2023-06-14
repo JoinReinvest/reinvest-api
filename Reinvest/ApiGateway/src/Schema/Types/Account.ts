@@ -204,11 +204,6 @@ const schema = `
         Returns basic bank account information.
         """
         readBankAccount(accountId: ID!): BankAccount
-
-        """
-        [MOCK] Return all beneficiaries accounts list
-        """
-        listBeneficiaries: [BeneficiaryAccount]
     }
 
     type Mutation {
@@ -316,13 +311,6 @@ export const Account = {
             ...account,
           };
         });
-      },
-      // TODO This is MOCK
-      listBeneficiaries: async (parent: any, input: any, { profileId, modules }: SessionContext) => {
-        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-        // const account = await api.readBeneficiariesAccounts(profileId);
-
-        return [];
       },
       readBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
