@@ -4,7 +4,6 @@ import type { PdfTypes, Template } from 'Documents/Port/Api/PdfController';
 import HTMLParser from 'Documents/Service/HTMLParser';
 
 export class GeneratePdf {
-  public static getClassName = (): string => 'GeneratePdf';
   private adapter: S3Adapter;
   private pdfGenerator: PdfGenerator;
 
@@ -13,14 +12,18 @@ export class GeneratePdf {
     this.pdfGenerator = pdfGenerator;
   }
 
-  async execute(catalog: string, fileName: string, template: Template, type: PdfTypes) {
+  public static getClassName = (): string => 'GeneratePdf';
+
+  async execute(catalog: string, fileName: string, template: Template, type: PdfTypes): Promise<void> {
     const htmlParser = new HTMLParser(type, template);
 
     const html = htmlParser.getHTML();
     const buffer = await this.pdfGenerator.generatePdfFromHtml(html);
 
-    const response = await this.adapter.uploadBufferPdf(catalog, fileName, buffer);
+    if (!buffer) {
+      throw new Error('Error generating pdf');
+    }
 
-    return response;
+    await this.adapter.uploadBufferPdf(catalog, fileName, buffer!);
   }
 }

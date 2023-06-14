@@ -13,15 +13,23 @@ export enum PdfTypes {
 }
 
 export class PdfController {
-  public static getClassName = (): string => 'PdfController';
   private generatePdfUseCase: GeneratePdf;
 
   constructor(generatePdf: GeneratePdf) {
     this.generatePdfUseCase = generatePdf;
   }
-  public async generatePdf(catalog: string, fileName: string, template: Template, type: PdfTypes) {
-    const response = await this.generatePdfUseCase.execute(catalog, fileName, template, type);
 
-    return response;
+  public static getClassName = (): string => 'PdfController';
+
+  public async generatePdf(catalog: string, fileName: string, template: Template, type: PdfTypes): Promise<boolean> {
+    try {
+      await this.generatePdfUseCase.execute(catalog, fileName, template, type);
+
+      return true;
+    } catch (error: any) {
+      console.error(`Generate ${type} PDF for ${catalog}/${fileName}`, error);
+
+      return false;
+    }
   }
 }

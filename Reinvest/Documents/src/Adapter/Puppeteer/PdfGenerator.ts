@@ -2,7 +2,7 @@ import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer';
 
 export class PdfGenerator {
-  private chromiumEndpoint: string;
+  private readonly chromiumEndpoint: string;
 
   constructor(chromiumEndpoint: string) {
     this.chromiumEndpoint = chromiumEndpoint;
@@ -10,7 +10,7 @@ export class PdfGenerator {
 
   public static getClassName = (): string => 'PdfGenerator';
 
-  generatePdfFromHtml = async (html: string) => {
+  generatePdfFromHtml = async (html: string): Promise<Buffer | null> => {
     try {
       const options = {
         format: 'A4',
@@ -18,45 +18,33 @@ export class PdfGenerator {
         margin: { top: '1in', right: '1in', bottom: '1in', left: '1in' },
       };
 
-      const pdf = await this.getPDFBuffer(html, options);
-
-      return pdf;
+      return await this.getPDFBuffer(html, options);
     } catch (error) {
       console.error('Error : ', error);
 
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          error,
-          message: 'Something went wrong',
-        }),
-      };
+      return null;
     }
   };
 
-  private getPDFBuffer = async (html: string, options: any): Promise<any> => {
+  private getPDFBuffer = async (html: string, options: any): Promise<Buffer> => {
     let browser = null;
-    try {
-      browser = await puppeteer.launch({
-        args: puppeteer.defaultArgs(),
-        executablePath: await chromium.executablePath(this.chromiumEndpoint),
-        headless: 'new',
-      });
+    browser = await puppeteer.launch({
+      args: puppeteer.defaultArgs(),
+      executablePath: await chromium.executablePath(this.chromiumEndpoint),
+      headless: 'new',
+    });
 
-      const page = await browser.newPage();
+    const page = await browser.newPage();
 
-      const loaded = page.waitForNavigation({
-        waitUntil: 'load',
-      });
+    const loaded = page.waitForNavigation({
+      waitUntil: 'load',
+    });
 
-      await page.setContent(html);
-      await loaded;
+    await page.setContent(html);
+    await loaded;
 
-      await page.pdf(options);
+    return page.pdf(options);
 
-      return await page.createPDFStream(options);
-    } catch (error) {
-      return error;
-    }
+    // return await page.createPDFStream(options);
   };
 }
