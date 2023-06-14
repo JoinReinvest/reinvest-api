@@ -247,7 +247,7 @@ const schema = `
         """
         deactivateBankAccount(accountId: ID!): BankAccount
 
-        "[MOCK] Update individual account"
+        "Update individual account"
         updateIndividualAccount(accountId: ID!, input: IndividualAccountInput): IndividualAccount
 
         "[MOCK] Update corporate account"

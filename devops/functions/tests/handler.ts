@@ -24,6 +24,8 @@ import serverless from 'serverless-http';
 import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/DatabaseProvider';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SharesAndDividends } from 'SharesAndDividends/index'; // dependencies
+import { tradesTable } from 'Trading/Adapter/Database/DatabaseAdapter'; // dependencies
+import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter'; // dependencies
 import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
 import { main as postSignUp } from '../postSignUp/handler'; // dependencies
@@ -383,10 +385,10 @@ const syncRouter = () => {
   });
   router.post('/push-transaction', async (req: any, res: any) => {
     try {
-      const { transactionId } = req.body;
+      const { investmentId } = req.body;
       const modules = boot();
       const investmentApi = modules.getApi<Investments.ApiType>(Investments);
-      await investmentApi.pushTransaction(transactionId);
+      await investmentApi.pushTransaction(investmentId);
 
       res.status(200).json({
         status: true,
@@ -539,6 +541,68 @@ const northCapitalRouter = () => {
     res.status(200).json({
       partyIds,
     });
+  });
+  router.post('/get-trade', async (req: any, res: any) => {
+    try {
+      const { investmentId } = req.body;
+      const reinvestTrade = await databaseProvider
+        .provide()
+        .selectFrom(tradesTable)
+        .selectAll()
+        .where('investmentId', '=', investmentId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncAdapter = new TradingNorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+      const ncTrade = await ncAdapter.getCurrentTradeState(reinvestTrade.tradeId);
+      res.status(200).json({
+        status: true,
+        reinvestTrade,
+        ncTrade,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
+  router.post('/update-trade-state', async (req: any, res: any) => {
+    try {
+      const { investmentId, tradeState } = req.body;
+
+      if (!['SETTLED', 'FUNDED'].includes(tradeState)) {
+        throw new Error('Invalid trade state, should be one of SETTLED, FUNDED');
+      }
+
+      const reinvestTrade = await databaseProvider
+        .provide()
+        .selectFrom(tradesTable)
+        .selectAll()
+        .where('investmentId', '=', investmentId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncAdapter = new TradingNorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+      const tradeDetailsAfterChanges = await ncAdapter.updateTradeStatusForTests(
+        reinvestTrade.tradeId,
+        reinvestTrade.vendorsConfigurationJson.northCapitalParentAccountId,
+        tradeState,
+      );
+
+      res.status(200).json({
+        status: true,
+        tradeDetailsAfterChanges,
+        reinvestTrade,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
   });
 
   router.post('/set-user-for-verification', async (req: any, res: any) => {
