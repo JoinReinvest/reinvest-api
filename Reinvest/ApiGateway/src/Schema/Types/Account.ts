@@ -2,6 +2,7 @@ import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
+import type { UpdateIndividualAccountInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateIndividualAccount';
 import Modules from 'Reinvest/Modules';
 
 const schema = `
@@ -264,6 +265,11 @@ const schema = `
     }
 `;
 
+type UpdateIndividualAccountDetailsInput = {
+  accountId: string;
+  input: UpdateIndividualAccountInput;
+};
+
 export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
   const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
 
@@ -413,14 +419,15 @@ export const Account = {
           bankAccountStatus: 'INACTIVE',
         };
       },
-      // TODO this is MOCK!
-      updateIndividualAccount: async (parent: any, { input }: { accountId: string; input: any }, { profileId, modules }: SessionContext) => {
+      updateIndividualAccount: async (parent: any, data: UpdateIndividualAccountDetailsInput, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-        // const errors = await api.updateIndividualAccount(profileId, accountId, input);
-        //
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        const { input, accountId } = data;
+
+        const errors = await api.updateIndividualAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
         return api.getIndividualAccount(profileId);
       },
