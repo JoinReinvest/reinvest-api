@@ -1,3 +1,4 @@
+import { getAvatarRemoveEvent, LegalEntityAvatarRemoved } from 'LegalEntities/Domain/Events/DocumentEvents';
 import { Avatar, AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
 import { Employer, EmployerInput } from 'LegalEntities/Domain/ValueObject/Employer';
 import { EmploymentStatus, EmploymentStatusInput } from 'LegalEntities/Domain/ValueObject/EmploymentStatus';
@@ -101,6 +102,19 @@ export class IndividualAccount {
 
   setAvatarDocument(avatar: Avatar) {
     this.avatar = avatar;
+  }
+
+  replaceAvatar(avatar: Avatar): LegalEntityAvatarRemoved | null {
+    if (this.avatar !== null && !this.avatar.isTheSame(avatar)) {
+      const event = getAvatarRemoveEvent({ ...this.avatar.toObject() });
+      this.avatar = avatar;
+
+      return event;
+    }
+
+    this.avatar = avatar;
+
+    return null;
   }
 
   setEmployer(employer: Employer) {

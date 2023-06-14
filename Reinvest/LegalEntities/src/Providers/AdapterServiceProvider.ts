@@ -19,6 +19,8 @@ import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
+import { UpdateIndividualAccount } from 'LegalEntities/UseCases/UpdateIndividualAccount';
+import { UpdateProfile } from 'LegalEntities/UseCases/UpdateProfile';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
@@ -60,6 +62,8 @@ export class AdapterServiceProvider {
     // use cases
     container
       .addSingleton(CompleteProfile, [ProfileRepository])
+      .addSingleton(UpdateProfile, [ProfileRepository])
+      .addSingleton(UpdateIndividualAccount, [AccountRepository])
       .addSingleton(CreateDraftAccount, [DraftAccountRepository])
       .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator, AccountRepository])
       .addSingleton(RemoveDraftAccount, [DraftAccountRepository])
