@@ -1,5 +1,10 @@
 # REINVEST API CHANGELOG
 
+## 1.16.1 - 06/14/2023
+
+* New MOCK query:
+    * `getPortfolioDetails` - returns all information about properties in the portfolio
+
 ## 1.16 - 06/13/2023
 
 * **!BREAKING CHANGE! - everywhere "id" was represented by `string` type in the API, has changed to `ID` type!**

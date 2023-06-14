@@ -39,13 +39,13 @@ const schema = `
 
     type Query {
         """
-        [MOCK] It returns the investment summary.
+        It returns the investment summary.
         Use this method to get info about the investment fees.
         """
         getInvestmentSummary(investmentId: ID!): InvestmentSummary!
 
         """
-        [MOCK] It returns the subscription agreement.
+        It returns the subscription agreement.
         """
         getSubscriptionAgreement(subscriptionAgreementId: ID!): SubscriptionAgreement!
         """
@@ -56,21 +56,21 @@ const schema = `
 
     type Mutation {
         """
-        [MOCK] It creates new investment and returns its ID.
+        It creates new investment and returns its ID.
         It requires bank account to be linked to the account.
         In other case it throws an error.
         """
         createInvestment(accountId: ID!, amount: USDInput): ID!
 
         """
-        [MOCK] It creates new subscription agreement for the specific investment
+        It creates new subscription agreement for the specific investment
         It returns the content of the agreement that must be rendered on the client side.
         Client must sign the agreement and call signSubscriptionAgreement mutation.
         """
         createSubscriptionAgreement(investmentId: ID!): SubscriptionAgreement!
 
         """
-        [MOCK] It signs the subscription agreement.
+        It signs the subscription agreement.
         """
         signSubscriptionAgreement(investmentId: ID!): Boolean!
 
@@ -82,14 +82,14 @@ const schema = `
         approveFees(investmentId: ID!): Boolean!
 
         """
-        [MOCK] It starts the investment.
+        It starts the investment.
         It requires subscription agreement to be signed and fees to be approved.
         The fees can be approved also by this method (if approveFees is true).
         """
         startInvestment(investmentId: ID!, approveFees: Boolean): Boolean!
 
         """
-        [MOCK] It aborts the investment that haven't been started yet (by startInvestment mutation).
+        It aborts the investment that haven't been started yet (by startInvestment mutation).
         """
         abortInvestment(investmentId: ID!): Boolean!
 
