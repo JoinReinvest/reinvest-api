@@ -83,7 +83,7 @@ export class UpdateBeneficiaryAccount {
       console.error(error);
       errors.push(<ValidationErrorType>{
         type: ValidationErrorEnum.UNKNOWN_ERROR,
-        field: 'draft',
+        field: 'beneficiaryAccount',
       });
     }
 
