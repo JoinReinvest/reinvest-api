@@ -98,6 +98,26 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     return true; // if fails, it will throw an exception
   }
 
+  /**
+   * @note This method is used only for integrations tests
+   * @param tradeId
+   * @param accountId
+   * @param tradeState
+   */
+  async updateTradeStatusForTests(tradeId: string, accountId: string, tradeState: 'SETTLED' | 'FUNDED'): Promise<any> {
+    const endpoint = 'tapiv3/index.php/v3/updateTradeStatus';
+    const data = {
+      tradeId,
+      accountId,
+      orderStatus: tradeState,
+    };
+
+    const response = await this.postRequest(endpoint, data);
+    const { statusCode, statusDesc, tradeDetails } = response;
+
+    return tradeDetails;
+  }
+
   async getTradeStatus(tradeId: string): Promise<string> {
     const { orderStatus } = await this.getCurrentTradeState(tradeId);
 

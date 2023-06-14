@@ -2,7 +2,6 @@ import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, PutObjectComma
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { FileType } from 'Documents/Adapter/S3/FileLinkService';
-import { Stream } from 'stream';
 
 export type S3Config = {
   avatarsBucket: string;
@@ -27,24 +26,22 @@ export class S3Adapter {
     return this.generatePutSignedUrl(this.config.documentsBucket, catalog, fileName);
   }
 
-  async uploadBufferPdf(catalog: string, fileName: string, buffer: any) {
+  async uploadBufferPdf(catalog: string, fileName: string, buffer: Buffer) {
     const client = new S3Client({
       region: this.config.region,
     });
 
-    const stream = new Stream.PassThrough();
-
+    console.log(`Uploading PDF to: ${this.config.documentsBucket}/${catalog}/${fileName}`);
     const parallelUploads3 = new Upload({
       client,
       params: {
         Bucket: this.config.documentsBucket,
         Key: `${catalog}/${fileName}`,
-        Body: stream,
+        Body: buffer,
         ContentType: 'application/pdf',
         ACL: 'private',
       },
     });
-    buffer.pipe(stream);
 
     await parallelUploads3.done();
 

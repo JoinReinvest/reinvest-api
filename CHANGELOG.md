@@ -1,5 +1,32 @@
 # REINVEST API CHANGELOG
 
+## 1.16.1 - 06/14/2023
+
+* New MOCK query:
+    * `getPortfolioDetails` - returns all information about properties in the portfolio
+* [TESTS] endpoints:
+    * `POST /north-capital/get-trade`
+        * with body, investmentId: string
+        * tt returns trade information from North Capital and from REINVEST db.
+    * `POST /north-capital/update-trade-state`
+        * with body, investmentId: string, tradeState: SETTLED | FUNDED
+        * it updates trade status in North Capital
+        * run `push-transaction` endpoint after that, to update investment status in REINVEST db
+    * `POST /sync/push-transaction` with body, investmentId: string
+        * it pushes transaction process further after changing status in North Capital
+    * `POST /user/create-and-login` - it also adds user to the `Executives` group
+    * `POST /north-capital/set-bank-account` - it allows to set bank account details in the replacement of doing the
+      Plaid flow
+    * `POST /calculate/next-dividends-batch` - it pushes dividends calculation after dividends declaration (as a
+      replacement of cron)
+    * `POST /calculate/distribute-dividends` - it pushes dividends distribution after dividends calculation (as a
+      replacement of cron)
+* No MOCKS anymore:
+    * `updateIndividualAccount` query
+    * `updateProfile` query
+* `deactivateBankAccount` mock mutation was removed
+* `listBeneficiaries` mock query was removed
+
 ## 1.16 - 06/13/2023
 
 * **!BREAKING CHANGE! - everywhere "id" was represented by `string` type in the API, has changed to `ID` type!**

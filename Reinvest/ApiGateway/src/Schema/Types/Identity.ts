@@ -16,7 +16,7 @@ const schema = `
         userInvitationLink: UserInvitationLink
 
         """
-        [MOCK] Returns information if user already assigned and verified phone number
+        Returns information if user already assigned and verified phone number
         """
         phoneCompleted: Boolean
     }
