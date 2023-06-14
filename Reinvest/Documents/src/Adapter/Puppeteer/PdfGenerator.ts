@@ -29,9 +29,10 @@ export class PdfGenerator {
   private getPDFBuffer = async (html: string, options: any): Promise<Buffer> => {
     let browser = null;
     browser = await puppeteer.launch({
-      args: [...puppeteer.defaultArgs(), '--no-sandbox'],
+      // args: [...puppeteer.defaultArgs(), '--no-sandbox'],
+      args: puppeteer.defaultArgs(),
       executablePath: await chromium.executablePath(this.chromiumEndpoint),
-      headless: true,
+      headless: 'new',
     });
 
     const page = await browser.newPage();

@@ -140,7 +140,7 @@ const schema = `
         completeProfileDetails(input: ProfileDetailsInput): Profile
 
         """
-        [MOCK] Update profile fields
+        Update profile fields
         Important Note: Some fields can trigger KYC/AML reverification
         """
         updateProfile(input: UpdateProfileInput): Profile

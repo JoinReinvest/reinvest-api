@@ -58,21 +58,21 @@ const schema = `
 
     type Query {
         """
-        [MOCK] Get all notifications for the given account id
+        Get all notifications for the given account id
         It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
         """
         getNotifications(accountId: ID!, filter: NotificationFilter = ALL, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
 
         """
-        [MOCK] Get all notifications for the given account id
-        It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
+        Provides info about the number of unread/total notifications for the given account id
+        It allows to retrieve notifications directly in the same query
         """
         getNotificationStats(accountId: ID!): NotificationsStats!
     }
 
     type Mutation {
         """
-        [MOCK] Mark notification as read
+        Mark notification as read
         """
         markNotificationAsRead(notificationId: ID!): Boolean!
     }
