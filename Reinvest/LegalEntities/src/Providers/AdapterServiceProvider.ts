@@ -19,10 +19,12 @@ import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
+import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
 import { UpdateIndividualAccount } from 'LegalEntities/UseCases/UpdateIndividualAccount';
 import { UpdateProfile } from 'LegalEntities/UseCases/UpdateProfile';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
+import { UpdateTrustAccount } from 'LegalEntities/UseCases/UpdateTrustAccount';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -64,6 +66,8 @@ export class AdapterServiceProvider {
       .addSingleton(CompleteProfile, [ProfileRepository])
       .addSingleton(UpdateProfile, [ProfileRepository])
       .addSingleton(UpdateIndividualAccount, [AccountRepository])
+      .addSingleton(UpdateCorporateAccount, [AccountRepository])
+      .addSingleton(UpdateTrustAccount, [AccountRepository])
       .addSingleton(CreateDraftAccount, [DraftAccountRepository])
       .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator, AccountRepository])
       .addSingleton(RemoveDraftAccount, [DraftAccountRepository])

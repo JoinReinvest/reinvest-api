@@ -2,6 +2,7 @@ import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
+import type { UpdateCompanyAccountInput } from 'Reinvest/LegalEntities/src/UseCases/abstract/UpdateCompany';
 import type { UpdateIndividualAccountInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateIndividualAccount';
 import Modules from 'Reinvest/Modules';
 
@@ -270,6 +271,16 @@ type UpdateIndividualAccountDetailsInput = {
   input: UpdateIndividualAccountInput;
 };
 
+type UpdateCorporateAccountDetailsInput = {
+  accountId: string;
+  input: UpdateCompanyAccountInput;
+};
+
+type UpdateTrustAccountDetailsInput = {
+  accountId: string;
+  input: UpdateCompanyAccountInput;
+};
+
 export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
   const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
 
@@ -431,23 +442,27 @@ export const Account = {
 
         return api.getIndividualAccount(profileId);
       },
-      updateCorporateAccount: async (parent: any, { accountId, input }: { accountId: string; input: any }, { profileId, modules }: SessionContext) => {
+      updateCorporateAccount: async (parent: any, data: UpdateCorporateAccountDetailsInput, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-        // const errors = await api.updateCorporateAccount(profileId, accountId, input);
-        //
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        const { input, accountId } = data;
+
+        const errors = await api.updateCorporateAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
         return api.getCompanyAccount(profileId, accountId);
       },
-      updateTrustAccount: async (parent: any, { accountId, input }: { accountId: string; input: any }, { profileId, modules }: SessionContext) => {
+      updateTrustAccount: async (parent: any, data: UpdateTrustAccountDetailsInput, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-        // const errors = await api.updateTrustAccount(profileId, accountId, input);
-        //
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        const { input, accountId } = data;
+
+        const errors = await api.updateTrustAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
         return api.getCompanyAccount(profileId, accountId);
       },

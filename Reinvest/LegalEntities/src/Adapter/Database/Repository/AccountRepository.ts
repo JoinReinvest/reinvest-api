@@ -341,13 +341,18 @@ export class AccountRepository {
   }
 
   async updateCompanyAccount(account: CompanyAccount, events: DomainEvent[] = []): Promise<void> {
-    const { profileId, accountId, address, companyType, stakeholders, companyDocuments } = account.toObject();
+    const { profileId, accountId, address, companyType, stakeholders, companyDocuments, annualRevenue, avatar, industry, numberOfEmployees } =
+      account.toObject();
 
     const values: Partial<LegalEntitiesCompanyAccount> = {
       address: JSON.stringify(address),
       companyType: JSON.stringify(companyType),
       companyDocuments: JSON.stringify(companyDocuments),
       stakeholders: JSON.stringify(stakeholders),
+      avatar: JSON.stringify(avatar),
+      annualRevenue: JSON.stringify(annualRevenue),
+      industry: JSON.stringify(industry),
+      numberOfEmployees: JSON.stringify(numberOfEmployees),
     };
 
     await this.databaseAdapterProvider

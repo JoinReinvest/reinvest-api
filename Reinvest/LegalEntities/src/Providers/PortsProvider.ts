@@ -23,10 +23,12 @@ import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
+import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
 import { UpdateIndividualAccount } from 'LegalEntities/UseCases/UpdateIndividualAccount';
 import { UpdateProfile } from 'LegalEntities/UseCases/UpdateProfile';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
+import { UpdateTrustAccount } from 'LegalEntities/UseCases/UpdateTrustAccount';
 
 export class PortsProvider {
   private config: LegalEntities.Config;
@@ -42,7 +44,7 @@ export class PortsProvider {
     container
       .addSingleton(CompleteProfileController, [CompleteProfile])
       .addSingleton(GetProfileController, [ProfileRepository])
-      .addSingleton(UpdateAccountsController, [UpdateIndividualAccount])
+      .addSingleton(UpdateAccountsController, [UpdateIndividualAccount, UpdateCorporateAccount, UpdateTrustAccount])
       .addSingleton(UpdateProfileController, [UpdateProfile])
       .addSingleton(ReadAccountController, [AccountRepository, AvatarQuery, BeneficiaryRepository])
       .addSingleton(BeneficiaryAccountController, [IdGenerator, BeneficiaryRepository, InvestmentAccountsService, 'LegalEntitiesTransactionalAdapter'])

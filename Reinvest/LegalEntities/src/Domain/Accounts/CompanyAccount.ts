@@ -1,4 +1,4 @@
-import { LegalEntityDocumentRemoved } from 'LegalEntities/Domain/Events/DocumentEvents';
+import { getAvatarRemoveEvent, LegalEntityAvatarRemoved, LegalEntityDocumentRemoved } from 'LegalEntities/Domain/Events/DocumentEvents';
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { Company, CompanyName, CompanyNameInput, CompanyTypeInput } from 'LegalEntities/Domain/ValueObject/Company';
 import { Avatar, AvatarInput, CompanyDocuments, DocumentSchema } from 'LegalEntities/Domain/ValueObject/Document';
@@ -190,6 +190,19 @@ export class CompanyAccount {
 
   setAvatarDocument(avatar: Avatar) {
     this.avatar = avatar;
+  }
+
+  replaceAvatar(avatar: Avatar): LegalEntityAvatarRemoved | null {
+    if (this.avatar !== null && !this.avatar.isTheSame(avatar)) {
+      const event = getAvatarRemoveEvent({ ...this.avatar.toObject() });
+      this.avatar = avatar;
+
+      return event;
+    }
+
+    this.avatar = avatar;
+
+    return null;
   }
 
   getInitials(): string {
