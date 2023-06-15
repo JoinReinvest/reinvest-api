@@ -36,9 +36,9 @@ const schema = `
         verifyPhoneNumber(countryCode: String, phoneNumber: String, authCode: String): Boolean
 
         """
-        [MOCK] It updates email address in the Cognito and in the REINVEST system
+        [MOCK] It reads new verified email from cognito and update it in the REINVEST database
         """
-        updateEmailAddress(email: EmailAddress): Boolean
+        updateEmailAddress: Boolean
     }
 `;
 
@@ -82,7 +82,7 @@ export const IdentitySchema = {
         return api.verifyPhoneNumber(userId, countryCode, phoneNumber, authCode);
       },
       // TODO This is MOCK
-      updateEmailAddress: async (parent: any, { email }: { email: string }, { userId, modules }: SessionContext) => {
+      updateEmailAddress: async (parent: any, data: any, { userId, modules }: SessionContext) => {
         const api = modules.getApi<Identity.ApiType>(Identity);
 
         return true;
