@@ -222,7 +222,11 @@ export const Investments = {
         return isStartedInvestment;
       },
       approveFees: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
+
+        return isApproved;
       },
       createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
