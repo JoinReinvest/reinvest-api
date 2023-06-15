@@ -19,6 +19,7 @@ import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
 import { UpdateIndividualAccount } from 'LegalEntities/UseCases/UpdateIndividualAccount';
@@ -67,10 +68,9 @@ export class AdapterServiceProvider {
       .addSingleton(CompleteProfile, [ProfileRepository])
       .addSingleton(UpdateProfile, [ProfileRepository])
       .addSingleton(UpdateIndividualAccount, [AccountRepository])
-      .addSingleton(UpdateCorporateAccount, [AccountRepository])
-      .addSingleton(UpdateTrustAccount, [AccountRepository])
       .addSingleton(UpdateCorporateAccount, [AccountRepository, UpdateCompany])
       .addSingleton(UpdateTrustAccount, [AccountRepository, UpdateCompany])
+      .addSingleton(UpdateBeneficiaryAccount, [BeneficiaryRepository])
       .addSingleton(CreateDraftAccount, [DraftAccountRepository])
       .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator, AccountRepository])
       .addSingleton(RemoveDraftAccount, [DraftAccountRepository])

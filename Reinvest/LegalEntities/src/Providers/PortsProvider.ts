@@ -22,6 +22,7 @@ import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
 import { UpdateIndividualAccount } from 'LegalEntities/UseCases/UpdateIndividualAccount';
@@ -44,7 +45,7 @@ export class PortsProvider {
     container
       .addSingleton(CompleteProfileController, [CompleteProfile])
       .addSingleton(GetProfileController, [ProfileRepository])
-      .addSingleton(UpdateAccountsController, [UpdateIndividualAccount, UpdateCorporateAccount, UpdateTrustAccount])
+      .addSingleton(UpdateAccountsController, [UpdateIndividualAccount, UpdateCorporateAccount, UpdateTrustAccount, UpdateBeneficiaryAccount])
       .addSingleton(UpdateProfileController, [UpdateProfile])
       .addSingleton(ReadAccountController, [AccountRepository, AvatarQuery, BeneficiaryRepository])
       .addSingleton(BeneficiaryAccountController, [IdGenerator, BeneficiaryRepository, InvestmentAccountsService, 'LegalEntitiesTransactionalAdapter'])

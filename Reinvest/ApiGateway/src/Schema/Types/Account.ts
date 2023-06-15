@@ -446,11 +446,11 @@ export const Account = {
         { profileId, modules }: SessionContext,
       ) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-        // const errors = await api.updateIndividualAccount(profileId, accountId, input);
-        //
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+        const errors = await api.updateBeneficiaryAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
 
         return api.readBeneficiaryAccount(profileId, accountId);
       },

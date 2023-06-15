@@ -1,4 +1,5 @@
 import { AccountType } from 'LegalEntities/Domain/AccountType';
+import { getAvatarRemoveEvent, LegalEntityAvatarRemoved } from 'LegalEntities/Domain/Events/DocumentEvents';
 import { Avatar, AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
 import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
 
@@ -61,6 +62,23 @@ export class BeneficiaryAccount {
 
   setAvatarDocument(avatar: Avatar) {
     this.avatar = avatar;
+  }
+
+  setName(name: BeneficiaryName) {
+    this.name = name;
+  }
+
+  replaceAvatar(avatar: Avatar): LegalEntityAvatarRemoved | null {
+    if (this.avatar !== null && !this.avatar.isTheSame(avatar)) {
+      const event = getAvatarRemoveEvent({ ...this.avatar.toObject() });
+      this.avatar = avatar;
+
+      return event;
+    }
+
+    this.avatar = avatar;
+
+    return null;
   }
 
   getAvatar(): Avatar | null {
