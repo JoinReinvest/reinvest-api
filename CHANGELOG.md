@@ -1,6 +1,6 @@
 # REINVEST API CHANGELOG
 
-## 1.16.2 06/15/2023
+## 1.16.2 - 06/15/2023
 
 * No MOCKS anymore:
     * For account update
