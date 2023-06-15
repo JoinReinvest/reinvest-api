@@ -253,7 +253,7 @@ const agreementContentMock = [
 const fundsWithdrawalAgreementMock = {
   id: '98e94d4c-f237-4f10-aa05-be8ade2ffee',
   status: 'WAITING_FOR_SIGNATURE',
-  createdDate: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
+  createdAt: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
   signedAt: null,
   content: agreementContentMock,
 };
