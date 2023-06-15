@@ -2,7 +2,7 @@ import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
-import type { UpdateCompanyAccountInput } from 'Reinvest/LegalEntities/src/UseCases/abstract/UpdateCompany';
+import type { UpdateCompanyAccountInput } from 'Reinvest/LegalEntities/src/Service/UpdateCompany';
 import type { UpdateIndividualAccountInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateIndividualAccount';
 import Modules from 'Reinvest/Modules';
 
