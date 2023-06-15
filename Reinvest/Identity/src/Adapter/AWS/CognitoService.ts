@@ -61,6 +61,36 @@ export class CognitoService {
     }
   }
 
+  async isEmailVerified(userId: string): Promise<boolean> {
+    try {
+      const user = await this.getUserAttributes(userId);
+
+      if (user === null) {
+        return false;
+      }
+
+      const emailVerified = user.UserAttributes.find((attribute: AttributeType) => attribute.Name === 'email_verified');
+
+      return !!emailVerified && emailVerified.Value === 'true';
+    } catch (error: any) {
+      console.error(error);
+
+      return false;
+    }
+  }
+
+  async getEmail(userId: string) {
+    const user = await this.getUserAttributes(userId);
+
+    if (user === null) {
+      return false;
+    }
+
+    const email = user.UserAttributes.find((attribute: AttributeType) => attribute.Name === 'email');
+
+    return email;
+  }
+
   private async sendAttributeUpdateCommand(command: AdminUpdateUserAttributesCommand): Promise<boolean> {
     const client = this.getClient();
     await client.send(command);
@@ -76,6 +106,7 @@ export class CognitoService {
         UserPoolId: this.config.userPoolID,
       }),
     )) as CognitoUserType;
+    console.log(user);
 
     return user ?? null;
   }

@@ -55,4 +55,15 @@ export class UserRepository {
 
     return user ? user.profileId : null;
   }
+
+  public async getUserEmailById(cognitoUserId: string, email: string) {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        email,
+      })
+      .where('cognitoUserId', '=', cognitoUserId)
+      .execute();
+  }
 }
