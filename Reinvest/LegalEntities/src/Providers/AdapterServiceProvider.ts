@@ -13,6 +13,7 @@ import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/Pro
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
 import { InvestmentAccountsService } from 'LegalEntities/Adapter/Modules/InvestmentAccountsService';
 import { LegalEntities } from 'LegalEntities/index';
+import { UpdateCompany } from 'LegalEntities/Service/UpdateCompany';
 import { CompleteDraftAccount } from 'LegalEntities/UseCases/CompleteDraftAccount';
 import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
@@ -45,7 +46,7 @@ export class AdapterServiceProvider {
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
       .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
 
-    container.addSingleton(IdGenerator);
+    container.addSingleton(IdGenerator).addSingleton(UpdateCompany);
 
     container.addSingleton(DocumentsService, ['Documents']).addSingleton(InvestmentAccountsService, ['InvestmentAccounts']);
 
@@ -67,8 +68,8 @@ export class AdapterServiceProvider {
       .addSingleton(CompleteProfile, [ProfileRepository])
       .addSingleton(UpdateProfile, [ProfileRepository])
       .addSingleton(UpdateIndividualAccount, [AccountRepository])
-      .addSingleton(UpdateCorporateAccount, [AccountRepository])
-      .addSingleton(UpdateTrustAccount, [AccountRepository])
+      .addSingleton(UpdateCorporateAccount, [AccountRepository, UpdateCompany])
+      .addSingleton(UpdateTrustAccount, [AccountRepository, UpdateCompany])
       .addSingleton(UpdateBeneficiaryAccount, [BeneficiaryRepository])
       .addSingleton(CreateDraftAccount, [DraftAccountRepository])
       .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator, AccountRepository])
