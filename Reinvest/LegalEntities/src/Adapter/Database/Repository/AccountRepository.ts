@@ -320,14 +320,39 @@ export class AccountRepository {
     }
   }
 
+  async updateIndividualAccount(account: IndividualAccount, events: DomainEvent[] = []): Promise<void> {
+    const { employmentStatus, employer, netWorth, netIncome, avatar, profileId, accountId } = account.toObject();
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(legalEntitiesIndividualAccountTable)
+      .set({
+        employmentStatus: JSON.stringify(employmentStatus),
+        employer: JSON.stringify(employer),
+        netWorth: JSON.stringify(netWorth),
+        netIncome: JSON.stringify(netIncome),
+        avatar: JSON.stringify(avatar),
+      })
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .execute();
+
+    await this.publishEvents(events);
+  }
+
   async updateCompanyAccount(account: CompanyAccount, events: DomainEvent[] = []): Promise<void> {
-    const { profileId, accountId, address, companyType, stakeholders, companyDocuments } = account.toObject();
+    const { profileId, accountId, address, companyType, stakeholders, companyDocuments, annualRevenue, avatar, industry, numberOfEmployees } =
+      account.toObject();
 
     const values: Partial<LegalEntitiesCompanyAccount> = {
       address: JSON.stringify(address),
       companyType: JSON.stringify(companyType),
       companyDocuments: JSON.stringify(companyDocuments),
       stakeholders: JSON.stringify(stakeholders),
+      avatar: JSON.stringify(avatar),
+      annualRevenue: JSON.stringify(annualRevenue),
+      industry: JSON.stringify(industry),
+      numberOfEmployees: JSON.stringify(numberOfEmployees),
     };
 
     await this.databaseAdapterProvider

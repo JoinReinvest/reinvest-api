@@ -3,6 +3,7 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
 import { CompleteProfileInput } from 'LegalEntities/UseCases/CompleteProfile';
+import type { UpdateProfileInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfile';
 
 const schema = `
     #graphql
@@ -75,6 +76,36 @@ const schema = `
         verifyAndFinish: Boolean
     }
 
+    input UpdateProfileInput {
+        """
+        Important Note: KYC/AML reverification will be triggered
+        An investor name
+        """
+        name: PersonName
+        "Permanent address of an investor"
+        address: AddressInput
+        "Is the investor US. Citizen or US. Resident with Green Card or Visa"
+        domicile: DomicileInput
+        """
+        Important Note: KYC/AML reverification will be triggered
+        ID scan can be provided in more then one document, ie. 2 scans of both sides of the ID.
+        Required "id" provided in the @FileLink type from the @createDocumentsFileLinks mutation
+        IMPORTANT: it removes previously uploaded id scan documents from s3 if the previous document ids are not listed in the request
+        """
+        idScan: [DocumentFileLinkInput]
+        investingExperience: ExperienceInput
+        """
+        FINRA, Politician, Trading company stakeholder, accredited investor, terms and conditions, privacy policy statements
+        REQUIRED statements to complete the profile:
+        - accredited investor
+        - terms and conditions
+        - privacy policy
+        """
+        statements: [StatementInput]
+        "If an investor decided to remove one of the statements during onboarding"
+        removeStatements: [StatementInput]
+    }
+
     input UpdateProfileForVerificationInput {
         "An investor name"
         name: PersonName
@@ -107,11 +138,21 @@ const schema = `
         To finish onboarding send field 'verifyAndFinish'
         """
         completeProfileDetails(input: ProfileDetailsInput): Profile
+
+        """
+        Update profile fields
+        Important Note: Some fields can trigger KYC/AML reverification
+        """
+        updateProfile(input: UpdateProfileInput): Profile
     }
 `;
 
 type CompleteProfileDetailsInput = {
   input: CompleteProfileInput;
+};
+
+type UpdateProfileForDetailsInput = {
+  input: UpdateProfileInput;
 };
 
 export const Profile = {
@@ -134,6 +175,18 @@ export const Profile = {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const { input } = data;
         const errors = await api.completeProfile(input, profileId);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.getProfile(profileId);
+      },
+
+      updateProfile: async (parent: any, data: UpdateProfileForDetailsInput, { profileId, modules }: SessionContext): Promise<ProfileResponse> => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const { input } = data;
+        const errors = await api.updateProfile(input, profileId);
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);

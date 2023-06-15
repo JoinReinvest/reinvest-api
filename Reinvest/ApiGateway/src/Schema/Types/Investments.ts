@@ -1,4 +1,5 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Portfolio } from 'Portfolio/index';
 import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
@@ -20,44 +21,56 @@ const schema = `
 
     type InvestmentSummary {
         id: ID!
-        tradeId: ID!
+        tradeId: String!
         createdAt: ISODateTime!
         amount: USD!
         status: InvestmentStatus!
         investmentFees: USD
         subscriptionAgreementId: ID
+        bankAccount: BankAccount
+    }
+
+    type InvestmentOverview {
+        id: ID!
+        tradeId: String!
+        createdAt: ISODateTime!
+        amount: USD!
     }
 
     type Query {
         """
-        [MOCK] It returns the investment summary.
+        It returns the investment summary.
         Use this method to get info about the investment fees.
         """
         getInvestmentSummary(investmentId: ID!): InvestmentSummary!
 
         """
-        [MOCK] It returns the subscription agreement.
+        It returns the subscription agreement.
         """
         getSubscriptionAgreement(subscriptionAgreementId: ID!): SubscriptionAgreement!
+        """
+        [MOCK] List of all investments history
+        """
+        listInvestments(accountId: ID!, pagination: Pagination = {page: 0, perPage: 10}): [InvestmentOverview]!
     }
 
     type Mutation {
         """
-        [MOCK] It creates new investment and returns its ID.
+        It creates new investment and returns its ID.
         It requires bank account to be linked to the account.
         In other case it throws an error.
         """
         createInvestment(accountId: ID!, amount: USDInput): ID!
 
         """
-        [MOCK] It creates new subscription agreement for the specific investment
+        It creates new subscription agreement for the specific investment
         It returns the content of the agreement that must be rendered on the client side.
         Client must sign the agreement and call signSubscriptionAgreement mutation.
         """
         createSubscriptionAgreement(investmentId: ID!): SubscriptionAgreement!
 
         """
-        [MOCK] It signs the subscription agreement.
+        It signs the subscription agreement.
         """
         signSubscriptionAgreement(investmentId: ID!): Boolean!
 
@@ -69,24 +82,28 @@ const schema = `
         approveFees(investmentId: ID!): Boolean!
 
         """
-        [MOCK] It starts the investment.
+        It starts the investment.
         It requires subscription agreement to be signed and fees to be approved.
         The fees can be approved also by this method (if approveFees is true).
         """
         startInvestment(investmentId: ID!, approveFees: Boolean): Boolean!
 
         """
-        [MOCK] It aborts the investment that haven't been started yet (by startInvestment mutation).
+        It aborts the investment that haven't been started yet (by startInvestment mutation).
         """
         abortInvestment(investmentId: ID!): Boolean!
+
+        """
+        [MOCK] It cancels the investment that is in Funding or Funded state, but the Grace period has not been passed away yet
+        """
+        cancelInvestment(investmentId: ID!): Boolean!
     }
 `;
-const investmentIdMock = '73e94d4c-f237-4f10-aa05-be8ade282be1';
 export const subscriptionAgreementIdMock = 'e04ce44d-eb21-4691-99cc-89fd11c2bfef';
-const investmentSummaryMock = {
-  id: investmentIdMock,
-  tradeId: '47584',
-  createdAt: '2023-03-24T12:32:16',
+const investmentSummaryMock = (tradeId: string, days: number) => ({
+  id: (days < 10 ? `0${days}` : days) + 'e94d4c-f237-4f10-aa05-be8ade282b' + (days < 10 ? `0${days}` : days),
+  tradeId,
+  createdAt: dayjs().subtract(days, 'day').format('YYYY-MM-DDThh:mm:ss'),
   amount: {
     value: '1000.00',
     formatted: '$1,000.00',
@@ -97,7 +114,7 @@ const investmentSummaryMock = {
     formatted: '$10.00',
   },
   subscriptionAgreementId: subscriptionAgreementIdMock,
-};
+});
 
 export type USDInput = {
   value: number;
@@ -120,10 +137,23 @@ export const Investments = {
     Query: {
       getInvestmentSummary: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-        const investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
+        let investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
 
         if (!investmentSummary) {
           throw new GraphQLError('CANNOT_GET_SUMMARY_FOR_GIVEN_INVESTMENT');
+        }
+
+        if (investmentSummary.bankAccountId) {
+          const api = modules.getApi<Registration.ApiType>(Registration);
+          const bankAccount = await api.getBankAccount(profileId, investmentSummary.bankAccountId);
+
+          if (bankAccount) {
+            investmentSummary = {
+              ...investmentSummary,
+              // @ts-ignore
+              bankAccount,
+            };
+          }
         }
 
         return investmentSummary;
@@ -138,6 +168,19 @@ export const Investments = {
         }
 
         return subscriptionAgreement;
+      },
+      listInvestments: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+        // let investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
+
+        return [
+          investmentSummaryMock('47584', 1),
+          investmentSummaryMock('47583', 8),
+          investmentSummaryMock('47582', 15),
+          investmentSummaryMock('47581', 22),
+          investmentSummaryMock('47580', 29),
+          investmentSummaryMock('46099', 90),
+        ];
       },
     },
     Mutation: {
@@ -169,23 +212,8 @@ export const Investments = {
       },
       startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-        let isApproved = true;
 
-        if (approveFees) {
-          isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
-        } else {
-          const isFeeApproved = await investmentAccountsApi.isFeesApproved(investmentId);
-
-          if (!isFeeApproved) {
-            throw new GraphQLError('FEE_NOT_APPROVED');
-          }
-        }
-
-        if (!isApproved) {
-          throw new GraphQLError('ERROR_OCCURED_DURING_APPROVING_FEE');
-        }
-
-        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId);
+        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId, approveFees);
 
         if (!isStartedInvestment) {
           throw new GraphQLError('CANNOT_START_INVESTMENT');
@@ -194,7 +222,11 @@ export const Investments = {
         return isStartedInvestment;
       },
       approveFees: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
+
+        return isApproved;
       },
       createSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
@@ -212,17 +244,22 @@ export const Investments = {
       signSubscriptionAgreement: async (parent: any, { investmentId }: any, { profileId, modules, clientIp }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, investmentId, clientIp);
+        const isSigned = await investmentAccountsApi.signSubscriptionAgreement(profileId, investmentId, clientIp);
 
-        if (!subscriptionAgreementId) {
-          throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
+        if (!isSigned) {
+          throw new JsonGraphQLError('CANNOT_SIGN_SUBSCRIPTION_AGREEMENT');
         }
 
-        const isAssigned = await investmentAccountsApi.assignSubscriptionAgreementToInvestment(investmentId, subscriptionAgreementId);
-
-        return isAssigned;
+        return isSigned;
       },
       abortInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.abortInvestment(profileId, investmentId);
+
+        return status;
+      },
+      cancelInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
         return true;
       },
     },

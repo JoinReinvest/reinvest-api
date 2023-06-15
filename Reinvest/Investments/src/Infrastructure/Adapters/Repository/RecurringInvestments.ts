@@ -1,5 +1,5 @@
 import { InvestmentsDatabaseAdapterProvider, recurringInvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-import type { RecurringInvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateRecurringInvestment';
+import type { RecurringInvestmentDraftCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import { RecurringInvestment } from 'Reinvest/Investments/src/Domain/Investments/RecurringInvestment';
 import { RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -32,7 +32,7 @@ export class RecurringInvestmentsRepository {
     return RecurringInvestment.create(recurringInvestment);
   }
 
-  async create(recurringInvestment: RecurringInvestmentCreate) {
+  async create(recurringInvestment: RecurringInvestmentDraftCreate) {
     const { id, accountId, profileId, portfolioId, money, startDate, frequency, status } = recurringInvestment;
     const amount = money.getAmount();
 
@@ -100,7 +100,8 @@ export class RecurringInvestmentsRepository {
     }
   }
 
-  async updateStatus(id: string, status: RecurringInvestmentStatus) {
+  async updateStatus(recurringInvestment: RecurringInvestment) {
+    const { id, status } = recurringInvestment.toObject();
     try {
       await this.databaseAdapterProvider
         .provide()

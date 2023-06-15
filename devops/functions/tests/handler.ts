@@ -1,5 +1,6 @@
 // @ts-nocheck
 import {
+  AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
   AdminDeleteUserCommand,
   AdminSetUserPasswordCommand,
@@ -23,6 +24,9 @@ import { VertaloAdapter } from 'Reinvest/Registration/src/Adapter/Vertalo/Vertal
 import serverless from 'serverless-http';
 import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/DatabaseProvider';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { SharesAndDividends } from 'SharesAndDividends/index'; // dependencies
+import { tradesTable } from 'Trading/Adapter/Database/DatabaseAdapter'; // dependencies
+import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter'; // dependencies
 import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
 import { main as postSignUp } from '../postSignUp/handler'; // dependencies
@@ -193,6 +197,14 @@ const userRouter = () => {
       });
       const changePasswordResult = await client.send(changePasswordCommand);
 
+      const addUserToExecutiveGroupCommand = new AdminAddUserToGroupCommand({
+        GroupName: 'Executives',
+        UserPoolId: COGNITO_CONFIG.userPoolID,
+        Username: email,
+      });
+
+      const userAddedToExecutiveGroup = client.send(addUserToExecutiveGroupCommand);
+
       const SignInCommand = new InitiateAuthCommand({
         ClientId: COGNITO_CONFIG.localClientId,
         AuthFlow: 'USER_PASSWORD_AUTH',
@@ -208,6 +220,7 @@ const userRouter = () => {
         createUserResult,
         postSignUpResult,
         changePasswordResult,
+        userAddedToExecutiveGroup,
         signInResult,
       });
     } catch (e: any) {
@@ -382,10 +395,10 @@ const syncRouter = () => {
   });
   router.post('/push-transaction', async (req: any, res: any) => {
     try {
-      const { transactionId } = req.body;
+      const { investmentId } = req.body;
       const modules = boot();
       const investmentApi = modules.getApi<Investments.ApiType>(Investments);
-      await investmentApi.pushTransaction(transactionId);
+      await investmentApi.pushTransaction(investmentId);
 
       res.status(200).json({
         status: true,
@@ -492,6 +505,55 @@ const northCapitalRouter = () => {
       });
     }
   });
+  router.post('/set-bank-account', async (req: any, res: any) => {
+    try {
+      const { accountId, accountNumber, routingNumber, accountType, institutionName, accountName } = req.body;
+      const profileId = await getProfileIdFromAccessToken(req.headers.authorization);
+      const mappedRecord = await databaseProvider
+        .provide()
+        .selectFrom('registration_mapping_registry')
+        .select(['profileId', 'recordId', 'externalId', 'mappedType', 'email', 'status', 'version', 'createdDate', 'updatedDate'])
+        .where('profileId', '=', profileId)
+        .where('externalId', '=', accountId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncSyncRecord = await databaseProvider
+        .provide()
+        .selectFrom('registration_north_capital_synchronization')
+        .select(['northCapitalId', 'recordId', 'type', 'crc', 'links', 'version', 'createdDate', 'updatedDate'])
+        .where('recordId', '=', mappedRecord.recordId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+      await ncAdapter.createExternalAchAccountForTests(
+        ncSyncRecord.northCapitalId,
+        accountName,
+        `${accountName} - ${institutionName}`,
+        institutionName,
+        routingNumber,
+        accountNumber,
+        accountType,
+      );
+
+      res.status(200).json({
+        accountName,
+        nickName: `${accountName} - ${institutionName}`,
+        institutionName,
+        routingNumber,
+        accountNumber,
+        accountType,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
+
   router.post('/sync-documents', async (req: any, res: any) => {
     try {
       const modules = boot();
@@ -538,6 +600,68 @@ const northCapitalRouter = () => {
     res.status(200).json({
       partyIds,
     });
+  });
+  router.post('/get-trade', async (req: any, res: any) => {
+    try {
+      const { investmentId } = req.body;
+      const reinvestTrade = await databaseProvider
+        .provide()
+        .selectFrom(tradesTable)
+        .selectAll()
+        .where('investmentId', '=', investmentId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncAdapter = new TradingNorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+      const ncTrade = await ncAdapter.getCurrentTradeState(reinvestTrade.tradeId);
+      res.status(200).json({
+        status: true,
+        reinvestTrade,
+        ncTrade,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
+  router.post('/update-trade-state', async (req: any, res: any) => {
+    try {
+      const { investmentId, tradeState } = req.body;
+
+      if (!['SETTLED', 'FUNDED'].includes(tradeState)) {
+        throw new Error('Invalid trade state, should be one of SETTLED, FUNDED');
+      }
+
+      const reinvestTrade = await databaseProvider
+        .provide()
+        .selectFrom(tradesTable)
+        .selectAll()
+        .where('investmentId', '=', investmentId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncAdapter = new TradingNorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+      const tradeDetailsAfterChanges = await ncAdapter.updateTradeStatusForTests(
+        reinvestTrade.tradeId,
+        reinvestTrade.vendorsConfigurationJson.northCapitalParentAccountId,
+        tradeState,
+      );
+
+      res.status(200).json({
+        status: true,
+        tradeDetailsAfterChanges,
+        reinvestTrade,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
   });
 
   router.post('/set-user-for-verification', async (req: any, res: any) => {
@@ -674,11 +798,77 @@ const transactionRouter = () => {
   return router;
 };
 
+const calculationRouter = () => {
+  const router = express.Router({ mergeParams: true });
+  router.post('/next-dividends-batch', async (req: any, res: any) => {
+    const modules = boot();
+    const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+    try {
+      const sharesToCalculate = await api.getNextSharesToCalculate();
+
+      if (!sharesToCalculate) {
+        res.status(200).json({
+          status: true,
+          sharesToCalculate: null,
+        });
+
+        return;
+      }
+
+      await api.calculateDividendsForShares(sharesToCalculate);
+      res.status(200).json({
+        status: true,
+        sharesToCalculate,
+      });
+    } catch (e: any) {
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    } finally {
+      await modules.close();
+    }
+  });
+  router.post('/distribute-dividends', async (req: any, res: any) => {
+    const modules = boot();
+    const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+    try {
+      const accountIdsToDistributeDividends = await api.getAccountsForDividendDistribution();
+
+      if (!accountIdsToDistributeDividends) {
+        res.status(200).json({
+          status: true,
+          accountIdsToDistributeDividends: null,
+        });
+
+        return;
+      }
+
+      const { distributionId, accountIds } = accountIdsToDistributeDividends;
+      await api.distributeDividends(distributionId, accountIds);
+      res.status(200).json({
+        status: true,
+        accountIdsToDistributeDividends,
+      });
+    } catch (e: any) {
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    } finally {
+      await modules.close();
+    }
+  });
+
+  return router;
+};
+
 router.use('/user', userRouter());
 router.use('/north-capital', northCapitalRouter());
 router.use('/vertalo', vertaloRouter());
 router.use('/sync', syncRouter());
 router.use('/transaction', transactionRouter());
+router.use('/calculate', calculationRouter());
 
 app.use('/tests', router);
 export const main = serverless(app);

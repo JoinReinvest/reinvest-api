@@ -2,16 +2,17 @@ import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Registration } from 'Registration/index';
+import type { UpdateCompanyAccountInput } from 'Reinvest/LegalEntities/src/Service/UpdateCompany';
+import type { UpdateIndividualAccountInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateIndividualAccount';
 import Modules from 'Reinvest/Modules';
 
 const schema = `
     #graphql
     type AccountOverview {
-        id: String
+        id: ID
         label:String
         type: AccountType
         avatar: GetAvatarLink
-        positionTotal: String
     }
 
     type IndividualAccountDetails {
@@ -22,10 +23,9 @@ const schema = `
     }
 
     type IndividualAccount {
-        id: String
+        id: ID
         label:String
         avatar: GetAvatarLink
-        positionTotal: String
         details: IndividualAccountDetails
     }
 
@@ -42,10 +42,9 @@ const schema = `
     }
 
     type CorporateAccount {
-        id: String
+        id: ID
         label:String
         avatar: GetAvatarLink
-        positionTotal: String
         details: CorporateAccountDetails
     }
 
@@ -62,10 +61,9 @@ const schema = `
     }
 
     type TrustAccount {
-        id: String
+        id: ID
         label:String
         avatar: GetAvatarLink
-        positionTotal: String
         details: TrustAccountDetails
     }
 
@@ -91,7 +89,6 @@ const schema = `
         IMPORTANT: it removes previously uploaded id scan documents from s3 for this stakeholder
         """
         removeStakeholders: [StakeholderIdInput]
-        companyType: CorporateCompanyTypeInput
     }
 
     input BeneficiaryNameInput {
@@ -117,7 +114,6 @@ const schema = `
         id: ID
         label: String
         avatar: GetAvatarLink
-        positionTotal: String
         details: BeneficiaryDetails
     }
 
@@ -143,43 +139,72 @@ const schema = `
         accountName: String
     }
 
+    enum BankAccountStatus {
+        ACTIVE
+        INACTIVE
+        DRAFT
+    }
+
     type BankAccount {
         accountNumber: String
         accountType: String
         bankName: String
+        bankAccountStatus: BankAccountStatus
+    }
+
+
+    input UpdateCompanyAccountInput {
+        address: AddressInput
+        annualRevenue: AnnualRevenueInput
+        numberOfEmployees: NumberOfEmployeesInput
+        industry: IndustryInput
+        companyDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes these documents from s3
+        """
+        removeDocuments: [DocumentFileLinkInput]
+        """
+        IMPORTANT: it removes previously uploaded avatar from s3 for this account
+        """
+        avatar: AvatarFileLinkInput
+        stakeholders: [StakeholderInput]
+        """
+        IMPORTANT: it removes previously uploaded id scan documents from s3 for this stakeholder
+        """
+        removeStakeholders: [StakeholderIdInput]
+    }
+
+    input UpdateBeneficiaryAccountInput {
+        name: BeneficiaryNameInput
+        avatar: AvatarFileLinkInput
     }
 
     type Query {
         """
         Return all accounts overview
-        [PARTIAL_MOCK] Position total is still mocked!!
         """
         getAccountsOverview: [AccountOverview]
         """
         Returns individual account information
-        [PARTIAL_MOCK] Position total is still mocked!!
         """
         getIndividualAccount: IndividualAccount
         """
         Returns beneficiary account information
-        [PARTIAL_MOCK] Position total is still mocked!!
         """
-        getBeneficiaryAccount(accountId: String): BeneficiaryAccount
+        getBeneficiaryAccount(accountId: ID!): BeneficiaryAccount
         """
         Returns corporate account information
-        [PARTIAL_MOCK] Position total is still mocked!!
         """
-        getCorporateAccount(accountId: String): CorporateAccount
+        getCorporateAccount(accountId: ID!): CorporateAccount
         """
         Returns trust account information
-        [PARTIAL_MOCK] Position total is still mocked!!
         """
-        getTrustAccount(accountId: String): TrustAccount
+        getTrustAccount(accountId: ID!): TrustAccount
 
         """
         Returns basic bank account information.
         """
-        readBankAccount(accountId: String!): BankAccount
+        readBankAccount(accountId: ID!): BankAccount
     }
 
     type Mutation {
@@ -187,34 +212,64 @@ const schema = `
         Open REINVEST Account based on draft.
         Currently supported: Individual Account
         """
-        openAccount(draftAccountId: String): Boolean
+        openAccount(draftAccountId: ID!): Boolean
 
         """
         Open beneficiary account
         """
-        openBeneficiaryAccount(individualAccountId: String!, input: CreateBeneficiaryInput!): BeneficiaryAccount
+        openBeneficiaryAccount(individualAccountId: ID!, input: CreateBeneficiaryInput!): BeneficiaryAccount
 
         """
         It creates new link to the investor bank account. It works only if the account does not have any bank account linked yet.
         Every time when the system create new link it cost $1.80 (on prod). Do not call it if it is not necessary.
         The bank account will not be activated until the investor fulfills the bank account.
         """
-        createBankAccount(accountId: String!): BankAccountLink
+        createBankAccount(accountId: ID!): BankAccountLink
 
         """
         It updates the link to the investor bank account. It works only if the account has bank account linked already.
         Every time when the system create new link it cost $1.80 (on prod). Do not call it if it is not necessary.
         The bank account will not be activated until the investor fulfills the bank account.
         """
-        updateBankAccount(accountId: String!): BankAccountLink
+        updateBankAccount(accountId: ID!): BankAccountLink
 
         """
         Provide the response from Plaid here.
         The bank account will not be activated until the investor fulfills the bank account.
         """
-        fulfillBankAccount(accountId: String!, input: FulfillBankAccountInput!): Boolean
+        fulfillBankAccount(accountId: ID!, input: FulfillBankAccountInput!): Boolean
+
+        "Update individual account"
+        updateIndividualAccount(accountId: ID!, input: IndividualAccountInput): IndividualAccount
+
+        "[MOCK] Update corporate account"
+        updateCorporateAccount(accountId: ID!, input: UpdateCompanyAccountInput): CorporateAccount
+
+        "[MOCK] Update trust account"
+        updateTrustAccount(accountId: ID!, input: UpdateCompanyAccountInput): TrustAccount
+
+        "[MOCK] Update beneficiary account"
+        updateBeneficiaryAccount(accountId: ID!, input: UpdateBeneficiaryAccountInput): BeneficiaryAccount
+
+        "[MOCK] Archive beneficiary account - it moves investments from a beneficiary to the individual account"
+        archiveBeneficiaryAccount(accountId: ID!, input: UpdateBeneficiaryAccountInput): Boolean!
     }
 `;
+
+type UpdateIndividualAccountDetailsInput = {
+  accountId: string;
+  input: UpdateIndividualAccountInput;
+};
+
+type UpdateCorporateAccountDetailsInput = {
+  accountId: string;
+  input: UpdateCompanyAccountInput;
+};
+
+type UpdateTrustAccountDetailsInput = {
+  accountId: string;
+  input: UpdateCompanyAccountInput;
+};
 
 export async function mapAccountIdToParentAccountIdIfRequired(profileId: string, accountId: string, modules: Modules): Promise<string> {
   const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
@@ -232,7 +287,6 @@ export const Account = {
 
         return {
           ...account,
-          positionTotal: '$5,560',
         };
       },
       getBeneficiaryAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
@@ -241,7 +295,6 @@ export const Account = {
 
         return {
           ...account,
-          positionTotal: '$1,150.25',
         };
       },
       getCorporateAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
@@ -250,7 +303,6 @@ export const Account = {
 
         return {
           ...account,
-          positionTotal: '$5,560',
         };
       },
       getTrustAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
@@ -259,7 +311,6 @@ export const Account = {
 
         return {
           ...account,
-          positionTotal: '$5,560',
         };
       },
       getAccountsOverview: async (parent: any, input: { accountId: string }, { profileId, modules }: SessionContext) => {
@@ -269,7 +320,6 @@ export const Account = {
         return accountsOverviewResponses.map(account => {
           return {
             ...account,
-            positionTotal: '$5,560',
           };
         });
       },
@@ -282,9 +332,7 @@ export const Account = {
           throw new GraphQLError('Bank account not exists');
         }
 
-        return {
-          ...bankAccount,
-        };
+        return bankAccount;
       },
     },
     Mutation: {
@@ -311,7 +359,6 @@ export const Account = {
 
         return {
           ...account,
-          positionTotal: '$1,150.25',
         };
       },
 
@@ -349,6 +396,83 @@ export const Account = {
         }
 
         return response;
+      },
+
+      updateIndividualAccount: async (parent: any, data: UpdateIndividualAccountDetailsInput, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const { input, accountId } = data;
+
+        const errors = await api.updateIndividualAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.getIndividualAccount(profileId);
+      },
+      updateCorporateAccount: async (parent: any, data: UpdateCorporateAccountDetailsInput, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const { input, accountId } = data;
+
+        const errors = await api.updateCorporateAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.getCompanyAccount(profileId, accountId);
+      },
+      updateTrustAccount: async (parent: any, data: UpdateTrustAccountDetailsInput, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const { input, accountId } = data;
+
+        const errors = await api.updateTrustAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.getCompanyAccount(profileId, accountId);
+      },
+      updateBeneficiaryAccount: async (
+        parent: any,
+        {
+          input,
+          accountId,
+        }: {
+          accountId: string;
+          input: any;
+        },
+        { profileId, modules }: SessionContext,
+      ) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const errors = await api.updateBeneficiaryAccount(profileId, accountId, input);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return api.readBeneficiaryAccount(profileId, accountId);
+      },
+      archiveBeneficiaryAccount: async (
+        parent: any,
+        {
+          input,
+          accountId,
+        }: {
+          accountId: string;
+          input: any;
+        },
+        { profileId, modules }: SessionContext,
+      ) => {
+        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        // const errors = await api.updateIndividualAccount(profileId, accountId, input);
+        //
+        // if (errors.length > 0) {
+        //   throw new JsonGraphQLError(errors);
+        // }
+
+        return true;
       },
     },
   },

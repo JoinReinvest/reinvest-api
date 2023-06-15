@@ -16,7 +16,7 @@ const schema = `
         userInvitationLink: UserInvitationLink
 
         """
-        [MOCK] Returns information if user already assigned and verified phone number
+        Returns information if user already assigned and verified phone number
         """
         phoneCompleted: Boolean
     }
@@ -34,10 +34,15 @@ const schema = `
         This action will set the phone number in the user Cognito profile and allow to use 2FA with phone number
         """
         verifyPhoneNumber(countryCode: String, phoneNumber: String, authCode: String): Boolean
+
+        """
+        [MOCK] It reads new verified email from cognito and update it in the REINVEST database
+        """
+        updateEmailAddress: Boolean
     }
 `;
 
-export const PhoneNumberVerification = {
+export const IdentitySchema = {
   typeDefs: schema,
   resolvers: {
     Query: {
@@ -75,6 +80,12 @@ export const PhoneNumberVerification = {
         const api = modules.getApi<Identity.ApiType>(Identity);
 
         return api.verifyPhoneNumber(userId, countryCode, phoneNumber, authCode);
+      },
+      // TODO This is MOCK
+      updateEmailAddress: async (parent: any, data: any, { userId, modules }: SessionContext) => {
+        const api = modules.getApi<Identity.ApiType>(Identity);
+
+        return true;
       },
     },
   },

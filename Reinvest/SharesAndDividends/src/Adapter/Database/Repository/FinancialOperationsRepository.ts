@@ -3,7 +3,7 @@ import {
   sadGlobalFinancialOperationsTable,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
-import { FinancialOperationRecord, FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/EVSDataPointsCalculatonService';
+import { FinancialOperationRecord, FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 
 export class FinancialOperationsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
