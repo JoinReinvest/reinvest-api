@@ -267,6 +267,21 @@ export class AccountRepository {
     }
   }
 
+  private async getNewInitials(profileId: string, accountType: AccountType) {
+    const initials = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(legalEntitiesCompanyAccountTable)
+      .select('initialValue')
+      .where('profileId', '=', profileId)
+      .where('accountType', '=', accountType)
+      .execute();
+
+    let lastMaxInitialValue = Math.max(...initials.map(el => el.initialValue));
+    const initialValue = lastMaxInitialValue++;
+
+    return initialValue;
+  }
+
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
     const {
       profileId,
@@ -290,6 +305,8 @@ export class AccountRepository {
         return true;
       }
 
+      const initialValue = await this.getNewInitials(profileId, accountType);
+
       await this.databaseAdapterProvider
         .provide()
         .insertInto(legalEntitiesCompanyAccountTable)
@@ -308,6 +325,7 @@ export class AccountRepository {
           companyDocuments: JSON.stringify(companyDocuments),
           stakeholders: JSON.stringify(stakeholders),
           einHash,
+          initialValue,
         })
         .onConflict(oc => oc.columns(['einHash']).doNothing())
         .execute();
@@ -387,6 +405,7 @@ export class AccountRepository {
           'accountType',
           'companyDocuments',
           'stakeholders',
+          'initialValue',
         ])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
         .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
