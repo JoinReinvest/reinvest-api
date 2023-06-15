@@ -91,7 +91,7 @@ export class EVSDataPointsCalculationService {
       for (const portfolioId in portfolio) {
         // @ts-ignore
         const { numberOfShares, pricePerShare } = portfolio[portfolioId];
-        EVSValue = EVSValue.add(pricePerShare.multiply(numberOfShares));
+        EVSValue = EVSValue.add(pricePerShare.multiplyBy(numberOfShares));
       }
 
       mainDataPoints[dateKey] = EVSValue.toUnit();
