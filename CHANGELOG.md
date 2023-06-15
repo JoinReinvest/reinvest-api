@@ -1,5 +1,15 @@
 # REINVEST API CHANGELOG
 
+## 1.16.2 - 06/15/2023
+
+* No MOCKS anymore:
+    * For account update
+      * `updateCorporateAccount`
+      * `updateTrustAccount`
+      * `updateBeneficiaryAccount`
+    * For investment
+      * `approveFees`
+
 ## 1.16.1 - 06/14/2023
 
 * New MOCK query:

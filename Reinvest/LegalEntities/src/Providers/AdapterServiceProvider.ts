@@ -13,16 +13,20 @@ import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/Pro
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
 import { InvestmentAccountsService } from 'LegalEntities/Adapter/Modules/InvestmentAccountsService';
 import { LegalEntities } from 'LegalEntities/index';
+import { UpdateCompany } from 'LegalEntities/Service/UpdateCompany';
 import { CompleteDraftAccount } from 'LegalEntities/UseCases/CompleteDraftAccount';
 import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
+import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
 import { UpdateIndividualAccount } from 'LegalEntities/UseCases/UpdateIndividualAccount';
 import { UpdateProfile } from 'LegalEntities/UseCases/UpdateProfile';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
+import { UpdateTrustAccount } from 'LegalEntities/UseCases/UpdateTrustAccount';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -42,7 +46,7 @@ export class AdapterServiceProvider {
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
       .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
 
-    container.addSingleton(IdGenerator);
+    container.addSingleton(IdGenerator).addSingleton(UpdateCompany);
 
     container.addSingleton(DocumentsService, ['Documents']).addSingleton(InvestmentAccountsService, ['InvestmentAccounts']);
 
@@ -64,6 +68,9 @@ export class AdapterServiceProvider {
       .addSingleton(CompleteProfile, [ProfileRepository])
       .addSingleton(UpdateProfile, [ProfileRepository])
       .addSingleton(UpdateIndividualAccount, [AccountRepository])
+      .addSingleton(UpdateCorporateAccount, [AccountRepository, UpdateCompany])
+      .addSingleton(UpdateTrustAccount, [AccountRepository, UpdateCompany])
+      .addSingleton(UpdateBeneficiaryAccount, [BeneficiaryRepository])
       .addSingleton(CreateDraftAccount, [DraftAccountRepository])
       .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator, AccountRepository])
       .addSingleton(RemoveDraftAccount, [DraftAccountRepository])
