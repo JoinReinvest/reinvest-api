@@ -22,8 +22,10 @@ export type UpdateCompanyAccountInput = {
   stakeholders?: StakeholderInput[];
 };
 
-abstract class UpdateCompany {
-  protected async updateCompanyData(account: CompanyAccount, input: UpdateCompanyAccountInput, profileId: string) {
+export class UpdateCompany {
+  public static getClassName = (): string => 'UpdateCompany';
+
+  async update(account: CompanyAccount, input: UpdateCompanyAccountInput, profileId: string) {
     const errors: any = [];
     const events: DomainEvent[] = [];
 
@@ -152,4 +154,3 @@ abstract class UpdateCompany {
     return events;
   }
 }
-export default UpdateCompany;
