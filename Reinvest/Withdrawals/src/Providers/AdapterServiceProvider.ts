@@ -4,7 +4,7 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { createWithdrawalsDatabaseAdapterProvider, WithdrawalsDatabaseAdapterInstanceProvider } from 'Withdrawals/Adapter/Database/DatabaseAdapter';
 import { FundsRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsRequestsRepository';
-import { SharesAndDividendsDocumentService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
+import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
 import { WithdrawalsDocumentService } from 'Withdrawals/Adapter/Module/WithdrawalsDocumentService';
 import { Withdrawals } from 'Withdrawals/index';
 
@@ -27,7 +27,7 @@ export class AdapterServiceProvider {
       .addSingleton(FundsRequestsRepository, [WithdrawalsDatabaseAdapterInstanceProvider]);
 
     // modules
-    container.addSingleton(SharesAndDividendsDocumentService, ['SharesAndDividends']);
+    container.addSingleton(SharesAndDividendsService, ['SharesAndDividends']);
     container.addSingleton(WithdrawalsDocumentService, ['Documents']);
   }
 }
