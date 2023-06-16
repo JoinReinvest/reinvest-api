@@ -6,7 +6,7 @@ import {
   legalEntitiesProfileTable,
 } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { LegalEntitiesCompanyAccount } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
-import { CompanyAccount, CompanyAccountOverview, CompanyOverviewSchema, CompanySchema } from 'LegalEntities/Domain/Accounts/CompanyAccount';
+import { CompanyAccount, CompanyAccountOverview, CompanyAccountType, CompanyOverviewSchema, CompanySchema } from 'LegalEntities/Domain/Accounts/CompanyAccount';
 import { IndividualAccount, IndividualAccountOverview, IndividualOverviewSchema, IndividualSchema } from 'LegalEntities/Domain/Accounts/IndividualAccount';
 import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
@@ -267,19 +267,19 @@ export class AccountRepository {
     }
   }
 
-  private async getNewInitials(profileId: string, accountType: AccountType) {
+  private async getNewInitials(profileId: string, accountType: CompanyAccountType) {
     const initials = await this.databaseAdapterProvider
       .provide()
       .selectFrom(legalEntitiesCompanyAccountTable)
-      .select('initialValue')
+      .select('initialsValue')
       .where('profileId', '=', profileId)
       .where('accountType', '=', accountType)
       .execute();
 
-    let lastMaxInitialValue = Math.max(...initials.map(el => el.initialValue));
-    const initialValue = lastMaxInitialValue++;
+    let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue));
+    const initialsValue = lastMaxInitialsValue++;
 
-    return initialValue;
+    return initialsValue;
   }
 
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
@@ -305,7 +305,7 @@ export class AccountRepository {
         return true;
       }
 
-      const initialValue = await this.getNewInitials(profileId, accountType);
+      const initialsValue = await this.getNewInitials(profileId, accountType);
 
       await this.databaseAdapterProvider
         .provide()
@@ -325,7 +325,7 @@ export class AccountRepository {
           companyDocuments: JSON.stringify(companyDocuments),
           stakeholders: JSON.stringify(stakeholders),
           einHash,
-          initialValue,
+          initialsValue,
         })
         .onConflict(oc => oc.columns(['einHash']).doNothing())
         .execute();
@@ -405,7 +405,7 @@ export class AccountRepository {
           'accountType',
           'companyDocuments',
           'stakeholders',
-          'initialValue',
+          'initialsValue',
         ])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
         .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)

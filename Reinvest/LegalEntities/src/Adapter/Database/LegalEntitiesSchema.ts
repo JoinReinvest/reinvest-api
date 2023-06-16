@@ -49,7 +49,7 @@ export interface LegalEntitiesCompanyAccount {
   ein: string | null;
   einHash: string;
   industry: string | null;
-  initialValue: number;
+  initialsValue: number;
   numberOfEmployees: string | null;
   profileId: string;
   stakeholders: string | null;
