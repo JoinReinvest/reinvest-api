@@ -30,6 +30,7 @@ import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 import { Trading } from 'Trading/index';
 import { Verification } from 'Verification/index';
+import { Withdrawals } from 'Withdrawals/index';
 
 console = logger(SENTRY_CONFIG);
 
@@ -177,6 +178,21 @@ export function boot(): Modules {
         registration: modules.get(Registration.moduleName) as Registration.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
         portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    Withdrawals.moduleName,
+    Withdrawals.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as Withdrawals.Config,
+      {
+        documents: modules.get(Documents.moduleName) as Documents.Main,
+        sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+        registration: modules.get(Registration.moduleName) as Registration.Main,
       },
     ),
   );

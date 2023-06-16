@@ -221,6 +221,38 @@ export class SharesRepository {
     return Money.lowPrecision(parseInt(<string>data.costOfSharesOwned));
   }
 
+  async getSettledSharesForAccountState(profileId: string, accountId: string) {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .select(['numberOfShares', 'dateFunding', 'unitPrice', 'id', 'portfolioId'])
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', '=', SharesStatus.SETTLED)
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data;
+  }
+
+  async areThereNotSettledShares(profileId: string, accountId: string): Promise<boolean> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .select(eb => [eb.fn.count('id').as('count')])
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', 'not in', [SharesStatus.SETTLED, SharesStatus.REVOKED])
+      .executeTakeFirst();
+
+    const areThereNotSettledShares = !data || parseInt(<string>data.count) === 0 ? false : true;
+
+    return areThereNotSettledShares;
+  }
+
   private async getRevokedSharesPerDay(
     portfolioId: string,
     calculatedFromDate: DateTime,

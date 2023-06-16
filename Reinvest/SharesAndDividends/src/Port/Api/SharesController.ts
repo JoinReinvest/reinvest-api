@@ -1,14 +1,17 @@
 import { Money } from 'Money/Money';
+import { AccountState, AccountStateQuery } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { ChangeSharesState, SharesChangeState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
 
 export class SharesController {
   private createSharesUseCase: CreateShares;
   private changeSharesStateUseCase: ChangeSharesState;
+  private accountStateQuery: AccountStateQuery;
 
-  constructor(createSharesUseCase: CreateShares, changeSharesStateUseCase: ChangeSharesState) {
+  constructor(createSharesUseCase: CreateShares, changeSharesStateUseCase: ChangeSharesState, accountStateQuery: AccountStateQuery) {
     this.createSharesUseCase = createSharesUseCase;
     this.changeSharesStateUseCase = changeSharesStateUseCase;
+    this.accountStateQuery = accountStateQuery;
   }
 
   static getClassName = () => 'SharesController';
@@ -34,5 +37,9 @@ export class SharesController {
 
   async setSharesToSettledState(investmentId: string): Promise<void> {
     await this.changeSharesStateUseCase.execute(investmentId, SharesChangeState.SETTLED);
+  }
+
+  async getAccountState(profileId: string, accountId: string): Promise<AccountState> {
+    return this.accountStateQuery.getAccountState(profileId, accountId);
   }
 }

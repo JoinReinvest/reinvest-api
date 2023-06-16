@@ -247,13 +247,13 @@ const schema = `
         "Update individual account"
         updateIndividualAccount(accountId: ID!, input: IndividualAccountInput): IndividualAccount
 
-        "[MOCK] Update corporate account"
+        "Update corporate account"
         updateCorporateAccount(accountId: ID!, input: UpdateCompanyAccountInput): CorporateAccount
 
-        "[MOCK] Update trust account"
+        "Update trust account"
         updateTrustAccount(accountId: ID!, input: UpdateCompanyAccountInput): TrustAccount
 
-        "[MOCK] Update beneficiary account"
+        "Update beneficiary account"
         updateBeneficiaryAccount(accountId: ID!, input: UpdateBeneficiaryAccountInput): BeneficiaryAccount
 
         "[MOCK] Archive beneficiary account - it moves investments from a beneficiary to the individual account"

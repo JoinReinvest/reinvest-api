@@ -113,4 +113,38 @@ export class DividendsRepository {
       .where('id', '=', dividendId)
       .execute();
   }
+
+  async getAwaitingDividendsForAccountState(profileId: string, accountId: string) {
+    const db = this.databaseAdapterProvider.provide();
+    const data = await db
+      .selectFrom(sadInvestorDividendsTable)
+      .select(['id', 'totalDividendAmount', 'totalFeeAmount'])
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', 'in', [InvestorDividendStatus.AWAITING_ACTION, InvestorDividendStatus.FEES_NOT_COVERED])
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data;
+  }
+
+  async getAwaitingReferralRewardsForAccountState(profileId: string, accountId: string) {
+    const db = this.databaseAdapterProvider.provide();
+    const data = await db
+      .selectFrom(sadInvestorIncentiveDividendTable)
+      .select(['id', 'amount'])
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', '=', IncentiveRewardStatus.AWAITING_ACTION)
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data;
+  }
 }

@@ -5,6 +5,7 @@ import { GraphQLError } from 'graphql';
 import { Investments } from 'Investments/index';
 import { Portfolio } from 'Portfolio/index';
 import { SharesAndDividends } from 'SharesAndDividends/index';
+import { Withdrawals } from 'Withdrawals/index';
 
 const schema = `
     #graphql
@@ -33,14 +34,7 @@ const schema = `
         dividendsList: [DividendOverview]!
     }
 
-    type GracePeriodInvestment {
-        investmentId: ID!
-        amount: USD!
-        gracePeriodEnd: ISODate!
-    }
-
     type FundsWithdrawalSimulation {
-        gracePeriodInvestments: [GracePeriodInvestment]!
         canWithdraw: Boolean!
         eligibleForWithdrawal: USD!
         accountValue: USD!
@@ -77,12 +71,12 @@ const schema = `
         getDividend(dividendId: ID!): Dividend!
 
         """
-        [MOCK] List all dividends
+        List all dividends
         """
         listDividends(accountId: ID!): DividendsList!
 
         """
-        [MOCK] Simulate funds withdrawal. It returns the simulation of withdrawal without any changes in the system.
+        Simulate funds withdrawal. It returns the simulation of withdrawal without any changes in the system.
         """
         simulateFundsWithdrawal(accountId: ID!): FundsWithdrawalSimulation!
 
@@ -263,11 +257,15 @@ const fundsWithdrawalRequestMock = (status: string) => ({
   status,
 });
 
-export const Withdrawals = {
+export const WithdrawalsSchema = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      simulateFundsWithdrawal: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => fundsWithdrawalSimulationMock,
+      simulateFundsWithdrawal: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        return api.simulateWithdrawals(profileId, accountId);
+      },
       getFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) =>
         fundsWithdrawalRequestMock('AWAITING_DECISION'),
       getDividend: async (parent: any, { dividendId }: any, { profileId, modules }: SessionContext) => {

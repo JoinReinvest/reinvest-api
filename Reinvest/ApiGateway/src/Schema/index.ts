@@ -19,7 +19,7 @@ import { Profile } from 'ApiGateway/Schema/Types/Profile';
 import { RecurringInvestments } from 'ApiGateway/Schema/Types/RecurringInvestments';
 import { Shared } from 'ApiGateway/Schema/Types/Shared';
 import { VerificationSchema } from 'ApiGateway/Schema/Types/Verification';
-import { Withdrawals } from 'ApiGateway/Schema/Types/Withdrawals';
+import { WithdrawalsSchema } from 'ApiGateway/Schema/Types/WithdrawalsSchema';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
 
 const executableSchemas = [EmailAddress, FileName, DateScalar, Money, Hello];
@@ -38,7 +38,7 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   Configuration.typeDefs,
   AccountStats.typeDefs,
   Notification.typeDefs,
-  Withdrawals.typeDefs,
+  WithdrawalsSchema.typeDefs,
   PortfolioSchema.typeDefs,
 ]);
 
@@ -54,7 +54,7 @@ const nonExecutableResolvers = mergeResolvers([
   Configuration.resolvers,
   AccountStats.resolvers,
   Notification.resolvers,
-  Withdrawals.resolvers,
+  WithdrawalsSchema.resolvers,
   PortfolioSchema.resolvers,
 ]);
 

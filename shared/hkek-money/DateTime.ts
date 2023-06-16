@@ -19,6 +19,10 @@ export class DateTime {
     return new DateTime(dayjs(dayjs(date).format('YYYY-MM-DD')));
   }
 
+  static daysAgo(days: number) {
+    return DateTime.now().subtractDays(days);
+  }
+
   toDate(): Date {
     return this.date.toDate();
   }
@@ -57,5 +61,9 @@ export class DateTime {
 
   isFuture() {
     return this.date.isAfter(dayjs(), 'day');
+  }
+
+  private subtractDays(days: number): DateTime {
+    return new DateTime(this.date.subtract(days, 'day'));
   }
 }

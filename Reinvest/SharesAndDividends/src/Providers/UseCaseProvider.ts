@@ -7,6 +7,7 @@ import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository
 import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 import { PortfolioService } from 'SharesAndDividends/Adapter/Modules/PortfolioService';
 import { SharesAndDividends } from 'SharesAndDividends/index';
+import { AccountStateQuery } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { CalculateDividends } from 'SharesAndDividends/UseCase/CalculateDividends';
 import { ChangeSharesState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import { CreateDividendDistribution } from 'SharesAndDividends/UseCase/CreateDividendDistribution';
@@ -51,5 +52,6 @@ export class UseCaseProvider {
       NotificationService,
     ]);
     container.addSingleton(MarkDividendAsReinvested, [DividendsRepository]);
+    container.addSingleton(AccountStateQuery, [DividendsRepository, SharesRepository, PortfolioService]);
   }
 }
