@@ -106,7 +106,6 @@ export class CognitoService {
         UserPoolId: this.config.userPoolID,
       }),
     )) as CognitoUserType;
-    console.log(user);
 
     return user ?? null;
   }
