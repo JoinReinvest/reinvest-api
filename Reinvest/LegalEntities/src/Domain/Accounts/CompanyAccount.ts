@@ -26,6 +26,7 @@ export type CompanySchema = {
   ein: SensitiveNumberSchema;
   einHash: string | null;
   industry: ValueStringInput;
+  initialsValue: number;
   numberOfEmployees: ValueRangeInput;
   profileId: string;
   stakeholders: StakeholderSchema[];
@@ -75,12 +76,14 @@ export class CompanyAccount {
   private avatar: Avatar | null = null;
   private documents: CompanyDocuments = new CompanyDocuments([]);
   private stakeholders: CompanyStakeholders = new CompanyStakeholders([]);
+  private initialsValue: number;
   private readonly accountType: CompanyAccountType;
 
-  constructor(profileId: string, accountId: string, accountType: CompanyAccountType) {
+  constructor(profileId: string, accountId: string, accountType: CompanyAccountType, initialsValue: number) {
     this.profileId = profileId;
     this.accountId = accountId;
     this.accountType = accountType;
+    this.initialsValue = initialsValue;
   }
 
   private get(value: ToObject | null) {
@@ -107,6 +110,7 @@ export class CompanyAccount {
       stakeholders: this.get(this.stakeholders),
       accountType: this.accountType,
       einHash: this.ein?.getHash() ?? null,
+      initialsValue: this.initialsValue,
     };
   }
 
@@ -125,8 +129,9 @@ export class CompanyAccount {
       stakeholders,
       companyDocuments,
       accountType,
+      initialsValue,
     } = companyData;
-    const account = new CompanyAccount(profileId, accountId, accountType);
+    const account = new CompanyAccount(profileId, accountId, accountType, initialsValue);
 
     if (companyName) {
       account.setCompanyName(CompanyName.create(companyName));
@@ -206,7 +211,9 @@ export class CompanyAccount {
   }
 
   getInitials(): string {
-    return getAccountInitials(this.accountType, this.companyName);
+    const initials = `${this.accountType.charAt(0)}${this.initialsValue}`;
+
+    return initials;
   }
 
   setAddress(address: Address) {

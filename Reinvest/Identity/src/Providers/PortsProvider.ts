@@ -21,7 +21,7 @@ export class PortsProvider {
     container.addAsValue('webAppUrl', this.config.webAppUrl);
     //controllers
     container
-      .addSingleton(ProfileController, [UserRepository])
+      .addSingleton(ProfileController, [UserRepository, CognitoService])
       .addSingleton(PhoneController, [PhoneRegistrationService, CognitoService])
       .addSingleton(UserRegistrationController, [UserRegistrationService])
       .addSingleton(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl']);

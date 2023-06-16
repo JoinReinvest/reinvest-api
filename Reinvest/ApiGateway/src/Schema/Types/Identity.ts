@@ -81,11 +81,11 @@ export const IdentitySchema = {
 
         return api.verifyPhoneNumber(userId, countryCode, phoneNumber, authCode);
       },
-      // TODO This is MOCK
       updateEmailAddress: async (parent: any, data: any, { userId, modules }: SessionContext) => {
         const api = modules.getApi<Identity.ApiType>(Identity);
+        const status = await api.updateEmailAddress(userId);
 
-        return true;
+        return status;
       },
     },
   },
