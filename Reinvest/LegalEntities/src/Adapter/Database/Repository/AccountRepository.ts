@@ -6,7 +6,7 @@ import {
   legalEntitiesProfileTable,
 } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { LegalEntitiesCompanyAccount } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
-import { CompanyAccount, CompanyAccountOverview, CompanyOverviewSchema, CompanySchema } from 'LegalEntities/Domain/Accounts/CompanyAccount';
+import { CompanyAccount, CompanyAccountOverview, CompanyAccountType, CompanyOverviewSchema, CompanySchema } from 'LegalEntities/Domain/Accounts/CompanyAccount';
 import { IndividualAccount, IndividualAccountOverview, IndividualOverviewSchema, IndividualSchema } from 'LegalEntities/Domain/Accounts/IndividualAccount';
 import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
@@ -267,6 +267,21 @@ export class AccountRepository {
     }
   }
 
+  private async getNewInitials(profileId: string, accountType: CompanyAccountType) {
+    const initials = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(legalEntitiesCompanyAccountTable)
+      .select('initialsValue')
+      .where('profileId', '=', profileId)
+      .where('accountType', '=', accountType)
+      .execute();
+
+    let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue));
+    const initialsValue = ++lastMaxInitialsValue;
+
+    return initialsValue;
+  }
+
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
     const {
       profileId,
@@ -290,6 +305,8 @@ export class AccountRepository {
         return true;
       }
 
+      const initialsValue = await this.getNewInitials(profileId, accountType);
+
       await this.databaseAdapterProvider
         .provide()
         .insertInto(legalEntitiesCompanyAccountTable)
@@ -308,6 +325,7 @@ export class AccountRepository {
           companyDocuments: JSON.stringify(companyDocuments),
           stakeholders: JSON.stringify(stakeholders),
           einHash,
+          initialsValue,
         })
         .onConflict(oc => oc.columns(['einHash']).doNothing())
         .execute();
@@ -387,6 +405,7 @@ export class AccountRepository {
           'accountType',
           'companyDocuments',
           'stakeholders',
+          'initialsValue',
         ])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
         .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
