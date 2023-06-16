@@ -71,12 +71,12 @@ const schema = `
         getDividend(dividendId: ID!): Dividend!
 
         """
-        [MOCK] List all dividends
+        List all dividends
         """
         listDividends(accountId: ID!): DividendsList!
 
         """
-        [MOCK] Simulate funds withdrawal. It returns the simulation of withdrawal without any changes in the system.
+        Simulate funds withdrawal. It returns the simulation of withdrawal without any changes in the system.
         """
         simulateFundsWithdrawal(accountId: ID!): FundsWithdrawalSimulation!
 

@@ -1,4 +1,9 @@
 # REINVEST API CHANGELOG
+## 1.16.4 - 06/16/2023
+
+* No MOCK anymore:
+  * `simulateFundsWithdrawal` it returns information about the funds withdrawals without creating actual request.
+  * `listDividends`
 
 ## 1.16.3 - 06/16/2023
 

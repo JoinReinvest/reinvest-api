@@ -36,7 +36,7 @@ const schema = `
         verifyPhoneNumber(countryCode: String, phoneNumber: String, authCode: String): Boolean
 
         """
-        [MOCK] It reads new verified email from cognito and update it in the REINVEST database
+        It reads new verified email from cognito and update it in the REINVEST database
         """
         updateEmailAddress: Boolean
     }
