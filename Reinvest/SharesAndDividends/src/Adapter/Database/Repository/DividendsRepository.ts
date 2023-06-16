@@ -104,6 +104,41 @@ export class DividendsRepository {
     return data;
   }
 
+  async getDividends(
+    profileId: string,
+    accountId: string,
+  ): Promise<
+    | {
+        amount: number;
+        createdDate: Date;
+        id: string;
+        status: IncentiveRewardStatus | InvestorDividendStatus;
+      }[]
+    | null
+  > {
+    const db = this.databaseAdapterProvider.provide();
+    const data = await db
+      .selectFrom(sadInvestorDividendsTable)
+      .select(['id', 'dividendAmount as amount', 'createdDate', 'status'])
+      .union(
+        // @ts-ignore
+        db
+          .selectFrom(sadInvestorIncentiveDividendTable)
+          .select(['id', 'amount', 'createdDate', 'status'])
+          .where('profileId', '=', <any>profileId)
+          .where('accountId', '=', <any>accountId),
+      )
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .execute();
+
+    if (!data) {
+      return null;
+    }
+
+    return data;
+  }
+
   async markIncentiveDividendReinvested(profileId: string, accountId: string, dividendId: string): Promise<void> {
     await this.databaseAdapterProvider
       .provide()
