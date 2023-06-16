@@ -14,6 +14,7 @@ export type SharesAndDividendsApiType = {
   declareDividend: DividendsCalculationController['declareDividend'];
   distributeDividends: DividendsCalculationController['distributeDividends'];
   distributionsCompleted: DividendsCalculationController['distributionsCompleted'];
+  getAccountState: SharesController['getAccountState'];
   getAccountStats: StatsController['getAccountStats'];
   getAccountsForDividendDistribution: DividendsCalculationController['getAccountsForDividendDistribution'];
   getDividend: DividendsController['getDividend'];
@@ -51,4 +52,5 @@ export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndD
   createDividendDistribution: container.delegateTo(DividendsCalculationController, 'createDividendDistribution'),
   calculationsCompleted: container.delegateTo(DividendsCalculationController, 'calculationsCompleted'),
   distributionsCompleted: container.delegateTo(DividendsCalculationController, 'distributionsCompleted'),
+  getAccountState: container.delegateTo(SharesController, 'getAccountState'),
 });

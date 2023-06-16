@@ -1,9 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
+import { WithdrawalsController } from 'Withdrawals/Port/Api/SimulateWithdrawals';
 
 export type WithdrawalsApiType = {
-  // canObjectBeUpdated: UserWithdrawalsActions['canObjectBeUpdated'];
+  simulateWithdrawals: WithdrawalsController['simulateWithdrawals'];
 };
 
 export const WithdrawalsApi = (container: ContainerInterface): WithdrawalsApiType => ({
-  // canObjectBeUpdated: container.delegateTo(UserWithdrawalsActions, 'canObjectBeUpdated'),
+  simulateWithdrawals: container.delegateTo(WithdrawalsController, 'simulateWithdrawals'),
 });
