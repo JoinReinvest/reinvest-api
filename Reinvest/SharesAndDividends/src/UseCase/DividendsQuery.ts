@@ -1,23 +1,7 @@
 import dayjs from 'dayjs';
 import { Money } from 'Money/Money';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
-
-export enum DividendState {
-  PENDING = 'PENDING',
-  PAID_OUT = 'PAID_OUT',
-  REINVESTED = 'REINVESTED',
-  PAYING_OUT = 'PAYING_OUT',
-}
-
-export type DividendDetails = {
-  amount: {
-    formatted: string;
-    value: number;
-  };
-  date: string;
-  id: string;
-  status: DividendState;
-};
+import { DividendDetails, DividendState } from 'SharesAndDividends/Domain/types';
 
 export class DividendsQuery {
   private dividendsRepository: DividendsRepository;

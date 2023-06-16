@@ -281,31 +281,11 @@ export const Withdrawals = {
 
         return dividend;
       },
-      listDividends: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      listDividends: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+        const list = await api.getDividendsList(profileId, accountId);
 
-        return {
-          dividendsList: [
-            {
-              id: '98e94d4c-f237-4f10-aa05-be8ade2ffee',
-              status: 'REINVESTED',
-              date: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
-              amount: {
-                value: 2245,
-                formatted: '$22.45',
-              },
-            },
-            {
-              id: '988e94d4c-f237-4f10-aa05-be8ade2ffaa',
-              status: 'PENDING',
-              date: dayjs().subtract(30, 'day').format('YYYY-MM-DDTHH:mm:ss'),
-              amount: {
-                value: 2855,
-                formatted: '$28.55',
-              },
-            },
-          ],
-        };
+        return list;
       },
       getFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock,
     },
