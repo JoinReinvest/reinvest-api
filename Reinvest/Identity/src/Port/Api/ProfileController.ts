@@ -50,11 +50,11 @@ export class ProfileController {
 
       const newEmail = await this.cognitoService.getEmail(userId);
 
-      if (!newEmail || !newEmail?.Value) {
+      if (!newEmail) {
         return false;
       }
 
-      await this.userRepository.getUserEmailById(userId, newEmail.Value);
+      await this.userRepository.updateUserEmail(userId, newEmail);
 
       return true;
     } catch (error: any) {

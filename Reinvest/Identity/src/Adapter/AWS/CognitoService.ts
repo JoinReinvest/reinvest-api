@@ -88,7 +88,7 @@ export class CognitoService {
 
     const email = user.UserAttributes.find((attribute: AttributeType) => attribute.Name === 'email');
 
-    return email;
+    return email?.Value;
   }
 
   private async sendAttributeUpdateCommand(command: AdminUpdateUserAttributesCommand): Promise<boolean> {
