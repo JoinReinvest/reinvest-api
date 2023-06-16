@@ -1,11 +1,14 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
+import { WithdrawDividend } from 'Withdrawals/UseCase/WithdrawDividend';
 
 export class WithdrawalsController {
   private withdrawalsQuery: WithdrawalsQuery;
+  private withdrawDividendUseCase: WithdrawDividend;
 
-  constructor(withdrawalsQuery: WithdrawalsQuery) {
+  constructor(withdrawalsQuery: WithdrawalsQuery, withdrawDividendUseCase: WithdrawDividend) {
     this.withdrawalsQuery = withdrawalsQuery;
+    this.withdrawDividendUseCase = withdrawDividendUseCase;
   }
 
   static getClassName = () => 'WithdrawalsController';
@@ -23,5 +26,15 @@ export class WithdrawalsController {
       accountValue: eligibleWithdrawalsState.getAccountValueAmount(),
       penaltiesFee: eligibleWithdrawalsState.getPenaltiesFeeAmount(),
     };
+  }
+
+  async withdrawDividends(profileId: UUID, accountId: UUID, dividendIds: UUID[]): Promise<boolean> {
+    const statuses = [];
+
+    for (const dividendId of dividendIds) {
+      statuses.push(await this.withdrawDividendUseCase.execute(profileId, accountId, dividendId));
+    }
+
+    return statuses.some(status => status === true);
   }
 }

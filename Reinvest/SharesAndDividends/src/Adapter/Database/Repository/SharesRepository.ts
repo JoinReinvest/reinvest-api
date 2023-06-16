@@ -86,6 +86,7 @@ export class SharesRepository {
         'accountId',
         'dateCreated',
         'dateFunded',
+        'dateFunding',
         'dateRevoked',
         'dateSettled',
         'id',

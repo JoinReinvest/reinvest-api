@@ -3,7 +3,7 @@ import { IncentiveRewardStatus } from 'SharesAndDividends/Domain/IncentiveReward
 import { InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
 import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 
-export class MarkDividendAsReinvested {
+export class MarkDividendAsWithdrawn {
   private dividendsRepository: DividendsRepository;
   private notificationService: NotificationService;
 
@@ -12,9 +12,9 @@ export class MarkDividendAsReinvested {
     this.notificationService = notificationService;
   }
 
-  static getClassName = () => 'MarkDividendAsReinvested';
+  static getClassName = () => 'MarkDividendAsWithdrawn';
 
-  async execute(profileId: string, accountId: string, dividendId: string): Promise<void> {
+  async execute(profileId: string, dividendId: string): Promise<void> {
     const dividend = await this.dividendsRepository.findDividend(profileId, dividendId);
 
     if (!dividend) {
@@ -22,9 +22,9 @@ export class MarkDividendAsReinvested {
     }
 
     if (dividend.type === 'REWARD') {
-      await this.dividendsRepository.markIncentiveDividendAs(IncentiveRewardStatus.REINVESTED, profileId, dividendId, accountId);
+      await this.dividendsRepository.markIncentiveDividendAs(IncentiveRewardStatus.WITHDRAWN, profileId, dividendId);
     } else {
-      await this.dividendsRepository.markDividendAs(InvestorDividendStatus.REINVESTED, profileId, dividendId);
+      await this.dividendsRepository.markDividendAs(InvestorDividendStatus.WITHDRAWN, profileId, dividendId);
     }
 
     await this.notificationService.markNotificationAsRead(profileId, dividendId);

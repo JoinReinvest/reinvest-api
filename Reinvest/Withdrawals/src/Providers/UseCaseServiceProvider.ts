@@ -2,6 +2,9 @@ import { ContainerInterface } from 'Container/Container';
 import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
 import { Withdrawals } from 'Withdrawals/index';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
+import { WithdrawDividend } from 'Withdrawals/UseCase/WithdrawDividend';
+import { DividendsRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/DividendsRequestsRepository';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
 
 export class UseCaseServiceProvider {
   private config: Withdrawals.Config;
@@ -12,5 +15,6 @@ export class UseCaseServiceProvider {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(WithdrawalsQuery, [SharesAndDividendsService]);
+    container.addSingleton(WithdrawDividend, [SharesAndDividendsService, DividendsRequestsRepository, 'WithdrawalTransactionalAdapter', IdGenerator]);
   }
 }

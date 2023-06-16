@@ -2,16 +2,24 @@ import type { DividendDetails } from 'SharesAndDividends/Domain/types';
 import { DividendsListQuery } from 'SharesAndDividends/UseCase/DividendsListQuery';
 import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
+import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
 
 export class DividendsController {
   private dividendsQuery: DividendsQuery;
   private markDividendAsReinvestedUseCase: MarkDividendAsReinvested;
   private dividendsListQueryUseCase: DividendsListQuery;
+  private markDividendAsWithdrewUseCase: MarkDividendAsWithdrawn;
 
-  constructor(dividendsQuery: DividendsQuery, markDividendAsReinvestedUseCase: MarkDividendAsReinvested, dividendsListQueryUseCase: DividendsListQuery) {
+  constructor(
+    dividendsQuery: DividendsQuery,
+    markDividendAsReinvestedUseCase: MarkDividendAsReinvested,
+    dividendsListQueryUseCase: DividendsListQuery,
+    markDividendAsWithdrewUseCase: MarkDividendAsWithdrawn,
+  ) {
     this.dividendsQuery = dividendsQuery;
     this.markDividendAsReinvestedUseCase = markDividendAsReinvestedUseCase;
     this.dividendsListQueryUseCase = dividendsListQueryUseCase;
+    this.markDividendAsWithdrewUseCase = markDividendAsWithdrewUseCase;
   }
 
   static getClassName = () => 'DividendsController';
@@ -21,10 +29,14 @@ export class DividendsController {
   }
 
   async getDividendsList(profileId: string, accountId: string): Promise<DividendDetails[] | null> {
-    return await this.dividendsListQueryUseCase.getList(profileId, accountId);
+    return this.dividendsListQueryUseCase.getList(profileId, accountId);
   }
 
   async markDividendReinvested(profileId: string, accountId: string, dividendId: string): Promise<void> {
     await this.markDividendAsReinvestedUseCase.execute(profileId, accountId, dividendId);
+  }
+
+  async markDividendAsWithdrew(profileId: string, dividendId: string): Promise<void> {
+    await this.markDividendAsWithdrewUseCase.execute(profileId, dividendId);
   }
 }

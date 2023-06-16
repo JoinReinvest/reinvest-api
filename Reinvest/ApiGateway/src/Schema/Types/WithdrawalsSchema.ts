@@ -1,5 +1,4 @@
 import { SessionContext } from 'ApiGateway/index';
-import { notificationsMock } from 'ApiGateway/Schema/Types/Notification';
 import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Investments } from 'Investments/index';
@@ -295,14 +294,10 @@ export const WithdrawalsSchema = {
 
         return api.reinvestDividends(profileId, accountId, portfolioId, dividendIds);
       },
-      withdrawDividend: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => {
-        let decision = true;
-        dividendIds.map((id: string) => {
-          const dividend = notificationsMock('', false).find(n => n.onObject?.id === id);
-          decision = decision && !!dividend;
-        });
+      withdrawDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
 
-        return decision;
+        return api.withdrawDividends(profileId, accountId, dividendIds);
       },
 
       createFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) =>

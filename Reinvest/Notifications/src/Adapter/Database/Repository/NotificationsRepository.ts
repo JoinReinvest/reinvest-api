@@ -25,6 +25,10 @@ export class NotificationsRepository {
   }
 
   async setReadToTrue(profileId: string, dismissIds: string[]) {
+    if (dismissIds.length === 0) {
+      return;
+    }
+
     await this.databaseAdapterProvider
       .provide()
       .updateTable(notificationsTable)
