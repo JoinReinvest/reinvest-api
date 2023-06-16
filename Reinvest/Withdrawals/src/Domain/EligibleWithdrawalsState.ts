@@ -48,4 +48,38 @@ export class EligibleWithdrawalsState {
       formatted: this.eligibleWithdrawals.totalFee.getFormattedAmount(),
     };
   }
+
+  getEligibleWhithdrawalsData() {
+    const { accountValue, numberOfShares, totalDividends, totalFee, totalFunds, eligibleFunds } = this.eligibleWithdrawals;
+
+    return {
+      accountValue: accountValue.getAmount(),
+      numberOfShares,
+      totalDividends: totalDividends.getAmount(),
+      totalFee: totalFee.getAmount(),
+      totalFunds: totalFunds.getAmount(),
+      eligibleFunds: eligibleFunds.getAmount(),
+    };
+  }
+
+  formatAwaitingDividends() {
+    return this.awaitingDividends.map(({ id, totalDividendAmount, totalFeeAmount }) => {
+      return {
+        id,
+        totalDividendAmount: totalDividendAmount.getAmount(),
+        totalFeeAmount: totalFeeAmount.getAmount(),
+      };
+    });
+  }
+  formatSettledShares() {
+    return this.settledShares.map(({ id, currentNavPerShare, numberOfShares, transactionDate, unitPrice }) => {
+      return {
+        id,
+        currentNavPerShare: currentNavPerShare.getAmount(),
+        numberOfShares: numberOfShares,
+        unitPrice: unitPrice.getAmount(),
+        transactionDate: transactionDate.toIsoDate(),
+      };
+    });
+  }
 }

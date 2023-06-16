@@ -305,8 +305,19 @@ export const WithdrawalsSchema = {
         return decision;
       },
 
-      createFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) =>
-        fundsWithdrawalRequestMock('AWAITING_SIGNING_AGREEMENT'),
+      createFundsWithdrawalRequest: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        const id = await api.createWithdrawalFundsRequest(profileId, accountId);
+
+        if (!id) {
+          throw new GraphQLError('Funds cannot be withdrawal');
+        }
+
+        const fundsWithdrawalRequest = await api.getFundsWithdrawalRequest(profileId, accountId, id);
+
+        return fundsWithdrawalRequest;
+      },
       createFundsWithdrawalAgreement: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock,
       requestFundsWithdrawal: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) =>
         fundsWithdrawalRequestMock('AWAITING_DECISION'),
