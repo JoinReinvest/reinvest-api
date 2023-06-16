@@ -277,7 +277,7 @@ export class AccountRepository {
       .execute();
 
     let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue));
-    const initialsValue = lastMaxInitialsValue++;
+    const initialsValue = ++lastMaxInitialsValue;
 
     return initialsValue;
   }
