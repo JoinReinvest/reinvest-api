@@ -179,6 +179,11 @@ const schema = `
         avatar: AvatarFileLinkInput
     }
 
+    type ArchivedBeneficiaryStatus {
+        archived: Boolean!
+        parentAccountUpdatedValue: USD
+    }
+
     type Query {
         """
         Return all accounts overview
@@ -252,7 +257,7 @@ const schema = `
         updateBeneficiaryAccount(accountId: ID!, input: UpdateBeneficiaryAccountInput): BeneficiaryAccount
 
         "[MOCK] Archive beneficiary account - it moves investments from a beneficiary to the individual account"
-        archiveBeneficiaryAccount(accountId: ID!, input: UpdateBeneficiaryAccountInput): Boolean!
+        archiveBeneficiaryAccount(accountId: ID!): ArchivedBeneficiaryStatus!
     }
 `;
 
@@ -457,7 +462,6 @@ export const Account = {
       archiveBeneficiaryAccount: async (
         parent: any,
         {
-          input,
           accountId,
         }: {
           accountId: string;
@@ -472,7 +476,13 @@ export const Account = {
         //   throw new JsonGraphQLError(errors);
         // }
 
-        return true;
+        return {
+          archived: true,
+          parentAccountUpdatedValue: {
+            value: 582000,
+            formatted: '$5,820.00',
+          },
+        };
       },
     },
   },
