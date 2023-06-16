@@ -1,9 +1,11 @@
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-import { WithdrawalsFundsRequestsTable } from 'Withdrawals/Adapter/Database/WithdrawalsSchema';
+import { WithdrawalsDividendsRequestsTable, WithdrawalsFundsRequestsTable } from 'Withdrawals/Adapter/Database/WithdrawalsSchema';
 
 export const withdrawalsFundsRequestsTable = 'withdrawals_funds_requests';
+export const withdrawalsDividendsRequestsTable = 'withdrawals_dividends_requests';
 
 export interface WithdrawalsDatabase {
+  [withdrawalsDividendsRequestsTable]: WithdrawalsDividendsRequestsTable;
   [withdrawalsFundsRequestsTable]: WithdrawalsFundsRequestsTable;
 }
 
