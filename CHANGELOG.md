@@ -1,5 +1,13 @@
 # REINVEST API CHANGELOG
 
+## 1.16.3 - 06/16/2023
+
+* No MOCKS anymore:
+    * For profile update
+      * `updateEmailAddress`
+* Changes:
+  * Avatar for company account returns f.e. C1, C2, T1
+
 ## 1.16.2 - 06/15/2023
 
 * No MOCKS anymore:
