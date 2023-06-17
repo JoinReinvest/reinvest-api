@@ -1,44 +1,34 @@
 import { CloudwatchPolicies } from '../../serverless/cloudwatch';
-import { CognitoUpdateAttributesPolicyBasedOnOutputArn } from '../../serverless/cognito';
 import { S3PoliciesWithImport } from '../../serverless/s3';
-import { SMSPolicy } from '../../serverless/sns';
 import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
 
-export const QueueFunction = {
-  handler: `devops/functions/queue/handler.main`,
-  role: 'QueueRole',
+export const PdfGeneratorFunction = {
+  handler: `devops/functions/pdfGenerator/handler.main`,
+  role: 'PdfGeneratorRole',
   timeout: 120,
   vpc: {
-    securityGroupIds: [getAttribute('InboxSecurityGroup', 'GroupId')],
+    securityGroupIds: [getAttribute('PdfGeneratorSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
   },
   events: [
     {
       sqs: {
-        arn: { 'Fn::GetAtt': ['SQSNotification', 'Arn'] },
+        arn: { 'Fn::GetAtt': ['SQSPdfGenerator', 'Arn'] },
         batchSize: 1,
       },
     },
   ],
 };
 
-export const SQSSendPolicy = [
-  {
-    Effect: 'Allow',
-    Action: ['sqs:SendMessage'],
-    Resource: 'arn:aws:sqs:us-east-1:*:*',
-  },
-];
-
-export const QueueResources = {
-  SQSNotification: {
+export const PdfGeneratorResources = {
+  SQSPdfGenerator: {
     Type: 'AWS::SQS::Queue',
     Properties: {
-      QueueName: '${sls:stage}-sqs-notification',
+      QueueName: '${sls:stage}-sqs-pdf-generator',
     },
   },
-  QueueRole: {
+  PdfGeneratorRole: {
     Type: 'AWS::IAM::Role',
     Properties: {
       AssumeRolePolicyDocument: {
@@ -54,18 +44,16 @@ export const QueueResources = {
       },
       Policies: [
         {
-          PolicyName: 'QueuePolicy',
+          PolicyName: 'PdfGeneratorPolicy',
           PolicyDocument: {
             Statement: [
               ...CloudwatchPolicies,
               ...EniPolicies,
               ...S3PoliciesWithImport,
-              ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
-              SMSPolicy,
               {
                 Effect: 'Allow',
                 Action: ['sqs:ReceiveMessage', 'sqs:DeleteMessage', 'sqs:GetQueueAttributes', 'sqs:SendMessage', 'sqs:SendMessageBatch'],
-                Resource: [{ 'Fn::GetAtt': ['SQSNotification', 'Arn'] }],
+                Resource: [{ 'Fn::GetAtt': ['SQSPdfGenerator', 'Arn'] }],
               },
             ],
           },
@@ -73,15 +61,14 @@ export const QueueResources = {
       ],
     },
   },
-  InboxSecurityGroup: {
+  PdfGeneratorSecurityGroup: {
     Type: 'AWS::EC2::SecurityGroup',
     Properties: {
-      GroupName: getResourceName('sg-inbox-lambda'),
-      GroupDescription: getResourceName('sg-inbox-lambda'),
+      GroupName: getResourceName('sg-pdf-generator-lambda'),
+      GroupDescription: getResourceName('sg-pdf-generator-lambda'),
       SecurityGroupIngress: SecurityGroupIngressRules,
       SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),
     },
   },
 };
-
