@@ -2,6 +2,7 @@ import { CloudwatchPolicies } from '../../serverless/cloudwatch';
 import { S3PoliciesWithImport } from '../../serverless/s3';
 import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
+import { SQSSendPolicy } from '../queue/queue-config';
 
 export const PdfGeneratorFunction = {
   handler: `devops/functions/pdfGenerator/handler.main`,
@@ -51,6 +52,7 @@ export const PdfGeneratorResources = {
               ...CloudwatchPolicies,
               ...EniPolicies,
               ...S3PoliciesWithImport,
+              ...SQSSendPolicy,
               {
                 Effect: 'Allow',
                 Action: ['sqs:ReceiveMessage', 'sqs:DeleteMessage', 'sqs:GetQueueAttributes', 'sqs:SendMessage', 'sqs:SendMessageBatch'],

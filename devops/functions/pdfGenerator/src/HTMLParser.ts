@@ -1,12 +1,13 @@
-import * as handlebars from "handlebars";
-import agreementHTMLTemplate from "./Templates/AgreementTemplate";
-import { PdfTypes, Template } from "./Types";
+import * as handlebars from 'handlebars';
 
-handlebars.registerHelper("bold_text", function (str) {
+import agreementHTMLTemplate from './Templates/AgreementTemplate';
+import { PdfTypes, Template } from './Types';
+
+handlebars.registerHelper('bold_text', function (str) {
   return new handlebars.SafeString(str);
 });
 
-handlebars.registerHelper("isdefined", function (value) {
+handlebars.registerHelper('isdefined', function (value) {
   return value !== undefined;
 });
 
@@ -21,8 +22,8 @@ class HTMLParser {
 
   private prepareLines(lines: string[]) {
     const replacedLines = lines.map(line => {
-      if (line.indexOf("{{") !== -1 && line.indexOf("}}")) {
-        return line.replaceAll("{{", "<b>").replaceAll("}}", "</b>");
+      if (line.indexOf('{{') !== -1 && line.indexOf('}}')) {
+        return line.replaceAll('{{', '<b>').replaceAll('}}', '</b>');
       }
 
       return line;
@@ -43,7 +44,7 @@ class HTMLParser {
     const formattedTemplate = this.template.map(({ paragraphs, header }) => {
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
-          lines: this.prepareLines(lines)
+          lines: this.prepareLines(lines),
         };
 
         if (isCheckedOption !== undefined) {

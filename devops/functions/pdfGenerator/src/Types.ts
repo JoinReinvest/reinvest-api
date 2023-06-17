@@ -7,5 +7,5 @@ export type Template = {
 }[];
 
 export enum PdfTypes {
-  AGREEMENT = "AGREEMENT",
+  AGREEMENT = 'AGREEMENT',
 }
