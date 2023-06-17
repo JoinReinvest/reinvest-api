@@ -7,7 +7,7 @@ export const PdfGeneratorFunction = {
   handler: `devops/functions/pdfGenerator/handler.main`,
   // layers: [{ Ref: 'ChromiumLambdaLayer' }],
   role: 'PdfGeneratorRole',
-  timeout: 120,
+  timeout: 30,
   vpc: {
     securityGroupIds: [getAttribute('PdfGeneratorSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
