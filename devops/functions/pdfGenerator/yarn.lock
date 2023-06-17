@@ -1186,10 +1186,10 @@
   dependencies:
     tslib "^2.5.0"
 
-"@sparticuz/chromium-min@^114.0.0":
+"@sparticuz/chromium@^114.0.0":
   version "114.0.0"
-  resolved "https://registry.yarnpkg.com/@sparticuz/chromium-min/-/chromium-min-114.0.0.tgz#e6d0d418881a8f933086761c0d5f1eab70b2a198"
-  integrity sha512-yIv8DFEt7kak+zQr5HM5WJ5loPo/J5qTR/1sqaEk7IM3BaXqiJRZAQQ5kVyuOErOcbGfruNFUGXUxLm5XdcXIQ==
+  resolved "https://registry.yarnpkg.com/@sparticuz/chromium/-/chromium-114.0.0.tgz#8c20ccb26ddc4de35aeec22f0df62966baf2475f"
+  integrity sha512-jzOUZInBjnJYXXCJFCDOEQb0t22Klx2+t7isZEiSOxLdDyDtDaykUS5c8Bw4KczWYb4fDxorO0D+g0rCFq5/gA==
   dependencies:
     follow-redirects "^1.15.2"
     tar-fs "^2.1.1"

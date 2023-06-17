@@ -1,5 +1,3 @@
-import { GeneratePdf } from 'Documents/UseCases/GeneratePdf';
-
 export type Template = {
   paragraphs: {
     lines: string[];
@@ -13,17 +11,11 @@ export enum PdfTypes {
 }
 
 export class PdfController {
-  private generatePdfUseCase: GeneratePdf;
-
-  constructor(generatePdf: GeneratePdf) {
-    this.generatePdfUseCase = generatePdf;
-  }
-
   public static getClassName = (): string => 'PdfController';
 
   public async generatePdf(catalog: string, fileName: string, template: Template, type: PdfTypes): Promise<boolean> {
     try {
-      await this.generatePdfUseCase.execute(catalog, fileName, template, type);
+      // await this.generatePdfUseCase.execute(catalog, fileName, template, type);
 
       return true;
     } catch (error: any) {

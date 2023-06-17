@@ -1,8 +1,9 @@
 import { SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
-import { GeneratePdf } from './src/GeneratePdf';
-import { S3Adapter } from './src/S3/S3Adapter';
 import { CHROMIUM_ENDPOINT, S3_CONFIG } from 'Reinvest/config';
+
+import { GeneratePdf } from './src/GeneratePdf';
 import { PdfGenerator } from './src/Puppeteer/PdfGenerator';
+import { S3Adapter } from './src/S3/S3Adapter';
 
 export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;

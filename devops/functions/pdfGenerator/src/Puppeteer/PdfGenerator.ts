@@ -1,4 +1,4 @@
-import chromium from '@sparticuz/chromium-min';
+import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer';
 
 export class PdfGenerator {
@@ -6,9 +6,10 @@ export class PdfGenerator {
 
   constructor(chromiumEndpoint: string) {
     this.chromiumEndpoint = chromiumEndpoint;
+    // console.log({ chromiumEndpoint });
   }
 
-  generatePdfFromHtml = async (html: string): Promise<Buffer | null> => {
+  async generatePdfFromHtml(html: string): Promise<Buffer | null> {
     try {
       const options = {
         format: 'A4',
@@ -22,15 +23,15 @@ export class PdfGenerator {
 
       return null;
     }
-  };
+  }
 
-  private getPDFBuffer = async (html: string, options: any): Promise<Buffer> => {
-    let browser = null;
-    browser = await puppeteer.launch({
-      // args: [...puppeteer.defaultArgs(), '--no-sandbox'],
-      args: puppeteer.defaultArgs(),
+  private async getPDFBuffer(html: string, options: any): Promise<Buffer> {
+    const browser = await puppeteer.launch({
       executablePath: await chromium.executablePath(this.chromiumEndpoint),
-      headless: 'new',
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
 
     const page = await browser.newPage();
@@ -43,5 +44,5 @@ export class PdfGenerator {
     await loaded;
 
     return page.pdf(options);
-  };
+  }
 }

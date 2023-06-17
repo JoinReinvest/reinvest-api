@@ -63,6 +63,13 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
+  // layers: {
+  //   chromium: {
+  //     package: {
+  //       artifact: './chromium-v114.0.0-layer.zip',
+  //     },
+  //   },
+  // },
   functions: {
     admin: AdminLambdaFunction,
     api: ApiLambdaFunction,

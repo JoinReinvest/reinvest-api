@@ -5,6 +5,7 @@ import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgress
 
 export const PdfGeneratorFunction = {
   handler: `devops/functions/pdfGenerator/handler.main`,
+  // layers: [{ Ref: 'ChromiumLambdaLayer' }],
   role: 'PdfGeneratorRole',
   timeout: 120,
   vpc: {

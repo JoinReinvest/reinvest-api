@@ -16,7 +16,7 @@
     "@aws-sdk/lib-storage": "^3.350.0",
     "@aws-sdk/s3-request-presigner": "^3.303.0",
     "@sentry/node": "^7.47.0",
-    "@sparticuz/chromium-min": "^114.0.0",
+    "@sparticuz/chromium": "^114.0.0",
     "handlebars": "^4.7.7",
     "puppeteer": "20.1.0"
   }
