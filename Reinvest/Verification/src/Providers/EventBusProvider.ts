@@ -4,6 +4,7 @@ import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEv
 import { Verification } from 'Verification/index';
 import { VerifyAccount } from 'Verification/IntegrationLogic/UseCase/VerifyAccount';
 import { VerifyAccountForInvestmentHandler } from 'Verification/Port/Queue/EventHandler/VerifyAccountForInvestmentHandler';
+import { NotifyAccountNotVerifiedEventHandler } from 'Verification/IntegrationLogic/Events/NotifyAccountNotVerifiedEventHandler';
 
 export default class EventBusProvider {
   private config: Verification.Config;
@@ -14,8 +15,10 @@ export default class EventBusProvider {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(VerifyAccountForInvestmentHandler, [VerifyAccount, SimpleEventBus]);
+    container.addSingleton(NotifyAccountNotVerifiedEventHandler, [SimpleEventBus]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
-    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), ['AccountVerifiedForInvestment']);
+    eventBus.subscribeHandlerForKinds(NotifyAccountNotVerifiedEventHandler.getClassName(), ['AccountNotVerifiedForInvestment', 'AccountVerifiedForInvestment']);
+    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), ['AccountVerifiedForInvestment', 'CreateNotification', 'DismissNotification']);
   }
 }

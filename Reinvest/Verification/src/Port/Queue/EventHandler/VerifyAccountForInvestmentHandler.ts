@@ -22,14 +22,26 @@ export class VerifyAccountForInvestmentHandler implements EventHandler<DomainEve
     const accountId = event.data.accountId;
     const decision = await this.verifyAccountUseCase.verify(profileId, accountId);
 
+    let returnEvent: DomainEvent = {
+      kind: 'AccountNotVerifiedForInvestment',
+      data: {
+        accountId,
+        profileId,
+      },
+      id: event.id,
+    };
+    console.log('decision', decision);
+
     if (decision.canUserContinueTheInvestment) {
-      await this.eventBus.publish({
+      returnEvent = {
         kind: 'AccountVerifiedForInvestment',
         data: {
           accountId: accountId,
         },
         id: event.id,
-      });
+      };
     }
+
+    await this.eventBus.publish(returnEvent);
   }
 }
