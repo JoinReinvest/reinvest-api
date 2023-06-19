@@ -1,10 +1,10 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { RegistrationDatabaseAdapterProvider, registrationMappingRegistryTable } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { InsertableMappingRegistry, SelectableMappedRecord } from 'Registration/Adapter/Database/RegistrationSchema';
 import { EmailCreator } from 'Registration/Domain/EmailCreator';
 import { MappedRecord, MappedRecordType } from 'Registration/Domain/Model/Mapping/MappedRecord';
 import { MappedRecordStatus, MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
-import { UUID } from 'HKEKTypes/Generics';
 
 const LOCK_TIME_SECONDS = 30;
 export const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
@@ -57,14 +57,31 @@ export class MappingRegistryRepository {
     return MappedRecord.create(data);
   }
 
-  async getAccountRecordByProfileAndExternalId(profileId: string, externalId: string, accountType: MappedType): Promise<MappedRecord | null> {
+  async getCompanyAccountRecordByProfileAndExternalId(profileId: string, externalId: string): Promise<MappedRecord | null> {
     const data = (await this.databaseAdapterProvider
       .provide()
       .selectFrom(registrationMappingRegistryTable)
       .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
       .where('profileId', '=', profileId)
       .where('externalId', '=', externalId)
-      .where('mappedType', '=', accountType)
+      .where('mappedType', 'in', [MappedType.CORPORATE_ACCOUNT, MappedType.TRUST_ACCOUNT])
+      .limit(1)
+      .executeTakeFirst()) as SelectableMappedRecord as MappedRecordType;
+
+    if (!data) {
+      return null;
+    }
+
+    return MappedRecord.create(data);
+  }
+
+  async getIndividualAccountRecordByProfile(profileId: string): Promise<MappedRecord | null> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('profileId', '=', profileId)
+      .where('mappedType', '=', MappedType.INDIVIDUAL_ACCOUNT)
       .limit(1)
       .executeTakeFirst()) as SelectableMappedRecord as MappedRecordType;
 

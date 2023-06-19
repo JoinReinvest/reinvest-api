@@ -144,6 +144,7 @@ export const VerificationSchema = {
         }
 
         const status = await registrationApi.synchronizeProfile(profileId);
+        await registrationApi.resynchronizeIndividualAccount(profileId);
 
         return await verificationApi.notifyAboutUpdate(profileId);
       },
@@ -194,7 +195,7 @@ export const VerificationSchema = {
           throw new JsonGraphQLError(errors);
         }
 
-        const status = await registrationApi.synchronizeCompany(profileId, accountId);
+        await registrationApi.resynchronizeCompanyAccount(profileId, accountId);
 
         return await verificationApi.notifyAboutUpdate(accountId);
       },
