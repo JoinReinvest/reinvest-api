@@ -5,6 +5,7 @@ import { Registration } from 'Registration/index';
 import type { UpdateCompanyAccountInput } from 'Reinvest/LegalEntities/src/Service/UpdateCompany';
 import type { UpdateIndividualAccountInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateIndividualAccount';
 import Modules from 'Reinvest/Modules';
+import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 
 const schema = `
     #graphql
@@ -414,7 +415,7 @@ export const Account = {
         }
 
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
-        await registrationApi.immediatelySynchronizeAccount(profileId, accountId);
+        await registrationApi.resynchronizeIndividualAccount(profileId, accountId);
 
         return api.getIndividualAccount(profileId);
       },
@@ -429,7 +430,7 @@ export const Account = {
         }
 
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
-        await registrationApi.synchronizeCompany(profileId, accountId);
+        await registrationApi.resynchronizeCompanyAccount(profileId, accountId, MappedType.CORPORATE_ACCOUNT);
 
         return api.getCompanyAccount(profileId, accountId);
       },
@@ -444,7 +445,7 @@ export const Account = {
         }
 
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
-        await registrationApi.immediatelySynchronizeAccount(profileId, accountId);
+        await registrationApi.resynchronizeCompanyAccount(profileId, accountId, MappedType.TRUST_ACCOUNT);
 
         return api.getCompanyAccount(profileId, accountId);
       },

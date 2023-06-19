@@ -1,13 +1,10 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import {
-  northCapitalDocumentsSynchronizationTable,
-  RegistrationDatabaseAdapterProvider,
-  registrationMappingRegistryTable,
-} from 'Registration/Adapter/Database/DatabaseAdapter';
+import { RegistrationDatabaseAdapterProvider, registrationMappingRegistryTable } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { InsertableMappingRegistry, SelectableMappedRecord } from 'Registration/Adapter/Database/RegistrationSchema';
 import { EmailCreator } from 'Registration/Domain/EmailCreator';
 import { MappedRecord, MappedRecordType } from 'Registration/Domain/Model/Mapping/MappedRecord';
 import { MappedRecordStatus, MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
+import { UUID } from 'HKEKTypes/Generics';
 
 const LOCK_TIME_SECONDS = 30;
 export const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
@@ -56,6 +53,24 @@ export class MappingRegistryRepository {
       .where('dependentId', '=', dependentId)
       .limit(1)
       .executeTakeFirstOrThrow()) as SelectableMappedRecord as MappedRecordType;
+
+    return MappedRecord.create(data);
+  }
+
+  async getAccountRecordByProfileAndExternalId(profileId: string, externalId: string, accountType: MappedType): Promise<MappedRecord | null> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('profileId', '=', profileId)
+      .where('externalId', '=', externalId)
+      .where('mappedType', '=', accountType)
+      .limit(1)
+      .executeTakeFirst()) as SelectableMappedRecord as MappedRecordType;
+
+    if (!data) {
+      return null;
+    }
 
     return MappedRecord.create(data);
   }
@@ -128,6 +143,25 @@ export class MappingRegistryRepository {
         .where(qb => qb.where('lockedUntil', '<=', new Date()).orWhere('lockedUntil', 'is', null))
         .returning(['lockedUntil'])
         .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error: any) {
+      console.log(error);
+
+      return false;
+    }
+  }
+
+  async setCompanyAndStakeholdersAsDirty(profileId: UUID, accountId: UUID) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(registrationMappingRegistryTable)
+        .set({ status: MappedRecordStatus.DIRTY })
+        .where('profileId', '=', profileId)
+        .where('externalId', '=', accountId)
+        .where('mappedType', 'in', [MappedType.COMPANY, MappedType.STAKEHOLDER])
+        .execute();
 
       return true;
     } catch (error: any) {

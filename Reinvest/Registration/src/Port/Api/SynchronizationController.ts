@@ -81,6 +81,29 @@ export class SynchronizationController {
     return await this.synchronizeCompanyUseCase.execute(record);
   }
 
+  public async resynchronizeCompanyAccount(profileId: string, accountId: string, mappedType: MappedType): Promise<boolean> {
+    const record = await this.mappingRegistryRepository.getAccountRecordByProfileAndExternalId(profileId, accountId, mappedType);
+
+    if (!record) {
+      return false;
+    }
+
+    await this.synchronizeCompanyAccountUseCase.execute(record);
+    await this.mappingRegistryRepository.setCompanyAndStakeholdersAsDirty(profileId, accountId);
+
+    return this.immediateSynchronizeUseCase.immediatelySynchronizeAllAccountStructure(profileId, accountId);
+  }
+
+  public async resynchronizeIndividualAccount(profileId: string, accountId: string): Promise<boolean> {
+    const record = await this.mappingRegistryRepository.getAccountRecordByProfileAndExternalId(profileId, accountId, MappedType.INDIVIDUAL_ACCOUNT);
+
+    if (!record) {
+      return false;
+    }
+
+    return this.synchronizeIndividualAccountUseCase.execute(record);
+  }
+
   public async immediatelySynchronizeAccount(profileId: string, accountId: string): Promise<boolean> {
     return this.immediateSynchronizeUseCase.immediatelySynchronizeAccount(profileId, accountId);
   }
