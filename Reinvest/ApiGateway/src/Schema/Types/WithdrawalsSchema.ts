@@ -62,6 +62,7 @@ const schema = `
         accountValue: USD!
         penaltiesFee: USD!
         decisionMessage: String
+        investorWithdrawalReason: String
         createdDate: ISODateTime!
         decisionDate: ISODateTime
     }
@@ -104,7 +105,7 @@ const schema = `
         """
         [MOCK] Create funds withdrawal request. It is just a DRAFT. You need to sign the agreement and then request the withdrawal.
         """
-        createFundsWithdrawalRequest(accountId: ID!): FundsWithdrawalRequest!
+        createFundsWithdrawalRequest(accountId: ID!, investorWithdrawalReason: String): FundsWithdrawalRequest!
 
         """
         [MOCK] It creates the funds withdrawal agreement.
@@ -191,15 +192,15 @@ const agreementContentMock = [
       {
         lines: [
           'This Subscription Agreement and the Operating Agreement are legal agreements between you and ____________\n' +
-            '(company name) pertaining to your investment in _________ (series name). Your investment in membership interests\n' +
-            'in ____________ (the "Series (name) Interests") is contingent upon you accepting all of terms and conditions contained\n' +
-            'in this Subscription Agreement and the Operating Agreement. The offering of the Series (name) Interests (the\n' +
-            '"Offering") is described in the Offering Circular which is available at ___________ and at the U.S. Securities and\n' +
-            'Exchange Commission’s EDGAR website located at www.sec.gov. Please carefully read this Subscription Agreement,\n' +
-            'the Operating Agreement and the Offering Circular before making an investment. This Subscription Agreement and\n' +
-            'the Operating Agreement contain certain representations by you and set forth certain rights and obligations\n' +
-            'pertaining to you,_________________, and your investment in ___________. The Offering Circular contains important\n' +
-            'information about the Series _____________ Interests and the terms and conditions of the Offering.',
+          '(company name) pertaining to your investment in _________ (series name). Your investment in membership interests\n' +
+          'in ____________ (the "Series (name) Interests") is contingent upon you accepting all of terms and conditions contained\n' +
+          'in this Subscription Agreement and the Operating Agreement. The offering of the Series (name) Interests (the\n' +
+          '"Offering") is described in the Offering Circular which is available at ___________ and at the U.S. Securities and\n' +
+          'Exchange Commission’s EDGAR website located at www.sec.gov. Please carefully read this Subscription Agreement,\n' +
+          'the Operating Agreement and the Offering Circular before making an investment. This Subscription Agreement and\n' +
+          'the Operating Agreement contain certain representations by you and set forth certain rights and obligations\n' +
+          'pertaining to you,_________________, and your investment in ___________. The Offering Circular contains important\n' +
+          'information about the Series _____________ Interests and the terms and conditions of the Offering.',
         ],
       },
     ],
@@ -210,31 +211,31 @@ const agreementContentMock = [
       {
         lines: [
           '{{(a) I am an "accredited investor", and have checked the appropriate box on the attached Certificate of\n' +
-            'Accredited Investor Status indicating the basis of such accredited investor status, which Certificate of\n' +
-            'Accredited Investor Status is true and correct; or}}',
+          'Accredited Investor Status indicating the basis of such accredited investor status, which Certificate of\n' +
+          'Accredited Investor Status is true and correct; or}}',
         ],
         isCheckedOption: false,
       },
       {
         lines: [
           '{{(b) The amount set forth on the first page of this Subscription Agreement, together with any previous\n' +
-            'investments in securities pursuant to this offering, does not exceed 10% of the greater of my net worth or\n' +
-            'annual income.}}',
+          'investments in securities pursuant to this offering, does not exceed 10% of the greater of my net worth or\n' +
+          'annual income.}}',
         ],
         isCheckedOption: true,
       },
       {
         lines: [
           'Are you or anyone in your immediate household, or, for any non-natural person, any officers, directors, or\n' +
-            'any person that owns or controls 5% (or greater) of the quity, associated with a FINRA member, organization,\n' +
-            'or the SEC',
+          'any person that owns or controls 5% (or greater) of the quity, associated with a FINRA member, organization,\n' +
+          'or the SEC',
           'NO',
         ],
       },
       {
         lines: [
           'Are you or anyone in your household or immediate family, or, for any non-natural person, any of its\n' +
-            'directors, trustees, 10% (or more) equity holder, an officer, or member of the board of directors of a publicly traded company?',
+          'directors, trustees, 10% (or more) equity holder, an officer, or member of the board of directors of a publicly traded company?',
           '{{YES}}',
           '{{Traded Company ticker symbols}}: RDW, TSLA, AAPL',
         ],
@@ -253,6 +254,7 @@ const fundsWithdrawalAgreementMock = {
 
 const fundsWithdrawalRequestMock = (status: string) => ({
   ...fundsWithdrawalSimulationMock,
+  investorWithdrawalReason: 'I need the money',
   status,
 });
 
@@ -300,7 +302,7 @@ export const WithdrawalsSchema = {
         return api.withdrawDividends(profileId, accountId, dividendIds);
       },
 
-      createFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) =>
+      createFundsWithdrawalRequest: async (parent: any, { accountId, investorWithdrawalReason }: any, { profileId, modules }: SessionContext) =>
         fundsWithdrawalRequestMock('AWAITING_SIGNING_AGREEMENT'),
       createFundsWithdrawalAgreement: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock,
       requestFundsWithdrawal: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) =>
