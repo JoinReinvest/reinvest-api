@@ -126,6 +126,18 @@ export abstract class AbstractVerifier {
       if (kind === VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING) {
         isKycInPendingState = true;
       }
+
+      if ([VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED, VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE].includes(kind)) {
+        // user object was updated, reset all statuses
+        amlStatus = VerificationStatus.PENDING;
+        kycStatus = VerificationStatus.PENDING;
+        objectUpdatesCounter = 0;
+        failedKycCounter = 0;
+        someReasons = [];
+        wasFailedRequest = false;
+        isKycInPendingState = false;
+        needMoreInfo = false;
+      }
     }
 
     return {

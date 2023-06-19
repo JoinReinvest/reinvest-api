@@ -1,4 +1,5 @@
 import { CompanyAccount } from 'LegalEntities/Domain/Accounts/CompanyAccount';
+import { sensitiveDataUpdated, UpdatedObjectType } from 'LegalEntities/Domain/Events/ProfileEvents';
 import { StakeholderToAccount } from 'LegalEntities/Domain/StakeholderToAccount';
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
@@ -47,6 +48,7 @@ export class UpdateCompany {
           switch (step) {
             case 'address':
               account.setAddress(Address.create(data as AddressInput));
+              events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
               break;
             case 'annualRevenue':
               account.setAnnualRevenue(AnnualRevenue.create(data as ValueRangeInput));
@@ -74,6 +76,7 @@ export class UpdateCompany {
                   path: profileId,
                 }),
               );
+              events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
               break;
             case 'removeDocuments':
               (data as File[]).map((document: File) => {
@@ -88,6 +91,7 @@ export class UpdateCompany {
                   events.push(removedDocumentEvent);
                 }
               });
+              events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
               break;
             case 'stakeholders':
               const stakeholdersEvents = this.addStakeholder(account, data as StakeholderInput[], profileId);
@@ -136,6 +140,7 @@ export class UpdateCompany {
       errors,
     };
   }
+
   private addStakeholder(account: CompanyAccount, data: StakeholderInput[], profileId: string): DomainEvent[] {
     let events: DomainEvent[] = [];
 
@@ -148,6 +153,12 @@ export class UpdateCompany {
 
       if (stakeholderEvents) {
         events = [...events, ...stakeholderEvents];
+      }
+
+      if (isNewStakeholder) {
+        events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
+      } else {
+        events.push(sensitiveDataUpdated(UpdatedObjectType.STAKEHOLDER, profileId, account.getId(), stakeholderSchema.id));
       }
     });
 

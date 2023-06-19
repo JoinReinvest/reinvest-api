@@ -1,5 +1,5 @@
 import { ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
-import type { UpdateCompanyAccountInput } from 'LegalEntities/UseCases/abstract/UpdateCompany';
+import { UpdateCompanyAccountInput } from 'LegalEntities/Service/UpdateCompany';
 import { UpdateBeneficiaryAccount, UpdateBeneficiaryAccountInput } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
 import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
 import { UpdateIndividualAccount, UpdateIndividualAccountInput } from 'LegalEntities/UseCases/UpdateIndividualAccount';

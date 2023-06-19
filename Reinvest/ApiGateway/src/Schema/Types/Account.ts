@@ -413,6 +413,9 @@ export const Account = {
           throw new JsonGraphQLError(errors);
         }
 
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        await registrationApi.immediatelySynchronizeAccount(profileId, accountId);
+
         return api.getIndividualAccount(profileId);
       },
       updateCorporateAccount: async (parent: any, data: UpdateCorporateAccountDetailsInput, { profileId, modules }: SessionContext) => {
@@ -425,6 +428,9 @@ export const Account = {
           throw new JsonGraphQLError(errors);
         }
 
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        await registrationApi.synchronizeCompany(profileId, accountId);
+
         return api.getCompanyAccount(profileId, accountId);
       },
       updateTrustAccount: async (parent: any, data: UpdateTrustAccountDetailsInput, { profileId, modules }: SessionContext) => {
@@ -436,6 +442,9 @@ export const Account = {
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);
         }
+
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        await registrationApi.immediatelySynchronizeAccount(profileId, accountId);
 
         return api.getCompanyAccount(profileId, accountId);
       },

@@ -17,6 +17,7 @@ export default class EventBusProvider {
       'LegalProfileCompleted',
       'LegalEntityDocumentRemoved',
       'LegalEntityAvatarRemoved',
+      'SensitiveDataUpdated',
     ]);
   }
 }
