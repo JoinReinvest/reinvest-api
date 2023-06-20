@@ -1,5 +1,5 @@
 import { Money } from 'Money/Money';
-import { TradeVerificationState, TradeVerificationStatus } from 'Trading/Domain/TradeVerification';
+import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -422,27 +422,15 @@ export class Trade {
     return amount;
   }
 
-  isTradeVerified() {
-    const tradeVerification = this.tradeSchema.northCapitalTradeState?.tradeVerification;
-
-    if (!tradeVerification) {
-      return false;
-    }
-
-    return tradeVerification.status === TradeVerificationStatus.VERIFIED;
+  getTradeVerification(): TradeVerification {
+    return new TradeVerification(this.tradeSchema.northCapitalTradeState?.tradeVerification);
   }
 
-  isTradeRejected() {
-    const tradeVerification = this.tradeSchema.northCapitalTradeState?.tradeVerification;
-
-    if (!tradeVerification) {
-      return false;
-    }
-
-    return tradeVerification.status === TradeVerificationStatus.REJECTED;
+  storeTradeVerification(tradeVerification: TradeVerification) {
+    this.tradeSchema.northCapitalTradeState!.tradeVerification = tradeVerification.toObject();
   }
 
-  getTradeVerificationState(): TradeVerificationState | undefined {
-    return this.tradeSchema.northCapitalTradeState?.tradeVerification;
+  getAccountIdForVerification() {
+    return this.tradeSchema.tradeConfiguration.parentId;
   }
 }

@@ -181,6 +181,7 @@ export function boot(): Modules {
         registration: modules.get(Registration.moduleName) as Registration.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
         portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        verification: modules.get(Verification.moduleName) as Verification.Main,
       },
     ),
   );

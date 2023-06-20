@@ -3,7 +3,7 @@ import { Money } from 'Money/Money';
 import NorthCapitalException from 'Registration/Adapter/NorthCapital/NorthCapitalException';
 import { ExecutionNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import { FundsMoveState, NorthCapitalTradeState } from 'Trading/Domain/Trade';
-import { TradeVerificationStatus } from 'Trading/Domain/TradeVerification';
+import { TradeApproval, TradeVerificationDecision } from 'Trading/Domain/TradeVerification';
 
 export type NorthCapitalConfig = {
   API_URL: string;
@@ -48,7 +48,7 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       tradeStatus: 'CREATED',
       tradeDate: transactionDate,
       tradeVerification: {
-        status: TradeVerificationStatus.PENDING,
+        status: TradeVerificationDecision.PENDING,
         events: [],
       },
     };
@@ -230,7 +230,7 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     }
   }
 
-  async getTradeVerification(tradeId: string) {
+  async getTradeApproval(tradeId: string): Promise<TradeApproval> {
     const { RRApprovalStatus, field3, RRApprovalDate } = await this.getCurrentTradeState(tradeId);
 
     return {
