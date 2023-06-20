@@ -37,6 +37,7 @@ export type CompanyOverviewSchema = {
   accountType: CompanyAccountType;
   avatar: AvatarInput | null;
   companyName: CompanyNameInput;
+  initialsValue: number;
   profileId: string;
 };
 
@@ -279,16 +280,18 @@ export class CompanyAccountOverview {
   private companyName: CompanyName | null = null;
   private avatar: Avatar | null = null;
   private readonly accountType: CompanyAccountType;
+  private initialsValue: number;
 
-  constructor(profileId: string, accountId: string, accountType: CompanyAccountType) {
+  constructor(profileId: string, accountId: string, accountType: CompanyAccountType, initialsValue: number) {
     this.profileId = profileId;
     this.accountId = accountId;
     this.accountType = accountType;
+    this.initialsValue = initialsValue;
   }
 
   static create(companyData: CompanyOverviewSchema): CompanyAccountOverview {
-    const { profileId, accountId, companyName, avatar, accountType } = companyData;
-    const account = new CompanyAccountOverview(profileId, accountId, accountType);
+    const { profileId, accountId, companyName, avatar, accountType, initialsValue } = companyData;
+    const account = new CompanyAccountOverview(profileId, accountId, accountType, initialsValue);
 
     if (companyName) {
       account.setCompanyName(CompanyName.create(companyName));
@@ -322,7 +325,9 @@ export class CompanyAccountOverview {
   }
 
   getInitials(): string {
-    return getAccountInitials(this.accountType, this.companyName);
+    const initials = `${this.accountType.charAt(0)}${this.initialsValue}`;
+
+    return initials;
   }
 
   getAvatar(): Avatar | null {
