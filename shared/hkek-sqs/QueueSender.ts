@@ -26,11 +26,16 @@ export class QueueSender {
     this.sqs = new SQSClient(SQSConfig);
   }
 
-  async send(message: string): Promise<void> {
+  async send(message: string, delay: number | null = null): Promise<void> {
     const params = {
       MessageBody: message,
       QueueUrl: this.queueUrl,
     };
+
+    if (delay) {
+      // @ts-ignore
+      params['DelaySeconds'] = delay;
+    }
 
     try {
       await this.sqs.send(new SendMessageCommand(params));
