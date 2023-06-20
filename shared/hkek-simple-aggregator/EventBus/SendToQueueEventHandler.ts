@@ -14,6 +14,6 @@ export class SendToQueueEventHandler implements EventHandler<DomainEvent> {
     const message = JSON.stringify(event);
 
     console.info(`Sending event: ${event.kind}`);
-    await this.queueSender.send(message, 2);
+    await this.queueSender.send(message);
   }
 }

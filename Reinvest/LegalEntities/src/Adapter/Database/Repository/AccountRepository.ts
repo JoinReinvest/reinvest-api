@@ -276,7 +276,7 @@ export class AccountRepository {
       .where('accountType', '=', accountType)
       .execute();
 
-    let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue));
+    let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue)) ?? 0;
     const initialsValue = ++lastMaxInitialsValue;
 
     return initialsValue;
