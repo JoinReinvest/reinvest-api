@@ -267,19 +267,20 @@ export class AccountRepository {
     }
   }
 
-  private async getNewInitials(profileId: string, accountType: CompanyAccountType) {
-    const initials = await this.databaseAdapterProvider
+  private async getNewInitials(profileId: string, accountType: CompanyAccountType): Promise<number> {
+    const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(legalEntitiesCompanyAccountTable)
-      .select('initialsValue')
+      .select(eb => [eb.fn.count('accountId').as('initials')])
       .where('profileId', '=', profileId)
       .where('accountType', '=', accountType)
-      .execute();
+      .executeTakeFirst();
 
-    let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue)) ?? 0;
-    ++lastMaxInitialsValue;
+    if (!data) {
+      return 1;
+    }
 
-    return lastMaxInitialsValue;
+    return parseInt(<string>data.initials) + 1;
   }
 
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
