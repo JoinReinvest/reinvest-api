@@ -277,9 +277,9 @@ export class AccountRepository {
       .execute();
 
     let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue)) ?? 0;
-    const initialsValue = ++lastMaxInitialsValue;
+    ++lastMaxInitialsValue;
 
-    return initialsValue;
+    return lastMaxInitialsValue;
   }
 
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
