@@ -161,10 +161,9 @@ export const RecurringInvestments = {
       ) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const { portfolioId } = await portfolioApi.getActivePortfolio();
 
-        const status = await investmentAccountsApi.createDraftRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+        const status = await investmentAccountsApi.createDraftRecurringInvestment(portfolioId, profileId, accountId, amount, schedule);
 
         if (!status) {
           throw new JsonGraphQLError('COULDNT_CREATE_RECURRING_INVESTMENT');
