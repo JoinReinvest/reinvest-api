@@ -1,4 +1,5 @@
 import { Money } from 'Money/Money';
+import { TradeVerificationState, TradeVerificationStatus } from 'Trading/Domain/TradeVerification';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -29,6 +30,7 @@ export type NorthCapitalTradeState = {
   tradePrice: string;
   tradeShares: string;
   tradeStatus: 'CREATED' | 'FUNDED' | 'SETTLED';
+  tradeVerification: TradeVerificationState;
 };
 
 export type VertaloDistributionState = {
@@ -418,5 +420,29 @@ export class Trade {
     const amount = this.amount.add(this.fees);
 
     return amount;
+  }
+
+  isTradeVerified() {
+    const tradeVerification = this.tradeSchema.northCapitalTradeState?.tradeVerification;
+
+    if (!tradeVerification) {
+      return false;
+    }
+
+    return tradeVerification.status === TradeVerificationStatus.VERIFIED;
+  }
+
+  isTradeRejected() {
+    const tradeVerification = this.tradeSchema.northCapitalTradeState?.tradeVerification;
+
+    if (!tradeVerification) {
+      return false;
+    }
+
+    return tradeVerification.status === TradeVerificationStatus.REJECTED;
+  }
+
+  getTradeVerificationState(): TradeVerificationState | undefined {
+    return this.tradeSchema.northCapitalTradeState?.tradeVerification;
   }
 }
