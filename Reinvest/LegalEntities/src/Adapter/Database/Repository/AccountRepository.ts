@@ -427,7 +427,7 @@ export class AccountRepository {
       const accounts = await this.databaseAdapterProvider
         .provide()
         .selectFrom(legalEntitiesCompanyAccountTable)
-        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType'])
+        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType', 'initialsValue'])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
         .castTo<CompanyOverviewSchema>()
         .execute();
