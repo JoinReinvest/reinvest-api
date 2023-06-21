@@ -1,6 +1,8 @@
 import type { JSONObject, UUID } from 'HKEKTypes/Generics';
+import { DividendWithdrawalDecision } from 'Withdrawals/Domain/DividendWithdrawalRequest';
 import type { WithdrawalsFundsRequestsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequests';
 import type { WithdrawalsFundsRequestsAgreementsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequestsAgreement';
+
 export interface WithdrawalsFundsRequestsTable {
   accountId: UUID;
   accountValue: number;
@@ -35,4 +37,16 @@ export interface WithdrawalsFundsRequestsAgreementsTable {
   signedByIp: string | null;
   status: WithdrawalsFundsRequestsAgreementsStatuses;
   templateVersion: number;
+}
+
+export interface WithdrawalsDividendsRequestsTable {
+  accountId: UUID;
+  dateCreated: Date;
+  dateDecided: Date | null;
+  dividendId: UUID;
+  eligibleAmount: number;
+  id: UUID;
+  payoutId: UUID | null;
+  profileId: UUID;
+  status: DividendWithdrawalDecision;
 }

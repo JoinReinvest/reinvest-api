@@ -53,4 +53,9 @@ export class NotificationService {
 
     await api.createNotification(profileId, accountId, type, header, body, dividendId, dividendId, 'DIVIDEND', dividendId);
   }
+
+  async markNotificationAsRead(profileId: string, dismissId: string): Promise<void> {
+    const api = this.notificationsModule.api();
+    await api.dismissNotifications(profileId, [dismissId]);
+  }
 }

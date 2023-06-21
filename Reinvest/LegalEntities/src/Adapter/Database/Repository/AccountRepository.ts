@@ -267,19 +267,20 @@ export class AccountRepository {
     }
   }
 
-  private async getNewInitials(profileId: string, accountType: CompanyAccountType) {
-    const initials = await this.databaseAdapterProvider
+  private async getNewInitials(profileId: string, accountType: CompanyAccountType): Promise<number> {
+    const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(legalEntitiesCompanyAccountTable)
-      .select('initialsValue')
+      .select(eb => [eb.fn.count('accountId').as('initials')])
       .where('profileId', '=', profileId)
       .where('accountType', '=', accountType)
-      .execute();
+      .executeTakeFirst();
 
-    let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue));
-    const initialsValue = ++lastMaxInitialsValue;
+    if (!data) {
+      return 1;
+    }
 
-    return initialsValue;
+    return parseInt(<string>data.initials) + 1;
   }
 
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
@@ -426,7 +427,7 @@ export class AccountRepository {
       const accounts = await this.databaseAdapterProvider
         .provide()
         .selectFrom(legalEntitiesCompanyAccountTable)
-        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType'])
+        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType', 'initialsValue'])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
         .castTo<CompanyOverviewSchema>()
         .execute();

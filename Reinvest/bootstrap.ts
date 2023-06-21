@@ -16,6 +16,7 @@ import {
   DATABASE_CONFIG,
   EMAIL_DOMAIN,
   NORTH_CAPITAL_CONFIG,
+  PDF_GENERATOR_SQS_CONFIG,
   S3_CONFIG,
   SENTRY_CONFIG,
   SNS_CONFIG,
@@ -42,6 +43,7 @@ export function boot(): Modules {
   const snsConfig = SNS_CONFIG as SNSConfig;
   const cognitoConfig = COGNITO_CONFIG as CognitoConfig;
   const queueConfig = SQS_CONFIG as QueueConfig;
+  const pdfGeneratorQueue = PDF_GENERATOR_SQS_CONFIG as QueueConfig;
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
 
@@ -157,6 +159,7 @@ export function boot(): Modules {
       {
         database: databaseConfig,
         queue: queueConfig,
+        pdfGeneratorQueue,
       } as Investments.Config,
       {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,

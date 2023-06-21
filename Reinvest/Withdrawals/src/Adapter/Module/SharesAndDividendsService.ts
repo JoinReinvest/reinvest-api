@@ -1,8 +1,9 @@
-import { UUID } from 'HKEKTypes/Generics';
-import { DateTime } from 'Money/DateTime';
-import { Money } from 'Money/Money';
-import { SharesAndDividends } from 'SharesAndDividends/index';
-import { CurrentAccountState } from 'Withdrawals/UseCase/WithdrawalsQuery';
+import { UUID } from "HKEKTypes/Generics";
+import { DateTime } from "Money/DateTime";
+import { Money } from "Money/Money";
+import { SharesAndDividends } from "SharesAndDividends/index";
+import { DividendDetails } from "Withdrawals/Domain/DividendWithdrawalRequest";
+import { CurrentAccountState } from "Withdrawals/UseCase/WithdrawalsQuery";
 
 /**
  * SharesAndDividends Module ACL
@@ -40,5 +41,31 @@ export class SharesAndDividendsService {
       })),
       areThereNotSettledShares,
     };
+  }
+
+  async findDividend(profileId: UUID, dividendId: UUID): Promise<DividendDetails> {
+    const dividend = await this.sharesAndDividendsModule.api().getDividend(profileId, dividendId);
+
+    if (!dividend) {
+      throw new Error('Dividend not found');
+    }
+
+    if (dividend.status !== 'PENDING') {
+      throw new Error('Dividend is already actioned');
+    }
+
+    const {
+      amount: { value },
+      id,
+    } = dividend;
+
+    return {
+      amount: Money.lowPrecision(value),
+      id,
+    };
+  }
+
+  async markDividendAsWithdrew(profileId: UUID, dividendId: UUID): Promise<void> {
+    await this.sharesAndDividendsModule.api().markDividendAsWithdrew(profileId, dividendId);
   }
 }

@@ -19,6 +19,7 @@ import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repos
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { GeneratePdfEventHandler } from 'Investments/Infrastructure/Events/GeneratePdfEventHandler';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -68,6 +69,7 @@ export default class EventBusProvider {
         TransactionCommands.MarkFundsAsReadyToDisburse,
         TransactionCommands.TransferSharesWhenTradeSettled,
         ReinvestmentCommands.TransferSharesForReinvestment,
-      ]);
+      ])
+      .subscribe('GeneratePdfCommand', GeneratePdfEventHandler.getClassName());
   }
 }

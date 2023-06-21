@@ -1,5 +1,4 @@
 import { SessionContext } from 'ApiGateway/index';
-import { notificationsMock } from 'ApiGateway/Schema/Types/Notification';
 import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Investments } from 'Investments/index';
@@ -63,6 +62,7 @@ const schema = `
         accountValue: USD!
         penaltiesFee: USD!
         decisionMessage: String
+        investorWithdrawalReason: String
         createdDate: ISODateTime!
         decisionDate: ISODateTime
     }
@@ -105,7 +105,7 @@ const schema = `
         """
         [MOCK] Create funds withdrawal request. It is just a DRAFT. You need to sign the agreement and then request the withdrawal.
         """
-        createFundsWithdrawalRequest(accountId: ID!): FundsWithdrawalRequest!
+        createFundsWithdrawalRequest(accountId: ID!, investorWithdrawalReason: String): FundsWithdrawalRequest!
 
         """
         [MOCK] It creates the funds withdrawal agreement.
@@ -244,16 +244,17 @@ const agreementContentMock = [
   },
 ];
 
-const fundsWithdrawalAgreementMock = {
+const fundsWithdrawalAgreementMock = (signed: boolean = false) => ({
   id: '98e94d4c-f237-4f10-aa05-be8ade2ffee',
-  status: 'WAITING_FOR_SIGNATURE',
+  status: signed ? 'SIGNED' : 'WAITING_FOR_SIGNATURE',
   createdAt: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
   signedAt: null,
   content: agreementContentMock,
-};
+});
 
 const fundsWithdrawalRequestMock = (status: string) => ({
   ...fundsWithdrawalSimulationMock,
+  investorWithdrawalReason: 'I need the money',
   status,
 });
 
@@ -295,14 +296,10 @@ export const WithdrawalsSchema = {
 
         return api.reinvestDividends(profileId, accountId, portfolioId, dividendIds);
       },
-      withdrawDividend: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => {
-        let decision = true;
-        dividendIds.map((id: string) => {
-          const dividend = notificationsMock('', false).find(n => n.onObject?.id === id);
-          decision = decision && !!dividend;
-        });
+      withdrawDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
 
-        return decision;
+        return api.withdrawDividends(profileId, accountId, dividendIds);
       },
 
       createFundsWithdrawalRequest: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
@@ -319,6 +316,8 @@ export const WithdrawalsSchema = {
         return fundsWithdrawalRequest;
       },
       createFundsWithdrawalAgreement: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock,
+      signFundsWithdrawalAgreement: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock(true),
+
       requestFundsWithdrawal: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) =>
         fundsWithdrawalRequestMock('AWAITING_DECISION'),
       abortFundsWithdrawalRequest: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => true,

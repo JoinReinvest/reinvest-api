@@ -66,7 +66,7 @@ export const S3Resources = {
     DeletionPolicy: 'Delete', // TODO change later to Retain!
     Properties: {
       BucketName: getResourceName('portfolio'),
-      AccessControl: 'PublicRead',
+      AccessControl: 'Private',
       ...CorsConfiguration,
     },
   },

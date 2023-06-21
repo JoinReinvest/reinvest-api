@@ -19,6 +19,7 @@ export namespace Investments {
   export type Config = {
     database: PostgreSQLConfig;
     queue: QueueConfig;
+    pdfGeneratorQueue: QueueConfig;
   };
 
   export type ModulesDependencies = {

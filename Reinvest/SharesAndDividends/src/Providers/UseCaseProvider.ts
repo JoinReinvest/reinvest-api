@@ -22,6 +22,7 @@ import { FinishDividendsCalculation } from 'SharesAndDividends/UseCase/FinishDiv
 import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDividendsDistribution';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
+import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
 
 export class UseCaseProvider {
   private config: SharesAndDividends.Config;
@@ -53,7 +54,8 @@ export class UseCaseProvider {
       'SharesAndDividendsTransactionalAdapter',
       NotificationService,
     ]);
-    container.addSingleton(MarkDividendAsReinvested, [DividendsRepository]);
+    container.addSingleton(MarkDividendAsReinvested, [DividendsRepository, NotificationService]);
+    container.addSingleton(MarkDividendAsWithdrawn, [DividendsRepository, NotificationService]);
     container.addSingleton(AccountStateQuery, [DividendsRepository, SharesRepository, PortfolioService]);
   }
 }

@@ -39,6 +39,8 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - name: "Install dependencies"
         run: yarn install
+      - name: "Install dependencies for pdf generator"
+        run: cd devops/functions/pdfGenerator && yarn install
       - name: "Run unit tests"
         run: yarn tdd
       - name: "Deploy functions and migrate db"
