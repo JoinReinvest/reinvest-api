@@ -1,7 +1,8 @@
 import { IdentityDatabaseAdapterProvider, userTable } from 'Identity/Adapter/Database/IdentityDatabaseAdapter';
-import { InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
+import { IdentityUser, InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
 import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/UserException';
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
+import { BanList } from 'Identity/Port/Api/BanController';
 
 export class UserRepository {
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
@@ -64,6 +65,27 @@ export class UserRepository {
         email,
       })
       .where('cognitoUserId', '=', cognitoUserId)
+      .execute();
+  }
+
+  async findUserByProfileId(profileId: string): Promise<IdentityUser | null> {
+    const user = await this.databaseAdapterProvider.provide().selectFrom(userTable).selectAll().where('profileId', '=', profileId).limit(1).executeTakeFirst();
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
+  async updateUserBanList(id: string, banList: BanList): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        bannedIdsJson: banList,
+      })
+      .where('id', '=', id)
       .execute();
   }
 }

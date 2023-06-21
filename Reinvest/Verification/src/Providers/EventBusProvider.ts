@@ -27,6 +27,12 @@ export default class EventBusProvider {
       'PrincipalVerificationNeedsMoreInfo',
       'PrincipalVerificationMadeDecision',
     ]);
-    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), ['AccountVerifiedForInvestment', 'CreateNotification', 'DismissNotification']);
+    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+      'AccountVerifiedForInvestment',
+      'CreateNotification',
+      'DismissNotification',
+      'AccountBanned',
+      'ProfileBanned',
+    ]);
   }
 }

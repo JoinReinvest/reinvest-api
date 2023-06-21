@@ -31,6 +31,9 @@ import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { Ban } from 'LegalEntities/UseCases/Ban';
+import { BanRepository } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
+import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 
 export class AdapterServiceProvider {
   private config: LegalEntities.Config;
@@ -48,7 +51,10 @@ export class AdapterServiceProvider {
 
     container.addSingleton(IdGenerator).addSingleton(UpdateCompany);
 
-    container.addSingleton(DocumentsService, ['Documents']).addSingleton(InvestmentAccountsService, ['InvestmentAccounts']);
+    container
+      .addSingleton(DocumentsService, ['Documents'])
+      .addSingleton(InvestmentAccountsService, ['InvestmentAccounts'])
+      .addSingleton(IdentityService, ['Identity']);
 
     // database
     container
@@ -56,6 +62,7 @@ export class AdapterServiceProvider {
       .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(BanRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
       .addSingleton(BeneficiaryRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addObjectFactory(
         'LegalEntitiesTransactionalAdapter',
@@ -83,6 +90,7 @@ export class AdapterServiceProvider {
       ])
       .addSingleton(UpdateProfileForVerification, [ProfileRepository])
       .addSingleton(UpdateCompanyForVerification, [AccountRepository])
-      .addSingleton(UpdateStakeholderForVerification, [AccountRepository]);
+      .addSingleton(UpdateStakeholderForVerification, [AccountRepository])
+      .addSingleton(Ban, [AccountRepository, ProfileRepository, BanRepository, IdentityService]);
   }
 }

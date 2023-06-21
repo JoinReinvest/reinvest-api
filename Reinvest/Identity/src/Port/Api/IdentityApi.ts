@@ -1,20 +1,22 @@
 import { ContainerInterface } from 'Container/Container';
+import { BanController } from 'Identity/Port/Api/BanController';
 import { IncentiveTokenController } from 'Identity/Port/Api/IncentiveTokenController';
 import { PhoneController } from 'Identity/Port/Api/PhoneController';
 import { ProfileController } from 'Identity/Port/Api/ProfileController';
 import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationController';
 
 export type IdentityApiType = {
+  addBannedId: BanController['addBannedId'];
   getProfileByEmail: ProfileController['getProfileByEmail'];
   getProfileId: ProfileController['getProfileId'];
   getUserInvitationLink: IncentiveTokenController['getUserInvitationLink'];
-  isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
 
+  isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
   isPhoneNumberCompleted: PhoneController['isPhoneNumberCompleted'];
+
   registerUser: UserRegistrationController['registerUser'];
 
   setPhoneNumber: PhoneController['setPhoneNumber'];
-
   updateEmailAddress: ProfileController['updateEmailAddress'];
   verifyPhoneNumber: PhoneController['verifyPhoneNumber'];
 };
@@ -31,4 +33,5 @@ export const identityApi = (container: ContainerInterface): IdentityApiType => (
   verifyPhoneNumber: container.delegateTo(PhoneController, 'verifyPhoneNumber'),
   isPhoneNumberCompleted: container.delegateTo(PhoneController, 'isPhoneNumberCompleted'),
   getProfileByEmail: container.delegateTo(ProfileController, 'getProfileByEmail'),
+  addBannedId: container.delegateTo(BanController, 'addBannedId'),
 });
