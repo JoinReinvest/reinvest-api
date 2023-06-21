@@ -1,8 +1,9 @@
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { PrincipalVerificationEvent, VerificationEvents } from 'Verification/Domain/ValueObject/VerificationEvents';
+import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
 
-export class MarkAccountAsApproved {
+export class MarkAccountAsDisapproved {
   private verifierService: VerifierService;
   private eventBus: EventBus;
 
@@ -11,19 +12,25 @@ export class MarkAccountAsApproved {
     this.eventBus = eventBus;
   }
 
-  static getClassName = () => 'MarkAccountAsApproved';
+  static getClassName = () => 'MarkAccountAsDisapproved';
 
-  async execute(profileId: string, accountId: string): Promise<void> {
+  async execute(profileId: string, accountId: string, objectIds: string[]): Promise<void> {
     try {
       const { accountVerifier, verifiers } = await this.verifierService.createVerifiersForAccount(profileId, accountId);
-      const principalApproved = (partyId: string) =>
+      const principalDisapproved = (partyId: string) =>
         <PrincipalVerificationEvent>{
           date: new Date(),
-          kind: VerificationEvents.PRINCIPAL_APPROVED,
+          kind: VerificationEvents.PRINCIPAL_DISAPPROVED,
           ncId: partyId,
         };
 
-      verifiers.forEach(verifier => verifier.handleVerificationEvent([principalApproved(verifier.getPartyId())]));
+      let filteredVerifiers = verifiers.filter(verifier => objectIds.includes(verifier.getPartyId()));
+
+      if (filteredVerifiers.length === 0) {
+        filteredVerifiers = accountVerifier.isIndividual() ? verifiers : verifiers.filter(verifier => verifier.isType(VerifierType.COMPANY));
+      }
+
+      filteredVerifiers.forEach(verifier => verifier.handleVerificationEvent([principalDisapproved(verifier.getPartyId())]));
 
       await this.verifierService.executeVerifiersDecisions(accountVerifier, verifiers);
       // await this.eventBus.publish(<DomainEvent>{

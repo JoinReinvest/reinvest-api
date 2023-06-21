@@ -18,6 +18,10 @@ export abstract class AbstractVerifier {
   protected type: VerifierType;
   protected accountId: string | null;
 
+  protected doNotHandleEventIfLastEventIs = {
+    [VerificationEvents.PRINCIPAL_NEED_MORE_INFO]: [VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED],
+  };
+
   constructor({ ncId, id, events, decision, type, accountId }: VerificationState) {
     this.ncId = ncId;
     this.id = id;
@@ -240,6 +244,17 @@ export abstract class AbstractVerifier {
       return true;
     }
 
+    const lastEvent = this.events.list[this.events.list.length - 1];
+
+    // @ts-ignore
+    if (this.doNotHandleEventIfLastEventIs[kind] && (!lastEvent || !this.doNotHandleEventIfLastEventIs[kind].includes(lastEvent.kind))) {
+      return true;
+    }
+
     return false;
+  }
+
+  isType(type: VerifierType): boolean {
+    return type === this.type;
   }
 }

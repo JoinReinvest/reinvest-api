@@ -21,7 +21,12 @@ export default class EventBusProvider {
     container.addSingleton(MarkSensitiveDataUpdatedHandler, [VerifierRepository]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
-    eventBus.subscribeHandlerForKinds(NotifyAccountNotVerifiedEventHandler.getClassName(), ['AccountNotVerifiedForInvestment', 'AccountVerifiedForInvestment']);
+    eventBus.subscribeHandlerForKinds(NotifyAccountNotVerifiedEventHandler.getClassName(), [
+      'AccountNotVerifiedForInvestment',
+      'AccountVerifiedForInvestment',
+      'PrincipalVerificationNeedsMoreInfo',
+      'PrincipalVerificationMadeDecision',
+    ]);
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), ['AccountVerifiedForInvestment', 'CreateNotification', 'DismissNotification']);
   }
 }

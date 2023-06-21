@@ -26,6 +26,7 @@ const schema = `
     enum NotificationObjectType {
         INVESTMENT
         DIVIDEND
+        ACCOUNT
     }
 
     type NotificationObject {

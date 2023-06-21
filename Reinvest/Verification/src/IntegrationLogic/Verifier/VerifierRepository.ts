@@ -5,6 +5,7 @@ import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationSe
 import { AccountStructure, IdToNCId } from 'Verification/Domain/ValueObject/AccountStructure';
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
 import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
+import { AccountVerifier } from 'Verification/IntegrationLogic/Verifier/AccountVerifier';
 import { CompanyVerifier } from 'Verification/IntegrationLogic/Verifier/CompanyVerifier';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileVerifier';
 import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/StakeholderVerifier';
@@ -126,9 +127,21 @@ export class VerifierRepository {
     }
   }
 
-  async getVerifiersByAccountId(profileId: UUID, accountId: UUID): Promise<Verifier[]> {
+  async getVerifiersByAccountId(
+    profileId: UUID,
+    accountId: UUID,
+  ): Promise<{
+    accountVerifier: AccountVerifier;
+    verifiers: Verifier[];
+  }> {
     const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
 
-    return this.createVerifiersFromAccountStructure(accountStructure);
+    const verifiers = await this.createVerifiersFromAccountStructure(accountStructure);
+    const accountVerifier = new AccountVerifier(profileId, accountId, accountStructure.type);
+
+    return {
+      verifiers,
+      accountVerifier,
+    };
   }
 }

@@ -16,6 +16,14 @@ export type NorthCapitalAccountStructure = {
   stakeholders?: IdToNCId[];
 };
 
+export type ObjectMapping = {
+  accountId: string | null;
+  partyId: string;
+  profileId: string;
+  stakeholderId: string | null;
+  type: MappedType;
+};
+
 export class RegistryQuery {
   private registryQueryRepository: RegistryQueryRepository;
 
@@ -88,6 +96,10 @@ export class RegistryQuery {
     });
 
     return this.isValidAccountStructure(accountStructure) ? accountStructure : null;
+  }
+
+  async getMappingByPartyId(partyId: string): Promise<ObjectMapping | null> {
+    return this.registryQueryRepository.getMappingByPartyId(partyId);
   }
 
   private isValidAccountStructure(accountStructure: NorthCapitalAccountStructure): boolean {

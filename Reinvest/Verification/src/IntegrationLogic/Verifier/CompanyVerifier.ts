@@ -10,7 +10,6 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE,
       VerificationEvents.PRINCIPAL_APPROVED,
       VerificationEvents.PRINCIPAL_DISAPPROVED,
-      VerificationEvents.PRINCIPAL_NEED_MORE_INFO,
     ],
     [VerificationDecisionType.REQUEST_AML_VERIFICATION]: [
       VerificationEvents.VERIFICATION_AML_RESULT,

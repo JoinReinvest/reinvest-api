@@ -40,7 +40,7 @@ export class VerifyAccountForInvestmentHandler implements EventHandler<DomainEve
         },
         id: event.id,
       };
-    }
+    } // TODO else check if banned
 
     await this.eventBus.publish(returnEvent);
   }

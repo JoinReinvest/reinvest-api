@@ -11,44 +11,34 @@ export class NotifyAccountNotVerifiedEventHandler implements EventHandler<Domain
   static getClassName = (): string => 'NotifyAccountNotVerifiedEventHandler';
 
   public async handle(event: DomainEvent): Promise<void> {
-    if (!['AccountNotVerifiedForInvestment', 'AccountVerifiedForInvestment'].includes(event.kind)) {
+    if (!['AccountNotVerifiedForInvestment', 'PrincipalVerificationNeedsMoreInfo'].includes(event.kind)) {
       return;
     }
 
     const {
-      id: investmentId,
+      id,
       kind,
       data: { profileId, accountId },
     } = event;
-    let command: DomainEvent;
-    const uniqueId = `${investmentId}-verification`;
 
-    if (kind === 'AccountNotVerifiedForInvestment') {
-      command = {
-        kind: 'CreateNotification',
-        data: {
-          accountId: accountId,
-          profileId: profileId,
-          notificationType: 'VERIFICATION_FAILED',
-          header: 'Verification failed [COPY-TO-UPDATE]',
-          body: 'Update your account information to continue investing.',
-          dismissId: uniqueId,
-          onObjectId: accountId,
-          onObjectType: 'ACCOUNT',
-          uniqueId: uniqueId,
-        },
-        id: event.id,
-      };
-    } else {
-      command = {
-        kind: 'DismissNotification',
-        data: {
-          profileId: profileId,
-          dismissId: uniqueId,
-        },
-        id: event.id,
-      };
-    }
+    const type = ['AccountNotVerifiedForInvestment', 'AccountVerifiedForInvestment'].includes(kind) ? 'verification' : 'principal-verification';
+    const uniqueId = `${id}-${type}`;
+
+    const command = {
+      kind: 'CreateNotification',
+      data: {
+        accountId: accountId,
+        profileId: profileId,
+        notificationType: 'VERIFICATION_FAILED',
+        header: 'Verification failed [COPY-TO-UPDATE]',
+        body: 'Update your account information to continue investing.',
+        dismissId: null,
+        onObjectId: accountId,
+        onObjectType: 'ACCOUNT',
+        uniqueId: uniqueId,
+      },
+      id: event.id,
+    };
 
     await this.eventBus.publish(command);
   }

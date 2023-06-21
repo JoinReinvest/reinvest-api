@@ -22,13 +22,7 @@ export class VerifierService {
     accountVerifier: AccountVerifier;
     verifiers: Verifier[];
   }> {
-    const verifiers = await this.verifierRepository.getVerifiersByAccountId(profileId, accountId);
-    const accountVerifier = new AccountVerifier(profileId, accountId);
-
-    return {
-      verifiers,
-      accountVerifier,
-    };
+    return this.verifierRepository.getVerifiersByAccountId(profileId, accountId);
   }
 
   async executeVerifiersDecisions(accountVerifier: AccountVerifier, verifiers: Verifier[]): Promise<AccountVerificationDecision> {
