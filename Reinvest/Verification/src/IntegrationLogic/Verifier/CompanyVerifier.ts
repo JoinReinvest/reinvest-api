@@ -5,7 +5,13 @@ import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/Abstrac
 
 export class CompanyVerifier extends AbstractVerifier implements Verifier {
   protected availableEventsForDecision: AvailableEventsForDecision = {
-    ANY_TIME: [VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED, VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE],
+    ANY_TIME: [
+      VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED,
+      VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE,
+      VerificationEvents.PRINCIPAL_APPROVED,
+      VerificationEvents.PRINCIPAL_DISAPPROVED,
+      VerificationEvents.PRINCIPAL_NEED_MORE_INFO,
+    ],
     [VerificationDecisionType.REQUEST_AML_VERIFICATION]: [
       VerificationEvents.VERIFICATION_AML_RESULT,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,

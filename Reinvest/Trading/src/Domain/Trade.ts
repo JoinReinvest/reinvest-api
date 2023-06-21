@@ -1,5 +1,6 @@
 import { Money } from 'Money/Money';
 import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
+import { UUID } from 'HKEKTypes/Generics';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -432,5 +433,9 @@ export class Trade {
 
   getAccountIdForVerification() {
     return this.tradeSchema.tradeConfiguration.parentId;
+  }
+
+  getProfileId(): UUID {
+    return this.tradeSchema.tradeConfiguration.profileId;
   }
 }

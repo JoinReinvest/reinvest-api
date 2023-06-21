@@ -1,5 +1,7 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { VerifierRecord } from 'Verification/Adapter/Database/RegistrationSchema';
 import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
+import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { AccountStructure, IdToNCId } from 'Verification/Domain/ValueObject/AccountStructure';
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
 import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
@@ -9,9 +11,11 @@ import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/Stak
 
 export class VerifierRepository {
   private verificationAdapter: VerificationAdapter;
+  private registrationService: RegistrationService;
 
-  constructor(verificationAdapter: VerificationAdapter) {
+  constructor(verificationAdapter: VerificationAdapter, registrationService: RegistrationService) {
     this.verificationAdapter = verificationAdapter;
+    this.registrationService = registrationService;
   }
 
   static getClassName = () => 'VerifierRepository';
@@ -44,17 +48,7 @@ export class VerifierRepository {
           verifiers.push(await this.createStakeholderVerifier(stakeholder, accountStructure.account));
         }
       }
-
-      return verifiers;
     }
-
-    // verifiers.push(this.partyVerifierFactory.createCompanyVerifier(accountStructure.company));
-
-    // if (accountStructure.stakeholders) {
-    //   accountStructure.stakeholders.forEach(stakeholder => {
-    //     verifiers.push(this.partyVerifierFactory.createStakeholderVerifier(stakeholder));
-    //   });
-    // }
 
     return verifiers;
   }
@@ -130,5 +124,11 @@ export class VerifierRepository {
       default:
         return null;
     }
+  }
+
+  async getVerifiersByAccountId(profileId: UUID, accountId: UUID): Promise<Verifier[]> {
+    const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
+
+    return this.createVerifiersFromAccountStructure(accountStructure);
   }
 }

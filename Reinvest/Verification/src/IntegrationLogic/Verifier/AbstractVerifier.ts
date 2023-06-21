@@ -93,6 +93,20 @@ export abstract class AbstractVerifier {
         }
       }
 
+      if (kind === VerificationEvents.PRINCIPAL_NEED_MORE_INFO) {
+        needMoreInfo = true;
+      }
+
+      if (kind === VerificationEvents.PRINCIPAL_APPROVED) {
+        kycStatus = VerificationStatus.APPROVED;
+        amlStatus = VerificationStatus.APPROVED;
+      }
+
+      if (kind === VerificationEvents.PRINCIPAL_DISAPPROVED) {
+        kycStatus = VerificationStatus.DISAPPROVED;
+        amlStatus = VerificationStatus.DISAPPROVED;
+      }
+
       if ([VerificationEvents.VERIFICATION_AML_RESULT, VerificationEvents.MANUAL_VERIFICATION_AML_RESULT].includes(kind)) {
         const { status, reasons } = <VerificationAmlResultEvent>event;
 

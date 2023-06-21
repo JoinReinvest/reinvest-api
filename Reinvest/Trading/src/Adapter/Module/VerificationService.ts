@@ -13,15 +13,15 @@ export class VerificationService {
 
   static getClassName = () => 'VerificationService';
 
-  async markAccountAsDisapproved(accountId: UUID, objectIds: UUID[] = []): Promise<void> {
-    // return this.verificationModule.api().markAccountAsDisapproved(accountId, objectIds);
+  async markAccountAsDisapproved(profileId: UUID, accountId: UUID, objectIds: UUID[] = []): Promise<void> {
+    return this.verificationModule.api().markAccountAsDisapproved(profileId, accountId, objectIds);
   }
 
-  async markAccountAsApproved(accountId: UUID): Promise<void> {
-    // return this.verificationModule.api().markAccountAsApproved(accountId);
+  async markAccountAsApproved(profileId: UUID, accountId: UUID): Promise<void> {
+    return this.verificationModule.api().markAccountAsApproved(profileId, accountId);
   }
 
-  async markAccountAsNeedMoreInfo(accountId: string, objectIds: string[]): Promise<void> {
-    // return this.verificationModule.api().markAccountAsNeedMoreInfo(accountId, objectIds);
+  async markAccountAsNeedMoreInfo(profileId: UUID, accountId: string, objectIds: string[]): Promise<void> {
+    return this.verificationModule.api().markAccountAsNeedMoreInfo(profileId, accountId, objectIds);
   }
 }

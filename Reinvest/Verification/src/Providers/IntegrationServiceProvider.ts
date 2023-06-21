@@ -4,6 +4,7 @@ import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapit
 import { Verification } from 'Verification/index';
 import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/VerifierExecutor';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
+import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 
 export class IntegrationServiceProvider {
   private config: Verification.Config;
@@ -14,6 +15,6 @@ export class IntegrationServiceProvider {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(VerifierExecutor, [VerificationNorthCapitalAdapter]);
-    container.addSingleton(VerifierRepository, [VerificationAdapter]);
+    container.addSingleton(VerifierRepository, [VerificationAdapter, RegistrationService]);
   }
 }

@@ -45,9 +45,9 @@ export class CheckIsTradeApproved {
       }
 
       if (tradeVerification.isVerified()) {
-        await this.verificationService.markAccountAsApproved(trade.getAccountIdForVerification());
+        await this.verificationService.markAccountAsApproved(trade.getProfileId(), trade.getAccountIdForVerification());
         await this.eventBus.publish({
-          kind: 'InvestmentApproved1',
+          kind: 'InvestmentApproved',
           id: investmentId,
         });
 
@@ -55,7 +55,7 @@ export class CheckIsTradeApproved {
       }
 
       if (tradeVerification.isRejected()) {
-        await this.verificationService.markAccountAsDisapproved(trade.getAccountIdForVerification(), tradeVerification.getObjectIds());
+        await this.verificationService.markAccountAsDisapproved(trade.getProfileId(), trade.getAccountIdForVerification(), tradeVerification.getObjectIds());
         await this.eventBus.publish({
           kind: 'InvestmentRejected',
           id: investmentId,
@@ -65,7 +65,7 @@ export class CheckIsTradeApproved {
       }
 
       if (tradeVerification.needMoreInfo()) {
-        await this.verificationService.markAccountAsNeedMoreInfo(trade.getAccountIdForVerification(), tradeVerification.getObjectIds());
+        await this.verificationService.markAccountAsNeedMoreInfo(trade.getProfileId(), trade.getAccountIdForVerification(), tradeVerification.getObjectIds());
 
         return;
       }
