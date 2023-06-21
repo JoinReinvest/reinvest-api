@@ -19,11 +19,12 @@ export const main: SQSHandler = async (event: SQSEvent) => {
     await generatePdf.execute(catalog, fileName, template, templateType);
     await queueSender.send(
       JSON.stringify({
-        kind: 'pdfGenerated',
+        kind: 'PdfGenerated',
         id,
         data: {
           profileId: catalog,
           fileName,
+          type: templateType,
         },
       }),
     );
