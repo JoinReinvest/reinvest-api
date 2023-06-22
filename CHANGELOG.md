@@ -1,5 +1,16 @@
 # REINVEST API CHANGELOG
 
+## 1.17.0 - 06/22/2023
+
+* Rejected verification can ban the profile or an account
+* All queries and mutations return "Profile is banned" error for banned profiles
+* All mutations related to the account return "Account is banned" error for banned accounts
+* `getAccountOverview` query returns `isBanned` field
+* When profile/company/stakeholder requires "UpdateForVerification" action, then sends `VERIFICATION_FAILED`
+  notification.
+    * System awaits for the `verifyAccount` process to be finished (the same as for creating investment, but triggered
+      from the notification).
+
 ## 1.16.6 - 06/16/2023
 
 * No MOCK anymore:
