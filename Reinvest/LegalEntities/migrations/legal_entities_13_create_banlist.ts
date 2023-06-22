@@ -4,7 +4,8 @@ import { legalEntitiesBannedListTable, LegalEntitiesDatabase } from 'LegalEntiti
 export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
   await db.schema
     .createTable(legalEntitiesBannedListTable)
-    .addColumn('profileId', 'uuid', col => col.primaryKey())
+    .addColumn('id', 'uuid', col => col.primaryKey())
+    .addColumn('profileId', 'uuid', col => col.notNull())
     .addColumn('accountId', 'uuid', col => col.defaultTo(null))
     .addColumn('stakeholderId', 'uuid', col => col.defaultTo(null))
     .addColumn('type', 'varchar(36)', col => col.notNull())
@@ -12,6 +13,7 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
     .addColumn('dateCreated', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .addColumn('dateCancelled', 'timestamp', col => col.defaultTo(null))
     .addColumn('sensitiveNumber', 'varchar(255)', col => col.notNull())
+    .addColumn('anonymizedSensitiveNumber', 'varchar(255)', col => col.notNull())
     .addColumn('status', 'varchar(36)', col => col.notNull())
     .execute();
 }

@@ -48,7 +48,7 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       tradeStatus: 'CREATED',
       tradeDate: transactionDate,
       tradeVerification: {
-        status: TradeVerificationDecision.PENDING,
+        decision: TradeVerificationDecision.PENDING,
         events: [],
       },
     };
@@ -115,6 +115,34 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       tradeId,
       accountId,
       orderStatus: tradeState,
+    };
+
+    const response = await this.postRequest(endpoint, data);
+    const { statusCode, statusDesc, tradeDetails } = response;
+
+    return tradeDetails;
+  }
+
+  /**
+   * @note This method is used only for integrations tests
+   * @param tradeId
+   * @param accountId
+   * @param tradeState
+   */
+  async updateTradePrincipalApprovalForTests(
+    tradeId: string,
+    accountId: string,
+    orderStatus: string,
+    rrApproval: 'Pending' | 'Approved' | 'Disapproved' | 'Under Review',
+    field3: string = '',
+  ): Promise<any> {
+    const endpoint = 'tapiv3/index.php/v3/updateTradeStatus';
+    const data = {
+      tradeId,
+      accountId,
+      orderStatus,
+      field3,
+      RRApprovalStatus: rrApproval,
     };
 
     const response = await this.postRequest(endpoint, data);

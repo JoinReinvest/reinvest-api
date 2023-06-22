@@ -62,7 +62,7 @@ export class AdapterServiceProvider {
       .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
-      .addSingleton(BanRepository, [LegalEntitiesDatabaseAdapterInstanceProvider])
+      .addSingleton(BanRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(BeneficiaryRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addObjectFactory(
         'LegalEntitiesTransactionalAdapter',

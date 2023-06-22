@@ -2,6 +2,7 @@ import { ContainerInterface } from 'Container/Container';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 
 export type InvestmentsTechnicalHandlerType = {
+  AccountBannedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
   AccountVerifiedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentApproved: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentFunded: () => TechnicalToDomainEventsHandler['handle'];
@@ -13,6 +14,7 @@ export type InvestmentsTechnicalHandlerType = {
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
+  AccountBannedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   AccountVerifiedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TradeCreated: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentFunded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),

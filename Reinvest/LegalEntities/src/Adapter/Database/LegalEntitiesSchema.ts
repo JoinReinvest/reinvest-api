@@ -21,7 +21,9 @@ export interface LegalEntitiesProfile {
 }
 
 export interface LegalEntitiesBannedList {
+  id: string;
   accountId: string | null;
+  anonymizedSensitiveNumber: string;
   dateCancelled: Date | null;
   dateCreated: Date;
   profileId: string;
