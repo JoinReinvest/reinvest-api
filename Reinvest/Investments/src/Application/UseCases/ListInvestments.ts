@@ -19,20 +19,8 @@ class ListInvestments {
     }
 
     const list = investmets.map(investmet => {
-      const { id, tradeId, dateCreated, amount, status, subscriptionAgreementId } = investmet.toObject();
-      const fee = investmet.getFee();
+      const { id, tradeId, dateCreated, amount } = investmet.toObject();
       const money = new Money(amount);
-      let investmentFees = null;
-
-      if (fee) {
-        const { amount: feeAmount } = fee.toObject();
-        const feeMoney = new Money(feeAmount);
-
-        investmentFees = {
-          formatted: feeMoney.getFormattedAmount(),
-          value: feeMoney.getAmount(),
-        };
-      }
 
       return {
         id,
@@ -42,9 +30,6 @@ class ListInvestments {
           formatted: money.getFormattedAmount(),
           value: money.getAmount(),
         },
-        status,
-        investmentFees,
-        subscriptionAgreementId,
       };
     });
 
