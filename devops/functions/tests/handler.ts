@@ -703,7 +703,6 @@ const northCapitalRouter = () => {
       });
     }
   });
-
   router.post('/set-user-for-verification', async (req: any, res: any) => {
     try {
       const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);

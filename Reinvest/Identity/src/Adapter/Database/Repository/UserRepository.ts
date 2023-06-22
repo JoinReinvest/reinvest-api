@@ -3,6 +3,7 @@ import { IdentityUser, InsertableUser } from 'Identity/Adapter/Database/Identity
 import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/UserException';
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 import { BanList } from 'Identity/Port/Api/BanController';
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 export class UserRepository {
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
@@ -39,16 +40,19 @@ export class UserRepository {
     }
   }
 
-  public async getUserProfileId(cognitoUserId: string): Promise<string | null> {
+  public async getUserProfile(cognitoUserId: string): Promise<{
+    bannedIdsJson: JSONObjectOf<BanList>;
+    profileId: string;
+  } | null> {
     const user = await this.databaseAdapterProvider
       .provide()
       .selectFrom(userTable)
-      .select('profileId')
+      .select(['profileId', 'bannedIdsJson'])
       .where('cognitoUserId', '=', cognitoUserId)
       .limit(1)
       .executeTakeFirst();
 
-    return user ? user.profileId : null;
+    return user ?? null;
   }
 
   public async getUserProfileByEmail(email: string): Promise<string | null> {

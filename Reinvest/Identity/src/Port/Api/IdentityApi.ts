@@ -7,8 +7,8 @@ import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationCo
 
 export type IdentityApiType = {
   addBannedId: BanController['addBannedId'];
+  getProfile: ProfileController['getProfile'];
   getProfileByEmail: ProfileController['getProfileByEmail'];
-  getProfileId: ProfileController['getProfileId'];
   getUserInvitationLink: IncentiveTokenController['getUserInvitationLink'];
 
   isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
@@ -24,7 +24,7 @@ export type IdentityApiType = {
 export const identityApi = (container: ContainerInterface): IdentityApiType => ({
   registerUser: container.delegateTo(UserRegistrationController, 'registerUser'),
 
-  getProfileId: container.delegateTo(ProfileController, 'getProfileId'),
+  getProfile: container.delegateTo(ProfileController, 'getProfile'),
   updateEmailAddress: container.delegateTo(ProfileController, 'updateEmailAddress'),
   isIncentiveTokenValid: container.delegateTo(IncentiveTokenController, 'isIncentiveTokenValid'),
   getUserInvitationLink: container.delegateTo(IncentiveTokenController, 'getUserInvitationLink'),
