@@ -16,6 +16,8 @@ export enum ValidationErrorEnum {
   WRONG_TYPE = 'WRONG_TYPE',
   NOT_FOUND = 'NOT_FOUND',
   NUMBER_OF_ACCOUNTS_EXCEEDED = 'NUMBER_OF_ACCOUNTS_EXCEEDED',
+  EIN_BANNED = 'EIN_BANNED',
+  SSN_BANNED = 'SSN_BANNED',
 }
 
 export type ValidationErrorType = {

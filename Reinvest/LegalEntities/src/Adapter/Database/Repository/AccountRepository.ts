@@ -1,4 +1,5 @@
 import {
+  legalEntitiesBannedListTable,
   legalEntitiesBeneficiaryTable,
   legalEntitiesCompanyAccountTable,
   LegalEntitiesDatabaseAdapterProvider,
@@ -612,5 +613,21 @@ export class AccountRepository {
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  async isSensitiveNumberBanned(hashedSensitiveNumber: string) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesBannedListTable)
+        .select(['sensitiveNumber'])
+        .where('sensitiveNumber', '=', hashedSensitiveNumber)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error: any) {
+      return false;
+    }
   }
 }

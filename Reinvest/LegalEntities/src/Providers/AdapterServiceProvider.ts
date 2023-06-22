@@ -49,7 +49,7 @@ export class AdapterServiceProvider {
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
       .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
 
-    container.addSingleton(IdGenerator).addSingleton(UpdateCompany);
+    container.addSingleton(IdGenerator);
 
     container
       .addSingleton(DocumentsService, ['Documents'])
@@ -72,6 +72,7 @@ export class AdapterServiceProvider {
 
     // use cases
     container
+      .addSingleton(UpdateCompany, [AccountRepository])
       .addSingleton(CompleteProfile, [ProfileRepository])
       .addSingleton(UpdateProfile, [ProfileRepository])
       .addSingleton(UpdateIndividualAccount, [AccountRepository])
