@@ -10,6 +10,8 @@
   notification.
     * System awaits for the `verifyAccount` process to be finished (the same as for creating investment, but triggered
       from the notification).
+* When adding/updating stakeholders to the corporate/trust account, the system checks if the stakeholder is not banned (
+  by SSN).
 
 ## 1.16.6 - 06/16/2023
 
