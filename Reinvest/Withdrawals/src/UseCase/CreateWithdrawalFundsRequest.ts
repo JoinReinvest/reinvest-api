@@ -1,6 +1,6 @@
-import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
+import { UUID } from 'HKEKTypes/Generics';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
-import { FundsRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsRequestsRepository';
+import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { DividendData, SettledSharesData } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import { WithdrawalsFundsRequestsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequests';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
@@ -29,12 +29,12 @@ export type WithdrawalFundsRequestCreate = {
 
 export class CreateWithdrawalFundsRequest {
   private idGenerator: IdGenerator;
-  private fundsRequestsRepository: FundsRequestsRepository;
+  private fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository;
   private withdrawalsQuery: WithdrawalsQuery;
 
-  constructor(idGenerator: IdGenerator, fundsRequestsRepository: FundsRequestsRepository, withdrawalsQuery: WithdrawalsQuery) {
+  constructor(idGenerator: IdGenerator, fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository, withdrawalsQuery: WithdrawalsQuery) {
     this.idGenerator = idGenerator;
-    this.fundsRequestsRepository = fundsRequestsRepository;
+    this.fundsWithdrawalRequestsRepository = fundsWithdrawalRequestsRepository;
     this.withdrawalsQuery = withdrawalsQuery;
   }
 
@@ -43,7 +43,7 @@ export class CreateWithdrawalFundsRequest {
   async execute(profileId: UUID, accountId: UUID) {
     const withdrawalsState = await this.withdrawalsQuery.prepareEligibleWithdrawalsState(profileId, accountId);
 
-    if (!withdrawalsState || withdrawalsState.canWithdraw()) {
+    if (!withdrawalsState) {
       return false;
     }
 
@@ -73,7 +73,7 @@ export class CreateWithdrawalFundsRequest {
       totalFee,
     };
 
-    await this.fundsRequestsRepository.create(withdrawalFundsRequest);
+    await this.fundsWithdrawalRequestsRepository.create(withdrawalFundsRequest);
 
     return id;
   }

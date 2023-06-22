@@ -34,7 +34,7 @@ export interface WithdrawalsFundsRequestsAgreementsTable {
   pdfDateCreated: Date | null;
   profileId: UUID;
   signedAt: Date | null;
-  signedByIp: string | null;
+  signedByIP: string | null;
   status: WithdrawalsFundsRequestsAgreementsStatuses;
   templateVersion: number;
 }

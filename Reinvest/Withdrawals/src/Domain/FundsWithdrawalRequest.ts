@@ -37,6 +37,14 @@ export type FundsWithdrawalRequestSchema = {
   totalFee: number;
   totalFunds: number;
 };
+
+export enum RetrunStatuses {
+  AWAITING_SIGNING_AGREEMENT = 'AWAITING_SIGNING_AGREEMENT',
+  DRAFT = 'DRAFT',
+  AWAITING_DECISION = 'AWAITING_DECISION',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
 export class FundsWithdrawalRequest {
   private accountId: UUID;
   private accountValue: number;
@@ -144,6 +152,41 @@ export class FundsWithdrawalRequest {
       totalFee,
       totalFunds,
     );
+  }
+
+  assignAgreement(id: string) {
+    this.agreementId = id;
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  abort() {
+    if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
+      throw new Error('CANNOT_BE_ABORTED');
+    } else {
+      this.status = WithdrawalsFundsRequestsStatuses.ABORTED;
+    }
+  }
+
+  request() {
+    this.status = WithdrawalsFundsRequestsStatuses.REQUESTED;
+  }
+
+  getReturnStatusValue() {
+    switch (this.status) {
+      case WithdrawalsFundsRequestsStatuses.REQUESTED:
+        return RetrunStatuses.AWAITING_DECISION;
+      case WithdrawalsFundsRequestsStatuses.DRAFT:
+        if (!this.agreementId) {
+          return RetrunStatuses.AWAITING_SIGNING_AGREEMENT;
+        } else {
+          return RetrunStatuses.DRAFT;
+        }
+      default:
+        return RetrunStatuses.DRAFT;
+    }
   }
 
   toObject() {

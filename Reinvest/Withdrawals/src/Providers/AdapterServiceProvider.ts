@@ -11,7 +11,8 @@ import {
   WithdrawalsDatabaseAdapterProvider,
 } from 'Withdrawals/Adapter/Database/DatabaseAdapter';
 import { DividendsRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/DividendsRequestsRepository';
-import { FundsRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsRequestsRepository';
+import { FundsWithdrawalRequestsAgreementsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsAgreementsRepository';
+import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
 import { WithdrawalsDocumentService } from 'Withdrawals/Adapter/Module/WithdrawalsDocumentService';
 import { Withdrawals } from 'Withdrawals/index';
@@ -34,7 +35,8 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(WithdrawalsDatabaseAdapterInstanceProvider, createWithdrawalsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(FundsRequestsRepository, [WithdrawalsDatabaseAdapterInstanceProvider])
+      .addSingleton(FundsWithdrawalRequestsRepository, [WithdrawalsDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(FundsWithdrawalRequestsAgreementsRepository, [WithdrawalsDatabaseAdapterInstanceProvider])
       .addSingleton(DividendsRequestsRepository, [WithdrawalsDatabaseAdapterInstanceProvider])
       .addObjectFactory(
         'WithdrawalTransactionalAdapter',

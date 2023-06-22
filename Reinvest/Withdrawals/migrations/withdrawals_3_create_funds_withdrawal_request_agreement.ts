@@ -17,6 +17,7 @@ export async function up(db: Kysely<WithdrawalsDatabase>): Promise<void> {
 
     .addColumn('contentFieldsJson', 'json', col => col.notNull())
     .addColumn('templateVersion', 'integer', col => col.defaultTo(1))
+    .addUniqueConstraint('funds_request_id_unique', ['fundsRequestId'])
     .execute();
 }
 
