@@ -188,6 +188,25 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     return true;
   }
 
+  async cancelTrade(tradeId: string, userEmail: string, reason: string): Promise<boolean> {
+    const endpoint = 'tapiv3/index.php/v3/cancelInvestment';
+    const data = {
+      tradeId,
+      requestedBy: userEmail,
+      reason,
+      notes: reason,
+    };
+
+    const response = await this.postRequest(endpoint, data);
+    const {
+      statusCode,
+      statusDesc,
+      'Canceled investment details': [cancelDetails],
+    } = response;
+
+    return cancelDetails;
+  }
+
   private async checkIfFileExistsInTrade(northCapitalId: string, documentId: string): Promise<boolean> {
     const uploadedDocuments = await this.getUploadedTradeDocuments(northCapitalId);
     const documentIdRegex = new RegExp(`.*(${documentId}).*`);

@@ -1,6 +1,6 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
-import { UUID } from 'HKEKTypes/Generics';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -73,7 +73,13 @@ export type VertaloPaymentState = {
   paymentMarkedDate: Date;
 };
 
+export type CancelTradeState = {
+  cancelDate: Date;
+  cancelState: any;
+};
+
 export type TradeSchema = {
+  cancelTradeState: CancelTradeState | null;
   disbursementState: DisbursementState | null;
   fundsMoveState: FundsMoveState | null;
   investmentId: string;
@@ -178,6 +184,14 @@ export class Trade {
       investorEmail: this.tradeSchema.vendorsConfiguration!.accountEmail,
       numberOfShares: this.tradeSchema.northCapitalTradeState!.tradeShares,
     };
+  }
+
+  getInvestorEmail() {
+    if (!this.tradeSchema.northCapitalTradeState) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    return this.tradeSchema.vendorsConfiguration!.parentEmail;
   }
 
   setVertaloDistributionState(vertaloDistribution: VertaloDistributionState) {
@@ -437,5 +451,16 @@ export class Trade {
 
   getProfileId(): UUID {
     return this.tradeSchema.tradeConfiguration.profileId;
+  }
+
+  setTradeCancelState(cancelState: any) {
+    this.tradeSchema.cancelTradeState = {
+      cancelState,
+      cancelDate: new Date(),
+    };
+  }
+
+  isCanceled(): boolean {
+    return !!this.tradeSchema.cancelTradeState;
   }
 }

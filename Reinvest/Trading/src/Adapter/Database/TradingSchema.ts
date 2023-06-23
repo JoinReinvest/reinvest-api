@@ -1,6 +1,7 @@
 import { JSONObjectOf } from 'HKEKTypes/Generics';
 import { ReinvestmentTradeConfiguration, ReinvestmentVendorsConfiguration } from 'Trading/Domain/ReinvestmentTrade';
 import {
+  CancelTradeState,
   DisbursementState,
   FundsMoveState,
   NorthCapitalTradeState,
@@ -13,6 +14,7 @@ import {
 } from 'Trading/Domain/Trade';
 
 export interface TradesTable {
+  cancelTradeJson: JSONObjectOf<CancelTradeState> | null;
   disbursementJson: JSONObjectOf<DisbursementState> | null;
   fundsMoveStateJson: JSONObjectOf<FundsMoveState> | null;
   investmentId: string;

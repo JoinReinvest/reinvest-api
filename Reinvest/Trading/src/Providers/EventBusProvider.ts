@@ -14,6 +14,8 @@ import { CreateTradeHandler } from 'Trading/Port/Queue/EventHandler/CreateTradeH
 import { MarkFundsAsReadyToDisburseHandler } from 'Trading/Port/Queue/EventHandler/MarkFundsAsReadyToDisburseHandler';
 import { TransferSharesForReinvestmentHandler } from 'Trading/Port/Queue/EventHandler/TransferSharesForReinvestmentHandler';
 import { TransferSharesWhenTradeSettledHandler } from 'Trading/Port/Queue/EventHandler/TransferSharesWhenTradeSettledHandler';
+import { CancelTradeHandler } from 'Trading/Port/Queue/EventHandler/CancelTradeHandler';
+import { CancelTrade } from 'Trading/IntegrationLogic/UseCase/CancelTrade';
 
 export default class EventBusProvider {
   private config: Trading.Config;
@@ -29,6 +31,7 @@ export default class EventBusProvider {
     container.addSingleton(MarkFundsAsReadyToDisburseHandler, [MarkFundsAsReadyToDisburse, SimpleEventBus]);
     container.addSingleton(TransferSharesWhenTradeSettledHandler, [TransferSharesWhenTradeSettled, SimpleEventBus]);
     container.addSingleton(TransferSharesForReinvestmentHandler, [TransferSharesForReinvestment, SimpleEventBus]);
+    container.addSingleton(CancelTradeHandler, [CancelTrade]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
