@@ -3,6 +3,7 @@ import { CognitoService } from 'Identity/Adapter/AWS/CognitoService';
 import { IncentiveTokenRepository } from 'Identity/Adapter/Database/Repository/IncentiveTokenRepository';
 import { UserRepository } from 'Identity/Adapter/Database/Repository/UserRepository';
 import { Identity } from 'Identity/index';
+import { BanController } from 'Identity/Port/Api/BanController';
 import { IncentiveTokenController } from 'Identity/Port/Api/IncentiveTokenController';
 import { PhoneController } from 'Identity/Port/Api/PhoneController';
 import { ProfileController } from 'Identity/Port/Api/ProfileController';
@@ -24,6 +25,7 @@ export class PortsProvider {
       .addSingleton(ProfileController, [UserRepository, CognitoService])
       .addSingleton(PhoneController, [PhoneRegistrationService, CognitoService])
       .addSingleton(UserRegistrationController, [UserRegistrationService])
+      .addSingleton(BanController, [UserRepository])
       .addSingleton(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl']);
   }
 }

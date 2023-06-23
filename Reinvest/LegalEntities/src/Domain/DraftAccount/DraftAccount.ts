@@ -379,6 +379,7 @@ export class CompanyDraftAccount extends DraftAccount {
       companyDocuments,
       accountType,
       einHash: this.ein?.getHash() ?? '',
+      initialsValue: 0,
     });
   }
 

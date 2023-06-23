@@ -96,6 +96,10 @@ export abstract class SensitiveNumber implements ToObject {
     return this.hashed;
   }
 
+  public getAnonymized(): string {
+    return this.anonymized;
+  }
+
   private static hash(sensitiveNumber: string) {
     return crypto.createHash('sha256').update(sensitiveNumber).digest('hex');
   }

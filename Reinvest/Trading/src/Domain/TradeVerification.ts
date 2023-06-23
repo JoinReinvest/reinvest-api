@@ -132,7 +132,8 @@ export class TradeVerification {
   isPending(): boolean {
     return (
       this.tradeVerificationState.decision === TradeVerificationDecision.PENDING ||
-      this.tradeVerificationState.decision === TradeVerificationDecision.NEED_MORE_INFO
+      this.tradeVerificationState.decision === TradeVerificationDecision.NEED_MORE_INFO ||
+      !this.tradeVerificationState.decision
     );
   }
 

@@ -33,14 +33,6 @@ export class MarkAccountAsDisapproved {
       filteredVerifiers.forEach(verifier => verifier.handleVerificationEvent([principalDisapproved(verifier.getPartyId())]));
 
       await this.verifierService.executeVerifiersDecisions(accountVerifier, verifiers);
-      // await this.eventBus.publish(<DomainEvent>{
-      //   kind: 'PrincipalVerificationMadeDecision',
-      //   data: {
-      //     accountId,
-      //     profileId,
-      //   },
-      //   id: accountId,
-      // });
     } catch (error: any) {
       console.error(error);
     }
