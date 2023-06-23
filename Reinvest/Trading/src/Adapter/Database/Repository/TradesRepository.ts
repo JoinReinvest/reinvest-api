@@ -117,6 +117,7 @@ export class TradesRepository {
     return {
       tradeId: schema.tradeId,
       tradeConfigurationJson: schema.tradeConfiguration,
+      // @ts-ignore
       vendorsConfigurationJson: schema.vendorsConfiguration,
       fundsMoveStateJson: schema.fundsMoveState,
       northCapitalTradeStateJson: schema.northCapitalTradeState,

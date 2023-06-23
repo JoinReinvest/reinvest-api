@@ -1,4 +1,5 @@
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
+import { sensitiveDataUpdated, UpdatedObjectType } from 'LegalEntities/Domain/Events/ProfileEvents';
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { IdentityDocument } from 'LegalEntities/Domain/ValueObject/Document';
 import { Domicile, DomicileInput } from 'LegalEntities/Domain/ValueObject/Domicile';
@@ -60,6 +61,7 @@ export class UpdateProfile {
         switch (step) {
           case 'name':
             profile.setName(PersonalName.create(data as PersonalNameInput));
+            events.push(sensitiveDataUpdated(UpdatedObjectType.PROFILE, profileId));
             break;
           case 'address':
             profile.setAddress(Address.create(data as AddressInput));
@@ -73,6 +75,7 @@ export class UpdateProfile {
             }));
             const removedDocumentsEvents = profile.replaceIdentityDocumentAndReturnRemoved(IdentityDocument.create(documents));
             events = [...events, ...removedDocumentsEvents];
+            events.push(sensitiveDataUpdated(UpdatedObjectType.PROFILE, profileId));
             break;
           case 'domicile':
             profile.setDomicile(Domicile.create(data as DomicileInput));

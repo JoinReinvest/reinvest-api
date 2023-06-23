@@ -146,7 +146,7 @@ export class Investment {
 
   abort() {
     if (this.checkIfCanBeAborted()) {
-      this.status = InvestmentStatus.FINISHED;
+      this.status = InvestmentStatus.ABORTED;
 
       if (this.fee) {
         this.fee.abort();
@@ -163,6 +163,7 @@ export class Investment {
       this.status === InvestmentStatus.WAITING_FOR_INVESTMENT_START
     );
   }
+
   approveFee() {
     this.fee?.approveFee();
   }

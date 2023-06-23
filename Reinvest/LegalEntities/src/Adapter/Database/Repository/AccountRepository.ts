@@ -1,4 +1,5 @@
 import {
+  legalEntitiesBannedListTable,
   legalEntitiesBeneficiaryTable,
   legalEntitiesCompanyAccountTable,
   LegalEntitiesDatabaseAdapterProvider,
@@ -422,6 +423,40 @@ export class AccountRepository {
     }
   }
 
+  async findCompanyAccountByAccountId(accountId: string): Promise<CompanyAccount | null> {
+    try {
+      const account = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesCompanyAccountTable)
+        .select([
+          'profileId',
+          'accountId',
+          'companyName',
+          'address',
+          'ein',
+          'annualRevenue',
+          'numberOfEmployees',
+          'industry',
+          'companyType',
+          'avatar',
+          'accountType',
+          'companyDocuments',
+          'stakeholders',
+          'initialsValue',
+        ])
+        .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
+        .limit(1)
+        .castTo<CompanySchema>()
+        .executeTakeFirstOrThrow();
+
+      return CompanyAccount.create(account);
+    } catch (error: any) {
+      console.warn(`Cannot find any company account: ${error.message}`);
+
+      return null;
+    }
+  }
+
   async findCompanyAccountOverviews(profileId: string): Promise<CompanyAccountOverview[]> {
     try {
       const accounts = await this.databaseAdapterProvider
@@ -578,5 +613,21 @@ export class AccountRepository {
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  async isSensitiveNumberBanned(hashedSensitiveNumber: string) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesBannedListTable)
+        .select(['sensitiveNumber'])
+        .where('sensitiveNumber', '=', hashedSensitiveNumber)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error: any) {
+      return false;
+    }
   }
 }

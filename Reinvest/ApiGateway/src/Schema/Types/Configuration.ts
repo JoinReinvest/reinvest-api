@@ -55,8 +55,9 @@ export const Configuration = {
       setAutomaticDividendReinvestmentAgreement: async (
         parent: any,
         { accountId, automaticDividendReinvestmentAgreement }: SetAutomaticDividendReinvestmentAgreement,
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
         const status = await investmentAccountsApi.createConfiguration(profileId, accountId, automaticDividendReinvestmentAgreement);
 

@@ -1,67 +1,28 @@
-import {
-  ManualVerificationAmlResult,
-  ManualVerificationKycResult,
-  VerificationEvent,
-  VerificationEvents,
-  VerificationKycSetToPendingEvent,
-} from 'Verification/Domain/ValueObject/VerificationEvents';
-import { mapVerificationStatus, NorthCapitalVerificationStatuses } from 'Verification/IntegrationLogic/NorthCapitalTypes';
-import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
+import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
+import { VerifyAccount } from 'Verification/IntegrationLogic/UseCase/VerifyAccount';
 
 export class NorthCapitalVerificationEvents {
-  private readonly verifierRepository: VerifierRepository;
-
-  constructor(verifierRepository: VerifierRepository) {
-    this.verifierRepository = verifierRepository;
+  constructor(registrationService: RegistrationService, verifyAccountUseCase: VerifyAccount) {
+    this.registrationService = registrationService;
+    this.verifyAccountUseCase = verifyAccountUseCase;
   }
 
   static getClassName = () => 'NorthCapitalVerificationEvents';
+  private registrationService: RegistrationService;
+  private verifyAccountUseCase: VerifyAccount;
 
-  async handleNorthCapitalVerificationEvent(
-    partyId: string,
-    kycStatus: NorthCapitalVerificationStatuses,
-    amlStatus: NorthCapitalVerificationStatuses | null,
-  ): Promise<boolean> {
-    const verifier = await this.verifierRepository.findVerifierByPartyId(partyId);
+  async handleNorthCapitalVerificationEvent(partyId: string): Promise<void> {
+    const partyMapping = await this.registrationService.getMappingByPartyId(partyId);
 
-    if (!verifier) {
-      return false;
+    if (!partyMapping) {
+      return;
     }
 
-    const events: VerificationEvent[] = [];
+    const { accountId, profileId } = partyMapping;
 
-    if (kycStatus === 'Pending') {
-      events.push(<VerificationKycSetToPendingEvent>{
-        date: new Date(),
-        kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
-        ncId: partyId,
-      });
-    } else {
-      events.push(<ManualVerificationKycResult>{
-        kind: VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
-        date: new Date(),
-        ncId: partyId,
-        reasons: [],
-        source: 'EVENT',
-        status: mapVerificationStatus(kycStatus),
-      });
-
-      if (amlStatus) {
-        events.push(<ManualVerificationAmlResult>{
-          kind: VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
-          date: new Date(),
-          ncId: partyId,
-          reasons: [],
-          source: 'EVENT',
-          status: mapVerificationStatus(amlStatus),
-        });
-      }
+    if (accountId) {
+      // todo handle the decision somehow?
+      await this.verifyAccountUseCase.verify(profileId, accountId);
     }
-
-    verifier.handleVerificationEvent(events);
-
-    await this.verifierRepository.storeVerifiers([verifier]);
-
-    return true;
   }
 }

@@ -118,6 +118,7 @@ export function boot(): Modules {
       } as LegalEntities.Config,
       {
         documents: modules.get(Documents.moduleName) as Documents.Main,
+        identity: modules.get(Identity.moduleName) as Identity.Main,
         investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main,
       },
     ),
@@ -181,6 +182,7 @@ export function boot(): Modules {
         registration: modules.get(Registration.moduleName) as Registration.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
         portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        verification: modules.get(Verification.moduleName) as Verification.Main,
       },
     ),
   );

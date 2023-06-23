@@ -114,9 +114,10 @@ export const VerificationSchema = {
         }: {
           accountId: string;
         },
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
         const api = modules.getApi<Verification.ApiType>(Verification);
 
         return api.verifyAccount(profileId, parentAccountId);
@@ -144,6 +145,7 @@ export const VerificationSchema = {
         }
 
         const status = await registrationApi.synchronizeProfile(profileId);
+        await registrationApi.resynchronizeIndividualAccount(profileId);
 
         return await verificationApi.notifyAboutUpdate(profileId);
       },
@@ -194,7 +196,7 @@ export const VerificationSchema = {
           throw new JsonGraphQLError(errors);
         }
 
-        const status = await registrationApi.synchronizeCompany(profileId, accountId);
+        await registrationApi.resynchronizeCompanyAccount(profileId, accountId);
 
         return await verificationApi.notifyAboutUpdate(accountId);
       },

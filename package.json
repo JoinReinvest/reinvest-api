@@ -10,6 +10,7 @@
     "npm": "please-use-yarn"
   },
   "scripts": {
+    "install:all": "yarn && yarn install && cd devops/functions/pdfGenerator && yarn install",
     "lint": "yarn eslint ./Reinvest ./test ./shared ./devops",
     "lint:errors": "yarn lint --quiet",
     "lint:fix": "yarn lint --fix",

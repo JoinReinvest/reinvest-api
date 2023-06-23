@@ -289,14 +289,18 @@ export const WithdrawalsSchema = {
       getFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock,
     },
     Mutation: {
-      reinvestDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules }: SessionContext) => {
+      reinvestDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
+
         const api = modules.getApi<Investments.ApiType>(Investments);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
         const { portfolioId } = await portfolioApi.getActivePortfolio();
 
         return api.reinvestDividends(profileId, accountId, portfolioId, dividendIds);
       },
-      withdrawDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules }: SessionContext) => {
+      withdrawDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
+
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
 
         return api.withdrawDividends(profileId, accountId, dividendIds);

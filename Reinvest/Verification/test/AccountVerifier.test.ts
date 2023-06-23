@@ -17,7 +17,7 @@ context('Given an investor has completed onboarding and synchronized all account
       },
     ];
     it('Then expect APPROVED decision', async () => {
-      const accountVerifier = new AccountVerifier('some-profile-uuid', 'some-account-uuid');
+      const accountVerifier = new AccountVerifier('some-profile-uuid', 'some-account-uuid', 'INDIVIDUAL');
       const result = await accountVerifier.makeAccountVerificationDecision(verifiersDecisions);
 
       expect(result.canUserContinueTheInvestment).to.be.true;
@@ -37,7 +37,7 @@ context('Given an investor has completed onboarding and synchronized all account
       },
     ];
     it('Then expect "require update" action', async () => {
-      const accountVerifier = new AccountVerifier('some-profile-uuid', 'some-account-uuid');
+      const accountVerifier = new AccountVerifier('some-profile-uuid', 'some-account-uuid', 'INDIVIDUAL');
       const result = await accountVerifier.makeAccountVerificationDecision(verifiersDecisions);
 
       expect(result.canUserContinueTheInvestment).to.be.false;
@@ -59,7 +59,7 @@ context('Given an investor has completed onboarding and synchronized all account
       },
     ];
     it('Then expect "ban profile" action', async () => {
-      const accountVerifier = new AccountVerifier('some-profile-uuid', 'some-account-uuid');
+      const accountVerifier = new AccountVerifier('some-profile-uuid', 'some-account-uuid', 'INDIVIDUAL');
       const result = await accountVerifier.makeAccountVerificationDecision(verifiersDecisions);
 
       expect(result.canUserContinueTheInvestment).to.be.false;
