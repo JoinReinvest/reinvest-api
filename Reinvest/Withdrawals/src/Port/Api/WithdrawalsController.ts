@@ -5,6 +5,7 @@ import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawa
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
 import { WithdrawDividend } from 'Withdrawals/UseCase/WithdrawDividend';
+import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 
 export class WithdrawalsController {
   private withdrawalsQuery: WithdrawalsQuery;
@@ -47,8 +48,20 @@ export class WithdrawalsController {
     };
   }
 
-  async createWithdrawalFundsRequest(profileId: UUID, accountId: UUID) {
-    return this.createWithdrawalFundsRequestUseCase.execute(profileId, accountId);
+  async createWithdrawalFundsRequest(profileId: UUID, accountId: UUID): Promise<WithdrawalError | null> {
+    try {
+      await this.createWithdrawalFundsRequestUseCase.execute(profileId, accountId);
+
+      return null;
+    } catch (error: any) {
+      if (Object.values(WithdrawalError).includes(error.message)) {
+        return error.message;
+      }
+
+      console.error(`Error creating withdrawal funds request for account ${accountId}`, error);
+
+      return WithdrawalError.UNKNOWN_ERROR;
+    }
   }
 
   async getFundsWithdrawalRequest(profileId: UUID, accountId: UUID) {

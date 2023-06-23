@@ -1,3 +1,4 @@
 export * as migration_20230616170100_create_dividends_requests from './withdrawals_1_create_dividends_requests';
 export * as migration_20230621093000_create_funds_withdrawals_requests from './withdrawals_2_create_funds_withdrawal_request';
 export * as migration_20230621093333_create_funds_withdrawals_requests_agreement from './withdrawals_3_create_funds_withdrawal_request_agreement';
+export * as migration_20230623113100_update_number_of_shares_type from './withdrawals_4_update_number_of_shares_type';

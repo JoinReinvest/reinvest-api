@@ -3,6 +3,7 @@ import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { FundsWithdrawalRequestsAgreementsRepository } from 'Reinvest/Withdrawals/src/Adapter/Database/Repository/FundsWithdrawalRequestsAgreementsRepository';
 import { FundsWithdrawalRequestsRepository } from 'Reinvest/Withdrawals/src/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { WithdrawalsFundsRequestsAgreementsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequestsAgreement';
+import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 
 export type FundsWithdrawalAgreementAgreementCreate = {
   accountId: UUID;
@@ -20,6 +21,7 @@ const mockedContentFieldsJson = {
   fullName: 'John Smith',
   telephoneNumber: '+17778887775',
 };
+
 export class CreateFundsWithdrawalAgreement {
   private idGenerator: IdGenerator;
   private fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository;
@@ -37,24 +39,21 @@ export class CreateFundsWithdrawalAgreement {
 
   static getClassName = () => 'CreateFundsWithdrawalAgreement';
 
-  async execute(profileId: UUID, accountId: UUID) {
-    const alreadyCreatedAgreement = await this.fundsWithdrawalRequestsAgreementsRepository.getAgreement(profileId, accountId);
+  async execute(profileId: UUID, accountId: UUID): Promise<void | never> {
+    const pendingFundsRequest = await this.fundsWithdrawalRequestsRepository.getPendingWithdrawalRequest(profileId, accountId);
+
+    if (!pendingFundsRequest || !pendingFundsRequest.isDraft()) {
+      throw new Error(WithdrawalError.NO_PENDING_WITHDRAWAL_REQUEST);
+    }
+
+    const alreadyCreatedAgreement = await this.fundsWithdrawalRequestsAgreementsRepository.getAgreement(pendingFundsRequest.getId());
 
     if (alreadyCreatedAgreement) {
-      const id = alreadyCreatedAgreement.getId();
-
-      return id;
+      return;
     }
 
     const id = this.idGenerator.createUuid();
-
-    const fundsWithdrawalRequest = await this.fundsWithdrawalRequestsRepository.getDraft(profileId, accountId);
-
-    if (!fundsWithdrawalRequest) {
-      return false;
-    }
-
-    const fundsWithdrawalRequestId = fundsWithdrawalRequest.getId();
+    const fundsWithdrawalRequestId = pendingFundsRequest.getId();
 
     const agreement: FundsWithdrawalAgreementAgreementCreate = {
       id,
@@ -70,9 +69,7 @@ export class CreateFundsWithdrawalAgreement {
     const status = await this.fundsWithdrawalRequestsAgreementsRepository.create(agreement);
 
     if (!status) {
-      return false;
+      throw new Error(WithdrawalError.UNKNOWN_ERROR);
     }
-
-    return id;
   }
 }

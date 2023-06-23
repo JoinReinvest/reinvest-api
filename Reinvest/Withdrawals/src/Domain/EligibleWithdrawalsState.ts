@@ -49,7 +49,7 @@ export class EligibleWithdrawalsState {
     };
   }
 
-  getEligibleWhithdrawalsData() {
+  getEligibleWithdrawalsData() {
     const { accountValue, numberOfShares, totalDividends, totalFee, totalFunds, eligibleFunds } = this.eligibleWithdrawals;
 
     return {

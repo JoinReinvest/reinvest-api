@@ -29,10 +29,10 @@ export class UseCaseServiceProvider {
     container.addSingleton(CreateWithdrawalFundsRequest, [IdGenerator, FundsWithdrawalRequestsRepository, WithdrawalsQuery]);
     container.addSingleton(GetFundsWithdrawalRequest, [FundsWithdrawalRequestsRepository, WithdrawalsQuery]);
     container.addSingleton(CreateFundsWithdrawalAgreement, [IdGenerator, FundsWithdrawalRequestsRepository, FundsWithdrawalRequestsAgreementsRepository]);
-    container.addSingleton(GetFundsWithdrawalAgreement, [FundsWithdrawalRequestsAgreementsRepository]);
+    container.addSingleton(GetFundsWithdrawalAgreement, [FundsWithdrawalRequestsAgreementsRepository, FundsWithdrawalRequestsRepository]);
     container.addSingleton(WithdrawDividend, [SharesAndDividendsService, DividendsRequestsRepository, 'WithdrawalTransactionalAdapter', IdGenerator]);
     container.addSingleton(SignFundsWithdrawalRequestAgreement, [FundsWithdrawalRequestsAgreementsRepository, FundsWithdrawalRequestsRepository]);
     container.addSingleton(AbortFundsWithdrawalRequest, [FundsWithdrawalRequestsRepository]);
-    container.addSingleton(RequestFundWithdrawal, [FundsWithdrawalRequestsRepository, FundsWithdrawalRequestsAgreementsRepository, WithdrawalsQuery]);
+    container.addSingleton(RequestFundWithdrawal, [FundsWithdrawalRequestsRepository]);
   }
 }

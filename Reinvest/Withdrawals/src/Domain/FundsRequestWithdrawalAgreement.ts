@@ -65,7 +65,11 @@ export class FundsRequestWithdrawalAgreement {
     return this.id;
   }
 
-  setSignature(ip: string) {
+  signAgreement(ip: string) {
+    if (this.isSigned()) {
+      return;
+    }
+
     this.status = WithdrawalsFundsRequestsAgreementsStatuses.SIGNED;
     this.signedByIP = ip;
     this.signedAt = new Date();

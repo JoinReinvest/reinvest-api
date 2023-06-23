@@ -1,6 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 
 import { WithdrawalsFundsRequestsStatuses } from './WithdrawalsFundsRequests';
+import { Money } from 'Money/Money';
 
 export type SettledSharesData = {
   currentNavPerShare: number;
@@ -15,6 +16,8 @@ export type DividendData = {
   totalDividendAmount: number;
   totalFeeAmount: number;
 };
+
+export type WithdrawalView = {};
 
 export type FundsWithdrawalRequestSchema = {
   accountId: UUID;
@@ -38,22 +41,34 @@ export type FundsWithdrawalRequestSchema = {
   totalFunds: number;
 };
 
-export enum RetrunStatuses {
+export enum WithdrawalStatus {
   AWAITING_SIGNING_AGREEMENT = 'AWAITING_SIGNING_AGREEMENT',
   DRAFT = 'DRAFT',
   AWAITING_DECISION = 'AWAITING_DECISION',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
 }
+
+export enum WithdrawalError {
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  PENDING_WITHDRAWAL_EXISTS = 'PENDING_WITHDRAWAL_EXISTS',
+  CAN_NOT_WITHDRAW = 'CAN_NOT_WITHDRAW',
+  NO_PENDING_WITHDRAWAL_REQUEST = 'NO_PENDING_WITHDRAWAL_REQUEST',
+  NO_WITHDRAWAL_AGREEMENT = 'NO_WITHDRAWAL_AGREEMENT',
+  WITHDRAWAL_AGREEMENT_ALREADY_SIGNED = 'WITHDRAWAL_AGREEMENT_ALREADY_SIGNED',
+  WITHDRAWAL_AGREEMENT_NOT_SIGNED = 'WITHDRAWAL_AGREEMENT_NOT_SIGNED',
+  WITHDRAWAL_REQUEST_ALREADY_SENT = 'WITHDRAWAL_REQUEST_ALREADY_SENT',
+}
+
 export class FundsWithdrawalRequest {
   private accountId: UUID;
-  private accountValue: number;
+  private accountValue: Money;
   private adminDecisionReason: string | null;
   private agreementId: UUID | null;
   private dateCreated: Date;
   private dateDecision: Date | null;
   private dividendsJson: DividendData[];
-  private eligibleFunds: number;
+  private eligibleFunds: Money;
   private id: UUID;
   private investorWithdrawalReason: string | null;
   private numberOfShares: number;
@@ -63,8 +78,8 @@ export class FundsWithdrawalRequest {
   private sharesJson: SettledSharesData[];
   private status: WithdrawalsFundsRequestsStatuses;
   private totalDividends: number;
-  private totalFee: number;
-  private totalFunds: number;
+  private totalFee: Money;
+  private totalFunds: Money;
 
   constructor(
     accountId: UUID,
@@ -88,13 +103,13 @@ export class FundsWithdrawalRequest {
     totalFunds: number,
   ) {
     this.accountId = accountId;
-    this.accountValue = accountValue;
+    this.accountValue = Money.lowPrecision(accountValue);
     this.adminDecisionReason = adminDecisionReason;
     this.agreementId = agreementId;
     this.dateCreated = dateCreated;
     this.dateDecision = dateDecision;
     this.dividendsJson = dividendsJson;
-    this.eligibleFunds = eligibleFunds;
+    this.eligibleFunds = Money.lowPrecision(eligibleFunds);
     this.id = id;
     this.investorWithdrawalReason = investorWithdrawalReason;
     this.numberOfShares = numberOfShares;
@@ -104,8 +119,8 @@ export class FundsWithdrawalRequest {
     this.sharesJson = sharesJson;
     this.status = status;
     this.totalDividends = totalDividends;
-    this.totalFee = totalFee;
-    this.totalFunds = totalFunds;
+    this.totalFee = Money.lowPrecision(totalFee);
+    this.totalFunds = Money.lowPrecision(totalFunds);
   }
 
   static create(fundsWithdrawalRequestData: FundsWithdrawalRequestSchema) {
@@ -174,31 +189,35 @@ export class FundsWithdrawalRequest {
     this.status = WithdrawalsFundsRequestsStatuses.REQUESTED;
   }
 
-  getReturnStatusValue() {
+  getWithdrawalStatus(): WithdrawalStatus {
     switch (this.status) {
       case WithdrawalsFundsRequestsStatuses.REQUESTED:
-        return RetrunStatuses.AWAITING_DECISION;
+        return WithdrawalStatus.AWAITING_DECISION;
+      case WithdrawalsFundsRequestsStatuses.ACCEPTED:
+        return WithdrawalStatus.APPROVED;
+      case WithdrawalsFundsRequestsStatuses.REJECTED:
+        return WithdrawalStatus.REJECTED;
       case WithdrawalsFundsRequestsStatuses.DRAFT:
         if (!this.agreementId) {
-          return RetrunStatuses.AWAITING_SIGNING_AGREEMENT;
+          return WithdrawalStatus.AWAITING_SIGNING_AGREEMENT;
         } else {
-          return RetrunStatuses.DRAFT;
+          return WithdrawalStatus.DRAFT;
         }
       default:
-        return RetrunStatuses.DRAFT;
+        return WithdrawalStatus.DRAFT;
     }
   }
 
   toObject() {
     return {
       accountId: this.accountId,
-      accountValue: this.accountValue,
+      accountValue: this.accountValue.getAmount(),
       adminDecisionReason: this.adminDecisionReason,
       agreementId: this.agreementId,
       dateCreated: this.dateCreated,
       dateDecision: this.dateDecision,
       dividendsJson: this.dividendsJson,
-      eligibleFunds: this.eligibleFunds,
+      eligibleFunds: this.eligibleFunds.getAmount(),
       id: this.id,
       investorWithdrawalReason: this.investorWithdrawalReason,
       numberOfShares: this.numberOfShares,
@@ -208,8 +227,41 @@ export class FundsWithdrawalRequest {
       sharesJson: this.sharesJson,
       status: this.status,
       totalDividends: this.totalDividends,
-      totalFee: this.totalFee,
-      totalFunds: this.totalFunds,
+      totalFee: this.totalFee.getAmount(),
+      totalFunds: this.totalFunds.getAmount(),
     };
+  }
+
+  isRequested(): boolean {
+    return this.status === WithdrawalsFundsRequestsStatuses.REQUESTED;
+  }
+
+  getWithdrawalView(): WithdrawalView {
+    return {
+      status: this.getWithdrawalStatus(),
+      createdDate: this.dateCreated,
+      decisionDate: this.dateDecision,
+      decisionMessage: this.adminDecisionReason,
+      eligibleForWithdrawal: {
+        value: this.eligibleFunds.getAmount(),
+        formatted: this.eligibleFunds.getFormattedAmount(),
+      },
+      accountValue: {
+        value: this.accountValue.getAmount(),
+        formatted: this.accountValue.getFormattedAmount(),
+      },
+      penaltiesFee: {
+        value: this.totalFee.getAmount(),
+        formatted: this.totalFee.getFormattedAmount(),
+      },
+    };
+  }
+
+  isDraft(): boolean {
+    return this.status === WithdrawalsFundsRequestsStatuses.DRAFT;
+  }
+
+  isAgreementAssigned(): boolean {
+    return !!this.agreementId;
   }
 }

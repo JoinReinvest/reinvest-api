@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
-import { DividendData, SettledSharesData } from 'Withdrawals/Domain/FundsWithdrawalRequest';
+import { DividendData, SettledSharesData, WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import { WithdrawalsFundsRequestsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequests';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
 
@@ -40,16 +40,24 @@ export class CreateWithdrawalFundsRequest {
 
   static getClassName = () => 'CreateWithdrawalFundsRequest';
 
-  async execute(profileId: UUID, accountId: UUID) {
+  async execute(profileId: UUID, accountId: UUID): Promise<void | never> {
+    const pendingWithdrawalRequest = await this.fundsWithdrawalRequestsRepository.getPendingWithdrawalRequest(profileId, accountId);
+
+    if (pendingWithdrawalRequest && pendingWithdrawalRequest.isRequested()) {
+      throw new Error(WithdrawalError.PENDING_WITHDRAWAL_EXISTS);
+    } else if (pendingWithdrawalRequest) {
+      return;
+    }
+
     const withdrawalsState = await this.withdrawalsQuery.prepareEligibleWithdrawalsState(profileId, accountId);
 
-    if (!withdrawalsState) {
-      return false;
+    if (!withdrawalsState || !withdrawalsState.canWithdraw()) {
+      throw new Error(WithdrawalError.CAN_NOT_WITHDRAW);
     }
 
     const id = this.idGenerator.createUuid();
 
-    const { accountValue, numberOfShares, totalDividends, totalFee, totalFunds, eligibleFunds } = withdrawalsState.getEligibleWhithdrawalsData();
+    const { accountValue, numberOfShares, totalDividends, totalFee, totalFunds, eligibleFunds } = withdrawalsState.getEligibleWithdrawalsData();
 
     const withdrawalFundsRequest: WithdrawalFundsRequestCreate = {
       id,
@@ -74,7 +82,5 @@ export class CreateWithdrawalFundsRequest {
     };
 
     await this.fundsWithdrawalRequestsRepository.create(withdrawalFundsRequest);
-
-    return id;
   }
 }

@@ -1,4 +1,4 @@
-import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { SessionContext } from 'ApiGateway/index';
 import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Investments } from 'Investments/index';
@@ -267,8 +267,11 @@ export const WithdrawalsSchema = {
 
         return api.simulateWithdrawals(profileId, accountId);
       },
-      getFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) =>
-        fundsWithdrawalRequestMock('AWAITING_DECISION'),
+      getFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        return api.getFundsWithdrawalRequest(profileId, accountId);
+      },
       getDividend: async (parent: any, { dividendId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
 
@@ -286,7 +289,11 @@ export const WithdrawalsSchema = {
 
         return list;
       },
-      getFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock,
+      getFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        return api.getFundsWithdrawalAgreement(profileId, accountId);
+      },
     },
     Mutation: {
       reinvestDividend: async (parent: any, { accountId, dividendIds }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
@@ -308,49 +315,40 @@ export const WithdrawalsSchema = {
 
       createFundsWithdrawalRequest: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+        const error = await api.createWithdrawalFundsRequest(profileId, accountId);
 
-        const id = await api.createWithdrawalFundsRequest(profileId, accountId);
-
-        if (!id) {
-          throw new GraphQLError('Funds cannot be withdrawn');
+        if (error) {
+          throw new GraphQLError(error);
         }
 
-        const fundsWithdrawalRequest = await api.getFundsWithdrawalRequest(profileId, accountId);
-
-        return fundsWithdrawalRequest;
+        return api.getFundsWithdrawalRequest(profileId, accountId);
       },
       createFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+        const error = await api.createFundsWithdrawalAgreement(profileId, accountId);
 
-        const id = await api.createFundsWithdrawalAgreement(profileId, accountId);
-
-        if (!id) {
-          throw new JsonGraphQLError('COULDNT_CREATE_SUBSCRIPTION');
+        if (error) {
+          throw new GraphQLError(error);
         }
 
-        const subscriptionAgreement = await api.getFundsWithdrawalAgreement(profileId, accountId);
-
-        return subscriptionAgreement;
+        return api.getFundsWithdrawalAgreement(profileId, accountId);
       },
       signFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules, clientIp }: SessionContext) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
 
-        const isAssigned = await api.signFundsWithdrawalAgreement(profileId, accountId, clientIp);
+        const error = await api.signFundsWithdrawalAgreement(profileId, accountId, clientIp);
 
-        if (!isAssigned) {
-          throw new JsonGraphQLError('COULDNT_ASSIGN');
+        if (error) {
+          throw new GraphQLError(error);
         }
 
-        const fundsWithdrawalAgreement = await api.getFundsWithdrawalAgreement(profileId, accountId);
-
-        return fundsWithdrawalAgreement;
+        return api.getFundsWithdrawalAgreement(profileId, accountId);
       },
       requestFundsWithdrawal: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+        await api.requestFundWithdrawal(profileId, accountId);
 
-        const fundsWithdrawalRequest = await api.requestFundWithdrawal(profileId, accountId);
-
-        return fundsWithdrawalRequest;
+        return api.getFundsWithdrawalRequest(profileId, accountId);
       },
       abortFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
