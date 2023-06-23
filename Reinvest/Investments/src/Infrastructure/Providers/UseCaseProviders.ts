@@ -10,6 +10,7 @@ import DeactivateRecurringInvestment from 'Investments/Application/UseCases/Deac
 import InitiateRecurringInvestment from 'Investments/Application/UseCases/InitiateRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
+import ListInvestments from 'Investments/Application/UseCases/ListInvestments';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
 import RecurringInvestmentQuery from 'Investments/Application/UseCases/RecurringInvestmentQuery';
 import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
@@ -76,5 +77,6 @@ export default class UseCaseProviders {
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
     container.addSingleton(AbortInvestment, [RecurringInvestmentsRepository, FeesRepository, 'InvestmentsDatabaseAdapter']);
+    container.addSingleton(ListInvestments, [InvestmentsRepository]);
   }
 }
