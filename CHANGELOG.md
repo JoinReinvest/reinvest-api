@@ -1,5 +1,21 @@
 # REINVEST API CHANGELOG
 
+## 1.17.1 - 06/23/2023
+
+* No MOCKS anymore:
+    * Queries:
+        * `getFundsWithdrawalRequest`
+        * `getFundsWithdrawalAgreement`
+        * `listInvestments`
+    * Mutations:
+        * `createFundsWithdrawalRequest`
+        * `createFundsWithdrawalAgreement`
+        * `signFundsWithdrawalAgreement`
+        * `requestFundsWithdrawal`
+        * `abortFundsWithdrawalRequest`
+    * To see the flow for withdrawals read Changelog#1.12.3
+*
+
 ## 1.17.0 - 06/22/2023
 
 * Rejected verification can ban the profile or an account

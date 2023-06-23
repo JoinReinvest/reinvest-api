@@ -49,7 +49,7 @@ const schema = `
         """
         getSubscriptionAgreement(subscriptionAgreementId: ID!): SubscriptionAgreement!
         """
-        [MOCK] List of all investments history
+        List of all investments history
         """
         listInvestments(accountId: ID!, pagination: Pagination = {page: 0, perPage: 10}): [InvestmentOverview]!
     }

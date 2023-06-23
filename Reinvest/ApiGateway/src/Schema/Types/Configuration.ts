@@ -14,14 +14,14 @@ const schema = `
 
     type Query {
         """
-        [MOCK] Return account configuration
+        Return account configuration
         """
         getAccountConfiguration(accountId: ID!): AccountConfiguration
     }
 
     type Mutation {
         """
-        [MOCK] Set automatic dividend reinvestment agreement
+        Set automatic dividend reinvestment agreement
         """
         setAutomaticDividendReinvestmentAgreement(accountId: ID!, automaticDividendReinvestmentAgreement: Boolean!): Boolean!
     }
