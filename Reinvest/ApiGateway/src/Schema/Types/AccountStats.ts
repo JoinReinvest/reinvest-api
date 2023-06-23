@@ -45,12 +45,12 @@ const schema = `
 
     type Query {
         """
-        [MOCK] Get EVS chart data for an account by resolution
+        Get EVS chart data for an account by resolution
         """
         getEVSChart(accountId: ID!, resolution: EVSChartResolution!): EVSChart
 
         """
-        [MOCK] Get account stats
+        Get account stats
         """
         getAccountStats(accountId: ID!): AccountStats
 

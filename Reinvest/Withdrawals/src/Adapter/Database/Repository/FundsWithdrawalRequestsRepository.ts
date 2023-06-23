@@ -37,7 +37,7 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
-  async assignAgreement(profileId: UUID, accountId: UUID, fundsWithdrawalRequest: FundsWithdrawalRequest) {
+  async assignAgreement(fundsWithdrawalRequest: FundsWithdrawalRequest) {
     const { id, agreementId } = fundsWithdrawalRequest.toObject();
     try {
       await this.databaseAdapterProvider
@@ -47,37 +47,11 @@ export class FundsWithdrawalRequestsRepository {
           agreementId,
         })
         .where('id', '=', id)
-        .where('profileId', '=', profileId)
-        .where('accountId', '=', accountId)
         .executeTakeFirst();
 
       return true;
     } catch (error: any) {
       console.error(`Cannot assign agreement to funds withdrawal request: ${error.message}`, error);
-
-      return false;
-    }
-  }
-
-  async getDraft(profileId: UUID, accountId: UUID) {
-    try {
-      const fundsWithdrawalRequest = await this.databaseAdapterProvider
-        .provide()
-        .selectFrom(withdrawalsFundsRequestsTable)
-        .selectAll()
-        .where('status', '=', WithdrawalsFundsRequestsStatuses.DRAFT)
-        .where('profileId', '=', profileId)
-        .where('accountId', '=', accountId)
-        .castTo<FundsWithdrawalRequestSchema>()
-        .executeTakeFirst();
-
-      if (!fundsWithdrawalRequest) {
-        return null;
-      }
-
-      return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
-    } catch (error: any) {
-      console.error('Cannot get funds withdrawal request');
 
       return false;
     }
@@ -92,6 +66,7 @@ export class FundsWithdrawalRequestsRepository {
         .set({
           status,
         })
+        .where('id', '=', fundsWithdrawalRequest.getId())
         .execute();
 
       return true;
@@ -102,34 +77,16 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
-  async get(profileId: UUID, accountId: UUID) {
+  async get(profileId: UUID, accountId: UUID): Promise<FundsWithdrawalRequest | null> {
     try {
       const fundsWithdrawalRequest = await this.databaseAdapterProvider
         .provide()
         .selectFrom(withdrawalsFundsRequestsTable)
-        .select([
-          'accountValue',
-          'adminDecisionReason',
-          'agreementId',
-          'dateCreated',
-          'dateDecision',
-          'dividendsJson',
-          'eligibleFunds',
-          'id',
-          'investorWithdrawalReason',
-          'numberOfShares',
-          'payoutId',
-          'profileId',
-          'redemptionId',
-          'sharesJson',
-          'status',
-          'totalDividends',
-          'totalFee',
-          'totalFunds',
-          'accountId',
-        ])
+        .selectAll()
         .where('profileId', '=', profileId)
         .where('accountId', '=', accountId)
+        .where('status', '!=', WithdrawalsFundsRequestsStatuses.ABORTED)
+        .orderBy('dateCreated', 'desc')
         .castTo<FundsWithdrawalRequestSchema>()
         .executeTakeFirst();
 
@@ -141,7 +98,7 @@ export class FundsWithdrawalRequestsRepository {
     } catch (error: any) {
       console.error('Cannot get funds withdrawal request');
 
-      return false;
+      return null;
     }
   }
 
@@ -151,5 +108,23 @@ export class FundsWithdrawalRequestsRepository {
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  async getPendingWithdrawalRequest(profileId: UUID, accountId: UUID) {
+    const fundsWithdrawalRequest = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', 'in', [WithdrawalsFundsRequestsStatuses.DRAFT, WithdrawalsFundsRequestsStatuses.REQUESTED])
+      .castTo<FundsWithdrawalRequestSchema>()
+      .executeTakeFirst();
+
+    if (!fundsWithdrawalRequest) {
+      return null;
+    }
+
+    return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
   }
 }

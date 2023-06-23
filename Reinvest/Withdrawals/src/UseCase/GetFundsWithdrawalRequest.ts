@@ -1,5 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
+import { WithdrawalError, WithdrawalView } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
 
 export class GetFundsWithdrawalRequest {
@@ -13,31 +14,13 @@ export class GetFundsWithdrawalRequest {
 
   static getClassName = () => 'GetFundsWithdrawalRequest';
 
-  async execute(profileId: UUID, accountId: UUID) {
+  async execute(profileId: UUID, accountId: UUID): Promise<WithdrawalView | never> {
     const fundsWithdrawalRequest = await this.fundsWithdrawalRequestsRepository.get(profileId, accountId);
 
     if (!fundsWithdrawalRequest) {
-      return false;
+      throw new Error(WithdrawalError.NO_PENDING_WITHDRAWAL_REQUEST);
     }
 
-    const withdrawalsState = await this.withdrawalsQuery.prepareEligibleWithdrawalsState(profileId, accountId);
-
-    if (!withdrawalsState) {
-      return false;
-    }
-
-    const { dateCreated, dateDecision, adminDecisionReason } = fundsWithdrawalRequest.toObject();
-
-    const status = fundsWithdrawalRequest.getReturnStatusValue();
-
-    return {
-      status,
-      createdDate: dateCreated,
-      decisionDate: dateDecision,
-      decisionMessage: adminDecisionReason,
-      eligibleForWithdrawal: withdrawalsState.getEligibleForWithdrawalsAmount(),
-      accountValue: withdrawalsState.getAccountValueAmount(),
-      penaltiesFee: withdrawalsState.getPenaltiesFeeAmount(),
-    };
+    return fundsWithdrawalRequest.getWithdrawalView();
   }
 }

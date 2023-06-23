@@ -12,7 +12,7 @@ class AbortFundsWithdrawalRequest {
 
   async execute(profileId: UUID, accountId: UUID) {
     try {
-      const fundsWithdrawalRequests = await this.fundsWithdrawalRequestsRepository.get(profileId, accountId);
+      const fundsWithdrawalRequests = await this.fundsWithdrawalRequestsRepository.getPendingWithdrawalRequest(profileId, accountId);
 
       if (!fundsWithdrawalRequests) {
         return false;

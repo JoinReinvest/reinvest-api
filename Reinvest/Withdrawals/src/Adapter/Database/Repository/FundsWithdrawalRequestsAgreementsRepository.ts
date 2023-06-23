@@ -12,7 +12,7 @@ export class FundsWithdrawalRequestsAgreementsRepository {
 
   public static getClassName = (): string => 'FundsWithdrawalRequestsAgreementsRepository';
 
-  async getAgreement(profileId: UUID, accountId: UUID) {
+  async getAgreement(fundsRequestId: UUID) {
     const fundsRequestWithdrawalAgreement = await this.databaseAdapterProvider
       .provide()
       .selectFrom(withdrawalsFundsRequestsAgreementsTable)
@@ -29,11 +29,12 @@ export class FundsWithdrawalRequestsAgreementsRepository {
         'status',
         'templateVersion',
       ])
-      .where('accountId', '=', accountId)
-      .where('profileId', '=', profileId)
+      .where('fundsRequestId', '=', fundsRequestId)
       .executeTakeFirst();
 
-    if (!fundsRequestWithdrawalAgreement) return null;
+    if (!fundsRequestWithdrawalAgreement) {
+      return null;
+    }
 
     return FundsRequestWithdrawalAgreement.create(fundsRequestWithdrawalAgreement);
   }
@@ -45,7 +46,7 @@ export class FundsWithdrawalRequestsAgreementsRepository {
         .provide()
         .updateTable(withdrawalsFundsRequestsAgreementsTable)
         .set({
-          ...withdrawalFundsRequestAgreement,
+          ...withdrawalFundsRequestAgreement.toObject(),
         })
         .where('id', '=', id)
         .execute();
@@ -90,7 +91,7 @@ export class FundsWithdrawalRequestsAgreementsRepository {
 
       return true;
     } catch (error: any) {
-      console.error(`Cannot create funds withdrawal request agreement: ${error.message}`, error);
+      console.error(`Cannot create funds withdrawal request agreement for funds request ${fundsRequestId}`, error);
 
       return false;
     }
