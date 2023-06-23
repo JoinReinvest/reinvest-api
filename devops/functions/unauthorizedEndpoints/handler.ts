@@ -45,7 +45,7 @@ app.post('/webhooks/updateParty', async function (req: any, res: any) {
   const verificationModule = modules.getApi<Verification.ApiType>(Verification);
 
   const aml = !amlStatus || !northCapitalVerificationStatuses.includes(amlStatus) ? null : amlStatus;
-  await verificationModule.handleNorthCapitalVerificationEvent(partyId, kycStatus, aml);
+  await verificationModule.handleNorthCapitalVerificationEvent(partyId);
 
   await modules.close();
 

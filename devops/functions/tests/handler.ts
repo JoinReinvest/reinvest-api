@@ -6,30 +6,30 @@ import {
   AdminSetUserPasswordCommand,
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
-  ListUsersCommand,
-} from '@aws-sdk/client-cognito-identity-provider';
-import * as bodyParser from 'body-parser';
-import express from 'express';
-import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
-import { Investments } from 'Investments/index';
-import { RegistrationDatabase } from 'Registration/Adapter/Database/DatabaseAdapter';
-import { boot } from 'Reinvest/bootstrap';
-import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from 'Reinvest/config';
-import { IdentityDatabase, userTable } from 'Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter';
-import { InvestmentAccountsDatabase } from 'Reinvest/InvestmentAccounts/src/Infrastructure/Storage/DatabaseAdapter';
-import { LegalEntitiesDatabase } from 'Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter';
-import { Registration } from 'Reinvest/Registration/src';
-import { NorthCapitalAdapter } from 'Reinvest/Registration/src/Adapter/NorthCapital/NorthCapitalAdapter';
-import { VertaloAdapter } from 'Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter';
-import serverless from 'serverless-http';
-import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/DatabaseProvider';
-import { QueueSender } from 'shared/hkek-sqs/QueueSender';
-import { SharesAndDividends } from 'SharesAndDividends/index'; // dependencies
-import { tradesTable } from 'Trading/Adapter/Database/DatabaseAdapter'; // dependencies
-import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter'; // dependencies
-import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
+  ListUsersCommand
+} from "@aws-sdk/client-cognito-identity-provider";
+import * as bodyParser from "body-parser";
+import express from "express";
+import { PhoneNumber } from "Identity/Domain/PhoneNumber";
+import { Investments } from "Investments/index";
+import { RegistrationDatabase } from "Registration/Adapter/Database/DatabaseAdapter";
+import { boot } from "Reinvest/bootstrap";
+import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from "Reinvest/config";
+import { IdentityDatabase, userTable } from "Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter";
+import { InvestmentAccountsDatabase } from "Reinvest/InvestmentAccounts/src/Infrastructure/Storage/DatabaseAdapter";
+import { LegalEntitiesDatabase } from "Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter";
+import { Registration } from "Reinvest/Registration/src";
+import { NorthCapitalAdapter } from "Reinvest/Registration/src/Adapter/NorthCapital/NorthCapitalAdapter";
+import { VertaloAdapter } from "Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter";
+import serverless from "serverless-http";
+import { DatabaseProvider, PostgreSQLConfig } from "shared/hkek-postgresql/DatabaseProvider";
+import { QueueSender } from "shared/hkek-sqs/QueueSender";
+import { SharesAndDividends } from "SharesAndDividends/index"; // dependencies
+import { tradesTable } from "Trading/Adapter/Database/DatabaseAdapter"; // dependencies
+import { TradingNorthCapitalAdapter } from "Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter"; // dependencies
+import { verifierRecordsTable } from "Verification/Adapter/Database/DatabaseAdapter";
 
-import { main as postSignUp } from '../postSignUp/handler'; // dependencies
+import { main as postSignUp } from "../postSignUp/handler"; // dependencies
 // dependencies
 type AllDatabases = IdentityDatabase & LegalEntitiesDatabase & InvestmentAccountsDatabase & RegistrationDatabase;
 const databaseProvider: DatabaseProvider<AllDatabases> = new DatabaseProvider<AllDatabases>(DATABASE_CONFIG as PostgreSQLConfig);
@@ -663,7 +663,46 @@ const northCapitalRouter = () => {
       });
     }
   });
+  router.post('/update-trade-principal', async (req: any, res: any) => {
+    try {
+      const { investmentId, rrApproval, field3 } = req.body;
 
+      if (!['Pending', 'Approved', 'Disapproved', 'Under Review'].includes(rrApproval)) {
+        throw new Error("Invalid trade state, should be one of 'Pending', 'Approved', 'Disapproved', 'Under Review'");
+      }
+
+      const reinvestTrade = await databaseProvider
+        .provide()
+        .selectFrom(tradesTable)
+        .selectAll()
+        .where('investmentId', '=', investmentId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      const ncAdapter = new TradingNorthCapitalAdapter(NORTH_CAPITAL_CONFIG);
+
+      const ncTrade = await ncAdapter.getCurrentTradeState(reinvestTrade.tradeId);
+      const tradeDetailsAfterChanges = await ncAdapter.updateTradePrincipalApprovalForTests(
+        reinvestTrade.tradeId,
+        reinvestTrade.vendorsConfigurationJson.northCapitalParentAccountId,
+        ncTrade.orderStatus,
+        rrApproval,
+        field3,
+      );
+
+      res.status(200).json({
+        status: true,
+        tradeDetailsAfterChanges,
+        reinvestTrade,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
   router.post('/set-user-for-verification', async (req: any, res: any) => {
     try {
       const ncAdapter = new NorthCapitalAdapter(NORTH_CAPITAL_CONFIG);

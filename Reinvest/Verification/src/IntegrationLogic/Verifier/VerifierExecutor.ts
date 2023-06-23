@@ -1,12 +1,16 @@
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
 
 export class VerifierExecutor {
   private northCapitalAdapter: VerificationNorthCapitalAdapter;
+  private eventBus: EventBus;
 
-  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter) {
+  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter, eventBus: EventBus) {
     this.northCapitalAdapter = northCapitalAdapter;
+    this.eventBus = eventBus;
   }
 
   static getClassName = () => 'VerifierExecutor';
@@ -57,6 +61,20 @@ export class VerifierExecutor {
       verifier.handleVerificationEvent(verificationResult);
 
       decision = verifier.makeDecision();
+    }
+
+    if ([VerificationDecisionType.ACCOUNT_BANNED, VerificationDecisionType.PROFILE_BANNED].includes(decision.decision)) {
+      await this.eventBus.publish(<DomainEvent>{
+        id: '',
+        kind: VerificationDecisionType.ACCOUNT_BANNED ? 'AccountBanned' : 'ProfileBanned',
+        data: {
+          profileId: decision.onObject?.profileId ?? null,
+          accountId: decision.onObject?.accountId ?? null,
+          stakeholderId: decision.onObject?.stakeholderId ?? null,
+          type: decision.onObject.type,
+          reasons: decision.reasons,
+        },
+      });
     }
 
     return decision;

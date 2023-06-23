@@ -1,5 +1,12 @@
 import { CognitoService } from 'Identity/Adapter/AWS/CognitoService';
 import { UserRepository } from 'Identity/Adapter/Database/Repository/UserRepository';
+import { BanList } from 'Identity/Port/Api/BanController';
+
+export type UserProfile = {
+  isBannedAccount: (accountId: string) => boolean;
+  isBannedProfile: () => boolean;
+  profileId: string;
+};
 
 export class ProfileController {
   private userRepository: UserRepository;
@@ -12,11 +19,21 @@ export class ProfileController {
 
   public static getClassName = (): string => 'ProfileController';
 
-  async getProfileId(userId: string): Promise<string | null> {
+  async getProfile(userId: string): Promise<UserProfile | null> {
     try {
-      const profileId = await this.userRepository.getUserProfileId(userId);
+      const user = await this.userRepository.getUserProfile(userId);
 
-      return profileId;
+      if (!user) {
+        return null;
+      }
+
+      const banList = <BanList>(user.bannedIdsJson ?? { list: [] });
+
+      return {
+        profileId: user.profileId,
+        isBannedAccount: (accountId: string) => banList.list.includes(accountId),
+        isBannedProfile: () => banList.list.includes(user.profileId),
+      };
     } catch (error: any) {
       console.log(error.message);
 

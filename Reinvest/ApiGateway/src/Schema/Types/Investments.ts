@@ -184,11 +184,13 @@ export const Investments = {
       },
     },
     Mutation: {
-      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
+      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules, throwIfBanned }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
         const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(individualAccountId);
+        throwIfBanned(accountId);
 
         const bankAccountData = await registrationApi.readBankAccount(profileId, individualAccountId);
 

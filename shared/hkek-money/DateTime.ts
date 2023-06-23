@@ -66,4 +66,8 @@ export class DateTime {
   private subtractDays(days: number): DateTime {
     return new DateTime(this.date.subtract(days, 'day'));
   }
+
+  toFormattedDate(dateFormat: string) {
+    return this.date.format(dateFormat);
+  }
 }

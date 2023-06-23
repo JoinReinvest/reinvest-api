@@ -14,6 +14,7 @@ export type RegistrationApiType = {
   getAccountMapping: RegistryQuery['getAccountMapping'];
   getBankAccount: BankAccountController['getBankAccount'];
   getBankAccountMapping: BankAccountQuery['getBankAccountMapping'];
+  getMappingByPartyId: RegistryQuery['getMappingByPartyId'];
   getNorthCapitalAccountStructure: RegistryQuery['getNorthCapitalAccountStructure'];
   immediatelySynchronizeAccount: SynchronizationController['immediatelySynchronizeAccount'];
   immediatelySynchronizeAllAccountStructure: SynchronizationController['immediatelySynchronizeAllAccountStructure'];
@@ -50,4 +51,5 @@ export const registrationApi = (container: ContainerInterface): RegistrationApiT
   immediatelySynchronizeAccount: container.delegateTo(SynchronizationController, 'immediatelySynchronizeAccount'),
   resynchronizeCompanyAccount: container.delegateTo(SynchronizationController, 'resynchronizeCompanyAccount'),
   resynchronizeIndividualAccount: container.delegateTo(SynchronizationController, 'resynchronizeIndividualAccount'),
+  getMappingByPartyId: container.delegateTo(RegistryQuery, 'getMappingByPartyId'),
 });

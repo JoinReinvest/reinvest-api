@@ -114,9 +114,10 @@ export const VerificationSchema = {
         }: {
           accountId: string;
         },
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
         const api = modules.getApi<Verification.ApiType>(Verification);
 
         return api.verifyAccount(profileId, parentAccountId);

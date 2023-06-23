@@ -1,18 +1,29 @@
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
+import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 
 export class CheckIsTradeApproved {
   private tradesRepository: TradesRepository;
   private northCapitalAdapter: TradingNorthCapitalAdapter;
+  private eventBus: EventBus;
+  private verificationService: VerificationService;
 
-  constructor(tradesRepository: TradesRepository, northCapitalAdapter: TradingNorthCapitalAdapter) {
+  constructor(
+    tradesRepository: TradesRepository,
+    northCapitalAdapter: TradingNorthCapitalAdapter,
+    eventBus: EventBus,
+    verificationService: VerificationService,
+  ) {
     this.tradesRepository = tradesRepository;
     this.northCapitalAdapter = northCapitalAdapter;
+    this.eventBus = eventBus;
+    this.verificationService = verificationService;
   }
 
   static getClassName = () => 'CheckIsTradeApproved';
 
-  async execute(investmentId: string): Promise<boolean> {
+  async execute(investmentId: string): Promise<void> {
     try {
       const trade = await this.tradesRepository.getTradeByInvestmentId(investmentId);
 
@@ -20,32 +31,46 @@ export class CheckIsTradeApproved {
         throw new Error(`Trade ${investmentId} is not awaiting approval`);
       }
 
-      // TODO RIA-236
-
       console.info(`[Trade ${investmentId}]`, 'Check is trade approved');
-      //
-      // if (trade.isTradeAwaitingFunding()) {
-      //   const tradeId = trade.getTradeId();
-      //   const tradeStatus = await this.northCapitalAdapter.getTradeStatus(tradeId);
-      //
-      //   if (tradeStatus === 'funded') {
-      //     trade.setTradeStatusToFunded();
-      //     await this.tradesRepository.updateTrade(trade);
-      //     console.info(`[Trade ${investmentId}]`, 'Trade is funded');
-      //   } else {
-      //     console.info(`[Trade ${investmentId}]`, 'Trade is NOT funded yet:', tradeStatus);
-      //
-      //     return false;
-      //   }
-      // }
+      const tradeVerification = trade.getTradeVerification();
 
-      console.info(`[Trade ${investmentId}]`, '[MOCK] RR Approval is Approved');
+      if (tradeVerification.isPending()) {
+        const tradeApproval = await this.northCapitalAdapter.getTradeApproval(trade.getTradeId());
 
-      return true;
+        tradeVerification.handle(tradeApproval);
+        tradeVerification.makeDecision();
+
+        trade.storeTradeVerification(tradeVerification);
+        await this.tradesRepository.updateTrade(trade);
+      }
+
+      if (tradeVerification.isVerified()) {
+        await this.verificationService.markAccountAsApproved(trade.getProfileId(), trade.getAccountIdForVerification());
+        await this.eventBus.publish({
+          kind: 'InvestmentApproved',
+          id: investmentId,
+        });
+
+        return;
+      }
+
+      if (tradeVerification.isRejected()) {
+        await this.verificationService.markAccountAsDisapproved(trade.getProfileId(), trade.getAccountIdForVerification(), tradeVerification.getObjectIds());
+        await this.eventBus.publish({
+          kind: 'InvestmentRejected',
+          id: investmentId,
+        });
+
+        return;
+      }
+
+      if (tradeVerification.needMoreInfo()) {
+        await this.verificationService.markAccountAsNeedMoreInfo(trade.getProfileId(), trade.getAccountIdForVerification(), tradeVerification.getObjectIds());
+
+        return;
+      }
     } catch (error) {
       console.error(`[Trade ${investmentId}]`, 'Trade approval process failed', error);
-
-      return false;
     }
   }
 }

@@ -1,13 +1,12 @@
 import { ContainerInterface } from 'Container/Container';
+import { BanEventHandler } from 'LegalEntities/Port/Events/BanEventHandler';
 
 export type LegalEntitiesTechnicalHandlerType = {
-  // completePerson: PeopleController["completePerson"],
-  // ProfileCreated: () => void,
+  AccountBanned: BanEventHandler['handle'];
+  ProfileBanned: BanEventHandler['handle'];
 };
 
 export const LegalEntitiesTechnicalHandler = (container: ContainerInterface): LegalEntitiesTechnicalHandlerType => ({
-  // completePerson: container.getClass<PeopleController>(PeopleController).completePerson,
-  // ProfileCreated: (): void => {
-  //     console.log('profile created testss')
-  // }
+  AccountBanned: container.delegateTo(BanEventHandler, 'handle'),
+  ProfileBanned: container.delegateTo(BanEventHandler, 'handle'),
 });

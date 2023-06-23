@@ -5,6 +5,7 @@ import {
 } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { EMPTY_UUID } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
+import { ObjectMapping } from 'Registration/Port/Api/RegistryQuery';
 
 export type NCAccountStructureMapping = {
   dependentId: string;
@@ -94,5 +95,34 @@ export class RegistryQueryRepository {
 
       return null;
     }
+  }
+
+  async getMappingByPartyId(partyId: string): Promise<ObjectMapping | null> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(northCapitalSynchronizationTable)
+      .innerJoin(registrationMappingRegistryTable, `${northCapitalSynchronizationTable}.recordId`, `${registrationMappingRegistryTable}.recordId`)
+      .select([
+        `${registrationMappingRegistryTable}.profileId`,
+        `${registrationMappingRegistryTable}.externalId`,
+        `${registrationMappingRegistryTable}.mappedType`,
+        `${registrationMappingRegistryTable}.dependentId`,
+      ])
+      .where(`${northCapitalSynchronizationTable}.northCapitalId`, '=', partyId)
+      .executeTakeFirst();
+
+    if (!result) {
+      return null;
+    }
+
+    const type = result.mappedType as MappedType;
+
+    return {
+      partyId,
+      profileId: result.profileId,
+      accountId: type !== MappedType.PROFILE ? result.externalId : null,
+      stakeholderId: type === MappedType.STAKEHOLDER ? result.dependentId : null,
+      type,
+    };
   }
 }
