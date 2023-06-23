@@ -25,7 +25,7 @@ export class EligibleWithdrawalsState {
   }
 
   canWithdraw(): boolean {
-    return this.eligibleWithdrawals.eligibleFunds.isGreaterThan(Money.zero()) && !this.areThereNotSettledShares;
+    return this.eligibleWithdrawals.eligibleFunds.isGreaterThan(Money.zero()); // && !this.areThereNotSettledShares; // uncomment it if you want to block withdrawals when there are unsettled shares - in grace period
   }
 
   getEligibleForWithdrawalsAmount(): MoneyAmount {
@@ -71,6 +71,7 @@ export class EligibleWithdrawalsState {
       };
     });
   }
+
   formatSettledShares() {
     return this.settledShares.map(({ id, currentNavPerShare, numberOfShares, transactionDate, unitPrice }) => {
       return {
