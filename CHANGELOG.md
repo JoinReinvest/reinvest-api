@@ -29,7 +29,7 @@
 * When adding/updating stakeholders to the corporate/trust account, the system checks if the stakeholder is not banned (
   by SSN).
 
-## 1.16.6 - 06/16/2023
+## 1.16.5 - 06/16/2023
 
 * No MOCK anymore:
     * `withdrawDividend` - it allows to withdraw dividends from the account

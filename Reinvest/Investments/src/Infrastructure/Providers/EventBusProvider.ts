@@ -50,6 +50,7 @@ export default class EventBusProvider {
         TransactionEvents.GRACE_PERIOD_ENDED,
         TransactionEvents.MARKED_AS_READY_TO_DISBURSE,
         TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
+        TransactionEvents.INVESTMENT_CANCELLED,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [
@@ -69,6 +70,7 @@ export default class EventBusProvider {
         TransactionCommands.MarkFundsAsReadyToDisburse,
         TransactionCommands.TransferSharesWhenTradeSettled,
         ReinvestmentCommands.TransferSharesForReinvestment,
+        TransactionCommands.CancelTransaction,
       ])
       .subscribe('GeneratePdfCommand', GeneratePdfEventHandler.getClassName());
   }

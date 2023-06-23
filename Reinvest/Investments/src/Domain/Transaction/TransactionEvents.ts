@@ -2,7 +2,10 @@ import { DomainEvent } from 'SimpleAggregator/Types';
 
 export enum TransactionEvents {
   INVESTMENT_CREATED = 'INVESTMENT_CREATED',
+  INVESTMENT_CANCELLED = 'INVESTMENT_CANCELLED',
+  INVESTMENT_REJECTED = 'INVESTMENT_REJECTED',
   ACCOUNT_VERIFIED_FOR_INVESTMENT = 'ACCOUNT_VERIFIED_FOR_INVESTMENT',
+  ACCOUNT_VERIFICATION_REJECTED_FOR_INVESTMENT = 'ACCOUNT_VERIFICATION_REJECTED_FOR_INVESTMENT',
   INVESTMENT_FINALIZED = 'INVESTMENT_FINALIZED',
   TRADE_CREATED = 'TRADE_CREATED',
   INVESTMENT_FUNDED = 'INVESTMENT_FUNDED',
@@ -35,6 +38,10 @@ export type AccountVerifiedForInvestment = TransactionEvent & {
     accountId: string;
   };
   kind: TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT;
+};
+
+export type InvestmentCancelled = TransactionEvent & {
+  kind: TransactionEvents.INVESTMENT_CANCELLED;
 };
 
 export type InvestmentFinalized = TransactionEvent & {

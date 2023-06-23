@@ -1,5 +1,4 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
-import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Portfolio } from 'Portfolio/index';
 import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
@@ -94,27 +93,11 @@ const schema = `
         abortInvestment(investmentId: ID!): Boolean!
 
         """
-        [MOCK] It cancels the investment that is in Funding or Funded state, but the Grace period has not been passed away yet
+        It cancels the investment that is in Funding or Funded state, but the Grace period has not been passed away yet
         """
         cancelInvestment(investmentId: ID!): Boolean!
     }
 `;
-export const subscriptionAgreementIdMock = 'e04ce44d-eb21-4691-99cc-89fd11c2bfef';
-const investmentSummaryMock = (tradeId: string, days: number) => ({
-  id: (days < 10 ? `0${days}` : days) + 'e94d4c-f237-4f10-aa05-be8ade282b' + (days < 10 ? `0${days}` : days),
-  tradeId,
-  createdAt: dayjs().subtract(days, 'day').format('YYYY-MM-DDThh:mm:ss'),
-  amount: {
-    value: '1000.00',
-    formatted: '$1,000.00',
-  },
-  status: 'IN_PROGRESS',
-  investmentFees: {
-    value: '10.00',
-    formatted: '$10.00',
-  },
-  subscriptionAgreementId: subscriptionAgreementIdMock,
-});
 
 export type USDInput = {
   value: number;
@@ -256,7 +239,9 @@ export const Investments = {
         return status;
       },
       cancelInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        return investmentAccountsApi.cancelInvestment(profileId, investmentId);
       },
     },
   },

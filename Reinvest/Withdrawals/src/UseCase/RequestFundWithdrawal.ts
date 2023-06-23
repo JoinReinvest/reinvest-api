@@ -18,14 +18,6 @@ export class RequestFundWithdrawal {
       throw new Error(WithdrawalError.NO_PENDING_WITHDRAWAL_REQUEST);
     }
 
-    if (!fundsWithdrawalRequest.isAgreementAssigned()) {
-      throw new Error(WithdrawalError.WITHDRAWAL_AGREEMENT_NOT_SIGNED);
-    }
-
-    if (!fundsWithdrawalRequest.isDraft()) {
-      throw new Error(WithdrawalError.WITHDRAWAL_REQUEST_ALREADY_SENT);
-    }
-
     fundsWithdrawalRequest.request();
 
     await this.fundsWithdrawalRequestsRepository.updateStatus(fundsWithdrawalRequest);

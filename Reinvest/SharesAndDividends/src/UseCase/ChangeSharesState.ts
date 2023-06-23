@@ -75,6 +75,11 @@ export class ChangeSharesState {
         shares.setSettledState();
         await this.sharesRepository.store(shares);
       }
+
+      if (state === SharesChangeState.REVOKED) {
+        shares.setRevokedState();
+        await this.sharesRepository.store(shares);
+      }
     } catch (error) {
       console.error('[ChangeSharesState]', investmentId, state, error);
     }

@@ -39,6 +39,10 @@ export class SharesController {
     await this.changeSharesStateUseCase.execute(investmentId, SharesChangeState.SETTLED);
   }
 
+  async setSharesToRevokedState(investmentId: string): Promise<void> {
+    await this.changeSharesStateUseCase.execute(investmentId, SharesChangeState.REVOKED);
+  }
+
   async getAccountState(profileId: string, accountId: string): Promise<AccountState> {
     return this.accountStateQuery.getAccountState(profileId, accountId);
   }
