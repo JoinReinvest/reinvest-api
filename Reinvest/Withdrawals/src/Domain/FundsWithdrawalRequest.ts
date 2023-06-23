@@ -58,6 +58,7 @@ export enum WithdrawalError {
   WITHDRAWAL_AGREEMENT_ALREADY_SIGNED = 'WITHDRAWAL_AGREEMENT_ALREADY_SIGNED',
   WITHDRAWAL_AGREEMENT_NOT_SIGNED = 'WITHDRAWAL_AGREEMENT_NOT_SIGNED',
   WITHDRAWAL_REQUEST_ALREADY_SENT = 'WITHDRAWAL_REQUEST_ALREADY_SENT',
+  CANNOT_BE_ABORTED = 'CANNOT_BE_ABORTED',
 }
 
 export class FundsWithdrawalRequest {
@@ -179,7 +180,7 @@ export class FundsWithdrawalRequest {
 
   abort() {
     if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
-      throw new Error('CANNOT_BE_ABORTED');
+      throw new Error(WithdrawalError.CANNOT_BE_ABORTED);
     } else {
       this.status = WithdrawalsFundsRequestsStatuses.ABORTED;
     }
