@@ -169,18 +169,12 @@ export const Investments = {
 
         return subscriptionAgreement;
       },
-      listInvestments: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      listInvestments: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-        // let investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
 
-        return [
-          investmentSummaryMock('47584', 1),
-          investmentSummaryMock('47583', 8),
-          investmentSummaryMock('47582', 15),
-          investmentSummaryMock('47581', 22),
-          investmentSummaryMock('47580', 29),
-          investmentSummaryMock('46099', 90),
-        ];
+        const list = await investmentAccountsApi.listInvestments(profileId, accountId, pagination);
+
+        return list;
       },
     },
     Mutation: {

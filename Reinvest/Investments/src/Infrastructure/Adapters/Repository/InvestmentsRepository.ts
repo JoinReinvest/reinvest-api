@@ -2,6 +2,7 @@ import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transac
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
 import type { Money } from 'Money/Money';
+import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
 import type { InvestmentCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateInvestment';
 import { Investment, InvestmentWithFee } from 'Reinvest/Investments/src/Domain/Investments/Investment';
 import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
@@ -64,6 +65,55 @@ export class InvestmentsRepository {
     }
 
     return Investment.create(investment);
+  }
+
+  async getInvestments(profileId: string, accountId: string, pagination: Pagination) {
+    const investmentsData = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(investmentsTable)
+      .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
+      .select([
+        `${investmentsTable}.accountId`,
+        `${investmentsTable}.amount`,
+        `${investmentsTable}.bankAccountId`,
+        `${investmentsTable}.dateCreated`,
+        `${investmentsTable}.dateUpdated`,
+        `${investmentsTable}.id`,
+        `${investmentsTable}.profileId`,
+        `${investmentsTable}.recurringInvestmentId`,
+        `${investmentsTable}.scheduledBy`,
+        `${investmentsTable}.status`,
+        `${investmentsTable}.subscriptionAgreementId`,
+        `${investmentsTable}.tradeId`,
+        `${investmentsTable}.dateStarted`,
+        `${investmentsTable}.portfolioId`,
+        `${investmentsTable}.parentId`,
+      ])
+      .select([
+        `${investmentsFeesTable}.amount as feeAmount`,
+        `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.approvedByIP`,
+        `${investmentsFeesTable}.dateCreated as feeDateCreated`,
+        `${investmentsFeesTable}.id as feeId`,
+        `${investmentsFeesTable}.investmentId`,
+        `${investmentsFeesTable}.status as feeStatus`,
+        `${investmentsFeesTable}.verificationFeeId`,
+      ])
+      .castTo<InvestmentWithFee>()
+      .where(`${investmentsTable}.profileId`, '=', profileId)
+      .where(`${investmentsTable}.accountId`, '=', accountId)
+      .orderBy('dateCreated', 'desc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .execute();
+
+    if (!investmentsData.length) {
+      return null;
+    }
+
+    const investments = investmentsData.map(investment => Investment.create(investment));
+
+    return investments;
   }
 
   async getInvestmentForSummary(investmentId: string) {

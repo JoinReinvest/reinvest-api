@@ -1,4 +1,4 @@
-import { SessionContext } from 'ApiGateway/index';
+import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
 import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Investments } from 'Investments/index';
@@ -306,13 +306,59 @@ export const WithdrawalsSchema = {
         return api.withdrawDividends(profileId, accountId, dividendIds);
       },
 
-      createFundsWithdrawalRequest: async (parent: any, { accountId, investorWithdrawalReason }: any, { profileId, modules }: SessionContext) =>
-        fundsWithdrawalRequestMock('AWAITING_SIGNING_AGREEMENT'),
-      createFundsWithdrawalAgreement: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock(false),
-      signFundsWithdrawalAgreement: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => fundsWithdrawalAgreementMock(true),
-      requestFundsWithdrawal: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) =>
-        fundsWithdrawalRequestMock('AWAITING_DECISION'),
-      abortFundsWithdrawalRequest: async (parent: any, { dividendIds }: any, { profileId, modules }: SessionContext) => true,
+      createFundsWithdrawalRequest: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        const id = await api.createWithdrawalFundsRequest(profileId, accountId);
+
+        if (!id) {
+          throw new GraphQLError('Funds cannot be withdrawn');
+        }
+
+        const fundsWithdrawalRequest = await api.getFundsWithdrawalRequest(profileId, accountId);
+
+        return fundsWithdrawalRequest;
+      },
+      createFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        const id = await api.createFundsWithdrawalAgreement(profileId, accountId);
+
+        if (!id) {
+          throw new JsonGraphQLError('COULDNT_CREATE_SUBSCRIPTION');
+        }
+
+        const subscriptionAgreement = await api.getFundsWithdrawalAgreement(profileId, accountId);
+
+        return subscriptionAgreement;
+      },
+      signFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules, clientIp }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        const isAssigned = await api.signFundsWithdrawalAgreement(profileId, accountId, clientIp);
+
+        if (!isAssigned) {
+          throw new JsonGraphQLError('COULDNT_ASSIGN');
+        }
+
+        const fundsWithdrawalAgreement = await api.getFundsWithdrawalAgreement(profileId, accountId);
+
+        return fundsWithdrawalAgreement;
+      },
+      requestFundsWithdrawal: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        const fundsWithdrawalRequest = await api.requestFundWithdrawal(profileId, accountId);
+
+        return fundsWithdrawalRequest;
+      },
+      abortFundsWithdrawalRequest: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
+
+        const status = api.abortFundsWithdrawalRequest(profileId, accountId);
+
+        return status;
+      },
     },
   },
 };
