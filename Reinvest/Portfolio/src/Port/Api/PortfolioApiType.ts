@@ -7,9 +7,11 @@ export type PortfolioApiType = {
   getPortfolio: PortfolioController['getPortfolio'];
   getPortfolioDetails: PortfolioController['getPortfolioDetails'];
   getPortfolioVendorsConfiguration: PortfolioController['getPortfolioVendorsConfiguration'];
+  synchronizePortfolio: PortfolioController['synchronizePortfolio'];
 };
 
 export const PortfolioApi = (container: ContainerInterface): PortfolioApiType => ({
+  synchronizePortfolio: container.delegateTo(PortfolioController, 'synchronizePortfolio'),
   getActivePortfolio: container.delegateTo(PortfolioController, 'getActivePortfolio'),
   getPortfolioDetails: container.delegateTo(PortfolioController, 'getPortfolioDetails'),
   getCurrentNav: container.delegateTo(PortfolioController, 'getCurrentNav'),

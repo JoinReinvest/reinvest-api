@@ -1,5 +1,6 @@
 import Container, { ContainerInterface } from 'Container/Container';
 import { PortfolioDatabaseAdapterInstanceProvider, PortfolioDatabaseAdapterProvider } from 'Portfolio/Adapter/Database/DatabaseAdapter';
+import { DealpathConfig } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
 import { PortfolioApi, PortfolioApiType } from 'Portfolio/Port/Api/PortfolioApiType';
 import { PortfolioTechnicalHandler, PortfolioTechnicalHandlerType } from 'Portfolio/Port/Queue/PortfolioTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Portfolio/Providers/AdapterServiceProvider';
@@ -16,6 +17,7 @@ export namespace Portfolio {
   export const moduleName = 'Portfolio';
   export type Config = {
     database: PostgreSQLConfig;
+    dealpathConfig: DealpathConfig;
     queue: QueueConfig;
   };
 
