@@ -3,7 +3,10 @@
 ## 1.17.2 - 06/26/2023
 
 * No MOCKS anymore:
-    * cancelInvestment - cancel investment after the investment has been started and the grace period has not ended yet
+    * `cancelInvestment` - cancel investment after the investment has been started and the grace period has not ended
+      yet
+* New MOCK mutation:
+  * `registerPushNotificationDevice` - Register device for Firebase push notifications
 
 ## 1.17.1 - 06/23/2023
 
