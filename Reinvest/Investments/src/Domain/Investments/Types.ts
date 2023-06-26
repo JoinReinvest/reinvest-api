@@ -7,6 +7,7 @@ export enum InvestmentStatus {
   FAILED = 'FAILED',
   FINISHED = 'FINISHED',
   ABORTED = 'ABORTED',
+  CANCELED = 'CANCELED',
 }
 
 export enum ScheduledBy {

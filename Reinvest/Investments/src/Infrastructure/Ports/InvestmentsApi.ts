@@ -11,6 +11,7 @@ import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrast
 export type InvestmentsApiType = {
   abortInvestment: InvestmentsController['abortInvestment'];
   approveFees: FeesController['approveFees'];
+  cancelInvestment: InvestmentsController['cancelInvestment'];
   createDraftRecurringInvestment: RecurringInvestmentsController['createDraftRecurringInvestment'];
   createInvestment: InvestmentsController['createInvestment'];
   createRecurringSubscriptionAgreement: SubscriptionAgreementController['createRecurringSubscriptionAgreement'];
@@ -20,7 +21,6 @@ export type InvestmentsApiType = {
   getScheduleSimulation: ScheduleSimulationController['getScheduleSimulation'];
   initiateRecurringInvestment: RecurringInvestmentsController['initiateRecurringInvestment'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
-  isFeesApproved: FeesController['isFeesApproved'];
   listInvestments: InvestmentsController['listInvestments'];
   pushTransaction: TransactionController['pushTransaction'];
   reinvestDividends: DividendsController['reinvestDividends'];
@@ -30,6 +30,7 @@ export type InvestmentsApiType = {
   subscriptionAgreementQuery: SubscriptionAgreementController['subscriptionAgreementQuery'];
   test: TempController['handle'];
   unsuspendRecurringInvestment: RecurringInvestmentsController['unsuspendRecurringInvestment'];
+  isFeesApproved: FeesController['isFeesApproved'];
 };
 
 export const investmentsApi = (container: ContainerInterface): InvestmentsApiType => ({
@@ -54,4 +55,5 @@ export const investmentsApi = (container: ContainerInterface): InvestmentsApiTyp
   signSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'signSubscriptionAgreement'),
   reinvestDividends: container.delegateTo(DividendsController, 'reinvestDividends'),
   pushTransaction: container.delegateTo(TransactionController, 'pushTransaction'),
+  cancelInvestment: container.delegateTo(InvestmentsController, 'cancelInvestment'),
 });

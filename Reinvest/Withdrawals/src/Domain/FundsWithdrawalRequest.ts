@@ -187,6 +187,14 @@ export class FundsWithdrawalRequest {
   }
 
   request() {
+    if (!this.isAgreementAssigned()) {
+      throw new Error(WithdrawalError.WITHDRAWAL_AGREEMENT_NOT_SIGNED);
+    }
+
+    if (!this.isDraft()) {
+      throw new Error(WithdrawalError.WITHDRAWAL_REQUEST_ALREADY_SENT);
+    }
+
     this.status = WithdrawalsFundsRequestsStatuses.REQUESTED;
   }
 
