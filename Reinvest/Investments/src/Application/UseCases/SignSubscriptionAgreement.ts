@@ -54,18 +54,31 @@ class SignSubscriptionAgreement {
     const isAssigned = await this.investmentsRepository.assignSubscriptionAgreementAndUpdateStatus(investment);
 
     if (isAssigned) {
+      // TODO this is separate use case!
       const { contentFieldsJson, templateVersion } = subscriptionAgreement.getDataForParser();
 
       const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as SubscriptionAgreementTemplateVersions]);
+      const parsedTemplated = parser.parse(contentFieldsJson as DynamicType);
 
-      const parsed = parser.parse(contentFieldsJson as DynamicType);
-
-      await this.documentsService.generatePdf(profileId, id, parsed, PdfTypes.AGREEMENT);
+      // await this.documentsService.generatePdf(profileId, id, parsedTemplated, PdfTypes.AGREEMENT);
 
       events.push({
         id,
         kind: 'SubscriptionAgreementSigned',
       });
+
+      const pdfCommand: DomainEvent = {
+        id,
+        kind: 'GeneratePdfCommand',
+        data: {
+          catalog: profileId,
+          fileName: id,
+          template: parsedTemplated,
+          templateType: PdfTypes.AGREEMENT,
+        },
+      };
+
+      events.push(pdfCommand);
 
       await this.investmentsRepository.publishEvents(events);
     }

@@ -4,6 +4,7 @@ import { LegalEntities } from 'LegalEntities/index';
 import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
 import { CompleteProfileInput } from 'LegalEntities/UseCases/CompleteProfile';
 import type { UpdateProfileInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfile';
+import { Registration } from 'Registration/index';
 
 const schema = `
     #graphql
@@ -191,6 +192,9 @@ export const Profile = {
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);
         }
+
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        await registrationApi.synchronizeProfile(profileId);
 
         return api.getProfile(profileId);
       },

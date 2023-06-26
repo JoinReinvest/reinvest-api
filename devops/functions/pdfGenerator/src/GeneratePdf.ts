@@ -1,7 +1,7 @@
-import type { PdfGenerator } from 'Documents/Adapter/Puppeteer/PdfGenerator';
-import type { S3Adapter } from 'Documents/Adapter/S3/S3Adapter';
-import type { PdfTypes, Template } from 'Documents/Port/Api/PdfController';
-import HTMLParser from 'Documents/Service/HTMLParser';
+import HTMLParser from './HTMLParser';
+import type { PdfGenerator } from './Puppeteer/PdfGenerator';
+import type { S3Adapter } from './S3/S3Adapter';
+import { PdfTypes, Template } from './Types';
 
 export class GeneratePdf {
   private adapter: S3Adapter;

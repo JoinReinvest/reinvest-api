@@ -1,7 +1,7 @@
 {
   "name": "reinvest-api",
   "version": "1.0.0",
-  "description": "ReInvest API",
+  "description": "REINVEST API",
   "main": "Reinvest/index.ts",
   "private": true,
   "engines": {
@@ -10,6 +10,7 @@
     "npm": "please-use-yarn"
   },
   "scripts": {
+    "install:all": "yarn && yarn install && cd devops/functions/pdfGenerator && yarn install",
     "lint": "yarn eslint ./Reinvest ./test ./shared ./devops",
     "lint:errors": "yarn lint --quiet",
     "lint:fix": "yarn lint --fix",
@@ -18,6 +19,7 @@
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",
     "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'",
     "development:deploy:saas": "NODE_ENV=development serverless deploy -s development --config serverless-saas.ts",
+    "database:deploy:saas": "NODE_ENV=database serverless deploy -s database --config serverless-saas.ts",
     "development:deploy:functions": "NODE_ENV=development serverless deploy -s development --config serverless-functions.ts",
     "development:invoke:migrateUp": "NODE_ENV=development sls invoke -s development --function migration --config serverless-functions.ts",
     "development:invoke:migrateDown": "NODE_ENV=development sls invoke -s development --function migration --data 'down' --config serverless-functions.ts",
@@ -25,6 +27,7 @@
     "development:destroy:functions": "NODE_ENV=development serverless remove -s development --config serverless-functions.ts",
     "development:logs:api": "sls logs -s development -f api -t  --config serverless-functions.ts",
     "development:logs:queue": "sls logs -s development -f queue -t  --config serverless-functions.ts",
+    "development:logs:pdf": "sls logs -s development -f pdfGenerator -t  --config serverless-functions.ts",
     "development:logs:tests": "sls logs -s development -f tests -t  --config serverless-functions.ts",
     "integrations:deploy:saas": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-saas.ts",
     "integrations:deploy:functions": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-functions.ts",
@@ -72,7 +75,6 @@
     "@graphql-tools/stitch": "^8.7.44",
     "@sentry/node": "^7.47.0",
     "@sentry/serverless": "^7.47.0",
-    "@sparticuz/chromium-min": "^114.0.0",
     "@types/dinero.js": "^1.9.0",
     "apollo-server-errors": "^3.3.1",
     "axios": "^1.3.4",
@@ -87,7 +89,6 @@
     "kysely": "0.25.0",
     "pg": "^8.10.0",
     "postgres": "^3.3.4",
-    "puppeteer": "20.1.0",
     "serverless-http": "^3.2.0",
     "typed-inject": "^3.0.1",
     "uuid": "^9.0.0"

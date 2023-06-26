@@ -1,9 +1,11 @@
+import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
 import { CompanyAccount } from 'LegalEntities/Domain/Accounts/CompanyAccount';
+import { sensitiveDataUpdated, UpdatedObjectType } from 'LegalEntities/Domain/Events/ProfileEvents';
 import { StakeholderToAccount } from 'LegalEntities/Domain/StakeholderToAccount';
 import { Address, AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { Stakeholder, StakeholderInput } from 'LegalEntities/Domain/ValueObject/Stakeholder';
-import { Uuid, ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import { Uuid, ValidationError, ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { AnnualRevenue, NumberOfEmployees, ValueRangeInput } from 'LegalEntities/Domain/ValueObject/ValueRange';
 import { Industry, ValueStringInput } from 'LegalEntities/Domain/ValueObject/ValueString';
 import { DomainEvent } from 'SimpleAggregator/Types';
@@ -24,6 +26,11 @@ export type UpdateCompanyAccountInput = {
 
 export class UpdateCompany {
   public static getClassName = (): string => 'UpdateCompany';
+  private accountRepository: AccountRepository;
+
+  constructor(accountRepository: AccountRepository) {
+    this.accountRepository = accountRepository;
+  }
 
   async update(account: CompanyAccount, input: UpdateCompanyAccountInput, profileId: string) {
     const errors: any = [];
@@ -47,6 +54,7 @@ export class UpdateCompany {
           switch (step) {
             case 'address':
               account.setAddress(Address.create(data as AddressInput));
+              events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
               break;
             case 'annualRevenue':
               account.setAnnualRevenue(AnnualRevenue.create(data as ValueRangeInput));
@@ -74,6 +82,7 @@ export class UpdateCompany {
                   path: profileId,
                 }),
               );
+              events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
               break;
             case 'removeDocuments':
               (data as File[]).map((document: File) => {
@@ -88,9 +97,10 @@ export class UpdateCompany {
                   events.push(removedDocumentEvent);
                 }
               });
+              events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
               break;
             case 'stakeholders':
-              const stakeholdersEvents = this.addStakeholder(account, data as StakeholderInput[], profileId);
+              const stakeholdersEvents = await this.addStakeholder(account, data as StakeholderInput[], profileId);
               events.push(...stakeholdersEvents);
 
               break;
@@ -136,20 +146,31 @@ export class UpdateCompany {
       errors,
     };
   }
-  private addStakeholder(account: CompanyAccount, data: StakeholderInput[], profileId: string): DomainEvent[] {
+
+  private async addStakeholder(account: CompanyAccount, data: StakeholderInput[], profileId: string): Promise<DomainEvent[]> {
     let events: DomainEvent[] = [];
 
     const stakeholderData = StakeholderToAccount.getStakeholderDataToAddToAccount(account, data, profileId);
 
-    stakeholderData.map(({ isNewStakeholder, stakeholderSchema }) => {
-      const stakeholderEvents = isNewStakeholder
-        ? account.addStakeholder(Stakeholder.create(stakeholderSchema))
-        : account.updateStakeholder(Stakeholder.create(stakeholderSchema));
+    for (const { isNewStakeholder, stakeholderSchema } of stakeholderData) {
+      const stakeholder = Stakeholder.create(stakeholderSchema);
+
+      if (await this.accountRepository.isSensitiveNumberBanned(stakeholder.getSSN().getHash())) {
+        throw new ValidationError(ValidationErrorEnum.SSN_BANNED, 'ssn', stakeholder.getSSN().getAnonymized());
+      }
+
+      const stakeholderEvents = isNewStakeholder ? account.addStakeholder(stakeholder) : account.updateStakeholder(stakeholder);
 
       if (stakeholderEvents) {
         events = [...events, ...stakeholderEvents];
       }
-    });
+
+      if (isNewStakeholder) {
+        events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
+      } else {
+        events.push(sensitiveDataUpdated(UpdatedObjectType.STAKEHOLDER, profileId, account.getId(), stakeholderSchema.id));
+      }
+    }
 
     return events;
   }

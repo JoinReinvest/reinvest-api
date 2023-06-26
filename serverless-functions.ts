@@ -14,6 +14,7 @@ import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/fu
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
+import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/pdfGenerator/queue-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
 import { cognitoPreSignUpFunction, CognitoPreSignUpResources } from './devops/functions/preSignUp/preSignUp-config';
 import { QueueFunction, QueueResources } from './devops/functions/queue/queue-config';
@@ -43,6 +44,7 @@ const serverlessConfiguration: AWS = {
       S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
       LocalCognitoClientId: { Ref: 'LocalCognito' },
       SQS_QUEUE_URL: getAttribute('SQSNotification', 'QueueUrl'),
+      SQS_PDF_GENERATOR_URL: getAttribute('SQSPdfGenerator', 'QueueUrl'),
       EMAIL_SEND_FROM: '${env:EMAIL_SEND_FROM}',
       EMAIL_REPLY_TO: '${env:EMAIL_REPLY_TO}',
       WEB_APP_URL: '${env:WEB_APP_URL}',
@@ -90,6 +92,7 @@ const serverlessConfiguration: AWS = {
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
+    pdfGenerator: PdfGeneratorFunction,
   },
   resources: {
     Description: 'REINVEST ${sls:stage} API functions',
@@ -108,6 +111,7 @@ const serverlessConfiguration: AWS = {
       ...CronVendorsSyncResources,
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
+      ...PdfGeneratorResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,

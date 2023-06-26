@@ -1,4 +1,6 @@
 import { Money } from 'Money/Money';
+import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
+import { UUID } from 'HKEKTypes/Generics';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -29,6 +31,7 @@ export type NorthCapitalTradeState = {
   tradePrice: string;
   tradeShares: string;
   tradeStatus: 'CREATED' | 'FUNDED' | 'SETTLED';
+  tradeVerification: TradeVerificationState;
 };
 
 export type VertaloDistributionState = {
@@ -418,5 +421,21 @@ export class Trade {
     const amount = this.amount.add(this.fees);
 
     return amount;
+  }
+
+  getTradeVerification(): TradeVerification {
+    return new TradeVerification(this.tradeSchema.northCapitalTradeState?.tradeVerification);
+  }
+
+  storeTradeVerification(tradeVerification: TradeVerification) {
+    this.tradeSchema.northCapitalTradeState!.tradeVerification = tradeVerification.toObject();
+  }
+
+  getAccountIdForVerification() {
+    return this.tradeSchema.tradeConfiguration.parentId;
+  }
+
+  getProfileId(): UUID {
+    return this.tradeSchema.tradeConfiguration.profileId;
   }
 }

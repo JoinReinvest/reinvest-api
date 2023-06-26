@@ -26,7 +26,14 @@ const server = new ApolloServer({
   },
 });
 
-export type SessionContext = { clientIp: string; modules: Modules; profileId: string; userId: string };
+export type SessionContext = {
+  clientIp: string;
+  isBannedAccount: (accountId: string) => boolean;
+  modules: Modules;
+  profileId: string;
+  throwIfBanned: (accountId: string) => void | never;
+  userId: string;
+};
 
 export const app = (modules: Modules) => {
   return startServerAndCreateLambdaHandler(server, {
@@ -47,17 +54,27 @@ export const app = (modules: Modules) => {
       const clientIp = event?.headers?.['X-Forwarded-For'] ?? '127.0.0.1';
       const userId = authorizer.jwt.claims.sub;
       const api = modules.getApi<Identity.ApiType>(Identity);
-      const profileId = await api.getProfileId(userId);
+      const userProfile = await api.getProfile(userId);
 
-      if (profileId === null) {
+      if (userProfile === null) {
         throw new GraphQLError('Profile not exist');
+      }
+
+      if (userProfile.isBannedProfile()) {
+        throw new GraphQLError('Profile is banned');
       }
 
       return <SessionContext>{
         clientIp,
         userId,
-        profileId,
+        profileId: userProfile.profileId,
         modules,
+        isBannedAccount: userProfile.isBannedAccount,
+        throwIfBanned: (accountId: string) => {
+          if (userProfile.isBannedAccount(accountId)) {
+            throw new GraphQLError('Account is banned');
+          }
+        },
       };
     },
   });

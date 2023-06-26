@@ -2,7 +2,7 @@ import { CloudwatchPolicies } from '../../serverless/cloudwatch';
 import { CognitoUpdateAttributesPolicyBasedOnOutputArn } from '../../serverless/cognito';
 import { S3PoliciesWithImport } from '../../serverless/s3';
 import { SMSPolicy } from '../../serverless/sns';
-import { exportOutput, getAttribute, getResourceName } from '../../serverless/utils';
+import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
 
 export const QueueFunction = {
@@ -59,8 +59,6 @@ export const QueueResources = {
             Statement: [
               ...CloudwatchPolicies,
               ...EniPolicies,
-              ...CloudwatchPolicies,
-              ...EniPolicies,
               ...S3PoliciesWithImport,
               ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
               SMSPolicy,
@@ -84,12 +82,5 @@ export const QueueResources = {
       SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),
     },
-  },
-};
-export const QueueOutputs = {
-  SQSQueueUrl: {
-    Value: getAttribute('SQSNotification', 'QueueUrl'),
-    Description: 'SQS Queue Url',
-    ...exportOutput('SQSQueueUrl'),
   },
 };

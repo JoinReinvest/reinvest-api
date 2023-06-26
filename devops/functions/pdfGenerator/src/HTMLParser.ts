@@ -1,8 +1,7 @@
-import type { Template } from 'Documents/Port/Api/PdfController';
-import { PdfTypes } from 'Documents/Port/Api/PdfController';
 import * as handlebars from 'handlebars';
 
-import agreementHTMLTemplate from './templates/AgreementTemplate';
+import agreementHTMLTemplate from './Templates/AgreementTemplate';
+import { PdfTypes, Template } from './Types';
 
 handlebars.registerHelper('bold_text', function (str) {
   return new handlebars.SafeString(str);

@@ -40,7 +40,12 @@ export class EVSDataPointsCalculationService {
   static calculateEVSDataPoints(resolution: EVSChartResolution, financialOperations: FinancialOperationRecord[]): EVSDataPoint[] {
     let startDate = null;
     const lastDate = dayjs().format('YYYY-MM-DD');
-    const portfolio = {};
+    const portfolio: {
+      [portfolioId: string]: {
+        numberOfShares: number;
+        pricePerShare: Money;
+      };
+    } = {};
     const mainDataPoints: { [date: string]: number } = {};
 
     for (const financialOperation of financialOperations) {

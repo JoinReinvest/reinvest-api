@@ -1,0 +1,23 @@
+{
+  "name": "reinvest-api-pdf-generator",
+  "version": "1.0.0",
+  "description": "REINVEST PDF Generator",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=1.22.0",
+    "npm": "please-use-yarn"
+  },
+  "dependencies": {
+    "@as-integrations/aws-lambda": "1.2.1",
+    "@aws-sdk/client-lambda": "^3.303.0",
+    "@aws-sdk/client-s3": "^3.303.0",
+    "@aws-sdk/client-sqs": "^3.303.0",
+    "@aws-sdk/lib-storage": "^3.350.0",
+    "@aws-sdk/s3-request-presigner": "^3.303.0",
+    "@sentry/node": "^7.47.0",
+    "@sparticuz/chromium-min": "^114.0.0",
+    "handlebars": "^4.7.7",
+    "puppeteer": "20.1.0"
+  }
+}

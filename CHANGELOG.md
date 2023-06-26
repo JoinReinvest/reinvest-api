@@ -1,14 +1,63 @@
 # REINVEST API CHANGELOG
 
+## 1.17.1 - 06/23/2023
+
+* No MOCKS anymore:
+    * Queries:
+        * `getFundsWithdrawalRequest`
+        * `getFundsWithdrawalAgreement`
+        * `listInvestments`
+    * Mutations:
+        * `createFundsWithdrawalRequest`
+        * `createFundsWithdrawalAgreement`
+        * `signFundsWithdrawalAgreement`
+        * `requestFundsWithdrawal`
+        * `abortFundsWithdrawalRequest`
+    * To see the flow for withdrawals read Changelog#1.12.3
+*
+
+## 1.17.0 - 06/22/2023
+
+* Rejected verification can ban the profile or an account
+* All queries and mutations return "Profile is banned" error for banned profiles
+* All mutations related to the account return "Account is banned" error for banned accounts
+* `getAccountOverview` query returns `isBanned` field
+* When profile/company/stakeholder requires "UpdateForVerification" action, then sends `VERIFICATION_FAILED`
+  notification.
+    * System awaits for the `verifyAccount` process to be finished (the same as for creating investment, but triggered
+      from the notification).
+* When adding/updating stakeholders to the corporate/trust account, the system checks if the stakeholder is not banned (
+  by SSN).
+
+## 1.16.6 - 06/16/2023
+
+* No MOCK anymore:
+    * `withdrawDividend` - it allows to withdraw dividends from the account
+        * notifications for dividends are automatically set as read after withdrawing and reinvesting dividends
+
+## 1.16.4 - 06/16/2023
+
+* No MOCK anymore:
+    * `simulateFundsWithdrawal` it returns information about the funds withdrawals without creating actual request.
+    * `listDividends`
+
+## 1.16.3 - 06/16/2023
+
+* No MOCKS anymore:
+    * For profile update
+        * `updateEmailAddress`
+* Changes:
+    * Avatar for company account returns f.e. C1, C2, T1
+
 ## 1.16.2 - 06/15/2023
 
 * No MOCKS anymore:
     * For account update
-      * `updateCorporateAccount`
-      * `updateTrustAccount`
-      * `updateBeneficiaryAccount`
+        * `updateCorporateAccount`
+        * `updateTrustAccount`
+        * `updateBeneficiaryAccount`
     * For investment
-      * `approveFees`
+        * `approveFees`
 
 ## 1.16.1 - 06/14/2023
 

@@ -79,16 +79,17 @@ export class DividendsRepository {
     createdDate: Date;
     id: string;
     status: IncentiveRewardStatus | InvestorDividendStatus;
+    type: 'DIVIDEND' | 'REWARD' | string;
   } | null> {
     const db = this.databaseAdapterProvider.provide();
     const data = await db
       .selectFrom(sadInvestorDividendsTable)
-      .select(['id', 'dividendAmount as amount', 'createdDate', 'status'])
+      .select(eb => ['id', 'dividendAmount as amount', 'createdDate', 'status', eb.val('DIVIDEND').as('type')])
       .union(
         // @ts-ignore
         db
           .selectFrom(sadInvestorIncentiveDividendTable)
-          .select(['id', 'amount', 'createdDate', 'status'])
+          .select(eb => ['id', 'amount', 'createdDate', 'status', eb.val('REWARD').as('type')])
           .where('profileId', '=', <any>profileId)
           .where('id', '=', <any>dividendId),
       )
@@ -104,13 +105,92 @@ export class DividendsRepository {
     return data;
   }
 
-  async markIncentiveDividendReinvested(profileId: string, accountId: string, dividendId: string): Promise<void> {
+  async getDividends(
+    profileId: string,
+    accountId: string,
+  ): Promise<
+    | {
+        amount: number;
+        createdDate: Date;
+        id: string;
+        status: IncentiveRewardStatus | InvestorDividendStatus;
+      }[]
+    | null
+  > {
+    const db = this.databaseAdapterProvider.provide();
+    const data = await db
+      .selectFrom(sadInvestorDividendsTable)
+      .select(['id', 'dividendAmount as amount', 'createdDate', 'status'])
+      .union(
+        // @ts-ignore
+        db
+          .selectFrom(sadInvestorIncentiveDividendTable)
+          .select(['id', 'amount', 'createdDate', 'status'])
+          .where('profileId', '=', <any>profileId)
+          .where('accountId', '=', <any>accountId),
+      )
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .execute();
+
+    if (!data) {
+      return null;
+    }
+
+    return data;
+  }
+
+  async markIncentiveDividendAs(status: IncentiveRewardStatus, profileId: string, dividendId: string, accountId: string | null = null): Promise<void> {
     await this.databaseAdapterProvider
       .provide()
       .updateTable(sadInvestorIncentiveDividendTable)
-      .set({ status: IncentiveRewardStatus.REINVESTED, accountId: accountId, actionDate: new Date() })
+      .set({ status, accountId: accountId, actionDate: new Date() })
       .where('profileId', '=', profileId)
       .where('id', '=', dividendId)
       .execute();
+  }
+
+  async markDividendAs(status: InvestorDividendStatus, profileId: string, dividendId: string): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorDividendsTable)
+      .set({ status, actionDate: new Date() })
+      .where('profileId', '=', profileId)
+      .where('id', '=', dividendId)
+      .execute();
+  }
+
+  async getAwaitingDividendsForAccountState(profileId: string, accountId: string) {
+    const db = this.databaseAdapterProvider.provide();
+    const data = await db
+      .selectFrom(sadInvestorDividendsTable)
+      .select(['id', 'totalDividendAmount', 'totalFeeAmount'])
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', 'in', [InvestorDividendStatus.AWAITING_ACTION, InvestorDividendStatus.FEES_NOT_COVERED])
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data;
+  }
+
+  async getAwaitingReferralRewardsForAccountState(profileId: string, accountId: string) {
+    const db = this.databaseAdapterProvider.provide();
+    const data = await db
+      .selectFrom(sadInvestorIncentiveDividendTable)
+      .select(['id', 'amount'])
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .where('status', '=', IncentiveRewardStatus.AWAITING_ACTION)
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data;
   }
 }

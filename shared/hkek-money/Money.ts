@@ -54,8 +54,12 @@ export class Money {
     return new Money(lowerPrecisionAmount);
   }
 
+  copy(): Money {
+    return new Money(this.amount, this.currency, this.precision);
+  }
+
   // returns dinero object
-  getValue(): DineroFactory.Dinero {
+  getInstance(): DineroFactory.Dinero {
     return this.value;
   }
 
@@ -78,7 +82,7 @@ export class Money {
   }
 
   add(addend: Money) {
-    const sum = this.value.add(addend.getValue());
+    const sum = this.value.add(addend.getInstance());
 
     return new Money(sum.getAmount(), this.currency, this.precision);
   }
@@ -88,7 +92,7 @@ export class Money {
   }
 
   subtract(subtrahend: Money): Money {
-    return new Money(this.value.subtract(subtrahend.getValue()).getAmount(), this.currency, this.precision);
+    return new Money(this.value.subtract(subtrahend.getInstance()).getAmount(), this.currency, this.precision);
   }
 
   divideBy(divisor: number): Money {
@@ -96,7 +100,7 @@ export class Money {
   }
 
   isGreaterThan(money: Money): boolean {
-    return this.value.greaterThan(money.getValue());
+    return this.value.greaterThan(money.getInstance());
   }
 
   isZero(): boolean {

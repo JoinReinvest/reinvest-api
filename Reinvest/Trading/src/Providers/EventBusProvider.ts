@@ -35,6 +35,7 @@ export default class EventBusProvider {
       'TradeCreated',
       'InvestmentFunded',
       'InvestmentApproved',
+      'InvestmentRejected',
       'InvestmentMarkedAsReadyToDisburse',
       'InvestmentSharesTransferred',
       'ReinvestmentSharesTransferred',

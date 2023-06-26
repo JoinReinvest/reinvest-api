@@ -1,9 +1,6 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import {
-  northCapitalDocumentsSynchronizationTable,
-  RegistrationDatabaseAdapterProvider,
-  registrationMappingRegistryTable,
-} from 'Registration/Adapter/Database/DatabaseAdapter';
+import { RegistrationDatabaseAdapterProvider, registrationMappingRegistryTable } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { InsertableMappingRegistry, SelectableMappedRecord } from 'Registration/Adapter/Database/RegistrationSchema';
 import { EmailCreator } from 'Registration/Domain/EmailCreator';
 import { MappedRecord, MappedRecordType } from 'Registration/Domain/Model/Mapping/MappedRecord';
@@ -56,6 +53,41 @@ export class MappingRegistryRepository {
       .where('dependentId', '=', dependentId)
       .limit(1)
       .executeTakeFirstOrThrow()) as SelectableMappedRecord as MappedRecordType;
+
+    return MappedRecord.create(data);
+  }
+
+  async getCompanyAccountRecordByProfileAndExternalId(profileId: string, externalId: string): Promise<MappedRecord | null> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('profileId', '=', profileId)
+      .where('externalId', '=', externalId)
+      .where('mappedType', 'in', [MappedType.CORPORATE_ACCOUNT, MappedType.TRUST_ACCOUNT])
+      .limit(1)
+      .executeTakeFirst()) as SelectableMappedRecord as MappedRecordType;
+
+    if (!data) {
+      return null;
+    }
+
+    return MappedRecord.create(data);
+  }
+
+  async getIndividualAccountRecordByProfile(profileId: string): Promise<MappedRecord | null> {
+    const data = (await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select(['recordId', 'profileId', 'externalId', 'dependentId', 'mappedType', 'email', 'status', 'version'])
+      .where('profileId', '=', profileId)
+      .where('mappedType', '=', MappedType.INDIVIDUAL_ACCOUNT)
+      .limit(1)
+      .executeTakeFirst()) as SelectableMappedRecord as MappedRecordType;
+
+    if (!data) {
+      return null;
+    }
 
     return MappedRecord.create(data);
   }
@@ -128,6 +160,25 @@ export class MappingRegistryRepository {
         .where(qb => qb.where('lockedUntil', '<=', new Date()).orWhere('lockedUntil', 'is', null))
         .returning(['lockedUntil'])
         .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error: any) {
+      console.log(error);
+
+      return false;
+    }
+  }
+
+  async setCompanyAndStakeholdersAsDirty(profileId: UUID, accountId: UUID) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(registrationMappingRegistryTable)
+        .set({ status: MappedRecordStatus.DIRTY })
+        .where('profileId', '=', profileId)
+        .where('externalId', '=', accountId)
+        .where('mappedType', 'in', [MappedType.COMPANY, MappedType.STAKEHOLDER])
+        .execute();
 
       return true;
     } catch (error: any) {

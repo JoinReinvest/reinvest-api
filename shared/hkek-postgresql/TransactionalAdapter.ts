@@ -22,7 +22,7 @@ export class TransactionalAdapter<Database> {
       return true;
     } catch (error: any) {
       console.log(`[ROLLBACK Transaction] "${transactionName}" failed with message "${error.message}"`);
-      console.error(error);
+      console.error(`[Transaction Error] ${transactionName}`, error);
       await sql`ROLLBACK`.execute(db);
 
       return false;

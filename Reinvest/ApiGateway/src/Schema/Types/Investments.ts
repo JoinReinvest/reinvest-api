@@ -49,7 +49,7 @@ const schema = `
         """
         getSubscriptionAgreement(subscriptionAgreementId: ID!): SubscriptionAgreement!
         """
-        [MOCK] List of all investments history
+        List of all investments history
         """
         listInvestments(accountId: ID!, pagination: Pagination = {page: 0, perPage: 10}): [InvestmentOverview]!
     }
@@ -75,7 +75,7 @@ const schema = `
         signSubscriptionAgreement(investmentId: ID!): Boolean!
 
         """
-        [MOCK] Approves the fees for the specific investment.
+        Approves the fees for the specific investment.
         In case if extra fee is required for recurring investment and the investment was started automatically by the system, then
         use this method to approve the fees (it will ask for that on verification step triggered from the notification).
         """
@@ -169,26 +169,22 @@ export const Investments = {
 
         return subscriptionAgreement;
       },
-      listInvestments: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      listInvestments: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-        // let investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
 
-        return [
-          investmentSummaryMock('47584', 1),
-          investmentSummaryMock('47583', 8),
-          investmentSummaryMock('47582', 15),
-          investmentSummaryMock('47581', 22),
-          investmentSummaryMock('47580', 29),
-          investmentSummaryMock('46099', 90),
-        ];
+        const list = await investmentAccountsApi.listInvestments(profileId, accountId, pagination);
+
+        return list;
       },
     },
     Mutation: {
-      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
+      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules, throwIfBanned }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
         const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(individualAccountId);
+        throwIfBanned(accountId);
 
         const bankAccountData = await registrationApi.readBankAccount(profileId, individualAccountId);
 
