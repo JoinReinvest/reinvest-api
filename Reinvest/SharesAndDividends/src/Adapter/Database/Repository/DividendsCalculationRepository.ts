@@ -161,6 +161,7 @@ export class DividendsCalculationRepository {
           status: eb => eb.ref(`excluded.status`),
         }),
       )
+      .onConflict(oc => oc.constraint('sad_calculated_dividends_unique').doNothing())
       .execute();
   }
 
