@@ -30,9 +30,10 @@ export class UserRegistrationService {
   async registerUser(userId: string, email: string, incentiveToken: IncentiveToken | null): Promise<boolean> {
     try {
       // check if user already exists
-      let profileId = await this.userRepository.getUserProfileId(userId);
+      const profile = await this.userRepository.getUserProfile(userId);
+      let profileId;
 
-      if (profileId === null) {
+      if (profile === null) {
         console.log(`Creating user: ${userId}`);
         profileId = this.idGenerator.createUuid();
         const id = this.idGenerator.createUuid();
@@ -40,7 +41,8 @@ export class UserRegistrationService {
         await this.userRepository.registerUser(id, profileId, userIncentiveToken, userId, email, incentiveToken);
         console.log(`User created: ${userId} with profile id ${profileId}`);
       } else {
-        console.log(`User ${userId} already exists with profile id ${profileId}`);
+        console.log(`User ${userId} already exists with profile id ${profile.profileId}`);
+        profileId = profile.profileId;
       }
 
       console.log(`Creating profile id ${profileId}`);
