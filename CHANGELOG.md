@@ -1,5 +1,10 @@
 # REINVEST API CHANGELOG
 
+## 1.17.2 - 06/26/2023
+
+* No MOCKS anymore:
+    * cancelInvestment - cancel investment after the investment has been started and the grace period has not ended yet
+
 ## 1.17.1 - 06/23/2023
 
 * No MOCKS anymore:

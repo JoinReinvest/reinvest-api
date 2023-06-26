@@ -195,7 +195,7 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     reason: string,
   ): Promise<{
     details: any;
-    status: TradeStatus;
+    status: string;
   }> {
     const endpoint = 'tapiv3/index.php/v3/cancelInvestment';
     const data = {
@@ -215,7 +215,7 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     const { orderStatus } = cancelDetails;
 
     return {
-      status: TradeStatus.fromResponse(orderStatus),
+      status: orderStatus,
       details: cancelDetails,
     };
   }

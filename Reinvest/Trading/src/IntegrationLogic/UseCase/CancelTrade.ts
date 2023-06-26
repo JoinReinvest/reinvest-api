@@ -72,11 +72,6 @@ export class CancelTrade {
             kind: CancelTradeEvent.TransactionCanceled,
             id: investmentId,
           });
-        } else {
-          await this.eventBus.publish({
-            kind: CancelTradeEvent.TransactionUnwinding,
-            id: investmentId,
-          });
         }
 
         return;
@@ -106,7 +101,7 @@ export class CancelTrade {
           kind: CancelTradeEvent.TransactionCanceledFailed,
           id: investmentId,
           data: {
-            reason: `Wrong trade state: ${cancelStatus.toString()}`,
+            reason: `Wrong trade state: ${cancelStatus}`,
           },
         });
       }

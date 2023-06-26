@@ -78,6 +78,8 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
         return this.decide(TransactionDecisions.CANCEL_TRANSACTION);
       case TransactionEvents.TRANSACTION_CANCELED:
         return this.decide(TransactionDecisions.DO_NOTHING);
+      case TransactionEvents.TRANSACTION_CANCELED_FAILED:
+        return this.decide(TransactionDecisions.DO_NOTHING); // TODO something?
       default:
         break;
     }

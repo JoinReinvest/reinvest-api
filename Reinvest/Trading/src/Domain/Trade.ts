@@ -452,13 +452,15 @@ export class Trade {
     return this.tradeSchema.tradeConfiguration.profileId;
   }
 
-  setTradeCancelState(status: TradeStatus, cancelState: any) {
+  setTradeCancelState(status: string, cancelState: any) {
     this.tradeSchema.cancelTradeState = {
       cancelState,
-      originalCancelStatus: status.toString(),
+      originalCancelStatus: status as OrderStatus,
       cancelDate: new Date(),
     };
-    this.tradeStatus = status;
+    this.tradeStatus = TradeStatus.fromResponse(status);
+    // @ts-ignore
+    this.tradeSchema.northCapitalTradeState!.tradeStatus = status;
   }
 
   isCanceled(): boolean {
