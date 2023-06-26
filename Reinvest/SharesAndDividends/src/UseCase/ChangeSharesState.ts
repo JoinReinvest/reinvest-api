@@ -5,6 +5,7 @@ import { SharesAndDividendsDatabase } from 'SharesAndDividends/Adapter/Database/
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
+import { FinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 
 export enum SharesChangeState {
   FUNDED = SharesStatus.FUNDED,
@@ -54,6 +55,7 @@ export class ChangeSharesState {
           shares.setFundingState(data.shares, Money.lowPrecision(data.unitPrice));
           const financialOperationId = this.idGenerator.createUuid();
           await this.financialOperationRepository.addInvestmentOperation(
+            FinancialOperationType.INVESTMENT,
             financialOperationId,
             profileId,
             accountId,
@@ -79,6 +81,17 @@ export class ChangeSharesState {
       if (state === SharesChangeState.REVOKED) {
         shares.setRevokedState();
         await this.sharesRepository.store(shares);
+        // const financialOperationId = this.idGenerator.createUuid();
+        // await this.financialOperationRepository.addInvestmentOperation(
+        //   FinancialOperationType.REVOKED,
+        //   financialOperationId,
+        //   profileId,
+        //   accountId,
+        //   portfolioId,
+        //   data.shares,
+        //   data.unitPrice,
+        //   investmentId,
+        // );
       }
     } catch (error) {
       console.error('[ChangeSharesState]', investmentId, state, error);

@@ -2,7 +2,7 @@ import { DomainEvent } from 'SimpleAggregator/Types';
 
 export enum TransactionEvents {
   INVESTMENT_CREATED = 'INVESTMENT_CREATED',
-  INVESTMENT_CANCELLED = 'INVESTMENT_CANCELLED',
+  INVESTMENT_CANCELED = 'INVESTMENT_CANCELED',
   INVESTMENT_REJECTED = 'INVESTMENT_REJECTED',
   ACCOUNT_VERIFIED_FOR_INVESTMENT = 'ACCOUNT_VERIFIED_FOR_INVESTMENT',
   ACCOUNT_VERIFICATION_REJECTED_FOR_INVESTMENT = 'ACCOUNT_VERIFICATION_REJECTED_FOR_INVESTMENT',
@@ -13,6 +13,9 @@ export enum TransactionEvents {
   GRACE_PERIOD_ENDED = 'GRACE_PERIOD_ENDED',
   MARKED_AS_READY_TO_DISBURSE = 'MARKED_AS_READY_TO_DISBURSE',
   INVESTMENT_SHARES_TRANSFERRED = 'INVESTMENT_SHARES_TRANSFERRED',
+  TRANSACTION_CANCELED = 'TRANSACTION_CANCELED',
+  TRANSACTION_CANCELED_UNWINDING = 'TRANSACTION_CANCELED_UNWINDING',
+  TRANSACTION_CANCELED_FAILED = 'TRANSACTION_CANCELED_FAILED',
 }
 
 export type TransactionEvent = DomainEvent & {
@@ -40,8 +43,8 @@ export type AccountVerifiedForInvestment = TransactionEvent & {
   kind: TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT;
 };
 
-export type InvestmentCancelled = TransactionEvent & {
-  kind: TransactionEvents.INVESTMENT_CANCELLED;
+export type InvestmentCanceled = TransactionEvent & {
+  kind: TransactionEvents.INVESTMENT_CANCELED;
 };
 
 export type InvestmentFinalized = TransactionEvent & {
@@ -85,4 +88,11 @@ export type InvestmentMarkedAsReadyToDisburse = TransactionEvent & {
 
 export type InvestmentSharesTransferred = TransactionEvent & {
   kind: TransactionEvents.INVESTMENT_SHARES_TRANSFERRED;
+};
+
+export type TransactionCanceledFailed = TransactionEvent & {
+  data: {
+    reason: string;
+  };
+  kind: TransactionEvents.TRANSACTION_CANCELED_FAILED;
 };

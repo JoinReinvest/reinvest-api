@@ -4,6 +4,7 @@ import NorthCapitalException from 'Registration/Adapter/NorthCapital/NorthCapita
 import { ExecutionNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import { FundsMoveState, NorthCapitalTradeState } from 'Trading/Domain/Trade';
 import { TradeApproval, TradeVerificationDecision } from 'Trading/Domain/TradeVerification';
+import { TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
 
 export type NorthCapitalConfig = {
   API_URL: string;
@@ -151,10 +152,10 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     return tradeDetails;
   }
 
-  async getTradeStatus(tradeId: string): Promise<string> {
+  async getTradeStatus(tradeId: string): Promise<TradeStatus> {
     const { orderStatus } = await this.getCurrentTradeState(tradeId);
 
-    return orderStatus.toLowerCase();
+    return TradeStatus.fromResponse(orderStatus);
   }
 
   async getCurrentTradeState(tradeId: string): Promise<any> {
@@ -188,7 +189,14 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     return true;
   }
 
-  async cancelTrade(tradeId: string, userEmail: string, reason: string): Promise<boolean> {
+  async cancelTrade(
+    tradeId: string,
+    userEmail: string,
+    reason: string,
+  ): Promise<{
+    details: any;
+    status: TradeStatus;
+  }> {
     const endpoint = 'tapiv3/index.php/v3/cancelInvestment';
     const data = {
       tradeId,
@@ -204,7 +212,12 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       'Canceled investment details': [cancelDetails],
     } = response;
 
-    return cancelDetails;
+    const { orderStatus } = cancelDetails;
+
+    return {
+      status: TradeStatus.fromResponse(orderStatus),
+      details: cancelDetails,
+    };
   }
 
   private async checkIfFileExistsInTrade(northCapitalId: string, documentId: string): Promise<boolean> {

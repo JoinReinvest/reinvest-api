@@ -60,7 +60,7 @@ export class TransferSharesWhenTradeSettled {
     if (!trade.isTradeSettled()) {
       const tradeStatus = await this.northCapitalAdapter.getTradeStatus(tradeId);
 
-      if (tradeStatus !== 'settled') {
+      if (tradeStatus.isSettled()) {
         return false;
       }
 

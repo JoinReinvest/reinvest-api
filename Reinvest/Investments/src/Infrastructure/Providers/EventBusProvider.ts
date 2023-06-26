@@ -50,7 +50,7 @@ export default class EventBusProvider {
         TransactionEvents.GRACE_PERIOD_ENDED,
         TransactionEvents.MARKED_AS_READY_TO_DISBURSE,
         TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
-        TransactionEvents.INVESTMENT_CANCELLED,
+        TransactionEvents.INVESTMENT_CANCELED,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [

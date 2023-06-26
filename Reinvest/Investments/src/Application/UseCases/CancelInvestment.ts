@@ -1,4 +1,4 @@
-import { InvestmentCancelled, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { InvestmentCanceled, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsDatabase } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
@@ -48,8 +48,8 @@ export class CancelInvestment {
           await this.feesRepository.updateStatus(fee);
         }
 
-        await this.eventBus.publish(<InvestmentCancelled>{
-          kind: TransactionEvents.INVESTMENT_CANCELLED,
+        await this.eventBus.publish(<InvestmentCanceled>{
+          kind: TransactionEvents.INVESTMENT_CANCELED,
           date: new Date(),
           id: investmentId,
           data: {},
