@@ -156,12 +156,12 @@ export class DividendsCalculationRepository {
       .provide()
       .insertInto(sadCalculatedDividendsTable)
       .values(recordsToStore)
+      .onConflict(oc => oc.constraint('sad_calculated_dividends_unique').doNothing())
       .onConflict(oc =>
         oc.column('id').doUpdateSet({
           status: eb => eb.ref(`excluded.status`),
         }),
       )
-      .onConflict(oc => oc.constraint('sad_calculated_dividends_unique').doNothing())
       .execute();
   }
 
