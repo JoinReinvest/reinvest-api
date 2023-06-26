@@ -97,7 +97,11 @@ export const AccountStats = {
 
         return api.getAccountStats(profileId, accountId);
       },
-      getAccountActivity: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      getAccountActivity: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
+        if (pagination?.page > 1) {
+          return [];
+        }
+
         return [
           {
             activityName: 'User email updated to t****@test.com',

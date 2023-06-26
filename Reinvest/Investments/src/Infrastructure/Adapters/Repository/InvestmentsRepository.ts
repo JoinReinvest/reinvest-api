@@ -83,7 +83,7 @@ export class InvestmentsRepository {
       .castTo<InvestmentWithFee>();
   }
 
-  async getInvestments(profileId: string, accountId: string, pagination: Pagination) {
+  async getInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<Investment[]> {
     const investmentsData = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
@@ -124,7 +124,7 @@ export class InvestmentsRepository {
       .execute();
 
     if (!investmentsData.length) {
-      return null;
+      return [];
     }
 
     const investments = investmentsData.map(investment => Investment.create(investment));
