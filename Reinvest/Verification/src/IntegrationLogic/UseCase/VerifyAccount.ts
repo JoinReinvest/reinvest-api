@@ -16,12 +16,12 @@ export class VerifyAccount {
   async verify(profileId: string, accountId: string): Promise<AccountVerificationDecision> {
     try {
       console.log('verify account id ' + accountId);
-      await this.registrationService.immediatelySynchronizeAllAccountStructure(profileId, accountId);
       const { accountVerifier, verifiers } = await this.verifierService.createVerifiersForAccount(profileId, accountId);
 
       return this.verifierService.executeVerifiersDecisions(accountVerifier, verifiers);
     } catch (error: any) {
       console.error(`[Verify Account: ${accountId}]`, error);
+      await this.registrationService.immediatelySynchronizeAllAccountStructure(profileId, accountId);
 
       return {
         canUserContinueTheInvestment: false,

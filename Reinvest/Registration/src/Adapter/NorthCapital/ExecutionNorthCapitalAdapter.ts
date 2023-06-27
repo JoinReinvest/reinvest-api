@@ -21,8 +21,7 @@ export abstract class ExecutionNorthCapitalAdapter {
       const response: AxiosResponse = await axios.put(`${this.url}/${endpoint}`, putData);
 
       return response.data;
-    } catch (error) {
-      // @ts-ignore
+    } catch (error: any) {
       const {
         response: {
           data: { statusCode, statusDesc },
