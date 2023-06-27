@@ -50,6 +50,31 @@ export class RegistryQueryRepository {
     }
   }
 
+  async getAccountStructureForSynchronization(profileId: string, accountId: string): Promise<NCAccountStructureMapping[]> {
+    try {
+      return await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(registrationMappingRegistryTable)
+        .leftJoin(northCapitalSynchronizationTable, `${registrationMappingRegistryTable}.recordId`, `${northCapitalSynchronizationTable}.recordId`)
+        .select([
+          `${registrationMappingRegistryTable}.recordId`,
+          `${registrationMappingRegistryTable}.externalId`,
+          `${registrationMappingRegistryTable}.mappedType`,
+          `${registrationMappingRegistryTable}.status`,
+          `${registrationMappingRegistryTable}.dependentId`,
+        ])
+        .select([`${northCapitalSynchronizationTable}.northCapitalId`])
+        .where(`${registrationMappingRegistryTable}.profileId`, '=', profileId)
+        .where(qb => qb.where('externalId', '=', accountId).orWhere('externalId', '=', EMPTY_UUID))
+        .castTo<NCAccountStructureMapping>()
+        .execute();
+    } catch (error: any) {
+      console.warn(`Cannot find account structure for id: ${profileId}/${accountId}`, error.message);
+
+      return [];
+    }
+  }
+
   async findNorthCapitalAccountId(profileId: string, accountId: string): Promise<string | null> {
     try {
       const result = await this.databaseAdapterProvider

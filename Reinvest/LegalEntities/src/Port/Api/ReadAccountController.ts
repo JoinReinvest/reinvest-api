@@ -4,6 +4,7 @@ import {
   CompanyAccountForSynchronization,
   CompanyForSynchronization,
   IndividualAccountForSynchronization,
+  ProfileAccountStructureResponse,
   StakeholderForSynchronization,
 } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
 import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
@@ -125,6 +126,10 @@ export class ReadAccountController {
 
   public async getIndividualAccountForSynchronization(profileId: string, accountId: string): Promise<IndividualAccountForSynchronization | null> {
     return this.accountRepository.getIndividualAccountForSynchronization(profileId, accountId);
+  }
+
+  public async getProfileAccountStructure(profileId: string): Promise<ProfileAccountStructureResponse[]> {
+    return this.accountRepository.getProfileAccountStructure(profileId);
   }
 
   public async getBeneficiaryAccountForSynchronization(profileId: string, accountId: string): Promise<BeneficiaryAccountForSynchronization | null> {

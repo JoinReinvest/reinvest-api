@@ -17,6 +17,7 @@ import { SynchronizeCompany } from 'Registration/IntegrationLogic/UseCase/Synchr
 import { SynchronizeCompanyAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount';
 import { SynchronizeIndividualAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount';
 import { SynchronizeProfile } from 'Registration/IntegrationLogic/UseCase/SynchronizeProfile';
+import { SynchronizeRegistryRecords } from 'Registration/IntegrationLogic/UseCase/SynchronizeRegistryRecords';
 import { SynchronizeStakeholder } from 'Registration/IntegrationLogic/UseCase/SynchronizeStakeholder';
 
 export class IntegrationServiceProvider {
@@ -28,6 +29,7 @@ export class IntegrationServiceProvider {
 
   public boot(container: ContainerInterface) {
     container
+      .addSingleton(SynchronizeRegistryRecords, [MappingRegistryRepository, LegalEntitiesService])
       .addSingleton(SynchronizeProfile, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer])
       .addSingleton(SynchronizeIndividualAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer])
       .addSingleton(SynchronizeBeneficiaryAccount, [MappingRegistryRepository, LegalEntitiesService, VertaloSynchronizer])
