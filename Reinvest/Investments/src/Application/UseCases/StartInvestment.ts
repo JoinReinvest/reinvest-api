@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 
 class StartInvestment {
@@ -9,8 +10,8 @@ class StartInvestment {
 
   static getClassName = (): string => 'StartInvestment';
 
-  async execute(profileId: string, investmentId: string, approveFees: boolean) {
-    const investment = await this.investmentsRepository.get(investmentId);
+  async execute(profileId: UUID, investmentId: UUID, approveFees: boolean) {
+    const investment = await this.investmentsRepository.getInvestmentByProfileAndId(profileId, investmentId);
 
     if (!investment) {
       return false;

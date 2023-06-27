@@ -34,6 +34,10 @@ export class SharesEventHandler {
       case TransactionEvents.INVESTMENT_SHARES_TRANSFERRED:
         await this.sharesAndDividendsModule.sharesSettled(objectId);
         break;
+      case TransactionEvents.TRANSACTION_CANCELED:
+      case TransactionEvents.TRANSACTION_CANCELED_UNWINDING:
+        await this.sharesAndDividendsModule.sharesRevoked(objectId);
+        break;
       case ReinvestmentEvents.DIVIDEND_REINVESTMENT_REQUESTED:
         const {
           portfolioId: reinvestmentPortfolioId,

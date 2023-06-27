@@ -6,6 +6,7 @@ import ListInvestments from 'Investments/Application/UseCases/ListInvestments';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import { Money } from 'Money/Money';
 import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments';
+import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
 
 export class InvestmentsController {
   private createInvestmentUseCase: CreateInvestment;
@@ -13,6 +14,7 @@ export class InvestmentsController {
   private startInvestmentUseCase: StartInvestment;
   private abortInvestmentUseCase: AbortInvestment;
   private listInvestmentsUseCase: ListInvestments;
+  private cancelInvestmentUseCase: CancelInvestment;
 
   constructor(
     createInvestmentUseCase: CreateInvestment,
@@ -20,12 +22,14 @@ export class InvestmentsController {
     startInvestmentUseCase: StartInvestment,
     abortInvestmentUseCase: AbortInvestment,
     listInvestmentsUseCase: ListInvestments,
+    cancelInvestmentUseCase: CancelInvestment,
   ) {
     this.createInvestmentUseCase = createInvestmentUseCase;
     this.investmentSummaryQueryUseCase = investmentSummaryQueryUseCase;
     this.startInvestmentUseCase = startInvestmentUseCase;
     this.abortInvestmentUseCase = abortInvestmentUseCase;
     this.listInvestmentsUseCase = listInvestmentsUseCase;
+    this.cancelInvestmentUseCase = cancelInvestmentUseCase;
   }
 
   public static getClassName = (): string => 'InvestmentsController';
@@ -48,7 +52,11 @@ export class InvestmentsController {
     return this.abortInvestmentUseCase.execute(profileId, investmentId);
   }
 
-  public async listInvestments(profileId: string, accoutnId: string, pagination: Pagination) {
-    return this.listInvestmentsUseCase.execute(profileId, accoutnId, pagination);
+  public async listInvestments(profileId: string, accountId: string, pagination: Pagination) {
+    return this.listInvestmentsUseCase.execute(profileId, accountId, pagination);
+  }
+
+  public async cancelInvestment(profileId: string, investmentId: string) {
+    return this.cancelInvestmentUseCase.execute(profileId, investmentId);
   }
 }

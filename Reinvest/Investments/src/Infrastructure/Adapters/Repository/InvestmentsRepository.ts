@@ -10,6 +10,7 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
 
 import { FeesRepository } from './FeesRepository';
+import { UUID } from 'HKEKTypes/Generics';
 
 export class InvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -25,7 +26,30 @@ export class InvestmentsRepository {
   public static getClassName = (): string => 'InvestmentsRepository';
 
   async get(investmentId: string): Promise<Investment | null> {
-    const investment = await this.databaseAdapterProvider
+    const investment = await this.getInvestmentQueryBuilder().where(`${investmentsTable}.id`, '=', investmentId).executeTakeFirst();
+
+    if (!investment) {
+      return null;
+    }
+
+    return Investment.create(investment);
+  }
+
+  async getInvestmentByProfileAndId(profileId: UUID, investmentId: UUID): Promise<Investment | null> {
+    const investment = await this.getInvestmentQueryBuilder()
+      .where(`${investmentsTable}.id`, '=', investmentId)
+      .where(`${investmentsTable}.profileId`, '=', profileId)
+      .executeTakeFirst();
+
+    if (!investment) {
+      return null;
+    }
+
+    return Investment.create(investment);
+  }
+
+  private getInvestmentQueryBuilder() {
+    return this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
       .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
@@ -56,18 +80,10 @@ export class InvestmentsRepository {
         `${investmentsFeesTable}.status as feeStatus`,
         `${investmentsFeesTable}.verificationFeeId`,
       ])
-      .castTo<InvestmentWithFee>()
-      .where(`${investmentsTable}.id`, '=', investmentId)
-      .executeTakeFirst();
-
-    if (!investment) {
-      return null;
-    }
-
-    return Investment.create(investment);
+      .castTo<InvestmentWithFee>();
   }
 
-  async getInvestments(profileId: string, accountId: string, pagination: Pagination) {
+  async getInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<Investment[]> {
     const investmentsData = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
@@ -108,7 +124,7 @@ export class InvestmentsRepository {
       .execute();
 
     if (!investmentsData.length) {
-      return null;
+      return [];
     }
 
     const investments = investmentsData.map(investment => Investment.create(investment));

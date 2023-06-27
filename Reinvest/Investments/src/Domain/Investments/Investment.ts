@@ -219,4 +219,22 @@ export class Investment {
   isGracePeriodEnded() {
     return this.gracePeriod.isGracePeriodEnded();
   }
+
+  cancel(): boolean {
+    if ([InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED].includes(this.status)) {
+      this.status = InvestmentStatus.CANCELED;
+
+      if (this.fee) {
+        this.fee.abort();
+      }
+
+      return true;
+    }
+
+    if (this.status === InvestmentStatus.CANCELED) {
+      return true;
+    }
+
+    return false;
+  }
 }

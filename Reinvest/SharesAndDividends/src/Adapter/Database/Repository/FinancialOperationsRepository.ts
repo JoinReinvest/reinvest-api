@@ -15,6 +15,7 @@ export class FinancialOperationsRepository {
   public static getClassName = (): string => 'FinancialOperationsRepository';
 
   async addInvestmentOperation(
+    operationType: FinancialOperationType,
     financialOperationId: string,
     profileId: string,
     accountId: string,
@@ -31,7 +32,7 @@ export class FinancialOperationsRepository {
         profileId,
         accountId,
         createdDate: new Date(),
-        operationType: FinancialOperationType.INVESTMENT,
+        operationType,
         dataJson: {
           numberOfShares,
           unitPrice,

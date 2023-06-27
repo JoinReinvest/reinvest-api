@@ -43,7 +43,7 @@ export class CreateTrade {
       }
 
       // create trade in north capital
-      if (!trade.isTradeCreated()) {
+      if (!trade.tradeExists()) {
         const { offeringId, shares, ip, northCapitalAccountId } = trade.getNorthCapitalTradeConfiguration();
         const northCapitalTrade = await this.northCapitalAdapter.createTrade(offeringId, northCapitalAccountId, shares, ip);
         trade.setTradeState(northCapitalTrade);

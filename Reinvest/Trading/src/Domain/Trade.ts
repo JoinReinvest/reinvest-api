@@ -1,6 +1,7 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
-import { UUID } from 'HKEKTypes/Generics';
+import { OrderStatus, TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -30,7 +31,7 @@ export type NorthCapitalTradeState = {
   tradeId: string;
   tradePrice: string;
   tradeShares: string;
-  tradeStatus: 'CREATED' | 'FUNDED' | 'SETTLED';
+  tradeStatus: 'CREATED' | 'FUNDED' | 'SETTLED' | 'CANCELED' | 'UNWIND PENDING' | 'UNWIND SETTLED';
   tradeVerification: TradeVerificationState;
 };
 
@@ -73,7 +74,14 @@ export type VertaloPaymentState = {
   paymentMarkedDate: Date;
 };
 
+export type CancelTradeState = {
+  cancelDate: Date;
+  cancelState: any;
+  originalCancelStatus: OrderStatus;
+};
+
 export type TradeSchema = {
+  cancelTradeState: CancelTradeState | null;
   disbursementState: DisbursementState | null;
   fundsMoveState: FundsMoveState | null;
   investmentId: string;
@@ -93,6 +101,7 @@ export class Trade {
   private tradeSchema: TradeSchema;
   private unitSharePrice: Money | null;
   private shares: number | null;
+  private tradeStatus: TradeStatus;
 
   constructor(tradeSchema: TradeSchema) {
     this.tradeSchema = tradeSchema;
@@ -104,6 +113,7 @@ export class Trade {
     this.fees = new Money(fees);
 
     this.shares = this.unitSharePrice ? this.calculateShares(this.amount, this.unitSharePrice) : null;
+    this.tradeStatus = TradeStatus.fromResponse(this.tradeSchema.northCapitalTradeState ? this.tradeSchema.northCapitalTradeState?.tradeStatus : null);
   }
 
   static create(tradeSchema: TradeSchema) {
@@ -127,6 +137,7 @@ export class Trade {
 
   setTradeState(tradeState: NorthCapitalTradeState) {
     this.tradeSchema.northCapitalTradeState = tradeState;
+    this.tradeStatus = TradeStatus.fromResponse(tradeState.tradeStatus);
     this.tradeSchema.tradeId = tradeState.tradeId;
   }
 
@@ -142,8 +153,8 @@ export class Trade {
     return this.tradeSchema.investmentId;
   }
 
-  isTradeCreated() {
-    return this.tradeSchema.northCapitalTradeState !== null;
+  tradeExists(): boolean {
+    return this.tradeStatus.isSet();
   }
 
   getNorthCapitalTradeConfiguration(): {
@@ -169,7 +180,7 @@ export class Trade {
   }
 
   getVertaloDistributionConfiguration() {
-    if (!this.tradeSchema.northCapitalTradeState) {
+    if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
     }
 
@@ -178,6 +189,14 @@ export class Trade {
       investorEmail: this.tradeSchema.vendorsConfiguration!.accountEmail,
       numberOfShares: this.tradeSchema.northCapitalTradeState!.tradeShares,
     };
+  }
+
+  getInvestorEmail() {
+    if (!this.tradeExists()) {
+      throw new Error('North Capital trade state is not set');
+    }
+
+    return this.tradeSchema.vendorsConfiguration!.parentEmail;
   }
 
   setVertaloDistributionState(vertaloDistribution: VertaloDistributionState) {
@@ -197,7 +216,7 @@ export class Trade {
     offeringId: string;
     tradeId: string;
   } {
-    if (!this.tradeSchema.northCapitalTradeState) {
+    if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
     }
 
@@ -207,7 +226,7 @@ export class Trade {
       investmentId: this.tradeSchema.investmentId,
       accountId: this.tradeSchema.vendorsConfiguration!.northCapitalParentAccountId,
       offeringId: this.tradeSchema.vendorsConfiguration!.offeringId,
-      tradeId: this.tradeSchema.northCapitalTradeState.tradeId,
+      tradeId: this.tradeSchema.northCapitalTradeState!.tradeId,
       bankName: this.tradeSchema.vendorsConfiguration!.bankAccountName,
       amount: amount,
       ip: this.tradeSchema.tradeConfiguration.ip,
@@ -223,14 +242,14 @@ export class Trade {
   }
 
   getSubscriptionAgreementConfiguration(): { profileId: string; subscriptionAgreementId: string; tradeId: string } {
-    if (!this.tradeSchema.northCapitalTradeState) {
+    if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
     }
 
     return {
       profileId: this.tradeSchema.tradeConfiguration.profileId,
       subscriptionAgreementId: this.tradeSchema.tradeConfiguration.subscriptionAgreementId,
-      tradeId: this.tradeSchema.northCapitalTradeState.tradeId,
+      tradeId: this.tradeSchema.northCapitalTradeState!.tradeId,
     };
   }
 
@@ -261,7 +280,7 @@ export class Trade {
       throw new Error('Vertalo distribution state is not set');
     }
 
-    if (!this.tradeSchema.northCapitalTradeState) {
+    if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
     }
 
@@ -297,23 +316,24 @@ export class Trade {
       throw new Error('Trade state is not set');
     }
 
-    return this.tradeSchema.northCapitalTradeState!.tradeStatus === 'CREATED';
+    return this.tradeStatus.isCreated();
   }
 
   getTradeId(): string {
-    if (!this.tradeSchema.northCapitalTradeState) {
+    if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
     }
 
-    return this.tradeSchema.northCapitalTradeState.tradeId;
+    return this.tradeSchema.northCapitalTradeState!.tradeId;
   }
 
   setTradeStatusToFunded() {
-    if (!this.tradeSchema.northCapitalTradeState) {
+    if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
     }
 
-    this.tradeSchema.northCapitalTradeState.tradeStatus = 'FUNDED';
+    this.tradeSchema.northCapitalTradeState!.tradeStatus = 'FUNDED';
+    this.tradeStatus = TradeStatus.fromResponse('FUNDED');
   }
 
   isVertaloDistributionOpened(): boolean {
@@ -325,11 +345,7 @@ export class Trade {
   }
 
   isTradeFunded(): boolean {
-    if (!this.tradeSchema.northCapitalTradeState) {
-      throw new Error('North Capital trade state is not set');
-    }
-
-    return this.tradeSchema.northCapitalTradeState.tradeStatus === 'FUNDED';
+    return this.tradeStatus.isFunded();
   }
 
   isMarkedReadyToDisbursement() {
@@ -358,19 +374,16 @@ export class Trade {
   }
 
   isTradeSettled(): boolean {
-    if (!this.tradeSchema.northCapitalTradeState) {
-      throw new Error('North Capital trade state is not set');
-    }
-
-    return this.tradeSchema.northCapitalTradeState.tradeStatus === 'SETTLED';
+    return this.tradeStatus.isSettled();
   }
 
   setTradeStatusToSettled() {
-    if (!this.tradeSchema.northCapitalTradeState) {
+    if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
     }
 
-    this.tradeSchema.northCapitalTradeState.tradeStatus = 'SETTLED';
+    this.tradeSchema.northCapitalTradeState!.tradeStatus = 'SETTLED';
+    this.tradeStatus = TradeStatus.fromResponse('SETTLED');
   }
 
   isPaymentMarkedInVertalo(): boolean {
@@ -437,5 +450,29 @@ export class Trade {
 
   getProfileId(): UUID {
     return this.tradeSchema.tradeConfiguration.profileId;
+  }
+
+  setTradeCancelState(status: string, cancelState: any) {
+    this.tradeSchema.cancelTradeState = {
+      cancelState,
+      originalCancelStatus: status as OrderStatus,
+      cancelDate: new Date(),
+    };
+    this.tradeStatus = TradeStatus.fromResponse(status);
+    // @ts-ignore
+    this.tradeSchema.northCapitalTradeState!.tradeStatus = status;
+  }
+
+  isCanceled(): boolean {
+    return this.tradeStatus.isCanceled();
+  }
+
+  isTradeUnwinding() {
+    return this.tradeStatus.isUnwindPending();
+  }
+
+  setTradeUnwounded() {
+    this.tradeSchema.northCapitalTradeState!.tradeStatus = 'UNWIND SETTLED';
+    this.tradeStatus = TradeStatus.fromResponse(OrderStatus.UNWIND_SETTLED);
   }
 }
