@@ -1,10 +1,12 @@
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-import { VerifierRecordsTable } from 'Verification/Adapter/Database/RegistrationSchema';
+import { VerificationFeesTable, VerifierRecordsTable } from 'Verification/Adapter/Database/VerificationSchema';
 
 export const verifierRecordsTable = 'verifier_records';
+export const verificationFeesTable = 'verification_fees';
 
 export interface VerificationDatabase {
   [verifierRecordsTable]: VerifierRecordsTable;
+  [verificationFeesTable]: VerificationFeesTable
 }
 
 export const VerificationDatabaseAdapterInstanceProvider = 'VerificationDatabaseAdapterProvider';
