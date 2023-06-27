@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import {
   legalEntitiesBannedListTable,
   legalEntitiesBeneficiaryTable,
@@ -68,6 +69,11 @@ export type StakeholderForSynchronization = StakeholderOutput & {
   idScan: DocumentSchema[];
   profileId: string;
   ssn: string | null;
+};
+
+export type ProfileAccountStructureResponse = {
+  accountId: UUID;
+  type: 'INDIVIDUAL_ACCOUNT' | 'CORPORATE_ACCOUNT' | 'TRUST_ACCOUNT' | 'BENEFICIARY_ACCOUNT';
 };
 
 export class AccountRepository {
@@ -205,6 +211,42 @@ export class AccountRepository {
     } catch (error: any) {
       return null;
     }
+  }
+
+  async getProfileAccountStructure(profileId: string): Promise<ProfileAccountStructureResponse[]> {
+    const db = this.databaseAdapterProvider.provide();
+    const accounts = await db
+      .selectFrom(legalEntitiesIndividualAccountTable)
+      .select(eb => [`accountId`, eb.val('INDIVIDUAL_ACCOUNT').as('type')])
+      .union(
+        db
+          .selectFrom(legalEntitiesCompanyAccountTable)
+          .select(eb => [`accountId`, eb.val('CORPORATE_ACCOUNT').as('type')])
+          .where('profileId', '=', <any>profileId)
+          .where('accountType', '=', 'CORPORATE'),
+      )
+      .union(
+        db
+          .selectFrom(legalEntitiesCompanyAccountTable)
+          .select(eb => [`accountId`, eb.val('TRUST_ACCOUNT').as('type')])
+          .where('profileId', '=', <any>profileId)
+          .where('accountType', '=', 'TRUST'),
+      )
+      .union(
+        db
+          .selectFrom(legalEntitiesBeneficiaryTable)
+          .select(eb => [`accountId`, eb.val('BENEFICIARY_ACCOUNT').as('type')])
+          .where('profileId', '=', <any>profileId),
+      )
+      .where(`${legalEntitiesIndividualAccountTable}.profileId`, '=', profileId)
+      .castTo<ProfileAccountStructureResponse>()
+      .execute();
+
+    if (!accounts.length) {
+      return [];
+    }
+
+    return accounts;
   }
 
   async getBeneficiaryAccountForSynchronization(profileId: string, accountId: string): Promise<BeneficiaryAccountForSynchronization | null> {
