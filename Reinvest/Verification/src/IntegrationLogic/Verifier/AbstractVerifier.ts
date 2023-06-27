@@ -1,4 +1,9 @@
-import { AvailableEventsForDecision, VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
+import {
+  AvailableEventsForDecision,
+  VerificationDecision,
+  VerificationDecisionType,
+  VerificationObject,
+} from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
   AutomaticVerificationResultEvent,
   VerificationAmlResultEvent,
@@ -55,26 +60,48 @@ export abstract class AbstractVerifier {
     ].includes(this.decision.decision);
   }
 
+  protected getDecisionId(onObject: VerificationObject, numberOfEvents: number): string {
+    let decisionId = onObject.type.toLowerCase();
+
+    if (onObject.profileId) {
+      decisionId += `-${onObject.profileId}`;
+    }
+
+    if (onObject.accountId) {
+      decisionId += `-${onObject.accountId}`;
+    }
+
+    if (onObject.stakeholderId) {
+      decisionId += `-${onObject.stakeholderId}`;
+    }
+
+    return `${decisionId}-${numberOfEvents}`;
+  }
+
   protected analyzeEvents(): {
     amlStatus: VerificationStatus;
-    decisionId: number;
     failedKycCounter: number;
     isKycInPendingState: boolean;
     kycStatus: VerificationStatus;
     needMoreInfo: boolean;
+    numberOfEvents: number;
+    numberOfKycManuallyApproved: number;
     objectUpdatesCounter: number;
     reasons: string[];
+    totalFailedKycCounter: number;
     wasFailedRequest: boolean;
   } {
     let amlStatus = VerificationStatus.PENDING;
     let kycStatus = VerificationStatus.PENDING;
     let objectUpdatesCounter = 0;
     let failedKycCounter = 0;
+    let totalFailedKycCounter = 0;
     let someReasons: string[] = [];
     let wasFailedRequest = false;
     let isKycInPendingState = false;
     let needMoreInfo = false;
-    const decisionId = this.events.list.length;
+    let numberOfKycManuallyApproved = 0;
+    const numberOfEvents = this.events.list.length;
 
     for (const event of this.events.list) {
       const { kind } = event;
@@ -94,6 +121,11 @@ export abstract class AbstractVerifier {
 
         if (status === VerificationStatus.DISAPPROVED) {
           failedKycCounter++;
+          totalFailedKycCounter++;
+        }
+
+        if (status === VerificationStatus.APPROVED) {
+          numberOfKycManuallyApproved++;
         }
       }
 
@@ -104,11 +136,14 @@ export abstract class AbstractVerifier {
       if (kind === VerificationEvents.PRINCIPAL_APPROVED) {
         kycStatus = VerificationStatus.APPROVED;
         amlStatus = VerificationStatus.APPROVED;
+        numberOfKycManuallyApproved++;
       }
 
       if (kind === VerificationEvents.PRINCIPAL_DISAPPROVED) {
         kycStatus = VerificationStatus.DISAPPROVED;
-        amlStatus = VerificationStatus.DISAPPROVED;
+        failedKycCounter++;
+        totalFailedKycCounter++;
+        someReasons = ['Principal disapproved'];
       }
 
       if ([VerificationEvents.VERIFICATION_AML_RESULT, VerificationEvents.MANUAL_VERIFICATION_AML_RESULT].includes(kind)) {
@@ -155,14 +190,21 @@ export abstract class AbstractVerifier {
         wasFailedRequest = false;
         isKycInPendingState = false;
         needMoreInfo = false;
+
+        if (kind === VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE) {
+          totalFailedKycCounter = 0;
+          numberOfKycManuallyApproved = 0;
+        }
       }
     }
 
     return {
       amlStatus,
-      decisionId,
+      numberOfEvents,
+      numberOfKycManuallyApproved,
       kycStatus,
       failedKycCounter,
+      totalFailedKycCounter,
       reasons: someReasons,
       wasFailedRequest,
       needMoreInfo,
@@ -224,6 +266,7 @@ export abstract class AbstractVerifier {
     if (!this.decision?.decision) {
       this.decision = {
         decision: VerificationDecisionType.UNKNOWN,
+        decisionId: '0',
         onObject: {
           type: this.type,
         },

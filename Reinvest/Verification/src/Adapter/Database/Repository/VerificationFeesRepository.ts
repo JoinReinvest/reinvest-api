@@ -3,7 +3,7 @@ import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { VerificationDatabaseAdapterProvider, verificationFeesTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 import { VerificationFeesTable } from 'Verification/Adapter/Database/VerificationSchema';
-import { VerificationFee, VerificationFeeSchema } from 'Verification/Domain/VerificationFee';
+import { VerificationFee, VerificationFeeSchema, VerificationFeeStatus } from 'Verification/Domain/VerificationFee';
 
 export class VerificationFeesRepository {
   private databaseAdapterProvider: VerificationDatabaseAdapterProvider;
@@ -24,7 +24,37 @@ export class VerificationFeesRepository {
     }
   }
 
-  async storeVerificationFee(verificationFee: VerificationFee): Promise<void> {
+  async updateVerificationFees(verificationFees: VerificationFee[]): Promise<void> {
+    if (verificationFees.length === 0) {
+      return;
+    }
+
+    const values = verificationFees.map(verificationFee => this.mapVerificationSchemaToTable(verificationFee));
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(verificationFeesTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.column('decisionId').doUpdateSet({
+          amountAssigned: eb => eb.ref(`excluded.amountAssigned`),
+          status: eb => eb.ref(`excluded.status`),
+        }),
+      )
+      .execute();
+  }
+
+  async createVerificationFee(verificationFee: VerificationFee): Promise<void> {
+    const values = this.mapVerificationSchemaToTable(verificationFee);
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(verificationFeesTable)
+      .values(values)
+      .onConflict(oc => oc.column('decisionId').doNothing())
+      .execute();
+  }
+
+  private mapVerificationSchemaToTable(verificationFee: VerificationFee): VerificationFeesTable {
     const feeSchema = verificationFee.toObject();
     const values: VerificationFeesTable = {
       ...feeSchema,
@@ -33,18 +63,7 @@ export class VerificationFeesRepository {
       dateCreated: feeSchema.dateCreated.toDate(),
     };
 
-    await this.databaseAdapterProvider
-      .provide()
-      .insertInto(verificationFeesTable)
-      .values(values)
-      .onConflict(oc => oc.column('decisionId').doNothing())
-      .onConflict(oc =>
-        oc.column('id').doUpdateSet({
-          amountAssigned: eb => eb.ref(`excluded.amountAssigned`),
-          status: eb => eb.ref(`excluded.status`),
-        }),
-      )
-      .execute();
+    return values;
   }
 
   private mapToVerificationFee(data?: VerificationFeesTable): VerificationFee | null {
@@ -60,5 +79,27 @@ export class VerificationFeesRepository {
     };
 
     return VerificationFee.createFromSchema(schema);
+  }
+
+  async getNotAssignedFees(profileId: UUID, accountId: UUID): Promise<VerificationFee[]> {
+    try {
+      const data = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(verificationFeesTable)
+        .selectAll()
+        .where(`status`, 'in', [VerificationFeeStatus.NOT_ASSIGNED, VerificationFeeStatus.NOT_ASSIGNED])
+        .where(eb => eb.where(`profileId`, '=', profileId).orWhere(`accountId`, '=', accountId))
+        .execute();
+
+      if (!data) {
+        return [];
+      }
+
+      return data.map(record => <VerificationFee>this.mapToVerificationFee(record));
+    } catch (error: any) {
+      console.error(`Error while fetching verification fees for account ${profileId}/${accountId}`, error);
+
+      return [];
+    }
   }
 }

@@ -7,6 +7,8 @@ import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/Ve
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
+import { VerificationFeesRepository } from 'Verification/Adapter/Database/Repository/VerificationFeesRepository';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
 
 export class AdapterServiceProvider {
   private config: Verification.Config;
@@ -21,10 +23,13 @@ export class AdapterServiceProvider {
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
       .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
 
+    container.addSingleton(IdGenerator);
+
     // db
     container
       .addAsValue(VerificationDatabaseAdapterInstanceProvider, createVerificationDatabaseAdapterProvider(this.config.database))
-      .addSingleton(VerificationAdapter, [VerificationDatabaseAdapterInstanceProvider]);
+      .addSingleton(VerificationAdapter, [VerificationDatabaseAdapterInstanceProvider])
+      .addSingleton(VerificationFeesRepository, [VerificationDatabaseAdapterInstanceProvider]);
 
     //modules
     container.addSingleton(RegistrationService, ['Registration']);

@@ -113,7 +113,7 @@ export class InvestmentsRepository {
         `${investmentsFeesTable}.id as feeId`,
         `${investmentsFeesTable}.investmentId`,
         `${investmentsFeesTable}.status as feeStatus`,
-        `${investmentsFeesTable}.verificationFeeId`,
+        `${investmentsFeesTable}.verificationFeeIdsJson`,
       ])
       .castTo<InvestmentWithFee>()
       .where(`${investmentsTable}.profileId`, '=', profileId)

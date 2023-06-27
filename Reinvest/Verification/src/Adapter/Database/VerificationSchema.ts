@@ -14,13 +14,13 @@ export interface VerifierRecordsTable {
 }
 
 export interface VerificationFeesTable {
-  accountId: UUID;
+  accountId: UUID | null;
   amount: number;
   amountAssigned: number;
   dateCreated: Date;
   decisionId: string;
   id: UUID;
-  profileId: UUID;
+  profileId: UUID | null;
   status: 'ASSIGNED' | 'NOT_ASSIGNED' | 'PARTIALLY_ASSIGNED';
 }
 

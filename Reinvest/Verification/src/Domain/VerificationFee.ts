@@ -1,6 +1,10 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { Money } from 'Money/Money';
 import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
+import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
+
+const VERIFICATION_FEE_FOR_MANUAL_KYC_IN_CENTS = 1000; // $10
+const VERIFICATION_FEE_FOR_MANUAL_KYB_IN_CENTS = 2500; // $25
 
 export enum VerificationFeeStatus {
   ASSIGNED = 'ASSIGNED',
@@ -9,13 +13,13 @@ export enum VerificationFeeStatus {
 }
 
 export type VerificationFeeSchema = {
-  accountId: UUID;
+  accountId: UUID | null;
   amount: Money;
   amountAssigned: Money;
   dateCreated: DateTime;
   decisionId: string;
   id: UUID;
-  profileId: UUID;
+  profileId: UUID | null;
   status: VerificationFeeStatus;
 };
 
@@ -26,7 +30,7 @@ export class VerificationFee {
     this.verificationFeeSchema = verificationFeeSchema;
   }
 
-  static create(id: UUID, profileId: UUID, accountId: UUID, decisionId: string, amount: Money) {
+  static create(id: UUID, decisionId: string, amount: Money, profileId: UUID | null, accountId: UUID | null) {
     return new VerificationFee({
       accountId,
       amount,
@@ -43,7 +47,49 @@ export class VerificationFee {
     return new VerificationFee(verificationFeeSchema);
   }
 
+  static getFeeForType(type: VerifierType) {
+    switch (type) {
+      case VerifierType.PROFILE:
+        return Money.lowPrecision(VERIFICATION_FEE_FOR_MANUAL_KYC_IN_CENTS);
+      case VerifierType.STAKEHOLDER:
+        return Money.zero();
+      case VerifierType.COMPANY:
+        return Money.lowPrecision(VERIFICATION_FEE_FOR_MANUAL_KYB_IN_CENTS);
+      default:
+        console.error(`Unknown verifier type ${type} when asking for verification fee`);
+
+        return Money.zero();
+    }
+  }
+
   toObject(): VerificationFeeSchema {
     return this.verificationFeeSchema;
+  }
+
+  // it returns paid amount
+  payToInvestmentAmount(maxAmount: Money): Money {
+    const amountLeftToPay = this.verificationFeeSchema.amount.subtract(this.verificationFeeSchema.amountAssigned);
+
+    if (amountLeftToPay.isZero()) {
+      this.verificationFeeSchema.status = VerificationFeeStatus.ASSIGNED;
+
+      return Money.zero();
+    }
+
+    if (amountLeftToPay.isGreaterThan(maxAmount)) {
+      this.verificationFeeSchema.status = VerificationFeeStatus.PARTIALLY_ASSIGNED;
+      this.verificationFeeSchema.amountAssigned = this.verificationFeeSchema.amountAssigned.add(maxAmount);
+
+      return maxAmount;
+    } else {
+      this.verificationFeeSchema.status = VerificationFeeStatus.ASSIGNED;
+      this.verificationFeeSchema.amountAssigned = this.verificationFeeSchema.amountAssigned.add(amountLeftToPay);
+
+      return amountLeftToPay;
+    }
+  }
+
+  getId(): UUID {
+    return this.verificationFeeSchema.id;
   }
 }

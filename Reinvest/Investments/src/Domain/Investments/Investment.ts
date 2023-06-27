@@ -1,8 +1,11 @@
 import { GracePeriod } from 'Investments/Domain/Investments/GracePeriod';
 import { InvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
-import { Fee, FeeSchema } from './Fee';
+import { Fee, FeeSchema, VerificationFeeIds } from './Fee';
 import { InvestmentsFeesStatus, InvestmentStatus, ScheduledBy } from './Types';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 type InvestmentSchema = InvestmentsTable;
 
@@ -14,7 +17,7 @@ export type InvestmentWithFee = InvestmentSchema & {
   feeId: string | null;
   feeStatus: InvestmentsFeesStatus | null;
   investmentId: string;
-  verificationFeeId: string;
+  verificationFeeIdsJson: JSONObjectOf<VerificationFeeIds> | null;
 };
 
 export class Investment {
@@ -111,18 +114,19 @@ export class Investment {
     );
 
     if (feeId) {
-      const feeData = {
-        approveDate: investmentData.approveDate,
+      let feeData: FeeSchema;
+      feeData = {
+        approveDate: investmentData.approveDate ? DateTime.from(investmentData.approveDate) : null,
         approvedByIP: investmentData.approvedByIP,
-        amount: investmentData.feeAmount,
-        dateCreated: investmentData.feeDateCreated,
+        amount: Money.lowPrecision(investmentData.feeAmount!),
+        dateCreated: DateTime.from(investmentData.feeDateCreated!),
         id: investmentData.feeId,
         status: investmentData.feeStatus,
         investmentId: investmentData.investmentId,
-        verificationFeeId: investmentData.verificationFeeId,
+        verificationFeeIds: investmentData.verificationFeeIdsJson!,
       } as FeeSchema;
 
-      investment.setFee(Fee.create(feeData));
+      investment.setFee(Fee.restoreFromSchema(feeData));
     }
 
     return investment;

@@ -165,6 +165,7 @@ export function boot(): Modules {
       {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
+        verification: modules.get(Verification.moduleName) as Verification.Main,
       },
     ),
   );

@@ -16,8 +16,8 @@ export async function up(db: Kysely<VerificationDatabase>): Promise<void> {
   await db.schema
     .createTable(verificationFeesTable)
     .addColumn('id', 'uuid', col => col.primaryKey())
-    .addColumn('profileId', 'uuid', col => col.notNull())
-    .addColumn('accountId', 'uuid', col => col.notNull())
+    .addColumn('profileId', 'uuid', col => col.defaultTo(null))
+    .addColumn('accountId', 'uuid', col => col.defaultTo(null))
     .addColumn('dateCreated', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .addColumn('amount', 'integer', col => col.notNull())
     .addColumn('amountAssigned', 'integer', col => col.notNull())

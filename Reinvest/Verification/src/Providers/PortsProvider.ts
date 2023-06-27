@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { Verification } from 'Verification/index';
 import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
@@ -12,7 +13,6 @@ import { AdminVerificationActions } from 'Verification/Port/Api/AdminVerificatio
 import { NorthCapitalVerificationEvents } from 'Verification/Port/Api/NorthCapitalVerificationEvents';
 import { PrincipalApprovals } from 'Verification/Port/Api/PrincipalApprovals';
 import { UserVerificationActions } from 'Verification/Port/Api/UserVerificationActions';
-import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class PortsProvider {
   private config: Verification.Config;

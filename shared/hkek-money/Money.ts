@@ -110,4 +110,8 @@ export class Money {
   isNegative(): boolean {
     return this.value.isNegative();
   }
+
+  isEqual(amount: Money): boolean {
+    return this.value.equalsTo(amount.getInstance());
+  }
 }
