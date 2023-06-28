@@ -1,12 +1,16 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { PortfolioDatabaseAdapterProvider, propertyTable } from 'Portfolio/Adapter/Database/DatabaseAdapter';
 import { Property, PropertySchema } from 'Reinvest/Portfolio/src/Domain/Property';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class PortfolioRepository {
   private databaseAdapterProvider: PortfolioDatabaseAdapterProvider;
+  private eventsPublisher: SimpleEventBus;
 
-  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventsPublisher = eventsPublisher;
   }
 
   public static getClassName = (): string => 'PortfolioRepository';
@@ -85,22 +89,32 @@ export class PortfolioRepository {
     }
   }
 
-  async updateProperty(property: Property) {
-    const { id, dataJson, status } = property.toObject();
+  async updateProperty(property: Property, events?: DomainEvent[]): Promise<void> {
+    const { id, dataJson, adminJson, dealpathJson, status } = property.toObject();
 
-    try {
-      await this.databaseAdapterProvider
-        .provide()
-        .updateTable(propertyTable)
-        .set({ dataJson: JSON.stringify(dataJson), status, lastUpdate: new Date() })
-        .where('id', '=', id)
-        .execute();
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(propertyTable)
+      .set({
+        dataJson: JSON.stringify(dataJson),
+        adminJson: JSON.stringify(adminJson),
+        dealpathJson: JSON.stringify(dealpathJson),
+        status,
+        lastUpdate: new Date(),
+      })
+      .where('id', '=', id)
+      .execute();
 
-      return true;
-    } catch (error: any) {
-      console.error(error);
-
-      return false;
+    if (events?.length) {
+      await this.publishEvents(events);
     }
+  }
+
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
+    }
+
+    await this.eventsPublisher.publishMany(events);
   }
 }

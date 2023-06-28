@@ -69,11 +69,16 @@ export function boot(): Modules {
 
   modules.register(
     Portfolio.moduleName,
-    Portfolio.create({
-      database: databaseConfig,
-      queue: queueConfig,
-      dealpathConfig,
-    } as Portfolio.Config),
+    Portfolio.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+        dealpathConfig,
+      } as Portfolio.Config,
+      {
+        documents: modules.get(Documents.moduleName) as Documents.Main,
+      },
+    ),
   );
 
   modules.register(

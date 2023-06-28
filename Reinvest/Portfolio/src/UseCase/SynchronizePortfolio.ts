@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
 import { DealpathAdapter } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
-import { Property, PropertyData, PropertyStatus } from 'Portfolio/Domain/Property';
+import { Property, PropertyDealpathData, PropertyStatus } from 'Portfolio/Domain/Property';
 import { Address, AddressInput } from 'Portfolio/ValueObject/Address';
 import { Location, LocationInput } from 'Portfolio/ValueObject/Location';
 
@@ -30,7 +30,7 @@ class SynchronizePortfolio {
       const propertyWithGivenId = await this.portfolioRepository.getById(property.id);
 
       if (propertyWithGivenId) {
-        const inputKeys = Object.keys(property) as (keyof PropertyData)[];
+        const inputKeys = Object.keys(property) as (keyof PropertyDealpathData)[];
 
         for (const step of inputKeys) {
           try {
@@ -79,14 +79,11 @@ class SynchronizePortfolio {
           address,
           location,
         };
-
-        const adminJson = {};
-
         const dataJson = {
           ...dealpathJson,
-          ...adminJson,
         };
-        const newProperty = Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: new Date(), dataJson, dealpathJson, adminJson });
+
+        const newProperty = Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: new Date(), dataJson, dealpathJson });
         await this.portfolioRepository.createProperty(newProperty);
       }
     }
