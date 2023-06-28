@@ -111,6 +111,7 @@ export function boot(): Modules {
         SNS: snsConfig,
         Cognito: cognitoConfig,
         webAppUrl: WEB_APP_URL,
+        queue: queueConfig,
       } as Identity.Config,
       {
         investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main,

@@ -1,6 +1,25 @@
 import { ContainerInterface } from 'Container/Container';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
+export const STORE_EVENT_COMMAND = 'StoreEventCommand';
+
+export type StoreEventCommand = DomainEvent & {
+  data: {
+    kind: string;
+    payload: any;
+  };
+  kind: 'StoreEventCommand';
+};
+
+export const storeEventCommand = (profileId: string, kind: string, payload: any = {}): StoreEventCommand => ({
+  id: profileId,
+  data: {
+    kind,
+    payload,
+  },
+  kind: 'StoreEventCommand',
+});
+
 export interface EventHandler<Event extends DomainEvent> {
   handle(event: Event): Promise<void>;
 }
