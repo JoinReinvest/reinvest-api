@@ -5,6 +5,7 @@ import { Money } from 'Money/Money';
 import { InvestmentsFeesStatus } from './Types';
 
 export type FeeSchema = {
+  abortedDate: DateTime | null;
   accountId: UUID;
   amount: Money;
   approveDate: DateTime | null;
@@ -17,11 +18,13 @@ export type FeeSchema = {
   verificationFeeIds: VerificationFeeIds;
 };
 
+export type VerificationReference = {
+  amount: number;
+  verificationFeeId: UUID;
+};
+
 export type VerificationFeeIds = {
-  fees: {
-    amount: number;
-    verificationFeeId: UUID;
-  }[];
+  fees: VerificationReference[];
 };
 
 export class Fee {
@@ -36,6 +39,7 @@ export class Fee {
       accountId,
       amount,
       approveDate: null,
+      abortedDate: null,
       approvedByIP: null,
       dateCreated: DateTime.now(),
       id,
@@ -50,9 +54,10 @@ export class Fee {
     return new Fee(feeSchema);
   }
 
-  approveFee(): void {
+  approveFee(ip: string): void {
     this.feeSchema.approveDate = DateTime.now();
     this.feeSchema.status = InvestmentsFeesStatus.APPROVED;
+    this.feeSchema.approvedByIP = ip;
   }
 
   getId(): UUID {
@@ -61,6 +66,7 @@ export class Fee {
 
   abort(): void {
     this.feeSchema.status = InvestmentsFeesStatus.ABORTED;
+    this.feeSchema.abortedDate = DateTime.now();
   }
 
   isApproved(): boolean {

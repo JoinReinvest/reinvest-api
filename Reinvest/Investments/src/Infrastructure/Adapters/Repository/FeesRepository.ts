@@ -28,42 +28,26 @@ export class FeesRepository {
     return this.restoreFeeFromSchema(feeData);
   }
 
-  async approveFee(fee: Fee) {
-    const { id, status, approveDate } = fee.toObject();
+  async storeFee(fee: Fee) {
+    const values = this.castSchemaToInvestmentsFeesTable(fee);
     try {
       await this.databaseAdapterProvider
         .provide()
-        .updateTable(investmentsFeesTable)
-        .set({
-          status,
-          approveDate: approveDate?.toDate(),
-        })
-        .where('id', '=', id)
+        .insertInto(investmentsFeesTable)
+        .values(values)
+        .onConflict(oc =>
+          oc.constraint('unique_investment_id').doUpdateSet({
+            approvedByIP: eb => eb.ref(`excluded.approvedByIP`),
+            status: eb => eb.ref(`excluded.status`),
+            abortedDate: eb => eb.ref(`excluded.abortedDate`),
+            approveDate: eb => eb.ref(`excluded.approveDate`),
+          }),
+        )
         .execute();
 
       return true;
     } catch (error: any) {
-      console.error(`Cannot update fee's status: ${error.message}`, error);
-
-      return false;
-    }
-  }
-
-  async updateStatus(fee: Fee) {
-    const { id, status } = fee.toObject();
-    try {
-      await this.databaseAdapterProvider
-        .provide()
-        .updateTable(investmentsFeesTable)
-        .set({
-          status,
-        })
-        .where('id', '=', id)
-        .execute();
-
-      return true;
-    } catch (error: any) {
-      console.error(`Cannot update status of fee: ${error.message}`, error);
+      console.error(`Cannot store fee for investment ${values.investmentId}`, error);
 
       return false;
     }

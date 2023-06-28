@@ -73,6 +73,7 @@ export class InvestmentsRepository {
       .select([
         `${investmentsFeesTable}.amount as feeAmount`,
         `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.abortedDate`,
         `${investmentsFeesTable}.approvedByIP`,
         `${investmentsFeesTable}.dateCreated as feeDateCreated`,
         `${investmentsFeesTable}.id as feeId`,
@@ -108,6 +109,7 @@ export class InvestmentsRepository {
       .select([
         `${investmentsFeesTable}.amount as feeAmount`,
         `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.abortedDate`,
         `${investmentsFeesTable}.approvedByIP`,
         `${investmentsFeesTable}.dateCreated as feeDateCreated`,
         `${investmentsFeesTable}.id as feeId`,
@@ -262,7 +264,7 @@ export class InvestmentsRepository {
 
       if (approveFee) {
         const fee = investment.getFee();
-        fee && (await this.feesRepository.approveFee(fee));
+        fee && (await this.feesRepository.storeFee(fee));
       }
 
       return true;

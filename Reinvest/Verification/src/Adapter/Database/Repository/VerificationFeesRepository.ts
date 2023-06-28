@@ -87,7 +87,7 @@ export class VerificationFeesRepository {
         .provide()
         .selectFrom(verificationFeesTable)
         .selectAll()
-        .where(`status`, 'in', [VerificationFeeStatus.NOT_ASSIGNED, VerificationFeeStatus.NOT_ASSIGNED])
+        .where(`status`, 'in', [VerificationFeeStatus.NOT_ASSIGNED, VerificationFeeStatus.PARTIALLY_ASSIGNED])
         .where(eb => eb.where(`profileId`, '=', profileId).orWhere(`accountId`, '=', accountId))
         .execute();
 

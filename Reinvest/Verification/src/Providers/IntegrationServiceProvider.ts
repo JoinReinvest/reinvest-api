@@ -6,6 +6,7 @@ import { VerificationFeesRepository } from 'Verification/Adapter/Database/Reposi
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
+import { PayFee } from 'Verification/IntegrationLogic/UseCase/PayFee';
 import { RegisterFee } from 'Verification/IntegrationLogic/UseCase/RegisterFee';
 import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/VerifierExecutor';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
@@ -19,6 +20,7 @@ export class IntegrationServiceProvider {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(RegisterFee, [VerificationFeesRepository, IdGenerator]);
+    container.addSingleton(PayFee, [VerificationFeesRepository]);
     container.addSingleton(VerifierExecutor, [VerificationNorthCapitalAdapter, SimpleEventBus, RegisterFee]);
     container.addSingleton(VerifierRepository, [VerificationAdapter, RegistrationService]);
   }

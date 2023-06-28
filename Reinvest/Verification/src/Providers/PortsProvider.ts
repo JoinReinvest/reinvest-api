@@ -13,6 +13,8 @@ import { AdminVerificationActions } from 'Verification/Port/Api/AdminVerificatio
 import { NorthCapitalVerificationEvents } from 'Verification/Port/Api/NorthCapitalVerificationEvents';
 import { PrincipalApprovals } from 'Verification/Port/Api/PrincipalApprovals';
 import { UserVerificationActions } from 'Verification/Port/Api/UserVerificationActions';
+import { PayFee } from 'Verification/IntegrationLogic/UseCase/PayFee';
+import { VerificationFeesController } from 'Verification/Port/Api/VerificationFeesController';
 
 export class PortsProvider {
   private config: Verification.Config;
@@ -27,6 +29,7 @@ export class PortsProvider {
     container.addSingleton(MarkAccountAsDisapproved, [VerifierService]);
     container.addSingleton(MarkAccountAsNeedMoreInfo, [VerifierService, SimpleEventBus]);
     container.addSingleton(VerifyAccount, [RegistrationService, VerifierService]);
+    container.addSingleton(VerificationFeesController, [PayFee]);
 
     // api
     container.addSingleton(AdminVerificationActions, [VerifierRepository]);

@@ -10,6 +10,7 @@ import { JSONObjectOf } from 'HKEKTypes/Generics';
 type InvestmentSchema = InvestmentsTable;
 
 export type InvestmentWithFee = InvestmentSchema & {
+  abortedDate: Date | null;
   approveDate: Date | null;
   approvedByIP: string | null;
   feeAmount: number | null;
@@ -114,17 +115,19 @@ export class Investment {
     );
 
     if (feeId) {
-      let feeData: FeeSchema;
-      feeData = {
+      const feeData = <FeeSchema>{
         approveDate: investmentData.approveDate ? DateTime.from(investmentData.approveDate) : null,
+        abortedDate: investmentData.abortedDate ? DateTime.from(investmentData.abortedDate) : null,
         approvedByIP: investmentData.approvedByIP,
+        accountId: investmentData.accountId,
+        profileId: investmentData.profileId,
         amount: Money.lowPrecision(investmentData.feeAmount!),
         dateCreated: DateTime.from(investmentData.feeDateCreated!),
         id: investmentData.feeId,
         status: investmentData.feeStatus,
         investmentId: investmentData.investmentId,
         verificationFeeIds: investmentData.verificationFeeIdsJson!,
-      } as FeeSchema;
+      };
 
       investment.setFee(Fee.restoreFromSchema(feeData));
     }
@@ -136,7 +139,7 @@ export class Investment {
     this.fee = fee;
   }
 
-  getFee() {
+  getFee(): Fee | null {
     return this.fee;
   }
 
@@ -168,8 +171,8 @@ export class Investment {
     );
   }
 
-  approveFee() {
-    this.fee?.approveFee();
+  approveFee(ip: string) {
+    this.fee?.approveFee(ip);
   }
 
   isFeeApproved() {
