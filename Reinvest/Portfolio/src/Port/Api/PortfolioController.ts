@@ -1,3 +1,9 @@
+import { UUID } from 'HKEKTypes/Generics';
+import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
+import { UpdateProperty, UpdatePropertyInput } from 'Portfolio/UseCase/UpdateProperty';
+
+import { GetProperty } from '../../UseCase/GetProperty';
+
 type Property = {
   POIs: { description: string; image: string; name: string }[];
   address: {
@@ -71,7 +77,29 @@ const propertyMock = (name: string, addressLine: string, city: string, zip: stri
  * Returns mock data for the active portfolio
  */
 export class PortfolioController {
+  private synchronizePortfolioUseCase: SynchronizePortfolio;
+  private updatePropertyUseCase: UpdateProperty;
+  private getPropertyUseCase: GetProperty;
+
+  constructor(synchronizePortfolioUseCase: SynchronizePortfolio, updatePropertyUseCase: UpdateProperty, getPropertyUseCase: GetProperty) {
+    this.synchronizePortfolioUseCase = synchronizePortfolioUseCase;
+    this.updatePropertyUseCase = updatePropertyUseCase;
+    this.getPropertyUseCase = getPropertyUseCase;
+  }
+
   static getClassName = (): string => 'PortfolioController';
+
+  async synchronizePortfolio(portfolioId: UUID) {
+    return this.synchronizePortfolioUseCase.execute(portfolioId);
+  }
+
+  async updateProperty(input: UpdatePropertyInput, propertyId: number, portfolioId: UUID) {
+    return this.updatePropertyUseCase.execute(input, propertyId, portfolioId);
+  }
+
+  async getProperty(propertyId: number, portfolioId: UUID) {
+    return this.getPropertyUseCase.execute(propertyId, portfolioId);
+  }
 
   async getActivePortfolio(): Promise<{ portfolioId: string; portfolioName: string }> {
     return { portfolioId: '34ccfe14-dc18-40df-a1d6-04f33b9fa7f4', portfolioName: 'Community REIT' };
