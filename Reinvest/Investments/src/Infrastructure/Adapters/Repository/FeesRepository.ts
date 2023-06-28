@@ -1,6 +1,9 @@
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-import { Fee } from 'Reinvest/Investments/src/Domain/Investments/Fee';
-import { InvestmentsFeesStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { InvestmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
+import { Fee, FeeSchema } from 'Reinvest/Investments/src/Domain/Investments/Fee';
+
 export class FeesRepository {
   public static getClassName = (): string => 'FeesRepository';
 
@@ -10,17 +13,19 @@ export class FeesRepository {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 
-  async get(investmentId: string) {
-    const investment = await this.databaseAdapterProvider
+  async getFeeByInvestmentId(investmentId: string): Promise<Fee | null> {
+    const feeData = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsFeesTable)
-      .select(['accountId', 'amount', 'approveDate', 'approvedByIP', 'dateCreated', 'id', 'investmentId', 'profileId', 'status', 'verificationFeeId'])
+      .selectAll()
       .where('investmentId', '=', investmentId)
       .executeTakeFirst();
 
-    if (!investment) return false;
+    if (!feeData) {
+      return null;
+    }
 
-    return Fee.create(investment);
+    return this.restoreFeeFromSchema(feeData);
   }
 
   async approveFee(fee: Fee) {
@@ -31,7 +36,7 @@ export class FeesRepository {
         .updateTable(investmentsFeesTable)
         .set({
           status,
-          approveDate,
+          approveDate: approveDate?.toDate(),
         })
         .where('id', '=', id)
         .execute();
@@ -62,5 +67,30 @@ export class FeesRepository {
 
       return false;
     }
+  }
+
+  private castSchemaToInvestmentsFeesTable(fee: Fee): InvestmentsFeesTable {
+    const { verificationFeeIds, ...feeSchema } = fee.toObject();
+
+    return <InvestmentsFeesTable>{
+      ...feeSchema,
+      amount: feeSchema.amount.getAmount(),
+      approveDate: feeSchema.approveDate ? feeSchema.approveDate.toDate() : null,
+      dateCreated: feeSchema.dateCreated.toDate(),
+      verificationFeeIdsJson: verificationFeeIds,
+    };
+  }
+
+  private restoreFeeFromSchema(feeData: InvestmentsFeesTable): Fee {
+    const { verificationFeeIdsJson, ...feeSchema } = feeData;
+    const schema = <FeeSchema>{
+      ...feeSchema,
+      amount: Money.lowPrecision(feeSchema.amount),
+      approveDate: feeSchema.approveDate ? DateTime.from(feeSchema.approveDate) : null,
+      dateCreated: DateTime.from(feeSchema.dateCreated),
+      verificationFeeIds: verificationFeeIdsJson,
+    };
+
+    return Fee.restoreFromSchema(schema);
   }
 }

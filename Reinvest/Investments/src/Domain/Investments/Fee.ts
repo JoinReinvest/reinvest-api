@@ -20,7 +20,7 @@ export type FeeSchema = {
 export type VerificationFeeIds = {
   fees: {
     amount: number;
-    verificationFeeId: string;
+    verificationFeeId: UUID;
   }[];
 };
 
@@ -50,24 +50,24 @@ export class Fee {
     return new Fee(feeSchema);
   }
 
-  approveFee() {
+  approveFee(): void {
     this.feeSchema.approveDate = DateTime.now();
     this.feeSchema.status = InvestmentsFeesStatus.APPROVED;
   }
 
-  getId() {
+  getId(): UUID {
     return this.feeSchema.id;
   }
 
-  abort() {
+  abort(): void {
     this.feeSchema.status = InvestmentsFeesStatus.ABORTED;
   }
 
-  isApproved() {
+  isApproved(): boolean {
     return this.feeSchema.status === InvestmentsFeesStatus.APPROVED;
   }
 
-  toObject() {
+  toObject(): FeeSchema {
     return this.feeSchema;
   }
 }
