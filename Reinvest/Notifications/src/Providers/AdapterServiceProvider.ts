@@ -1,7 +1,7 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
-import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
 import { createNotificationsDatabaseAdapterProvider, NotificationsDatabaseAdapterInstanceProvider } from 'Notifications/Adapter/Database/DatabaseAdapter';
+import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
 import { Notifications } from 'Notifications/index';
@@ -28,6 +28,6 @@ export class AdapterServiceProvider {
       .addAsValue(NotificationsDatabaseAdapterInstanceProvider, createNotificationsDatabaseAdapterProvider(this.config.database))
       .addSingleton(NotificationsRepository, [NotificationsDatabaseAdapterInstanceProvider])
       .addSingleton(StoredEventRepository, [NotificationsDatabaseAdapterInstanceProvider])
-      .addSingleton(AccountRepository, [NotificationsDatabaseAdapterInstanceProvider]);
+      .addSingleton(AccountActivitiesRepository, [NotificationsDatabaseAdapterInstanceProvider]);
   }
 }

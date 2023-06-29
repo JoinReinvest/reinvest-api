@@ -11,6 +11,11 @@ export type AccountActivitySchema = {
   profileId: UUID;
 };
 
+export type AccountView = {
+  activityName: string;
+  date: string;
+};
+
 export class AccountActivity {
   private accountActivitySchema: AccountActivitySchema;
 
@@ -42,5 +47,12 @@ export class AccountActivity {
 
   toObject(): AccountActivitySchema {
     return this.accountActivitySchema;
+  }
+
+  getView(): AccountView {
+    return {
+      activityName: this.accountActivitySchema.activityName,
+      date: this.accountActivitySchema.activityDate.toIsoDateTime(),
+    };
   }
 }

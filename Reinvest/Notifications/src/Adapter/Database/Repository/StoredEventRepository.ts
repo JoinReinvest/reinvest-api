@@ -2,7 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { NotificationsDatabaseAdapterProvider, storedEventsTable } from 'Notifications/Adapter/Database/DatabaseAdapter';
 import { StoredEventsTable } from 'Notifications/Adapter/Database/NotificationsSchema';
-import { StoredEvent, StoredEventSchema } from 'Notifications/Domain/StoredEvent';
+import { StoredEvent, StoredEventSchema, StoredEventStatus } from 'Notifications/Domain/StoredEvent';
 
 export class StoredEventRepository {
   private databaseAdapterProvider: NotificationsDatabaseAdapterProvider;
@@ -37,6 +37,7 @@ export class StoredEventRepository {
             dateEmailed: eb => eb.ref(`excluded.dateEmailed`),
             dateInApp: eb => eb.ref(`excluded.dateInApp`),
             datePushed: eb => eb.ref(`excluded.datePushed`),
+            status: eb => eb.ref(`excluded.status`),
           }),
         )
         .execute();
@@ -78,5 +79,23 @@ export class StoredEventRepository {
     };
 
     return StoredEvent.restore(schema);
+  }
+
+  async listStoredEventsIds(): Promise<UUID[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(storedEventsTable)
+      .select(['id'])
+      .where('status', 'in', [StoredEventStatus.PENDING, StoredEventStatus.FAILED])
+      .orderBy('dateCreated', 'desc')
+      .orderBy('status', 'desc') // PENDING first
+      .limit(50)
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map((row: any) => row.id);
   }
 }
