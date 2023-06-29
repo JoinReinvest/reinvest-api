@@ -42,6 +42,7 @@ const serverlessConfiguration: AWS = {
       CognitoUserPoolID: importOutput('CognitoUserPoolID'),
       S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
       S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
+      S3_BUCKET_PORTFOLIO: importOutput('PortfolioBucketName'),
       LocalCognitoClientId: { Ref: 'LocalCognito' },
       SQS_QUEUE_URL: getAttribute('SQSNotification', 'QueueUrl'),
       SQS_PDF_GENERATOR_URL: getAttribute('SQSPdfGenerator', 'QueueUrl'),
