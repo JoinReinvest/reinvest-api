@@ -84,7 +84,7 @@ export class DistributeDividends {
         await this.dividendsCalculationRepository.storeInvestorDividend(dividendWithNoCoveredFee);
       }
 
-      await this.dividendsCalculationRepository.storeCalculatedDividends(partialDividends);
+      await this.dividendsCalculationRepository.updateCalculatedDividends(partialDividends);
 
       if (investorDividend.shouldSendNotification()) {
         await this.notificationService.notifyDividendUpdate(investorDividend);
