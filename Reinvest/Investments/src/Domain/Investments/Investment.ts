@@ -1,12 +1,16 @@
 import { GracePeriod } from 'Investments/Domain/Investments/GracePeriod';
 import { InvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 
-import { Fee, FeeSchema } from './Fee';
+import { Fee, FeeSchema, VerificationFeeIds } from './Fee';
 import { InvestmentsFeesStatus, InvestmentStatus, ScheduledBy } from './Types';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 type InvestmentSchema = InvestmentsTable;
 
 export type InvestmentWithFee = InvestmentSchema & {
+  abortedDate: Date | null;
   approveDate: Date | null;
   approvedByIP: string | null;
   feeAmount: number | null;
@@ -14,7 +18,7 @@ export type InvestmentWithFee = InvestmentSchema & {
   feeId: string | null;
   feeStatus: InvestmentsFeesStatus | null;
   investmentId: string;
-  verificationFeeId: string;
+  verificationFeeIdsJson: JSONObjectOf<VerificationFeeIds> | null;
 };
 
 export class Investment {
@@ -111,18 +115,21 @@ export class Investment {
     );
 
     if (feeId) {
-      const feeData = {
-        approveDate: investmentData.approveDate,
+      const feeData = <FeeSchema>{
+        approveDate: investmentData.approveDate ? DateTime.from(investmentData.approveDate) : null,
+        abortedDate: investmentData.abortedDate ? DateTime.from(investmentData.abortedDate) : null,
         approvedByIP: investmentData.approvedByIP,
-        amount: investmentData.feeAmount,
-        dateCreated: investmentData.feeDateCreated,
+        accountId: investmentData.accountId,
+        profileId: investmentData.profileId,
+        amount: Money.lowPrecision(investmentData.feeAmount!),
+        dateCreated: DateTime.from(investmentData.feeDateCreated!),
         id: investmentData.feeId,
         status: investmentData.feeStatus,
         investmentId: investmentData.investmentId,
-        verificationFeeId: investmentData.verificationFeeId,
-      } as FeeSchema;
+        verificationFeeIds: investmentData.verificationFeeIdsJson!,
+      };
 
-      investment.setFee(Fee.create(feeData));
+      investment.setFee(Fee.restoreFromSchema(feeData));
     }
 
     return investment;
@@ -132,7 +139,7 @@ export class Investment {
     this.fee = fee;
   }
 
-  getFee() {
+  getFee(): Fee | null {
     return this.fee;
   }
 
@@ -164,8 +171,8 @@ export class Investment {
     );
   }
 
-  approveFee() {
-    this.fee?.approveFee();
+  approveFee(ip: string) {
+    this.fee?.approveFee(ip);
   }
 
   isFeeApproved() {
