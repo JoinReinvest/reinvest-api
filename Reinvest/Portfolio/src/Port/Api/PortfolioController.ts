@@ -1,77 +1,14 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DataJson } from 'Portfolio/Domain/types';
 import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
 import { UpdateProperty, UpdatePropertyInput } from 'Portfolio/UseCase/UpdateProperty';
-
-import { GetProperty } from '../../UseCase/GetProperty';
-
-type Property = {
-  POIs: { description: string; image: string; name: string }[];
-  address: {
-    addressLine: string;
-    city: string;
-    zip: string;
-  };
-  gallery: string[];
-  image: string;
-  impactMetrics: {
-    jobsCreated: string;
-    totalProjectSize: string;
-    units: string;
-  };
-  keyMetrics: {
-    projectReturn: string;
-    rating: string;
-    structure: string;
-  };
-  location: {
-    lat: string;
-    lng: string;
-  };
-  name: string;
-};
+import { GetProperties } from 'Reinvest/Portfolio/src/UseCase/GetProperties';
 
 type PortfolioDetails = {
   id: string;
   name: string;
-  properties: Property[];
+  properties: DataJson[];
 };
-
-const propertyMock = (name: string, addressLine: string, city: string, zip: string): Property => ({
-  keyMetrics: {
-    projectReturn: '10%',
-    structure: 'Equity',
-    rating: 'A',
-  },
-  POIs: [
-    {
-      name: 'Good Schools',
-      description: 'Good Schools and education opportunities',
-      image: 'https://picsum.photos/52/52',
-    },
-    {
-      name: 'Vehicle-Dependent',
-      description: 'Some public transit available',
-      image: 'https://picsum.photos/52/52',
-    },
-  ],
-  impactMetrics: {
-    units: '10%',
-    totalProjectSize: '-',
-    jobsCreated: '300',
-  },
-  name,
-  address: {
-    addressLine,
-    city,
-    zip,
-  },
-  image: 'https://picsum.photos/1352/296',
-  gallery: ['https://picsum.photos/435/200', 'https://picsum.photos/435/200', 'https://picsum.photos/435/200', 'https://picsum.photos/435/200'],
-  location: {
-    lat: '37.572',
-    lng: '-101.373',
-  },
-});
 
 /**
  * Returns mock data for the active portfolio
@@ -79,12 +16,12 @@ const propertyMock = (name: string, addressLine: string, city: string, zip: stri
 export class PortfolioController {
   private synchronizePortfolioUseCase: SynchronizePortfolio;
   private updatePropertyUseCase: UpdateProperty;
-  private getPropertyUseCase: GetProperty;
+  private getPropertiesUseCase: GetProperties;
 
-  constructor(synchronizePortfolioUseCase: SynchronizePortfolio, updatePropertyUseCase: UpdateProperty, getPropertyUseCase: GetProperty) {
+  constructor(synchronizePortfolioUseCase: SynchronizePortfolio, updatePropertyUseCase: UpdateProperty, getPropertiesUseCase: GetProperties) {
     this.synchronizePortfolioUseCase = synchronizePortfolioUseCase;
     this.updatePropertyUseCase = updatePropertyUseCase;
-    this.getPropertyUseCase = getPropertyUseCase;
+    this.getPropertiesUseCase = getPropertiesUseCase;
   }
 
   static getClassName = (): string => 'PortfolioController';
@@ -97,12 +34,12 @@ export class PortfolioController {
     return this.updatePropertyUseCase.execute(input, propertyId, portfolioId);
   }
 
-  async getProperty(propertyId: number, portfolioId: UUID) {
-    return this.getPropertyUseCase.execute(propertyId, portfolioId);
-  }
-
   async getActivePortfolio(): Promise<{ portfolioId: string; portfolioName: string }> {
     return { portfolioId: '34ccfe14-dc18-40df-a1d6-04f33b9fa7f4', portfolioName: 'Community REIT' };
+  }
+
+  async getProperties(portfolioId: UUID) {
+    return this.getPropertiesUseCase.execute(portfolioId);
   }
 
   async getPortfolio(portfolioId: string): Promise<{ portfolioId: string; portfolioName: string }> {
@@ -112,15 +49,12 @@ export class PortfolioController {
   async getPortfolioDetails(portfolioId: string): Promise<PortfolioDetails> {
     const portfolio = await this.getPortfolio(portfolioId);
 
+    const properties = await this.getProperties(portfolio.portfolioId);
+
     return {
       id: portfolio.portfolioId,
       name: portfolio.portfolioName,
-      properties: [
-        propertyMock('Ulysses, KS', '4781 Ridge Road', 'Ulysses', 'KS 16804'),
-        propertyMock('Kingsform, MI', '1613 S Park St', 'Kingsform', 'MI 49802'),
-        propertyMock('New York, NY', '1615 S Park St', 'New York', 'MI 69804'),
-        propertyMock('Chicago, CG', '1614 S Park St', 'Chicago', 'MI 59803'),
-      ],
+      properties: properties,
     };
   }
 

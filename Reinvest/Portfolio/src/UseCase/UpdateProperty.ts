@@ -1,16 +1,23 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
-import { DataJson } from 'Portfolio/Domain/Property';
+import { ImpactMetrics, KeyMetrics, PropertyAddress, PropertyLocation } from 'Portfolio/Domain/types';
 import { ValidationErrorEnum, ValidationErrorType } from 'Portfolio/Domain/Validation';
-import { Address, AddressInput } from 'Portfolio/ValueObject/Address';
-import { Image } from 'Portfolio/ValueObject/Image';
-import { ImpactMetrics, ImpactMetricsInput } from 'Portfolio/ValueObject/ImpactMetrics';
-import { KeyMetrics, KeyMetricsInput } from 'Portfolio/ValueObject/KeyMetrics';
-import { Location, LocationInput } from 'Portfolio/ValueObject/Location';
-import { POI, POIInput } from 'Portfolio/ValueObject/POI';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
-export type UpdatePropertyInput = DataJson;
+export type UpdatePropertyInput = {
+  POIs?: {
+    description: string;
+    image: { id: string };
+    name: string;
+  }[];
+  address?: PropertyAddress;
+  gallery?: { id: string }[];
+  image?: { id: string };
+  impactMetrics?: ImpactMetrics;
+  keyMetrics?: KeyMetrics;
+  location?: PropertyLocation;
+  name?: string;
+};
 
 export class UpdateProperty {
   private portfolioRepository: PortfolioRepository;
@@ -52,23 +59,23 @@ export class UpdateProperty {
 
         switch (step) {
           case 'name':
-            property.setName(data as string);
+            property.setNameAsAdmin(data as string);
             break;
           case 'address':
-            property.setAddress(Address.create(data as AddressInput));
+            property.setAddressAsAdmin(data as PropertyAddress);
             break;
           case 'location':
-            property.setLocation(Location.create(data as LocationInput));
+            property.setLocationAsAdmin(data as PropertyLocation);
             break;
           case 'POIs':
-            const pois = data as POIInput[];
-            pois.forEach(({ image, description, name }) => {
-              property.addPOI(POI.create({ description, name, image, path: portfolioId }));
+            const pois = data as UpdatePropertyInput['POIs'];
+            pois!.forEach(({ image: { id: imageId }, description, name }) => {
+              property.addPOIAsAdmin({ description, name, image: imageId, path: portfolioId });
             });
             break;
           case 'image':
-            const id = data as string;
-            const event = property.replaceImage(Image.create({ id, path: portfolioId }));
+            const id = (<UpdatePropertyInput['image']>data)!.id;
+            const event = property.replaceImageAsAdmin({ id, path: portfolioId });
 
             if (event) {
               events.push(event);
@@ -76,16 +83,16 @@ export class UpdateProperty {
 
             break;
           case 'gallery':
-            const ids = data as string[];
-            ids.forEach(id => {
-              property.addGalleryImage(Image.create({ id, path: portfolioId }));
+            const ids = <UpdatePropertyInput['gallery']>data;
+            ids!.forEach(({ id }) => {
+              property.addGalleryImageAsAdmin({ id, path: portfolioId });
             });
             break;
           case 'keyMetrics':
-            property.setKeyMetrics(KeyMetrics.create(data as KeyMetricsInput));
+            property.setKeyMetricsAsAdmin(data as KeyMetrics);
             break;
           case 'impactMetrics':
-            property.setImpactMetrics(ImpactMetrics.create(data as ImpactMetricsInput));
+            property.setImpactMetricsAsAdmin(data as ImpactMetrics);
             break;
 
           default:
@@ -103,8 +110,6 @@ export class UpdateProperty {
         });
       }
     }
-
-    property.saveAsAdmin();
 
     await this.portfolioRepository.updateProperty(property, events);
 

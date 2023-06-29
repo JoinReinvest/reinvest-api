@@ -1,50 +1,24 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { Address } from 'Portfolio/ValueObject/Address';
-import { Image } from 'Portfolio/ValueObject/Image';
-import { ImpactMetrics, ImpactMetricsInput } from 'Portfolio/ValueObject/ImpactMetrics';
-import { KeyMetrics, KeyMetricsInput } from 'Portfolio/ValueObject/KeyMetrics';
-import { Location } from 'Portfolio/ValueObject/Location';
-import { POI, POIInput } from 'Portfolio/ValueObject/POI';
 
-export enum PropertyStatus {
-  ACTIVE = 'ACTIVE',
-  ARCHIVE = 'ARCHIVE',
-}
-
-export type PropertyDealpathData = {
-  id: number;
-  address?: {
-    address_1: string;
-    address_2: string;
-    city: string;
-    postal_code: string;
-  };
-  location?: {
-    lat: string;
-    lng: string;
-  };
-  name?: string;
-};
-
-export type PropertyAdminData = {
-  POIs?: POIInput[];
-  gallery?: string[];
-  image?: string;
-  impactMetrics?: ImpactMetricsInput;
-  keyMetrics?: KeyMetricsInput;
-};
-export type DealpathJson = PropertyDealpathData;
-
-export type DataJson = DealpathJson & PropertyAdminData;
+import {
+  ImpactMetrics,
+  KeyMetrics,
+  POI,
+  PropertyAddress,
+  PropertyAdminData,
+  PropertyDealpathData,
+  PropertyImage,
+  PropertyLocation,
+  PropertyStatus,
+} from './types';
 
 export type PropertySchema = {
-  dataJson: DataJson;
-  dealpathJson: DealpathJson;
   id: number;
   lastUpdate: Date;
   portfolioId: UUID;
   status: PropertyStatus;
-  adminJson?: DataJson;
+  adminJson?: PropertyAdminData;
+  dealpathJson?: PropertyDealpathData;
 };
 
 export class Property {
@@ -52,15 +26,8 @@ export class Property {
   private portfolioId: UUID;
   private lastUpdate: Date;
   private status: PropertyStatus;
-  private address: Address | null = null;
-  private location: Location | null = null;
-  private name: string | null = null;
-  private keyMetrics: KeyMetrics | null = null;
-  private impactMetrics: ImpactMetrics | null = null;
-  private image: Image | null = null;
-  private gallery: Image[] | null = null;
-  private POIs: POI[] | null = null;
-  private asAdmin: boolean = false;
+  private dealpathJson: PropertyDealpathData | Record<string, never> = {};
+  private adminJson: PropertyAdminData | Record<string, never> = {};
 
   constructor(id: number, portfolioId: UUID, status: PropertyStatus, lastUpdate: Date) {
     this.id = id;
@@ -70,32 +37,16 @@ export class Property {
   }
 
   static create(propertySchema: PropertySchema) {
-    const { id, portfolioId, status, lastUpdate, dataJson } = propertySchema;
+    const { id, portfolioId, status, lastUpdate, dealpathJson, adminJson } = propertySchema;
 
     const property = new Property(id, portfolioId, status, lastUpdate);
 
-    if (dataJson.address) {
-      const { address_1, address_2, postal_code, city } = dataJson.address;
-
-      property.setAddress(Address.create({ address_1, address_2, postal_code, city }));
+    if (dealpathJson) {
+      property.setDealpathJson(dealpathJson);
     }
 
-    if (dataJson.location) {
-      const { lat, lng } = dataJson.location;
-
-      property.setLocation(Location.create({ lat, lng }));
-    }
-
-    if (dataJson.name) {
-      property.setName(dataJson.name);
-    }
-
-    if (dataJson.keyMetrics) {
-      property.setKeyMetrics(KeyMetrics.create(dataJson.keyMetrics));
-    }
-
-    if (dataJson.impactMetrics) {
-      property.setImpactMetrics(ImpactMetrics.create(dataJson.impactMetrics));
+    if (adminJson) {
+      property.setAdminJson(adminJson);
     }
 
     return property;
@@ -105,33 +56,53 @@ export class Property {
     return this.id;
   }
 
-  setName(name: string) {
-    this.name = name;
+  setAdminJson(adminJson: PropertyAdminData) {
+    this.adminJson = adminJson;
   }
 
-  setAddress(address: Address) {
-    this.address = address;
+  setDealpathJson(dealpathJson: PropertyDealpathData) {
+    this.dealpathJson = dealpathJson;
   }
 
-  setLocation(location: Location) {
-    this.location = location;
+  setNameAsDealpath(name: string) {
+    this.dealpathJson.name = name;
   }
 
-  setKeyMetrics(keyMetrics: KeyMetrics) {
-    this.keyMetrics = keyMetrics;
+  setNameAsAdmin(name: string) {
+    this.adminJson.name = name;
   }
 
-  setImpactMetrics(impactMetrics: ImpactMetrics) {
-    this.impactMetrics = impactMetrics;
+  setAddressAsDealpath(address: PropertyAddress) {
+    this.dealpathJson.address = address;
   }
 
-  setImage(image: Image) {
-    this.image = image;
+  setAddressAsAdmin(address: PropertyAddress) {
+    this.adminJson.address = address;
   }
 
-  replaceImage(image: Image) {
-    if (this.image !== null && !this.image.isTheSame(image)) {
-      const { id, path } = image.toObject();
+  setLocationAsDealpath(location: PropertyLocation) {
+    this.dealpathJson.location = location;
+  }
+
+  setLocationAsAdmin(location: PropertyLocation) {
+    this.adminJson.location = location;
+  }
+
+  setKeyMetricsAsAdmin(keyMetrics: KeyMetrics) {
+    this.adminJson.keyMetrics = keyMetrics;
+  }
+
+  setImpactMetricsAsAdmin(impactMetrics: ImpactMetrics) {
+    this.adminJson.impactMetrics = impactMetrics;
+  }
+
+  setImageAsAdmin(image: PropertyImage) {
+    this.adminJson.image = image;
+  }
+
+  replaceImageAsAdmin(image: PropertyImage) {
+    if (this.adminJson.image !== null && this.adminJson.image?.id !== image.id) {
+      const { id, path } = image;
 
       const event = {
         kind: 'PropertyImageRemoved',
@@ -140,62 +111,54 @@ export class Property {
           path,
         },
       };
-      this.image = image;
+      this.adminJson.image = image;
 
       return event;
     }
 
-    this.image = image;
+    this.adminJson.image = image;
 
     return null;
   }
 
-  addGalleryImage(image: Image) {
-    const imageAlreadyAdded = this.gallery?.find(el => el.toObject().id === image.toObject().id);
+  addGalleryImageAsAdmin(image: PropertyImage) {
+    if (!this.adminJson.gallery) {
+      this.adminJson.gallery = [];
+    }
+
+    const imageAlreadyAdded = this.adminJson.gallery?.find(el => el.id === image.id);
 
     if (!imageAlreadyAdded) {
-      this.gallery?.push(image);
+      this.adminJson.gallery?.push(image);
     }
   }
 
-  addPOI(poi: POI) {
-    this.POIs?.push(poi);
+  addPOIAsAdmin(poi: POI) {
+    if (!this.adminJson.POIs) {
+      this.adminJson.POIs = [];
+    }
+
+    this.adminJson.POIs?.push(poi);
   }
 
   archive() {
     this.status = PropertyStatus.ARCHIVE;
   }
 
-  saveAsAdmin() {
-    this.asAdmin = true;
-  }
-
   toObject() {
-    let adminJson;
-    let dealpathJson;
+    const dealpathJson = {
+      name: this.dealpathJson.name,
+      address: this.dealpathJson.address,
+      location: this.dealpathJson.location,
+    };
 
-    if (!this.asAdmin) {
-      dealpathJson = {
-        name: this.name,
-        address: this.address,
-        location: this.location?.toObject(),
-        id: this.id,
-      };
-    }
-
-    if (this.asAdmin) {
-      adminJson = {
-        name: this.name,
-        address: this.address?.toObject(),
-        location: this.location?.toObject(),
-        keyMetrics: this.keyMetrics?.toObject(),
-        impactMetrics: this.impactMetrics?.toObject(),
-        id: this.id,
-        gallery: this.gallery?.map(img => img.toObject()),
-        image: this.image?.toObject(),
-        POIs: this.POIs?.map(poi => poi.toObject()),
-      };
-    }
+    const adminJson = {
+      keyMetrics: this.adminJson.keyMetrics,
+      impactMetrics: this.adminJson.impactMetrics,
+      gallery: this.adminJson.gallery,
+      image: this.adminJson.image,
+      POIs: this.adminJson.POIs,
+    };
 
     return {
       id: this.id,

@@ -1,13 +1,13 @@
-import type { PropertyData } from 'Portfolio/Domain/Property';
+import { PropertyDealpathData } from 'Portfolio/Domain/types';
 
 export type GetPropertyResponse = {
   property: {
-    data: PropertyData;
+    data: PropertyDealpathData;
   };
 };
 
 export type GetPropertiesResponse = {
   properties: {
-    data: PropertyData[];
+    data: PropertyDealpathData[];
   };
 };
