@@ -56,6 +56,21 @@ export class GetProperties {
         Object.assign(data, { POIs: pois });
       }
 
+      if (data.address) {
+        let addressLine = data.address.address_1;
+
+        if (data.address.address_2) {
+          addressLine += `, ${data.address.address_2}`;
+        }
+
+        data.address = {
+          // @ts-ignore
+          addressLine,
+          city: data.address.city,
+          zip: data.address.postal_code,
+        };
+      }
+
       propertiesData.push({
         id,
         portfolioId,

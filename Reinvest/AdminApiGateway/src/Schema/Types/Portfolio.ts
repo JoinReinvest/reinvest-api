@@ -47,10 +47,9 @@ const schema = `
     }
 
     type PropertyAddress {
-        address_1: String
-        address_2: String
+        addressLine: String
         city: String
-        postal_code: String
+        zip: String
     }
 
     input FileLink {
