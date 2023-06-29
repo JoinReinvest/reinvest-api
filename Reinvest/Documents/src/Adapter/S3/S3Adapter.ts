@@ -6,6 +6,7 @@ import { FileType } from 'Documents/Adapter/S3/FileLinkService';
 export type S3Config = {
   avatarsBucket: string;
   documentsBucket: string;
+  portfolioBucket: string;
   region: string;
 };
 
@@ -54,6 +55,21 @@ export class S3Adapter {
     });
 
     const bucketName = type === FileType.AVATAR ? this.config.avatarsBucket : this.config.documentsBucket;
+
+    const getCommand = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: `${catalog}/${fileName}`,
+    });
+
+    return getSignedUrl(client, getCommand, { expiresIn: 3600 });
+  }
+
+  public async getImageUrl(fileName: string, catalog: string) {
+    const client = new S3Client({
+      region: this.config.region,
+    });
+
+    const bucketName = this.config.portfolioBucket;
 
     const getCommand = new GetObjectCommand({
       Bucket: bucketName,

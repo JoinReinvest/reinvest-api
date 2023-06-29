@@ -17,6 +17,12 @@ export const VERTALO_CONFIG = {
   API_URL: process.env.VERTALO_API_URL as string,
 };
 
+export const DEALPATH_CONFIG = {
+  API_URL: process.env.DEALPATH_API_URL as string,
+  AUTHORIZATION_TOKEN: process.env.DEALPATH_AUTHORIZATION_TOKEN as string,
+  VERSION_HEADER: process.env.DEALPATH_VERSION_HEADER as string,
+};
+
 export const WEB_APP_URL = process.env.WEB_APP_URL?.replace(/\/*$/, '') as string;
 
 export const DATABASE_CONFIG = {
@@ -30,6 +36,7 @@ export const S3_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   avatarsBucket: process.env.S3_BUCKET_AVATARS as string,
   documentsBucket: process.env.S3_BUCKET_DOCUMENTS as string,
+  portfolioBucket: process.env.S3_BUCKET_PORTFOLIO as string,
 };
 
 export const COGNITO_CONFIG = {

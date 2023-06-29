@@ -189,10 +189,10 @@ export const Investments = {
 
         return investmentId;
       },
-      startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
+      startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules, clientIp }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId, approveFees);
+        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId, approveFees, clientIp);
 
         if (!isStartedInvestment) {
           throw new GraphQLError('CANNOT_START_INVESTMENT');
@@ -200,10 +200,10 @@ export const Investments = {
 
         return isStartedInvestment;
       },
-      approveFees: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
+      approveFees: async (parent: any, { investmentId }: any, { profileId, modules, clientIp }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
+        const isApproved = await investmentAccountsApi.approveFees(profileId, investmentId, clientIp);
 
         return isApproved;
       },

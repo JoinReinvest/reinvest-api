@@ -44,8 +44,8 @@ export class InvestmentsController {
     return this.investmentSummaryQueryUseCase.execute(profileId, investmentId);
   }
 
-  public async startInvestment(profileId: string, investmentId: string, approveFees: boolean) {
-    return this.startInvestmentUseCase.execute(profileId, investmentId, approveFees);
+  public async startInvestment(profileId: string, investmentId: string, approveFees: boolean, clientIp: string) {
+    return this.startInvestmentUseCase.execute(profileId, investmentId, approveFees, clientIp);
   }
 
   public async abortInvestment(profileId: string, investmentId: string) {
