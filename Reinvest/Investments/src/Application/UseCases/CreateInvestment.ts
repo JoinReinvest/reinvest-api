@@ -60,7 +60,7 @@ class CreateInvestment {
       parentId,
     };
 
-    const status = this.transactionalAdapter.transaction(`Create investment ${id} with fees for ${profileId}/${accountId}`, async () => {
+    const status = await this.transactionalAdapter.transaction(`Create investment ${id} with fees for ${profileId}/${accountId}`, async () => {
       await this.investmentsRepository.create(investment, money);
       const fees = await this.verificationService.payFeesForInvestment(money, profileId, accountId);
 

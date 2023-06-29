@@ -1,4 +1,5 @@
 import { DatabaseProvider } from 'PostgreSQL/DatabaseProvider';
+import { sql } from 'kysely';
 
 export class TransactionalAdapter<Database> {
   static getClassName = (): string => 'TransactionalAdapter';
@@ -12,17 +13,17 @@ export class TransactionalAdapter<Database> {
     const db = this.databaseProvider.provide();
 
     console.log(`[BEGIN Transaction]: ${transactionName}`);
-    // await sql`BEGIN TRANSACTION`.execute(db);
+    await sql`BEGIN TRANSACTION`.execute(db);
     try {
       await callback();
-      // await sql`COMMIT`.execute(db);
+      await sql`COMMIT`.execute(db);
       console.log(`[COMMIT Transaction] ${transactionName}`);
 
       return true;
     } catch (error: any) {
       console.log(`[ROLLBACK Transaction] "${transactionName}" failed with message "${error.message}"`);
       console.error(`[Transaction Error] ${transactionName}`, error);
-      // await sql`ROLLBACK`.execute(db);
+      await sql`ROLLBACK`.execute(db);
 
       return false;
     }
