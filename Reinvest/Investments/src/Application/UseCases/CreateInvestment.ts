@@ -65,7 +65,7 @@ class CreateInvestment {
       const fees = await this.verificationService.payFeesForInvestment(money, profileId, accountId);
 
       if (fees.length === 0) {
-        return;
+        return true;
       }
 
       let feeAmount = Money.zero();
@@ -82,7 +82,7 @@ class CreateInvestment {
       }
 
       if (feeAmount.isZero()) {
-        return;
+        return true;
       }
 
       const feeId = this.idGenerator.createUuid();
