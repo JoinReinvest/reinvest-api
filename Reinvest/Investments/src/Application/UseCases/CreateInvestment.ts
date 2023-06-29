@@ -62,10 +62,15 @@ class CreateInvestment {
 
     // const status = await this.transactionalAdapter.transaction(`Create investment ${id} with fees for ${profileId}/${accountId}`, async () => {
     const status = await this.investmentsRepository.create(investment, money);
+
+    if (!status) {
+      return false;
+    }
+
     const fees = await this.verificationService.payFeesForInvestment(money, profileId, accountId);
 
     if (fees.length === 0) {
-      return;
+      return id;
     }
 
     let feeAmount = Money.zero();
@@ -82,17 +87,13 @@ class CreateInvestment {
     }
 
     if (feeAmount.isZero()) {
-      return;
+      return id;
     }
 
     const feeId = this.idGenerator.createUuid();
     const investmentFee = Fee.create(accountId, feeAmount, feeId, id, profileId, feesReferences);
     await this.feeRepository.storeFee(investmentFee);
     // });
-
-    if (!status) {
-      return false;
-    }
 
     return id;
   }
