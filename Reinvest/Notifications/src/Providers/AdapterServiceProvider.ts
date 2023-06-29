@@ -6,6 +6,7 @@ import { Notifications } from 'Notifications/index';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
 
 export class AdapterServiceProvider {
   private config: Notifications.Config;
@@ -24,6 +25,7 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(NotificationsDatabaseAdapterInstanceProvider, createNotificationsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(NotificationsRepository, [NotificationsDatabaseAdapterInstanceProvider]);
+      .addSingleton(NotificationsRepository, [NotificationsDatabaseAdapterInstanceProvider])
+      .addSingleton(StoredEventRepository, [NotificationsDatabaseAdapterInstanceProvider]);
   }
 }

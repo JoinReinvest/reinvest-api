@@ -1,6 +1,7 @@
-import { EventHandler, STORE_EVENT_COMMAND, StoreEventCommand } from 'SimpleAggregator/EventBus/EventBus';
-import { StoredEvent } from 'Notifications/Domain/StoredEvent';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
+import { StoredEvent } from 'Notifications/Domain/StoredEvent';
+import { EventHandler, STORE_EVENT_COMMAND, StoreEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class StoreEventsHandler implements EventHandler<StoreEventCommand> {
   static getClassName = (): string => 'StoreEventsHandler';
