@@ -9,18 +9,16 @@ class ApproveFees {
     this.feesRepository = feesRepository;
   }
 
-  async execute(profileId: string, investmentId: string) {
-    const fee = await this.feesRepository.get(investmentId);
+  async execute(profileId: string, investmentId: string, ip: string): Promise<boolean> {
+    const fee = await this.feesRepository.getFeeByInvestmentId(investmentId);
 
     if (!fee || fee.isApproved()) {
       return true;
     }
 
-    fee.approveFee();
+    fee.approveFee(ip);
 
-    const isApproved = await this.feesRepository.approveFee(fee);
-
-    return isApproved;
+    return this.feesRepository.storeFee(fee);
   }
 }
 

@@ -79,7 +79,7 @@ const schema = `
         """
         [MOCK] Register device for Firebase push notifications
         """
-        registerPushNotificationDevice(deviceId: String!, deviceToken: String!, expirationDate: ISODateTime): Boolean!
+        registerPushNotificationDevice(deviceId: String!): Boolean!
     }
 
 `;
@@ -119,7 +119,7 @@ export const Notification = {
 
         return api.dismissNotifications(profileId, [notificationId]);
       },
-      registerPushNotificationDevice: async (parent: any, { deviceId, deviceToken, expirationDate }: any, { profileId, modules }: SessionContext) => {
+      registerPushNotificationDevice: async (parent: any, { deviceId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Notifications.ApiType>(Notifications);
 
         return true;

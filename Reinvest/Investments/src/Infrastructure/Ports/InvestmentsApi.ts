@@ -21,6 +21,7 @@ export type InvestmentsApiType = {
   getScheduleSimulation: ScheduleSimulationController['getScheduleSimulation'];
   initiateRecurringInvestment: RecurringInvestmentsController['initiateRecurringInvestment'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
+  isFeesApproved: FeesController['isFeesApproved'];
   listInvestments: InvestmentsController['listInvestments'];
   pushTransaction: TransactionController['pushTransaction'];
   reinvestDividends: DividendsController['reinvestDividends'];
@@ -30,7 +31,6 @@ export type InvestmentsApiType = {
   subscriptionAgreementQuery: SubscriptionAgreementController['subscriptionAgreementQuery'];
   test: TempController['handle'];
   unsuspendRecurringInvestment: RecurringInvestmentsController['unsuspendRecurringInvestment'];
-  isFeesApproved: FeesController['isFeesApproved'];
 };
 
 export const investmentsApi = (container: ContainerInterface): InvestmentsApiType => ({

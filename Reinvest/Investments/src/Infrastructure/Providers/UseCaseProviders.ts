@@ -37,6 +37,7 @@ import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import CreateDraftRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
+import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -54,7 +55,7 @@ export default class UseCaseProviders {
       [InvestmentsDatabaseAdapterInstanceProvider],
     );
 
-    container.addSingleton(CreateInvestment, [InvestmentsRepository, IdGenerator]);
+    container.addSingleton(CreateInvestment, [InvestmentsRepository, FeesRepository, VerificationService, IdGenerator, 'InvestmentsTransactionalAdapter']);
     container.addSingleton(CreateSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, IdGenerator]);
     container.addSingleton(SubscriptionAgreementQuery, [SubscriptionAgreementRepository]);
     container.addSingleton(InvestmentSummaryQuery, [InvestmentsRepository]);

@@ -45,7 +45,7 @@ export class CancelInvestment {
         const fee = investment.getFee();
 
         if (fee) {
-          await this.feesRepository.updateStatus(fee);
+          await this.feesRepository.storeFee(fee);
         }
 
         await this.eventBus.publish(<InvestmentCanceled>{

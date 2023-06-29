@@ -12,11 +12,11 @@ export class FeesController {
 
   public static getClassName = (): string => 'FeesController';
 
-  public async approveFees(profileId: string, investmentId: string) {
-    return await this.approveFeesUseCase.execute(profileId, investmentId);
+  public async approveFees(profileId: string, investmentId: string, ip: string) {
+    return this.approveFeesUseCase.execute(profileId, investmentId, ip);
   }
 
   public async isFeesApproved(investmentId: string) {
-    return await this.isFeeApprovedUseCase.execute(investmentId);
+    return this.isFeeApprovedUseCase.execute(investmentId);
   }
 }

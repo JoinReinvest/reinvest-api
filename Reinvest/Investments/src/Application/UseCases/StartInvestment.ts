@@ -10,7 +10,7 @@ class StartInvestment {
 
   static getClassName = (): string => 'StartInvestment';
 
-  async execute(profileId: UUID, investmentId: UUID, approveFees: boolean) {
+  async execute(profileId: UUID, investmentId: UUID, approveFees: boolean, ip: string) {
     const investment = await this.investmentsRepository.getInvestmentByProfileAndId(profileId, investmentId);
 
     if (!investment) {
@@ -22,7 +22,7 @@ class StartInvestment {
     }
 
     if (approveFees) {
-      investment.approveFee();
+      investment.approveFee(ip);
     }
 
     const subscriptionAgreementId = investment.getSubscriptionAgreementId();
