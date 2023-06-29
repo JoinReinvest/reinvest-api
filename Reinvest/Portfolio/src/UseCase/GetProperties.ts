@@ -1,3 +1,4 @@
+import { FileLink } from 'Documents/Adapter/S3/FileLinkService';
 import { UUID } from 'HKEKTypes/Generics';
 import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
 import { DocumentsService } from 'Reinvest/Portfolio/src/Adapter/Documents/DocumentsService';
@@ -30,16 +31,16 @@ export class GetProperties {
       const data = { ...dataJson };
 
       if (image) {
-        const imgLink = await this.documents.getImageFileLink({ id: image.id, path: image.path });
-        Object.assign(data, { image: imgLink });
+        const imgLink = <FileLink>await this.documents.getImageFileLink({ id: image.id, path: image.path });
+        Object.assign(data, { image: imgLink.url });
       }
 
       if (gallery && gallery?.length !== 0) {
         const images = [];
 
         for (const image of gallery) {
-          const img = await this.documents.getImageFileLink({ id: image.id, path: image.path });
-          images.push(img);
+          const img = <FileLink>await this.documents.getImageFileLink({ id: image.id, path: image.path });
+          images.push(img.url);
         }
 
         Object.assign(data, { gallery: images });
@@ -49,8 +50,8 @@ export class GetProperties {
         const pois = [];
 
         for (const poi of POIs) {
-          const img = await this.documents.getImageFileLink({ id: poi.image, path: poi.path });
-          pois.push({ name: poi.name, description: poi.description, image: img });
+          const img = <FileLink>await this.documents.getImageFileLink({ id: poi.image, path: poi.path });
+          pois.push({ name: poi.name, description: poi.description, image: img.url });
         }
 
         Object.assign(data, { POIs: pois });

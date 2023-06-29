@@ -53,10 +53,11 @@ const schema = `
     }
 
     input FileLink {
-      id: String
+        id: String
     }
 
     type Property {
+        id: Int
         name: String
         keyMetrics: KeyMetrics
         impactMetrics: ImpactMetrics
