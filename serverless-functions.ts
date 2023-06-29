@@ -63,6 +63,9 @@ const serverlessConfiguration: AWS = {
       SNS_ORIGINATION_NUMBER: '${env:SNS_ORIGINATION_NUMBER}',
       SENTRY_DSN: '${env:SENTRY_DSN}',
       CHROMIUM_ENDPOINT: '${env:CHROMIUM_ENDPOINT}',
+      DEALPATH_API_URL: '${env:DEALPATH_API_URL}',
+      DEALPATH_AUTHORIZATION_TOKEN: '${env:DEALPATH_AUTHORIZATION_TOKEN}',
+      DEALPATH_VERSION_HEADER: '${env:DEALPATH_VERSION_HEADER}',
     },
     apiGateway: {
       minimumCompressionSize: 1024,
