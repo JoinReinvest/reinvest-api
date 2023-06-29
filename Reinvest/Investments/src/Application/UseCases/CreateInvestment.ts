@@ -49,50 +49,51 @@ class CreateInvestment {
     const tradeIdSize = TradeId.getTradeIdSize();
 
     const investment: InvestmentCreate = {
+      accountId,
+      bankAccountId,
       id,
+      parentId,
       portfolioId,
       profileId,
-      bankAccountId,
-      accountId,
       scheduledBy: ScheduledBy.DIRECT,
       status: InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT,
       tradeId: this.idGenerator.createNumericId(tradeIdSize),
-      parentId,
     };
 
-    const status = this.transactionalAdapter.transaction(`Create investment ${id} with fees for ${profileId}/${accountId}`, async () => {
-      await this.investmentsRepository.create(investment, money);
-      const fees = await this.verificationService.payFeesForInvestment(money, profileId, accountId);
-
-      if (fees.length === 0) {
-        return;
-      }
-
-      let feeAmount = Money.zero();
-      const feesReferences: VerificationFeeIds = {
-        fees: [],
-      };
-
-      for (const fee of fees) {
-        feeAmount = feeAmount.add(fee.amount);
-        feesReferences.fees.push({
-          amount: fee.amount.getAmount(),
-          verificationFeeId: fee.verificationFeeId,
-        });
-      }
-
-      if (feeAmount.isZero()) {
-        return;
-      }
-
-      const feeId = this.idGenerator.createUuid();
-      const investmentFee = Fee.create(accountId, feeAmount, feeId, id, profileId, feesReferences);
-      await this.feeRepository.storeFee(investmentFee);
-    });
+    // const status = await this.transactionalAdapter.transaction(`Create investment ${id} with fees for ${profileId}/${accountId}`, async () => {
+    const status = await this.investmentsRepository.create(investment, money);
 
     if (!status) {
       return false;
     }
+
+    const fees = await this.verificationService.payFeesForInvestment(money, profileId, accountId);
+
+    if (fees.length === 0) {
+      return id;
+    }
+
+    let feeAmount = Money.zero();
+    const feesReferences: VerificationFeeIds = {
+      fees: [],
+    };
+
+    for (const fee of fees) {
+      feeAmount = feeAmount.add(fee.amount);
+      feesReferences.fees.push({
+        amount: fee.amount.getAmount(),
+        verificationFeeId: fee.verificationFeeId,
+      });
+    }
+
+    if (feeAmount.isZero()) {
+      return id;
+    }
+
+    const feeId = this.idGenerator.createUuid();
+    const investmentFee = Fee.create(accountId, feeAmount, feeId, id, profileId, feesReferences);
+    await this.feeRepository.storeFee(investmentFee);
+    // });
 
     return id;
   }
