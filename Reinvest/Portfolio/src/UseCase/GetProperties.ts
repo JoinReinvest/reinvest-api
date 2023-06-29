@@ -58,6 +58,12 @@ export class GetProperties {
       }
 
       if (data.address) {
+        data.location = {
+          // @ts-ignore
+          lat: data.address!.lat,
+          // @ts-ignore
+          lng: data.address!.lng,
+        };
         let addressLine = data.address.address_1;
 
         if (data.address.address_2) {
