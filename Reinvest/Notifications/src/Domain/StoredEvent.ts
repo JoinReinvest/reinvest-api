@@ -1,9 +1,6 @@
 import { JSONObject, UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
-
-export enum StoredEventKind {
-  UserRegistered = 'UserRegistered',
-}
+import { StoredEventConfigurationType, StoredEventKind, StoredEvents } from 'Notifications/Domain/StoredEventsTypes';
 
 export enum StoredEventStatus {
   PENDING = 'PENDING',
@@ -26,19 +23,21 @@ export type StoredEventSchema = {
 };
 
 export class StoredEvent {
-  private storedEventSchema1: StoredEventSchema;
+  private storedEventSchema: StoredEventSchema;
+  private storedEventConfiguration: StoredEventConfigurationType;
 
   constructor(storedEventSchema: StoredEventSchema) {
-    this.storedEventSchema1 = storedEventSchema;
+    this.storedEventSchema = storedEventSchema;
+    this.storedEventConfiguration = StoredEvents[this.storedEventSchema.kind] ?? {};
   }
 
-  static create(id: UUID, profileId: UUID, kind: StoredEventKind, payload: JSONObject) {
+  static create(id: UUID, profileId: UUID, kind: StoredEventKind, payload: JSONObject, eventDate: DateTime) {
     const storedEventSchema = <StoredEventSchema>{
       id,
       kind,
       payload,
       status: StoredEventStatus.PENDING,
-      dateCreated: DateTime.now(),
+      dateCreated: eventDate,
       dateAccountActivity: null,
       dateAnalytics: null,
       dateEmailed: null,
@@ -55,6 +54,61 @@ export class StoredEvent {
   }
 
   toObject(): StoredEventSchema {
-    return this.storedEventSchema1;
+    return this.storedEventSchema;
+  }
+
+  shouldProcessAccountActivity(): boolean {
+    return !!this.storedEventConfiguration.accountActivity && this.storedEventSchema.dateAccountActivity === null;
+  }
+
+  shouldProcessAnalyticEvent(): boolean {
+    return !!this.storedEventConfiguration.analyticEvent && this.storedEventSchema.dateAnalytics === null;
+  }
+
+  shouldProcessEmail(): boolean {
+    return !!this.storedEventConfiguration.email && this.storedEventSchema.dateEmailed === null;
+  }
+
+  shouldProcessInApp(): boolean {
+    return !!this.storedEventConfiguration.inApp && this.storedEventSchema.dateInApp === null;
+  }
+
+  shouldProcessPush(): boolean {
+    return !!this.storedEventConfiguration.push && this.storedEventSchema.datePushed === null;
+  }
+
+  getEventDate(): DateTime {
+    return this.storedEventSchema.dateCreated;
+  }
+
+  getAccountActivity(): {
+    accountId: UUID | null;
+    data: JSONObject;
+    date: DateTime;
+    name: string;
+    profileId: UUID;
+  } {
+    const accountActivity = this.storedEventConfiguration.accountActivity;
+    const data = accountActivity!.data(this.storedEventSchema.payload);
+
+    return {
+      accountId: <UUID>data['accountId'] ?? null,
+      data,
+      date: this.storedEventSchema.dateCreated,
+      name: accountActivity!.name(this.storedEventSchema.payload),
+      profileId: this.storedEventSchema.profileId,
+    };
+  }
+
+  markAccountActivityAsProcessed() {
+    this.storedEventSchema.dateAccountActivity = DateTime.now();
+  }
+
+  markAsProcessed() {
+    this.storedEventSchema.status = StoredEventStatus.PROCESSED;
+  }
+
+  markAsFailed() {
+    this.storedEventSchema.status = StoredEventStatus.FAILED;
   }
 }

@@ -30,3 +30,12 @@ export interface StoredEventsTable {
   profileId: string;
   status: string;
 }
+
+export interface AccountActivitiesTable {
+  accountId: string | null;
+  activityDate: Date;
+  activityName: string;
+  dataJson: JSONObject | null;
+  hash: string;
+  profileId: string;
+}

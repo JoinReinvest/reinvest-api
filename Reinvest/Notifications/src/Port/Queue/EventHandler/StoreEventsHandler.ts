@@ -1,4 +1,5 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
 import { StoredEvent } from 'Notifications/Domain/StoredEvent';
 import { EventHandler, STORE_EVENT_COMMAND, StoreEventCommand } from 'SimpleAggregator/EventBus/EventBus';
@@ -19,12 +20,12 @@ export class StoreEventsHandler implements EventHandler<StoreEventCommand> {
     }
 
     const {
-      data: { kind, payload },
+      data: { kind, payload, date },
       id: profileId,
     } = event;
 
     const id = this.idGenerator.createUuid();
-    const storedEvent = StoredEvent.create(id, profileId, kind, payload);
+    const storedEvent = StoredEvent.create(id, profileId, kind, payload, DateTime.from(date));
     await this.storedEventsRepository.store(storedEvent);
 
     console.log('store events handler', event);

@@ -1,10 +1,12 @@
 import { ContainerInterface } from 'Container/Container';
+import { DateTime } from 'Money/DateTime';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export const STORE_EVENT_COMMAND = 'StoreEventCommand';
 
 export type StoreEventCommand = DomainEvent & {
   data: {
+    date: string;
     kind: string;
     payload: any;
   };
@@ -14,6 +16,7 @@ export type StoreEventCommand = DomainEvent & {
 export const storeEventCommand = (profileId: string, kind: string, payload: any = {}): StoreEventCommand => ({
   id: profileId,
   data: {
+    date: DateTime.now().toIsoDateTime(),
     kind,
     payload,
   },
