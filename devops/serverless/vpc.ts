@@ -190,7 +190,7 @@ export const VpcResources = {
           {
             Action: ['sqs:SendMessage'],
             Effect: 'Allow',
-            Resource: 'arn:aws:sqs:us-east-1:*:*',
+            Resource: 'arn:aws:sqs:us-east-2:*:*',
             Principal: {
               Service: 'lambda.amazonaws.com',
             },

@@ -13,6 +13,7 @@ import {
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
+import { FirebaseFunction, FirebaseResources } from './devops/functions/firebase/queue-config'
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
 import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/pdfGenerator/queue-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
@@ -93,6 +94,7 @@ const serverlessConfiguration: AWS = {
     cognitoPreSignUpFunction,
     tests: TestsFunction,
     pdfGenerator: PdfGeneratorFunction,
+    firebase: FirebaseFunction
   },
   resources: {
     Description: 'REINVEST ${sls:stage} API functions',
@@ -112,6 +114,7 @@ const serverlessConfiguration: AWS = {
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
       ...PdfGeneratorResources,
+      ...FirebaseResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,
