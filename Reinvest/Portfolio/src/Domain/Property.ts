@@ -122,6 +122,10 @@ export class Property {
   }
 
   addGalleryImageAsAdmin(image: PropertyImage) {
+    if (!this.adminJson.gallery) {
+      this.adminJson.gallery = [];
+    }
+
     const imageAlreadyAdded = this.adminJson.gallery?.find(el => el.id === image.id);
 
     if (!imageAlreadyAdded) {
@@ -130,6 +134,10 @@ export class Property {
   }
 
   addPOIAsAdmin(poi: POI) {
+    if (!this.adminJson.POIs) {
+      this.adminJson.POIs = [];
+    }
+
     this.adminJson.POIs?.push(poi);
   }
 

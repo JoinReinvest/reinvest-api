@@ -12,9 +12,9 @@ const schema = `
     }
 
     input KeyMetricsInput {
-        projectReturn: String
-        structure: String
-        rating: String
+        projectReturn: String!
+        structure: String!
+        rating: String!
     }
 
     type ImpactMetrics {
@@ -24,9 +24,9 @@ const schema = `
     }
 
     input ImpactMetricsInput {
-        units: String
-        totalProjectSize: String
-        jobsCreated: String
+        units: String!
+        totalProjectSize: String!
+        jobsCreated: String!
     }
 
     type Location {
@@ -41,9 +41,9 @@ const schema = `
     }
 
     input POIInput {
-        name: String
-        description: String
-        image: String
+        name: String!
+        description: String!
+        image: FileLink!
     }
 
     type PropertyAddress {
@@ -53,7 +53,7 @@ const schema = `
     }
 
     input FileLink {
-        id: String
+        id: String!
     }
 
     type Property {

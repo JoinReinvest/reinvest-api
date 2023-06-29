@@ -15,7 +15,7 @@ export class PortfolioRepository {
 
   public static getClassName = (): string => 'PortfolioRepository';
 
-  async getById(id: number) {
+  async getById(id: number): Promise<Property | null> {
     try {
       const propertyData = await this.databaseAdapterProvider
         .provide()

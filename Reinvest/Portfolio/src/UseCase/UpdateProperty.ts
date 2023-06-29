@@ -1,14 +1,18 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
-import { ImpactMetrics, KeyMetrics, POI, PropertyAddress, PropertyLocation } from 'Portfolio/Domain/types';
+import { ImpactMetrics, KeyMetrics, PropertyAddress, PropertyLocation } from 'Portfolio/Domain/types';
 import { ValidationErrorEnum, ValidationErrorType } from 'Portfolio/Domain/Validation';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type UpdatePropertyInput = {
-  POIs?: POI[];
+  POIs?: {
+    description: string;
+    image: { id: string };
+    name: string;
+  }[];
   address?: PropertyAddress;
-  gallery?: string[];
-  image?: string;
+  gallery?: { id: string }[];
+  image?: { id: string };
   impactMetrics?: ImpactMetrics;
   keyMetrics?: KeyMetrics;
   location?: PropertyLocation;
@@ -64,13 +68,13 @@ export class UpdateProperty {
             property.setLocationAsAdmin(data as PropertyLocation);
             break;
           case 'POIs':
-            const pois = data as POI[];
-            pois.forEach(({ image, description, name }) => {
-              property.addPOIAsAdmin({ description, name, image, path: portfolioId });
+            const pois = data as UpdatePropertyInput['POIs'];
+            pois!.forEach(({ image: { id: imageId }, description, name }) => {
+              property.addPOIAsAdmin({ description, name, image: imageId, path: portfolioId });
             });
             break;
           case 'image':
-            const id = data as string;
+            const id = (<UpdatePropertyInput['image']>data)!.id;
             const event = property.replaceImageAsAdmin({ id, path: portfolioId });
 
             if (event) {
@@ -79,8 +83,8 @@ export class UpdateProperty {
 
             break;
           case 'gallery':
-            const ids = data as string[];
-            ids.forEach(id => {
+            const ids = <UpdatePropertyInput['gallery']>data;
+            ids!.forEach(({ id }) => {
               property.addGalleryImageAsAdmin({ id, path: portfolioId });
             });
             break;
