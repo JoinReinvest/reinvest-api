@@ -1,10 +1,12 @@
-import { NotificationsTable } from 'Notifications/Adapter/Database/NotificationsSchema';
+import { NotificationsTable, StoredEventsTable } from 'Notifications/Adapter/Database/NotificationsSchema';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 
 export const notificationsTable = 'notifications_notifications';
+export const storedEventsTable = 'notifications_stored_events';
 
 export interface NotificationsDatabase {
   [notificationsTable]: NotificationsTable;
+  [storedEventsTable]: StoredEventsTable;
 }
 
 export const NotificationsDatabaseAdapterInstanceProvider = 'NotificationsDatabaseAdapterProvider';
