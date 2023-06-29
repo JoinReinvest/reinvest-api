@@ -23,6 +23,10 @@ export class S3Adapter {
     return this.generatePutSignedUrl(this.config.avatarsBucket, catalog, fileName);
   }
 
+  public async generatePutSignedUrlForImage(catalog: string, fileName: string): Promise<string> {
+    return this.generatePutSignedUrl(this.config.portfolioBucket, catalog, fileName);
+  }
+
   public async generatePutSignedUrlForDocument(catalog: string, fileName: string): Promise<string> {
     return this.generatePutSignedUrl(this.config.documentsBucket, catalog, fileName);
   }
@@ -76,7 +80,7 @@ export class S3Adapter {
       Key: `${catalog}/${fileName}`,
     });
 
-    return getSignedUrl(client, getCommand, { expiresIn: 3600 });
+    return getSignedUrl(client, getCommand, { expiresIn: 527040 });
   }
 
   async deleteFile(catalog: string, fileName: string, fileType: FileType): Promise<boolean> {

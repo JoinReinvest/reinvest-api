@@ -1,11 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
 import { DealpathAdapter } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
-import { Property, PropertyDealpathData, PropertyStatus } from 'Portfolio/Domain/Property';
-import { Address, AddressInput } from 'Portfolio/ValueObject/Address';
-import { Location, LocationInput } from 'Portfolio/ValueObject/Location';
-
-import { ValidationErrorEnum, ValidationErrorType } from '../Domain/Validation';
 
 class SynchronizePortfolio {
   private portfolioRepository: PortfolioRepository;
@@ -18,73 +13,20 @@ class SynchronizePortfolio {
 
   static getClassName = () => 'SynchronizePortfolio';
 
-  async execute(portfolioId: UUID) {
-    const errors = [];
-    const propertiesFromDealpath = await this.dealpathAdapter.getProperties();
+  async execute(portfolioId: UUID): Promise<boolean> {
+    const properties = await this.dealpathAdapter.getProperties(portfolioId);
 
-    if (!propertiesFromDealpath || propertiesFromDealpath?.properties.data.length === 0) {
+    if (!properties || properties.length === 0) {
       return false;
     }
 
-    for (const property of propertiesFromDealpath.properties.data) {
-      const propertyWithGivenId = await this.portfolioRepository.getById(property.id);
+    for (const property of properties) {
+      const propertyWithGivenId = await this.portfolioRepository.getById(property.getId());
 
       if (propertyWithGivenId) {
-        const inputKeys = Object.keys(property) as (keyof PropertyDealpathData)[];
-
-        for (const step of inputKeys) {
-          try {
-            const data = property[step];
-
-            if (data === null) {
-              errors.push(<ValidationErrorType>{
-                type: ValidationErrorEnum.EMPTY_VALUE,
-                field: step,
-              });
-              continue;
-            }
-
-            switch (step) {
-              case 'name':
-                propertyWithGivenId.setName(data as string);
-                break;
-              case 'address':
-                propertyWithGivenId.setAddress(Address.create(data as AddressInput));
-                break;
-              case 'location':
-                propertyWithGivenId.setLocation(Location.create(data as LocationInput));
-                break;
-              default:
-                errors.push(<ValidationErrorType>{
-                  type: ValidationErrorEnum.UNKNOWN_ERROR,
-                  field: step,
-                });
-                break;
-            }
-          } catch (error: any) {
-            errors.push(<ValidationErrorType>{
-              type: ValidationErrorEnum.UNKNOWN_ERROR,
-              field: step,
-            });
-          }
-        }
-
-        await this.portfolioRepository.updateProperty(propertyWithGivenId);
+        await this.portfolioRepository.updateProperty(property);
       } else {
-        const { id, address, name, location } = property;
-
-        const dealpathJson = {
-          id,
-          name,
-          address,
-          location,
-        };
-        const dataJson = {
-          ...dealpathJson,
-        };
-
-        const newProperty = Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: new Date(), dataJson, dealpathJson });
-        await this.portfolioRepository.createProperty(newProperty);
+        await this.portfolioRepository.createProperty(property);
       }
     }
 
@@ -92,7 +34,7 @@ class SynchronizePortfolio {
 
     if (propertiesInDb && propertiesInDb.length) {
       const propertiesToArchive = propertiesInDb.filter(property => {
-        return !propertiesFromDealpath.properties.data.find(el => el.id === property.getId());
+        return !properties.find(el => el.getId() === property.getId());
       });
 
       for (const property of propertiesToArchive) {
@@ -102,7 +44,7 @@ class SynchronizePortfolio {
       }
     }
 
-    return errors;
+    return true;
   }
 }
 

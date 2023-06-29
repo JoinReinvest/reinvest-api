@@ -11,7 +11,19 @@ const schema = `
         rating: String
     }
 
+    input KeyMetricsInput {
+        projectReturn: String
+        structure: String
+        rating: String
+    }
+
     type ImpactMetrics {
+        units: String
+        totalProjectSize: String
+        jobsCreated: String
+    }
+
+    input ImpactMetricsInput {
         units: String
         totalProjectSize: String
         jobsCreated: String
@@ -28,10 +40,21 @@ const schema = `
         image: String
     }
 
+    input POIInput {
+        name: String
+        description: String
+        image: String
+    }
+
     type PropertyAddress {
-        addressLine: String
+        address_1: String
+        address_2: String
         city: String
-        zip: String
+        postal_code: String
+    }
+
+    input FileLink {
+      id: String
     }
 
     type Property {
@@ -45,12 +68,19 @@ const schema = `
         location: Location
     }
 
+    input PropertyInput {
+        keyMetrics: KeyMetricsInput
+        impactMetrics: ImpactMetricsInput
+        image: FileLink
+        gallery: [FileLink]
+        POIs: [POIInput]
+    }
+
     type PortfolioDetails {
         id: String
         name: String
         properties: [Property]
     }
-
 
     type Query {
         """
@@ -58,9 +88,12 @@ const schema = `
         """
         getPortfolioDetails: PortfolioDetails
     }
+
     type Mutation {
-      """
-      updateProperty(input: Property, portfolioId: ID!, propertyId: number): Property
+
+        updateProperty(input: PropertyInput!, propertyId: Int): Boolean
+
+        synchronizePortfolio: Boolean
     }
 `;
 
@@ -74,31 +107,46 @@ export const PortfolioSchema = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      getProperty: async (parent: any, { portfolioId, propertyId }: any, { modules, isExecutive }: AdminSessionContext) => {
-        if (!isExecutive) {
+      getPortfolioDetails: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
-        return api.getProperty(propertyId, portfolioId);
+        const { portfolioId } = await api.getActivePortfolio();
+
+        return api.getPortfolioDetails(portfolioId);
       },
     },
     Mutation: {
-      updateProperty: async (parent: any, { input, portfolioId, propertyId }: UpdatePropertyDetailsInput, { modules, isExecutive }: AdminSessionContext) => {
-        if (!isExecutive) {
+      synchronizePortfolio: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
+        const { portfolioId } = await api.getActivePortfolio();
+        const status = await api.synchronizePortfolio(portfolioId);
+
+        return status;
+      },
+      updateProperty: async (parent: any, { input, propertyId }: UpdatePropertyDetailsInput, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+
+        const { portfolioId } = await api.getActivePortfolio();
         const errors = await api.updateProperty(input, propertyId, portfolioId);
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);
         }
 
-        return api.getProperty(propertyId, portfolioId);
+        return true;
       },
     },
   },
