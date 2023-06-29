@@ -36,6 +36,7 @@ export const S3_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   avatarsBucket: process.env.S3_BUCKET_AVATARS as string,
   documentsBucket: process.env.S3_BUCKET_DOCUMENTS as string,
+  portfolioBucket: process.env.S3_BUCKET_PORTFOLIO as string,
 };
 
 export const COGNITO_CONFIG = {

@@ -43,6 +43,12 @@ export class FileLinkService {
     return { id, url };
   }
 
+  async getImageLink(id: string, catalog: string): Promise<FileLink> {
+    const url = await this.adapter.getImageUrl(id, catalog);
+
+    return { id, url };
+  }
+
   async getDocumentFileLink(id: string, catalog: string): Promise<FileLink> {
     const url = await this.adapter.getSignedGetUrl(FileType.DOCUMENT, catalog, id);
 

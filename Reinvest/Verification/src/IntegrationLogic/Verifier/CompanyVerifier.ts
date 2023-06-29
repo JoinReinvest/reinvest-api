@@ -6,11 +6,12 @@ import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/Abstrac
 export class CompanyVerifier extends AbstractVerifier implements Verifier {
   protected availableEventsForDecision: AvailableEventsForDecision = {
     ANY_TIME: [
-      VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED,
       VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE,
       VerificationEvents.PRINCIPAL_APPROVED,
       VerificationEvents.PRINCIPAL_DISAPPROVED,
+      VerificationEvents.PRINCIPAL_NEED_MORE_INFO,
     ],
+    [VerificationDecisionType.APPROVED]: [VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED],
     [VerificationDecisionType.REQUEST_AML_VERIFICATION]: [
       VerificationEvents.VERIFICATION_AML_RESULT,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
@@ -24,6 +25,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
     ],
     [VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED]: [
+      VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
       VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
       VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
       VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
@@ -61,7 +63,20 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     };
 
     let decision: VerificationDecisionType = VerificationDecisionType.UNKNOWN;
-    const { amlStatus, failedKycCounter, kycStatus, reasons, needMoreInfo, wasFailedRequest, objectUpdatesCounter, isKycInPendingState } = this.analyzeEvents();
+    const {
+      amlStatus,
+      failedKycCounter,
+      kycStatus,
+      reasons,
+      needMoreInfo,
+      wasFailedRequest,
+      objectUpdatesCounter,
+      isKycInPendingState,
+      numberOfEvents,
+      numberOfKycManuallyApproved,
+      totalFailedKycCounter,
+    } = this.analyzeEvents();
+    const decisionId = this.getDecisionId(onObject, numberOfEvents);
     let someReasons = reasons;
 
     if (wasFailedRequest) {
@@ -69,6 +84,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
 
       return {
         decision,
+        decisionId,
         reasons: someReasons,
         onObject,
       };
@@ -79,6 +95,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
 
       return {
         decision,
+        decisionId,
         onObject,
         reasons: ['AML verification failed'],
       };
@@ -87,6 +104,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     if (needMoreInfo) {
       return {
         decision: VerificationDecisionType.ENTITY_UPDATE_REQUIRED,
+        decisionId,
         onObject,
         reasons: someReasons,
       };
@@ -120,6 +138,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
 
       return {
         decision,
+        decisionId,
         reasons: someReasons,
         onObject,
       };
@@ -130,6 +149,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
 
       return {
         decision,
+        decisionId,
         onObject,
       };
     }
@@ -137,6 +157,7 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     if (amlStatus === VerificationStatus.PENDING) {
       return {
         decision: VerificationDecisionType.REQUEST_AML_VERIFICATION,
+        decisionId,
         onObject,
       };
     }
@@ -144,7 +165,10 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
     if (kycStatus === VerificationStatus.PENDING) {
       if (isKycInPendingState) {
         // object is prepared for manual verification
-        decision = VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED;
+        decision =
+          numberOfKycManuallyApproved + totalFailedKycCounter > 0 // if company was manually approved or failed before, we need to ask for paid manual verification
+            ? VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED
+            : VerificationDecisionType.MANUAL_KYB_REVIEW_REQUIRED;
       } else {
         // we need to prepare object for manual verification
         decision = VerificationDecisionType.SET_KYB_STATUS_TO_PENDING;
@@ -152,11 +176,13 @@ export class CompanyVerifier extends AbstractVerifier implements Verifier {
 
       return {
         decision,
+        decisionId,
         onObject,
       };
     }
 
     console.error('Decision for entity is unknown', {
+      decisionId,
       onObject,
       amlStatus,
       kycStatus,

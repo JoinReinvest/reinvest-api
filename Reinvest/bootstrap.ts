@@ -69,11 +69,16 @@ export function boot(): Modules {
 
   modules.register(
     Portfolio.moduleName,
-    Portfolio.create({
-      database: databaseConfig,
-      queue: queueConfig,
-      dealpathConfig,
-    } as Portfolio.Config),
+    Portfolio.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+        dealpathConfig,
+      } as Portfolio.Config,
+      {
+        documents: modules.get(Documents.moduleName) as Documents.Main,
+      },
+    ),
   );
 
   modules.register(
@@ -169,6 +174,7 @@ export function boot(): Modules {
       {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
+        verification: modules.get(Verification.moduleName) as Verification.Main,
       },
     ),
   );

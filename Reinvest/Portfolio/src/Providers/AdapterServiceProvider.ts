@@ -7,6 +7,7 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 import { DealpathAdapter } from '../Adapter/Dealpath/DealpathAdapter';
+import { DocumentsService } from '../Service/DocumentsService';
 
 export class AdapterServiceProvider {
   private config: Portfolio.Config;
@@ -24,7 +25,9 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(PortfolioDatabaseAdapterInstanceProvider, createPortfolioDatabaseAdapterProvider(this.config.database))
-      .addSingleton(PortfolioRepository, [PortfolioDatabaseAdapterInstanceProvider]);
+      .addSingleton(PortfolioRepository, [PortfolioDatabaseAdapterInstanceProvider, SimpleEventBus]);
+
+    container.addSingleton(DocumentsService, ['Documents']);
 
     // dealpath
     container.addAsValue('DealpathConfig', this.config.dealpathConfig).addSingleton(DealpathAdapter, ['DealpathConfig']);

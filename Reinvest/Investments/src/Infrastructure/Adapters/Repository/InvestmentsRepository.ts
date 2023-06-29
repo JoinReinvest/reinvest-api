@@ -73,12 +73,13 @@ export class InvestmentsRepository {
       .select([
         `${investmentsFeesTable}.amount as feeAmount`,
         `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.abortedDate`,
         `${investmentsFeesTable}.approvedByIP`,
         `${investmentsFeesTable}.dateCreated as feeDateCreated`,
         `${investmentsFeesTable}.id as feeId`,
         `${investmentsFeesTable}.investmentId`,
         `${investmentsFeesTable}.status as feeStatus`,
-        `${investmentsFeesTable}.verificationFeeId`,
+        `${investmentsFeesTable}.verificationFeeIdsJson`,
       ])
       .castTo<InvestmentWithFee>();
   }
@@ -108,12 +109,13 @@ export class InvestmentsRepository {
       .select([
         `${investmentsFeesTable}.amount as feeAmount`,
         `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.abortedDate`,
         `${investmentsFeesTable}.approvedByIP`,
         `${investmentsFeesTable}.dateCreated as feeDateCreated`,
         `${investmentsFeesTable}.id as feeId`,
         `${investmentsFeesTable}.investmentId`,
         `${investmentsFeesTable}.status as feeStatus`,
-        `${investmentsFeesTable}.verificationFeeId`,
+        `${investmentsFeesTable}.verificationFeeIdsJson`,
       ])
       .castTo<InvestmentWithFee>()
       .where(`${investmentsTable}.profileId`, '=', profileId)
@@ -262,7 +264,7 @@ export class InvestmentsRepository {
 
       if (approveFee) {
         const fee = investment.getFee();
-        fee && (await this.feesRepository.approveFee(fee));
+        fee && (await this.feesRepository.storeFee(fee));
       }
 
       return true;

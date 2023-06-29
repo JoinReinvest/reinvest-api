@@ -11,11 +11,12 @@ import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/Abstrac
 export class PartyVerifier extends AbstractVerifier {
   protected availableEventsForDecision: AvailableEventsForDecision = {
     ANY_TIME: [
-      VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED,
       VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE,
       VerificationEvents.PRINCIPAL_APPROVED,
       VerificationEvents.PRINCIPAL_DISAPPROVED,
+      VerificationEvents.PRINCIPAL_NEED_MORE_INFO,
     ],
+    [VerificationDecisionType.APPROVED]: [VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED],
     [VerificationDecisionType.REQUEST_VERIFICATION]: [
       VerificationEvents.VERIFICATION_KYC_RESULT,
       VerificationEvents.VERIFICATION_AML_RESULT,
@@ -43,14 +44,18 @@ export class PartyVerifier extends AbstractVerifier {
 
   protected makeDecisionForParty(onObject: VerificationObject): VerificationDecision {
     let decision: VerificationDecisionType = VerificationDecisionType.UNKNOWN;
-    const { amlStatus, failedKycCounter, kycStatus, reasons, needMoreInfo, wasFailedRequest, objectUpdatesCounter, isKycInPendingState } = this.analyzeEvents();
+    const { amlStatus, failedKycCounter, kycStatus, reasons, needMoreInfo, wasFailedRequest, objectUpdatesCounter, isKycInPendingState, numberOfEvents } =
+      this.analyzeEvents();
     let someReasons = reasons;
+
+    const decisionId = this.getDecisionId(onObject, numberOfEvents);
 
     if (wasFailedRequest) {
       decision = VerificationDecisionType.WAIT_FOR_SUPPORT;
 
       return {
         decision,
+        decisionId,
         reasons: someReasons,
         onObject,
       };
@@ -61,6 +66,7 @@ export class PartyVerifier extends AbstractVerifier {
 
       return {
         decision,
+        decisionId,
         onObject,
         reasons: ['AML verification failed'],
       };
@@ -69,6 +75,7 @@ export class PartyVerifier extends AbstractVerifier {
     if (needMoreInfo) {
       return {
         decision: VerificationDecisionType.UPDATE_REQUIRED,
+        decisionId,
         onObject,
         reasons: someReasons,
       };
@@ -108,6 +115,7 @@ export class PartyVerifier extends AbstractVerifier {
 
       return {
         decision,
+        decisionId,
         reasons: someReasons,
         onObject,
       };
@@ -118,6 +126,7 @@ export class PartyVerifier extends AbstractVerifier {
 
       return {
         decision,
+        decisionId,
         onObject,
       };
     }
@@ -127,6 +136,7 @@ export class PartyVerifier extends AbstractVerifier {
 
       return {
         decision,
+        decisionId,
         onObject,
       };
     }
@@ -136,11 +146,13 @@ export class PartyVerifier extends AbstractVerifier {
 
       return {
         decision,
+        decisionId,
         onObject,
       };
     }
 
     console.error('Decision for party verification is unknown', {
+      decisionId,
       onObject,
       amlStatus,
       kycStatus,

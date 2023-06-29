@@ -10,7 +10,7 @@ class IsFeeApproved {
   }
 
   async execute(investmentId: string) {
-    const fee = await this.feesRepository.get(investmentId);
+    const fee = await this.feesRepository.getFeeByInvestmentId(investmentId);
 
     if (!fee || fee.isApproved()) {
       return true;
