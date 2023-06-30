@@ -9,11 +9,12 @@ export const main: SQSHandler = async (event: SQSEvent) => {
   try {
     const { token, title, body } = JSON.parse(record.body);
 
-    if (!admin.apps.length) {
-      admin.initializeApp({
+    admin.initializeApp(
+      {
         credential: admin.credential.cert(firebaseServiceAccount),
-      });
-    }
+      },
+      'firebase-handler',
+    );
 
     const message = {
       token,
@@ -22,7 +23,7 @@ export const main: SQSHandler = async (event: SQSEvent) => {
         body,
       },
     };
-
+    console.log('Sending message', message);
     await admin.messaging().send(message);
   } catch (error: any) {
     console.log(error);
