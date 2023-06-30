@@ -5,48 +5,50 @@ import { InvestmentsController } from 'Investments/Infrastructure/Ports/Investme
 import { ScheduleSimulationController } from 'Investments/Infrastructure/Ports/ScheduleSimulationController';
 import { SubscriptionAgreementController } from 'Investments/Infrastructure/Ports/SubscriptionAgreementController';
 import { TempController } from 'Investments/Infrastructure/Ports/TempController';
-import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrastructure/Ports/RecurringInvestmentsController';
 import { TransactionController } from 'Investments/Infrastructure/Ports/TransactionController';
+import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrastructure/Ports/RecurringInvestmentsController';
 
 export type InvestmentsApiType = {
+  abortInvestment: InvestmentsController['abortInvestment'];
   approveFees: FeesController['approveFees'];
-  assignSubscriptionAgreementToInvestment: InvestmentsController['assignSubscriptionAgreementToInvestment'];
-  assignSubscriptionAgreementToRecurringInvestment: RecurringInvestmentsController['assignSubscriptionAgreementToRecurringInvestment'];
+  createDraftRecurringInvestment: RecurringInvestmentsController['createDraftRecurringInvestment'];
   createInvestment: InvestmentsController['createInvestment'];
-  createRecurringInvestment: RecurringInvestmentsController['createRecurringInvestment'];
   createRecurringSubscriptionAgreement: SubscriptionAgreementController['createRecurringSubscriptionAgreement'];
   createSubscriptionAgreement: SubscriptionAgreementController['createSubscriptionAgreement'];
   deactivateRecurringInvestment: RecurringInvestmentsController['deactivateRecurringInvestment'];
-  deleteRecurringInvestment: RecurringInvestmentsController['deleteRecurringInvestment'];
   getRecurringInvestment: RecurringInvestmentsController['getRecurringInvestment'];
   getScheduleSimulation: ScheduleSimulationController['getScheduleSimulation'];
   initiateRecurringInvestment: RecurringInvestmentsController['initiateRecurringInvestment'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
   isFeesApproved: FeesController['isFeesApproved'];
+  listInvestments: InvestmentsController['listInvestments'];
   pushTransaction: TransactionController['pushTransaction'];
   reinvestDividends: DividendsController['reinvestDividends'];
+  signRecurringSubscriptionAgreement: SubscriptionAgreementController['signRecurringSubscriptionAgreement'];
   signSubscriptionAgreement: SubscriptionAgreementController['signSubscriptionAgreement'];
   startInvestment: InvestmentsController['startInvestment'];
   subscriptionAgreementQuery: SubscriptionAgreementController['subscriptionAgreementQuery'];
   test: TempController['handle'];
+  unsuspendRecurringInvestment: RecurringInvestmentsController['unsuspendRecurringInvestment'];
 };
 
 export const investmentsApi = (container: ContainerInterface): InvestmentsApiType => ({
   test: container.delegateTo(TempController, 'handle'),
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
-  createRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createRecurringInvestment'),
+  listInvestments: container.delegateTo(InvestmentsController, 'listInvestments'),
+  createDraftRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createDraftRecurringInvestment'),
+  unsuspendRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'unsuspendRecurringInvestment'),
+  abortInvestment: container.delegateTo(InvestmentsController, 'abortInvestment'),
   getRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'getRecurringInvestment'),
   deactivateRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'deactivateRecurringInvestment'),
   initiateRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'initiateRecurringInvestment'),
-  assignSubscriptionAgreementToRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'assignSubscriptionAgreementToRecurringInvestment'),
-  deleteRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'deleteRecurringInvestment'),
   getScheduleSimulation: container.delegateTo(ScheduleSimulationController, 'getScheduleSimulation'),
   startInvestment: container.delegateTo(InvestmentsController, 'startInvestment'),
   approveFees: container.delegateTo(FeesController, 'approveFees'),
   isFeesApproved: container.delegateTo(FeesController, 'isFeesApproved'),
   investmentSummaryQuery: container.delegateTo(InvestmentsController, 'investmentSummaryQuery'),
-  assignSubscriptionAgreementToInvestment: container.delegateTo(InvestmentsController, 'assignSubscriptionAgreementToInvestment'),
   createSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'createSubscriptionAgreement'),
+  signRecurringSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'signRecurringSubscriptionAgreement'),
   createRecurringSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'createRecurringSubscriptionAgreement'),
   subscriptionAgreementQuery: container.delegateTo(SubscriptionAgreementController, 'subscriptionAgreementQuery'),
   signSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'signSubscriptionAgreement'),

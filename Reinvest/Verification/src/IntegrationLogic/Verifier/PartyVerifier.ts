@@ -10,7 +10,12 @@ import { AbstractVerifier } from 'Verification/IntegrationLogic/Verifier/Abstrac
 
 export class PartyVerifier extends AbstractVerifier {
   protected availableEventsForDecision: AvailableEventsForDecision = {
-    ANY_TIME: [VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED, VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE],
+    ANY_TIME: [
+      VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED,
+      VerificationEvents.VERIFICATION_CLEANED_ADMINISTRATIVE,
+      VerificationEvents.PRINCIPAL_APPROVED,
+      VerificationEvents.PRINCIPAL_DISAPPROVED,
+    ],
     [VerificationDecisionType.REQUEST_VERIFICATION]: [
       VerificationEvents.VERIFICATION_KYC_RESULT,
       VerificationEvents.VERIFICATION_AML_RESULT,

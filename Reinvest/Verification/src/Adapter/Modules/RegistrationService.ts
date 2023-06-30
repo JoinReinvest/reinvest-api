@@ -1,5 +1,14 @@
 import { Registration } from 'Registration/index';
 import { AccountStructure } from 'Verification/Domain/ValueObject/AccountStructure';
+import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
+
+export type PartyMapping = {
+  accountId: string | null;
+  partyId: string;
+  profileId: string;
+  stakeholderId: string | null;
+  type: MappedType;
+};
 
 /**
  * Registration Module ACL
@@ -27,5 +36,17 @@ export class RegistrationService {
     }
 
     return accountStructure;
+  }
+
+  async getMappingByPartyId(partyId: string): Promise<PartyMapping | null> {
+    const api = this.registrationModule.api();
+
+    const partyMapping = await api.getMappingByPartyId(partyId);
+
+    if (!partyMapping) {
+      throw new Error(`Party mapping not found for partyId: ${partyId}`);
+    }
+
+    return partyMapping;
   }
 }

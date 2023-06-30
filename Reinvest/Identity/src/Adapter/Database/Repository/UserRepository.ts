@@ -1,7 +1,9 @@
 import { IdentityDatabaseAdapterProvider, userTable } from 'Identity/Adapter/Database/IdentityDatabaseAdapter';
-import { InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
+import { IdentityUser, InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
 import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/UserException';
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
+import { BanList } from 'Identity/Port/Api/BanController';
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 export class UserRepository {
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
@@ -38,21 +40,56 @@ export class UserRepository {
     }
   }
 
-  public async getUserProfileId(cognitoUserId: string): Promise<string | null> {
+  public async getUserProfile(cognitoUserId: string): Promise<{
+    bannedIdsJson: JSONObjectOf<BanList>;
+    profileId: string;
+  } | null> {
     const user = await this.databaseAdapterProvider
       .provide()
       .selectFrom(userTable)
-      .select('profileId')
+      .select(['profileId', 'bannedIdsJson'])
       .where('cognitoUserId', '=', cognitoUserId)
       .limit(1)
       .executeTakeFirst();
 
-    return user ? user.profileId : null;
+    return user ?? null;
   }
 
   public async getUserProfileByEmail(email: string): Promise<string | null> {
     const user = await this.databaseAdapterProvider.provide().selectFrom(userTable).select('profileId').where('email', '=', email).limit(1).executeTakeFirst();
 
     return user ? user.profileId : null;
+  }
+
+  public async updateUserEmail(cognitoUserId: string, email: string) {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        email,
+      })
+      .where('cognitoUserId', '=', cognitoUserId)
+      .execute();
+  }
+
+  async findUserByProfileId(profileId: string): Promise<IdentityUser | null> {
+    const user = await this.databaseAdapterProvider.provide().selectFrom(userTable).selectAll().where('profileId', '=', profileId).limit(1).executeTakeFirst();
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
+  async updateUserBanList(id: string, banList: BanList): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        bannedIdsJson: banList,
+      })
+      .where('id', '=', id)
+      .execute();
   }
 }

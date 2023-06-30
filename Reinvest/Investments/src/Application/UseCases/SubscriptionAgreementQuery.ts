@@ -1,5 +1,6 @@
-import TemplateParser, { DynamicType } from 'Investments/Application/Service/TemplateParser';
-import { subscriptionAgreementsTemplate, TemplateVersions } from 'Investments/Domain/SubscriptionAgreement';
+import TemplateParser from 'Investments/Application/Service/TemplateParser';
+import { subscriptionAgreementsTemplate } from 'Investments/Domain/SubscriptionAgreements/subscriptionAgreementsTemplates';
+import type { DynamicType, SubscriptionAgreementTemplateVersions } from 'Investments/Domain/SubscriptionAgreements/types';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class SubscriptionAgreementQuery {
@@ -20,7 +21,7 @@ class SubscriptionAgreementQuery {
 
     const { contentFieldsJson, templateVersion, id, agreementType, status, dateCreated, signedAt } = subscriptionAgreement.toObject();
 
-    const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as TemplateVersions]);
+    const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as SubscriptionAgreementTemplateVersions]);
 
     const parsed = parser.parse(contentFieldsJson as DynamicType);
 

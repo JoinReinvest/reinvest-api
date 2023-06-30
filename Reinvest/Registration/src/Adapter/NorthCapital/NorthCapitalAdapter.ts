@@ -384,6 +384,49 @@ export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     };
   }
 
+  /**
+   * This method is used to create an external ach account for integration testing purposes
+   * @param id
+   * @param fullName
+   * @param nickName
+   * @param bankName
+   * @param bankRoutingNumber
+   * @param bankAccountNumber
+   * @param ipAddress
+   * @param accountType
+   */
+  async createExternalAchAccountForTests(
+    id: string,
+    fullName: string,
+    nickName: string,
+    bankName: string,
+    bankRoutingNumber: string,
+    bankAccountNumber: string,
+    accountType: 'Checking' | 'Saving' = 'Checking',
+  ): Promise<boolean> {
+    const endpoint = 'tapiv3/index.php/v3/createExternalAccount';
+    const data = {
+      accountId: id,
+      types: 'Account',
+      ExtAccountfullname: fullName,
+      ExtRoutingnumber: bankRoutingNumber,
+      ExtAccountnumber: bankAccountNumber,
+      Extnickname: nickName,
+      ExtBankname: bankName,
+      updatedIpAddress: '127.0.0.1',
+      accountType,
+    };
+    let statusCode;
+    try {
+      const response = await this.postRequest(endpoint, data);
+      statusCode = response.statusCode;
+    } catch (error: NorthCapitalException | any) {
+      statusCode = error.getStatus();
+    }
+
+    return statusCode === 101;
+  }
+
   private getPlaidValue<Result>(plaidResponse: PlaidResponse, key: keyof PlaidResponse) {
     const value = plaidResponse[key];
 

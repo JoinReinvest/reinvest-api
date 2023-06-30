@@ -1,13 +1,25 @@
-import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
-import { DividendDetails, DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
+import type { DividendDetails } from 'SharesAndDividends/Domain/types';
+import { DividendsListQuery } from 'SharesAndDividends/UseCase/DividendsListQuery';
+import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
+import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
+import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
 
 export class DividendsController {
   private dividendsQuery: DividendsQuery;
-  private dividendsRepository: DividendsRepository;
+  private markDividendAsReinvestedUseCase: MarkDividendAsReinvested;
+  private dividendsListQueryUseCase: DividendsListQuery;
+  private markDividendAsWithdrewUseCase: MarkDividendAsWithdrawn;
 
-  constructor(dividendsQuery: DividendsQuery, dividendsRepository: DividendsRepository) {
+  constructor(
+    dividendsQuery: DividendsQuery,
+    markDividendAsReinvestedUseCase: MarkDividendAsReinvested,
+    dividendsListQueryUseCase: DividendsListQuery,
+    markDividendAsWithdrewUseCase: MarkDividendAsWithdrawn,
+  ) {
     this.dividendsQuery = dividendsQuery;
-    this.dividendsRepository = dividendsRepository;
+    this.markDividendAsReinvestedUseCase = markDividendAsReinvestedUseCase;
+    this.dividendsListQueryUseCase = dividendsListQueryUseCase;
+    this.markDividendAsWithdrewUseCase = markDividendAsWithdrewUseCase;
   }
 
   static getClassName = () => 'DividendsController';
@@ -16,8 +28,15 @@ export class DividendsController {
     return this.dividendsQuery.getDividend(profileId, dividendId);
   }
 
+  async getDividendsList(profileId: string, accountId: string): Promise<DividendDetails[] | null> {
+    return this.dividendsListQueryUseCase.getList(profileId, accountId);
+  }
+
   async markDividendReinvested(profileId: string, accountId: string, dividendId: string): Promise<void> {
-    // TODO include regular investor dividend - do it on the domain side, not on db side!!
-    await this.dividendsRepository.markIncentiveDividendReinvested(profileId, accountId, dividendId);
+    await this.markDividendAsReinvestedUseCase.execute(profileId, accountId, dividendId);
+  }
+
+  async markDividendAsWithdrew(profileId: string, dividendId: string): Promise<void> {
+    await this.markDividendAsWithdrewUseCase.execute(profileId, dividendId);
   }
 }

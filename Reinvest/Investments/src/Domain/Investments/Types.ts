@@ -6,6 +6,7 @@ export enum InvestmentStatus {
   FUNDED = 'FUNDED',
   FAILED = 'FAILED',
   FINISHED = 'FINISHED',
+  ABORTED = 'ABORTED',
 }
 
 export enum ScheduledBy {
@@ -31,6 +32,7 @@ export enum InvestmentsFeesStatus {
 
 export type InvestmentSummarySchema = {
   amount: number;
+  bankAccountId: string | null;
   dateCreated: Date;
   feeAmount: number | null;
   id: string;

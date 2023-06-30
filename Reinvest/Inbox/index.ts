@@ -15,6 +15,7 @@ export class Inbox {
       const kind = message.kind;
       console.log({ kind, message, messageId });
 
+      // @ts-ignore
       for (const module of this.modules.iterate()) {
         if (module.isHandleEvent(kind)) {
           const handlers = module.technicalEventHandler();

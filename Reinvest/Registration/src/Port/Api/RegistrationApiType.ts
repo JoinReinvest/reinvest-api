@@ -12,13 +12,17 @@ export type RegistrationApiType = {
   createBankAccount: BankAccountController['createBankAccount'];
   fulfillBankAccount: BankAccountController['fulfillBankAccount'];
   getAccountMapping: RegistryQuery['getAccountMapping'];
+  getBankAccount: BankAccountController['getBankAccount'];
   getBankAccountMapping: BankAccountQuery['getBankAccountMapping'];
+  getMappingByPartyId: RegistryQuery['getMappingByPartyId'];
   getNorthCapitalAccountStructure: RegistryQuery['getNorthCapitalAccountStructure'];
   immediatelySynchronizeAccount: SynchronizationController['immediatelySynchronizeAccount'];
   immediatelySynchronizeAllAccountStructure: SynchronizationController['immediatelySynchronizeAllAccountStructure'];
   listDocumentsToSynchronize: NorthCapitalDocumentSynchronizationQuery['listDocumentsToSynchronize'];
   listObjectsToSync: SynchronizationQuery['listObjectsToSync'];
   readBankAccount: BankAccountController['readBankAccount'];
+  resynchronizeCompanyAccount: SynchronizationController['resynchronizeCompanyAccount'];
+  resynchronizeIndividualAccount: SynchronizationController['resynchronizeIndividualAccount'];
   synchronize: SynchronizationController['synchronize'];
   synchronizeCompany: SynchronizationController['synchronizeCompany'];
   synchronizeDocument: NorthCapitalDocumentSynchronizationController['synchronizeDocument'];
@@ -39,9 +43,13 @@ export const registrationApi = (container: ContainerInterface): RegistrationApiT
   createBankAccount: container.delegateTo(BankAccountController, 'createBankAccount'),
   fulfillBankAccount: container.delegateTo(BankAccountController, 'fulfillBankAccount'),
   readBankAccount: container.delegateTo(BankAccountController, 'readBankAccount'),
+  getBankAccount: container.delegateTo(BankAccountController, 'getBankAccount'),
   updateBankAccount: container.delegateTo(BankAccountController, 'updateBankAccount'),
   getAccountMapping: container.delegateTo(RegistryQuery, 'getAccountMapping'),
   getBankAccountMapping: container.delegateTo(BankAccountQuery, 'getBankAccountMapping'),
   immediatelySynchronizeAllAccountStructure: container.delegateTo(SynchronizationController, 'immediatelySynchronizeAllAccountStructure'),
   immediatelySynchronizeAccount: container.delegateTo(SynchronizationController, 'immediatelySynchronizeAccount'),
+  resynchronizeCompanyAccount: container.delegateTo(SynchronizationController, 'resynchronizeCompanyAccount'),
+  resynchronizeIndividualAccount: container.delegateTo(SynchronizationController, 'resynchronizeIndividualAccount'),
+  getMappingByPartyId: container.delegateTo(RegistryQuery, 'getMappingByPartyId'),
 });

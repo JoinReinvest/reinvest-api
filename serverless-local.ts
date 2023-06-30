@@ -2,10 +2,19 @@ import type { AWS } from '@serverless/typescript';
 
 import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 import { ApiLambdaFunction, ApiLambdaResources } from './devops/functions/api/api-config';
-import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cronDocumentSync/cron-document-sync-config';
-import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cronVendorsSync/cron-vendors-sync-config';
+import {
+  CronDividendsCalculationFunction,
+  CronDividendsCalculationResources,
+} from './devops/functions/cron/dividendsCalculation/cron-dividends-calculation-config';
+import {
+  CronDividendsDistributionFunction,
+  CronDividendsDistributionResources,
+} from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
+import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
+import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
+import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/pdfGenerator/queue-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
 import { cognitoPreSignUpFunction, CognitoPreSignUpResources } from './devops/functions/preSignUp/preSignUp-config';
 import { QueueFunction, QueueResources } from './devops/functions/queue/queue-config';
@@ -36,6 +45,7 @@ const serverlessConfiguration: AWS = {
       ExplorerHostedUI: '${env:LocalHostedUiUrl}',
       ApiUrl: 'http://localhost:3000/api',
       SQS_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-notification',
+      SQS_PDF_GENERATOR_URL: 'http://localhost:9324/000000000000/development-sqs-pdf-generator',
       IT_IS_LOCAL: 'true',
     },
     logs: {
@@ -53,6 +63,13 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
+  // layers: {
+  //   chromium: {
+  //     package: {
+  //       artifact: './chromium-v114.0.0-layer.zip',
+  //     },
+  //   },
+  // },
   functions: {
     admin: AdminLambdaFunction,
     api: ApiLambdaFunction,
@@ -61,10 +78,13 @@ const serverlessConfiguration: AWS = {
     queue: QueueFunction,
     cronDocumentsSync: CronDocumentSyncFunction,
     cronVendorsSync: CronVendorsSyncFunction,
+    cronDividendsCalculation: CronDividendsCalculationFunction,
+    cronDividendsDistribution: CronDividendsDistributionFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     unauthorizedEndpoints: UnauthorizedEndpointsFunction,
     tests: TestsFunction,
+    pdfGenerator: PdfGeneratorFunction,
   },
   resources: {
     Resources: {
@@ -84,6 +104,9 @@ const serverlessConfiguration: AWS = {
       ...TestsLambdaResources,
       ...CronDocumentSyncResources,
       ...CronVendorsSyncResources,
+      ...CronDividendsCalculationResources,
+      ...CronDividendsDistributionResources,
+      ...PdfGeneratorResources,
     },
     Outputs: {
       ...CognitoOutputs,

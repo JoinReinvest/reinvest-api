@@ -1,4 +1,5 @@
 import {
+  legalEntitiesBannedListTable,
   legalEntitiesBeneficiaryTable,
   legalEntitiesCompanyAccountTable,
   LegalEntitiesDatabaseAdapterProvider,
@@ -6,7 +7,7 @@ import {
   legalEntitiesProfileTable,
 } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { LegalEntitiesCompanyAccount } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
-import { CompanyAccount, CompanyAccountOverview, CompanyOverviewSchema, CompanySchema } from 'LegalEntities/Domain/Accounts/CompanyAccount';
+import { CompanyAccount, CompanyAccountOverview, CompanyAccountType, CompanyOverviewSchema, CompanySchema } from 'LegalEntities/Domain/Accounts/CompanyAccount';
 import { IndividualAccount, IndividualAccountOverview, IndividualOverviewSchema, IndividualSchema } from 'LegalEntities/Domain/Accounts/IndividualAccount';
 import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
@@ -267,6 +268,22 @@ export class AccountRepository {
     }
   }
 
+  private async getNewInitials(profileId: string, accountType: CompanyAccountType): Promise<number> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(legalEntitiesCompanyAccountTable)
+      .select(eb => [eb.fn.count('accountId').as('initials')])
+      .where('profileId', '=', profileId)
+      .where('accountType', '=', accountType)
+      .executeTakeFirst();
+
+    if (!data) {
+      return 1;
+    }
+
+    return parseInt(<string>data.initials) + 1;
+  }
+
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
     const {
       profileId,
@@ -290,6 +307,8 @@ export class AccountRepository {
         return true;
       }
 
+      const initialsValue = await this.getNewInitials(profileId, accountType);
+
       await this.databaseAdapterProvider
         .provide()
         .insertInto(legalEntitiesCompanyAccountTable)
@@ -308,6 +327,7 @@ export class AccountRepository {
           companyDocuments: JSON.stringify(companyDocuments),
           stakeholders: JSON.stringify(stakeholders),
           einHash,
+          initialsValue,
         })
         .onConflict(oc => oc.columns(['einHash']).doNothing())
         .execute();
@@ -320,14 +340,39 @@ export class AccountRepository {
     }
   }
 
+  async updateIndividualAccount(account: IndividualAccount, events: DomainEvent[] = []): Promise<void> {
+    const { employmentStatus, employer, netWorth, netIncome, avatar, profileId, accountId } = account.toObject();
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(legalEntitiesIndividualAccountTable)
+      .set({
+        employmentStatus: JSON.stringify(employmentStatus),
+        employer: JSON.stringify(employer),
+        netWorth: JSON.stringify(netWorth),
+        netIncome: JSON.stringify(netIncome),
+        avatar: JSON.stringify(avatar),
+      })
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .execute();
+
+    await this.publishEvents(events);
+  }
+
   async updateCompanyAccount(account: CompanyAccount, events: DomainEvent[] = []): Promise<void> {
-    const { profileId, accountId, address, companyType, stakeholders, companyDocuments } = account.toObject();
+    const { profileId, accountId, address, companyType, stakeholders, companyDocuments, annualRevenue, avatar, industry, numberOfEmployees } =
+      account.toObject();
 
     const values: Partial<LegalEntitiesCompanyAccount> = {
       address: JSON.stringify(address),
       companyType: JSON.stringify(companyType),
       companyDocuments: JSON.stringify(companyDocuments),
       stakeholders: JSON.stringify(stakeholders),
+      avatar: JSON.stringify(avatar),
+      annualRevenue: JSON.stringify(annualRevenue),
+      industry: JSON.stringify(industry),
+      numberOfEmployees: JSON.stringify(numberOfEmployees),
     };
 
     await this.databaseAdapterProvider
@@ -362,8 +407,43 @@ export class AccountRepository {
           'accountType',
           'companyDocuments',
           'stakeholders',
+          'initialsValue',
         ])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
+        .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
+        .limit(1)
+        .castTo<CompanySchema>()
+        .executeTakeFirstOrThrow();
+
+      return CompanyAccount.create(account);
+    } catch (error: any) {
+      console.warn(`Cannot find any company account: ${error.message}`);
+
+      return null;
+    }
+  }
+
+  async findCompanyAccountByAccountId(accountId: string): Promise<CompanyAccount | null> {
+    try {
+      const account = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesCompanyAccountTable)
+        .select([
+          'profileId',
+          'accountId',
+          'companyName',
+          'address',
+          'ein',
+          'annualRevenue',
+          'numberOfEmployees',
+          'industry',
+          'companyType',
+          'avatar',
+          'accountType',
+          'companyDocuments',
+          'stakeholders',
+          'initialsValue',
+        ])
         .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
         .limit(1)
         .castTo<CompanySchema>()
@@ -382,7 +462,7 @@ export class AccountRepository {
       const accounts = await this.databaseAdapterProvider
         .provide()
         .selectFrom(legalEntitiesCompanyAccountTable)
-        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType'])
+        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType', 'initialsValue'])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
         .castTo<CompanyOverviewSchema>()
         .execute();
@@ -533,5 +613,21 @@ export class AccountRepository {
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  async isSensitiveNumberBanned(hashedSensitiveNumber: string) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesBannedListTable)
+        .select(['sensitiveNumber'])
+        .where('sensitiveNumber', '=', hashedSensitiveNumber)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error: any) {
+      return false;
+    }
   }
 }

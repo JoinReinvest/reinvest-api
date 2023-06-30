@@ -16,6 +16,7 @@ import { IntegrationServiceProvider } from 'Trading/Providers/IntegrationService
 import { PortsProvider } from 'Trading/Providers/PortsProvider';
 
 import * as TradingMigrations from '../migrations';
+import { Verification } from 'Verification/index';
 
 export namespace Trading {
   export const moduleName = 'Trading';
@@ -30,6 +31,7 @@ export namespace Trading {
     documents: Documents.Main;
     portfolio: Portfolio.Main;
     registration: Registration.Main;
+    verification: Verification.Main;
   };
 
   export type ApiType = TradingApiType & Api;
@@ -80,6 +82,7 @@ export namespace Trading {
       }
 
       this.container.addAsValue('Registration', this.modules.registration);
+      this.container.addAsValue('Verification', this.modules.verification);
       this.container.addAsValue('Portfolio', this.modules.portfolio);
       this.container.addAsValue('Documents', this.modules.documents);
 

@@ -11,14 +11,15 @@ import { Configuration } from 'ApiGateway/Schema/Types/Configuration';
 import { DocumentTypes } from 'ApiGateway/Schema/Types/DocumentTypes';
 import { DraftAccount } from 'ApiGateway/Schema/Types/DraftAccount';
 import { Hello } from 'ApiGateway/Schema/Types/Hello';
-import { PhoneNumberVerification } from 'ApiGateway/Schema/Types/Identity';
+import { IdentitySchema } from 'ApiGateway/Schema/Types/Identity';
 import { Investments } from 'ApiGateway/Schema/Types/Investments';
 import { Notification } from 'ApiGateway/Schema/Types/Notification';
+import { PortfolioSchema } from 'ApiGateway/Schema/Types/Portfolio';
 import { Profile } from 'ApiGateway/Schema/Types/Profile';
 import { RecurringInvestments } from 'ApiGateway/Schema/Types/RecurringInvestments';
 import { Shared } from 'ApiGateway/Schema/Types/Shared';
 import { VerificationSchema } from 'ApiGateway/Schema/Types/Verification';
-import { Withdrawals } from 'ApiGateway/Schema/Types/Withdrawals';
+import { WithdrawalsSchema } from 'ApiGateway/Schema/Types/WithdrawalsSchema';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
 
 const executableSchemas = [EmailAddress, FileName, DateScalar, Money, Hello];
@@ -29,7 +30,7 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   Account.typeDefs,
   ...DraftAccount.typeDefs,
   Profile.typeDefs,
-  PhoneNumberVerification.typeDefs,
+  IdentitySchema.typeDefs,
   DocumentTypes.typeDefs,
   VerificationSchema.typeDefs,
   Investments.typeDefs,
@@ -37,14 +38,15 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   Configuration.typeDefs,
   AccountStats.typeDefs,
   Notification.typeDefs,
-  Withdrawals.typeDefs,
+  WithdrawalsSchema.typeDefs,
+  PortfolioSchema.typeDefs,
 ]);
 
 const nonExecutableResolvers = mergeResolvers([
   Account.resolvers,
   DraftAccount.resolvers,
   Profile.resolvers,
-  PhoneNumberVerification.resolvers,
+  IdentitySchema.resolvers,
   DocumentTypes.resolvers,
   VerificationSchema.resolvers,
   Investments.resolvers,
@@ -52,7 +54,8 @@ const nonExecutableResolvers = mergeResolvers([
   Configuration.resolvers,
   AccountStats.resolvers,
   Notification.resolvers,
-  Withdrawals.resolvers,
+  WithdrawalsSchema.resolvers,
+  PortfolioSchema.resolvers,
 ]);
 
 let schema = mergeSchemas({

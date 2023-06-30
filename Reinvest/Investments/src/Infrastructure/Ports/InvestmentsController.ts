@@ -1,6 +1,8 @@
-import AssignSubscriptionAgreementToInvestment from 'Investments/Application/UseCases/AssignSubscriptionAgreementToInvestment';
+import { Pagination } from 'Investments/Application/Pagination';
+import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
+import ListInvestments from 'Investments/Application/UseCases/ListInvestments';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import { Money } from 'Money/Money';
 import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments';
@@ -8,19 +10,22 @@ import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments'
 export class InvestmentsController {
   private createInvestmentUseCase: CreateInvestment;
   private investmentSummaryQueryUseCase: InvestmentSummaryQuery;
-  private assignSubscriptionAgreementToInvestmentUseCase: AssignSubscriptionAgreementToInvestment;
   private startInvestmentUseCase: StartInvestment;
+  private abortInvestmentUseCase: AbortInvestment;
+  private listInvestmentsUseCase: ListInvestments;
 
   constructor(
     createInvestmentUseCase: CreateInvestment,
     investmentSummaryQueryUseCase: InvestmentSummaryQuery,
-    assignSubscriptionAgreementToInvestmentUseCase: AssignSubscriptionAgreementToInvestment,
     startInvestmentUseCase: StartInvestment,
+    abortInvestmentUseCase: AbortInvestment,
+    listInvestmentsUseCase: ListInvestments,
   ) {
     this.createInvestmentUseCase = createInvestmentUseCase;
     this.investmentSummaryQueryUseCase = investmentSummaryQueryUseCase;
-    this.assignSubscriptionAgreementToInvestmentUseCase = assignSubscriptionAgreementToInvestmentUseCase;
     this.startInvestmentUseCase = startInvestmentUseCase;
+    this.abortInvestmentUseCase = abortInvestmentUseCase;
+    this.listInvestmentsUseCase = listInvestmentsUseCase;
   }
 
   public static getClassName = (): string => 'InvestmentsController';
@@ -32,14 +37,18 @@ export class InvestmentsController {
   }
 
   public async investmentSummaryQuery(profileId: string, investmentId: string) {
-    return await this.investmentSummaryQueryUseCase.execute(profileId, investmentId);
+    return this.investmentSummaryQueryUseCase.execute(profileId, investmentId);
   }
 
-  public async assignSubscriptionAgreementToInvestment(investmentId: string, subscriptionAgreementId: string) {
-    return await this.assignSubscriptionAgreementToInvestmentUseCase.execute(investmentId, subscriptionAgreementId);
+  public async startInvestment(profileId: string, investmentId: string, approveFees: boolean) {
+    return this.startInvestmentUseCase.execute(profileId, investmentId, approveFees);
   }
 
-  public async startInvestment(profileId: string, investmentId: string) {
-    return await this.startInvestmentUseCase.execute(profileId, investmentId);
+  public async abortInvestment(profileId: string, investmentId: string) {
+    return this.abortInvestmentUseCase.execute(profileId, investmentId);
+  }
+
+  public async listInvestments(profileId: string, accoutnId: string, pagination: Pagination) {
+    return this.listInvestmentsUseCase.execute(profileId, accoutnId, pagination);
   }
 }

@@ -39,6 +39,8 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - name: "Install dependencies"
         run: yarn install
+      - name: "Install dependencies for pdf generator"
+        run: cd devops/functions/pdfGenerator && yarn install
       - name: "Run unit tests"
         run: yarn tdd
       - name: "Deploy functions and migrate db"
@@ -60,6 +62,7 @@ jobs:
           VERTALO_CLIENT_SECRET: ${{ secrets[format('{0}_VERTALO_CLIENT_SECRET', env.SHARED_ENVIRONMENT)] }}
           SNS_ORIGINATION_NUMBER: ${{ secrets.SNS_ORIGINATION_NUMBER }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          CHROMIUM_ENDPOINT: ${{ secrets.CHROMIUM_ENDPOINT }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:functions"

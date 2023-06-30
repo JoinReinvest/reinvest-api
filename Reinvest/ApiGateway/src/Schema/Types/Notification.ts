@@ -26,6 +26,7 @@ const schema = `
     enum NotificationObjectType {
         INVESTMENT
         DIVIDEND
+        ACCOUNT
     }
 
     type NotificationObject {
@@ -34,7 +35,7 @@ const schema = `
     }
 
     type NotificationsStats {
-        accountId: String!
+        accountId: ID!
         unreadCount: Int!
         totalCount: Int!
     }
@@ -58,23 +59,23 @@ const schema = `
 
     type Query {
         """
-        [MOCK] Get all notifications for the given account id
+        Get all notifications for the given account id
         It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
         """
-        getNotifications(accountId: String!, filter: NotificationFilter = ALL, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
+        getNotifications(accountId: ID!, filter: NotificationFilter = ALL, pagination: Pagination = {page: 0, perPage: 10}): [Notification]!
 
         """
-        [MOCK] Get all notifications for the given account id
-        It sort notifications by date descending. Not dismissible (pinned) notifications are always first.
+        Provides info about the number of unread/total notifications for the given account id
+        It allows to retrieve notifications directly in the same query
         """
-        getNotificationStats(accountId: String!): NotificationsStats!
+        getNotificationStats(accountId: ID!): NotificationsStats!
     }
 
     type Mutation {
         """
-        [MOCK] Mark notification as read
+        Mark notification as read
         """
-        markNotificationAsRead(notificationId: String!): Boolean!
+        markNotificationAsRead(notificationId: ID!): Boolean!
     }
 
 `;
@@ -163,10 +164,9 @@ export const Notification = {
         }
 
         const api = modules.getApi<Notifications.ApiType>(Notifications);
-        const listOfNotifications = notificationsMock(accountId, false);
         const notifications = await api.getNotifications(profileId, accountId, filter, pagination);
 
-        return [...notifications, ...listOfNotifications];
+        return [...notifications];
       },
       getNotificationStats: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         if (accountId.length === 0) {
@@ -176,12 +176,10 @@ export const Notification = {
         const api = modules.getApi<Notifications.ApiType>(Notifications);
         const { unreadCount, totalCount } = await api.getNotificationsStats(profileId, accountId);
 
-        const listOfNotifications = notificationsMock(accountId, false);
-
         return {
           accountId,
-          unreadCount: unreadCount + listOfNotifications.length,
-          totalCount: totalCount + listOfNotifications.length,
+          unreadCount: unreadCount,
+          totalCount: totalCount,
         };
       },
     },

@@ -1,18 +1,15 @@
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
-import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 
 class StartInvestment {
   private readonly investmentsRepository: InvestmentsRepository;
-  private readonly subscriptionAgreementRepository: SubscriptionAgreementRepository;
 
-  constructor(investmentsRepository: InvestmentsRepository, subscriptionAgreementRepository: SubscriptionAgreementRepository) {
+  constructor(investmentsRepository: InvestmentsRepository) {
     this.investmentsRepository = investmentsRepository;
-    this.subscriptionAgreementRepository = subscriptionAgreementRepository;
   }
 
   static getClassName = (): string => 'StartInvestment';
 
-  async execute(profileId: string, investmentId: string) {
+  async execute(profileId: string, investmentId: string, approveFees: boolean) {
     const investment = await this.investmentsRepository.get(investmentId);
 
     if (!investment) {
@@ -23,23 +20,25 @@ class StartInvestment {
       return true;
     }
 
+    if (approveFees) {
+      investment.approveFee();
+    }
+
     const subscriptionAgreementId = investment.getSubscriptionAgreementId();
 
     if (!subscriptionAgreementId) {
       return false;
     }
 
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreement(profileId, subscriptionAgreementId);
+    const isStarted = investment.startInvestment();
 
-    if (!subscriptionAgreement?.isSigned()) {
+    if (!isStarted) {
       return false;
     }
 
-    investment.startInvestment();
+    const isCorrectlyUpdated = await this.investmentsRepository.updateInvestment(investment, approveFees);
 
-    const isStarted = await this.investmentsRepository.startInvestment(investment);
-
-    return isStarted;
+    return isCorrectlyUpdated;
   }
 }
 

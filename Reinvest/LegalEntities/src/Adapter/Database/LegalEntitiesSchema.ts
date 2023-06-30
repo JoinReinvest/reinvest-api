@@ -1,5 +1,6 @@
 import { JSONObjectOf } from 'HKEKTypes/Generics';
 import { Insertable } from 'kysely';
+import { BannedType } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
 import { BeneficiaryName } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
 import { AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
 
@@ -17,6 +18,20 @@ export interface LegalEntitiesProfile {
   ssn: string | null;
   ssnObject: string | null;
   statements: string | null;
+}
+
+export interface LegalEntitiesBannedList {
+  id: string;
+  accountId: string | null;
+  anonymizedSensitiveNumber: string;
+  dateCancelled: Date | null;
+  dateCreated: Date;
+  profileId: string;
+  reasons: string;
+  sensitiveNumber: string;
+  stakeholderId: string | null;
+  status: 'ACTIVE' | 'CANCELLED';
+  type: BannedType;
 }
 
 export interface LegalEntitiesDraftAccount {
@@ -49,6 +64,7 @@ export interface LegalEntitiesCompanyAccount {
   ein: string | null;
   einHash: string;
   industry: string | null;
+  initialsValue: number;
   numberOfEmployees: string | null;
   profileId: string;
   stakeholders: string | null;

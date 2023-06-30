@@ -1,0 +1,45 @@
+@startuml
+
+actor "User" as U
+participant "API" as A
+database "DB" as DB
+participant "Admin API" as AdA
+actor "Admin" as Ad
+
+U -> A: Simulate withdrawals
+DB -> A: investor_dividends(AWAITING_ACTIONS)
+DB -> A: investments(IN_GRACE_PERIOD)
+DB -> A: shares(SETTLED)
+U -> A: Create request
+A -> DB: funds_requests(DRAFT)
+U -> A: Create withdrawal agreement
+A -> DB: funds_requests_agreements(AWAITING_SIGNING)
+U -> A: Sign withdrawal agreement
+A -> DB: funds_requests_agreements(SIGNED)
+A -> DB: funds_requests(agreementId)
+U -> A: Send withdrawal request
+A -> DB: funds_requests(REQUESTED)
+
+opt Abort request (before admin decision)
+    U -> A: Abort request
+    A -> DB: funds_requests(ABORTED)
+end
+
+Ad -> AdA: List funds requests
+DB -> AdA: funds_requests(REQUESTED)
+
+opt Admin approval
+    Ad -> AdA: Approve request
+    AdA -> DB: funds_requests(ACCEPTED)
+    AdA -> DB: sad_shares(REVOKED)
+    AdA -> DB: sad_financial_operations(WITHDRAWAL)
+    AdA -> DB: sad_investor_dividends(WITHDRAWN)
+end
+
+opt Admin rejection
+    Ad -> AdA: Reject request
+    AdA -> DB: funds_requests(REJECTED)
+end
+
+
+@enduml

@@ -1,6 +1,9 @@
+import { JSONObjectOf } from 'HKEKTypes/Generics';
+import { BanList } from 'Identity/Port/Api/BanController';
 import { Insertable } from 'kysely';
 
 export interface IdentityUser {
+  bannedIdsJson: JSONObjectOf<BanList>;
   cognitoUserId: string;
   createdAt: string;
   email: string;

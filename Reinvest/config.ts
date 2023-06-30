@@ -2,6 +2,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
+export const CHROMIUM_ENDPOINT = process.env.CHROMIUM_ENDPOINT ?? 'https://reinvest-chromium-upload-bucket.s3.amazonaws.com/chromium-v114.0.0-pack.tar';
+
 export const NORTH_CAPITAL_CONFIG = {
   CLIENT_ID: process.env.NORTH_CAPITAL_CLIENT_ID as string,
   DEVELOPER_API_KEY: process.env.NORTH_CAPITAL_DEVELOPER_API_KEY as string,
@@ -46,7 +48,11 @@ export const SQS_CONFIG = {
   queueUrl: process.env.SQS_QUEUE_URL as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',
 };
-
+export const PDF_GENERATOR_SQS_CONFIG = {
+  region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+  queueUrl: process.env.SQS_PDF_GENERATOR_URL as string,
+  isLocal: process.env.IT_IS_LOCAL === 'true',
+};
 export const LAMBDA_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',

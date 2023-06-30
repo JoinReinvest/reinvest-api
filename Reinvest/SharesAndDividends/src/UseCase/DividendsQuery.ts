@@ -1,23 +1,7 @@
 import dayjs from 'dayjs';
 import { Money } from 'Money/Money';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
-
-export enum DividendState {
-  PENDING = 'PENDING',
-  PAID_OUT = 'PAID_OUT',
-  REINVESTED = 'REINVESTED',
-  PAYING_OUT = 'PAYING_OUT',
-}
-
-export type DividendDetails = {
-  amount: {
-    formatted: string;
-    value: number;
-  };
-  date: string;
-  id: string;
-  status: DividendState;
-};
+import { DividendDetails, DividendState } from 'SharesAndDividends/Domain/types';
 
 export class DividendsQuery {
   private dividendsRepository: DividendsRepository;
@@ -40,7 +24,7 @@ export class DividendsQuery {
 
     let dividendStatus = DividendState.PENDING;
 
-    if (['WITHDRAWN', 'ZEROED'].includes(status)) {
+    if (['WITHDRAWN', 'ZEROED', 'FEES_NOT_COVERED', 'FEES_MOVED_TO_NEXT_DIVIDEND'].includes(status)) {
       dividendStatus = DividendState.PAID_OUT;
     } else if (status === 'WITHDRAWING') {
       dividendStatus = DividendState.PAYING_OUT;

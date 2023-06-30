@@ -26,8 +26,8 @@ const schema = `
 
     type VerificationObject {
         type: VerificationObjectType!
-        accountId: String
-        stakeholderId: String
+        accountId: ID
+        stakeholderId: ID
     }
 
     type VerificationAction {
@@ -67,7 +67,7 @@ const schema = `
         * 'BAN_PROFILE': it means that profile must be banned and all accounts are blocked
         * 'REQUIRE_MANUAL_REVIEW' or 'REQUIRE_ADMIN_SUPPORT': just information, no action on frontend is required ('canUserContinueTheInvestment' should be set to 'true')
         """
-        verifyAccount(accountId: String): VerificationDecision
+        verifyAccount(accountId: ID!): VerificationDecision
 
         """
         It updates profile for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
@@ -79,12 +79,12 @@ const schema = `
         """
         It updates stakeholder for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
         """
-        updateStakeholderForVerification(accountId: String, stakeholderId: String, input: UpdateStakeholderForVerificationInput!): Boolean
+        updateStakeholderForVerification(accountId: ID!, stakeholderId: ID!, input: UpdateStakeholderForVerificationInput!): Boolean
 
         """
         It updates company for verification. Provide only fields that were changed by the investor, but all required to meet the schema definition.
         """
-        updateCompanyForVerification(accountId: String, input: UpdateCompanyForVerificationInput!): Boolean
+        updateCompanyForVerification(accountId: ID!, input: UpdateCompanyForVerificationInput!): Boolean
     }
 `;
 
@@ -114,9 +114,10 @@ export const VerificationSchema = {
         }: {
           accountId: string;
         },
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
         const api = modules.getApi<Verification.ApiType>(Verification);
 
         return api.verifyAccount(profileId, parentAccountId);
@@ -144,6 +145,7 @@ export const VerificationSchema = {
         }
 
         const status = await registrationApi.synchronizeProfile(profileId);
+        await registrationApi.resynchronizeIndividualAccount(profileId);
 
         return await verificationApi.notifyAboutUpdate(profileId);
       },
@@ -194,7 +196,7 @@ export const VerificationSchema = {
           throw new JsonGraphQLError(errors);
         }
 
-        const status = await registrationApi.synchronizeCompany(profileId, accountId);
+        await registrationApi.resynchronizeCompanyAccount(profileId, accountId);
 
         return await verificationApi.notifyAboutUpdate(accountId);
       },

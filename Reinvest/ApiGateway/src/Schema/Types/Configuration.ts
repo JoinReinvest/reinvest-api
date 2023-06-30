@@ -14,14 +14,14 @@ const schema = `
 
     type Query {
         """
-        [MOCK] Return account configuration
+        Return account configuration
         """
         getAccountConfiguration(accountId: ID!): AccountConfiguration
     }
 
     type Mutation {
         """
-        [MOCK] Set automatic dividend reinvestment agreement
+        Set automatic dividend reinvestment agreement
         """
         setAutomaticDividendReinvestmentAgreement(accountId: ID!, automaticDividendReinvestmentAgreement: Boolean!): Boolean!
     }
@@ -55,8 +55,9 @@ export const Configuration = {
       setAutomaticDividendReinvestmentAgreement: async (
         parent: any,
         { accountId, automaticDividendReinvestmentAgreement }: SetAutomaticDividendReinvestmentAgreement,
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
         const status = await investmentAccountsApi.createConfiguration(profileId, accountId, automaticDividendReinvestmentAgreement);
 

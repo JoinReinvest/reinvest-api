@@ -11,10 +11,12 @@ import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
 import {
+  CHROMIUM_ENDPOINT,
   COGNITO_CONFIG,
   DATABASE_CONFIG,
   EMAIL_DOMAIN,
   NORTH_CAPITAL_CONFIG,
+  PDF_GENERATOR_SQS_CONFIG,
   S3_CONFIG,
   SENTRY_CONFIG,
   SNS_CONFIG,
@@ -29,6 +31,7 @@ import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 import { Trading } from 'Trading/index';
 import { Verification } from 'Verification/index';
+import { Withdrawals } from 'Withdrawals/index';
 
 console = logger(SENTRY_CONFIG);
 
@@ -40,6 +43,7 @@ export function boot(): Modules {
   const snsConfig = SNS_CONFIG as SNSConfig;
   const cognitoConfig = COGNITO_CONFIG as CognitoConfig;
   const queueConfig = SQS_CONFIG as QueueConfig;
+  const pdfGeneratorQueue = PDF_GENERATOR_SQS_CONFIG as QueueConfig;
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
 
@@ -56,6 +60,7 @@ export function boot(): Modules {
     Documents.create({
       database: databaseConfig,
       s3: s3Config,
+      chromiumEndpoint: CHROMIUM_ENDPOINT,
     } as Documents.Config),
   );
 
@@ -113,6 +118,7 @@ export function boot(): Modules {
       } as LegalEntities.Config,
       {
         documents: modules.get(Documents.moduleName) as Documents.Main,
+        identity: modules.get(Identity.moduleName) as Identity.Main,
         investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main,
       },
     ),
@@ -154,9 +160,11 @@ export function boot(): Modules {
       {
         database: databaseConfig,
         queue: queueConfig,
+        pdfGeneratorQueue,
       } as Investments.Config,
       {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+        documents: modules.get(Documents.moduleName) as Documents.Main,
       },
     ),
   );
@@ -174,6 +182,22 @@ export function boot(): Modules {
         registration: modules.get(Registration.moduleName) as Registration.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
         portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        verification: modules.get(Verification.moduleName) as Verification.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    Withdrawals.moduleName,
+    Withdrawals.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as Withdrawals.Config,
+      {
+        documents: modules.get(Documents.moduleName) as Documents.Main,
+        sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+        registration: modules.get(Registration.moduleName) as Registration.Main,
       },
     ),
   );

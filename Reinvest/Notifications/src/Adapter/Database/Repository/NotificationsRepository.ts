@@ -20,11 +20,20 @@ export class NotificationsRepository {
       .provide()
       .insertInto(notificationsTable)
       .values(values)
-      .onConflict(oc => oc.column('uniqueId').doNothing())
+      .onConflict(oc =>
+        oc.column('uniqueId').doUpdateSet({
+          isRead: false,
+          dateRead: null,
+        }),
+      )
       .execute();
   }
 
   async setReadToTrue(profileId: string, dismissIds: string[]) {
+    if (dismissIds.length === 0) {
+      return;
+    }
+
     await this.databaseAdapterProvider
       .provide()
       .updateTable(notificationsTable)
@@ -119,7 +128,6 @@ export class NotificationsRepository {
     }
 
     return query
-      .orderBy('isDismissible', 'desc')
       .orderBy('dateCreated', 'desc')
       .limit(pagination.perPage)
       .offset(pagination.perPage * pagination.page);

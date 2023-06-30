@@ -1,7 +1,7 @@
 import Container, { ContainerInterface } from 'Container/Container';
 import { Documents } from 'Documents/index';
+import { Identity } from 'Identity/index';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
-import { InvestmentAccountDbProvider, investmentAccountsDatabaseProviderName } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
 import { LegalEntitiesDatabaseAdapterInstanceProvider, LegalEntitiesDatabaseAdapterProvider } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { LegalEntitiesApi, LegalEntitiesApiType } from 'LegalEntities/Port/Api/LegalEntitiesApi';
 import { LegalEntitiesTechnicalHandler, LegalEntitiesTechnicalHandlerType } from 'LegalEntities/Port/Events/LegalEntitiesTechnicalHandler';
@@ -23,6 +23,7 @@ export namespace LegalEntities {
 
   export type ModulesDependencies = {
     documents: Documents.Main;
+    identity: Identity.Main;
     investmentAccounts: InvestmentAccounts.Main;
   };
 
@@ -48,6 +49,7 @@ export namespace LegalEntities {
 
       this.container.addAsValue('Documents', this.modules.documents);
       this.container.addAsValue('InvestmentAccounts', this.modules.investmentAccounts);
+      this.container.addAsValue('Identity', this.modules.identity);
 
       new AdapterServiceProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);

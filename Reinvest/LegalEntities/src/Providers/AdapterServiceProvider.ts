@@ -13,18 +13,27 @@ import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/Pro
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
 import { InvestmentAccountsService } from 'LegalEntities/Adapter/Modules/InvestmentAccountsService';
 import { LegalEntities } from 'LegalEntities/index';
+import { UpdateCompany } from 'LegalEntities/Service/UpdateCompany';
 import { CompleteDraftAccount } from 'LegalEntities/UseCases/CompleteDraftAccount';
 import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
+import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
+import { UpdateIndividualAccount } from 'LegalEntities/UseCases/UpdateIndividualAccount';
+import { UpdateProfile } from 'LegalEntities/UseCases/UpdateProfile';
 import { UpdateProfileForVerification } from 'LegalEntities/UseCases/UpdateProfileForVerification';
 import { UpdateStakeholderForVerification } from 'LegalEntities/UseCases/UpdateStakeholderForVerification';
+import { UpdateTrustAccount } from 'LegalEntities/UseCases/UpdateTrustAccount';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { Ban } from 'LegalEntities/UseCases/Ban';
+import { BanRepository } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
+import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 
 export class AdapterServiceProvider {
   private config: LegalEntities.Config;
@@ -42,7 +51,10 @@ export class AdapterServiceProvider {
 
     container.addSingleton(IdGenerator);
 
-    container.addSingleton(DocumentsService, ['Documents']).addSingleton(InvestmentAccountsService, ['InvestmentAccounts']);
+    container
+      .addSingleton(DocumentsService, ['Documents'])
+      .addSingleton(InvestmentAccountsService, ['InvestmentAccounts'])
+      .addSingleton(IdentityService, ['Identity']);
 
     // database
     container
@@ -50,6 +62,7 @@ export class AdapterServiceProvider {
       .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(BanRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(BeneficiaryRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addObjectFactory(
         'LegalEntitiesTransactionalAdapter',
@@ -59,7 +72,13 @@ export class AdapterServiceProvider {
 
     // use cases
     container
+      .addSingleton(UpdateCompany, [AccountRepository])
       .addSingleton(CompleteProfile, [ProfileRepository])
+      .addSingleton(UpdateProfile, [ProfileRepository])
+      .addSingleton(UpdateIndividualAccount, [AccountRepository])
+      .addSingleton(UpdateCorporateAccount, [AccountRepository, UpdateCompany])
+      .addSingleton(UpdateTrustAccount, [AccountRepository, UpdateCompany])
+      .addSingleton(UpdateBeneficiaryAccount, [BeneficiaryRepository])
       .addSingleton(CreateDraftAccount, [DraftAccountRepository])
       .addSingleton(CompleteDraftAccount, [DraftAccountRepository, IdGenerator, AccountRepository])
       .addSingleton(RemoveDraftAccount, [DraftAccountRepository])
@@ -72,6 +91,7 @@ export class AdapterServiceProvider {
       ])
       .addSingleton(UpdateProfileForVerification, [ProfileRepository])
       .addSingleton(UpdateCompanyForVerification, [AccountRepository])
-      .addSingleton(UpdateStakeholderForVerification, [AccountRepository]);
+      .addSingleton(UpdateStakeholderForVerification, [AccountRepository])
+      .addSingleton(Ban, [AccountRepository, ProfileRepository, BanRepository, IdentityService]);
   }
 }

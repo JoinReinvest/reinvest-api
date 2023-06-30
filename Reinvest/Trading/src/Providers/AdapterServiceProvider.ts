@@ -10,6 +10,7 @@ import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingServ
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { Trading } from 'Trading/index';
+import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
 
 export class AdapterServiceProvider {
   private config: Trading.Config;
@@ -31,8 +32,10 @@ export class AdapterServiceProvider {
       .addSingleton(ReinvestmentRepository, [TradingDatabaseAdapterInstanceProvider]);
 
     // modules
-    container.addSingleton(VendorsMappingService, ['Registration', 'Portfolio']).addSingleton(TradingDocumentService, ['Documents']);
-
+    container
+      .addSingleton(VendorsMappingService, ['Registration', 'Portfolio'])
+      .addSingleton(TradingDocumentService, ['Documents'])
+      .addSingleton(VerificationService, ['Verification']);
     // north capital
     container.addAsValue('NorthCapitalConfig', this.config.northCapital).addSingleton(TradingNorthCapitalAdapter, ['NorthCapitalConfig']);
 

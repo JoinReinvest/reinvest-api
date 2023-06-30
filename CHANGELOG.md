@@ -1,5 +1,186 @@
 # REINVEST API CHANGELOG
 
+## 1.17.1 - 06/23/2023
+
+* No MOCKS anymore:
+    * Queries:
+        * `getFundsWithdrawalRequest`
+        * `getFundsWithdrawalAgreement`
+        * `listInvestments`
+    * Mutations:
+        * `createFundsWithdrawalRequest`
+        * `createFundsWithdrawalAgreement`
+        * `signFundsWithdrawalAgreement`
+        * `requestFundsWithdrawal`
+        * `abortFundsWithdrawalRequest`
+    * To see the flow for withdrawals read Changelog#1.12.3
+*
+
+## 1.17.0 - 06/22/2023
+
+* Rejected verification can ban the profile or an account
+* All queries and mutations return "Profile is banned" error for banned profiles
+* All mutations related to the account return "Account is banned" error for banned accounts
+* `getAccountOverview` query returns `isBanned` field
+* When profile/company/stakeholder requires "UpdateForVerification" action, then sends `VERIFICATION_FAILED`
+  notification.
+    * System awaits for the `verifyAccount` process to be finished (the same as for creating investment, but triggered
+      from the notification).
+* When adding/updating stakeholders to the corporate/trust account, the system checks if the stakeholder is not banned (
+  by SSN).
+
+## 1.16.6 - 06/16/2023
+
+* No MOCK anymore:
+    * `withdrawDividend` - it allows to withdraw dividends from the account
+        * notifications for dividends are automatically set as read after withdrawing and reinvesting dividends
+
+## 1.16.4 - 06/16/2023
+
+* No MOCK anymore:
+    * `simulateFundsWithdrawal` it returns information about the funds withdrawals without creating actual request.
+    * `listDividends`
+
+## 1.16.3 - 06/16/2023
+
+* No MOCKS anymore:
+    * For profile update
+        * `updateEmailAddress`
+* Changes:
+    * Avatar for company account returns f.e. C1, C2, T1
+
+## 1.16.2 - 06/15/2023
+
+* No MOCKS anymore:
+    * For account update
+        * `updateCorporateAccount`
+        * `updateTrustAccount`
+        * `updateBeneficiaryAccount`
+    * For investment
+        * `approveFees`
+
+## 1.16.1 - 06/14/2023
+
+* New MOCK query:
+    * `getPortfolioDetails` - returns all information about properties in the portfolio
+* [TESTS] endpoints:
+    * `POST /north-capital/get-trade`
+        * with body, investmentId: string
+        * tt returns trade information from North Capital and from REINVEST db.
+    * `POST /north-capital/update-trade-state`
+        * with body, investmentId: string, tradeState: SETTLED | FUNDED
+        * it updates trade status in North Capital
+        * run `push-transaction` endpoint after that, to update investment status in REINVEST db
+    * `POST /sync/push-transaction` with body, investmentId: string
+        * it pushes transaction process further after changing status in North Capital
+    * `POST /user/create-and-login` - it also adds user to the `Executives` group
+    * `POST /north-capital/set-bank-account` - it allows to set bank account details in the replacement of doing the
+      Plaid flow
+    * `POST /calculate/next-dividends-batch` - it pushes dividends calculation after dividends declaration (as a
+      replacement of cron)
+    * `POST /calculate/distribute-dividends` - it pushes dividends distribution after dividends calculation (as a
+      replacement of cron)
+* No MOCKS anymore:
+    * `updateIndividualAccount` query
+    * `updateProfile` query
+* `deactivateBankAccount` mock mutation was removed
+* `listBeneficiaries` mock query was removed
+
+## 1.16 - 06/13/2023
+
+* **!BREAKING CHANGE! - everywhere "id" was represented by `string` type in the API, has changed to `ID` type!**
+* New MOCKS:
+    * Queries:
+        * `getAccountActivity` - list account activities. The list of potential activities is listed in
+          the `AccountActivity`
+          enum
+        * `listBeneficiaries`
+        * `listInvestments` - List of all investments history
+        * `listDividends` - List of all dividends history
+    * Mutations:
+        * `updateProfile`
+        * `updateIndividualAccount`
+        * `updateCorporateAccount`
+        * `updateTrustAccount`
+        * `updateBeneficiaryAccount`
+        * `archiveBeneficiaryAccount`
+        * `updateEmailAddress`
+        * `cancelInvestment` - it cancels investment process, but only if the investment HAS BEEN started already and
+          the Grace Period has not ended yet
+        * `getFundsWithdrawalAgreement` - it returns funds withdrawal agreement in the same template format as for
+          subscription agreement
+        * `signFundsWithdrawalAgreement` - it signs funds withdrawal agreement
+* API Changes:
+    * `readBankAccount` query returns new field: `bankAccountStatus` - it returns the status of the bank account (
+      active/inactive/draft)
+    * `getInvestmentSummary` query returns also `BankAccount` type information
+    * `positionTotal` field was removed
+      from `AccountOverview`, `IndividualAccount`, `CorporateAccount`, `TrustAccount`
+      types. Right now this field is present only in `AccountStats` type as `accountValue`
+        * Queries/Mutations:  `getTemplate`, `signDocumentFromTemplate` were removed from the API
+    * Updating type names:
+        * `SubscriptionAgreementStatus` -> `AgreementStatus`
+        * `SubscriptionAgreementParagraph` -> `AgreementParagraph`
+        * `SubscriptionAgreementSection` -> `AgreementSection`
+    * Updating MOCKS for `FundsWithdrawalAgreement`
+        * After consulting with Transfer Agent, the API will return the same template as for subscription agreement for
+          funds withdrawal agreement
+        * the investor does not have to download/print/sign/upload anything.
+        * **The process of signing funds withdrawal agreement is the same as for subscription agreement**
+        * See changes in the API for
+          mutations: `createFundsWithdrawalAgreement`, `signFundsWithdrawalAgreement`, `requestFundsWithdrawal`
+* No MOCKS anymore:
+    * `abortInvestment` - it aborts investment process, but only if the investment HAS NOT BEEN started yet
+    * `deactivateRecurringInvestment` - it deactivates (soft delete) recurring investment
+    * `unsuspendRecurringInvestment`  - it activates recurring investment if went to SUSPENDED state (because of failed
+      transactions)
+
+* Backend changes:
+    * Added dividends implementation
+        * [ADMIN] Added dividend declaration process
+        * [CRON] Dividends calculation
+        * [ADMIN] Added dividend distribution process
+        * [CRON]  Distribute dividends to investors and send notifications
+    * After signing subscription agreement, the PDF file is actually generated and stored in S3
+
+## 1.15  05/26/2023 - 06/19/2023
+
+* No MOCKS anymore:
+    * For account settings
+        * `getAccountConfiguration`
+        * `setAutomaticDividendReinvestmentAgreement`
+    * For investment process
+        * `signSubscriptionAgreement`
+        * `startInvestment`
+    * For recurring investment process
+        * `getScheduleSimulation`
+        * `createRecurringInvestment`
+        * `createRecurringSubscriptionAgreement`
+        * `signRecurringInvestmentSubscriptionAgreement`
+        * `initiateRecurringInvestment`
+        * `getActiveRecurringInvestment`
+        * `getDraftRecurringInvestment`
+    * For account stats
+        * `getAccountStats`
+        * `getEVSChart`
+        * `getNotifications`
+        * `markNotificationAsRead`
+    * For dividends
+        * `reinvestDividend`
+
+* New Queries:
+    * `getNotificationStats` - provides info about the number of unread/total notifications for the given account id
+        * it allows to retrieve notifications directly in the same query
+
+* ADMIN:
+    * new mutation for Executives: `giveIncentiveRewardByHand` that allow to give the user incentive reward by hand
+
+* Changes:
+    * Notifications with `isDismissible` = `false` are not dismissible anymore. They are always first in the list.
+        * notification is dismissed automatically after some time or after some action
+    * Dividends reinvestment actually triggers shares transfer from REINVEST to investor in Vertalo (sandbox)
+    * Investing for beneficiaries works the same as for regular account
+
 ## 1.14 - 05/24/2023
 
 * add `bankName` filed in `readBankAccount` query
@@ -35,6 +216,8 @@
         * Mark payment as completed in Vertalo
         * Transfer shares from REINVEST to investor in Vertalo
     * FinishInvestment: [MOCK] Finish investment
+    * [FOR TESTS PURPOSE] Next states of process are triggered by changes the state of trade in North Capital
+        * trade CREATED -> FUNDED -> SETTLED
 
 ## 1.13 - 05/17/2023
 
@@ -195,7 +378,8 @@
       Client must sign the agreement and call signSubscriptionAgreement mutation.
     * `signSubscriptionAgreement` - It signs the subscription agreement.
     * `approveFees` - Approves the fees for the specific investment.
-      In case if extra fee is required for recurring investment and the investment was started automatically by the
+      In case if extra totalFeeAmount is required for recurring investment and the investment was started automatically
+      by the
       system, then
       use this method to approve the fees (it will ask for that on verification step triggered from the notification).
     * `startInvestment` - It starts the investment.

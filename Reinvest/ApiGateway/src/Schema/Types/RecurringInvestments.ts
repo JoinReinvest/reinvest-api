@@ -1,5 +1,5 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
-import { subscriptionAgreementIdMock, USDInput } from 'ApiGateway/Schema/Types/Investments';
+import { USDInput } from 'ApiGateway/Schema/Types/Investments';
 import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
 import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { LegalEntities } from 'Reinvest/LegalEntities/src';
@@ -44,62 +44,57 @@ const schema = `
 
     type Query {
         """
-        [MOCK] It returns the current recurring investment summary.
+        It returns the current recurring investment summary.
         """
         getActiveRecurringInvestment(accountId: ID!): RecurringInvestment
 
         """
-        [MOCK] It returns the created draft recurring investment summary.
+        It returns the created draft recurring investment summary.
         """
         getDraftRecurringInvestment(accountId: ID!): RecurringInvestment
 
         """
-        [MOCK] Returns the simulation of the recurring investment schedule.
+        Returns the simulation of the recurring investment schedule.
         """
         getScheduleSimulation(schedule: RecurringInvestmentScheduleInput!): [ISODate!]!
     }
 
     type Mutation {
         """
-        [MOCK] It creates new investment and returns its ID.
+        It creates new investment and returns its ID.
         It requires bank account to be linked to the account.
         In other case it throws an error.
         """
         createRecurringInvestment(accountId: ID!, amount: USDInput!, schedule: RecurringInvestmentScheduleInput!): RecurringInvestment!
 
         """
-        [MOCK] It creates new subscription agreement for the specific recurring investment
+        It creates new subscription agreement for the specific recurring investment
         It returns the content of the agreement that must be rendered on the client side.
         Client must sign the agreement and call signRecurringInvestmentSubscriptionAgreement mutation.
         """
         createRecurringSubscriptionAgreement(accountId: ID!): SubscriptionAgreement!
 
         """
-        [MOCK] It signs the recurring investment subscription agreement.
+        It signs the recurring investment subscription agreement.
         """
         signRecurringInvestmentSubscriptionAgreement(accountId: ID!): Boolean!
 
         """
-        [MOCK] It STARTS the recurring investment, CANCEL previous recurring investment if exists and schedule the first investment.
+        It STARTS the recurring investment, CANCEL previous recurring investment if exists and schedule the first investment.
         """
         initiateRecurringInvestment(accountId: ID!): Boolean!
+
+        """
+        It DEACTIVATE the recurring investment.
+        """
+        deactivateRecurringInvestment(accountId: ID!): Boolean!
+
+        """
+        It UNSUSPEND the recurring investment.
+        """
+        unsuspendRecurringInvestment(accountId: ID!): Boolean!
     }
 `;
-const recurringInvestmentIdMock = '89e94d4c-f237-4f10-aa05-be8ade28123';
-const recurringInvestmentMock = (status: string) => ({
-  id: recurringInvestmentIdMock,
-  schedule: {
-    startDate: '2023-06-01',
-    frequency: 'MONTHLY',
-  },
-  nextInvestmentDate: '2023-06-01',
-  amount: {
-    value: '1000.00',
-    formatted: '$1,000.00',
-  },
-  subscriptionAgreementId: subscriptionAgreementIdMock,
-  status,
-});
 
 export type Schedule = {
   frequency: RecurringInvestmentFrequency;
@@ -128,7 +123,7 @@ export const RecurringInvestments = {
     Query: {
       getActiveRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-
+        // TODO protect it with profileId!
         const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.ACTIVE);
 
         if (!recurringInvestment) {
@@ -138,6 +133,7 @@ export const RecurringInvestments = {
         return recurringInvestment;
       },
       getDraftRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        // TODO protect it with profileId!
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
@@ -161,20 +157,14 @@ export const RecurringInvestments = {
       createRecurringInvestment: async (
         parent: any,
         { accountId, amount, schedule }: CreateRecurringInvestmentInput,
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const individualAccountId = accountId; // await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules); TODO no need for now - remember to add parent id on beneficiary when implementing cron job
-
-        const alreadyExistedRecurringInvestmentDraft = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-
-        if (alreadyExistedRecurringInvestmentDraft) {
-          await investmentAccountsApi.deleteRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
-        }
-
         const { portfolioId } = await portfolioApi.getActivePortfolio();
-        const status = await investmentAccountsApi.createRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+
+        const status = await investmentAccountsApi.createDraftRecurringInvestment(portfolioId, profileId, accountId, amount, schedule);
 
         if (!status) {
           throw new JsonGraphQLError('COULDNT_CREATE_RECURRING_INVESTMENT');
@@ -184,7 +174,8 @@ export const RecurringInvestments = {
 
         return recurringInvestment;
       },
-      createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const subscriptionAgreementId = await investmentAccountsApi.createRecurringSubscriptionAgreement(profileId, accountId);
@@ -197,41 +188,41 @@ export const RecurringInvestments = {
 
         return subscriptionAgreement;
       },
-      signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, clientIp }: SessionContext) => {
+      signRecurringInvestmentSubscriptionAgreement: async (
+        parent: any,
+        { accountId }: any,
+        { profileId, modules, clientIp, throwIfBanned }: SessionContext,
+      ) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+        const isSigned = await investmentAccountsApi.signRecurringSubscriptionAgreement(profileId, accountId, clientIp);
 
-        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-
-        if (!recurringInvestment) {
-          return false;
+        if (!isSigned) {
+          throw new JsonGraphQLError('CANNOT_SIGN_RECURRING_SUBSCRIPTION_AGREEMENT');
         }
 
-        const subscriptionAgreementId = await investmentAccountsApi.signSubscriptionAgreement(profileId, recurringInvestment.id, clientIp);
-
-        if (!subscriptionAgreementId) {
-          throw new JsonGraphQLError('CANNOT_FIND_INVESTMENT_RELATED_TO_SUBSCRIPTION_AGREEMENT');
-        }
-
-        const isAssigned = await investmentAccountsApi.assignSubscriptionAgreementToRecurringInvestment(accountId, subscriptionAgreementId);
-
-        return isAssigned;
+        return isSigned;
       },
-      initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-
-        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-
-        if (!recurringInvestment) {
-          throw new JsonGraphQLError('NO_INVESTMENT_TO_INITIATE');
-        }
-
-        await investmentAccountsApi.deactivateRecurringInvestment(accountId);
 
         const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
 
-        if (!status) {
-          return false;
-        }
+        return status;
+      },
+      deactivateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.deactivateRecurringInvestment(accountId);
+
+        return status;
+      },
+      unsuspendRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        const status = await investmentAccountsApi.unsuspendRecurringInvestment(accountId);
 
         return status;
       },

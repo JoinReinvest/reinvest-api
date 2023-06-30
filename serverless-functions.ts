@@ -2,10 +2,19 @@ import type { AWS } from '@serverless/typescript';
 
 import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 import { ApiLambdaFunction, ApiLambdaResources } from './devops/functions/api/api-config';
-import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cronDocumentSync/cron-document-sync-config';
-import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cronVendorsSync/cron-vendors-sync-config';
+import {
+  CronDividendsCalculationFunction,
+  CronDividendsCalculationResources,
+} from './devops/functions/cron/dividendsCalculation/cron-dividends-calculation-config';
+import {
+  CronDividendsDistributionFunction,
+  CronDividendsDistributionResources,
+} from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
+import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
+import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
+import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/pdfGenerator/queue-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
 import { cognitoPreSignUpFunction, CognitoPreSignUpResources } from './devops/functions/preSignUp/preSignUp-config';
 import { QueueFunction, QueueResources } from './devops/functions/queue/queue-config';
@@ -13,7 +22,7 @@ import { TestsFunction, TestsLambdaResources } from './devops/functions/tests/te
 import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } from './devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config';
 import { CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs, CognitoEnvs } from './devops/serverless/cognito';
 import { margeWithApiGatewayUrl, ProviderEnvironment } from './devops/serverless/serverless-common';
-import { getAttribute, getResourceName, importOutput } from './devops/serverless/utils';
+import { getAttribute, importOutput } from './devops/serverless/utils';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
@@ -35,6 +44,7 @@ const serverlessConfiguration: AWS = {
       S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
       LocalCognitoClientId: { Ref: 'LocalCognito' },
       SQS_QUEUE_URL: getAttribute('SQSNotification', 'QueueUrl'),
+      SQS_PDF_GENERATOR_URL: getAttribute('SQSPdfGenerator', 'QueueUrl'),
       EMAIL_SEND_FROM: '${env:EMAIL_SEND_FROM}',
       EMAIL_REPLY_TO: '${env:EMAIL_REPLY_TO}',
       WEB_APP_URL: '${env:WEB_APP_URL}',
@@ -51,6 +61,7 @@ const serverlessConfiguration: AWS = {
       VERTALO_CLIENT_SECRET: '${env:VERTALO_CLIENT_SECRET}',
       SNS_ORIGINATION_NUMBER: '${env:SNS_ORIGINATION_NUMBER}',
       SENTRY_DSN: '${env:SENTRY_DSN}',
+      CHROMIUM_ENDPOINT: '${env:CHROMIUM_ENDPOINT}',
     },
     apiGateway: {
       minimumCompressionSize: 1024,
@@ -76,9 +87,12 @@ const serverlessConfiguration: AWS = {
     queue: QueueFunction,
     cronDocumentsSync: CronDocumentSyncFunction,
     cronVendorsSync: CronVendorsSyncFunction,
+    cronDividendsCalculation: CronDividendsCalculationFunction,
+    cronDividendsDistribution: CronDividendsDistributionFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
+    pdfGenerator: PdfGeneratorFunction,
   },
   resources: {
     Description: 'REINVEST ${sls:stage} API functions',
@@ -95,6 +109,9 @@ const serverlessConfiguration: AWS = {
       ...TestsLambdaResources,
       ...CronDocumentSyncResources,
       ...CronVendorsSyncResources,
+      ...CronDividendsCalculationResources,
+      ...CronDividendsDistributionResources,
+      ...PdfGeneratorResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,
