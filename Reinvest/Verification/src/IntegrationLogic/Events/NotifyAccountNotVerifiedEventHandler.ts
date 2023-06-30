@@ -36,6 +36,10 @@ export class NotifyAccountNotVerifiedEventHandler implements EventHandler<Domain
         onObjectId: accountId,
         onObjectType: 'ACCOUNT',
         uniqueId: uniqueId,
+        pushNotification: {
+          title: 'Verification failed [COPY-TO-UPDATE]',
+          body: 'Update your account information to continue investing.',
+        },
       },
       id: event.id,
     };

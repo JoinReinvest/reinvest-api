@@ -45,12 +45,11 @@ export const StoredEvents = <StoredEventsType>{
         origin,
         investmentId,
       }),
-      name: ({ amount, tradeId }) => {
-        const castedAmount = parseInt(amount);
-        const formattedAmount = Money.lowPrecision(castedAmount).getFormattedAmount();
-
-        return `Trade ${tradeId} started with amount ${formattedAmount}`;
-      },
+      name: investmentStartedBody,
+    },
+    push: {
+      title: () => 'Investment started',
+      body: investmentStartedBody,
     },
   },
   PaymentInitiated: {
@@ -72,8 +71,19 @@ export const StoredEvents = <StoredEventsType>{
         onObjectType: NotificationObjectType.INVESTMENT,
       }),
     },
+    push: {
+      title: ({ tradeId }) => `Payment initiated for trade ${tradeId}`,
+      body: paymentInitiatedBody,
+    },
   },
 };
+
+function investmentStartedBody({ amount, tradeId }: DictionaryType): string {
+  const castedAmount = parseInt(amount);
+  const formattedAmount = Money.lowPrecision(castedAmount).getFormattedAmount();
+
+  return `Trade ${tradeId} started with amount ${formattedAmount}`;
+}
 
 function paymentInitiatedBody({ amount, tradeId, fee }: DictionaryType): string {
   const castedAmount = parseInt(amount);

@@ -77,7 +77,7 @@ const schema = `
         markNotificationAsRead(notificationId: ID!): Boolean!
 
         """
-        [MOCK] Register device for Firebase push notifications
+        Register device for Firebase push notifications
         """
         registerPushNotificationDevice(deviceId: String!): Boolean!
     }
@@ -121,8 +121,13 @@ export const Notification = {
       },
       registerPushNotificationDevice: async (parent: any, { deviceId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Notifications.ApiType>(Notifications);
+        const deviceIdTrimmed = deviceId.trim();
 
-        return true;
+        if (!deviceIdTrimmed) {
+          return false;
+        }
+
+        return api.registerPushNotificationDevice(profileId, deviceIdTrimmed);
       },
     },
   },

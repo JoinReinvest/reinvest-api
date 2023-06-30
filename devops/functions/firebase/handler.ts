@@ -6,9 +6,7 @@ export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;
 
   try {
-    const {
-      data: { token, title, body },
-    } = JSON.parse(record.body);
+    const { token, title, body } = JSON.parse(record.body);
 
     admin.initializeApp({
       credential: admin.credential.cert(<admin.ServiceAccount>JSON.parse(FIREBASE_SERVICE_ACCOUNT_JSON)),

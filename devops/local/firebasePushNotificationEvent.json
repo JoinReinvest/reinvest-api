@@ -3,7 +3,7 @@
     {
       "messageId": "MessageID_1",
       "receiptHandle": "MessageReceiptHandle",
-      "body": "{\"data\": { \"title\": \"This is REINVEST PN Test\", \"body\": \"Push notification test\", \"token\": \"cTV4fa65E0D4mGm6_UVv5V:APA91bF2VNplYRNpTPts66bG64fSzMOPxolO5QI8nYing6imkWFVsMLa8dMfVyQEyI54Nw988M5KJZHo4rVAxKgevjOGV-Ft03U7eyFgqpN9c-qxFfAhAHnbR0n64lqzw9Pj3GHScQPc\"}}",
+      "body": "{ \"title\": \"This is REINVEST PN Test\", \"body\": \"Push notification test\", \"token\": \"cTV4fa65E0D4mGm6_UVv5V:APA91bF2VNplYRNpTPts66bG64fSzMOPxolO5QI8nYing6imkWFVsMLa8dMfVyQEyI54Nw988M5KJZHo4rVAxKgevjOGV-Ft03U7eyFgqpN9c-qxFfAhAHnbR0n64lqzw9Pj3GHScQPc\"}",
       "md5OfBody": "fce0ea8dd236ccb3ed9b37dae260836f",
       "md5OfMessageAttributes": "582c92c5c5b6ac403040a4f3ab3115c9",
       "eventSourceARN": "arn:aws:sqs:us-west-2:123456789012:SQSQueue",

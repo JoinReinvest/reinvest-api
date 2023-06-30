@@ -1,4 +1,4 @@
-import { JSONObject } from 'HKEKTypes/Generics';
+import { JSONObject, UUID } from 'HKEKTypes/Generics';
 
 export interface NotificationsTable {
   accountId: string | null;
@@ -38,4 +38,11 @@ export interface AccountActivitiesTable {
   dataJson: JSONObject | null;
   hash: string;
   profileId: string;
+}
+
+export interface RegisteredPushDevicesTable {
+  dateUpdated: Date;
+  deviceId: string;
+  id: UUID;
+  profileId: UUID;
 }

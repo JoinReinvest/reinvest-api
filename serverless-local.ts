@@ -48,6 +48,7 @@ const serverlessConfiguration: AWS = {
       ApiUrl: 'http://localhost:3000/api',
       SQS_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-notification',
       SQS_PDF_GENERATOR_URL: 'http://localhost:9324/000000000000/development-sqs-pdf-generator',
+      SQS_FIREBASE_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-firebase',
       IT_IS_LOCAL: 'true',
     },
     logs: {
@@ -139,6 +140,7 @@ const serverlessConfiguration: AWS = {
     'serverless-offline': {
       useChildProcesses: true,
       noPrependStageInUrl: true,
+      disableScheduledEvents: true,
     },
     // 'serverless-offline-watcher': [
     //   {

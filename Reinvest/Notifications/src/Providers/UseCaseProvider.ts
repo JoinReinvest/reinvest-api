@@ -8,6 +8,7 @@ import { Notifications } from 'Notifications/index';
 import { ProcessStoredEvent } from 'Notifications/Application/UseCase/ProcessStoredEvent';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
+import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 
 export class UseCaseProvider {
   private config: Notifications.Config;
@@ -20,6 +21,6 @@ export class UseCaseProvider {
     container.addSingleton(CreateNotification, [NotificationsRepository, IdGenerator]);
     container.addSingleton(DismissNotifications, [NotificationsRepository]);
     container.addSingleton(NotificationQuery, [NotificationsRepository]);
-    container.addSingleton(ProcessStoredEvent, [StoredEventRepository, AccountActivitiesRepository, CreateNotification]);
+    container.addSingleton(ProcessStoredEvent, [StoredEventRepository, AccountActivitiesRepository, CreateNotification, PushNotificationRepository]);
   }
 }

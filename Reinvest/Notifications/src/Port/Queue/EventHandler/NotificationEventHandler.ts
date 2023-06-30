@@ -1,6 +1,8 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
+import { NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
 import { NotificationObjectType, NotificationsType } from 'Notifications/Domain/Notification';
 import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
@@ -24,6 +26,10 @@ export type CreateNotificationCommand = DomainEvent & {
     onObjectType: NotificationObjectType | null;
     profileId: UUID;
     uniqueId: UUID | null;
+    pushNotification?: {
+      body: string;
+      title: string;
+    };
   };
   kind: 'CreateNotification';
 };
@@ -31,10 +37,19 @@ export type CreateNotificationCommand = DomainEvent & {
 export class NotificationEventHandler implements EventHandler<DomainEvent> {
   private createNotificationUseCase: CreateNotification;
   private dismissNotificationsUseCase: DismissNotifications;
+  private pushNotificationRepository: PushNotificationRepository;
+  private notificationQuery: NotificationQuery;
 
-  constructor(createNotificationUseCase: CreateNotification, dismissNotificationsUseCase: DismissNotifications) {
+  constructor(
+    createNotificationUseCase: CreateNotification,
+    dismissNotificationsUseCase: DismissNotifications,
+    pushNotificationRepository: PushNotificationRepository,
+    notificationQuery: NotificationQuery,
+  ) {
     this.createNotificationUseCase = createNotificationUseCase;
     this.dismissNotificationsUseCase = dismissNotificationsUseCase;
+    this.pushNotificationRepository = pushNotificationRepository;
+    this.notificationQuery = notificationQuery;
   }
 
   static getClassName = (): string => 'NotificationEventHandler';
@@ -51,11 +66,13 @@ export class NotificationEventHandler implements EventHandler<DomainEvent> {
 
   private async createNotification(event: CreateNotificationCommand): Promise<void> {
     try {
-      const { notificationType, accountId, body, dismissId, header, onObjectId, onObjectType, profileId, uniqueId } = event.data;
+      const { notificationType, accountId, body, dismissId, header, onObjectId, onObjectType, profileId, uniqueId, pushNotification } = event.data;
 
       if (!Object.keys(NotificationsType).includes(notificationType)) {
         throw new Error(`Invalid notification type: ${notificationType}`);
       }
+
+      const doesNotificationAlreadyStored = uniqueId ? await this.notificationQuery.doesNotificationExists(uniqueId) : false;
 
       await this.createNotificationUseCase.execute({
         accountId,
@@ -68,6 +85,10 @@ export class NotificationEventHandler implements EventHandler<DomainEvent> {
         profileId,
         uniqueId,
       });
+
+      if (pushNotification && !doesNotificationAlreadyStored) {
+        await this.pushNotificationRepository.pushNotification(profileId, pushNotification.title, pushNotification.body);
+      }
     } catch (error: any) {
       console.error('[NotificationEventHandler] createNotification', error);
     }

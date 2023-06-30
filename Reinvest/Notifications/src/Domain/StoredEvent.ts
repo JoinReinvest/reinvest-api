@@ -79,10 +79,6 @@ export class StoredEvent {
     return !!this.storedEventConfiguration.push && this.storedEventSchema.datePushed === null;
   }
 
-  getEventDate(): DateTime {
-    return this.storedEventSchema.dateCreated;
-  }
-
   getAccountActivity(): {
     accountId: UUID | null;
     data: JSONObject;
@@ -104,6 +100,10 @@ export class StoredEvent {
 
   markAccountActivityAsProcessed() {
     this.storedEventSchema.dateAccountActivity = DateTime.now();
+  }
+
+  markPushAsProcessed() {
+    this.storedEventSchema.datePushed = DateTime.now();
   }
 
   markInAppAsProcessed() {
@@ -141,5 +141,23 @@ export class StoredEvent {
 
   getId(): UUID {
     return this.storedEventSchema.id;
+  }
+
+  getPushNotification(): {
+    body: string;
+    profileId: UUID;
+    title: string;
+  } {
+    const pushNotificationConfiguration = this.storedEventConfiguration.push;
+
+    if (!pushNotificationConfiguration) {
+      throw new Error(`Push notification configuration not found for type: ${this.storedEventSchema.kind}`);
+    }
+
+    return {
+      body: pushNotificationConfiguration.body(this.storedEventSchema.payload),
+      profileId: this.storedEventSchema.profileId,
+      title: pushNotificationConfiguration.title(this.storedEventSchema.payload),
+    };
   }
 }

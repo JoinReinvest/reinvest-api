@@ -48,6 +48,7 @@ const serverlessConfiguration: AWS = {
       LocalCognitoClientId: { Ref: 'LocalCognito' },
       SQS_QUEUE_URL: getAttribute('SQSNotification', 'QueueUrl'),
       SQS_PDF_GENERATOR_URL: getAttribute('SQSPdfGenerator', 'QueueUrl'),
+      SQS_FIREBASE_QUEUE_URL: getAttribute('SQSFirebase', 'QueueUrl'),
       EMAIL_SEND_FROM: '${env:EMAIL_SEND_FROM}',
       EMAIL_REPLY_TO: '${env:EMAIL_REPLY_TO}',
       WEB_APP_URL: '${env:WEB_APP_URL}',
@@ -68,6 +69,7 @@ const serverlessConfiguration: AWS = {
       DEALPATH_API_URL: '${env:DEALPATH_API_URL}',
       DEALPATH_AUTHORIZATION_TOKEN: '${env:DEALPATH_AUTHORIZATION_TOKEN}',
       DEALPATH_VERSION_HEADER: '${env:DEALPATH_VERSION_HEADER}',
+      FIREBASE_SERVICE_ACCOUNT_JSON: '${env:FIREBASE_SERVICE_ACCOUNT_JSON}',
     },
     apiGateway: {
       minimumCompressionSize: 1024,
