@@ -3,18 +3,15 @@ import admin from 'firebase-admin';
 
 import { firebaseServiceAccount } from './accountService';
 
+admin.initializeApp({
+  credential: admin.credential.cert(firebaseServiceAccount),
+});
+
 export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;
 
   try {
     const { token, title, body } = JSON.parse(record.body);
-
-    admin.initializeApp(
-      {
-        credential: admin.credential.cert(firebaseServiceAccount),
-      },
-      'firebase-handler',
-    );
 
     const message = {
       token,
