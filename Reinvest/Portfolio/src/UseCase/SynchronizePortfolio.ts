@@ -24,6 +24,7 @@ class SynchronizePortfolio {
       const propertyWithGivenId = await this.portfolioRepository.getById(property.getId());
 
       if (propertyWithGivenId) {
+        property.setAdminJson(propertyWithGivenId.getAdminJson());
         await this.portfolioRepository.updateProperty(property);
       } else {
         await this.portfolioRepository.createProperty(property);

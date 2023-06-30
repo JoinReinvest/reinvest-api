@@ -173,4 +173,8 @@ export class Property {
       },
     };
   }
+
+  getAdminJson(): PropertyAdminData {
+    return this.adminJson;
+  }
 }
