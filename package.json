@@ -28,6 +28,7 @@
     "development:logs:api": "sls logs -s development -f api -t  --config serverless-functions.ts",
     "development:logs:queue": "sls logs -s development -f queue -t  --config serverless-functions.ts",
     "development:logs:pdf": "sls logs -s development -f pdfGenerator -t  --config serverless-functions.ts",
+    "development:logs:firebase": "sls logs -s development -f firebase -t  --config serverless-functions.ts",
     "development:logs:tests": "sls logs -s development -f tests -t  --config serverless-functions.ts",
     "integrations:deploy:saas": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-saas.ts",
     "integrations:deploy:functions": "NODE_ENV=integrations serverless deploy -s integrations --config serverless-functions.ts",
