@@ -1,6 +1,7 @@
 import { SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
 import admin from 'firebase-admin';
-import { FIREBASE_SERVICE_ACCOUNT_JSON } from 'Reinvest/config';
+
+import { firebaseServiceAccount } from './accountService';
 
 export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;
@@ -9,7 +10,7 @@ export const main: SQSHandler = async (event: SQSEvent) => {
     const { token, title, body } = JSON.parse(record.body);
 
     admin.initializeApp({
-      credential: admin.credential.cert(<admin.ServiceAccount>JSON.parse(FIREBASE_SERVICE_ACCOUNT_JSON)),
+      credential: admin.credential.cert(firebaseServiceAccount),
     });
 
     const message = {

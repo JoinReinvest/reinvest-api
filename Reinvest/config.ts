@@ -80,4 +80,4 @@ export const SENTRY_CONFIG = {
 
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
 
-export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;
+// export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;
