@@ -88,6 +88,7 @@ export class AdapterServiceProvider {
         AccountRepository,
         'LegalEntitiesTransactionalAdapter',
         ProfileRepository,
+        SimpleEventBus,
       ])
       .addSingleton(UpdateProfileForVerification, [ProfileRepository])
       .addSingleton(UpdateCompanyForVerification, [AccountRepository])

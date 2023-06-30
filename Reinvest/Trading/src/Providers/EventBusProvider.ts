@@ -1,5 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { Trading } from 'Trading/index';
 import { CancelTrade, CancelTradeEvent } from 'Trading/IntegrationLogic/UseCase/CancelTrade';
@@ -35,6 +35,7 @@ export default class EventBusProvider {
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+      STORE_EVENT_COMMAND,
       'TradeCreated',
       'InvestmentFunded',
       'InvestmentApproved',

@@ -1,5 +1,27 @@
 import { ContainerInterface } from 'Container/Container';
+import { DateTime } from 'Money/DateTime';
 import { DomainEvent } from 'SimpleAggregator/Types';
+
+export const STORE_EVENT_COMMAND = 'StoreEventCommand';
+
+export type StoreEventCommand = DomainEvent & {
+  data: {
+    date: string;
+    kind: string;
+    payload: any;
+  };
+  kind: 'StoreEventCommand';
+};
+
+export const storeEventCommand = (profileId: string, kind: string, payload: any = {}): StoreEventCommand => ({
+  id: profileId,
+  data: {
+    date: DateTime.now().toIsoDateTime(),
+    kind,
+    payload,
+  },
+  kind: 'StoreEventCommand',
+});
 
 export interface EventHandler<Event extends DomainEvent> {
   handle(event: Event): Promise<void>;

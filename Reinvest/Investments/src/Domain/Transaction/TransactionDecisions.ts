@@ -42,6 +42,7 @@ export type CreateTradeDecision = TransactionDecision & {
     parentId: string;
     portfolioId: string;
     subscriptionAgreementId: string;
+    userTradeId: string;
   };
   kind: TransactionDecisions.CREATE_TRADE;
 };

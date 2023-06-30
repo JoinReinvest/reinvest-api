@@ -1,5 +1,5 @@
 import { SessionContext } from 'ApiGateway/index';
-import dayjs from 'dayjs';
+import { Notifications } from 'Notifications/index';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 
 const schema = `
@@ -38,9 +38,16 @@ const schema = `
         advisorFees: String!
     }
 
+    type AccountActivityData {
+        origin: String
+        tradeId: String
+    }
+
     type AccountActivity {
         activityName: String!
         date: ISODate!
+        """Only some activities can have extra data. For most of them there is no extra data"""
+        data: AccountActivityData
     }
 
     type Query {
@@ -55,34 +62,7 @@ const schema = `
         getAccountStats(accountId: ID!): AccountStats
 
         """
-        [MOCK] Get account activities
-        Activities Types:
-        - PROFILE_CREATED
-        - INDIVIDUAL/CORPORATE/TRUST/BENEFICIARY_ACCOUNT_CREATED
-        - INDIVIDUAL/CORPORATE/TRUST/BENEFICIARY_ACCOUNT_UPDATED
-        - INVESTMENT_CREATED
-        - INVESTMENT_FAILED
-        - INVESTMENT_CANCELED
-        - INVESTMENT_FINISHED
-        - FUNDS_WITHDRAWAL_CREATED
-        - FUNDS_WITHDREW
-        - BENEFICIARY_ACCOUNT_ARCHIVED
-        - SHARES_ISSUED
-        - DIVIDEND_RECEIVED
-        - REFERRAL_REWARD_RECEIVED
-        - EMAIL_UPDATED
-        - DIVIDEND_REINVESTED
-        - DIVIDEND_WITHDREW
-        - ACCOUNT_BANNED
-        - PROFILE_BANNED
-        - ACCOUNT_UNBANNED
-        - PROFILE_UNBANNED
-        - RECURRING_INVESTMENT_CREATED
-        - RECURRING_INVESTMENT_SUSPENDED
-        - RECURRING_INVESTMENT_ARCHIVED
-        - VERIFICATION_FAILED
-
-        DB: Type, uniqueKey, contentFields, dateCreated, profileId, accountId (can be null)
+        Get account activities
         """
         getAccountActivity(accountId: ID!, pagination: Pagination = {page: 0, perPage: 10}): [AccountActivity]!
     }
@@ -98,24 +78,9 @@ export const AccountStats = {
         return api.getAccountStats(profileId, accountId);
       },
       getAccountActivity: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
-        if (pagination?.page > 1) {
-          return [];
-        }
+        const api = modules.getApi<Notifications.ApiType>(Notifications);
 
-        return [
-          {
-            activityName: 'User email updated to t****@test.com',
-            date: dayjs().subtract(2, 'day').format('YYYY-MM-DD'),
-          },
-          {
-            activityName: '$400 invested',
-            date: dayjs().subtract(23, 'day').format('YYYY-MM-DD'),
-          },
-          {
-            activityName: '$22.45 dividend received',
-            date: dayjs().subtract(16, 'day').format('YYYY-MM-DD'),
-          },
-        ];
+        return api.listAccountActivities(profileId, accountId, pagination);
       },
       getEVSChart: async (parent: any, { accountId, resolution }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);

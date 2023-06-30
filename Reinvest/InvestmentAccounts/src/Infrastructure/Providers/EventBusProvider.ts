@@ -2,7 +2,7 @@ import { ContainerInterface } from 'Container/Container';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { ProfileQueryEventHandler } from 'InvestmentAccounts/Infrastructure/Events/EventHandlers';
 import { ProfileQuery } from 'InvestmentAccounts/Infrastructure/Storage/Queries/ProfileQuery';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
@@ -19,6 +19,7 @@ export default class EventBusProvider {
     // eventBus
     //     .subscribe('ProfileSnapshotChanged', ProfileQueryEventHandler.getClassName())
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+      STORE_EVENT_COMMAND,
       'IndividualAccountOpened',
       'CorporateAccountOpened',
       'TrustAccountOpened',

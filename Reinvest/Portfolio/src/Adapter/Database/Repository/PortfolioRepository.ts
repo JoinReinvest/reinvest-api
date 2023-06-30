@@ -35,7 +35,7 @@ export class PortfolioRepository {
     } catch (error: any) {
       console.error(error);
 
-      return false;
+      return null;
     }
   }
 

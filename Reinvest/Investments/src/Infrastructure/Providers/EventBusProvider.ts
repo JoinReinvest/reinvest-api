@@ -18,7 +18,7 @@ import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repo
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import { GeneratePdfEventHandler } from 'Investments/Infrastructure/Events/GeneratePdfEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
@@ -66,6 +66,7 @@ export default class EventBusProvider {
       .subscribe(TransactionCommands.FinalizeInvestment, FinalizeInvestmentEventHandler.getClassName())
       .subscribe(TransactionCommands.CheckIsGracePeriodEnded, CheckIsGracePeriodEndedEventHandler.getClassName())
       .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+        STORE_EVENT_COMMAND,
         TransactionCommands.VerifyAccountForInvestment,
         TransactionCommands.CreateTrade,
         TransactionCommands.CheckIsInvestmentFunded,

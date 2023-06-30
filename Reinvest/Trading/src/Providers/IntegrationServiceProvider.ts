@@ -24,7 +24,14 @@ export class IntegrationServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(CreateTrade, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter, VendorsMappingService, TradingDocumentService]);
+    container.addSingleton(CreateTrade, [
+      TradesRepository,
+      TradingNorthCapitalAdapter,
+      TradingVertaloAdapter,
+      VendorsMappingService,
+      TradingDocumentService,
+      SimpleEventBus,
+    ]);
     container.addSingleton(CheckIsTradeFunded, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter]);
     container.addSingleton(CheckIsTradeApproved, [TradesRepository, TradingNorthCapitalAdapter, SimpleEventBus, VerificationService]);
     container.addSingleton(MarkFundsAsReadyToDisburse, [TradesRepository, TradingNorthCapitalAdapter]);

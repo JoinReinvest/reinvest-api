@@ -11,6 +11,7 @@ import {
   CronDividendsDistributionResources,
 } from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
+import { CronNotificationsFunction, CronNotificationsResources } from './devops/functions/cron/notifications/cron-notifications-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
@@ -93,6 +94,7 @@ const serverlessConfiguration: AWS = {
     cronVendorsSync: CronVendorsSyncFunction,
     cronDividendsCalculation: CronDividendsCalculationFunction,
     cronDividendsDistribution: CronDividendsDistributionFunction,
+    cronNotificationsFunction: CronNotificationsFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
@@ -116,6 +118,7 @@ const serverlessConfiguration: AWS = {
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
       ...PdfGeneratorResources,
+      ...CronNotificationsResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,
