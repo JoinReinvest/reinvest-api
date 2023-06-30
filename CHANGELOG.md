@@ -1,6 +1,49 @@
 # REINVEST API CHANGELOG
 
-## 1.16.6 - 06/16/2023
+## 1.17.3 - 06/29/2023
+
+* No MOCKS anymore:
+    * `getPortfolioDetails`
+    * `getAccountActivity`
+
+## 1.17.2 - 06/26/2023
+
+* No MOCKS anymore:
+    * `cancelInvestment` - cancel investment after the investment has been started and the grace period has not ended
+      yet
+* New MOCK mutation:
+    * `registerPushNotificationDevice` - Register device for Firebase push notifications
+
+## 1.17.1 - 06/23/2023
+
+* No MOCKS anymore:
+    * Queries:
+        * `getFundsWithdrawalRequest`
+        * `getFundsWithdrawalAgreement`
+        * `listInvestments`
+    * Mutations:
+        * `createFundsWithdrawalRequest`
+        * `createFundsWithdrawalAgreement`
+        * `signFundsWithdrawalAgreement`
+        * `requestFundsWithdrawal`
+        * `abortFundsWithdrawalRequest`
+    * To see the flow for withdrawals read Changelog#1.12.3
+*
+
+## 1.17.0 - 06/22/2023
+
+* Rejected verification can ban the profile or an account
+* All queries and mutations return "Profile is banned" error for banned profiles
+* All mutations related to the account return "Account is banned" error for banned accounts
+* `getAccountOverview` query returns `isBanned` field
+* When profile/company/stakeholder requires "UpdateForVerification" action, then sends `VERIFICATION_FAILED`
+  notification.
+    * System awaits for the `verifyAccount` process to be finished (the same as for creating investment, but triggered
+      from the notification).
+* When adding/updating stakeholders to the corporate/trust account, the system checks if the stakeholder is not banned (
+  by SSN).
+
+## 1.16.5 - 06/16/2023
 
 * No MOCK anymore:
     * `withdrawDividend` - it allows to withdraw dividends from the account

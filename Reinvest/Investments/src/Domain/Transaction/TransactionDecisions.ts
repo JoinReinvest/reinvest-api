@@ -9,6 +9,8 @@ export enum TransactionDecisions {
   MARK_FUNDS_AS_READY_TO_DISBURSE = 'MARK_FUNDS_AS_READY_TO_DISBURSE',
   TRANSFER_SHARES_WHEN_TRADE_SETTLED = 'TRANSFER_SHARES_WHEN_TRADE_SETTLED',
   FINISH_INVESTMENT = 'FINISH_INVESTMENT',
+  CANCEL_TRANSACTION = 'CANCEL_TRANSACTION',
+  DO_NOTHING = 'DO_NOTHING',
 }
 
 export type TransactionDecision = {
@@ -40,6 +42,7 @@ export type CreateTradeDecision = TransactionDecision & {
     parentId: string;
     portfolioId: string;
     subscriptionAgreementId: string;
+    userTradeId: string;
   };
   kind: TransactionDecisions.CREATE_TRADE;
 };
@@ -62,4 +65,8 @@ export type MarkFundsAsReadyToDisburseDecision = TransactionDecision & {
 
 export type TransferSharesWhenTradeSettledDecision = TransactionDecision & {
   kind: TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED;
+};
+
+export type CancelTransactionDecision = TransactionDecision & {
+  kind: TransactionDecisions.CANCEL_TRANSACTION;
 };

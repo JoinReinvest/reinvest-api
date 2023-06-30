@@ -160,6 +160,10 @@ export class CompleteDraftAccount {
                 throw new ValidationError(ValidationErrorEnum.NOT_UNIQUE, 'ein');
               }
 
+              if (await this.accountRepository.isSensitiveNumberBanned(ein.getHash())) {
+                throw new ValidationError(ValidationErrorEnum.EIN_BANNED, 'ein');
+              }
+
               draft.setEIN(ein);
               break;
             case 'annualRevenue':
@@ -207,7 +211,7 @@ export class CompleteDraftAccount {
               });
               break;
             case 'stakeholders':
-              const stakeholdersEvents = this.addStakeholder(draft, data, profileId);
+              const stakeholdersEvents = await this.addStakeholder(draft, data, profileId);
               events = [...events, ...stakeholdersEvents];
               break;
             case 'removeStakeholders':
@@ -266,20 +270,24 @@ export class CompleteDraftAccount {
     return draft;
   }
 
-  private addStakeholder(account: CompanyDraftAccount, data: StakeholderInput[], profileId: string): DomainEvent[] {
+  private async addStakeholder(account: CompanyDraftAccount, data: StakeholderInput[], profileId: string): Promise<DomainEvent[]> {
     let events: DomainEvent[] = [];
 
     const stakeholderData = StakeholderToAccount.getStakeholderDataToAddToAccount(account, data, profileId);
 
-    stakeholderData.map(({ isNewStakeholder, stakeholderSchema }) => {
-      const stakeholderEvents = isNewStakeholder
-        ? account.addStakeholder(Stakeholder.create(stakeholderSchema))
-        : account.updateStakeholder(Stakeholder.create(stakeholderSchema));
+    for (const { isNewStakeholder, stakeholderSchema } of stakeholderData) {
+      const stakeholder = Stakeholder.create(stakeholderSchema);
+
+      if (await this.accountRepository.isSensitiveNumberBanned(stakeholder.getSSN().getHash())) {
+        throw new ValidationError(ValidationErrorEnum.SSN_BANNED, 'ssn', stakeholder.getSSN().getAnonymized());
+      }
+
+      const stakeholderEvents = isNewStakeholder ? account.addStakeholder(stakeholder) : account.updateStakeholder(stakeholder);
 
       if (stakeholderEvents) {
         events = [...events, ...stakeholderEvents];
       }
-    });
+    }
 
     return events;
   }

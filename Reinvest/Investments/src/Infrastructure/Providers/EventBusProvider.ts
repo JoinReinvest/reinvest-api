@@ -16,10 +16,10 @@ import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
-import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
-import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { GeneratePdfEventHandler } from 'Investments/Infrastructure/Events/GeneratePdfEventHandler';
+import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
+import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
+import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -50,6 +50,10 @@ export default class EventBusProvider {
         TransactionEvents.GRACE_PERIOD_ENDED,
         TransactionEvents.MARKED_AS_READY_TO_DISBURSE,
         TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
+        TransactionEvents.INVESTMENT_CANCELED,
+        TransactionEvents.TRANSACTION_CANCELED,
+        TransactionEvents.TRANSACTION_CANCELED_UNWINDING,
+        TransactionEvents.TRANSACTION_CANCELED_FAILED,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [
@@ -62,6 +66,7 @@ export default class EventBusProvider {
       .subscribe(TransactionCommands.FinalizeInvestment, FinalizeInvestmentEventHandler.getClassName())
       .subscribe(TransactionCommands.CheckIsGracePeriodEnded, CheckIsGracePeriodEndedEventHandler.getClassName())
       .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+        STORE_EVENT_COMMAND,
         TransactionCommands.VerifyAccountForInvestment,
         TransactionCommands.CreateTrade,
         TransactionCommands.CheckIsInvestmentFunded,
@@ -69,6 +74,7 @@ export default class EventBusProvider {
         TransactionCommands.MarkFundsAsReadyToDisburse,
         TransactionCommands.TransferSharesWhenTradeSettled,
         ReinvestmentCommands.TransferSharesForReinvestment,
+        TransactionCommands.CancelTransaction,
       ])
       .subscribe('GeneratePdfCommand', GeneratePdfEventHandler.getClassName());
   }

@@ -2,6 +2,7 @@ import { Updateable } from 'kysely';
 import { tradesTable, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { TradesTable } from 'Trading/Adapter/Database/TradingSchema';
 import {
+  CancelTradeState,
   DisbursementState,
   FundsMoveState,
   NorthCapitalTradeState,
@@ -51,6 +52,7 @@ export class TradesRepository {
         'disbursementJson',
         'tradeId',
         'vertaloPaymentJson',
+        'cancelTradeJson',
       ])
       .where('investmentId', '=', investmentId)
       .executeTakeFirst();
@@ -79,6 +81,7 @@ export class TradesRepository {
         disbursementJson: null,
         tradeId: null,
         vertaloPaymentJson: null,
+        cancelTradeJson: null,
       })
       .execute();
 
@@ -110,6 +113,7 @@ export class TradesRepository {
       disbursementState: trade.disbursementJson as unknown as DisbursementState,
       sharesTransferState: trade.sharesTransferJson as unknown as SharesTransferState,
       vertaloPaymentState: trade.vertaloPaymentJson as unknown as VertaloPaymentState,
+      cancelTradeState: trade.cancelTradeJson as unknown as CancelTradeState,
     };
   }
 
@@ -117,6 +121,7 @@ export class TradesRepository {
     return {
       tradeId: schema.tradeId,
       tradeConfigurationJson: schema.tradeConfiguration,
+      // @ts-ignore
       vendorsConfigurationJson: schema.vendorsConfiguration,
       fundsMoveStateJson: schema.fundsMoveState,
       northCapitalTradeStateJson: schema.northCapitalTradeState,
@@ -128,6 +133,8 @@ export class TradesRepository {
       sharesTransferJson: schema.sharesTransferState,
       // @ts-ignore
       vertaloPaymentJson: schema.vertaloPaymentState,
+      // @ts-ignore
+      cancelTradeJson: schema.cancelTradeState,
     };
   }
 }

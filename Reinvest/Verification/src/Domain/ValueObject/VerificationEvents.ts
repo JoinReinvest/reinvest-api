@@ -14,6 +14,9 @@ export enum VerificationEvents {
   VERIFICATION_PROFILE_UNBANNED_ADMINISTRATIVE = 'VerificationProfileUnbannedAdministrativeEvent',
   VERIFICATION_ACCOUNT_UNBANNED_ADMINISTRATIVE = 'VerificationAccountUnbannedAdministrativeEvent',
   VERIFICATION_CLEANED_ADMINISTRATIVE = 'VerificationCleanedAdministrativeEvent',
+  PRINCIPAL_APPROVED = 'PrincipalApprovedEvent',
+  PRINCIPAL_DISAPPROVED = 'PrincipalDisapprovedEvent',
+  PRINCIPAL_NEED_MORE_INFO = 'PrincipalNeedMoreInfoEvent',
   VERIFICATION_REQUESTED_OBJECT_UPDATED = 'VerificationRequestedObjectUpdatedEvent',
   VERIFICATION_USER_OBJECT_UPDATED = 'VerificationUserObjectUpdatedEvent',
   VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED = 'VerificationNorthCapitalRequestFailedEvent',
@@ -31,6 +34,10 @@ export type AutomaticVerificationResultEvent = VerificationEvent & {
   reasons: string[];
   source: 'DIRECT' | 'EVENT';
   status: VerificationStatus;
+};
+
+export type PrincipalVerificationEvent = VerificationEvent & {
+  kind: VerificationEvents.PRINCIPAL_APPROVED | VerificationEvents.PRINCIPAL_DISAPPROVED | VerificationEvents.PRINCIPAL_NEED_MORE_INFO;
 };
 
 export type ManualVerificationResultEvent = VerificationEvent & {

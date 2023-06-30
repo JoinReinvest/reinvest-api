@@ -12,6 +12,9 @@ import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 import { MarkFundsAsReadyToDisburse } from 'Trading/IntegrationLogic/UseCase/MarkFundsAsReadyToDisburse';
 import { TransferSharesForReinvestment } from 'Trading/IntegrationLogic/UseCase/TransferSharesForReinvestment';
 import { TransferSharesWhenTradeSettled } from 'Trading/IntegrationLogic/UseCase/TransferSharesWhenTradeSettled';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
+import { CancelTrade } from 'Trading/IntegrationLogic/UseCase/CancelTrade';
 
 export class IntegrationServiceProvider {
   private config: Trading.Config;
@@ -21,11 +24,19 @@ export class IntegrationServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(CreateTrade, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter, VendorsMappingService, TradingDocumentService]);
+    container.addSingleton(CreateTrade, [
+      TradesRepository,
+      TradingNorthCapitalAdapter,
+      TradingVertaloAdapter,
+      VendorsMappingService,
+      TradingDocumentService,
+      SimpleEventBus,
+    ]);
     container.addSingleton(CheckIsTradeFunded, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter]);
-    container.addSingleton(CheckIsTradeApproved, [TradesRepository, TradingNorthCapitalAdapter]);
+    container.addSingleton(CheckIsTradeApproved, [TradesRepository, TradingNorthCapitalAdapter, SimpleEventBus, VerificationService]);
     container.addSingleton(MarkFundsAsReadyToDisburse, [TradesRepository, TradingNorthCapitalAdapter]);
     container.addSingleton(TransferSharesWhenTradeSettled, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter]);
     container.addSingleton(TransferSharesForReinvestment, [ReinvestmentRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter, VendorsMappingService]);
+    container.addSingleton(CancelTrade, [TradesRepository, TradingNorthCapitalAdapter, SimpleEventBus]);
   }
 }

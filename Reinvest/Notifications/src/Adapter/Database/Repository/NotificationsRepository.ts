@@ -20,7 +20,12 @@ export class NotificationsRepository {
       .provide()
       .insertInto(notificationsTable)
       .values(values)
-      .onConflict(oc => oc.column('uniqueId').doNothing())
+      .onConflict(oc =>
+        oc.column('uniqueId').doUpdateSet({
+          isRead: false,
+          dateRead: null,
+        }),
+      )
       .execute();
   }
 

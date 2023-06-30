@@ -7,5 +7,7 @@ export interface SharesServiceInterface {
 
   sharesFunded(investmentId: string): Promise<void>;
 
+  sharesRevoked(investmentId: string): Promise<void>;
+
   sharesSettled(investmentId: string): Promise<void>;
 }

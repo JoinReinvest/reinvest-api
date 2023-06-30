@@ -1,17 +1,22 @@
-import { VerifierRecord } from 'Verification/Adapter/Database/RegistrationSchema';
+import { UUID } from 'HKEKTypes/Generics';
+import { VerifierRecord } from 'Verification/Adapter/Database/VerificationSchema';
 import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
+import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { AccountStructure, IdToNCId } from 'Verification/Domain/ValueObject/AccountStructure';
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
 import { VerificationEventsList, VerificationState, Verifier, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
+import { AccountVerifier } from 'Verification/IntegrationLogic/Verifier/AccountVerifier';
 import { CompanyVerifier } from 'Verification/IntegrationLogic/Verifier/CompanyVerifier';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileVerifier';
 import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/StakeholderVerifier';
 
 export class VerifierRepository {
   private verificationAdapter: VerificationAdapter;
+  private registrationService: RegistrationService;
 
-  constructor(verificationAdapter: VerificationAdapter) {
+  constructor(verificationAdapter: VerificationAdapter, registrationService: RegistrationService) {
     this.verificationAdapter = verificationAdapter;
+    this.registrationService = registrationService;
   }
 
   static getClassName = () => 'VerifierRepository';
@@ -44,17 +49,7 @@ export class VerifierRepository {
           verifiers.push(await this.createStakeholderVerifier(stakeholder, accountStructure.account));
         }
       }
-
-      return verifiers;
     }
-
-    // verifiers.push(this.partyVerifierFactory.createCompanyVerifier(accountStructure.company));
-
-    // if (accountStructure.stakeholders) {
-    //   accountStructure.stakeholders.forEach(stakeholder => {
-    //     verifiers.push(this.partyVerifierFactory.createStakeholderVerifier(stakeholder));
-    //   });
-    // }
 
     return verifiers;
   }
@@ -130,5 +125,23 @@ export class VerifierRepository {
       default:
         return null;
     }
+  }
+
+  async getVerifiersByAccountId(
+    profileId: UUID,
+    accountId: UUID,
+  ): Promise<{
+    accountVerifier: AccountVerifier;
+    verifiers: Verifier[];
+  }> {
+    const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
+
+    const verifiers = await this.createVerifiersFromAccountStructure(accountStructure);
+    const accountVerifier = new AccountVerifier(profileId, accountId, accountStructure.type);
+
+    return {
+      verifiers,
+      accountVerifier,
+    };
   }
 }

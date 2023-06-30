@@ -1,5 +1,4 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
-import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
 import { Portfolio } from 'Portfolio/index';
 import { Investments as InvestmentsModule } from 'Reinvest/Investments/src';
@@ -17,6 +16,8 @@ const schema = `
         FUNDED
         FAILED
         FINISHED
+        CANCELED
+        ABORTED
     }
 
     type InvestmentSummary {
@@ -49,7 +50,7 @@ const schema = `
         """
         getSubscriptionAgreement(subscriptionAgreementId: ID!): SubscriptionAgreement!
         """
-        [MOCK] List of all investments history
+        List of all investments history
         """
         listInvestments(accountId: ID!, pagination: Pagination = {page: 0, perPage: 10}): [InvestmentOverview]!
     }
@@ -94,27 +95,11 @@ const schema = `
         abortInvestment(investmentId: ID!): Boolean!
 
         """
-        [MOCK] It cancels the investment that is in Funding or Funded state, but the Grace period has not been passed away yet
+        It cancels the investment that is in Funding or Funded state, but the Grace period has not been passed away yet
         """
         cancelInvestment(investmentId: ID!): Boolean!
     }
 `;
-export const subscriptionAgreementIdMock = 'e04ce44d-eb21-4691-99cc-89fd11c2bfef';
-const investmentSummaryMock = (tradeId: string, days: number) => ({
-  id: (days < 10 ? `0${days}` : days) + 'e94d4c-f237-4f10-aa05-be8ade282b' + (days < 10 ? `0${days}` : days),
-  tradeId,
-  createdAt: dayjs().subtract(days, 'day').format('YYYY-MM-DDThh:mm:ss'),
-  amount: {
-    value: '1000.00',
-    formatted: '$1,000.00',
-  },
-  status: 'IN_PROGRESS',
-  investmentFees: {
-    value: '10.00',
-    formatted: '$10.00',
-  },
-  subscriptionAgreementId: subscriptionAgreementIdMock,
-});
 
 export type USDInput = {
   value: number;
@@ -169,26 +154,22 @@ export const Investments = {
 
         return subscriptionAgreement;
       },
-      listInvestments: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      listInvestments: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-        // let investmentSummary = await investmentAccountsApi.investmentSummaryQuery(profileId, investmentId);
 
-        return [
-          investmentSummaryMock('47584', 1),
-          investmentSummaryMock('47583', 8),
-          investmentSummaryMock('47582', 15),
-          investmentSummaryMock('47581', 22),
-          investmentSummaryMock('47580', 29),
-          investmentSummaryMock('46099', 90),
-        ];
+        const list = await investmentAccountsApi.listInvestments(profileId, accountId, pagination);
+
+        return list;
       },
     },
     Mutation: {
-      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules }: SessionContext) => {
+      createInvestment: async (parent: any, { accountId, amount }: CreateInvestment, { profileId, modules, throwIfBanned }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
         const registrationApi = modules.getApi<Registration.ApiType>(Registration);
         const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(individualAccountId);
+        throwIfBanned(accountId);
 
         const bankAccountData = await registrationApi.readBankAccount(profileId, individualAccountId);
 
@@ -210,10 +191,10 @@ export const Investments = {
 
         return investmentId;
       },
-      startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules }: SessionContext) => {
+      startInvestment: async (parent: any, { investmentId, approveFees }: any, { profileId, modules, clientIp }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId, approveFees);
+        const isStartedInvestment = await investmentAccountsApi.startInvestment(profileId, investmentId, approveFees, clientIp);
 
         if (!isStartedInvestment) {
           throw new GraphQLError('CANNOT_START_INVESTMENT');
@@ -221,10 +202,10 @@ export const Investments = {
 
         return isStartedInvestment;
       },
-      approveFees: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
+      approveFees: async (parent: any, { investmentId }: any, { profileId, modules, clientIp }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const isApproved = await investmentAccountsApi.approveFees(profileId, investmentId);
+        const isApproved = await investmentAccountsApi.approveFees(profileId, investmentId, clientIp);
 
         return isApproved;
       },
@@ -260,7 +241,9 @@ export const Investments = {
         return status;
       },
       cancelInvestment: async (parent: any, { investmentId }: any, { profileId, modules }: SessionContext) => {
-        return true;
+        const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
+
+        return investmentAccountsApi.cancelInvestment(profileId, investmentId);
       },
     },
   },

@@ -29,5 +29,7 @@ export interface Verifier {
 
   handleVerificationEvent(event: VerificationEvent | VerificationEvent[]): void;
 
+  isType(type: VerifierType): boolean;
+
   makeDecision(): VerificationDecision;
 }

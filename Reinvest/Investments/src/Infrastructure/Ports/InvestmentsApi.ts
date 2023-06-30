@@ -11,6 +11,7 @@ import { RecurringInvestmentsController } from 'Reinvest/Investments/src/Infrast
 export type InvestmentsApiType = {
   abortInvestment: InvestmentsController['abortInvestment'];
   approveFees: FeesController['approveFees'];
+  cancelInvestment: InvestmentsController['cancelInvestment'];
   createDraftRecurringInvestment: RecurringInvestmentsController['createDraftRecurringInvestment'];
   createInvestment: InvestmentsController['createInvestment'];
   createRecurringSubscriptionAgreement: SubscriptionAgreementController['createRecurringSubscriptionAgreement'];
@@ -21,6 +22,7 @@ export type InvestmentsApiType = {
   initiateRecurringInvestment: RecurringInvestmentsController['initiateRecurringInvestment'];
   investmentSummaryQuery: InvestmentsController['investmentSummaryQuery'];
   isFeesApproved: FeesController['isFeesApproved'];
+  listInvestments: InvestmentsController['listInvestments'];
   pushTransaction: TransactionController['pushTransaction'];
   reinvestDividends: DividendsController['reinvestDividends'];
   signRecurringSubscriptionAgreement: SubscriptionAgreementController['signRecurringSubscriptionAgreement'];
@@ -34,6 +36,7 @@ export type InvestmentsApiType = {
 export const investmentsApi = (container: ContainerInterface): InvestmentsApiType => ({
   test: container.delegateTo(TempController, 'handle'),
   createInvestment: container.delegateTo(InvestmentsController, 'createInvestment'),
+  listInvestments: container.delegateTo(InvestmentsController, 'listInvestments'),
   createDraftRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'createDraftRecurringInvestment'),
   unsuspendRecurringInvestment: container.delegateTo(RecurringInvestmentsController, 'unsuspendRecurringInvestment'),
   abortInvestment: container.delegateTo(InvestmentsController, 'abortInvestment'),
@@ -52,4 +55,5 @@ export const investmentsApi = (container: ContainerInterface): InvestmentsApiTyp
   signSubscriptionAgreement: container.delegateTo(SubscriptionAgreementController, 'signSubscriptionAgreement'),
   reinvestDividends: container.delegateTo(DividendsController, 'reinvestDividends'),
   pushTransaction: container.delegateTo(TransactionController, 'pushTransaction'),
+  cancelInvestment: container.delegateTo(InvestmentsController, 'cancelInvestment'),
 });

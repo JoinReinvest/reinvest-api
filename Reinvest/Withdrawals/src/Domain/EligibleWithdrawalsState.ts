@@ -25,7 +25,7 @@ export class EligibleWithdrawalsState {
   }
 
   canWithdraw(): boolean {
-    return this.eligibleWithdrawals.eligibleFunds.isGreaterThan(Money.zero()) && !this.areThereNotSettledShares;
+    return this.eligibleWithdrawals.eligibleFunds.isGreaterThan(Money.zero()); // && !this.areThereNotSettledShares; // uncomment it if you want to block withdrawals when there are unsettled shares - in grace period
   }
 
   getEligibleForWithdrawalsAmount(): MoneyAmount {
@@ -47,5 +47,40 @@ export class EligibleWithdrawalsState {
       value: this.eligibleWithdrawals.totalFee.getAmount(),
       formatted: this.eligibleWithdrawals.totalFee.getFormattedAmount(),
     };
+  }
+
+  getEligibleWithdrawalsData() {
+    const { accountValue, numberOfShares, totalDividends, totalFee, totalFunds, eligibleFunds } = this.eligibleWithdrawals;
+
+    return {
+      accountValue: accountValue.getAmount(),
+      numberOfShares,
+      totalDividends: totalDividends.getAmount(),
+      totalFee: totalFee.getAmount(),
+      totalFunds: totalFunds.getAmount(),
+      eligibleFunds: eligibleFunds.getAmount(),
+    };
+  }
+
+  formatAwaitingDividends() {
+    return this.awaitingDividends.map(({ id, totalDividendAmount, totalFeeAmount }) => {
+      return {
+        id,
+        totalDividendAmount: totalDividendAmount.getAmount(),
+        totalFeeAmount: totalFeeAmount.getAmount(),
+      };
+    });
+  }
+
+  formatSettledShares() {
+    return this.settledShares.map(({ id, currentNavPerShare, numberOfShares, transactionDate, unitPrice }) => {
+      return {
+        id,
+        currentNavPerShare: currentNavPerShare.getAmount(),
+        numberOfShares: numberOfShares,
+        unitPrice: unitPrice.getAmount(),
+        transactionDate: transactionDate.toIsoDate(),
+      };
+    });
   }
 }

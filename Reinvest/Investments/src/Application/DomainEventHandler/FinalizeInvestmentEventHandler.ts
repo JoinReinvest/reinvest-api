@@ -25,7 +25,7 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
       return;
     }
 
-    const { ip, status, subscriptionAgreementPdfDateCreated, subscriptionAgreementId, portfolioId, bankAccountId, investmentAmount, feeAmount } =
+    const { ip, tradeId, status, subscriptionAgreementPdfDateCreated, subscriptionAgreementId, portfolioId, bankAccountId, investmentAmount, feeAmount } =
       investmentDetails;
 
     if (status !== InvestmentStatus.IN_PROGRESS) {
@@ -54,6 +54,7 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
         bankAccountId,
         subscriptionAgreementId,
         portfolioId,
+        userTradeId: tradeId,
       },
       id: investmentId,
     });

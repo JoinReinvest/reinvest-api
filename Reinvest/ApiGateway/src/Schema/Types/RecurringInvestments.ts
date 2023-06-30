@@ -157,14 +157,14 @@ export const RecurringInvestments = {
       createRecurringInvestment: async (
         parent: any,
         { accountId, amount, schedule }: CreateRecurringInvestmentInput,
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const portfolioApi = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const individualAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         const { portfolioId } = await portfolioApi.getActivePortfolio();
 
-        const status = await investmentAccountsApi.createDraftRecurringInvestment(portfolioId, profileId, individualAccountId, amount, schedule);
+        const status = await investmentAccountsApi.createDraftRecurringInvestment(portfolioId, profileId, accountId, amount, schedule);
 
         if (!status) {
           throw new JsonGraphQLError('COULDNT_CREATE_RECURRING_INVESTMENT');
@@ -174,7 +174,8 @@ export const RecurringInvestments = {
 
         return recurringInvestment;
       },
-      createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const subscriptionAgreementId = await investmentAccountsApi.createRecurringSubscriptionAgreement(profileId, accountId);
@@ -187,7 +188,12 @@ export const RecurringInvestments = {
 
         return subscriptionAgreement;
       },
-      signRecurringInvestmentSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, clientIp }: SessionContext) => {
+      signRecurringInvestmentSubscriptionAgreement: async (
+        parent: any,
+        { accountId }: any,
+        { profileId, modules, clientIp, throwIfBanned }: SessionContext,
+      ) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
         const isSigned = await investmentAccountsApi.signRecurringSubscriptionAgreement(profileId, accountId, clientIp);
 
@@ -197,7 +203,8 @@ export const RecurringInvestments = {
 
         return isSigned;
       },
-      initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      initiateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
@@ -211,7 +218,8 @@ export const RecurringInvestments = {
 
         return status;
       },
-      unsuspendRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      unsuspendRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
+        throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
         const status = await investmentAccountsApi.unsuspendRecurringInvestment(accountId);

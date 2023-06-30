@@ -1,7 +1,9 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { createNotificationsDatabaseAdapterProvider, NotificationsDatabaseAdapterInstanceProvider } from 'Notifications/Adapter/Database/DatabaseAdapter';
+import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
+import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
 import { Notifications } from 'Notifications/index';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -24,6 +26,8 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(NotificationsDatabaseAdapterInstanceProvider, createNotificationsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(NotificationsRepository, [NotificationsDatabaseAdapterInstanceProvider]);
+      .addSingleton(NotificationsRepository, [NotificationsDatabaseAdapterInstanceProvider])
+      .addSingleton(StoredEventRepository, [NotificationsDatabaseAdapterInstanceProvider])
+      .addSingleton(AccountActivitiesRepository, [NotificationsDatabaseAdapterInstanceProvider]);
   }
 }

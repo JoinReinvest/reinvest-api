@@ -7,7 +7,9 @@ import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/Do
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import {
   createInvestmentsDatabaseAdapterProvider,
+  InvestmentsDatabase,
   InvestmentsDatabaseAdapterInstanceProvider,
+  InvestmentsDatabaseAdapterProvider,
 } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
@@ -20,6 +22,8 @@ import { GeneratePdfEventHandler } from 'Investments/Infrastructure/Events/Gener
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
+import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 
 export default class AdaptersProviders {
   private config: Investments.Config;
@@ -47,9 +51,17 @@ export default class AdaptersProviders {
       .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(ReinvestmentRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
-      .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider]);
+      .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addObjectFactory(
+        'InvestmentsTransactionalAdapter',
+        (databaseProvider: InvestmentsDatabaseAdapterProvider) => new TransactionalAdapter<InvestmentsDatabase>(databaseProvider),
+        [InvestmentsDatabaseAdapterInstanceProvider],
+      );
 
-    container.addSingleton(SharesAndDividendService, ['SharesAndDividends']).addSingleton(DocumentsService, ['Documents']);
+    container
+      .addSingleton(SharesAndDividendService, ['SharesAndDividends'])
+      .addSingleton(DocumentsService, ['Documents'])
+      .addSingleton(VerificationService, ['Verification']);
 
     // process manager
     container.addSingleton(TransactionExecutor, [SimpleEventBus]);

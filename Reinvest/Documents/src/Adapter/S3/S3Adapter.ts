@@ -6,6 +6,7 @@ import { FileType } from 'Documents/Adapter/S3/FileLinkService';
 export type S3Config = {
   avatarsBucket: string;
   documentsBucket: string;
+  portfolioBucket: string;
   region: string;
 };
 
@@ -20,6 +21,10 @@ export class S3Adapter {
 
   public async generatePutSignedUrlForAvatar(catalog: string, fileName: string): Promise<string> {
     return this.generatePutSignedUrl(this.config.avatarsBucket, catalog, fileName);
+  }
+
+  public async generatePutSignedUrlForImage(catalog: string, fileName: string): Promise<string> {
+    return this.generatePutSignedUrl(this.config.portfolioBucket, catalog, fileName);
   }
 
   public async generatePutSignedUrlForDocument(catalog: string, fileName: string): Promise<string> {
@@ -61,6 +66,21 @@ export class S3Adapter {
     });
 
     return getSignedUrl(client, getCommand, { expiresIn: 3600 });
+  }
+
+  public async getImageUrl(fileName: string, catalog: string) {
+    const client = new S3Client({
+      region: this.config.region,
+    });
+
+    const bucketName = this.config.portfolioBucket;
+
+    const getCommand = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: `${catalog}/${fileName}`,
+    });
+
+    return getSignedUrl(client, getCommand, { expiresIn: 527040 });
   }
 
   async deleteFile(catalog: string, fileName: string, fileType: FileType): Promise<boolean> {

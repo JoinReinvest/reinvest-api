@@ -1,19 +1,14 @@
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { AccountVerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';
-import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
-import { AccountVerifier } from 'Verification/IntegrationLogic/Verifier/AccountVerifier';
-import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/VerifierExecutor';
-import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
+import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
 
 export class VerifyAccount {
   private registrationService: RegistrationService;
-  private verifierRepository: VerifierRepository;
-  private verifierExecutor: VerifierExecutor;
+  private verifierService: VerifierService;
 
-  constructor(registrationService: RegistrationService, verifierRepository: VerifierRepository, verifierExecutor: VerifierExecutor) {
+  constructor(registrationService: RegistrationService, verifierService: VerifierService) {
     this.registrationService = registrationService;
-    this.verifierRepository = verifierRepository;
-    this.verifierExecutor = verifierExecutor;
+    this.verifierService = verifierService;
   }
 
   static getClassName = () => 'VerifyAccount';
@@ -21,18 +16,12 @@ export class VerifyAccount {
   async verify(profileId: string, accountId: string): Promise<AccountVerificationDecision> {
     try {
       console.log('verify account id ' + accountId);
-      await this.registrationService.immediatelySynchronizeAllAccountStructure(profileId, accountId);
-      const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
-      const verifiers = await this.verifierRepository.createVerifiersFromAccountStructure(accountStructure);
-      const accountVerifier = new AccountVerifier(profileId, accountId);
-      const verifierExecutor = this.verifierExecutor;
+      const { accountVerifier, verifiers } = await this.verifierService.createVerifiersForAccount(profileId, accountId);
 
-      const decisions = await Promise.all(verifiers.map(async (verifier: Verifier) => await verifierExecutor.executeDecision(verifier)));
-      await this.verifierRepository.storeVerifiers(verifiers);
-
-      return accountVerifier.makeAccountVerificationDecision(decisions);
+      return this.verifierService.executeVerifiersDecisions(accountVerifier, verifiers);
     } catch (error: any) {
-      console.error(error);
+      console.error(`[Verify Account: ${accountId}]`, error);
+      await this.registrationService.immediatelySynchronizeAllAccountStructure(profileId, accountId);
 
       return {
         canUserContinueTheInvestment: false,

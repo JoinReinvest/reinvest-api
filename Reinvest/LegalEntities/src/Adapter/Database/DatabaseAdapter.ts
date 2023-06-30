@@ -1,5 +1,6 @@
 import { Kysely } from 'kysely';
 import {
+  LegalEntitiesBannedList,
   LegalEntitiesBeneficiary,
   LegalEntitiesCompanyAccount,
   LegalEntitiesDraftAccount,
@@ -13,8 +14,10 @@ export const legalEntitiesDraftAccountTable = 'legal_entities_draft_accounts';
 export const legalEntitiesIndividualAccountTable = 'legal_entities_individual_account';
 export const legalEntitiesCompanyAccountTable = 'legal_entities_company_account';
 export const legalEntitiesBeneficiaryTable = 'legal_entities_beneficiary';
+export const legalEntitiesBannedListTable = 'legal_entities_banned_list';
 
 export interface LegalEntitiesDatabase {
+  [legalEntitiesBannedListTable]: LegalEntitiesBannedList;
   [legalEntitiesBeneficiaryTable]: LegalEntitiesBeneficiary;
   [legalEntitiesCompanyAccountTable]: LegalEntitiesCompanyAccount;
   [legalEntitiesDraftAccountTable]: LegalEntitiesDraftAccount;

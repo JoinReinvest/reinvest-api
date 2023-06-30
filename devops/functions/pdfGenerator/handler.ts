@@ -1,4 +1,5 @@
 import { SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
+import { PdfTypes } from 'devops/functions/pdfGenerator/src/Types';
 import { CHROMIUM_ENDPOINT, S3_CONFIG, SQS_CONFIG } from 'Reinvest/config';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 
@@ -6,27 +7,58 @@ import { GeneratePdf } from './src/GeneratePdf';
 import { PdfGenerator } from './src/Puppeteer/PdfGenerator';
 import { S3Adapter } from './src/S3/S3Adapter';
 
+export type GeneratePdfCommand = {
+  data: {
+    catalog: string;
+    fileName: string;
+    template: string;
+    templateType: PdfTypes;
+  };
+  id: string;
+  kind: 'GeneratePdf';
+};
+
+export type MakeScreenshotToPDf = {
+  data: {
+    catalog: string;
+    fileName: string;
+    url: string;
+  };
+  id: string;
+  kind: 'MakeScreenshotToPDf';
+};
+
 export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;
 
   try {
-    const {
-      data: { catalog, fileName, template, templateType },
-      id,
-    } = JSON.parse(record.body);
-    console.log({ catalog, fileName });
+    const data = JSON.parse(record.body);
+    const { kind } = data;
     const { generatePdf, queueSender } = boot();
-    await generatePdf.execute(catalog, fileName, template, templateType);
-    await queueSender.send(
-      JSON.stringify({
-        kind: 'pdfGenerated',
+
+    if (!kind || kind === 'GeneratePdf') {
+      const {
+        data: { catalog, fileName, template, templateType },
         id,
-        data: {
-          profileId: catalog,
-          fileName,
-        },
-      }),
-    );
+      } = data;
+      console.log({ catalog, fileName });
+      await generatePdf.execute(catalog, fileName, template, templateType);
+      await queueSender.send(
+        JSON.stringify({
+          kind: 'PdfGenerated',
+          id,
+          data: {
+            profileId: catalog,
+            fileName,
+            type: templateType,
+          },
+        }),
+      );
+    }
+
+    if (kind === 'MakeScreenshotToPDf') {
+      // todo screenshot
+    }
     // send event back
   } catch (error: any) {
     console.log(error);

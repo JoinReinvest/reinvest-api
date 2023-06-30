@@ -13,6 +13,7 @@ const schema = `
         label:String
         type: AccountType
         avatar: GetAvatarLink
+        isBanned: Boolean
     }
 
     type IndividualAccountDetails {
@@ -318,13 +319,14 @@ export const Account = {
           ...account,
         };
       },
-      getAccountsOverview: async (parent: any, input: { accountId: string }, { profileId, modules }: SessionContext) => {
+      getAccountsOverview: async (parent: any, input: { accountId: string }, { profileId, modules, isBannedAccount }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const accountsOverviewResponses = await api.getAccountsOverview(profileId);
 
         return accountsOverviewResponses.map(account => {
           return {
             ...account,
+            isBanned: isBannedAccount(account.id),
           };
         });
       },
@@ -367,8 +369,10 @@ export const Account = {
         };
       },
 
-      createBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      createBankAccount: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
+
         const api = modules.getApi<Registration.ApiType>(Registration);
         const response = await api.createBankAccount(profileId, parentAccountId);
 
@@ -379,8 +383,10 @@ export const Account = {
         return response;
       },
 
-      fulfillBankAccount: async (parent: any, { accountId, input }: any, { profileId, modules }: SessionContext) => {
+      fulfillBankAccount: async (parent: any, { accountId, input }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
+
         const api = modules.getApi<Registration.ApiType>(Registration);
         const response = await api.fulfillBankAccount(profileId, parentAccountId, input);
 
@@ -391,8 +397,10 @@ export const Account = {
         return response.status;
       },
 
-      updateBankAccount: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
+      updateBankAccount: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
+
         const api = modules.getApi<Registration.ApiType>(Registration);
         const response = await api.updateBankAccount(profileId, parentAccountId);
 
@@ -403,9 +411,10 @@ export const Account = {
         return response;
       },
 
-      updateIndividualAccount: async (parent: any, data: UpdateIndividualAccountDetailsInput, { profileId, modules }: SessionContext) => {
+      updateIndividualAccount: async (parent: any, data: UpdateIndividualAccountDetailsInput, { profileId, modules, throwIfBanned }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const { input, accountId } = data;
+        throwIfBanned(accountId);
 
         const errors = await api.updateIndividualAccount(profileId, accountId, input);
 
@@ -413,11 +422,15 @@ export const Account = {
           throw new JsonGraphQLError(errors);
         }
 
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        await registrationApi.resynchronizeIndividualAccount(profileId);
+
         return api.getIndividualAccount(profileId);
       },
-      updateCorporateAccount: async (parent: any, data: UpdateCorporateAccountDetailsInput, { profileId, modules }: SessionContext) => {
+      updateCorporateAccount: async (parent: any, data: UpdateCorporateAccountDetailsInput, { profileId, modules, throwIfBanned }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const { input, accountId } = data;
+        throwIfBanned(accountId);
 
         const errors = await api.updateCorporateAccount(profileId, accountId, input);
 
@@ -425,17 +438,24 @@ export const Account = {
           throw new JsonGraphQLError(errors);
         }
 
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        await registrationApi.resynchronizeCompanyAccount(profileId, accountId);
+
         return api.getCompanyAccount(profileId, accountId);
       },
-      updateTrustAccount: async (parent: any, data: UpdateTrustAccountDetailsInput, { profileId, modules }: SessionContext) => {
+      updateTrustAccount: async (parent: any, data: UpdateTrustAccountDetailsInput, { profileId, modules, throwIfBanned }: SessionContext) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
         const { input, accountId } = data;
+        throwIfBanned(accountId);
 
         const errors = await api.updateTrustAccount(profileId, accountId, input);
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);
         }
+
+        const registrationApi = modules.getApi<Registration.ApiType>(Registration);
+        await registrationApi.resynchronizeCompanyAccount(profileId, accountId);
 
         return api.getCompanyAccount(profileId, accountId);
       },
@@ -448,9 +468,12 @@ export const Account = {
           accountId: string;
           input: any;
         },
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
+
         const errors = await api.updateBeneficiaryAccount(profileId, accountId, input);
 
         if (errors.length > 0) {
@@ -467,9 +490,12 @@ export const Account = {
           accountId: string;
           input: any;
         },
-        { profileId, modules }: SessionContext,
+        { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
         const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+
+        const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
+        throwIfBanned(parentAccountId);
         // const errors = await api.updateIndividualAccount(profileId, accountId, input);
         //
         // if (errors.length > 0) {

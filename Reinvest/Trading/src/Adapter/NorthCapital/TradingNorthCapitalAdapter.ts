@@ -3,6 +3,8 @@ import { Money } from 'Money/Money';
 import NorthCapitalException from 'Registration/Adapter/NorthCapital/NorthCapitalException';
 import { ExecutionNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import { FundsMoveState, NorthCapitalTradeState } from 'Trading/Domain/Trade';
+import { TradeApproval, TradeVerificationDecision } from 'Trading/Domain/TradeVerification';
+import { TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
 
 export type NorthCapitalConfig = {
   API_URL: string;
@@ -46,6 +48,10 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       tradeShares: numberOfShares,
       tradeStatus: 'CREATED',
       tradeDate: transactionDate,
+      tradeVerification: {
+        decision: TradeVerificationDecision.PENDING,
+        events: [],
+      },
     };
   }
 
@@ -118,10 +124,38 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     return tradeDetails;
   }
 
-  async getTradeStatus(tradeId: string): Promise<string> {
+  /**
+   * @note This method is used only for integrations tests
+   * @param tradeId
+   * @param accountId
+   * @param tradeState
+   */
+  async updateTradePrincipalApprovalForTests(
+    tradeId: string,
+    accountId: string,
+    orderStatus: string,
+    rrApproval: 'Pending' | 'Approved' | 'Disapproved' | 'Under Review',
+    field3: string = '',
+  ): Promise<any> {
+    const endpoint = 'tapiv3/index.php/v3/updateTradeStatus';
+    const data = {
+      tradeId,
+      accountId,
+      orderStatus,
+      field3,
+      RRApprovalStatus: rrApproval,
+    };
+
+    const response = await this.postRequest(endpoint, data);
+    const { statusCode, statusDesc, tradeDetails } = response;
+
+    return tradeDetails;
+  }
+
+  async getTradeStatus(tradeId: string): Promise<TradeStatus> {
     const { orderStatus } = await this.getCurrentTradeState(tradeId);
 
-    return orderStatus.toLowerCase();
+    return TradeStatus.fromResponse(orderStatus);
   }
 
   async getCurrentTradeState(tradeId: string): Promise<any> {
@@ -153,6 +187,37 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
     const response = await this.postRequest(endpoint, data);
 
     return true;
+  }
+
+  async cancelTrade(
+    tradeId: string,
+    userEmail: string,
+    reason: string,
+  ): Promise<{
+    details: any;
+    status: string;
+  }> {
+    const endpoint = 'tapiv3/index.php/v3/cancelInvestment';
+    const data = {
+      tradeId,
+      requestedBy: userEmail,
+      reason,
+      notes: reason,
+    };
+
+    const response = await this.postRequest(endpoint, data);
+    const {
+      statusCode,
+      statusDesc,
+      'Canceled investment details': [cancelDetails],
+    } = response;
+
+    const { orderStatus } = cancelDetails;
+
+    return {
+      status: orderStatus,
+      details: cancelDetails,
+    };
   }
 
   private async checkIfFileExistsInTrade(northCapitalId: string, documentId: string): Promise<boolean> {
@@ -223,5 +288,15 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
         throw new Error(error.message);
       }
     }
+  }
+
+  async getTradeApproval(tradeId: string): Promise<TradeApproval> {
+    const { RRApprovalStatus, field3, RRApprovalDate } = await this.getCurrentTradeState(tradeId);
+
+    return {
+      approvalStatus: RRApprovalStatus.toLowerCase(),
+      message: field3,
+      changeDate: RRApprovalDate,
+    };
   }
 }

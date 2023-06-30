@@ -1,5 +1,5 @@
 import { ReinvestmentEvents, SharesTransferredForReinvestment } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
-import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { TransactionCanceledFailed, TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -63,6 +63,32 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
           kind: TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
           date: new Date(),
           data: {},
+          id: event.id,
+        });
+        break;
+      case 'TransactionCanceled':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.TRANSACTION_CANCELED,
+          date: new Date(),
+          data: {},
+          id: event.id,
+        });
+        break;
+      case 'TransactionUnwinding':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.TRANSACTION_CANCELED_UNWINDING,
+          date: new Date(),
+          data: {},
+          id: event.id,
+        });
+        break;
+      case 'TransactionCanceledFailed':
+        await this.eventBus.publish(<TransactionCanceledFailed>{
+          kind: TransactionEvents.TRANSACTION_CANCELED_FAILED,
+          date: new Date(),
+          data: {
+            reason: event.data.reason,
+          },
           id: event.id,
         });
         break;

@@ -135,7 +135,33 @@ export class DividendsCalculationRepository {
   }
 
   async storeCalculatedDividends(calculatedDividends: CalculatedDividend[]) {
-    const recordsToStore = calculatedDividends.map((calculatedDividend: CalculatedDividend): CalculatedDividendsTable => {
+    const recordsToStore = this.mapCalculateDividendToSchema(calculatedDividends);
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadCalculatedDividendsTable)
+      .values(recordsToStore)
+      .onConflict(oc => oc.constraint('sad_calculated_dividends_unique').doNothing())
+      .execute();
+  }
+
+  async updateCalculatedDividends(calculatedDividends: CalculatedDividend[]) {
+    const recordsToStore = this.mapCalculateDividendToSchema(calculatedDividends);
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadCalculatedDividendsTable) // todo change it to multiple update?
+      .values(recordsToStore)
+      .onConflict(oc =>
+        oc.column('id').doUpdateSet({
+          status: eb => eb.ref(`excluded.status`),
+        }),
+      )
+      .execute();
+  }
+
+  private mapCalculateDividendToSchema(calculatedDividends: CalculatedDividend[]): CalculatedDividendsTable[] {
+    return calculatedDividends.map((calculatedDividend: CalculatedDividend): CalculatedDividendsTable => {
       const schema = calculatedDividend.toObject();
 
       return {
@@ -151,17 +177,6 @@ export class DividendsCalculationRepository {
         status: schema.status,
       };
     });
-
-    await this.databaseAdapterProvider
-      .provide()
-      .insertInto(sadCalculatedDividendsTable)
-      .values(recordsToStore)
-      .onConflict(oc =>
-        oc.column('id').doUpdateSet({
-          status: eb => eb.ref(`excluded.status`),
-        }),
-      )
-      .execute();
   }
 
   async getDividendDeclarationStats(declarationId: UUID) {

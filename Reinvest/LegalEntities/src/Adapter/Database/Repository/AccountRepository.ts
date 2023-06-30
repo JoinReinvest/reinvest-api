@@ -1,4 +1,6 @@
+import { UUID } from 'HKEKTypes/Generics';
 import {
+  legalEntitiesBannedListTable,
   legalEntitiesBeneficiaryTable,
   legalEntitiesCompanyAccountTable,
   LegalEntitiesDatabaseAdapterProvider,
@@ -67,6 +69,11 @@ export type StakeholderForSynchronization = StakeholderOutput & {
   idScan: DocumentSchema[];
   profileId: string;
   ssn: string | null;
+};
+
+export type ProfileAccountStructureResponse = {
+  accountId: UUID;
+  type: 'INDIVIDUAL_ACCOUNT' | 'CORPORATE_ACCOUNT' | 'TRUST_ACCOUNT' | 'BENEFICIARY_ACCOUNT';
 };
 
 export class AccountRepository {
@@ -206,6 +213,42 @@ export class AccountRepository {
     }
   }
 
+  async getProfileAccountStructure(profileId: string): Promise<ProfileAccountStructureResponse[]> {
+    const db = this.databaseAdapterProvider.provide();
+    const accounts = await db
+      .selectFrom(legalEntitiesIndividualAccountTable)
+      .select(eb => [`accountId`, eb.val('INDIVIDUAL_ACCOUNT').as('type')])
+      .union(
+        db
+          .selectFrom(legalEntitiesCompanyAccountTable)
+          .select(eb => [`accountId`, eb.val('CORPORATE_ACCOUNT').as('type')])
+          .where('profileId', '=', <any>profileId)
+          .where('accountType', '=', 'CORPORATE'),
+      )
+      .union(
+        db
+          .selectFrom(legalEntitiesCompanyAccountTable)
+          .select(eb => [`accountId`, eb.val('TRUST_ACCOUNT').as('type')])
+          .where('profileId', '=', <any>profileId)
+          .where('accountType', '=', 'TRUST'),
+      )
+      .union(
+        db
+          .selectFrom(legalEntitiesBeneficiaryTable)
+          .select(eb => [`accountId`, eb.val('BENEFICIARY_ACCOUNT').as('type')])
+          .where('profileId', '=', <any>profileId),
+      )
+      .where(`${legalEntitiesIndividualAccountTable}.profileId`, '=', profileId)
+      .castTo<ProfileAccountStructureResponse>()
+      .execute();
+
+    if (!accounts.length) {
+      return [];
+    }
+
+    return accounts;
+  }
+
   async getBeneficiaryAccountForSynchronization(profileId: string, accountId: string): Promise<BeneficiaryAccountForSynchronization | null> {
     try {
       const account = await this.databaseAdapterProvider
@@ -267,19 +310,20 @@ export class AccountRepository {
     }
   }
 
-  private async getNewInitials(profileId: string, accountType: CompanyAccountType) {
-    const initials = await this.databaseAdapterProvider
+  private async getNewInitials(profileId: string, accountType: CompanyAccountType): Promise<number> {
+    const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(legalEntitiesCompanyAccountTable)
-      .select('initialsValue')
+      .select(eb => [eb.fn.count('accountId').as('initials')])
       .where('profileId', '=', profileId)
       .where('accountType', '=', accountType)
-      .execute();
+      .executeTakeFirst();
 
-    let lastMaxInitialsValue = Math.max(...initials.map(el => el.initialsValue));
-    const initialsValue = ++lastMaxInitialsValue;
+    if (!data) {
+      return 1;
+    }
 
-    return initialsValue;
+    return parseInt(<string>data.initials) + 1;
   }
 
   async createCompanyAccount(account: CompanyAccount): Promise<boolean> {
@@ -421,12 +465,46 @@ export class AccountRepository {
     }
   }
 
+  async findCompanyAccountByAccountId(accountId: string): Promise<CompanyAccount | null> {
+    try {
+      const account = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesCompanyAccountTable)
+        .select([
+          'profileId',
+          'accountId',
+          'companyName',
+          'address',
+          'ein',
+          'annualRevenue',
+          'numberOfEmployees',
+          'industry',
+          'companyType',
+          'avatar',
+          'accountType',
+          'companyDocuments',
+          'stakeholders',
+          'initialsValue',
+        ])
+        .where(`${legalEntitiesCompanyAccountTable}.accountId`, '=', accountId)
+        .limit(1)
+        .castTo<CompanySchema>()
+        .executeTakeFirstOrThrow();
+
+      return CompanyAccount.create(account);
+    } catch (error: any) {
+      console.warn(`Cannot find any company account: ${error.message}`);
+
+      return null;
+    }
+  }
+
   async findCompanyAccountOverviews(profileId: string): Promise<CompanyAccountOverview[]> {
     try {
       const accounts = await this.databaseAdapterProvider
         .provide()
         .selectFrom(legalEntitiesCompanyAccountTable)
-        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType'])
+        .select(['accountId', 'profileId', 'companyName', 'avatar', 'accountType', 'initialsValue'])
         .where(`${legalEntitiesCompanyAccountTable}.profileId`, '=', profileId)
         .castTo<CompanyOverviewSchema>()
         .execute();
@@ -577,5 +655,21 @@ export class AccountRepository {
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  async isSensitiveNumberBanned(hashedSensitiveNumber: string) {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(legalEntitiesBannedListTable)
+        .select(['sensitiveNumber'])
+        .where('sensitiveNumber', '=', hashedSensitiveNumber)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error: any) {
+      return false;
+    }
   }
 }

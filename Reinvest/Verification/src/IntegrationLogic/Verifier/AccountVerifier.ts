@@ -9,10 +9,12 @@ import {
 export class AccountVerifier {
   private profileId: string;
   private accountId: string;
+  private accountType: 'INDIVIDUAL' | 'COMPANY';
 
-  constructor(profileId: string, accountId: string) {
+  constructor(profileId: string, accountId: string, accountType: 'INDIVIDUAL' | 'COMPANY') {
     this.profileId = profileId;
     this.accountId = accountId;
+    this.accountType = accountType;
   }
 
   makeAccountVerificationDecision(membersDecisions: VerificationDecision[]): AccountVerificationDecision {
@@ -139,5 +141,9 @@ export class AccountVerifier {
       action: ActionName.REQUIRE_MANUAL_REVIEW,
       onObject: decision.onObject,
     });
+  }
+
+  isIndividual(): boolean {
+    return this.accountType === 'INDIVIDUAL';
   }
 }

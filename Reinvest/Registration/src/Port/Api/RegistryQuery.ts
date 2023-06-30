@@ -16,6 +16,14 @@ export type NorthCapitalAccountStructure = {
   stakeholders?: IdToNCId[];
 };
 
+export type ObjectMapping = {
+  accountId: string | null;
+  partyId: string;
+  profileId: string;
+  stakeholderId: string | null;
+  type: MappedType;
+};
+
 export class RegistryQuery {
   private registryQueryRepository: RegistryQueryRepository;
 
@@ -45,8 +53,19 @@ export class RegistryQuery {
 
   async getNorthCapitalAccountStructure(profileId: string, accountId: string): Promise<NorthCapitalAccountStructure | null> {
     const accountMapping = await this.registryQueryRepository.getNorthCapitalAccountStructure(profileId, accountId);
-    const accountStructure = <NorthCapitalAccountStructure>{};
+    const accountStructure = this.mapAccountStructure(accountMapping, profileId);
 
+    return this.isValidAccountStructure(accountStructure) ? accountStructure : null;
+  }
+
+  async getAccountStructureForSynchronization(profileId: string, accountId: string): Promise<NorthCapitalAccountStructure | null> {
+    const accountMapping = await this.registryQueryRepository.getAccountStructureForSynchronization(profileId, accountId);
+
+    return this.mapAccountStructure(accountMapping, profileId);
+  }
+
+  private mapAccountStructure(accountMapping: NCAccountStructureMapping[], profileId: string): NorthCapitalAccountStructure {
+    const accountStructure = <NorthCapitalAccountStructure>{};
     accountMapping.map((record: NCAccountStructureMapping) => {
       if (record.mappedType === MappedType.PROFILE) {
         accountStructure.profile = {
@@ -87,7 +106,11 @@ export class RegistryQuery {
       }
     });
 
-    return this.isValidAccountStructure(accountStructure) ? accountStructure : null;
+    return accountStructure;
+  }
+
+  async getMappingByPartyId(partyId: string): Promise<ObjectMapping | null> {
+    return this.registryQueryRepository.getMappingByPartyId(partyId);
   }
 
   private isValidAccountStructure(accountStructure: NorthCapitalAccountStructure): boolean {
