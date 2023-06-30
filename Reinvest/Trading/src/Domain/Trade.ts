@@ -14,6 +14,7 @@ export type TradeConfiguration = {
   portfolioId: string;
   profileId: string;
   subscriptionAgreementId: string;
+  userTradeId: string;
 };
 export type VendorsConfiguration = {
   accountEmail: string;
@@ -208,13 +209,15 @@ export class Trade {
   }
 
   getFundsTransferConfiguration(): {
-    accountId: string;
     amount: Money;
     bankName: string;
+    fee: Money;
     investmentId: string;
     ip: string;
+    ncAccountId: string;
     offeringId: string;
     tradeId: string;
+    userTradeId: string; // the nice one
   } {
     if (!this.tradeExists()) {
       throw new Error('North Capital trade state is not set');
@@ -224,12 +227,14 @@ export class Trade {
 
     return {
       investmentId: this.tradeSchema.investmentId,
-      accountId: this.tradeSchema.vendorsConfiguration!.northCapitalParentAccountId,
+      ncAccountId: this.tradeSchema.vendorsConfiguration!.northCapitalParentAccountId,
       offeringId: this.tradeSchema.vendorsConfiguration!.offeringId,
       tradeId: this.tradeSchema.northCapitalTradeState!.tradeId,
       bankName: this.tradeSchema.vendorsConfiguration!.bankAccountName,
       amount: amount,
+      fee: this.fees,
       ip: this.tradeSchema.tradeConfiguration.ip,
+      userTradeId: this.tradeSchema.tradeConfiguration?.userTradeId,
     };
   }
 
@@ -474,5 +479,9 @@ export class Trade {
   setTradeUnwounded() {
     this.tradeSchema.northCapitalTradeState!.tradeStatus = 'UNWIND SETTLED';
     this.tradeStatus = TradeStatus.fromResponse(OrderStatus.UNWIND_SETTLED);
+  }
+
+  getReinvestAccountId(): UUID {
+    return this.tradeSchema.tradeConfiguration.accountId;
   }
 }

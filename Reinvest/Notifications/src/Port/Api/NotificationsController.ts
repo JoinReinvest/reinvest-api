@@ -2,7 +2,7 @@ import { Pagination } from 'Notifications/Application/Pagination';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
 import { NotificationFilter, NotificationQuery, NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
-import { NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
+import { NotificationObjectType, NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
 
 export class NotificationsController {
   private createNotificationUseCase: CreateNotification;
@@ -25,7 +25,7 @@ export class NotificationsController {
     body: string,
     dismissId: string | null,
     onObjectId: string | null,
-    onObjectType: string | null,
+    onObjectType: NotificationObjectType | null,
     uniqueId: string | null,
   ): Promise<boolean> {
     try {

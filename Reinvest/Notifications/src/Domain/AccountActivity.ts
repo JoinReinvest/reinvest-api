@@ -13,6 +13,10 @@ export type AccountActivitySchema = {
 
 export type AccountView = {
   activityName: string;
+  data: {
+    origin?: string;
+    tradeId?: string;
+  };
   date: string;
 };
 
@@ -30,6 +34,7 @@ export class AccountActivity {
       activityName,
       dataJson,
       hash: this.hashData(profileId, accountId, activityName, activityDate, dataJson),
+      profileId,
     };
 
     return new AccountActivity(accountActivitySchema);
@@ -50,9 +55,23 @@ export class AccountActivity {
   }
 
   getView(): AccountView {
+    const dataView = {};
+    const data = this.accountActivitySchema.dataJson;
+
+    if (data?.tradeId) {
+      // @ts-ignore
+      dataView['tradeId'] = data.tradeId;
+    }
+
+    if (data?.origin) {
+      // @ts-ignore
+      dataView['origin'] = data.origin;
+    }
+
     return {
       activityName: this.accountActivitySchema.activityName,
       date: this.accountActivitySchema.activityDate.toIsoDateTime(),
+      data: dataView,
     };
   }
 }

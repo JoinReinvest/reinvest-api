@@ -1,4 +1,4 @@
-import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { UUID } from 'HKEKTypes/Generics';
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
 import type { Money } from 'Money/Money';
@@ -10,7 +10,6 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
 
 import { FeesRepository } from './FeesRepository';
-import { UUID } from 'HKEKTypes/Generics';
 
 export class InvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -234,24 +233,9 @@ export class InvestmentsRepository {
     }
   }
 
-  async updateInvestment(investment: Investment, approveFee: boolean) {
+  async updateInvestment(investment: Investment, approveFee: boolean, events: DomainEvent[] = []) {
     const { id, status, dateStarted, accountId, profileId, amount, portfolioId, parentId } = investment.toObject();
     try {
-      await this.publishEvents([
-        <InvestmentCreated>{
-          id,
-          kind: TransactionEvents.INVESTMENT_CREATED,
-          date: new Date(),
-          data: {
-            profileId,
-            accountId,
-            portfolioId,
-            parentId,
-            amount,
-          },
-        },
-      ]);
-
       await this.databaseAdapterProvider
         .provide()
         .updateTable(investmentsTable)
@@ -266,6 +250,8 @@ export class InvestmentsRepository {
         const fee = investment.getFee();
         fee && (await this.feesRepository.storeFee(fee));
       }
+
+      await this.publishEvents(events);
 
       return true;
     } catch (error: any) {

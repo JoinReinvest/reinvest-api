@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
-import { NotificationsType } from 'Notifications/Domain/Notification';
+import { NotificationObjectType, NotificationsType } from 'Notifications/Domain/Notification';
 import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -21,7 +21,7 @@ export type CreateNotificationCommand = DomainEvent & {
     header: string;
     notificationType: NotificationsType;
     onObjectId: UUID | null;
-    onObjectType: string | null;
+    onObjectType: NotificationObjectType | null;
     profileId: UUID;
     uniqueId: UUID | null;
   };

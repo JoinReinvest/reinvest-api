@@ -13,6 +13,12 @@ export enum NotificationsType {
   GENERIC_NOTIFICATION = 'GENERIC_NOTIFICATION',
 }
 
+export enum NotificationObjectType {
+  ACCOUNT = 'ACCOUNT',
+  INVESTMENT = 'INVESTMENT',
+  DIVIDEND = 'DIVIDEND',
+}
+
 export type NotificationSchema = {
   accountId: string | null;
   body: string;
@@ -25,7 +31,7 @@ export type NotificationSchema = {
   isRead: boolean;
   notificationType: NotificationsType;
   onObjectId: string | null;
-  onObjectType: string | null;
+  onObjectType: NotificationObjectType | null;
   profileId: string;
   uniqueId: string | null;
 };
@@ -37,7 +43,7 @@ export type NotificationInput = {
   id: string;
   notificationType: NotificationsType;
   onObjectId: string | null;
-  onObjectType: string | null;
+  onObjectType: NotificationObjectType | null;
   profileId: string;
   uniqueId: string | null;
 };
@@ -106,7 +112,7 @@ export class Notification {
       onObject: this.notificationSchema.onObjectId
         ? {
             id: this.notificationSchema!.onObjectId as string,
-            type: this.notificationSchema!.onObjectType as string,
+            type: this.notificationSchema!.onObjectType as NotificationObjectType,
           }
         : null,
     };

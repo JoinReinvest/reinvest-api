@@ -20,6 +20,6 @@ export class UseCaseProvider {
     container.addSingleton(CreateNotification, [NotificationsRepository, IdGenerator]);
     container.addSingleton(DismissNotifications, [NotificationsRepository]);
     container.addSingleton(NotificationQuery, [NotificationsRepository]);
-    container.addSingleton(ProcessStoredEvent, [StoredEventRepository, AccountActivitiesRepository]);
+    container.addSingleton(ProcessStoredEvent, [StoredEventRepository, AccountActivitiesRepository, CreateNotification]);
   }
 }

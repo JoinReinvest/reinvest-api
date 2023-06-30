@@ -1,6 +1,6 @@
 import { SessionContext } from 'ApiGateway/index';
-import { SharesAndDividends } from 'SharesAndDividends/index';
 import { Notifications } from 'Notifications/index';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 const schema = `
     #graphql
@@ -38,9 +38,16 @@ const schema = `
         advisorFees: String!
     }
 
+    type AccountActivityData {
+        origin: String
+        tradeId: String
+    }
+
     type AccountActivity {
         activityName: String!
         date: ISODate!
+        """Only some activities can have extra data. For most of them there is no extra data"""
+        data: AccountActivityData
     }
 
     type Query {

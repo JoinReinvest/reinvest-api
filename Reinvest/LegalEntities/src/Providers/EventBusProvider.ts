@@ -17,11 +17,11 @@ export default class EventBusProvider {
     container.addSingleton(BanEventHandler, [Ban]);
 
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+      STORE_EVENT_COMMAND,
       'LegalProfileCompleted',
       'LegalEntityDocumentRemoved',
       'LegalEntityAvatarRemoved',
       'SensitiveDataUpdated',
-      STORE_EVENT_COMMAND,
     ]);
   }
 }

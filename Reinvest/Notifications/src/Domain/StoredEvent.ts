@@ -1,6 +1,8 @@
-import { JSONObject, UUID } from 'HKEKTypes/Generics';
+import { DictionaryType, JSONObject, UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
-import { StoredEventConfigurationType, StoredEventKind, StoredEvents } from 'Notifications/Domain/StoredEventsTypes';
+import { CreateNewNotificationInput } from 'Notifications/Application/UseCase/CreateNotification';
+import { StoredEventKind, StoredEvents } from 'Notifications/Domain/StoredEventsConfiguration';
+import { StoredEventConfigurationType } from 'Notifications/Domain/StoredEventTypes';
 
 export enum StoredEventStatus {
   PENDING = 'PENDING',
@@ -17,7 +19,7 @@ export type StoredEventSchema = {
   datePushed: DateTime | null;
   id: UUID;
   kind: StoredEventKind;
-  payload: JSONObject;
+  payload: DictionaryType;
   profileId: UUID;
   status: StoredEventStatus;
 };
@@ -92,7 +94,7 @@ export class StoredEvent {
     const data = accountActivity!.data(this.storedEventSchema.payload);
 
     return {
-      accountId: <UUID>data['accountId'] ?? null,
+      accountId: <UUID>this.storedEventSchema.payload['accountId'] ?? null,
       data,
       date: this.storedEventSchema.dateCreated,
       name: accountActivity!.name(this.storedEventSchema.payload),
@@ -104,11 +106,40 @@ export class StoredEvent {
     this.storedEventSchema.dateAccountActivity = DateTime.now();
   }
 
+  markInAppAsProcessed() {
+    this.storedEventSchema.dateInApp = DateTime.now();
+  }
+
   markAsProcessed() {
     this.storedEventSchema.status = StoredEventStatus.PROCESSED;
   }
 
   markAsFailed() {
     this.storedEventSchema.status = StoredEventStatus.FAILED;
+  }
+
+  getNotification(): CreateNewNotificationInput {
+    const inAppNotificationConfiguration = this.storedEventConfiguration.inApp;
+
+    if (!inAppNotificationConfiguration) {
+      throw new Error(`Notification configuration not found for type: ${this.storedEventSchema.kind}`);
+    }
+
+    const { onObjectId, onObjectType } = inAppNotificationConfiguration.onObject(this.storedEventSchema.payload);
+
+    return {
+      accountId: <UUID>this.storedEventSchema.payload['accountId'] ?? null,
+      body: inAppNotificationConfiguration.body(this.storedEventSchema.payload),
+      header: inAppNotificationConfiguration.header(this.storedEventSchema.payload),
+      notificationType: inAppNotificationConfiguration.notificationType,
+      onObjectId,
+      onObjectType,
+      profileId: this.storedEventSchema.profileId,
+      uniqueId: this.storedEventSchema.id,
+    };
+  }
+
+  getId(): UUID {
+    return this.storedEventSchema.id;
   }
 }
