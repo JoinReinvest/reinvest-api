@@ -16,7 +16,7 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: 'aws',
     runtime: 'nodejs18.x',
-    region: 'us-east-2',
+    region: 'us-east-1',
     environment: {
       ...ProviderEnvironment,
       COGNITO_RETENTION_POLICY: 'Delete',
