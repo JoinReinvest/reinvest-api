@@ -16,6 +16,7 @@ export namespace Notifications {
   export const moduleName = 'Notifications';
   export type Config = {
     database: PostgreSQLConfig;
+    firebaseQueue: QueueConfig;
     queue: QueueConfig;
   };
 

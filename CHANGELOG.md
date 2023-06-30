@@ -1,5 +1,10 @@
 # REINVEST API CHANGELOG
 
+## 1.17.4 - 06/30/2023
+
+* No MOCKS anymore:
+    * `registerPushNotificationDevice` - Register device for Firebase push notifications
+
 ## 1.17.3 - 06/29/2023
 
 * No MOCKS anymore:

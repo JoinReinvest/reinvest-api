@@ -1,6 +1,7 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
 import { Notification, NotificationObjectType, NotificationsType } from 'Notifications/Domain/Notification';
+import { PushNotification, PushNotificationCommand } from 'Notifications/Adapter/PushNotificationAdapter';
 
 export type CreateNewNotificationInput = {
   accountId: string | null;

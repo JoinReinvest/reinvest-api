@@ -60,6 +60,13 @@ export const PDF_GENERATOR_SQS_CONFIG = {
   queueUrl: process.env.SQS_PDF_GENERATOR_URL as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',
 };
+
+export const FIREBASE_SQS_CONFIG = {
+  region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+  queueUrl: process.env.SQS_FIREBASE_QUEUE_URL as string,
+  isLocal: process.env.IT_IS_LOCAL === 'true',
+};
+
 export const LAMBDA_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',
@@ -72,3 +79,5 @@ export const SENTRY_CONFIG = {
 };
 
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
+
+export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;

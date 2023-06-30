@@ -132,4 +132,24 @@ export class NotificationsRepository {
       .limit(pagination.perPage)
       .offset(pagination.perPage * pagination.page);
   }
+
+  async doesUniqueIdExists(uniqueId: string): Promise<boolean> {
+    if (!uniqueId) {
+      return false;
+    }
+
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(notificationsTable)
+        .select(['uniqueId'])
+        .where('uniqueId', '=', uniqueId)
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error: any) {
+      return false;
+    }
+  }
 }

@@ -7,6 +7,8 @@ import { StoreEventsHandler } from 'Notifications/Port/Queue/EventHandler/StoreE
 import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
+import { NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
 
 export default class EventBusProvider {
   private config: Notifications.Config;
@@ -16,7 +18,7 @@ export default class EventBusProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(NotificationEventHandler, [CreateNotification, DismissNotifications]);
+    container.addSingleton(NotificationEventHandler, [CreateNotification, DismissNotifications, PushNotificationRepository, NotificationQuery]);
     container.addSingleton(StoreEventsHandler, [StoredEventRepository, IdGenerator]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;

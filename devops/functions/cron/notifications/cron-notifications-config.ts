@@ -13,7 +13,10 @@ export const CronNotificationsFunction = {
   },
   events: [
     {
-      schedule: 'rate(5 minutes)',
+      schedule: {
+        rate: ['rate(1 minute)'],
+        enabled: process.env?.DISABLE_CRON ? false : true,
+      },
     },
   ],
 };

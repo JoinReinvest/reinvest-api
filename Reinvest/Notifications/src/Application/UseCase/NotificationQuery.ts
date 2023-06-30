@@ -33,4 +33,8 @@ export class NotificationQuery {
   async getNotificationsStats(profileId: string, accountId: string): Promise<NotificationsStats> {
     return this.notificationsRepository.getNotificationsStats(profileId, accountId);
   }
+
+  async doesNotificationExists(uniqueId: string): Promise<boolean> {
+    return this.notificationsRepository.doesUniqueIdExists(uniqueId);
+  }
 }
