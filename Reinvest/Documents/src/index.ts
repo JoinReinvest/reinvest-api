@@ -4,9 +4,11 @@ import { DocumentsApi, DocumentsApiType } from 'Documents/Port/Api/DocumentsApi'
 import { documentsTechnicalHandler, DocumentsTechnicalHandlerType } from 'Documents/Port/Queue/DocumentsTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Documents/Providers/AdapterServiceProvider';
 import { PortsProvider } from 'Documents/Providers/PortsProvider';
+import { UseCaseProvider } from 'Documents/Providers/UseCaseProvider';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-import { NoMigrationException } from 'PostgreSQL/NoMigrationException';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
+
+import * as DocumentsMigrations from '../migrations';
 
 export namespace Documents {
   export const moduleName = 'Documents';
@@ -34,6 +36,7 @@ export namespace Documents {
         return;
       }
 
+      new UseCaseProvider(this.config).boot(this.container);
       new AdapterServiceProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);
 
@@ -58,7 +61,7 @@ export namespace Documents {
     }
 
     migration() {
-      throw new NoMigrationException();
+      return DocumentsMigrations;
     }
 
     async close(): Promise<void> {

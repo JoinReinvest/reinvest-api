@@ -1,5 +1,6 @@
 import { SessionContext } from 'ApiGateway/index';
 import { Documents } from 'Documents/index';
+import { UUID } from 'HKEKTypes/Generics';
 
 const schema = `
     #graphql
@@ -42,9 +43,19 @@ const schema = `
         url: String
     }
 
+    type RenderedPage {
+      id: ID
+      url: String // original url
+      name: String
+    }
+
     type Query {
         "Returns document link by id"
         getDocument(documentId: ID!): GetDocumentLink
+
+        listRenderedPage(): RenderedPage
+
+        getRenderedPageLink(id: ID): PutFileLink
     }
 
     type Mutation {
@@ -65,6 +76,8 @@ const schema = `
         Use "id" wherever system needs the reference to the avatar file.
         """
         createAvatarFileLink: PutFileLink
+
+        renderPageToPdf(link: String, name: String): ID
     }
 `;
 
@@ -77,6 +90,19 @@ export const DocumentTypes = {
 
         return api.getDocumentLink(documentId, profileId);
       },
+      listRenderedPage: async (parent: any, args: any, { modules, profileId }: SessionContext) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
+        const list = await api.listRenderedPage(profileId);
+
+        return list;
+      },
+      getRenderedPageLink: async (parent: any, { id }: { id: UUID }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
+
+        const renderedPageLink = await api.getRenderedPageLink(profileId, id);
+
+        return renderedPageLink;
+      },
     },
     Mutation: {
       createDocumentsFileLinks: async (parent: any, { numberOfLinks }: { numberOfLinks: number }, { profileId, modules }: SessionContext) => {
@@ -88,6 +114,13 @@ export const DocumentTypes = {
         const api = modules.getApi<Documents.ApiType>(Documents);
 
         return api.createAvatarFileLink(profileId);
+      },
+      renderPageToPdf: async (parent: any, { link, name }: { link: string; name: string }, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Documents.ApiType>(Documents);
+
+        const id = await api.renderPageToPdf(profileId, name, link);
+
+        return id;
       },
     },
   },

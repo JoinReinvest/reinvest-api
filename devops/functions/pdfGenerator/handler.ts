@@ -4,6 +4,7 @@ import { CHROMIUM_ENDPOINT, S3_CONFIG, SQS_CONFIG } from 'Reinvest/config';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 
 import { GeneratePdf } from './src/GeneratePdf';
+import { MakeScreenshotToPdf } from './src/MakeScreenshotToPdf';
 import { PdfGenerator } from './src/Puppeteer/PdfGenerator';
 import { S3Adapter } from './src/S3/S3Adapter';
 
@@ -18,14 +19,14 @@ export type GeneratePdfCommand = {
   kind: 'GeneratePdf';
 };
 
-export type MakeScreenshotToPDf = {
+export type MakeScreenshotToPdfCommand = {
   data: {
     catalog: string;
     fileName: string;
     url: string;
   };
   id: string;
-  kind: 'MakeScreenshotToPDf';
+  kind: 'MakeScreenshotToPdf';
 };
 
 export const main: SQSHandler = async (event: SQSEvent) => {
@@ -34,14 +35,15 @@ export const main: SQSHandler = async (event: SQSEvent) => {
   try {
     const data = JSON.parse(record.body);
     const { kind } = data;
-    const { generatePdf, queueSender } = boot();
+
+    const { generatePdf, queueSender, makeScreenshotToPdf } = boot();
 
     if (!kind || kind === 'GeneratePdf') {
       const {
         data: { catalog, fileName, template, templateType },
         id,
       } = data;
-      console.log({ catalog, fileName });
+
       await generatePdf.execute(catalog, fileName, template, templateType);
       await queueSender.send(
         JSON.stringify({
@@ -56,8 +58,13 @@ export const main: SQSHandler = async (event: SQSEvent) => {
       );
     }
 
-    if (kind === 'MakeScreenshotToPDf') {
-      // todo screenshot
+    if (kind === 'MakeScreenshotToPdf') {
+      const {
+        data: { catalog, fileName, name, url, templateType },
+        id,
+      } = data;
+
+      await makeScreenshotToPdf.execute(catalog, fileName, name, url, templateType);
     }
     // send event back
   } catch (error: any) {
@@ -67,6 +74,7 @@ export const main: SQSHandler = async (event: SQSEvent) => {
 
 function boot(): {
   generatePdf: GeneratePdf;
+  makeScreenshotToPdf: MakeScreenshotToPdf;
   queueSender: QueueSender;
 } {
   const s3Config = S3_CONFIG;
@@ -76,6 +84,7 @@ function boot(): {
 
   return {
     generatePdf: new GeneratePdf(s3Adapter, pdfGenerator),
+    makeScreenshotToPdf: new MakeScreenshotToPdf(s3Adapter, pdfGenerator),
     queueSender,
   };
 }
