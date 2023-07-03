@@ -1,2 +1,1 @@
-// export * as migration_20233006113300_create_rendered_page_pdf from './archiving_create_rendered_page_pdf';
-export {};
+export * as migration_20230703160700_create_archiving_beneficiary from './archiving_1_create_archiving_beneficiary';

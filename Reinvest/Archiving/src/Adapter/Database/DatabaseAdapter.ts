@@ -1,10 +1,11 @@
+import { ArchivingBeneficiaryTable } from 'Archiving/Adapter/Database/ArchivingSchema';
 import { Kysely } from 'kysely/dist/esm';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 
-export const archivingRenderedPagePdfTable = 'archiving_rendered_page_pdf_table';
+export const archivingBeneficiary = 'archiving_beneficiary';
 
 export interface ArchivingDatabase {
-  // [archivingRenderedPagePdfTable]: ArchivingRenderedPagePdfSchema;
+  [archivingBeneficiary]: ArchivingBeneficiaryTable;
 }
 
 export const ArchivingDatabaseAdapterInstance = 'ArchivingDatabaseAdapter';
