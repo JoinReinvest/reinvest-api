@@ -6,9 +6,10 @@ export async function up(db: Kysely<DocumentsDatabase>): Promise<void> {
     .createTable(documentsRenderedPagePdfTable)
     .addColumn('id', 'uuid', col => col.primaryKey().notNull().unique())
     .addColumn('profileId', 'uuid', col => col.notNull())
-    .addColumn('url', 'varchar(36)', col => col.notNull())
-    .addColumn('name', 'varchar(36)', col => col.notNull())
+    .addColumn('url', 'text', col => col.notNull())
+    .addColumn('name', 'varchar(255)', col => col.notNull())
     .addColumn('dateCreated', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
+    .addColumn('dateGenerated', 'timestamp', col => col.defaultTo(null))
     .execute();
 }
 

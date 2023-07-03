@@ -6,6 +6,7 @@ import { DomainEvent } from 'SimpleAggregator/Types';
 export enum PdfTypes {
   PAGE = 'PAGE',
 }
+
 export type RenderPageToPdfCreate = {
   dateCreated: Date;
   id: UUID;
@@ -40,9 +41,9 @@ class RenderPageToPdf {
 
     const pdfCommand: DomainEvent = {
       id,
-      kind: 'RenderPageToPdfCommand',
+      kind: 'MakeScreenshotToPdf',
       data: {
-        catalog: profileId,
+        catalog: `${profileId}/calculations`,
         fileName: id,
         name,
         url,

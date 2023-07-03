@@ -1,7 +1,6 @@
-import HTMLParser from './HTMLParser';
 import type { PdfGenerator } from './Puppeteer/PdfGenerator';
 import type { S3Adapter } from './S3/S3Adapter';
-import { PdfTypes, Template } from './Types';
+import { PdfTypes } from './Types';
 
 export class MakeScreenshotToPdf {
   private adapter: S3Adapter;
@@ -21,6 +20,6 @@ export class MakeScreenshotToPdf {
       throw new Error('Error generating pdf');
     }
 
-    await this.adapter.uploadScreenshotPdf(catalog, fileName, buffer!);
+    await this.adapter.uploadBufferPdf(catalog, fileName, buffer!);
   }
 }

@@ -20,6 +20,7 @@ export class PdfGenerator {
 
     return browser;
   }
+
   async generatePdfFromHtml(html: string): Promise<Buffer | null> {
     try {
       const options = {
@@ -39,13 +40,8 @@ export class PdfGenerator {
   async makeScreenshot(url: string) {
     try {
       const browser = await this.getPuppeteerConfig();
-
       const page = await browser.newPage();
-
-      const website_url = url ?? 'https://yog9.github.io/SnapShot/#/SnapScout/mountain';
-
-      await page.goto(website_url, { waitUntil: 'networkidle0' });
-
+      await page.goto(url, { waitUntil: 'networkidle0' });
       await page.emulateMediaType('screen');
 
       const pdf = await page.pdf({
@@ -54,7 +50,7 @@ export class PdfGenerator {
         format: 'A4',
       });
 
-      await browser.close();
+      // await browser.close();
 
       return pdf;
     } catch (error) {
@@ -63,6 +59,7 @@ export class PdfGenerator {
       return null;
     }
   }
+
   private async getPDFBuffer(html: string, options: any): Promise<Buffer> {
     const browser = await puppeteer.launch({
       executablePath: await chromium.executablePath(this.chromiumEndpoint),

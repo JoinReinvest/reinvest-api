@@ -1,4 +1,4 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { DocumentsPdfPageRepository } from 'Reinvest/Documents/src/Adapter/Repository/DocumentsPdfPageRepository';
 
 class ListRenderedPage {
@@ -9,10 +9,8 @@ class ListRenderedPage {
     this.documentsPdfPageRepository = documentsPdfPageRepository;
   }
 
-  async execute(profileId: UUID) {
-    const list = await this.documentsPdfPageRepository.getAllByProfileId(profileId);
-
-    return list;
+  async execute(profileId: UUID, pagination: Pagination) {
+    return this.documentsPdfPageRepository.getAllByProfileId(profileId, pagination);
   }
 }
 

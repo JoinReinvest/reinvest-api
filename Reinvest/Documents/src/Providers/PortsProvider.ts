@@ -19,8 +19,10 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     //controllers
-    container.addSingleton(FileLinksController, [FileLinkService]).addSingleton(PdfController, [RenderPageToPdf, GetRenderedPageLink, ListRenderedPage]);
-    container.addSingleton(FileLinksController, [FileLinkService]);
+    container
+      .addSingleton(FileLinksController, [FileLinkService])
+      .addSingleton(PdfController, [RenderPageToPdf, GetRenderedPageLink, ListRenderedPage])
+      .addSingleton(FileLinksController, [FileLinkService]);
 
     // queue
     container.addSingleton(DocumentRemovedEventHandler, [S3Adapter]).addSingleton(AvatarRemovedEventHandler, [S3Adapter]);

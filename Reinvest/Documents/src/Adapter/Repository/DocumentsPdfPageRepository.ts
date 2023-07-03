@@ -1,6 +1,6 @@
 import { DocumentsDatabaseAdapterProvider, documentsRenderedPagePdfTable } from 'Documents/Adapter/Database/DatabaseAdapter';
 import { RenderPageToPdfCreate } from 'Documents/UseCases/RenderPageToPdf';
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -15,13 +15,16 @@ export class DocumentsPdfPageRepository {
     this.eventsPublisher = eventsPublisher;
   }
 
-  async getAllByProfileId(profileId: UUID) {
+  async getAllByProfileId(profileId: UUID, pagination: Pagination) {
     try {
       const list = await this.documentsDatabaseAdapterProvider
         .provide()
         .selectFrom(documentsRenderedPagePdfTable)
-        .select(['id', 'url', 'name'])
+        .select(['id', 'url', 'name', 'dateCreated', 'dateGenerated'])
         .where('profileId', '=', profileId)
+        .orderBy('dateCreated', 'desc')
+        .limit(pagination.perPage)
+        .offset(pagination.perPage * pagination.page)
         .execute();
 
       return list;

@@ -1,5 +1,6 @@
+import { FileLink } from 'Documents/Adapter/S3/FileLinkService';
 import RenderPageToPdf from 'Documents/UseCases/RenderPageToPdf';
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 
 import GetRenderedPageLink from '../../UseCases/GetRenderedPageLink';
 import ListRenderedPage from '../../UseCases/ListRenderedPage';
@@ -42,9 +43,7 @@ export class PdfController {
 
   public async renderPageToPdf(profileId: UUID, name: string, url: string) {
     try {
-      const id = await this.renderPageToPdfUseCase.execute(profileId, name, url);
-
-      return id;
+      return await this.renderPageToPdfUseCase.execute(profileId, name, url);
     } catch (error: any) {
       console.error(`Generate ${url} page to pdf for ${profileId}/calculations/:id`, error);
 
@@ -52,23 +51,19 @@ export class PdfController {
     }
   }
 
-  public async getRenderedPageLink(profileId: UUID, id: UUID) {
+  public async getRenderedPageLink(profileId: UUID, id: UUID): Promise<FileLink | null> {
     try {
-      const renderedPage = await this.getRenderedPageLinkUseCase.execute(profileId, id);
-
-      return renderedPage;
+      return await this.getRenderedPageLinkUseCase.execute(profileId, id);
     } catch (error: any) {
-      return false;
+      return null;
     }
   }
 
-  public async listRenderedPage(profileId: UUID) {
+  public async listRenderedPages(profileId: UUID, pagination: Pagination = { page: 0, perPage: 10 }) {
     try {
-      const renderedPage = await this.listRenderedPageUseCase.execute(profileId);
-
-      return renderedPage;
+      return await this.listRenderedPageUseCase.execute(profileId, pagination);
     } catch (error: any) {
-      return false;
+      return [];
     }
   }
 }

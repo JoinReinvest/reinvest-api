@@ -66,6 +66,7 @@ export function boot(): Modules {
     Documents.create({
       database: databaseConfig,
       s3: s3Config,
+      pdfGeneratorQueue,
       chromiumEndpoint: CHROMIUM_ENDPOINT,
     } as Documents.Config),
   );

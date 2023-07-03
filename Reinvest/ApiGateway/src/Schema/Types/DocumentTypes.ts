@@ -44,18 +44,21 @@ const schema = `
     }
 
     type RenderedPage {
-      id: ID
-      url: String // original url
-      name: String
+        id: ID
+        """source url"""
+        url: String
+        name: String
+        dateCreated: String
+        dateGenerated: String
     }
 
     type Query {
         "Returns document link by id"
         getDocument(documentId: ID!): GetDocumentLink
 
-        listRenderedPage(): RenderedPage
+        listRenderedPages(pagination: Pagination = {page: 0, perPage: 10}): [RenderedPage]
 
-        getRenderedPageLink(id: ID): PutFileLink
+        getRenderedPageLink(id: ID!): GetDocumentLink
     }
 
     type Mutation {
@@ -90,18 +93,15 @@ export const DocumentTypes = {
 
         return api.getDocumentLink(documentId, profileId);
       },
-      listRenderedPage: async (parent: any, args: any, { modules, profileId }: SessionContext) => {
+      listRenderedPages: async (parent: any, { pagination }: any, { modules, profileId }: SessionContext) => {
         const api = modules.getApi<Documents.ApiType>(Documents);
-        const list = await api.listRenderedPage(profileId);
 
-        return list;
+        return api.listRenderedPages(profileId, pagination);
       },
       getRenderedPageLink: async (parent: any, { id }: { id: UUID }, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Documents.ApiType>(Documents);
 
-        const renderedPageLink = await api.getRenderedPageLink(profileId, id);
-
-        return renderedPageLink;
+        return api.getRenderedPageLink(profileId, id);
       },
     },
     Mutation: {
@@ -118,9 +118,7 @@ export const DocumentTypes = {
       renderPageToPdf: async (parent: any, { link, name }: { link: string; name: string }, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Documents.ApiType>(Documents);
 
-        const id = await api.renderPageToPdf(profileId, name, link);
-
-        return id;
+        return api.renderPageToPdf(profileId, name, link);
       },
     },
   },

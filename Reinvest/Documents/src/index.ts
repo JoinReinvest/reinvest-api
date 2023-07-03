@@ -5,16 +5,19 @@ import { documentsTechnicalHandler, DocumentsTechnicalHandlerType } from 'Docume
 import { AdapterServiceProvider } from 'Documents/Providers/AdapterServiceProvider';
 import { PortsProvider } from 'Documents/Providers/PortsProvider';
 import { UseCaseProvider } from 'Documents/Providers/UseCaseProvider';
-import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
+import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
+import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 
 import * as DocumentsMigrations from '../migrations';
+import EventBusProvider from 'Documents/Providers/EventBusProvider';
 
 export namespace Documents {
   export const moduleName = 'Documents';
   export type Config = {
     chromiumEndpoint: string;
     database: PostgreSQLConfig;
+    pdfGeneratorQueue: QueueConfig;
     s3: S3Config;
   };
 
@@ -36,9 +39,10 @@ export namespace Documents {
         return;
       }
 
-      new UseCaseProvider(this.config).boot(this.container);
       new AdapterServiceProvider(this.config).boot(this.container);
+      new UseCaseProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);
+      new EventBusProvider(this.config).boot(this.container);
 
       this.booted = true;
     }
