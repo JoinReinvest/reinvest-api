@@ -3,6 +3,7 @@ import { RenderPageToPdfCreate } from 'Documents/UseCases/RenderPageToPdf';
 import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 export class DocumentsPdfPageRepository {
   public static getClassName = (): string => 'DocumentsPdfPageRepository';
@@ -27,7 +28,11 @@ export class DocumentsPdfPageRepository {
         .offset(pagination.perPage * pagination.page)
         .execute();
 
-      return list;
+      return list.map(item => ({
+        ...item,
+        dateCreated: DateTime.from(item.dateCreated).toIsoDateTime(),
+        dateGenerated: item.dateGenerated ? DateTime.from(item.dateGenerated).toIsoDateTime() : null,
+      }));
     } catch (err: any) {
       return [];
     }

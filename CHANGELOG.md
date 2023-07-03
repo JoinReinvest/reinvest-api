@@ -1,5 +1,14 @@
 # REINVEST API CHANGELOG
 
+## 1.18.0 - 07/03/2023
+
+* New mutation:
+    * `renderPageToPdf` - It allows to render page from link to pdf
+* New queries:
+    * `listRenderedPages` - It returns list of rendered pages
+    * `getRenderedPageLink` - when you want to get link to download rendered page use this query with id of rendered
+      page
+
 ## 1.17.4 - 06/30/2023
 
 * No MOCKS anymore:
