@@ -1,3 +1,4 @@
+import { NotificationObjectType } from 'Notifications/Domain/Notification';
 import { Notifications } from 'Notifications/index';
 import { IncentiveReward, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { InvestorDividend } from 'SharesAndDividends/Domain/InvestorDividend';
@@ -37,8 +38,12 @@ export class NotificationService {
     const header = message.header;
     // @ts-ignore
     const body = rewardType === RewardType.INVITER ? message.bodyForInviter(amount) : message.bodyForInvitee(amount);
+    const pushNotification = {
+      title: header,
+      body,
+    };
 
-    await api.createNotification(profileId, null, type, header, body, rewardId, rewardId, 'DIVIDEND', rewardId);
+    await api.createNotification(profileId, null, type, header, body, rewardId, rewardId, NotificationObjectType.DIVIDEND, rewardId, pushNotification);
   }
 
   async notifyDividendUpdate(investorDividend: InvestorDividend): Promise<void> {
@@ -51,7 +56,7 @@ export class NotificationService {
     // @ts-ignore
     const body = message.body(dividendAmount);
 
-    await api.createNotification(profileId, accountId, type, header, body, dividendId, dividendId, 'DIVIDEND', dividendId);
+    await api.createNotification(profileId, accountId, type, header, body, dividendId, dividendId, NotificationObjectType.DIVIDEND, dividendId);
   }
 
   async markNotificationAsRead(profileId: string, dismissId: string): Promise<void> {

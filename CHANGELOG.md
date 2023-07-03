@@ -1,12 +1,23 @@
 # REINVEST API CHANGELOG
 
+## 1.17.4 - 06/30/2023
+
+* No MOCKS anymore:
+    * `registerPushNotificationDevice` - Register device for Firebase push notifications
+
+## 1.17.3 - 06/29/2023
+
+* No MOCKS anymore:
+    * `getPortfolioDetails`
+    * `getAccountActivity`
+
 ## 1.17.2 - 06/26/2023
 
 * No MOCKS anymore:
     * `cancelInvestment` - cancel investment after the investment has been started and the grace period has not ended
       yet
 * New MOCK mutation:
-  * `registerPushNotificationDevice` - Register device for Firebase push notifications
+    * `registerPushNotificationDevice` - Register device for Firebase push notifications
 
 ## 1.17.1 - 06/23/2023
 

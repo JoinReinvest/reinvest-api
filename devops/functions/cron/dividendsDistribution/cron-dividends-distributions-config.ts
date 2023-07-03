@@ -12,7 +12,10 @@ export const CronDividendsDistributionFunction = {
   },
   events: [
     {
-      schedule: 'rate(1 hour)',
+      schedule: {
+        rate: ['rate(1 hour)'],
+        enabled: process.env?.DISABLE_CRON ? false : true,
+      },
     },
   ],
 };

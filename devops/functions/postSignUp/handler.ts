@@ -22,7 +22,7 @@ export const main: PostAuthenticationTriggerHandler = async (event, context, cal
     return;
   }
 
-  if (!emailVerified) {
+  if (!emailVerified || !email) {
     callback('EMAIL_NOT_VERIFIED', event);
 
     return;

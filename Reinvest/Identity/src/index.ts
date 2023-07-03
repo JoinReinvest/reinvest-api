@@ -10,6 +10,7 @@ import { ServicesProvider } from 'Identity/Providers/ServicesProvider';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
+import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 
 import * as IdentityMigrations from '../migrations';
 
@@ -19,6 +20,7 @@ export namespace Identity {
     Cognito: CognitoConfig;
     SNS: SNSConfig;
     database: PostgreSQLConfig;
+    queue: QueueConfig;
     webAppUrl: string;
   };
 

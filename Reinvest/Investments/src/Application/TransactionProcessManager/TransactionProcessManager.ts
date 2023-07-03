@@ -39,7 +39,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
   }
 
   makeDecision(): TransactionDecision {
-    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId, parentId } = this.eventsAnalysis();
+    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId, parentId, userTradeId } = this.eventsAnalysis();
 
     if (!lastEvent || !this.profileId) {
       return this.decide(TransactionDecisions.AWAITING_INVESTMENT);
@@ -60,6 +60,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           subscriptionAgreementId,
           portfolioId,
           parentId,
+          userTradeId,
         });
       case TransactionEvents.TRADE_CREATED:
         return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED);
@@ -154,6 +155,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     parentId: string | null;
     portfolioId: string | null;
     subscriptionAgreementId: string | null;
+    userTradeId: string | null;
   } {
     let amount = null;
     let fees = null;
@@ -164,6 +166,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     let bankAccountId = null;
     let portfolioId = null;
     let parentId = null;
+    let userTradeId = null;
 
     for (const event of this.events) {
       lastEvent = event;
@@ -180,12 +183,24 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           bankAccountId = event.data.bankAccountId;
           subscriptionAgreementId = event.data.subscriptionAgreementId;
           portfolioId = event.data.portfolioId;
+          userTradeId = event.data.userTradeId;
           break;
         default:
           break;
       }
     }
 
-    return { accountId, lastEvent, amount, fees, subscriptionAgreementId, ip, bankAccountId, portfolioId, parentId };
+    return {
+      accountId,
+      lastEvent,
+      amount,
+      fees,
+      subscriptionAgreementId,
+      ip,
+      bankAccountId,
+      portfolioId,
+      parentId,
+      userTradeId,
+    };
   }
 }

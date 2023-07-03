@@ -17,6 +17,7 @@ import {
   DATABASE_CONFIG,
   DEALPATH_CONFIG,
   EMAIL_DOMAIN,
+  FIREBASE_SQS_CONFIG,
   NORTH_CAPITAL_CONFIG,
   PDF_GENERATOR_SQS_CONFIG,
   S3_CONFIG,
@@ -46,6 +47,7 @@ export function boot(): Modules {
   const cognitoConfig = COGNITO_CONFIG as CognitoConfig;
   const queueConfig = SQS_CONFIG as QueueConfig;
   const pdfGeneratorQueue = PDF_GENERATOR_SQS_CONFIG as QueueConfig;
+  const firebaseQueue = FIREBASE_SQS_CONFIG as QueueConfig;
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
   const dealpathConfig = DEALPATH_CONFIG as DealpathConfig;
@@ -55,6 +57,7 @@ export function boot(): Modules {
     Notifications.create({
       database: databaseConfig,
       queue: queueConfig,
+      firebaseQueue: firebaseQueue,
     } as Notifications.Config),
   );
 
@@ -111,6 +114,7 @@ export function boot(): Modules {
         SNS: snsConfig,
         Cognito: cognitoConfig,
         webAppUrl: WEB_APP_URL,
+        queue: queueConfig,
       } as Identity.Config,
       {
         investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main,

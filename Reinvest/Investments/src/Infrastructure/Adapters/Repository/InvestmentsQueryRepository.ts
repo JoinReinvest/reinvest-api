@@ -15,6 +15,7 @@ export type InvestmentDetails = {
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
   subscriptionAgreementPdfDateCreated: Date | null;
+  tradeId: string;
 };
 
 export class InvestmentsQueryRepository {
@@ -38,6 +39,7 @@ export class InvestmentsQueryRepository {
         `${investmentsTable}.bankAccountId`,
         `${investmentsTable}.portfolioId`,
         `${investmentsTable}.status`,
+        `${investmentsTable}.tradeId`,
       ])
       .select([`${subscriptionAgreementTable}.signedByIP as ip`, `${subscriptionAgreementTable}.pdfDateCreated as subscriptionAgreementPdfDateCreated`])
       .select([`${investmentsFeesTable}.amount as feeAmount`])
