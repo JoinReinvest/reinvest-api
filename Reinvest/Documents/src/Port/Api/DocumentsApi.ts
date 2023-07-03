@@ -10,10 +10,16 @@ export type DocumentsApiType = {
   getAvatarLink: FileLinksController['getAvatarLink'];
   getDocumentLink: FileLinksController['getDocumentLink'];
   getImageLink: FileLinksController['getImageLink'];
+  getRenderedPageLink: PdfController['getRenderedPageLink'];
+  listRenderedPages: PdfController['listRenderedPages'];
+  renderPageToPdf: PdfController['renderPageToPdf'];
 };
 
 export const DocumentsApi = (container: ContainerInterface): DocumentsApiType => ({
+  getRenderedPageLink: container.delegateTo(PdfController, 'getRenderedPageLink'),
   generatePdf: container.delegateTo(PdfController, 'generatePdf'),
+  listRenderedPages: container.delegateTo(PdfController, 'listRenderedPages'),
+  renderPageToPdf: container.delegateTo(PdfController, 'renderPageToPdf'),
   createAvatarFileLink: container.delegateTo(FileLinksController, 'createAvatarFileLink'),
   createImageFileLinks: container.delegateTo(FileLinksController, 'createImageFileLinks'),
   createDocumentsFileLinks: container.delegateTo(FileLinksController, 'createDocumentsFileLinks'),

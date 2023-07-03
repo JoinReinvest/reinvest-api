@@ -68,6 +68,21 @@ export class S3Adapter {
     return getSignedUrl(client, getCommand, { expiresIn: 3600 });
   }
 
+  public async getRenderedPage(fileName: string, catalog: string) {
+    const client = new S3Client({
+      region: this.config.region,
+    });
+
+    const bucketName = this.config.documentsBucket;
+
+    const getCommand = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: `${catalog}/calculations/${fileName}`,
+    });
+
+    return getSignedUrl(client, getCommand, { expiresIn: 527040 });
+  }
+
   public async getImageUrl(fileName: string, catalog: string) {
     const client = new S3Client({
       region: this.config.region,
