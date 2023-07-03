@@ -16,6 +16,7 @@
       "Money/*": ["./shared/hkek-money/*"],
 
       "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
+      "Archiving/*": ["./Reinvest/Archiving/src/*"],
       "AdminApiGateway/*": ["./Reinvest/AdminApiGateway/src/*"],
       "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],
       "LegalEntities/*": ["./Reinvest/LegalEntities/src/*"],

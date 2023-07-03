@@ -1,3 +1,4 @@
+import { Archiving } from 'Archiving/index';
 import { Documents } from 'Documents/index';
 import { CognitoConfig } from 'Identity/Adapter/AWS/CognitoService';
 import { SNSConfig } from 'Identity/Adapter/AWS/SmsService';
@@ -213,6 +214,19 @@ export function boot(): Modules {
         documents: modules.get(Documents.moduleName) as Documents.Main,
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         registration: modules.get(Registration.moduleName) as Registration.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    Archiving.moduleName,
+    Archiving.create(
+      {
+        database: databaseConfig,
+      } as Archiving.Config,
+      {
+        legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
+        investments: modules.get(Investments.moduleName) as Investments.Main,
       },
     ),
   );
