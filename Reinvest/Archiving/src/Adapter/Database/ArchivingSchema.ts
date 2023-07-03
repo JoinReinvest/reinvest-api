@@ -1,8 +1,8 @@
-import { ArchivingBeneficiaryStatus } from 'Archiving/Domain/ArchivedBeneficiary';
-import { JSONObject } from 'HKEKTypes/Generics';
+import { AccountArchivingState, ArchivingBeneficiaryStatus } from 'Archiving/Domain/ArchivedBeneficiary';
+import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
 
 export interface ArchivingBeneficiaryTable {
-  accountArchivingStateJson: JSONObject;
+  accountArchivingStateJson: JSONObjectOf<AccountArchivingState>;
   accountId: string;
   dateCompleted: Date | null;
   dateCreated: Date;

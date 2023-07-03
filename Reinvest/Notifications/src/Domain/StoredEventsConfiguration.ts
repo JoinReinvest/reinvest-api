@@ -10,6 +10,7 @@ export enum StoredEventKind {
   TrustAccountOpened = 'TrustAccountOpened',
   InvestmentProcessStarted = 'InvestmentProcessStarted',
   PaymentInitiated = 'PaymentInitiated',
+  ArchivingBeneficiaryStarted = 'ArchivingBeneficiaryStarted',
 }
 
 export const StoredEvents = <StoredEventsType>{
@@ -50,6 +51,29 @@ export const StoredEvents = <StoredEventsType>{
     push: {
       title: () => 'Investment started',
       body: investmentStartedBody,
+    },
+  },
+  ArchivingBeneficiaryStarted: {
+    accountActivity: {
+      data: ({ label, beneficiaryId, accountId }) => ({
+        label,
+        beneficiaryId,
+        accountId,
+      }),
+      name: ({ label }) => `Beneficiary ${label} is being archived`,
+    },
+    push: {
+      title: () => 'Archiving beneficiary started',
+      body: ({ label }) => `Beneficiary ${label} is being archived`,
+    },
+    inApp: {
+      header: () => 'Archiving beneficiary started',
+      body: ({ label }) => `Beneficiary ${label} is being archived`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+      onObject: ({ beneficiaryId }) => ({
+        onObjectId: beneficiaryId,
+        onObjectType: NotificationObjectType.ACCOUNT,
+      }),
     },
   },
   PaymentInitiated: {

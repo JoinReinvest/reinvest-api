@@ -9,6 +9,8 @@ import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
+import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 import * as ArchivingMigrations from '../migrations';
 
@@ -16,11 +18,13 @@ export namespace Archiving {
   export const moduleName = 'Archiving';
   export type Config = {
     database: PostgreSQLConfig;
+    queue: QueueConfig;
   };
 
   export type ModulesDependencies = {
     investments: Investments.Main;
     legalEntities: LegalEntities.Main;
+    sharesAndDividends: SharesAndDividends.Main;
   };
 
   export type ApiType = ArchivingApiType & Api;
@@ -45,6 +49,8 @@ export namespace Archiving {
 
       this.container.addAsValue('Investments', this.modules.investments);
       this.container.addAsValue('LegalEntities', this.modules.legalEntities);
+      this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
+
       new AdapterServiceProvider(this.config).boot(this.container);
       new UseCaseProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);

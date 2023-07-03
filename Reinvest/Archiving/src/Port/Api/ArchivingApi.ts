@@ -1,9 +1,12 @@
+import { ArchiveBeneficiaryController } from 'Archiving/Port/Api/ArchiveBeneficiaryController';
 import { ContainerInterface } from 'Container/Container';
 
 export type ArchivingApiType = {
-  // createAvatarFileLink: FileLinksController['createAvatarFileLink'];
+  initArchivingBeneficiary: ArchiveBeneficiaryController['initArchivingBeneficiary'];
+  pushArchiveBeneficiaryProcess: ArchiveBeneficiaryController['pushArchiveBeneficiaryProcess'];
 };
 
 export const ArchivingApi = (container: ContainerInterface): ArchivingApiType => ({
-  // getRenderedPageLink: container.delegateTo(PdfController, 'getRenderedPageLink'),
+  pushArchiveBeneficiaryProcess: container.delegateTo(ArchiveBeneficiaryController, 'pushArchiveBeneficiaryProcess'),
+  initArchivingBeneficiary: container.delegateTo(ArchiveBeneficiaryController, 'initArchivingBeneficiary'),
 });

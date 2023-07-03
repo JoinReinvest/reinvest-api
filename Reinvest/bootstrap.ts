@@ -223,10 +223,12 @@ export function boot(): Modules {
     Archiving.create(
       {
         database: databaseConfig,
+        queue: queueConfig,
       } as Archiving.Config,
       {
         legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
         investments: modules.get(Investments.moduleName) as Investments.Main,
+        sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
       },
     ),
   );

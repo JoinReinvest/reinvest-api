@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { LegalEntitiesDatabase } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
@@ -126,5 +127,17 @@ export class BeneficiaryAccountController {
         errors,
       };
     }
+  }
+
+  public async archiveBeneficiary(profileId: UUID, accountId: UUID): Promise<boolean> {
+    const beneficiary = await this.beneficiaryRepository.findBeneficiary(profileId, accountId);
+
+    if (!beneficiary) {
+      return false;
+    }
+
+    // todo archive beneficiary - add archived status for beneficiary
+    // todo add id of an account to ban list in identity service
+    return true;
   }
 }

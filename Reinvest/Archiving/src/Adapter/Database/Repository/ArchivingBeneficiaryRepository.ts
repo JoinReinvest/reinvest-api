@@ -1,6 +1,7 @@
 import { ArchivingBeneficiaryTable } from 'Archiving/Adapter/Database/ArchivingSchema';
 import { archivingBeneficiary, ArchivingDatabaseAdapterProvider } from 'Archiving/Adapter/Database/DatabaseAdapter';
-import { ArchivedBeneficiary, ArchivingBeneficiarySchema } from 'Archiving/Domain/ArchivedBeneficiary';
+import { AccountArchivingState, ArchivedBeneficiary, ArchivingBeneficiarySchema } from 'Archiving/Domain/ArchivedBeneficiary';
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
@@ -44,7 +45,6 @@ export class ArchivingBeneficiaryRepository {
             vertaloConfigurationJson: eb => eb.ref(`excluded.vertaloConfigurationJson`),
             accountArchivingStateJson: eb => eb.ref(`excluded.accountArchivingStateJson`),
             dateCompleted: eb => eb.ref(`excluded.dateCompleted`),
-            investmentTransferStateJson: eb => eb.ref(`excluded.investmentTransferStateJson`),
             status: eb => eb.ref(`excluded.status`),
           }),
         )
@@ -59,12 +59,11 @@ export class ArchivingBeneficiaryRepository {
   }
 
   private castToObject(tableData: ArchivingBeneficiaryTable): ArchivedBeneficiary {
-    const { accountArchivingStateJson, investmentTransferStateJson, vertaloConfigurationJson, ...data } = tableData;
+    const { accountArchivingStateJson, vertaloConfigurationJson, ...data } = tableData;
 
     return ArchivedBeneficiary.restore(<ArchivingBeneficiarySchema>{
       ...data,
-      accountArchivingState: accountArchivingStateJson,
-      investmentTransferState: investmentTransferStateJson,
+      accountArchivingState: accountArchivingStateJson as AccountArchivingState,
       vertaloConfiguration: vertaloConfigurationJson,
       dateCreated: DateTime.from(data.dateCreated),
       dateCompleted: data.dateCompleted ? DateTime.from(data.dateCompleted) : null,
@@ -72,12 +71,11 @@ export class ArchivingBeneficiaryRepository {
   }
 
   private castToTable(object: ArchivedBeneficiary): ArchivingBeneficiaryTable {
-    const { accountArchivingState, investmentTransferState, vertaloConfiguration, ...data } = object.toObject();
+    const { accountArchivingState, vertaloConfiguration, ...data } = object.toObject();
 
     return <ArchivingBeneficiaryTable>{
       ...data,
-      accountArchivingStateJson: accountArchivingState,
-      investmentTransferStateJson: investmentTransferState,
+      accountArchivingStateJson: accountArchivingState as JSONObjectOf<AccountArchivingState>,
       vertaloConfigurationJson: vertaloConfiguration,
       dateCreated: data.dateCreated.toDate(),
       dateCompleted: data.dateCompleted ? data.dateCompleted.toDate() : null,

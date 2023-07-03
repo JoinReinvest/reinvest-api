@@ -14,7 +14,6 @@ export async function up(db: Kysely<ArchivingDatabase>): Promise<void> {
     .addColumn('dateCompleted', 'timestamp', col => col.defaultTo(null))
     .addColumn('vertaloConfigurationJson', 'json', col => col.defaultTo(null))
     .addColumn('accountArchivingStateJson', 'json', col => col.defaultTo(null))
-    .addColumn('investmentTransferStateJson', 'json', col => col.defaultTo(null))
     .execute();
 
   await db.schema.alterTable(archivingBeneficiary).addUniqueConstraint('unique_profile_account', ['profileId', 'accountId']).execute();

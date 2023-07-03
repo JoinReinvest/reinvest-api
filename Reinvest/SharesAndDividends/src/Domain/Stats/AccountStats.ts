@@ -3,6 +3,7 @@ import { Money } from 'Money/Money';
 export type AccountStatsView = {
   EVS: string;
   accountValue: string;
+  accountValueAmount: number;
   advisorFees: string;
   appreciation: string;
   costOfSharesOwned: string;
@@ -45,6 +46,7 @@ export class AccountStats {
     return {
       EVS: this.EVS.getFormattedAmount(),
       accountValue: this.accountValue.getFormattedAmount(),
+      accountValueAmount: this.accountValue.getAmount(),
       advisorFees: this.advisorFees.getFormattedAmount(),
       appreciation: this.appreciation.getFormattedAmount(),
       costOfSharesOwned: this.costOfSharesOwned.getFormattedAmount(),

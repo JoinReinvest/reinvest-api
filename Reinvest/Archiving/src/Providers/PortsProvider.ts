@@ -1,4 +1,7 @@
 import { Archiving } from 'Archiving/index';
+import { ArchiveBeneficiaryController } from 'Archiving/Port/Api/ArchiveBeneficiaryController';
+import { ArchiveBeneficiary } from 'Archiving/UseCases/ArchiveBeneficiary';
+import { InitArchivingBeneficiary } from 'Archiving/UseCases/InitArchivingBeneficiary';
 import { ContainerInterface } from 'Container/Container';
 
 export class PortsProvider {
@@ -9,9 +12,6 @@ export class PortsProvider {
   }
 
   public boot(container: ContainerInterface) {
-    //controllers
-    // container.addSingleton(PdfController, [RenderPageToPdf, GetRenderedPageLink, ListRenderedPage]).addSingleton(FileLinksController, [FileLinkService]);
-    // queue
-    // container.addSingleton(DocumentRemovedEventHandler, [S3Adapter]).addSingleton(AvatarRemovedEventHandler, [S3Adapter]);
+    container.addSingleton(ArchiveBeneficiaryController, [InitArchivingBeneficiary, ArchiveBeneficiary]);
   }
 }
