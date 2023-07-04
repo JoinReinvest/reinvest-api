@@ -73,6 +73,7 @@ export interface InvestorDividendsTable {
   status: InvestorDividendStatus;
   totalDividendAmount: number;
   totalFeeAmount: number;
+  transferredId: UUID | null;
 }
 
 export type DividendsSelection = Pick<InvestorDividendsTable, 'totalDividendAmount' | 'totalFeeAmount'>;

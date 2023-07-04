@@ -48,9 +48,10 @@ export class ArchiveBeneficiary {
       }
 
       if (!beneficiary.areDividendsTransferred()) {
-        // const transferredDividends = await this.sharesAndDividendsService.transferDividends(profileId, accountId, beneficiary.getParentId());
-        // beneficiary.setTransferredDividends(transferredDividends);
-        // await this.archivingRepository.store(beneficiary);
+        // TODO verify if it works!
+        const transferredDividends = await this.sharesAndDividendsService.transferDividends(profileId, accountId, beneficiary.getParentId());
+        beneficiary.setTransferredDividends(transferredDividends);
+        await this.archivingRepository.store(beneficiary);
       }
 
       if (!beneficiary.areSharesTransferred()) {
@@ -59,13 +60,14 @@ export class ArchiveBeneficiary {
           accountId,
           beneficiary.getParentId(),
           beneficiary.getTransferredInvestments(),
+          beneficiary.getTransferredDividends(),
         );
         beneficiary.setTransferredShares(transferredShares);
         await this.archivingRepository.store(beneficiary);
       }
 
       // TODO add financial operation for beneficiary to revoke shares and add new shares for individual to reflect on chart
-
+      // TODO what about recurring investment?
       return true;
     } catch (error: any) {
       console.log(`Can not archive beneficiary: ${profileId}/${accountId}`, error);

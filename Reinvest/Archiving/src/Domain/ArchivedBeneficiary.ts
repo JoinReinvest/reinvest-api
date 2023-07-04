@@ -17,12 +17,17 @@ export type TransferredShares = {
   previousShareId: UUID;
 };
 
+export type TransferredDividends = {
+  newDividendId: UUID;
+  previousDividendId: UUID;
+};
+
 export type AccountArchivingState = {
   isArchived: boolean;
   isRecurringInvestmentDisabled: boolean;
   transferredDividends: {
     areTransferred: boolean;
-    dividends: UUID[];
+    dividends: TransferredDividends[];
   };
   transferredInvestments: {
     areTransferred: boolean;
@@ -110,7 +115,7 @@ export class ArchivedBeneficiary {
     this.archivingBeneficiarySchema.accountArchivingState.transferredShares.areTransferred = true;
   }
 
-  setTransferredDividends(transferredDividends: any) {
+  setTransferredDividends(transferredDividends: TransferredDividends[]) {
     this.archivingBeneficiarySchema.accountArchivingState.transferredDividends.dividends = transferredDividends;
     this.archivingBeneficiarySchema.accountArchivingState.transferredDividends.areTransferred = true;
   }
@@ -145,5 +150,13 @@ export class ArchivedBeneficiary {
     }
 
     return this.archivingBeneficiarySchema.accountArchivingState.transferredInvestments.investments;
+  }
+
+  getTransferredDividends(): TransferredDividends[] {
+    if (!this.areDividendsTransferred()) {
+      return [];
+    }
+
+    return this.archivingBeneficiarySchema.accountArchivingState.transferredDividends.dividends;
   }
 }

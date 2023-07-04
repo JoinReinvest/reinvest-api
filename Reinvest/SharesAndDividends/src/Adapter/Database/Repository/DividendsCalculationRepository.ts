@@ -250,6 +250,18 @@ export class DividendsCalculationRepository {
     );
   }
 
+  async transferCalculatedDividendsToAccount(fromAccountId: UUID, toAccountId: UUID): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadCalculatedDividendsTable)
+      .set({
+        accountId: toAccountId,
+      })
+      .where('accountId', '=', fromAccountId)
+      .where('status', '=', 'AWAITING_DISTRIBUTION')
+      .execute();
+  }
+
   async getDividendWithNoCoveredFee(accountId: UUID): Promise<InvestorDividend | null> {
     const data = await this.databaseAdapterProvider
       .provide()
@@ -260,6 +272,22 @@ export class DividendsCalculationRepository {
       .executeTakeFirst();
 
     return this.restoreInvestorDividend(<InvestorDividendsTable>data);
+  }
+
+  async getUnpaidDividendsForAccount(accountId: UUID): Promise<InvestorDividend[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadInvestorDividendsTable)
+      .selectAll()
+      .where('accountId', '=', accountId)
+      .where('status', 'in', [InvestorDividendStatus.FEES_NOT_COVERED, InvestorDividendStatus.AWAITING_ACTION])
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(dividend => this.restoreInvestorDividend(<InvestorDividendsTable>dividend)!);
   }
 
   async storeInvestorDividend(investorDividend: InvestorDividend): Promise<void> {
@@ -311,5 +339,35 @@ export class DividendsCalculationRepository {
     };
 
     return InvestorDividend.restore(investorDividendSchema);
+  }
+
+  async transferInvestorDividends(toStore: InvestorDividend[]) {
+    const values = this.castInvestorDividendToTable(toStore);
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadInvestorDividendsTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.column('id').doUpdateSet({
+          accountId: eb => eb.ref(`excluded.accountId`),
+        }),
+      )
+      .execute();
+  }
+
+  private castInvestorDividendToTable(dividends: InvestorDividend[]): InvestorDividendsTable[] {
+    const investorDividendsTable: InvestorDividendsTable[] = [];
+
+    for (const dividend of dividends) {
+      const { calculatedDividends, ...schema } = dividend.toObject();
+      const values = <InvestorDividendsTable>{
+        calculatedDividendsJson: <JSONObjectOf<CalculatedDividendsList>>calculatedDividends,
+        ...schema,
+      };
+
+      investorDividendsTable.push(values);
+    }
+
+    return investorDividendsTable;
   }
 }
