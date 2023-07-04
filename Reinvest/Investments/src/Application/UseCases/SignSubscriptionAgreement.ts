@@ -1,5 +1,4 @@
 import TemplateParser from 'Investments/Application/Service/TemplateParser';
-import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { subscriptionAgreementsTemplate } from 'Investments/Domain/SubscriptionAgreements/subscriptionAgreementsTemplates';
 import { DynamicType, PdfTypes, SubscriptionAgreementTemplateVersions } from 'Investments/Domain/SubscriptionAgreements/types';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
@@ -33,7 +32,6 @@ class SignSubscriptionAgreement {
     }
 
     subscriptionAgreement.setSignature(clientIp);
-
     const isSigned = await this.subscriptionAgreementRepository.signSubscriptionAgreement(subscriptionAgreement);
 
     if (!isSigned) {
@@ -41,7 +39,6 @@ class SignSubscriptionAgreement {
     }
 
     const id = subscriptionAgreement.getId();
-
     const investment = await this.investmentsRepository.getInvestmentByProfileAndId(profileId, investmentId);
 
     if (!investment) {
@@ -49,9 +46,7 @@ class SignSubscriptionAgreement {
     }
 
     investment.assignSubscriptionAgreement(id);
-    investment.updateStatus(InvestmentStatus.WAITING_FOR_FEES_APPROVAL);
-
-    const isAssigned = await this.investmentsRepository.assignSubscriptionAgreementAndUpdateStatus(investment);
+    const isAssigned = await this.investmentsRepository.store(investment);
 
     if (isAssigned) {
       // TODO this is separate use case!

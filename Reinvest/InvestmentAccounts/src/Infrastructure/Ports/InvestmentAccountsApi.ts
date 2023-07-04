@@ -9,6 +9,7 @@ export type InvestmentAccountsApiType = {
   getConfiguration: ConfigurationController['getConfiguration'];
   listAccountTypesUserCanOpen: AccountManagementController['listAccountTypesUserCanOpen'];
   openAccount: AccountManagementController['openAccount'];
+  removeBeneficiary: AccountManagementController['removeBeneficiary'];
 };
 
 export const investmentAccountsApi = (container: ContainerInterface): InvestmentAccountsApiType => ({
@@ -17,4 +18,5 @@ export const investmentAccountsApi = (container: ContainerInterface): Investment
   getConfiguration: container.delegateTo(ConfigurationController, 'getConfiguration'),
   openAccount: container.delegateTo(AccountManagementController, 'openAccount'),
   listAccountTypesUserCanOpen: container.delegateTo(AccountManagementController, 'listAccountTypesUserCanOpen'),
+  removeBeneficiary: container.delegateTo(AccountManagementController, 'removeBeneficiary'),
 });

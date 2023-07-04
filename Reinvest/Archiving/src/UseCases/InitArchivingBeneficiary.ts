@@ -43,7 +43,10 @@ export class InitArchivingBeneficiary {
       ]);
 
       await this.archivingRepository.store(beneficiary);
+
       await this.legalEntitiesService.archiveBeneficiary(profileId, accountId);
+      beneficiary.setAccountAsArchived();
+      await this.archivingRepository.store(beneficiary);
 
       return true;
     } catch (error: any) {

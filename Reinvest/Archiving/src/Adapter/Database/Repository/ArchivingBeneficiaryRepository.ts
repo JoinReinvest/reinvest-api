@@ -1,10 +1,12 @@
 import { ArchivingBeneficiaryTable } from 'Archiving/Adapter/Database/ArchivingSchema';
 import { archivingBeneficiary, ArchivingDatabaseAdapterProvider } from 'Archiving/Adapter/Database/DatabaseAdapter';
-import { AccountArchivingState, ArchivedBeneficiary, ArchivingBeneficiarySchema } from 'Archiving/Domain/ArchivedBeneficiary';
-import { JSONObjectOf } from 'HKEKTypes/Generics';
+import { AccountArchivingState, ArchivedBeneficiary, ArchivingBeneficiarySchema, ArchivingBeneficiaryStatus } from 'Archiving/Domain/ArchivedBeneficiary';
+import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
+
+export type ArchivingBeneficiaryIds = { accountId: UUID; profileId: UUID };
 
 export class ArchivingBeneficiaryRepository {
   public static getClassName = (): string => 'ArchivingBeneficiaryRepository';
@@ -88,5 +90,20 @@ export class ArchivingBeneficiaryRepository {
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  async getPendingArchivingBeneficiaries(): Promise<ArchivingBeneficiaryIds[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(archivingBeneficiary)
+      .select(['profileId', 'accountId'])
+      .where('status', '=', ArchivingBeneficiaryStatus.IN_PROGRESS)
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(({ profileId, accountId }) => ({ profileId, accountId }));
   }
 }

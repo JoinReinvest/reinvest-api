@@ -8,6 +8,7 @@ import {
   InitiateAuthCommand,
   ListUsersCommand
 } from "@aws-sdk/client-cognito-identity-provider";
+import { Archiving } from "Archiving/index"; // dependencies
 import * as bodyParser from "body-parser";
 import express from "express";
 import { PhoneNumber } from "Identity/Domain/PhoneNumber";
@@ -402,6 +403,29 @@ const syncRouter = () => {
 
       res.status(200).json({
         status: true,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
+  router.post('/push-archiving', async (req: any, res: any) => {
+    try {
+      const modules = boot();
+      const api = modules.getApi<Archiving.ApiType>(Archiving);
+      const processes = await api.getPendingBeneficiaryArchivingProcesses();
+
+      for (const process of processes) {
+        const { profileId, accountId } = process;
+        await api.pushArchiveBeneficiaryProcess(profileId, accountId);
+      }
+
+      res.status(200).json({
+        status: true,
+        pendingProcesses: processes,
       });
     } catch (e: any) {
       console.log(e);

@@ -1,6 +1,8 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { AccountType } from 'InvestmentAccounts/Domain/ProfileAggregate/AccountType';
 import {
   BeneficiaryAccountOpened,
+  BeneficiaryAccountRemoved,
   CorporateAccountOpened,
   IndividualAccountOpened,
   ProfileCreated,
@@ -173,6 +175,12 @@ class Profile extends SimpleAggregate {
         beneficiaryAccountIds.push(event.data.beneficiaryAccountId);
         this.setState('beneficiaryAccountIds', beneficiaryAccountIds);
         break;
+      case 'BeneficiaryAccountRemoved':
+        const beneficiaryAccountIdsAfterRemoval = this.getState('beneficiaryAccountIds', []).filter(
+          (beneficiaryAccountId: UUID) => beneficiaryAccountId !== event.data.beneficiaryAccountId,
+        );
+        this.setState('beneficiaryAccountIds', beneficiaryAccountIdsAfterRemoval);
+        break;
       default:
         return super.apply(event);
     }
@@ -207,6 +215,24 @@ class Profile extends SimpleAggregate {
     const trustAccountIds = this.getState('trustAccountIds', []);
 
     return trustAccountIds.length < MAX_NUMBER_OF_TRUSTS;
+  }
+
+  removeBeneficiaryAccount(accountId: string): BeneficiaryAccountRemoved {
+    if (!this.hasBeneficiaryAccount(accountId)) {
+      ProfileException.throw('THE_ACCOUNT_DOES_NOT_EXIST');
+    }
+
+    return this.apply(<BeneficiaryAccountRemoved>{
+      id: this.getId(),
+      kind: 'BeneficiaryAccountRemoved',
+      data: {
+        beneficiaryAccountId: accountId,
+      },
+    });
+  }
+
+  private hasBeneficiaryAccount(accountId: UUID): boolean {
+    return this.getState('beneficiaryAccountIds', []).includes(accountId);
   }
 }
 

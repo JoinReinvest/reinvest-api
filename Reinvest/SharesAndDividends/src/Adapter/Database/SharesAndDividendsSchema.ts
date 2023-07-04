@@ -3,7 +3,7 @@ import { DividendDeclarationStatus, NumberOfSharesPerDay } from 'SharesAndDivide
 import { DividendDistributionStatus } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDistribution';
 import { IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { CalculatedDividendsList, InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
-import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
+import { SharesOrigin, SharesStatus } from 'SharesAndDividends/Domain/Shares';
 import { FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 
 export interface SharesTable {
@@ -14,12 +14,14 @@ export interface SharesTable {
   dateRevoked: Date | null;
   dateSettled: Date | null;
   id: string;
-  investmentId: string;
   numberOfShares: number | null;
+  origin: SharesOrigin;
+  originId: string;
   portfolioId: string;
   price: number;
   profileId: string;
   status: SharesStatus;
+  transferredFrom: string | null;
   unitPrice: number | null;
 }
 

@@ -30,6 +30,7 @@ import { TransactionController } from 'Investments/Infrastructure/Ports/Transact
 import CreateRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
 
 export default class PortsProviders {
   private config: Investments.Config;
@@ -47,6 +48,7 @@ export default class PortsProviders {
       AbortInvestment,
       ListInvestments,
       CancelInvestment,
+      TransferInvestments,
     ]);
     container.addSingleton(SubscriptionAgreementController, [
       CreateSubscriptionAgreement,

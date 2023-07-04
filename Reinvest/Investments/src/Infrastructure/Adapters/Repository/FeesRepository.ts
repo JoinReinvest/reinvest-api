@@ -3,6 +3,7 @@ import { InvestmentsFeesTable } from 'Investments/Infrastructure/Adapters/Postgr
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { Fee, FeeSchema } from 'Reinvest/Investments/src/Domain/Investments/Fee';
+import { UUID } from 'HKEKTypes/Generics';
 
 export class FeesRepository {
   public static getClassName = (): string => 'FeesRepository';
@@ -13,7 +14,7 @@ export class FeesRepository {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 
-  async getFeeByInvestmentId(investmentId: string): Promise<Fee | null> {
+  async getFeeByInvestmentId(investmentId: UUID): Promise<Fee | null> {
     const feeData = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsFeesTable)
@@ -26,6 +27,16 @@ export class FeesRepository {
     }
 
     return this.restoreFeeFromSchema(feeData);
+  }
+
+  async getFeesByInvestmentId(investmentIds: UUID[]): Promise<Fee[]> {
+    const fees = await this.databaseAdapterProvider.provide().selectFrom(investmentsFeesTable).selectAll().where('investmentId', 'in', investmentIds).execute();
+
+    if (!fees) {
+      return [];
+    }
+
+    return fees.map(fee => this.restoreFeeFromSchema(fee));
   }
 
   async storeFee(fee: Fee) {

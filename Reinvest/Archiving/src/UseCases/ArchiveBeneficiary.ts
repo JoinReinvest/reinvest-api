@@ -6,10 +6,11 @@ import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 
 export class ArchiveBeneficiary {
+  static getClassName = (): string => 'ArchiveBeneficiary';
   private legalEntitiesService: LegalEntitiesService;
+  private sharesAndDividendsService: SharesAndDividendsService;
   private investmentsService: InvestmentsService;
   private archivingRepository: ArchivingBeneficiaryRepository;
-  static getClassName = (): string => 'ArchiveBeneficiary';
   private idGenerator: IdGeneratorInterface;
 
   constructor(
@@ -19,6 +20,7 @@ export class ArchiveBeneficiary {
     archivingRepository: ArchivingBeneficiaryRepository,
     idGenerator: IdGeneratorInterface,
   ) {
+    this.sharesAndDividendsService = sharesAndDividendsService;
     this.investmentsService = investmentsService;
     this.legalEntitiesService = legalEntitiesService;
     this.archivingRepository = archivingRepository;
@@ -40,14 +42,9 @@ export class ArchiveBeneficiary {
       }
 
       if (!beneficiary.areInvestmentsTransferred()) {
-        // const transferredInvestments = await this.investmentsService.transferInvestments(profileId, accountId, beneficiary.getParentId());
-        // beneficiary.setTransferredInvestments(transferredInvestments);
-      }
-
-      if (!beneficiary.areSharesTransferred()) {
-        // const transferredShares = await this.sharesAndDividendsService.transferShares(profileId, accountId, beneficiary.getParentId());
-        // beneficiary.setTransferredShares(transferredShares);
-        // await this.archivingRepository.store(beneficiary);
+        const transferredInvestments = await this.investmentsService.transferInvestments(profileId, accountId, beneficiary.getParentId());
+        beneficiary.setTransferredInvestments(transferredInvestments);
+        await this.archivingRepository.store(beneficiary);
       }
 
       if (!beneficiary.areDividendsTransferred()) {
@@ -56,9 +53,18 @@ export class ArchiveBeneficiary {
         // await this.archivingRepository.store(beneficiary);
       }
 
-      if (!beneficiary.isRecurringInvestmentDisabled()) {
-        // await this.investmentsService.disableRecurringInvestment(profileId, accountId);
+      if (!beneficiary.areSharesTransferred()) {
+        const transferredShares = await this.sharesAndDividendsService.transferShares(
+          profileId,
+          accountId,
+          beneficiary.getParentId(),
+          beneficiary.getTransferredInvestments(),
+        );
+        beneficiary.setTransferredShares(transferredShares);
+        await this.archivingRepository.store(beneficiary);
       }
+
+      // TODO add financial operation for beneficiary to revoke shares and add new shares for individual to reflect on chart
 
       return true;
     } catch (error: any) {

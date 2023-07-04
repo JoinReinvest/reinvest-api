@@ -20,7 +20,6 @@ export class ProfileRepository {
   }
 
   public async storeAndPublish(events: DomainEvent[], snapshot: AggregateState): Promise<void> {
-    // await this.transactionalAdapter.transaction(`Store and publish aggregate state: ${this.tableName}/${snapshot.aggregateId}`, async () => {
     await this.aggregateRepository.store(this.tableName, snapshot);
 
     const snapshotChanged = <ProfileSnapshotChanged>{
@@ -30,7 +29,6 @@ export class ProfileRepository {
     };
     await this.eventBus.publishMany(events);
     await this.eventBus.publish(snapshotChanged);
-    // });
   }
 
   public async restore(profileId: string): Promise<Profile | null> {

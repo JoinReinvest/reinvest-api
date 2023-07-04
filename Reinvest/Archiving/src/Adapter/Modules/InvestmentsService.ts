@@ -10,12 +10,10 @@ export class InvestmentsService {
     this.investmentsModule = investmentsModule;
   }
 
-  async transferInvestments(profileId: UUID, transferFromAccount: UUID, transferToAccount: UUID): Promise<TransferredInvestments> {
-    // const api = this.investmentsModule.api();
-    //
-    // return api.transferInvestments(profileId, accountId, parentId);
+  async transferInvestments(profileId: UUID, transferFromAccount: UUID, transferToAccount: UUID): Promise<TransferredInvestments[]> {
+    const api = this.investmentsModule.api();
 
-    return {} as TransferredInvestments;
+    return api.transferInvestments(profileId, transferFromAccount, transferToAccount);
   }
 
   async disableRecurringInvestment(profileId: UUID, accountId: UUID): Promise<void> {

@@ -11,3 +11,4 @@ export * as migration_20230414123600_le_alter_company_ein from './legal_entities
 export * as migration_202305051212200_le_beneficiary from './legal_entities_11_add_beneficiary';
 export * as migration_202306151615000_le_add_company_initial_value from './legal_entities_12_add_company_initial_value';
 export * as migration_20230623102200_le_create_banlist from './legal_entities_13_create_banlist';
+export * as migration_20230704083600_le_archive_beneficiary from './legal_entities_14_archive_beneficiary';

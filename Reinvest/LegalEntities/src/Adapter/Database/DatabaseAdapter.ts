@@ -1,7 +1,7 @@
 import { Kysely } from 'kysely';
 import {
   LegalEntitiesBannedList,
-  LegalEntitiesBeneficiary,
+  LegalEntitiesBeneficiaryTable,
   LegalEntitiesCompanyAccount,
   LegalEntitiesDraftAccount,
   LegalEntitiesIndividualAccount,
@@ -18,7 +18,7 @@ export const legalEntitiesBannedListTable = 'legal_entities_banned_list';
 
 export interface LegalEntitiesDatabase {
   [legalEntitiesBannedListTable]: LegalEntitiesBannedList;
-  [legalEntitiesBeneficiaryTable]: LegalEntitiesBeneficiary;
+  [legalEntitiesBeneficiaryTable]: LegalEntitiesBeneficiaryTable;
   [legalEntitiesCompanyAccountTable]: LegalEntitiesCompanyAccount;
   [legalEntitiesDraftAccountTable]: LegalEntitiesDraftAccount;
   [legalEntitiesIndividualAccountTable]: LegalEntitiesIndividualAccount;

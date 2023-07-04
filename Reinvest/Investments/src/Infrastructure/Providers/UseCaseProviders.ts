@@ -38,6 +38,7 @@ import CreateDraftRecurringInvestment from 'Reinvest/Investments/src/Application
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
 import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
+import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -78,8 +79,9 @@ export default class UseCaseProviders {
     container.addSingleton(UnsuspendRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
-    container.addSingleton(AbortInvestment, [InvestmentsRepository, FeesRepository, 'InvestmentsDatabaseAdapter']);
-    container.addSingleton(CancelInvestment, [InvestmentsRepository, FeesRepository, 'InvestmentsDatabaseAdapter', SimpleEventBus]);
+    container.addSingleton(AbortInvestment, [InvestmentsRepository]);
+    container.addSingleton(CancelInvestment, [InvestmentsRepository, SimpleEventBus]);
     container.addSingleton(ListInvestments, [InvestmentsRepository]);
+    container.addSingleton(TransferInvestments, [InvestmentsRepository, SharesAndDividendService, IdGenerator]);
   }
 }

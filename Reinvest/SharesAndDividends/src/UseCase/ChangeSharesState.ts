@@ -35,7 +35,7 @@ export class ChangeSharesState {
   static getClassName = () => 'ChangeSharesState';
 
   async execute(
-    investmentId: string,
+    originId: string,
     state: SharesChangeState,
     data?: {
       shares: number;
@@ -43,15 +43,15 @@ export class ChangeSharesState {
     },
   ): Promise<void> {
     try {
-      const shares = await this.sharesRepository.getSharesByInvestmentId(investmentId);
+      const shares = await this.sharesRepository.getSharesByOriginId(originId);
 
       if (!shares) {
-        throw new Error(`Shares with investmentId ${investmentId} not found`);
+        throw new Error(`Shares with originId ${originId} not found`);
       }
 
       if (state === SharesChangeState.FUNDING && data !== undefined) {
         const { profileId, accountId, portfolioId } = shares.toObject();
-        await this.transactionAdapter.transaction(`Update shares record for investment ${investmentId} in account ${accountId} to FUNDING state`, async () => {
+        await this.transactionAdapter.transaction(`Update shares record for originId ${originId} in account ${accountId} to FUNDING state`, async () => {
           shares.setFundingState(data.shares, Money.lowPrecision(data.unitPrice));
           const financialOperationId = this.idGenerator.createUuid();
           await this.financialOperationRepository.addInvestmentOperation(
@@ -62,7 +62,7 @@ export class ChangeSharesState {
             portfolioId,
             data.shares,
             data.unitPrice,
-            investmentId,
+            originId,
           );
           await this.sharesRepository.store(shares);
         });
@@ -94,7 +94,7 @@ export class ChangeSharesState {
         // );
       }
     } catch (error) {
-      console.error('[ChangeSharesState]', investmentId, state, error);
+      console.error('[ChangeSharesState]', originId, state, error);
     }
   }
 }

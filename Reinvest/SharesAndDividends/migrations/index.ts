@@ -11,3 +11,4 @@ export * as migration_20230525170700_sad_update_shares from './sad_10_update_sha
 export * as migration_20230529112500_update_incentive_reward from './sad_11_update_incentive_reward';
 export * as migration_20230607101000_update_dividends_declaration from './sad_12_update_dividends_declaration';
 export * as migration_20230609130100_sad_add_indexes from './sad_13_sad_add_indexes';
+export * as migration_202307041348_sad_add_transferred_id from './sad_14_sad_add_transferred_id';

@@ -34,7 +34,7 @@ export class Fee {
     this.feeSchema = feeSchema;
   }
 
-  static create(accountId: UUID, amount: Money, id: string, investmentId: string, profileId: string, verificationFeeIds: VerificationFeeIds): Fee {
+  static create(accountId: UUID, amount: Money, id: UUID, investmentId: UUID, profileId: UUID, verificationFeeIds: VerificationFeeIds): Fee {
     return new Fee({
       accountId,
       amount,
@@ -62,6 +62,10 @@ export class Fee {
 
   getId(): UUID {
     return this.feeSchema.id;
+  }
+
+  getInvestmentId(): UUID {
+    return this.feeSchema.investmentId;
   }
 
   abort(): void {

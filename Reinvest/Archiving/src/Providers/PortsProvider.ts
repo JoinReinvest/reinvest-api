@@ -1,3 +1,4 @@
+import { ArchivingBeneficiaryRepository } from 'Archiving/Adapter/Database/Repository/ArchivingBeneficiaryRepository';
 import { Archiving } from 'Archiving/index';
 import { ArchiveBeneficiaryController } from 'Archiving/Port/Api/ArchiveBeneficiaryController';
 import { ArchiveBeneficiary } from 'Archiving/UseCases/ArchiveBeneficiary';
@@ -12,6 +13,6 @@ export class PortsProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(ArchiveBeneficiaryController, [InitArchivingBeneficiary, ArchiveBeneficiary]);
+    container.addSingleton(ArchiveBeneficiaryController, [InitArchivingBeneficiary, ArchiveBeneficiary, ArchivingBeneficiaryRepository]);
   }
 }

@@ -8,11 +8,13 @@ export enum InvestmentStatus {
   FINISHED = 'FINISHED',
   ABORTED = 'ABORTED',
   CANCELED = 'CANCELED',
+  TRANSFERRED = 'TRANSFERRED',
 }
 
-export enum ScheduledBy {
+export enum Origin {
   DIRECT = 'DIRECT',
   SCHEDULER = 'SCHEDULER',
+  TRANSFER = 'TRANSFER',
 }
 
 export enum AgreementTypes {

@@ -1,6 +1,8 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { Fee, VerificationFeeIds } from 'Investments/Domain/Investments/Fee';
-import { InvestmentStatus, ScheduledBy } from 'Investments/Domain/Investments/Types';
+import { Investment } from 'Investments/Domain/Investments/Investment';
+import { InvestmentStatus, Origin } from 'Investments/Domain/Investments/Types';
 import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
 import { InvestmentsDatabase } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
@@ -13,10 +15,10 @@ export type InvestmentCreate = {
   accountId: string;
   bankAccountId: string;
   id: string;
+  origin: Origin;
   parentId: string | null;
   portfolioId: string;
   profileId: string;
-  scheduledBy: ScheduledBy;
   status: InvestmentStatus;
   tradeId: string;
 };
@@ -43,34 +45,40 @@ class CreateInvestment {
     this.transactionalAdapter = transactionalAdapter;
   }
 
-  async execute(portfolioId: string, profileId: string, accountId: string, bankAccountId: string, money: Money, parentId: string | null) {
-    const id = this.idGenerator.createUuid();
+  async execute(portfolioId: UUID, profileId: UUID, accountId: UUID, bankAccountId: UUID, amount: Money, parentId: UUID | null) {
+    const investmentId = this.idGenerator.createUuid();
+    const tradeId = this.idGenerator.createNumericId(TradeId.getTradeIdSize());
 
-    const tradeIdSize = TradeId.getTradeIdSize();
-
-    const investment: InvestmentCreate = {
+    const investment = Investment.create(
+      investmentId,
+      amount,
+      profileId,
       accountId,
       bankAccountId,
-      id,
-      parentId,
       portfolioId,
-      profileId,
-      scheduledBy: ScheduledBy.DIRECT,
-      status: InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT,
-      tradeId: this.idGenerator.createNumericId(tradeIdSize),
-    };
+      tradeId,
+      Origin.DIRECT,
+      null,
+      parentId,
+      null,
+      null,
+    );
+    const fee = await this.calculateFee(amount, profileId, parentId ?? accountId, investmentId);
 
-    // const status = await this.transactionalAdapter.transaction(`Create investment ${id} with fees for ${profileId}/${accountId}`, async () => {
-    const status = await this.investmentsRepository.create(investment, money);
-
-    if (!status) {
-      return false;
+    if (fee) {
+      investment.setFee(fee);
     }
 
-    const fees = await this.verificationService.payFeesForInvestment(money, profileId, accountId);
+    await this.investmentsRepository.store(investment);
+
+    return investmentId;
+  }
+
+  private async calculateFee(amount: Money, profileId: UUID, accountId: UUID, investmentId: UUID): Promise<Fee | null> {
+    const fees = await this.verificationService.payFeesForInvestment(amount, profileId, accountId);
 
     if (fees.length === 0) {
-      return id;
+      return null;
     }
 
     let feeAmount = Money.zero();
@@ -87,15 +95,12 @@ class CreateInvestment {
     }
 
     if (feeAmount.isZero()) {
-      return id;
+      return null;
     }
 
     const feeId = this.idGenerator.createUuid();
-    const investmentFee = Fee.create(accountId, feeAmount, feeId, id, profileId, feesReferences);
-    await this.feeRepository.storeFee(investmentFee);
-    // });
 
-    return id;
+    return Fee.create(accountId, feeAmount, feeId, investmentId, profileId, feesReferences);
   }
 }
 

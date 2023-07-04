@@ -8,7 +8,13 @@ export enum ArchivingBeneficiaryStatus {
 
 // from id to id
 export type TransferredInvestments = {
-  [fromInvestmentId: UUID]: UUID;
+  newInvestmentId: UUID;
+  previousInvestmentId: UUID;
+};
+
+export type TransferredShares = {
+  newShareId: UUID;
+  previousShareId: UUID;
 };
 
 export type AccountArchivingState = {
@@ -20,11 +26,11 @@ export type AccountArchivingState = {
   };
   transferredInvestments: {
     areTransferred: boolean;
-    investments: TransferredInvestments;
+    investments: TransferredInvestments[];
   };
   transferredShares: {
     areTransferred: boolean;
-    shares: any;
+    shares: TransferredShares[];
   };
 };
 
@@ -54,11 +60,11 @@ export class ArchivedBeneficiary {
         isArchived: false,
         transferredInvestments: {
           areTransferred: false,
-          investments: {},
+          investments: [],
         },
         transferredShares: {
           areTransferred: false,
-          shares: {},
+          shares: [],
         },
         transferredDividends: {
           areTransferred: false,
@@ -94,12 +100,12 @@ export class ArchivedBeneficiary {
     this.archivingBeneficiarySchema.accountArchivingState.isArchived = true;
   }
 
-  setTransferredInvestments(transferredInvestments: TransferredInvestments) {
+  setTransferredInvestments(transferredInvestments: TransferredInvestments[]) {
     this.archivingBeneficiarySchema.accountArchivingState.transferredInvestments.investments = transferredInvestments;
     this.archivingBeneficiarySchema.accountArchivingState.transferredInvestments.areTransferred = true;
   }
 
-  setTransferredShares(transferredShares: any) {
+  setTransferredShares(transferredShares: TransferredShares[]) {
     this.archivingBeneficiarySchema.accountArchivingState.transferredShares.shares = transferredShares;
     this.archivingBeneficiarySchema.accountArchivingState.transferredShares.areTransferred = true;
   }
@@ -131,5 +137,13 @@ export class ArchivedBeneficiary {
 
   isRecurringInvestmentDisabled(): boolean {
     return this.archivingBeneficiarySchema.accountArchivingState.isRecurringInvestmentDisabled;
+  }
+
+  getTransferredInvestments(): TransferredInvestments[] {
+    if (!this.areInvestmentsTransferred()) {
+      return [];
+    }
+
+    return this.archivingBeneficiarySchema.accountArchivingState.transferredInvestments.investments;
   }
 }

@@ -1,13 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import { LegalEntitiesDatabase } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
-import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
-import { InvestmentAccountsService } from 'LegalEntities/Adapter/Modules/InvestmentAccountsService';
-import { BeneficiaryAccount, BeneficiaryName, BeneficiarySchema } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
-import { AccountType } from 'LegalEntities/Domain/AccountType';
-import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
-import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
-import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import { ArchiveBeneficiary } from 'LegalEntities/UseCases/ArchiveBeneficiary';
+import { OpenBeneficiary } from 'LegalEntities/UseCases/OpenBeneficiary';
 
 export type CreateBeneficiaryInput = {
   avatar?: {
@@ -20,21 +14,12 @@ export type CreateBeneficiaryInput = {
 };
 
 export class BeneficiaryAccountController {
-  private uniqueIdGenerator: IdGeneratorInterface;
-  private beneficiaryRepository: BeneficiaryRepository;
-  private investmentAccountService: InvestmentAccountsService;
-  private transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>;
+  private openBeneficiaryUseCase: OpenBeneficiary;
+  private archiveBeneficiaryUseCase: ArchiveBeneficiary;
 
-  constructor(
-    uniqueIdGenerator: IdGeneratorInterface,
-    beneficiaryRepository: BeneficiaryRepository,
-    investmentAccountService: InvestmentAccountsService,
-    transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>,
-  ) {
-    this.uniqueIdGenerator = uniqueIdGenerator;
-    this.beneficiaryRepository = beneficiaryRepository;
-    this.investmentAccountService = investmentAccountService;
-    this.transactionAdapter = transactionAdapter;
+  constructor(openBeneficiaryUseCase: OpenBeneficiary, archiveBeneficiaryUseCase: ArchiveBeneficiary) {
+    this.openBeneficiaryUseCase = openBeneficiaryUseCase;
+    this.archiveBeneficiaryUseCase = archiveBeneficiaryUseCase;
   }
 
   public static getClassName = (): string => 'BeneficiaryAccountController';
@@ -48,96 +33,22 @@ export class BeneficiaryAccountController {
     accountId?: string;
     errors?: ValidationErrorType[];
   }> {
-    const errors = [];
-    try {
-      if (!individualId) {
-        errors.push(<ValidationErrorType>{
-          type: ValidationErrorEnum.EMPTY_VALUE,
-          field: 'individualAccountId',
-        });
-      }
+    const result = await this.openBeneficiaryUseCase.execute(profileId, individualId, input);
 
-      let name = null;
-      let avatar = null;
-
-      if (input?.avatar?.id) {
-        avatar = Avatar.create({ id: input?.avatar?.id, path: profileId });
-      }
-
-      if (!input?.name?.firstName || !input?.name?.lastName) {
-        errors.push(<ValidationErrorType>{
-          type: ValidationErrorEnum.MISSING_MANDATORY_FIELDS,
-          field: 'name',
-        });
-      } else {
-        name = input.name;
-      }
-
-      if (errors.length > 0) {
-        return {
-          status: false,
-          errors,
-        };
-      }
-
-      const accountId = this.uniqueIdGenerator.createUuid();
-      const beneficiarySchema: BeneficiarySchema = {
-        accountId,
-        avatar: avatar ? avatar.toObject() : null,
-        profileId,
-        individualId,
-        name: <BeneficiaryName>name,
-      };
-      const beneficiaryAccount = BeneficiaryAccount.create(beneficiarySchema);
-
-      const status = await this.transactionAdapter.transaction(`Open beneficiary account for profile ${profileId}`, async () => {
-        await this.beneficiaryRepository.storeBeneficiary(beneficiaryAccount);
-        const accountOpened = await this.investmentAccountService.openAccount(profileId, accountId, AccountType.BENEFICIARY);
-
-        if (!accountOpened) {
-          throw new Error(`CANNOT_OPEN_ANOTHER_ACCOUNT_OF_TYPE_BENEFICIARY`);
-        }
-      });
-
-      if (!status) {
-        return {
-          status: false,
-          errors: [
-            <ValidationErrorType>{
-              type: ValidationErrorEnum.NUMBER_OF_ACCOUNTS_EXCEEDED,
-              field: 'openBeneficiaryAccount',
-            },
-          ],
-        };
-      }
-
-      return {
-        status: true,
-        accountId,
-      };
-    } catch (error: any) {
-      console.error(error);
-      errors.push(<ValidationErrorType>{
-        type: ValidationErrorEnum.UNKNOWN_ERROR,
-        field: 'openBeneficiaryAccount',
-      });
-
+    if (result.errors.length > 0) {
       return {
         status: false,
-        errors,
+        errors: result.errors,
       };
     }
+
+    return {
+      status: true,
+      accountId: result.accountId,
+    };
   }
 
   public async archiveBeneficiary(profileId: UUID, accountId: UUID): Promise<boolean> {
-    const beneficiary = await this.beneficiaryRepository.findBeneficiary(profileId, accountId);
-
-    if (!beneficiary) {
-      return false;
-    }
-
-    // todo archive beneficiary - add archived status for beneficiary
-    // todo add id of an account to ban list in identity service
-    return true;
+    return this.archiveBeneficiaryUseCase.execute(profileId, accountId);
   }
 }

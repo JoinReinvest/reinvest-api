@@ -1,6 +1,5 @@
 import { Investment } from 'Investments/Domain/Investments/Investment';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
-import { Money } from 'Money/Money';
 import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
 
 class ListInvestments {
@@ -17,15 +16,14 @@ class ListInvestments {
 
     return investments.map((investment: Investment) => {
       const { id, tradeId, dateCreated, amount } = investment.toObject();
-      const money = new Money(amount);
 
       return {
         id,
         tradeId,
         createdAt: dateCreated,
         amount: {
-          formatted: money.getFormattedAmount(),
-          value: money.getAmount(),
+          formatted: amount.getFormattedAmount(),
+          value: amount.getAmount(),
         },
       };
     });

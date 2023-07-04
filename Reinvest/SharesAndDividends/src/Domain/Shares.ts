@@ -10,6 +10,11 @@ export enum SharesStatus {
   REVOKED = 'REVOKED',
 }
 
+export enum SharesOrigin {
+  INVESTMENT = 'INVESTMENT',
+  DIVIDEND = 'DIVIDEND',
+}
+
 export type SharesSchema = {
   accountId: UUID;
   dateCreated: Date;
@@ -18,12 +23,14 @@ export type SharesSchema = {
   dateRevoked: Date | null;
   dateSettled: Date | null;
   id: UUID;
-  investmentId: UUID;
   numberOfShares: number | null;
+  origin: SharesOrigin;
+  originId: UUID;
   portfolioId: UUID;
   price: number;
   profileId: UUID;
   status: SharesStatus;
+  transferredFrom: UUID | null;
   unitPrice: number | null;
 };
 
@@ -34,7 +41,7 @@ export class Shares {
     this.sharesSchema = sharesSchema;
   }
 
-  static create(id: string, portfolioId: string, profileId: string, accountId: string, investmentId: string, price: Money): Shares {
+  static create(id: UUID, portfolioId: UUID, profileId: UUID, accountId: UUID, originId: UUID, price: Money, origin: SharesOrigin): Shares {
     return new Shares({
       accountId,
       dateCreated: new Date(),
@@ -43,50 +50,20 @@ export class Shares {
       dateRevoked: null,
       dateSettled: null,
       id,
-      investmentId,
+      originId,
+      origin,
       numberOfShares: null,
       portfolioId,
       price: price.getAmount(),
       profileId,
       status: SharesStatus.CREATED,
+      transferredFrom: null,
       unitPrice: null,
     });
   }
 
   static restore(data: SharesSchema): Shares {
-    const {
-      accountId,
-      dateCreated,
-      dateFunding,
-      dateFunded,
-      dateRevoked,
-      dateSettled,
-      id,
-      investmentId,
-      numberOfShares,
-      portfolioId,
-      price,
-      profileId,
-      status,
-      unitPrice,
-    } = data;
-
-    return new Shares({
-      accountId,
-      dateCreated,
-      dateFunding,
-      dateFunded,
-      dateRevoked,
-      dateSettled,
-      id,
-      investmentId,
-      numberOfShares,
-      portfolioId,
-      price,
-      profileId,
-      status,
-      unitPrice,
-    });
+    return new Shares(data);
   }
 
   toObject(): SharesSchema {
@@ -161,5 +138,34 @@ export class Shares {
     const onePercentOfPricePerYear = price.multiplyBy(ONE_PERCENT).divideBy(DAYS_IN_YEAR);
 
     return onePercentOfPricePerYear.multiplyBy(numberOfDaysInvestorOwnsShares).decreasePrecision();
+  }
+
+  isTransferred(): boolean {
+    return this.sharesSchema.transferredFrom !== null;
+  }
+
+  getTransferredFromId(): UUID {
+    if (!this.isTransferred()) {
+      throw new Error('Shares has not been transferred');
+    }
+
+    return this.sharesSchema.transferredFrom!;
+  }
+
+  getOriginId(): UUID {
+    return this.sharesSchema.originId;
+  }
+
+  transferShare(newShareTransferId: UUID, transferToAccountId: UUID, newOriginId: UUID): Shares {
+    const transferredSchema = { ...this.toObject() };
+
+    transferredSchema.id = newShareTransferId;
+    transferredSchema.originId = newOriginId;
+    transferredSchema.transferredFrom = this.getId();
+    transferredSchema.status = SharesStatus.REVOKED;
+
+    this.sharesSchema.accountId = transferToAccountId;
+
+    return Shares.restore(transferredSchema);
   }
 }
