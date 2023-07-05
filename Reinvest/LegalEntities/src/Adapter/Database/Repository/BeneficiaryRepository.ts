@@ -68,6 +68,7 @@ export class BeneficiaryRepository {
       .selectFrom(legalEntitiesBeneficiaryTable)
       .selectAll()
       .where('profileId', '=', profileId)
+      .where('isArchived', '=', false)
       .castTo<LegalEntitiesBeneficiaryTable>()
       .execute();
 

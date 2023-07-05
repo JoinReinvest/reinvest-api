@@ -1,17 +1,18 @@
 import { Investment } from 'Investments/Domain/Investments/Investment';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
+import { UUID } from 'HKEKTypes/Generics';
 
-class ListInvestments {
+class ListInvestmentsQuery {
   private readonly investmentsRepository: InvestmentsRepository;
 
   constructor(investmentsRepository: InvestmentsRepository) {
     this.investmentsRepository = investmentsRepository;
   }
 
-  static getClassName = (): string => 'ListInvestments';
+  static getClassName = (): string => 'ListInvestmentsQuery';
 
-  async execute(profileId: string, accountId: string, pagination: Pagination) {
+  async listAllInvestments(profileId: string, accountId: string, pagination: Pagination) {
     const investments = await this.investmentsRepository.getInvestments(profileId, accountId, pagination);
 
     return investments.map((investment: Investment) => {
@@ -28,6 +29,10 @@ class ListInvestments {
       };
     });
   }
+
+  async getPendingInvestmentsIds(): Promise<UUID[]> {
+    return this.investmentsRepository.getPendingInvestmentsIds();
+  }
 }
 
-export default ListInvestments;
+export default ListInvestmentsQuery;

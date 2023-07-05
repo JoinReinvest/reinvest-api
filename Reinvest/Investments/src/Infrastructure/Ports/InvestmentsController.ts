@@ -4,7 +4,7 @@ import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
-import ListInvestments from 'Investments/Application/UseCases/ListInvestments';
+import ListInvestmentsQuery from 'Investments/Application/UseCases/ListInvestmentsQuery';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
 import { Money } from 'Money/Money';
@@ -15,7 +15,7 @@ export class InvestmentsController {
   private investmentSummaryQueryUseCase: InvestmentSummaryQuery;
   private startInvestmentUseCase: StartInvestment;
   private abortInvestmentUseCase: AbortInvestment;
-  private listInvestmentsUseCase: ListInvestments;
+  private listInvestmentsQuery: ListInvestmentsQuery;
   private cancelInvestmentUseCase: CancelInvestment;
   private transferInvestmentsUseCase: TransferInvestments;
 
@@ -24,7 +24,7 @@ export class InvestmentsController {
     investmentSummaryQueryUseCase: InvestmentSummaryQuery,
     startInvestmentUseCase: StartInvestment,
     abortInvestmentUseCase: AbortInvestment,
-    listInvestmentsUseCase: ListInvestments,
+    listInvestmentsQuery: ListInvestmentsQuery,
     cancelInvestmentUseCase: CancelInvestment,
     transferInvestmentsUseCase: TransferInvestments,
   ) {
@@ -32,7 +32,7 @@ export class InvestmentsController {
     this.investmentSummaryQueryUseCase = investmentSummaryQueryUseCase;
     this.startInvestmentUseCase = startInvestmentUseCase;
     this.abortInvestmentUseCase = abortInvestmentUseCase;
-    this.listInvestmentsUseCase = listInvestmentsUseCase;
+    this.listInvestmentsQuery = listInvestmentsQuery;
     this.cancelInvestmentUseCase = cancelInvestmentUseCase;
     this.transferInvestmentsUseCase = transferInvestmentsUseCase;
   }
@@ -58,7 +58,7 @@ export class InvestmentsController {
   }
 
   public async listInvestments(profileId: UUID, accountId: UUID, pagination: Pagination) {
-    return this.listInvestmentsUseCase.execute(profileId, accountId, pagination);
+    return this.listInvestmentsQuery.listAllInvestments(profileId, accountId, pagination);
   }
 
   public async cancelInvestment(profileId: UUID, investmentId: UUID) {
@@ -67,5 +67,9 @@ export class InvestmentsController {
 
   public async transferInvestments(profileId: UUID, transferFromAccount: UUID, transferToAccount: UUID) {
     return this.transferInvestmentsUseCase.execute(profileId, transferFromAccount, transferToAccount);
+  }
+
+  public async getPendingInvestments(): Promise<UUID[]> {
+    return this.listInvestmentsQuery.getPendingInvestmentsIds();
   }
 }

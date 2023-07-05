@@ -5,6 +5,7 @@ import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { SharesAndDividends } from 'SharesAndDividends/index';
+import { Verification } from 'Verification/index';
 
 import * as InvestmentsMigrations from '../migrations';
 import { investmentsTechnicalHandler, InvestmentsTechnicalHandlerType } from './Infrastructure/Events/InvestmentsTechnicalHandler';
@@ -13,7 +14,6 @@ import AdaptersProviders from './Infrastructure/Providers/AdaptersProviders';
 import EventBusProvider from './Infrastructure/Providers/EventBusProvider';
 import PortsProviders from './Infrastructure/Providers/PortsProviders';
 import UseCaseProviders from './Infrastructure/Providers/UseCaseProviders';
-import { Verification } from 'Verification/index';
 
 export namespace Investments {
   export const moduleName = 'Investments';

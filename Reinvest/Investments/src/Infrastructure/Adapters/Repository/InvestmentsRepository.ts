@@ -7,7 +7,7 @@ import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
 import { Investment } from 'Reinvest/Investments/src/Domain/Investments/Investment';
-import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { InvestmentStatus, InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -213,5 +213,20 @@ export class InvestmentsRepository {
     }
 
     return data.map((investment: InvestmentsTable) => this.castToObject(investment, null));
+  }
+
+  async getPendingInvestmentsIds(): Promise<UUID[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(investmentsTable)
+      .select(['id'])
+      .where(`status`, 'in', [InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED])
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(investment => <UUID>investment.id);
   }
 }
