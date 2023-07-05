@@ -1,9 +1,10 @@
+import { ArchiveBeneficiaryEventHandler } from 'Archiving/Port/Queue/EventHandler/ArchiveBeneficiaryEventHandler';
 import { ContainerInterface } from 'Container/Container';
 
 export type ArchivingTechnicalHandlerType = {
-  // LegalEntityAvatarRemoved: AvatarRemovedEventHandler['handle'];
+  ArchiveBeneficiary: ArchiveBeneficiaryEventHandler['handle'];
 };
 
 export const archivingTechnicalHandler = (container: ContainerInterface): ArchivingTechnicalHandlerType => ({
-  // LegalEntityDocumentRemoved: container.delegateTo(DocumentRemovedEventHandler, 'handle'),
+  ArchiveBeneficiary: container.delegateTo(ArchiveBeneficiaryEventHandler, 'handle'),
 });

@@ -12,6 +12,6 @@ export default class EventBusProvider {
 
   public boot(container: ContainerInterface) {
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
-    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [STORE_EVENT_COMMAND]);
+    eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [STORE_EVENT_COMMAND, 'ArchiveBeneficiary']);
   }
 }

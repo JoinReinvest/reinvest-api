@@ -4,6 +4,7 @@ import { ArchiveBeneficiaryController } from 'Archiving/Port/Api/ArchiveBenefici
 import { ArchiveBeneficiary } from 'Archiving/UseCases/ArchiveBeneficiary';
 import { InitArchivingBeneficiary } from 'Archiving/UseCases/InitArchivingBeneficiary';
 import { ContainerInterface } from 'Container/Container';
+import { ArchiveBeneficiaryEventHandler } from 'Archiving/Port/Queue/EventHandler/ArchiveBeneficiaryEventHandler';
 
 export class PortsProvider {
   private config: Archiving.Config;
@@ -14,5 +15,6 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     container.addSingleton(ArchiveBeneficiaryController, [InitArchivingBeneficiary, ArchiveBeneficiary, ArchivingBeneficiaryRepository]);
+    container.addSingleton(ArchiveBeneficiaryEventHandler, [ArchiveBeneficiary]);
   }
 }

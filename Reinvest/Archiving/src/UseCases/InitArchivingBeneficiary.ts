@@ -34,19 +34,22 @@ export class InitArchivingBeneficiary {
       const { label, parentId } = beneficiaryData;
       const id = this.idGenerator.createUuid();
       beneficiary = ArchivedBeneficiary.create(id, profileId, accountId, parentId, label);
-      await this.archivingRepository.publishEvents([
+
+      await this.archivingRepository.store(beneficiary, [
         storeEventCommand(profileId, 'ArchivingBeneficiaryStarted', {
           label,
           beneficiaryId: accountId,
           accountId: parentId,
         }),
+        {
+          kind: 'ArchiveBeneficiary',
+          id,
+          data: {
+            profileId,
+            accountId,
+          },
+        },
       ]);
-
-      await this.archivingRepository.store(beneficiary);
-
-      await this.legalEntitiesService.archiveBeneficiary(profileId, accountId);
-      beneficiary.setAccountAsArchived();
-      await this.archivingRepository.store(beneficiary);
 
       return true;
     } catch (error: any) {
