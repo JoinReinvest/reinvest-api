@@ -17,7 +17,9 @@ const schema = `
         FAILED
         FINISHED
         CANCELED
+        CANCELING
         ABORTED
+        TRANSFERRED
     }
 
     type InvestmentSummary {

@@ -1,6 +1,7 @@
 import { ContainerInterface } from 'Container/Container';
 import { CheckIsGracePeriodEndedEventHandler } from 'Investments/Application/DomainEventHandler/CheckIsGracePeriodEndedEventHandler';
 import { FinalizeInvestmentEventHandler } from 'Investments/Application/DomainEventHandler/FinalizeInvestmentEventHandler';
+import { InvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/InvestmentStatusEventHandler';
 import { ReinvestmentEventHandler } from 'Investments/Application/DomainEventHandler/ReinvestmentEventHandler';
 import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/SharesEventHandler';
 import { TransactionEventHandler } from 'Investments/Application/DomainEventHandler/TransactionEventHandler';
@@ -16,9 +17,9 @@ import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
-import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
+import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
@@ -31,8 +32,9 @@ export default class EventBusProvider {
   public boot(container: ContainerInterface) {
     container
       .addSingleton(SharesEventHandler, [SharesAndDividendService])
+      .addSingleton(InvestmentStatusEventHandler, [InvestmentsRepository])
       .addSingleton(TechnicalToDomainEventsHandler, [SimpleEventBus])
-      .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler])
+      .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler, InvestmentStatusEventHandler])
       .addSingleton(ReinvestmentEventHandler, [ReinvestmentRepository, ReinvestmentExecutor, SharesEventHandler])
       .addSingleton(CheckIsGracePeriodEndedEventHandler, [InvestmentsRepository, SimpleEventBus])
       .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus]);
@@ -54,6 +56,7 @@ export default class EventBusProvider {
         TransactionEvents.TRANSACTION_CANCELED,
         TransactionEvents.TRANSACTION_CANCELED_UNWINDING,
         TransactionEvents.TRANSACTION_CANCELED_FAILED,
+        TransactionEvents.INVESTMENT_FINISHED,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [

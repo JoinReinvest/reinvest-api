@@ -220,7 +220,7 @@ export class InvestmentsRepository {
       .provide()
       .selectFrom(investmentsTable)
       .select(['id'])
-      .where(`status`, 'in', [InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED])
+      .where(`status`, 'in', [InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED, InvestmentStatus.CANCELING])
       .execute();
 
     if (!data) {

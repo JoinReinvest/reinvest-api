@@ -22,6 +22,7 @@ import {
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
 } from 'Investments/Domain/Transaction/TransactionDecisions';
+import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class TransactionExecutor {
@@ -35,7 +36,6 @@ export class TransactionExecutor {
 
   async execute(transaction: TransactionProcessManager): Promise<void> {
     const decision = transaction.makeDecision();
-    console.log(decision);
 
     if ([TransactionDecisions.VERIFY_ACCOUNT].includes(decision.kind)) {
       await this.eventBus.publish(verifyAccountForInvestment(decision as VerifyAccountDecision));
@@ -87,6 +87,17 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.CANCEL_TRANSACTION].includes(decision.kind)) {
       await this.eventBus.publish(cancelTransaction(decision as CancelTransactionDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.FINISH_INVESTMENT].includes(decision.kind)) {
+      await this.eventBus.publish(<TransactionEvent>{
+        id: decision.investmentId,
+        kind: TransactionEvents.INVESTMENT_FINISHED,
+        data: {},
+        date: new Date(),
+      });
 
       return;
     }
