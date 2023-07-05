@@ -109,6 +109,7 @@ export interface FinancialOperationsTable {
   id: string;
   operationType: FinancialOperationType;
   profileId: string;
+  uniqueId: string | null;
 }
 
 export interface GlobalFinancialOperationsTable {

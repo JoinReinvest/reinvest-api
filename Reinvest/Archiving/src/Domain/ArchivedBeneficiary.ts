@@ -1,4 +1,4 @@
-import { JSONObject, UUID } from 'HKEKTypes/Generics';
+import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 
 export enum ArchivingBeneficiaryStatus {
@@ -14,7 +14,9 @@ export type TransferredInvestments = {
 
 export type TransferredShares = {
   newShareId: UUID;
+  numberOfShares: number;
   previousShareId: UUID;
+  price: number;
 };
 
 export type TransferredDividends = {
@@ -39,6 +41,15 @@ export type AccountArchivingState = {
   };
 };
 
+export type VertaloConfiguration = {
+  configuration: {
+    customerId: string | null;
+    email: string | null;
+    investorId: string | null;
+  };
+  isSet: boolean;
+};
+
 export type ArchivingBeneficiarySchema = {
   accountArchivingState: AccountArchivingState;
   accountId: UUID;
@@ -49,8 +60,18 @@ export type ArchivingBeneficiarySchema = {
   parentId: UUID;
   profileId: UUID;
   status: ArchivingBeneficiaryStatus;
-  vertaloConfiguration: JSONObject;
+  vertaloConfiguration: VertaloConfiguration;
 };
+
+export type BeneficiaryTransferStats = {
+  amountTransferred: number;
+  numberOfInvestments: number;
+  numberOfShares: number;
+  transferredFrom: UUID;
+  transferredTo: UUID;
+};
+
+export type VertaloMappingConfiguration = { customerId: string | null; email: string; investorId: string | null };
 
 export class ArchivedBeneficiary {
   private archivingBeneficiarySchema: ArchivingBeneficiarySchema;
@@ -85,7 +106,14 @@ export class ArchivedBeneficiary {
       parentId,
       profileId,
       status: ArchivingBeneficiaryStatus.IN_PROGRESS,
-      vertaloConfiguration: {},
+      vertaloConfiguration: {
+        isSet: false,
+        configuration: {
+          investorId: null,
+          email: null,
+          customerId: null,
+        },
+      },
     });
   }
 
@@ -158,5 +186,51 @@ export class ArchivedBeneficiary {
     }
 
     return this.archivingBeneficiarySchema.accountArchivingState.transferredDividends.dividends;
+  }
+
+  setCompleted(): void {
+    this.archivingBeneficiarySchema.status = ArchivingBeneficiaryStatus.COMPLETED;
+    this.archivingBeneficiarySchema.dateCompleted = DateTime.now();
+  }
+
+  isCompleted(): boolean {
+    return this.archivingBeneficiarySchema.status === ArchivingBeneficiaryStatus.COMPLETED;
+  }
+
+  getTransfersStats(): BeneficiaryTransferStats {
+    const shares = this.archivingBeneficiarySchema.accountArchivingState.transferredShares.shares;
+    let numberOfShares = 0;
+    let amountTransferred = 0;
+
+    for (const share of shares) {
+      numberOfShares += share.numberOfShares;
+      amountTransferred += share.price;
+    }
+
+    return {
+      amountTransferred,
+      numberOfInvestments: this.archivingBeneficiarySchema.accountArchivingState.transferredInvestments.investments.length,
+      numberOfShares,
+      transferredFrom: this.archivingBeneficiarySchema.accountId,
+      transferredTo: this.archivingBeneficiarySchema.parentId,
+    };
+  }
+
+  isVertaloConfigurationSet(): boolean {
+    return this.archivingBeneficiarySchema.vertaloConfiguration?.isSet;
+  }
+
+  setVertaloConfiguration(vertaloConfiguration: VertaloMappingConfiguration | null): void {
+    this.archivingBeneficiarySchema.vertaloConfiguration.isSet = true;
+
+    if (vertaloConfiguration === null) {
+      return;
+    }
+
+    this.archivingBeneficiarySchema.vertaloConfiguration.configuration = {
+      customerId: vertaloConfiguration.customerId,
+      email: vertaloConfiguration.email,
+      investorId: vertaloConfiguration.investorId,
+    };
   }
 }

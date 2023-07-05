@@ -280,7 +280,7 @@ export class DividendsCalculationRepository {
       .selectFrom(sadInvestorDividendsTable)
       .selectAll()
       .where('accountId', '=', accountId)
-      .where('status', 'in', [InvestorDividendStatus.FEES_NOT_COVERED, InvestorDividendStatus.AWAITING_ACTION])
+      .where('status', 'in', [InvestorDividendStatus.FEES_NOT_COVERED, InvestorDividendStatus.AWAITING_ACTION, InvestorDividendStatus.TRANSFERRED])
       .execute();
 
     if (!data) {

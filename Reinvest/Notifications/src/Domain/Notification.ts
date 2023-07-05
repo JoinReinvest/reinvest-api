@@ -1,3 +1,5 @@
+import { UUID } from 'HKEKTypes/Generics';
+
 export enum NotificationsType {
   DIVIDEND_RECEIVED = 'DIVIDEND_RECEIVED',
   REWARD_DIVIDEND_RECEIVED = 'REWARD_DIVIDEND_RECEIVED',
@@ -116,5 +118,9 @@ export class Notification {
           }
         : null,
     };
+  }
+
+  transferToAccount(accountId: UUID): void {
+    this.notificationSchema.accountId = accountId;
   }
 }

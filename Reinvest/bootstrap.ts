@@ -229,6 +229,7 @@ export function boot(): Modules {
         legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
         investments: modules.get(Investments.moduleName) as Investments.Main,
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+        registration: modules.get(Registration.moduleName) as Registration.Main,
       },
     ),
   );

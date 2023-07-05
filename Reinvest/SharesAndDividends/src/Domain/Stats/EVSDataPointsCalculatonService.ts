@@ -11,10 +11,14 @@ export enum EVSChartResolution {
 }
 
 export enum FinancialOperationType {
+  // in plus operations
   INVESTMENT = 'INVESTMENT',
   REINVESTMENT = 'REINVESTMENT',
+  TRANSFER_IN = 'TRANSFER_IN',
+  // in minus operations
   WITHDRAWAL = 'WITHDRAWAL',
   REVOKED = 'REVOKED',
+  TRANSFER_OUT = 'TRANSFER_OUT',
 }
 
 export enum GlobalFinancialOperationType {

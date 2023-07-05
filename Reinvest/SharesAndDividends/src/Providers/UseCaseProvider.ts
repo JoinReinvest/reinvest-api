@@ -42,9 +42,9 @@ export class UseCaseProvider {
 
     // use cases
     container.addSingleton(CreateShares, [SharesRepository, IdGenerator]);
-    container.addSingleton(TransferShares, [SharesRepository, IdGenerator]);
-    container.addSingleton(TransferDividends, [DividendsCalculationRepository, IdGenerator]);
-    container.addSingleton(ChangeSharesState, [SharesRepository, IdGenerator, FinancialOperationsRepository, 'SharesAndDividendsTransactionalAdapter']);
+    container.addSingleton(TransferShares, [SharesRepository, FinancialOperationsRepository, IdGenerator]);
+    container.addSingleton(TransferDividends, [DividendsCalculationRepository, NotificationService, IdGenerator]);
+    container.addSingleton(ChangeSharesState, [SharesRepository, FinancialOperationsRepository, 'SharesAndDividendsTransactionalAdapter']);
     container.addSingleton(CreateIncentiveReward, [DividendsRepository, IdGenerator, NotificationService]);
     container.addSingleton(DeclareDividend, [IdGenerator, DividendsCalculationRepository, SharesRepository]);
     container.addSingleton(CalculateDividends, [IdGenerator, DividendsCalculationRepository, SharesRepository]);

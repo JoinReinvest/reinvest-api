@@ -1,6 +1,12 @@
 import { ArchivingBeneficiaryTable } from 'Archiving/Adapter/Database/ArchivingSchema';
 import { archivingBeneficiary, ArchivingDatabaseAdapterProvider } from 'Archiving/Adapter/Database/DatabaseAdapter';
-import { AccountArchivingState, ArchivedBeneficiary, ArchivingBeneficiarySchema, ArchivingBeneficiaryStatus } from 'Archiving/Domain/ArchivedBeneficiary';
+import {
+  AccountArchivingState,
+  ArchivedBeneficiary,
+  ArchivingBeneficiarySchema,
+  ArchivingBeneficiaryStatus,
+  VertaloConfiguration,
+} from 'Archiving/Domain/ArchivedBeneficiary';
 import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -35,7 +41,7 @@ export class ArchivingBeneficiaryRepository {
     return this.castToObject(data);
   }
 
-  async store(archivedBeneficiary: ArchivedBeneficiary): Promise<boolean> {
+  async store(archivedBeneficiary: ArchivedBeneficiary, events: DomainEvent[] = []): Promise<boolean> {
     const values = this.castToTable(archivedBeneficiary);
     try {
       await this.databaseAdapterProvider
@@ -52,6 +58,8 @@ export class ArchivingBeneficiaryRepository {
         )
         .execute();
 
+      await this.publishEvents(events);
+
       return true;
     } catch (error: any) {
       console.error(`Cannot store beneficiary archiving record`, error);
@@ -66,7 +74,7 @@ export class ArchivingBeneficiaryRepository {
     return ArchivedBeneficiary.restore(<ArchivingBeneficiarySchema>{
       ...data,
       accountArchivingState: accountArchivingStateJson as AccountArchivingState,
-      vertaloConfiguration: vertaloConfigurationJson,
+      vertaloConfiguration: vertaloConfigurationJson as VertaloConfiguration,
       dateCreated: DateTime.from(data.dateCreated),
       dateCompleted: data.dateCompleted ? DateTime.from(data.dateCompleted) : null,
     });
@@ -78,7 +86,7 @@ export class ArchivingBeneficiaryRepository {
     return <ArchivingBeneficiaryTable>{
       ...data,
       accountArchivingStateJson: accountArchivingState as JSONObjectOf<AccountArchivingState>,
-      vertaloConfigurationJson: vertaloConfiguration,
+      vertaloConfigurationJson: vertaloConfiguration as JSONObjectOf<VertaloConfiguration>,
       dateCreated: data.dateCreated.toDate(),
       dateCompleted: data.dateCompleted ? data.dateCompleted.toDate() : null,
     };

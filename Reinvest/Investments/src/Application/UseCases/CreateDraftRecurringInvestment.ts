@@ -39,7 +39,7 @@ class CreateDraftRecurringInvestment {
   static getClassName = (): string => 'CreateDraftRecurringInvestment';
 
   async execute(portfolioId: string, profileId: string, accountId: string, money: Money, schedule: Schedule) {
-    const alreadyExistedRecurringInvestmentDraft = await this.recurringInvestmentsRepository.get(accountId, RecurringInvestmentStatus.DRAFT);
+    const alreadyExistedRecurringInvestmentDraft = await this.recurringInvestmentsRepository.get(profileId, accountId, RecurringInvestmentStatus.DRAFT);
     let status = true;
 
     if (alreadyExistedRecurringInvestmentDraft) {

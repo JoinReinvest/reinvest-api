@@ -17,6 +17,8 @@ export class InvestmentsService {
   }
 
   async disableRecurringInvestment(profileId: UUID, accountId: UUID): Promise<void> {
-    return;
+    const api = this.investmentsModule.api();
+
+    await api.deactivateRecurringInvestment(profileId, accountId);
   }
 }

@@ -2,12 +2,13 @@ import { ArchivingDatabaseAdapterInstance, DatabaseAdapterProvider } from 'Archi
 import { ArchivingBeneficiaryRepository } from 'Archiving/Adapter/Database/Repository/ArchivingBeneficiaryRepository';
 import { InvestmentsService } from 'Archiving/Adapter/Modules/InvestmentsService';
 import { LegalEntitiesService } from 'Archiving/Adapter/Modules/LegalEntitiesService';
+import { RegistrationService } from 'Archiving/Adapter/Modules/RegistrationService';
 import { SharesAndDividendsService } from 'Archiving/Adapter/Modules/SharesAndDividendsService';
 import { Archiving } from 'Archiving/index';
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
-import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export class AdapterServiceProvider {
@@ -30,8 +31,10 @@ export class AdapterServiceProvider {
       .addAsValue(ArchivingDatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
       .addSingleton(ArchivingBeneficiaryRepository, [ArchivingDatabaseAdapterInstance, SimpleEventBus]);
 
+    // modules
     container
       .addSingleton(LegalEntitiesService, ['LegalEntities'])
+      .addSingleton(RegistrationService, ['Registration'])
       .addSingleton(InvestmentsService, ['Investments'])
       .addSingleton(SharesAndDividendsService, ['SharesAndDividends']);
   }

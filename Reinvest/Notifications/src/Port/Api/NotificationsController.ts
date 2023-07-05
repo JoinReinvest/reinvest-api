@@ -1,26 +1,31 @@
+import { UUID } from 'HKEKTypes/Generics';
+import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 import { Pagination } from 'Notifications/Application/Pagination';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
 import { NotificationFilter, NotificationQuery, NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
+import { TransferNotification } from 'Notifications/Application/UseCase/TransferNotification';
 import { NotificationObjectType, NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
-import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 
 export class NotificationsController {
   private createNotificationUseCase: CreateNotification;
   private dismissNotificationsUseCase: DismissNotifications;
   private notificationQuery: NotificationQuery;
   private pushNotificationRepository: PushNotificationRepository;
+  private transferNotificationUseCase: TransferNotification;
 
   constructor(
     createNotificationUseCase: CreateNotification,
     dismissNotificationsUseCase: DismissNotifications,
     notificationQuery: NotificationQuery,
     pushNotificationRepository: PushNotificationRepository,
+    transferNotificationUseCase: TransferNotification,
   ) {
     this.createNotificationUseCase = createNotificationUseCase;
     this.dismissNotificationsUseCase = dismissNotificationsUseCase;
     this.notificationQuery = notificationQuery;
     this.pushNotificationRepository = pushNotificationRepository;
+    this.transferNotificationUseCase = transferNotificationUseCase;
   }
 
   static getClassName = () => 'NotificationsController';
@@ -92,5 +97,9 @@ export class NotificationsController {
 
   async getNotificationsStats(profileId: string, accountId: string): Promise<NotificationsStats> {
     return this.notificationQuery.getNotificationsStats(profileId, accountId);
+  }
+
+  async transferNotificationToAccount(profileId: UUID, newAccountId: UUID, notificationUniqueId: UUID): Promise<void> {
+    await this.transferNotificationUseCase.execute(profileId, newAccountId, notificationUniqueId);
   }
 }

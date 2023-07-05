@@ -8,6 +8,7 @@ import Container, { ContainerInterface } from 'Container/Container';
 import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
+import { Registration } from 'Registration/index';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { SharesAndDividends } from 'SharesAndDividends/index';
@@ -24,6 +25,7 @@ export namespace Archiving {
   export type ModulesDependencies = {
     investments: Investments.Main;
     legalEntities: LegalEntities.Main;
+    registration: Registration.Main;
     sharesAndDividends: SharesAndDividends.Main;
   };
 
@@ -50,6 +52,7 @@ export namespace Archiving {
       this.container.addAsValue('Investments', this.modules.investments);
       this.container.addAsValue('LegalEntities', this.modules.legalEntities);
       this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
+      this.container.addAsValue('Registration', this.modules.registration);
 
       new AdapterServiceProvider(this.config).boot(this.container);
       new UseCaseProvider(this.config).boot(this.container);

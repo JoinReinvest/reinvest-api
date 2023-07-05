@@ -15,7 +15,7 @@ export class SharesAndDividendsService {
     transferFromAccount: UUID,
     transferToAccount: UUID,
     transferredInvestments: TransferredInvestments[],
-    tranferredDividends: TransferredDividends[],
+    transferredDividends: TransferredDividends[],
   ): Promise<TransferredShares[]> {
     const api = this.sharesAndDividendsModule.api();
     const transferredOrigins = [];
@@ -27,7 +27,7 @@ export class SharesAndDividendsService {
       });
     }
 
-    for (const dividend of tranferredDividends) {
+    for (const dividend of transferredDividends) {
       transferredOrigins.push({
         newId: dividend.newDividendId,
         previousId: dividend.previousDividendId,

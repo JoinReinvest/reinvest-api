@@ -1,6 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
+import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 
 export type TransferredDividends = {
   newDividendId: UUID;
@@ -9,11 +10,13 @@ export type TransferredDividends = {
 
 export class TransferDividends {
   static getClassName = () => 'TransferDividends';
+  private notificationService: NotificationService;
 
   private dividendsCalculationRepository: DividendsCalculationRepository;
   private idGenerator: IdGeneratorInterface;
 
-  constructor(dividendsCalculationRepository: DividendsCalculationRepository, idGenerator: IdGeneratorInterface) {
+  constructor(dividendsCalculationRepository: DividendsCalculationRepository, notificationService: NotificationService, idGenerator: IdGeneratorInterface) {
+    this.notificationService = notificationService;
     this.dividendsCalculationRepository = dividendsCalculationRepository;
     this.idGenerator = idGenerator;
   }
@@ -43,6 +46,10 @@ export class TransferDividends {
 
       toStore.push(transferredDividend);
       toStore.push(dividend);
+
+      if (dividend.shouldSendNotification()) {
+        await this.notificationService.transferDividendNotificationToAccount(profileId, transferToAccountId, dividend.getId());
+      }
     }
 
     if (toStore.length > 0) {

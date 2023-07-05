@@ -4,6 +4,7 @@ import { RecurringInvestment } from 'Reinvest/Investments/src/Domain/Investments
 import { RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
+import { UUID } from 'HKEKTypes/Generics';
 
 export class RecurringInvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -16,12 +17,13 @@ export class RecurringInvestmentsRepository {
 
   public static getClassName = (): string => 'RecurringInvestmentsRepository';
 
-  async get(accountId: string, status: RecurringInvestmentStatus) {
+  async get(profileId: UUID, accountId: UUID, status: RecurringInvestmentStatus) {
     const recurringInvestment = await this.databaseAdapterProvider
       .provide()
       .selectFrom(recurringInvestmentsTable)
-      .select(['accountId', 'amount', 'dateCreated', 'frequency', 'id', 'portfolioId', 'profileId', 'startDate', 'status', 'subscriptionAgreementId'])
+      .selectAll()
       .where('accountId', '=', accountId)
+      .where('profileId', '=', profileId)
       .where('status', '=', status)
       .executeTakeFirst();
 

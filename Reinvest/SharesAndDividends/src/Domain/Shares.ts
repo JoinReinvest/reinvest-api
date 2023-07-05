@@ -122,6 +122,24 @@ export class Shares {
     };
   }
 
+  forFinancialOperation(): {
+    accountId: UUID;
+    numberOfShares: number;
+    originId: UUID;
+    portfolioId: UUID;
+    profileId: UUID;
+    unitPrice: number;
+  } {
+    return {
+      accountId: this.sharesSchema.accountId,
+      numberOfShares: this.sharesSchema.numberOfShares!,
+      originId: this.sharesSchema.id,
+      portfolioId: this.sharesSchema.portfolioId,
+      profileId: this.sharesSchema.profileId,
+      unitPrice: this.sharesSchema.unitPrice!,
+    };
+  }
+
   getId(): UUID {
     return this.sharesSchema.id;
   }
@@ -167,5 +185,21 @@ export class Shares {
     this.sharesSchema.accountId = transferToAccountId;
 
     return Shares.restore(transferredSchema);
+  }
+
+  isRevoked(): boolean {
+    return this.sharesSchema.status === SharesStatus.REVOKED;
+  }
+
+  isCreated(): boolean {
+    return this.sharesSchema.status === SharesStatus.CREATED;
+  }
+
+  getNumberOfShares(): number {
+    return this.sharesSchema.numberOfShares!;
+  }
+
+  getPrice(): number {
+    return this.sharesSchema.price;
   }
 }

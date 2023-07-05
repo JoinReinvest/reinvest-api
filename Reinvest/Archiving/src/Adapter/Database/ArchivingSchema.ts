@@ -1,5 +1,5 @@
-import { AccountArchivingState, ArchivingBeneficiaryStatus } from 'Archiving/Domain/ArchivedBeneficiary';
-import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
+import { AccountArchivingState, ArchivingBeneficiaryStatus, VertaloConfiguration } from 'Archiving/Domain/ArchivedBeneficiary';
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 export interface ArchivingBeneficiaryTable {
   accountArchivingStateJson: JSONObjectOf<AccountArchivingState>;
@@ -7,10 +7,9 @@ export interface ArchivingBeneficiaryTable {
   dateCompleted: Date | null;
   dateCreated: Date;
   id: string;
-  investmentTransferStateJson: JSONObject;
   label: string;
   parentId: string;
   profileId: string;
   status: ArchivingBeneficiaryStatus;
-  vertaloConfigurationJson: JSONObject;
+  vertaloConfigurationJson: JSONObjectOf<VertaloConfiguration>;
 }

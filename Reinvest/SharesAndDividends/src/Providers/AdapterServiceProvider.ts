@@ -36,7 +36,7 @@ export class AdapterServiceProvider {
     container
       .addAsValue(SharesAndDividendsDatabaseAdapterInstanceProvider, createSharesAndDividendsDatabaseAdapterProvider(this.config.database))
       .addSingleton(SharesRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
-      .addSingleton(FinancialOperationsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
+      .addSingleton(FinancialOperationsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(DividendsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
       .addSingleton(DividendsCalculationRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
       .addObjectFactory(

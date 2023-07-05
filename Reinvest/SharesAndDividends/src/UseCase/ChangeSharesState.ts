@@ -1,4 +1,3 @@
-import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { Money } from 'Money/Money';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { SharesAndDividendsDatabase } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
@@ -17,17 +16,14 @@ export enum SharesChangeState {
 export class ChangeSharesState {
   private sharesRepository: SharesRepository;
   private transactionAdapter: TransactionalAdapter<SharesAndDividendsDatabase>;
-  private idGenerator: IdGeneratorInterface;
   private financialOperationRepository: FinancialOperationsRepository;
 
   constructor(
     sharesRepository: SharesRepository,
-    idGenerator: IdGeneratorInterface,
     financialOperationRepository: FinancialOperationsRepository,
     transactionAdapter: TransactionalAdapter<SharesAndDividendsDatabase>,
   ) {
     this.sharesRepository = sharesRepository;
-    this.idGenerator = idGenerator;
     this.financialOperationRepository = financialOperationRepository;
     this.transactionAdapter = transactionAdapter;
   }
@@ -53,17 +49,17 @@ export class ChangeSharesState {
         const { profileId, accountId, portfolioId } = shares.toObject();
         await this.transactionAdapter.transaction(`Update shares record for originId ${originId} in account ${accountId} to FUNDING state`, async () => {
           shares.setFundingState(data.shares, Money.lowPrecision(data.unitPrice));
-          const financialOperationId = this.idGenerator.createUuid();
-          await this.financialOperationRepository.addInvestmentOperation(
-            FinancialOperationType.INVESTMENT,
-            financialOperationId,
-            profileId,
-            accountId,
-            portfolioId,
-            data.shares,
-            data.unitPrice,
-            originId,
-          );
+          await this.financialOperationRepository.addFinancialOperations([
+            {
+              operationType: FinancialOperationType.INVESTMENT,
+              profileId,
+              accountId,
+              portfolioId,
+              numberOfShares: data.shares,
+              unitPrice: data.unitPrice,
+              originId,
+            },
+          ]);
           await this.sharesRepository.store(shares);
         });
       }
@@ -82,7 +78,7 @@ export class ChangeSharesState {
         shares.setRevokedState();
         await this.sharesRepository.store(shares);
         // const financialOperationId = this.idGenerator.createUuid();
-        // await this.financialOperationRepository.addInvestmentOperation(
+        // await this.financialOperationRepository.addFinancialOperation(
         //   FinancialOperationType.REVOKED,
         //   financialOperationId,
         //   profileId,

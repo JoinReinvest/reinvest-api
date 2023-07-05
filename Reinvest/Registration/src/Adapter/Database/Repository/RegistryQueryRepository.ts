@@ -1,10 +1,13 @@
+import { UUID } from 'HKEKTypes/Generics';
 import {
   northCapitalSynchronizationTable,
   RegistrationDatabaseAdapterProvider,
   registrationMappingRegistryTable,
+  vertaloSynchronizationTable,
 } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { EMPTY_UUID } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
+import { VertaloIds } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
 import { ObjectMapping } from 'Registration/Port/Api/RegistryQuery';
 
 export type NCAccountStructureMapping = {
@@ -15,6 +18,8 @@ export type NCAccountStructureMapping = {
   recordId: string;
   status: string;
 };
+
+export type VertaloMappingConfiguration = { customerId: string | null; email: string; investorId: string | null };
 
 export class RegistryQueryRepository {
   private databaseAdapterProvider: RegistrationDatabaseAdapterProvider;
@@ -149,5 +154,42 @@ export class RegistryQueryRepository {
       stakeholderId: type === MappedType.STAKEHOLDER ? result.dependentId : null,
       type,
     };
+  }
+
+  async getVertaloConfigurationForAccount(profileId: UUID, accountId: UUID): Promise<VertaloMappingConfiguration | null> {
+    try {
+      const data = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(registrationMappingRegistryTable)
+        .leftJoin(vertaloSynchronizationTable, `${registrationMappingRegistryTable}.recordId`, `${vertaloSynchronizationTable}.recordId`)
+        .select([`${vertaloSynchronizationTable}.vertaloIds`])
+        .select([`${registrationMappingRegistryTable}.email`])
+        .where(`${registrationMappingRegistryTable}.externalId`, '=', accountId)
+        .where(`${registrationMappingRegistryTable}.mappedType`, 'in', [
+          MappedType.INDIVIDUAL_ACCOUNT,
+          MappedType.CORPORATE_ACCOUNT,
+          MappedType.TRUST_ACCOUNT,
+          MappedType.BENEFICIARY_ACCOUNT,
+        ])
+        .executeTakeFirstOrThrow();
+
+      const result = <VertaloMappingConfiguration>{
+        email: data.email,
+        investorId: null,
+        customerId: null,
+      };
+
+      if (data.vertaloIds) {
+        const { investorId, customerId } = <VertaloIds>data.vertaloIds;
+        result.investorId = investorId;
+        result.customerId = customerId;
+      }
+
+      return result;
+    } catch (error: any) {
+      console.warn(`Cannot find vertalo account mapping for id: ${accountId}`, error.message);
+
+      return null;
+    }
   }
 }

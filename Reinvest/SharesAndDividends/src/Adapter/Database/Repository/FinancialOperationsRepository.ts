@@ -1,3 +1,5 @@
+import { UUID } from 'HKEKTypes/Generics';
+import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import {
   sadFinancialOperationsTable,
   sadGlobalFinancialOperationsTable,
@@ -5,45 +7,59 @@ import {
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { FinancialOperationRecord, FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 
+export type FinancialOperation = {
+  accountId: UUID;
+  numberOfShares: number;
+  operationType: FinancialOperationType;
+  originId: UUID;
+  portfolioId: UUID;
+  profileId: UUID;
+  unitPrice: number;
+  uniqueId?: UUID | null;
+};
+
 export class FinancialOperationsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
+  private idGenerator: IdGeneratorInterface;
 
-  constructor(databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider, idGenerator: IdGeneratorInterface) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.idGenerator = idGenerator;
   }
 
   public static getClassName = (): string => 'FinancialOperationsRepository';
 
-  async addInvestmentOperation(
-    operationType: FinancialOperationType,
-    financialOperationId: string,
-    profileId: string,
-    accountId: string,
-    portfolioId: string,
-    numberOfShares: number,
-    unitPrice: number,
-    investmentId: string,
-  ): Promise<void> {
+  async addFinancialOperations(operations: FinancialOperation[]): Promise<void> {
+    const values = operations.map((operation: FinancialOperation) => {
+      const financialOperationId = this.idGenerator.createUuid();
+
+      return {
+        id: financialOperationId,
+        profileId: operation.profileId,
+        accountId: operation.accountId,
+        createdDate: new Date(),
+        operationType: operation.operationType,
+        dataJson: {
+          numberOfShares: operation.numberOfShares,
+          unitPrice: operation.unitPrice,
+          portfolioId: operation.portfolioId,
+          originId: operation.originId,
+        },
+        uniqueId: operation.uniqueId ?? null,
+      };
+    });
+
     await this.databaseAdapterProvider
       .provide()
       .insertInto(sadFinancialOperationsTable)
-      .values({
-        id: financialOperationId,
-        profileId,
-        accountId,
-        createdDate: new Date(),
-        operationType,
-        dataJson: {
-          numberOfShares,
-          unitPrice,
-          portfolioId,
-          investmentId,
-        },
-      })
+      .values(values)
+      .onConflict(oc => oc.column('uniqueId').doNothing())
       .execute();
   }
 
-  async navChangedOperation(financialOperationId: string, numberOfShares: number, unitPrice: number, portfolioId: string): Promise<void> {
+  async navChangedOperation(numberOfShares: number, unitPrice: number, portfolioId: string): Promise<void> {
+    const financialOperationId = this.idGenerator.createUuid();
+
     await this.databaseAdapterProvider
       .provide()
       .insertInto(sadGlobalFinancialOperationsTable)

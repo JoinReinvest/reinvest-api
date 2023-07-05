@@ -43,7 +43,7 @@ class CreateRecurringSubscriptionAgreement {
   async execute(profileId: string, accountId: string) {
     const id = this.idGenerator.createUuid();
 
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, RecurringInvestmentStatus.DRAFT);
+    const recurringInvestment = await this.recurringInvestmentsRepository.get(profileId, accountId, RecurringInvestmentStatus.DRAFT);
 
     if (!recurringInvestment) {
       return false;
