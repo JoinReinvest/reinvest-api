@@ -11,9 +11,33 @@ export enum StoredEventKind {
   InvestmentProcessStarted = 'InvestmentProcessStarted',
   PaymentInitiated = 'PaymentInitiated',
   ArchivingBeneficiaryStarted = 'ArchivingBeneficiaryStarted',
+  ArchivingBeneficiaryCompleted = 'ArchivingBeneficiaryCompleted',
+  TransferringBeneficiaryToParentCompleted = 'TransferringBeneficiaryToParentCompleted',
 }
 
 export const StoredEvents = <StoredEventsType>{
+  ArchivingBeneficiaryCompleted: {
+    accountActivity: {
+      data: ({ amountTransferred, numberOfShares, name, numberOfInvestments }) => ({
+        amountTransferred,
+        numberOfShares,
+        name,
+        numberOfInvestments,
+      }),
+      name: ({ numberOfShares }) => `Beneficiary archived. Transferred ${numberOfShares} shares to main account`,
+    },
+  },
+  TransferringBeneficiaryToParentCompleted: {
+    accountActivity: {
+      data: ({ amountTransferred, numberOfShares, name, numberOfInvestments }) => ({
+        amountTransferred,
+        numberOfShares,
+        name,
+        numberOfInvestments,
+      }),
+      name: ({ numberOfShares, name }) => `Beneficiary "${name}" is archived. ${numberOfShares} shares were transferred`,
+    },
+  },
   UserRegistered: {
     accountActivity: {
       data: () => ({}),

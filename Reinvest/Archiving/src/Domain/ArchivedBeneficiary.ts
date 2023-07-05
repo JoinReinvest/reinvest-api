@@ -65,6 +65,7 @@ export type ArchivingBeneficiarySchema = {
 
 export type BeneficiaryTransferStats = {
   amountTransferred: number;
+  name: string;
   numberOfInvestments: number;
   numberOfShares: number;
   transferredFrom: UUID;
@@ -213,6 +214,7 @@ export class ArchivedBeneficiary {
       numberOfShares,
       transferredFrom: this.archivingBeneficiarySchema.accountId,
       transferredTo: this.archivingBeneficiarySchema.parentId,
+      name: this.archivingBeneficiarySchema.label,
     };
   }
 
