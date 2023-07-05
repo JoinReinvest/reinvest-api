@@ -75,19 +75,18 @@ export class ChangeSharesState {
       }
 
       if (state === SharesChangeState.REVOKED) {
+        if (shares.isRevoked()) {
+          return;
+        }
+
         shares.setRevokedState();
         await this.sharesRepository.store(shares);
-        // const financialOperationId = this.idGenerator.createUuid();
-        // await this.financialOperationRepository.addFinancialOperation(
-        //   FinancialOperationType.REVOKED,
-        //   financialOperationId,
-        //   profileId,
-        //   accountId,
-        //   portfolioId,
-        //   data.shares,
-        //   data.unitPrice,
-        //   investmentId,
-        // );
+        await this.financialOperationRepository.addFinancialOperations([
+          {
+            operationType: FinancialOperationType.REVOKED,
+            ...shares.forFinancialOperation(),
+          },
+        ]);
       }
     } catch (error) {
       console.error('[ChangeSharesState]', originId, state, error);

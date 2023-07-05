@@ -1,7 +1,19 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { Investment } from 'Investments/Domain/Investments/Investment';
+import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
-import { UUID } from 'HKEKTypes/Generics';
+
+export type InvestmentOverview = {
+  amount: {
+    formatted: string;
+    value: number;
+  };
+  createdAt: string;
+  id: UUID;
+  status: InvestmentStatus;
+  tradeId: string;
+};
 
 class ListInvestmentsQuery {
   private readonly investmentsRepository: InvestmentsRepository;
@@ -12,16 +24,17 @@ class ListInvestmentsQuery {
 
   static getClassName = (): string => 'ListInvestmentsQuery';
 
-  async listAllInvestments(profileId: string, accountId: string, pagination: Pagination) {
-    const investments = await this.investmentsRepository.getInvestments(profileId, accountId, pagination);
+  async listAllInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<InvestmentOverview[]> {
+    const investments = await this.investmentsRepository.listPaginatedInvestments(profileId, accountId, pagination);
 
-    return investments.map((investment: Investment) => {
-      const { id, tradeId, dateCreated, amount } = investment.toObject();
+    return investments.map((investment: Investment): InvestmentOverview => {
+      const { id, tradeId, dateCreated, amount, status } = investment.toObject();
 
       return {
         id,
         tradeId,
-        createdAt: dateCreated,
+        createdAt: dateCreated.toIsoDateTime(),
+        status,
         amount: {
           formatted: amount.getFormattedAmount(),
           value: amount.getAmount(),

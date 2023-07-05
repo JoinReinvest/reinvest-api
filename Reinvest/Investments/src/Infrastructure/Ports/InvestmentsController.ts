@@ -4,7 +4,7 @@ import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
 import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
-import ListInvestmentsQuery from 'Investments/Application/UseCases/ListInvestmentsQuery';
+import ListInvestmentsQuery, { InvestmentOverview } from 'Investments/Application/UseCases/ListInvestmentsQuery';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
 import { Money } from 'Money/Money';
@@ -57,7 +57,7 @@ export class InvestmentsController {
     return this.abortInvestmentUseCase.execute(profileId, investmentId);
   }
 
-  public async listInvestments(profileId: UUID, accountId: UUID, pagination: Pagination) {
+  public async listInvestments(profileId: UUID, accountId: UUID, pagination: Pagination): Promise<InvestmentOverview[]> {
     return this.listInvestmentsQuery.listAllInvestments(profileId, accountId, pagination);
   }
 
