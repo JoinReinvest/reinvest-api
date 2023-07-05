@@ -1,5 +1,6 @@
 import { TransactionProcessManager } from 'Investments/Application/TransactionProcessManager/TransactionProcessManager';
 import {
+  cancelTransaction,
   checkIfGracePeriodEnded,
   checkIsInvestmentApproved,
   checkIsInvestmentFunded,
@@ -10,6 +11,7 @@ import {
   verifyAccountForInvestment,
 } from 'Investments/Domain/Transaction/TransactionCommands';
 import {
+  CancelTransactionDecision,
   CheckIfGracePeriodEndedDecision,
   CheckIsInvestmentApprovedDecision,
   CheckIsInvestmentFundedDecision,
@@ -79,6 +81,12 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED].includes(decision.kind)) {
       await this.eventBus.publish(transferSharesWhenTradeSettled(decision as TransferSharesWhenTradeSettledDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.CANCEL_TRANSACTION].includes(decision.kind)) {
+      await this.eventBus.publish(cancelTransaction(decision as CancelTransactionDecision));
 
       return;
     }

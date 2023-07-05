@@ -6,6 +6,7 @@ import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { logger } from 'Logger/logger';
 import { Notifications } from 'Notifications/index';
+import { DealpathConfig } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
 import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
@@ -14,7 +15,9 @@ import {
   CHROMIUM_ENDPOINT,
   COGNITO_CONFIG,
   DATABASE_CONFIG,
+  DEALPATH_CONFIG,
   EMAIL_DOMAIN,
+  FIREBASE_SQS_CONFIG,
   NORTH_CAPITAL_CONFIG,
   PDF_GENERATOR_SQS_CONFIG,
   S3_CONFIG,
@@ -44,14 +47,17 @@ export function boot(): Modules {
   const cognitoConfig = COGNITO_CONFIG as CognitoConfig;
   const queueConfig = SQS_CONFIG as QueueConfig;
   const pdfGeneratorQueue = PDF_GENERATOR_SQS_CONFIG as QueueConfig;
+  const firebaseQueue = FIREBASE_SQS_CONFIG as QueueConfig;
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
+  const dealpathConfig = DEALPATH_CONFIG as DealpathConfig;
 
   modules.register(
     Notifications.moduleName,
     Notifications.create({
       database: databaseConfig,
       queue: queueConfig,
+      firebaseQueue: firebaseQueue,
     } as Notifications.Config),
   );
 
@@ -60,16 +66,23 @@ export function boot(): Modules {
     Documents.create({
       database: databaseConfig,
       s3: s3Config,
+      pdfGeneratorQueue,
       chromiumEndpoint: CHROMIUM_ENDPOINT,
     } as Documents.Config),
   );
 
   modules.register(
     Portfolio.moduleName,
-    Portfolio.create({
-      database: databaseConfig,
-      queue: queueConfig,
-    } as Portfolio.Config),
+    Portfolio.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+        dealpathConfig,
+      } as Portfolio.Config,
+      {
+        documents: modules.get(Documents.moduleName) as Documents.Main,
+      },
+    ),
   );
 
   modules.register(
@@ -102,6 +115,7 @@ export function boot(): Modules {
         SNS: snsConfig,
         Cognito: cognitoConfig,
         webAppUrl: WEB_APP_URL,
+        queue: queueConfig,
       } as Identity.Config,
       {
         investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main,
@@ -165,6 +179,7 @@ export function boot(): Modules {
       {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
+        verification: modules.get(Verification.moduleName) as Verification.Main,
       },
     ),
   );

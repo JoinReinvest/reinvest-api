@@ -122,6 +122,11 @@ export class Shares {
     this.sharesSchema.dateSettled = new Date();
   }
 
+  setRevokedState() {
+    this.sharesSchema.status = SharesStatus.REVOKED;
+    this.sharesSchema.dateRevoked = new Date();
+  }
+
   forDividendCalculation(): {
     accountId: UUID;
     dateFunding: DateTime;

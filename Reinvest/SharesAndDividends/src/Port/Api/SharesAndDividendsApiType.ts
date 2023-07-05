@@ -29,6 +29,7 @@ export type SharesAndDividendsApiType = {
   markDividendReinvested: DividendsController['markDividendReinvested'];
   setSharesToFundedState: SharesController['setSharesToFundedState'];
   setSharesToFundingState: SharesController['setSharesToFundingState'];
+  setSharesToRevokedState: SharesController['setSharesToRevokedState'];
   setSharesToSettledState: SharesController['setSharesToSettledState'];
 };
 
@@ -57,4 +58,5 @@ export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndD
   distributionsCompleted: container.delegateTo(DividendsCalculationController, 'distributionsCompleted'),
   getAccountState: container.delegateTo(SharesController, 'getAccountState'),
   markDividendAsWithdrew: container.delegateTo(DividendsController, 'markDividendAsWithdrew'),
+  setSharesToRevokedState: container.delegateTo(SharesController, 'setSharesToRevokedState'),
 });

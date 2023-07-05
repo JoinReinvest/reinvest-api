@@ -1,3 +1,4 @@
+import { EventBus, storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
 import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
@@ -11,6 +12,7 @@ export class CreateTrade {
   private vertaloAdapter: TradingVertaloAdapter;
   private registrationService: VendorsMappingService;
   private documentService: TradingDocumentService;
+  private eventBus: EventBus;
 
   constructor(
     tradesRepository: TradesRepository,
@@ -18,12 +20,14 @@ export class CreateTrade {
     vertaloAdapter: TradingVertaloAdapter,
     registrationService: VendorsMappingService,
     documentService: TradingDocumentService,
+    eventBus: EventBus,
   ) {
     this.tradesRepository = tradesRepository;
     this.northCapitalAdapter = northCapitalAdapter;
     this.vertaloAdapter = vertaloAdapter;
     this.registrationService = registrationService;
     this.documentService = documentService;
+    this.eventBus = eventBus;
   }
 
   static getClassName = () => 'CreateTrade';
@@ -43,7 +47,7 @@ export class CreateTrade {
       }
 
       // create trade in north capital
-      if (!trade.isTradeCreated()) {
+      if (!trade.tradeExists()) {
         const { offeringId, shares, ip, northCapitalAccountId } = trade.getNorthCapitalTradeConfiguration();
         const northCapitalTrade = await this.northCapitalAdapter.createTrade(offeringId, northCapitalAccountId, shares, ip);
         trade.setTradeState(northCapitalTrade);
@@ -73,11 +77,21 @@ export class CreateTrade {
 
       // init funds transfer
       if (!trade.isFundsTransferCreated()) {
-        const { accountId, offeringId, tradeId, bankName, amount, ip, investmentId } = trade.getFundsTransferConfiguration();
-        const fundsTransfer = await this.northCapitalAdapter.createFundsTransfer(investmentId, accountId, offeringId, tradeId, bankName, amount, ip);
+        const { ncAccountId, offeringId, tradeId, bankName, amount, fee, ip, investmentId, userTradeId } = trade.getFundsTransferConfiguration();
+        const fundsTransfer = await this.northCapitalAdapter.createFundsTransfer(investmentId, ncAccountId, offeringId, tradeId, bankName, amount, ip);
         trade.setFundsTransferState(fundsTransfer);
         await this.tradesRepository.updateTrade(trade);
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'NC funds transfer created', fundsTransfer);
+
+        await this.eventBus.publish(
+          storeEventCommand(trade.getProfileId(), 'PaymentInitiated', {
+            accountId: trade.getReinvestAccountId(),
+            investmentId,
+            amount: amount.getAmount(),
+            fee: fee.getAmount(),
+            tradeId: userTradeId,
+          }),
+        );
       }
 
       // open distribution (awaiting for funds transfer)

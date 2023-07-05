@@ -6,6 +6,9 @@ import { FileLinksController } from 'Documents/Port/Api/FileLinksController';
 import { PdfController } from 'Documents/Port/Api/PdfController';
 import { AvatarRemovedEventHandler } from 'Documents/Port/Queue/EventHandler/AvatarRemovedEventHandler';
 import { DocumentRemovedEventHandler } from 'Documents/Port/Queue/EventHandler/DocumentRemovedEventHandler';
+import GetRenderedPageLink from 'Documents/UseCases/GetRenderedPageLink';
+import ListRenderedPage from 'Documents/UseCases/ListRenderedPage';
+import RenderPageToPdf from 'Documents/UseCases/RenderPageToPdf';
 
 export class PortsProvider {
   private config: Documents.Config;
@@ -16,8 +19,10 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     //controllers
-    container.addSingleton(FileLinksController, [FileLinkService]).addSingleton(PdfController, []);
-    container.addSingleton(FileLinksController, [FileLinkService]);
+    container
+      .addSingleton(FileLinksController, [FileLinkService])
+      .addSingleton(PdfController, [RenderPageToPdf, GetRenderedPageLink, ListRenderedPage])
+      .addSingleton(FileLinksController, [FileLinkService]);
 
     // queue
     container.addSingleton(DocumentRemovedEventHandler, [S3Adapter]).addSingleton(AvatarRemovedEventHandler, [S3Adapter]);

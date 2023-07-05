@@ -18,7 +18,7 @@ class AbortInvestment {
 
   async execute(profileId: string, investmentId: string) {
     try {
-      const investment = await this.investmentsRepository.get(investmentId);
+      const investment = await this.investmentsRepository.getInvestmentByProfileAndId(profileId, investmentId);
 
       if (!investment) {
         return false;
@@ -26,13 +26,12 @@ class AbortInvestment {
 
       investment.abort();
 
-      const fee = investment.getFee();
-
       const status = await this.transactionAdapter.transaction(`Abort investment ${investmentId} with related fee if exist`, async () => {
         await this.investmentsRepository.updateStatus(investment);
+        const fee = investment.getFee();
 
         if (fee) {
-          await this.feesRepository.updateStatus(fee);
+          await this.feesRepository.storeFee(fee);
         }
       });
 

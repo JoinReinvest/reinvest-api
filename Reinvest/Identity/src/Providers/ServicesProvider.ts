@@ -9,6 +9,7 @@ import { PhoneRegistrationService } from 'Identity/Service/PhoneRegistrationServ
 import { UserRegistrationService } from 'Identity/Service/UserRegistrationService';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { UniqueTokenGenerator } from 'IdGenerator/UniqueTokenGenerator';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class ServicesProvider {
   private config: Identity.Config;
@@ -19,7 +20,7 @@ export class ServicesProvider {
 
   public boot(container: ContainerInterface) {
     container
-      .addSingleton(UserRegistrationService, [UserRepository, ProfileService, CognitoService, IdGenerator, IncentiveTokenRepository])
+      .addSingleton(UserRegistrationService, [UserRepository, ProfileService, CognitoService, IdGenerator, IncentiveTokenRepository, SimpleEventBus])
       .addSingleton(PhoneRegistrationService, [UserRepository, PhoneRepository, UniqueTokenGenerator]);
   }
 }

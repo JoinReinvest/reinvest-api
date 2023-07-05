@@ -11,6 +11,9 @@ import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { UniqueTokenGenerator } from 'IdGenerator/UniqueTokenGenerator';
 import { DatabaseProvider } from 'PostgreSQL/DatabaseProvider';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
+import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export class AdapterServiceProvider {
   private config: Identity.Config;
@@ -22,8 +25,15 @@ export class AdapterServiceProvider {
   public boot(container: ContainerInterface) {
     container.addSingleton(IdGenerator).addSingleton(UniqueTokenGenerator);
 
-    container.addAsValue('SNSConfig', this.config.SNS).addAsValue('CognitoConfig', this.config.Cognito);
+    container
+      .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
+      .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
 
+    const eventBus = new SimpleEventBus(container);
+    eventBus.subscribe(STORE_EVENT_COMMAND, SendToQueueEventHandler.getClassName());
+    container.addAsValue(SimpleEventBus.getClassName(), eventBus);
+
+    container.addAsValue('SNSConfig', this.config.SNS).addAsValue('CognitoConfig', this.config.Cognito);
     container.addSingleton(SmsService, ['SNSConfig']).addSingleton(CognitoService, ['CognitoConfig']);
 
     // database

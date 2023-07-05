@@ -13,3 +13,8 @@ export interface JSONObjectOf<Type> {
 }
 
 export type UUID = string;
+
+export type Pagination = {
+  page: number;
+  perPage: number;
+};

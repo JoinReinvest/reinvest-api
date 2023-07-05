@@ -8,4 +8,5 @@ export type Template = {
 
 export enum PdfTypes {
   AGREEMENT = 'AGREEMENT',
+  PAGE = 'PAGE',
 }

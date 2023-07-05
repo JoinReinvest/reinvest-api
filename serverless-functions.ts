@@ -11,8 +11,10 @@ import {
   CronDividendsDistributionResources,
 } from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
+import { CronNotificationsFunction, CronNotificationsResources } from './devops/functions/cron/notifications/cron-notifications-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
+import { FirebaseFunction, FirebaseResources } from './devops/functions/firebase/queue-config';
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
 import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/pdfGenerator/queue-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
@@ -42,9 +44,11 @@ const serverlessConfiguration: AWS = {
       CognitoUserPoolID: importOutput('CognitoUserPoolID'),
       S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
       S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
+      S3_BUCKET_PORTFOLIO: importOutput('PortfolioBucketName'),
       LocalCognitoClientId: { Ref: 'LocalCognito' },
       SQS_QUEUE_URL: getAttribute('SQSNotification', 'QueueUrl'),
       SQS_PDF_GENERATOR_URL: getAttribute('SQSPdfGenerator', 'QueueUrl'),
+      SQS_FIREBASE_QUEUE_URL: getAttribute('SQSFirebase', 'QueueUrl'),
       EMAIL_SEND_FROM: '${env:EMAIL_SEND_FROM}',
       EMAIL_REPLY_TO: '${env:EMAIL_REPLY_TO}',
       WEB_APP_URL: '${env:WEB_APP_URL}',
@@ -62,6 +66,10 @@ const serverlessConfiguration: AWS = {
       SNS_ORIGINATION_NUMBER: '${env:SNS_ORIGINATION_NUMBER}',
       SENTRY_DSN: '${env:SENTRY_DSN}',
       CHROMIUM_ENDPOINT: '${env:CHROMIUM_ENDPOINT}',
+      DEALPATH_API_URL: '${env:DEALPATH_API_URL}',
+      DEALPATH_AUTHORIZATION_TOKEN: '${env:DEALPATH_AUTHORIZATION_TOKEN}',
+      DEALPATH_VERSION_HEADER: '${env:DEALPATH_VERSION_HEADER}',
+      // FIREBASE_SERVICE_ACCOUNT_JSON: '${env:FIREBASE_SERVICE_ACCOUNT_JSON}',
     },
     apiGateway: {
       minimumCompressionSize: 1024,
@@ -89,10 +97,12 @@ const serverlessConfiguration: AWS = {
     cronVendorsSync: CronVendorsSyncFunction,
     cronDividendsCalculation: CronDividendsCalculationFunction,
     cronDividendsDistribution: CronDividendsDistributionFunction,
+    cronNotificationsFunction: CronNotificationsFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
     pdfGenerator: PdfGeneratorFunction,
+    firebase: FirebaseFunction,
   },
   resources: {
     Description: 'REINVEST ${sls:stage} API functions',
@@ -112,6 +122,8 @@ const serverlessConfiguration: AWS = {
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
       ...PdfGeneratorResources,
+      ...FirebaseResources,
+      ...CronNotificationsResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,

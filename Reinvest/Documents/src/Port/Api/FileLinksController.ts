@@ -18,8 +18,16 @@ export class FileLinksController {
     return this.fileLinkService.createFileLinks(FileType.DOCUMENT, profileId, numberOfLinks);
   }
 
+  public async createImageFileLinks(numberOfLinks: number, profileId: string): Promise<FileLink[]> {
+    return this.fileLinkService.createImageFileLinks(profileId, numberOfLinks);
+  }
+
   public async getAvatarLink(id: string, catalog: string): Promise<FileLink> {
     return this.fileLinkService.getAvatarFileLink(id, catalog);
+  }
+
+  public async getImageLink(id: string, catalog: string): Promise<FileLink> {
+    return this.fileLinkService.getImageLink(id, catalog);
   }
 
   public async getDocumentLink(id: string, catalog: string): Promise<FileLink> {

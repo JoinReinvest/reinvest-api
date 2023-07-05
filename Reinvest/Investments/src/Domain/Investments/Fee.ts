@@ -1,80 +1,79 @@
-import type { InvestmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
 
 import { InvestmentsFeesStatus } from './Types';
 
-export type FeeSchema = InvestmentsFeesTable;
+export type FeeSchema = {
+  abortedDate: DateTime | null;
+  accountId: UUID;
+  amount: Money;
+  approveDate: DateTime | null;
+  approvedByIP: string | null;
+  dateCreated: DateTime;
+  id: UUID;
+  investmentId: UUID;
+  profileId: UUID;
+  status: InvestmentsFeesStatus;
+  verificationFeeIds: VerificationFeeIds;
+};
+
+export type VerificationReference = {
+  amount: number;
+  verificationFeeId: UUID;
+};
+
+export type VerificationFeeIds = {
+  fees: VerificationReference[];
+};
 
 export class Fee {
-  private accountId: string;
-  private amount: number;
-  private approveDate: Date | null;
-  private approvedByIP: string | null;
-  private dateCreated: Date;
-  private id: string;
-  private investmentId: string;
-  private profileId: string;
-  private status: InvestmentsFeesStatus;
-  private verificationFeeId: string;
+  private feeSchema: FeeSchema;
 
-  constructor(
-    accountId: string,
-    amount: number,
-    approveDate: Date | null,
-    approvedByIP: string | null,
-    dateCreated: Date,
-    id: string,
-    investmentId: string,
-    profileId: string,
-    status: InvestmentsFeesStatus,
-    verificationFeeId: string,
-  ) {
-    this.accountId = accountId;
-    this.amount = amount;
-    this.approveDate = approveDate;
-    this.approvedByIP = approvedByIP;
-    this.dateCreated = dateCreated;
-    this.id = id;
-    this.investmentId = investmentId;
-    this.profileId = profileId;
-    this.status = status;
-    this.verificationFeeId = verificationFeeId;
+  constructor(feeSchema: FeeSchema) {
+    this.feeSchema = feeSchema;
   }
 
-  static create(data: FeeSchema) {
-    const { accountId, amount, approveDate, approvedByIP, dateCreated, id, investmentId, profileId, status, verificationFeeId } = data;
-
-    return new Fee(accountId, amount, approveDate, approvedByIP, dateCreated, id, investmentId, profileId, status, verificationFeeId);
+  static create(accountId: UUID, amount: Money, id: string, investmentId: string, profileId: string, verificationFeeIds: VerificationFeeIds): Fee {
+    return new Fee({
+      accountId,
+      amount,
+      approveDate: null,
+      abortedDate: null,
+      approvedByIP: null,
+      dateCreated: DateTime.now(),
+      id,
+      investmentId,
+      profileId,
+      status: InvestmentsFeesStatus.AWAITING,
+      verificationFeeIds,
+    });
   }
 
-  approveFee() {
-    this.approveDate = new Date();
-    this.status = InvestmentsFeesStatus.APPROVED;
+  static restoreFromSchema(feeSchema: FeeSchema): Fee {
+    return new Fee(feeSchema);
   }
 
-  getId() {
-    return this.id;
+  approveFee(ip: string): void {
+    this.feeSchema.approveDate = DateTime.now();
+    this.feeSchema.status = InvestmentsFeesStatus.APPROVED;
+    this.feeSchema.approvedByIP = ip;
   }
 
-  abort() {
-    this.status = InvestmentsFeesStatus.ABORTED;
+  getId(): UUID {
+    return this.feeSchema.id;
   }
 
-  isApproved() {
-    return this.status === InvestmentsFeesStatus.APPROVED;
+  abort(): void {
+    this.feeSchema.status = InvestmentsFeesStatus.ABORTED;
+    this.feeSchema.abortedDate = DateTime.now();
   }
 
-  toObject() {
-    return {
-      accountId: this.accountId,
-      amount: this.amount,
-      approveDate: this.approveDate,
-      approvedByIP: this.approvedByIP,
-      dateCreated: this.dateCreated,
-      id: this.id,
-      investmentId: this.investmentId,
-      profileId: this.profileId,
-      status: this.status,
-      verificationFeeId: this.verificationFeeId,
-    };
+  isApproved(): boolean {
+    return this.feeSchema.status === InvestmentsFeesStatus.APPROVED;
+  }
+
+  toObject(): FeeSchema {
+    return this.feeSchema;
   }
 }

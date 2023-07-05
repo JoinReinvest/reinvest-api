@@ -17,6 +17,12 @@ export const VERTALO_CONFIG = {
   API_URL: process.env.VERTALO_API_URL as string,
 };
 
+export const DEALPATH_CONFIG = {
+  API_URL: process.env.DEALPATH_API_URL as string,
+  AUTHORIZATION_TOKEN: process.env.DEALPATH_AUTHORIZATION_TOKEN as string,
+  VERSION_HEADER: process.env.DEALPATH_VERSION_HEADER as string,
+};
+
 export const WEB_APP_URL = process.env.WEB_APP_URL?.replace(/\/*$/, '') as string;
 
 export const DATABASE_CONFIG = {
@@ -30,6 +36,7 @@ export const S3_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   avatarsBucket: process.env.S3_BUCKET_AVATARS as string,
   documentsBucket: process.env.S3_BUCKET_DOCUMENTS as string,
+  portfolioBucket: process.env.S3_BUCKET_PORTFOLIO as string,
 };
 
 export const COGNITO_CONFIG = {
@@ -53,6 +60,13 @@ export const PDF_GENERATOR_SQS_CONFIG = {
   queueUrl: process.env.SQS_PDF_GENERATOR_URL as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',
 };
+
+export const FIREBASE_SQS_CONFIG = {
+  region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+  queueUrl: process.env.SQS_FIREBASE_QUEUE_URL as string,
+  isLocal: process.env.IT_IS_LOCAL === 'true',
+};
+
 export const LAMBDA_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',
@@ -65,3 +79,5 @@ export const SENTRY_CONFIG = {
 };
 
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
+
+// export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;

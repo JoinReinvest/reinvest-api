@@ -14,6 +14,7 @@ import {
   TrustDraftAccount,
 } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { EventBus, storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class TransformDraftAccountIntoRegularAccount {
   public static getClassName = (): string => 'TransformDraftAccountIntoRegularAccount';
@@ -22,6 +23,7 @@ export class TransformDraftAccountIntoRegularAccount {
   private accountRepository: AccountRepository;
   private transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>;
   private profileRepository: ProfileRepository;
+  private eventBus: EventBus;
 
   constructor(
     draftAccountRepository: DraftAccountRepository,
@@ -29,12 +31,14 @@ export class TransformDraftAccountIntoRegularAccount {
     accountRepository: AccountRepository,
     transactionAdapter: TransactionalAdapter<LegalEntitiesDatabase>,
     profileRepository: ProfileRepository,
+    eventBus: EventBus,
   ) {
     this.draftAccountRepository = draftAccountRepository;
     this.investmentAccountService = investmentAccountService;
     this.accountRepository = accountRepository;
     this.transactionAdapter = transactionAdapter;
     this.profileRepository = profileRepository;
+    this.eventBus = eventBus;
   }
 
   async execute(profileId: string, draftAccountId: string): Promise<string | null> {
@@ -117,10 +121,33 @@ export class TransformDraftAccountIntoRegularAccount {
       }
 
       await this.draftAccountRepository.removeDraft(profileId, draftId);
+      await this.publishAccountOpenedEvent(profileId, accountType, account);
     });
 
     if (!status) {
       throw new Error('ACCOUNT_TRANSFORMATION_FAILED');
     }
+  }
+
+  private async publishAccountOpenedEvent(profileId: string, accountType: AccountType, account: IndividualAccount | CompanyAccount): Promise<void> {
+    let eventName: string;
+    const payload = {
+      accountId: account.getId(),
+      label: account.getLabel(),
+    };
+    switch (accountType) {
+      case AccountType.INDIVIDUAL:
+        eventName = 'IndividualAccountOpened';
+        break;
+      case AccountType.CORPORATE:
+        eventName = 'CorporateAccountOpened';
+        break;
+      case AccountType.TRUST:
+        eventName = 'TrustAccountOpened';
+        break;
+      default:
+        return;
+    }
+    await this.eventBus.publish(storeEventCommand(profileId, eventName, payload));
   }
 }

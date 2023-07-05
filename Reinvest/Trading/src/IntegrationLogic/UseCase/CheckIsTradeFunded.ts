@@ -29,13 +29,13 @@ export class CheckIsTradeFunded {
         const tradeId = trade.getTradeId();
         const tradeStatus = await this.northCapitalAdapter.getTradeStatus(tradeId);
 
-        if (tradeStatus === 'funded') {
+        if (tradeStatus.isFunded()) {
           trade.setTradeStatusToFunded();
           await this.tradesRepository.updateTrade(trade);
           console.info(`[Trade ${investmentId}]`, 'Trade is funded');
         } else {
           // TODO if trade is not funded, we should check the status of payment, as trade status is not changed if payment failed!!!
-          console.info(`[Trade ${investmentId}]`, 'Trade is NOT funded yet:', tradeStatus);
+          console.info(`[Trade ${investmentId}]`, 'Trade is NOT funded yet:', tradeStatus.toString());
 
           return false;
         }

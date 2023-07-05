@@ -57,14 +57,6 @@ export class VerifyAccountForInvestmentHandler implements EventHandler<DomainEve
       };
     }
 
-    // todo remove
-    returnEvent = {
-      kind: 'AccountVerifiedForInvestment',
-      data: {
-        accountId: accountId,
-      },
-      id: event.id,
-    };
     await this.eventBus.publish(returnEvent);
   }
 }

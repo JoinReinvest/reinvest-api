@@ -2,17 +2,25 @@ import { Pagination } from 'Notifications/Application/Pagination';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
 import { NotificationFilter, NotificationQuery, NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
-import { NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
+import { NotificationObjectType, NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
+import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 
 export class NotificationsController {
   private createNotificationUseCase: CreateNotification;
   private dismissNotificationsUseCase: DismissNotifications;
   private notificationQuery: NotificationQuery;
+  private pushNotificationRepository: PushNotificationRepository;
 
-  constructor(createNotificationUseCase: CreateNotification, dismissNotificationsUseCase: DismissNotifications, notificationQuery: NotificationQuery) {
+  constructor(
+    createNotificationUseCase: CreateNotification,
+    dismissNotificationsUseCase: DismissNotifications,
+    notificationQuery: NotificationQuery,
+    pushNotificationRepository: PushNotificationRepository,
+  ) {
     this.createNotificationUseCase = createNotificationUseCase;
     this.dismissNotificationsUseCase = dismissNotificationsUseCase;
     this.notificationQuery = notificationQuery;
+    this.pushNotificationRepository = pushNotificationRepository;
   }
 
   static getClassName = () => 'NotificationsController';
@@ -25,14 +33,16 @@ export class NotificationsController {
     body: string,
     dismissId: string | null,
     onObjectId: string | null,
-    onObjectType: string | null,
+    onObjectType: NotificationObjectType | null,
     uniqueId: string | null,
+    pushNotification?: { body: string; title: string },
   ): Promise<boolean> {
     try {
       if (!Object.keys(NotificationsType).includes(notificationType)) {
         throw new Error(`Invalid notification type: ${notificationType}`);
       }
 
+      const doesNotificationAlreadyStored = uniqueId ? await this.notificationQuery.doesNotificationExists(uniqueId) : false;
       await this.createNotificationUseCase.execute({
         accountId,
         body,
@@ -44,6 +54,10 @@ export class NotificationsController {
         profileId,
         uniqueId,
       });
+
+      if (pushNotification && !doesNotificationAlreadyStored) {
+        await this.pushNotificationRepository.pushNotification(profileId, pushNotification.title, pushNotification.body);
+      }
 
       return true;
     } catch (error: any) {

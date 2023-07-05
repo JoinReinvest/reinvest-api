@@ -37,8 +37,27 @@ export class FileLinkService {
     return fileLinks;
   }
 
+  async createImageFileLinks(catalog: string, numberOfLinks: number = 1): Promise<FileLink[]> {
+    const fileLinks = <FileLink[]>[];
+
+    for (let i = 0; i < numberOfLinks; i++) {
+      const id = this.idGenerator.createUuid();
+      const url = await this.adapter.generatePutSignedUrlForImage(catalog, id);
+
+      fileLinks.push({ url, id });
+    }
+
+    return fileLinks;
+  }
+
   async getAvatarFileLink(id: string, catalog: string): Promise<FileLink> {
     const url = await this.adapter.getSignedGetUrl(FileType.AVATAR, catalog, id);
+
+    return { id, url };
+  }
+
+  async getImageLink(id: string, catalog: string): Promise<FileLink> {
+    const url = await this.adapter.getImageUrl(id, catalog);
 
     return { id, url };
   }

@@ -1,11 +1,20 @@
 {
-  "request": {
-    "userAttributes": {
-      "sub": "f1877917-9e48-4637-b896-36649848a5b8",
-      "email_verified": "true",
-      "cognito:user_status": "CONFIRMED",
-      "custom:incentive_token": "",
-      "email": "lukasz@devkick.pl"
+  "Records": [
+    {
+      "messageId": "MessageID_1",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{  \"kind\": \"MakeScreenshotToPdf\",       \"data\": {          \"catalog\": \"catalog\",          \"fileName\": \"test\",          \"template\": \"test\",          \"templateType\": \"test\"        },        \"id\": \"test\"      }",
+      "md5OfBody": "fce0ea8dd236ccb3ed9b37dae260836f",
+      "md5OfMessageAttributes": "582c92c5c5b6ac403040a4f3ab3115c9",
+      "eventSourceARN": "arn:aws:sqs:us-west-2:123456789012:SQSQueue",
+      "eventSource": "aws:sqs",
+      "awsRegion": "us-west-2",
+      "attributes": {
+        "ApproximateReceiveCount": "2",
+        "SentTimestamp": "1520621625029",
+        "SenderId": "AROAIWPX5BD2BHG722MW4:sender",
+        "ApproximateFirstReceiveTimestamp": "1520621634884"
+      }
     }
-  }
+  ]
 }

@@ -1,17 +1,17 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
-import { Notification, NotificationsType } from 'Notifications/Domain/Notification';
+import { Notification, NotificationObjectType, NotificationsType } from 'Notifications/Domain/Notification';
 
 export type CreateNewNotificationInput = {
   accountId: string | null;
   body: string;
-  dismissId: string | null;
   header: string;
   notificationType: NotificationsType;
   onObjectId: string | null;
-  onObjectType: string | null;
+  onObjectType: NotificationObjectType | null;
   profileId: string;
   uniqueId: string | null;
+  dismissId?: string | null;
 };
 
 export class CreateNotification {

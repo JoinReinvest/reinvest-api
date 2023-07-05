@@ -45,6 +45,7 @@ export type VerificationObject = {
 
 export type VerificationDecision = {
   decision: VerificationDecisionType;
+  decisionId: string;
   onObject: VerificationObject;
   reasons?: string[];
 };

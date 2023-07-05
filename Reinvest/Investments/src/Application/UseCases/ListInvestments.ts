@@ -1,3 +1,4 @@
+import { Investment } from 'Investments/Domain/Investments/Investment';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { Money } from 'Money/Money';
 import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
@@ -12,14 +13,10 @@ class ListInvestments {
   static getClassName = (): string => 'ListInvestments';
 
   async execute(profileId: string, accountId: string, pagination: Pagination) {
-    const investmets = await this.investmentsRepository.getInvestments(profileId, accountId, pagination);
+    const investments = await this.investmentsRepository.getInvestments(profileId, accountId, pagination);
 
-    if (!investmets?.length) {
-      return null;
-    }
-
-    const list = investmets.map(investmet => {
-      const { id, tradeId, dateCreated, amount } = investmet.toObject();
+    return investments.map((investment: Investment) => {
+      const { id, tradeId, dateCreated, amount } = investment.toObject();
       const money = new Money(amount);
 
       return {
@@ -32,8 +29,6 @@ class ListInvestments {
         },
       };
     });
-
-    return list;
   }
 }
 

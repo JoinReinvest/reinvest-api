@@ -25,6 +25,7 @@ import { BeneficiaryAccountOpenedEventHandler } from 'Registration/Port/Queue/Ev
 import { CompanyAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/CompanyAccountOpenedEventHandler';
 import { IndividualAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler';
 import { ProfileCompletedEventHandler } from 'Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler';
+import { SynchronizeRegistryRecords } from 'Registration/IntegrationLogic/UseCase/SynchronizeRegistryRecords';
 
 export class PortsProvider {
   private config: Registration.Config;
@@ -46,6 +47,7 @@ export class PortsProvider {
         SynchronizeCompany,
         SynchronizeStakeholder,
         RegistryQuery,
+        SynchronizeRegistryRecords,
       ])
       .addSingleton(SynchronizationController, [
         MappingRegistryRepository,

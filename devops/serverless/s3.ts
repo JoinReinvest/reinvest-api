@@ -98,4 +98,9 @@ export const S3Outputs = {
     Description: 'Portfolio bucket Arn',
     ...exportOutput('PortfolioBucketArn'),
   },
+  PortfolioBucketName: {
+    Value: getResourceName('portfolio'),
+    Description: 'Portfolio bucket name',
+    ...exportOutput('PortfolioBucketName'),
+  },
 };

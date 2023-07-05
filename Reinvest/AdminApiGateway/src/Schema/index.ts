@@ -6,10 +6,25 @@ import { Shared } from 'AdminApiGateway/Schema/Types/Shared';
 import { DateScalar } from 'ApiGateway/Schema/Scalars/DateScalar';
 import { EmailAddress } from 'ApiGateway/Schema/Scalars/EmailAddress';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
+import { PortfolioSchema } from 'Reinvest/AdminApiGateway/src/Schema/Types/Portfolio';
+
+import { DocumentTypes } from './Types/DocumentTypes';
 
 const executableSchemas = [EmailAddress, DateScalar];
-const nonExecutableTypeDefs = mergeTypeDefs([constraintDirectiveTypeDefs, Shared.typeDefs, AdminVerificationSchema.typeDefs, DividendsSchema.typeDefs]);
-const nonExecutableResolvers = mergeResolvers([AdminVerificationSchema.resolvers, DividendsSchema.resolvers]);
+const nonExecutableTypeDefs = mergeTypeDefs([
+  constraintDirectiveTypeDefs,
+  Shared.typeDefs,
+  AdminVerificationSchema.typeDefs,
+  DividendsSchema.typeDefs,
+  PortfolioSchema.typeDefs,
+  DocumentTypes.typeDefs,
+]);
+const nonExecutableResolvers = mergeResolvers([
+  AdminVerificationSchema.resolvers,
+  DividendsSchema.resolvers,
+  PortfolioSchema.resolvers,
+  DocumentTypes.resolvers,
+]);
 
 let schema = mergeSchemas({
   schemas: executableSchemas,

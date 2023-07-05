@@ -1,5 +1,6 @@
 import Container, { ContainerInterface } from 'Container/Container';
 import { PortfolioDatabaseAdapterInstanceProvider, PortfolioDatabaseAdapterProvider } from 'Portfolio/Adapter/Database/DatabaseAdapter';
+import { DealpathConfig } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
 import { PortfolioApi, PortfolioApiType } from 'Portfolio/Port/Api/PortfolioApiType';
 import { PortfolioTechnicalHandler, PortfolioTechnicalHandlerType } from 'Portfolio/Port/Queue/PortfolioTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Portfolio/Providers/AdapterServiceProvider';
@@ -7,6 +8,7 @@ import EventBusProvider from 'Portfolio/Providers/EventBusProvider';
 import { PortsProvider } from 'Portfolio/Providers/PortsProvider';
 import { UseCaseProvider } from 'Portfolio/Providers/UseCaseProvider';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
+import { Documents } from 'Reinvest/Documents/src';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 
@@ -16,7 +18,12 @@ export namespace Portfolio {
   export const moduleName = 'Portfolio';
   export type Config = {
     database: PostgreSQLConfig;
+    dealpathConfig: DealpathConfig;
     queue: QueueConfig;
+  };
+
+  export type ModulesDependencies = {
+    documents: Documents.Main;
   };
 
   export type ApiType = PortfolioApiType & Api;
@@ -26,9 +33,11 @@ export namespace Portfolio {
     private readonly config: Portfolio.Config;
     private readonly container: ContainerInterface;
     private booted = false;
+    private modules: Portfolio.ModulesDependencies;
 
-    constructor(config: Portfolio.Config) {
+    constructor(config: Portfolio.Config, modules: ModulesDependencies) {
       this.config = config;
+      this.modules = modules;
       this.container = new Container();
     }
 
@@ -64,6 +73,8 @@ export namespace Portfolio {
         return;
       }
 
+      this.container.addAsValue('Documents', this.modules.documents);
+
       new AdapterServiceProvider(this.config).boot(this.container);
       new UseCaseProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);
@@ -73,7 +84,7 @@ export namespace Portfolio {
     }
   }
 
-  export function create(config: Portfolio.Config): Portfolio.Main {
-    return new Portfolio.Main(config);
+  export function create(config: Portfolio.Config, modules: Portfolio.ModulesDependencies): Portfolio.Main {
+    return new Portfolio.Main(config, modules);
   }
 }

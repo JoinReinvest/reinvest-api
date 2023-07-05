@@ -3,6 +3,7 @@ import { SynchronizeCompany } from 'Registration/IntegrationLogic/UseCase/Synchr
 import { SynchronizeCompanyAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount';
 import { SynchronizeIndividualAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount';
 import { SynchronizeProfile } from 'Registration/IntegrationLogic/UseCase/SynchronizeProfile';
+import { SynchronizeRegistryRecords } from 'Registration/IntegrationLogic/UseCase/SynchronizeRegistryRecords';
 import { SynchronizeStakeholder } from 'Registration/IntegrationLogic/UseCase/SynchronizeStakeholder';
 import { NorthCapitalAccountStructure, RegistryQuery } from 'Registration/Port/Api/RegistryQuery';
 
@@ -14,6 +15,7 @@ export class ImmediateSynchronize {
   private synchronizeCompanyAccountUseCase: SynchronizeCompanyAccount;
   private synchronizeCompanyUseCase: SynchronizeCompany;
   private synchronizeStakeholderUseCase: SynchronizeStakeholder;
+  private synchronizeRegistryRecords: SynchronizeRegistryRecords;
 
   constructor(
     mappingRegistryRepository: MappingRegistryRepository,
@@ -23,6 +25,7 @@ export class ImmediateSynchronize {
     synchronizeCompanyUseCase: SynchronizeCompany,
     synchronizeStakeholderUseCase: SynchronizeStakeholder,
     registryQuery: RegistryQuery,
+    synchronizeRegistryRecords: SynchronizeRegistryRecords,
   ) {
     this.mappingRegistryRepository = mappingRegistryRepository;
     this.synchronizeProfileUseCase = synchronizeProfileUseCase;
@@ -31,12 +34,14 @@ export class ImmediateSynchronize {
     this.synchronizeCompanyUseCase = synchronizeCompanyUseCase;
     this.synchronizeStakeholderUseCase = synchronizeStakeholderUseCase;
     this.registryQuery = registryQuery;
+    this.synchronizeRegistryRecords = synchronizeRegistryRecords;
   }
 
   public static getClassName = (): string => 'ImmediateSynchronize';
 
   public async immediatelySynchronizeAccount(profileId: string, accountId: string): Promise<boolean> {
-    const accountStructure = await this.registryQuery.getNorthCapitalAccountStructure(profileId, accountId);
+    await this.synchronizeRegistryRecords.execute(profileId);
+    const accountStructure = await this.registryQuery.getAccountStructureForSynchronization(profileId, accountId);
 
     if (!accountStructure) {
       return false;
@@ -58,7 +63,8 @@ export class ImmediateSynchronize {
   }
 
   public async immediatelySynchronizeAllAccountStructure(profileId: string, accountId: string): Promise<boolean> {
-    const accountStructure = await this.registryQuery.getNorthCapitalAccountStructure(profileId, accountId);
+    await this.synchronizeRegistryRecords.execute(profileId);
+    const accountStructure = await this.registryQuery.getAccountStructureForSynchronization(profileId, accountId);
 
     if (!accountStructure) {
       return false;
