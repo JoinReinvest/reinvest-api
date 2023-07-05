@@ -165,9 +165,9 @@ export class UpdateCompany {
         events = [...events, ...stakeholderEvents];
       }
 
-      if (isNewStakeholder) {
-        events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
-      } else {
+      events.push(sensitiveDataUpdated(UpdatedObjectType.ACCOUNT, profileId, account.getId()));
+
+      if (!isNewStakeholder) {
         events.push(sensitiveDataUpdated(UpdatedObjectType.STAKEHOLDER, profileId, account.getId(), stakeholderSchema.id));
       }
     }

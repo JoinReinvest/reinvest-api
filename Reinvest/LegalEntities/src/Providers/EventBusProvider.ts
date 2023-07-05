@@ -2,7 +2,7 @@ import { ContainerInterface } from 'Container/Container';
 import { LegalEntities } from 'LegalEntities/index';
 import { BanEventHandler } from 'LegalEntities/Port/Events/BanEventHandler';
 import { Ban } from 'LegalEntities/UseCases/Ban';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
@@ -17,6 +17,7 @@ export default class EventBusProvider {
     container.addSingleton(BanEventHandler, [Ban]);
 
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+      STORE_EVENT_COMMAND,
       'LegalProfileCompleted',
       'LegalEntityDocumentRemoved',
       'LegalEntityAvatarRemoved',

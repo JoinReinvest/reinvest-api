@@ -31,6 +31,10 @@ export class SharesAndDividendService implements SharesServiceInterface {
     await this.sharesAndDividendsModule.api().setSharesToSettledState(investmentId);
   }
 
+  async sharesRevoked(investmentId: string): Promise<void> {
+    await this.sharesAndDividendsModule.api().setSharesToRevokedState(investmentId);
+  }
+
   async getDividend(profileId: string, dividendId: string): Promise<DividendDetails | null> {
     // @ts-ignore
     return this.sharesAndDividendsModule.api().getDividend(profileId, dividendId);

@@ -13,18 +13,20 @@ import AdaptersProviders from './Infrastructure/Providers/AdaptersProviders';
 import EventBusProvider from './Infrastructure/Providers/EventBusProvider';
 import PortsProviders from './Infrastructure/Providers/PortsProviders';
 import UseCaseProviders from './Infrastructure/Providers/UseCaseProviders';
+import { Verification } from 'Verification/index';
 
 export namespace Investments {
   export const moduleName = 'Investments';
   export type Config = {
     database: PostgreSQLConfig;
-    queue: QueueConfig;
     pdfGeneratorQueue: QueueConfig;
+    queue: QueueConfig;
   };
 
   export type ModulesDependencies = {
     documents: Documents.Main;
     sharesAndDividends: SharesAndDividends.Main;
+    verification: Verification.Main;
   };
 
   export type ApiType = InvestmentsApiType & Api;
@@ -76,6 +78,7 @@ export namespace Investments {
 
       this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
       this.container.addAsValue('Documents', this.modules.documents);
+      this.container.addAsValue('Verification', this.modules.verification);
       new AdaptersProviders(this.config).boot(this.container);
       new UseCaseProviders(this.config).boot(this.container);
       new PortsProviders(this.config).boot(this.container);

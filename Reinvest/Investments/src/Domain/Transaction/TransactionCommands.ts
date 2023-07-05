@@ -1,4 +1,5 @@
 import {
+  CancelTransactionDecision,
   CheckIfGracePeriodEndedDecision,
   CheckIsInvestmentApprovedDecision,
   CheckIsInvestmentFundedDecision,
@@ -19,6 +20,7 @@ export enum TransactionCommands {
   CheckIsGracePeriodEnded = 'CheckIsGracePeriodEnded',
   MarkFundsAsReadyToDisburse = 'MarkFundsAsReadyToDisburse',
   TransferSharesWhenTradeSettled = 'TransferSharesWhenTradeSettled',
+  CancelTransaction = 'CancelTransaction',
 }
 
 export const verifyAccountForInvestment = (decision: VerifyAccountDecision): DomainEvent => ({
@@ -48,6 +50,7 @@ export const createTrade = (decision: CreateTradeDecision): DomainEvent => ({
     subscriptionAgreementId: decision.data.subscriptionAgreementId,
     portfolioId: decision.data.portfolioId,
     parentId: decision.data.parentId,
+    userTradeId: decision.data.userTradeId,
   },
 });
 
@@ -73,5 +76,10 @@ export const markFundsAsReadyToDisburse = (decision: MarkFundsAsReadyToDisburseD
 
 export const transferSharesWhenTradeSettled = (decision: TransferSharesWhenTradeSettledDecision): DomainEvent => ({
   kind: TransactionCommands.TransferSharesWhenTradeSettled,
+  id: decision.investmentId,
+});
+
+export const cancelTransaction = (decision: CancelTransactionDecision): DomainEvent => ({
+  kind: TransactionCommands.CancelTransaction,
   id: decision.investmentId,
 });

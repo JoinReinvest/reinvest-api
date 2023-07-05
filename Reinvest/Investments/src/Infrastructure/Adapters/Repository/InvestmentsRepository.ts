@@ -1,4 +1,4 @@
-import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { UUID } from 'HKEKTypes/Generics';
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
 import type { Money } from 'Money/Money';
@@ -25,7 +25,30 @@ export class InvestmentsRepository {
   public static getClassName = (): string => 'InvestmentsRepository';
 
   async get(investmentId: string): Promise<Investment | null> {
-    const investment = await this.databaseAdapterProvider
+    const investment = await this.getInvestmentQueryBuilder().where(`${investmentsTable}.id`, '=', investmentId).executeTakeFirst();
+
+    if (!investment) {
+      return null;
+    }
+
+    return Investment.create(investment);
+  }
+
+  async getInvestmentByProfileAndId(profileId: UUID, investmentId: UUID): Promise<Investment | null> {
+    const investment = await this.getInvestmentQueryBuilder()
+      .where(`${investmentsTable}.id`, '=', investmentId)
+      .where(`${investmentsTable}.profileId`, '=', profileId)
+      .executeTakeFirst();
+
+    if (!investment) {
+      return null;
+    }
+
+    return Investment.create(investment);
+  }
+
+  private getInvestmentQueryBuilder() {
+    return this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
       .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
@@ -49,25 +72,18 @@ export class InvestmentsRepository {
       .select([
         `${investmentsFeesTable}.amount as feeAmount`,
         `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.abortedDate`,
         `${investmentsFeesTable}.approvedByIP`,
         `${investmentsFeesTable}.dateCreated as feeDateCreated`,
         `${investmentsFeesTable}.id as feeId`,
         `${investmentsFeesTable}.investmentId`,
         `${investmentsFeesTable}.status as feeStatus`,
-        `${investmentsFeesTable}.verificationFeeId`,
+        `${investmentsFeesTable}.verificationFeeIdsJson`,
       ])
-      .castTo<InvestmentWithFee>()
-      .where(`${investmentsTable}.id`, '=', investmentId)
-      .executeTakeFirst();
-
-    if (!investment) {
-      return null;
-    }
-
-    return Investment.create(investment);
+      .castTo<InvestmentWithFee>();
   }
 
-  async getInvestments(profileId: string, accountId: string, pagination: Pagination) {
+  async getInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<Investment[]> {
     const investmentsData = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
@@ -92,12 +108,13 @@ export class InvestmentsRepository {
       .select([
         `${investmentsFeesTable}.amount as feeAmount`,
         `${investmentsFeesTable}.approveDate`,
+        `${investmentsFeesTable}.abortedDate`,
         `${investmentsFeesTable}.approvedByIP`,
         `${investmentsFeesTable}.dateCreated as feeDateCreated`,
         `${investmentsFeesTable}.id as feeId`,
         `${investmentsFeesTable}.investmentId`,
         `${investmentsFeesTable}.status as feeStatus`,
-        `${investmentsFeesTable}.verificationFeeId`,
+        `${investmentsFeesTable}.verificationFeeIdsJson`,
       ])
       .castTo<InvestmentWithFee>()
       .where(`${investmentsTable}.profileId`, '=', profileId)
@@ -108,7 +125,7 @@ export class InvestmentsRepository {
       .execute();
 
     if (!investmentsData.length) {
-      return null;
+      return [];
     }
 
     const investments = investmentsData.map(investment => Investment.create(investment));
@@ -216,24 +233,9 @@ export class InvestmentsRepository {
     }
   }
 
-  async updateInvestment(investment: Investment, approveFee: boolean) {
+  async updateInvestment(investment: Investment, approveFee: boolean, events: DomainEvent[] = []) {
     const { id, status, dateStarted, accountId, profileId, amount, portfolioId, parentId } = investment.toObject();
     try {
-      await this.publishEvents([
-        <InvestmentCreated>{
-          id,
-          kind: TransactionEvents.INVESTMENT_CREATED,
-          date: new Date(),
-          data: {
-            profileId,
-            accountId,
-            portfolioId,
-            parentId,
-            amount,
-          },
-        },
-      ]);
-
       await this.databaseAdapterProvider
         .provide()
         .updateTable(investmentsTable)
@@ -246,8 +248,10 @@ export class InvestmentsRepository {
 
       if (approveFee) {
         const fee = investment.getFee();
-        fee && (await this.feesRepository.approveFee(fee));
+        fee && (await this.feesRepository.storeFee(fee));
       }
+
+      await this.publishEvents(events);
 
       return true;
     } catch (error: any) {

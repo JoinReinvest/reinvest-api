@@ -1,13 +1,15 @@
 import { ContainerInterface } from 'Container/Container';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { Trading } from 'Trading/index';
+import { CancelTrade, CancelTradeEvent } from 'Trading/IntegrationLogic/UseCase/CancelTrade';
 import { CheckIsTradeApproved } from 'Trading/IntegrationLogic/UseCase/CheckIsTradeApproved';
 import { CheckIsTradeFunded } from 'Trading/IntegrationLogic/UseCase/CheckIsTradeFunded';
 import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 import { MarkFundsAsReadyToDisburse } from 'Trading/IntegrationLogic/UseCase/MarkFundsAsReadyToDisburse';
 import { TransferSharesForReinvestment } from 'Trading/IntegrationLogic/UseCase/TransferSharesForReinvestment';
 import { TransferSharesWhenTradeSettled } from 'Trading/IntegrationLogic/UseCase/TransferSharesWhenTradeSettled';
+import { CancelTradeHandler } from 'Trading/Port/Queue/EventHandler/CancelTradeHandler';
 import { CheckIsInvestmentApprovedHandler } from 'Trading/Port/Queue/EventHandler/CheckIsInvestmentApprovedHandler';
 import { CheckIsInvestmentFundedHandler } from 'Trading/Port/Queue/EventHandler/CheckIsInvestmentFundedHandler';
 import { CreateTradeHandler } from 'Trading/Port/Queue/EventHandler/CreateTradeHandler';
@@ -29,9 +31,11 @@ export default class EventBusProvider {
     container.addSingleton(MarkFundsAsReadyToDisburseHandler, [MarkFundsAsReadyToDisburse, SimpleEventBus]);
     container.addSingleton(TransferSharesWhenTradeSettledHandler, [TransferSharesWhenTradeSettled, SimpleEventBus]);
     container.addSingleton(TransferSharesForReinvestmentHandler, [TransferSharesForReinvestment, SimpleEventBus]);
+    container.addSingleton(CancelTradeHandler, [CancelTrade]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
+      STORE_EVENT_COMMAND,
       'TradeCreated',
       'InvestmentFunded',
       'InvestmentApproved',
@@ -39,6 +43,9 @@ export default class EventBusProvider {
       'InvestmentMarkedAsReadyToDisburse',
       'InvestmentSharesTransferred',
       'ReinvestmentSharesTransferred',
+      CancelTradeEvent.TransactionCanceled,
+      CancelTradeEvent.TransactionUnwinding,
+      CancelTradeEvent.TransactionCanceledFailed,
     ]);
   }
 }

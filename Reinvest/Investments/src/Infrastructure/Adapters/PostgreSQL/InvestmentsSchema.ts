@@ -1,4 +1,5 @@
-import { JSONObject } from 'HKEKTypes/Generics';
+import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
+import { VerificationFeeIds } from 'Investments/Domain/Investments/Fee';
 import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import type {
@@ -45,6 +46,7 @@ export interface SubscriptionAgreementTable {
 }
 
 export interface InvestmentsFeesTable {
+  abortedDate: Date | null;
   accountId: string;
   amount: number;
   approveDate: Date | null;
@@ -54,7 +56,7 @@ export interface InvestmentsFeesTable {
   investmentId: string;
   profileId: string;
   status: InvestmentsFeesStatus;
-  verificationFeeId: string;
+  verificationFeeIdsJson: JSONObjectOf<VerificationFeeIds>;
 }
 
 export interface TransactionEventsTable {

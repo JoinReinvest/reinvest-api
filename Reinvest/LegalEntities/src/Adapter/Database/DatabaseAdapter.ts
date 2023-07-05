@@ -17,12 +17,12 @@ export const legalEntitiesBeneficiaryTable = 'legal_entities_beneficiary';
 export const legalEntitiesBannedListTable = 'legal_entities_banned_list';
 
 export interface LegalEntitiesDatabase {
+  [legalEntitiesBannedListTable]: LegalEntitiesBannedList;
   [legalEntitiesBeneficiaryTable]: LegalEntitiesBeneficiary;
   [legalEntitiesCompanyAccountTable]: LegalEntitiesCompanyAccount;
   [legalEntitiesDraftAccountTable]: LegalEntitiesDraftAccount;
   [legalEntitiesIndividualAccountTable]: LegalEntitiesIndividualAccount;
   [legalEntitiesProfileTable]: LegalEntitiesProfile;
-  [legalEntitiesBannedListTable]: LegalEntitiesBannedList;
 }
 
 export const LegalEntitiesDatabaseAdapterInstanceProvider = 'LegalEntitiesDatabaseAdapterProvider';

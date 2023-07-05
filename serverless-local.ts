@@ -11,8 +11,10 @@ import {
   CronDividendsDistributionResources,
 } from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
+import { CronNotificationsFunction, CronNotificationsResources } from './devops/functions/cron/notifications/cron-notifications-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
+import { FirebaseFunction, FirebaseResources } from './devops/functions/firebase/queue-config';
 import { MigrationLambdaFunction, MigrationLambdaResources } from './devops/functions/migration/migration-config';
 import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/pdfGenerator/queue-config';
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
@@ -46,6 +48,7 @@ const serverlessConfiguration: AWS = {
       ApiUrl: 'http://localhost:3000/api',
       SQS_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-notification',
       SQS_PDF_GENERATOR_URL: 'http://localhost:9324/000000000000/development-sqs-pdf-generator',
+      SQS_FIREBASE_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-firebase',
       IT_IS_LOCAL: 'true',
     },
     logs: {
@@ -63,13 +66,6 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
-  // layers: {
-  //   chromium: {
-  //     package: {
-  //       artifact: './chromium-v114.0.0-layer.zip',
-  //     },
-  //   },
-  // },
   functions: {
     admin: AdminLambdaFunction,
     api: ApiLambdaFunction,
@@ -80,11 +76,13 @@ const serverlessConfiguration: AWS = {
     cronVendorsSync: CronVendorsSyncFunction,
     cronDividendsCalculation: CronDividendsCalculationFunction,
     cronDividendsDistribution: CronDividendsDistributionFunction,
+    cronNotificationsFunction: CronNotificationsFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     unauthorizedEndpoints: UnauthorizedEndpointsFunction,
     tests: TestsFunction,
     pdfGenerator: PdfGeneratorFunction,
+    firebase: FirebaseFunction,
   },
   resources: {
     Resources: {
@@ -107,6 +105,8 @@ const serverlessConfiguration: AWS = {
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
       ...PdfGeneratorResources,
+      ...FirebaseResources,
+      ...CronNotificationsResources,
     },
     Outputs: {
       ...CognitoOutputs,
@@ -140,6 +140,7 @@ const serverlessConfiguration: AWS = {
     'serverless-offline': {
       useChildProcesses: true,
       noPrependStageInUrl: true,
+      disableScheduledEvents: true,
     },
     // 'serverless-offline-watcher': [
     //   {

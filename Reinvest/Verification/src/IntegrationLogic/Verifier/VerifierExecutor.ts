@@ -3,14 +3,17 @@ import { DomainEvent } from 'SimpleAggregator/Types';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { VerificationDecision, VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
+import { RegisterFee } from 'Verification/IntegrationLogic/UseCase/RegisterFee';
 
 export class VerifierExecutor {
   private northCapitalAdapter: VerificationNorthCapitalAdapter;
   private eventBus: EventBus;
+  private registerFeeUseCase: RegisterFee;
 
-  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter, eventBus: EventBus) {
+  constructor(northCapitalAdapter: VerificationNorthCapitalAdapter, eventBus: EventBus, registerFeeUseCase: RegisterFee) {
     this.northCapitalAdapter = northCapitalAdapter;
     this.eventBus = eventBus;
+    this.registerFeeUseCase = registerFeeUseCase;
   }
 
   static getClassName = () => 'VerifierExecutor';
@@ -36,6 +39,7 @@ export class VerifierExecutor {
     if ([VerificationDecisionType.PAID_MANUAL_KYC_REVIEW_REQUIRED].includes(decision.decision)) {
       const verificationResult = await this.northCapitalAdapter.getPartyKycAmlStatus(verifier.getPartyId());
       verifier.handleVerificationEvent(verificationResult);
+      await this.registerFeeUseCase.execute(decision);
 
       decision = verifier.makeDecision();
     }
@@ -59,6 +63,10 @@ export class VerifierExecutor {
       const verificationResult = await this.northCapitalAdapter.getEntityKycAmlStatus(verifier.getPartyId());
 
       verifier.handleVerificationEvent(verificationResult);
+
+      if (decision.decision === VerificationDecisionType.PAID_MANUAL_KYB_REVIEW_REQUIRED) {
+        await this.registerFeeUseCase.execute(decision);
+      }
 
       decision = verifier.makeDecision();
     }

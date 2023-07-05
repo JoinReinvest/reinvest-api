@@ -1,5 +1,5 @@
-import { sql } from 'kysely';
 import { DatabaseProvider } from 'PostgreSQL/DatabaseProvider';
+import { sql } from 'kysely';
 
 export class TransactionalAdapter<Database> {
   static getClassName = (): string => 'TransactionalAdapter';

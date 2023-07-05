@@ -51,7 +51,7 @@ const schema = `
 
     type Query {
         """
-        [MOCK] returns all information about properties in the portfolio
+        Returns all information about properties in the portfolio
         """
         getPortfolioDetails: PortfolioDetails
     }

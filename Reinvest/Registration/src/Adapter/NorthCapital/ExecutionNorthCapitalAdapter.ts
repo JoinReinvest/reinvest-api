@@ -21,13 +21,13 @@ export abstract class ExecutionNorthCapitalAdapter {
       const response: AxiosResponse = await axios.put(`${this.url}/${endpoint}`, putData);
 
       return response.data;
-    } catch (error) {
-      // @ts-ignore
+    } catch (error: any) {
       const {
         response: {
           data: { statusCode, statusDesc },
         },
       } = error;
+      console.error(`[NC PUT] North capital error: ${endpoint}`, error, data);
       throw new NorthCapitalException(statusCode, statusDesc);
     }
   }
@@ -44,7 +44,7 @@ export abstract class ExecutionNorthCapitalAdapter {
           data: { statusCode, statusDesc },
         },
       } = error;
-      console.warn('North capital error', error);
+      console.error(`[NC POST] North capital error: ${endpoint}`, error, data);
       throw new NorthCapitalException(statusCode, statusDesc);
     }
   }

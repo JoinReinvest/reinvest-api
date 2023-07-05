@@ -1,5 +1,33 @@
 # REINVEST API CHANGELOG
 
+## 1.18.0 - 07/03/2023
+
+* New mutation:
+    * `renderPageToPdf` - It allows to render page from link to pdf
+* New queries:
+    * `listRenderedPages` - It returns list of rendered pages
+    * `getRenderedPageLink` - when you want to get link to download rendered page use this query with id of rendered
+      page
+
+## 1.17.4 - 06/30/2023
+
+* No MOCKS anymore:
+    * `registerPushNotificationDevice` - Register device for Firebase push notifications
+
+## 1.17.3 - 06/29/2023
+
+* No MOCKS anymore:
+    * `getPortfolioDetails`
+    * `getAccountActivity`
+
+## 1.17.2 - 06/26/2023
+
+* No MOCKS anymore:
+    * `cancelInvestment` - cancel investment after the investment has been started and the grace period has not ended
+      yet
+* New MOCK mutation:
+    * `registerPushNotificationDevice` - Register device for Firebase push notifications
+
 ## 1.17.1 - 06/23/2023
 
 * No MOCKS anymore:
@@ -29,7 +57,7 @@
 * When adding/updating stakeholders to the corporate/trust account, the system checks if the stakeholder is not banned (
   by SSN).
 
-## 1.16.6 - 06/16/2023
+## 1.16.5 - 06/16/2023
 
 * No MOCK anymore:
     * `withdrawDividend` - it allows to withdraw dividends from the account

@@ -51,7 +51,7 @@ class CreateSubscriptionAgreement {
 
     const id = this.idGenerator.createUuid();
 
-    const investment = await this.investmentsRepository.get(investmentId);
+    const investment = await this.investmentsRepository.getInvestmentByProfileAndId(profileId, investmentId);
 
     if (!investment) {
       return false;

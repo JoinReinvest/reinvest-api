@@ -1,1 +1,1 @@
-export * as documents_1 from './documents_1';
+export * as migration_20230630153300_create_rendered_page_pdf from './documents_create_rendered_page_pdf';

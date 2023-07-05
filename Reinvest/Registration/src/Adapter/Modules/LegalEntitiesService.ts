@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { LegalEntities } from 'LegalEntities/index';
 import {
   BeneficiaryAccountForSynchronization,
@@ -7,6 +8,11 @@ import {
   StakeholderForSynchronization,
 } from 'Registration/Domain/Model/Account';
 import { ProfileForSynchronization } from 'Registration/Domain/Model/Profile';
+
+export type ProfileAccountStructure = {
+  accountId: UUID;
+  type: 'INDIVIDUAL_ACCOUNT' | 'CORPORATE_ACCOUNT' | 'TRUST_ACCOUNT' | 'BENEFICIARY_ACCOUNT';
+};
 
 /**
  * Legal Entities Module ACL
@@ -88,5 +94,11 @@ export class LegalEntitiesService {
     }
 
     return beneficiaryAccount;
+  }
+
+  async getProfileAccountStructure(profileId: UUID): Promise<ProfileAccountStructure[]> {
+    const api = this.legalEntitiesModule.api();
+
+    return (await api.getProfileAccountStructure(profileId)) as ProfileAccountStructure[];
   }
 }
