@@ -20,6 +20,7 @@ import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
 import { cognitoPreSignUpFunction, CognitoPreSignUpResources } from './devops/functions/preSignUp/preSignUp-config';
 import { QueueFunction, QueueResources } from './devops/functions/queue/queue-config';
+import { SegmentFunction, SegmentResources } from './devops/functions/segment/queue-config'
 import { TestsFunction, TestsLambdaResources } from './devops/functions/tests/tests-config';
 import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } from './devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config';
 import { CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs, CognitoEnvs } from './devops/serverless/cognito';
@@ -103,6 +104,7 @@ const serverlessConfiguration: AWS = {
     tests: TestsFunction,
     pdfGenerator: PdfGeneratorFunction,
     firebase: FirebaseFunction,
+    segment: SegmentFunction,
   },
   resources: {
     Description: 'REINVEST ${sls:stage} API functions',
@@ -123,6 +125,7 @@ const serverlessConfiguration: AWS = {
       ...CronDividendsDistributionResources,
       ...PdfGeneratorResources,
       ...FirebaseResources,
+      ...SegmentResources,
       ...CronNotificationsResources,
     },
     Outputs: {

@@ -26,6 +26,7 @@ import {
   SQS_CONFIG,
   VERTALO_CONFIG,
   WEB_APP_URL,
+    SEGMENT_API_KEY
 } from 'Reinvest/config';
 import { Identity } from 'Reinvest/Identity/src';
 import Modules from 'Reinvest/Modules';
