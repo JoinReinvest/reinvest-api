@@ -858,6 +858,24 @@ const transactionRouter = () => {
     });
   });
 
+  router.post('/send-grace-period-ended', async (req: any, res: any) => {
+    try {
+      const { investmentId } = req.body;
+      await sendMessage('GracePeriodEnded', investmentId, {
+        date: new Date(),
+      });
+      res.status(200).json({
+        status: true,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({
+        status: false,
+        message: e.message,
+      });
+    }
+  });
+
   return router;
 };
 

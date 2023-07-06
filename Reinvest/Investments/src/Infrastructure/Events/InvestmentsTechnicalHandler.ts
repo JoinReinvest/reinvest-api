@@ -4,6 +4,7 @@ import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Event
 export type InvestmentsTechnicalHandlerType = {
   AccountBannedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
   AccountVerifiedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
+  GracePeriodEnded: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentApproved: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentFunded: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentMarkedAsReadyToDisburse: () => TechnicalToDomainEventsHandler['handle'];
@@ -29,4 +30,5 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TransactionCanceled: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TransactionUnwinding: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TransactionCanceledFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  GracePeriodEnded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
 });

@@ -252,4 +252,9 @@ export class Investment {
     this.investmentSchema.status = InvestmentStatus.FINISHED;
     this.investmentSchema.dateUpdated = DateTime.now();
   }
+
+  settlingStarted() {
+    this.investmentSchema.status = InvestmentStatus.SETTLING;
+    this.investmentSchema.dateUpdated = DateTime.now();
+  }
 }

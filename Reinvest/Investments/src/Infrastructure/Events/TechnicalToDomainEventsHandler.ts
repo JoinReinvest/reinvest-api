@@ -92,6 +92,14 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
           id: event.id,
         });
         break;
+      case 'GracePeriodEnded':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.GRACE_PERIOD_ENDED,
+          date: new Date(),
+          data: {},
+          id: event.id,
+        });
+        break;
       case 'ReinvestmentSharesTransferred':
         await this.eventBus.publish(<SharesTransferredForReinvestment>{
           kind: ReinvestmentEvents.SHARES_TRANSFERRED_FOR_REINVESTMENT,

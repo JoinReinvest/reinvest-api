@@ -27,14 +27,15 @@ export class CheckIsGracePeriodEndedEventHandler implements EventHandler<Transac
       throw new Error(`Investment with id ${investmentId} not found`);
     }
 
-    // TODO - uncomment it to add grace period validation
-    // if (investment && investment.isGracePeriodEnded()) {
-    await this.eventBus.publish(<GracePeriodEnded>{
-      kind: TransactionEvents.GRACE_PERIOD_ENDED,
-      id: investmentId,
-      date: new Date(),
-      data: {},
-    });
-    // }
+    console.log(`Awaiting grace period end for transaction ${investmentId}`);
+
+    if (investment && investment.isGracePeriodEnded()) {
+      await this.eventBus.publish(<GracePeriodEnded>{
+        kind: TransactionEvents.GRACE_PERIOD_ENDED,
+        id: investmentId,
+        date: new Date(),
+        data: {},
+      });
+    }
   }
 }
