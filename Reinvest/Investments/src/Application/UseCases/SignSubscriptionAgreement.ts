@@ -1,8 +1,9 @@
+import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
+import { AgreementTypes } from 'Investments/Domain/Investments/Types';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 
 class SignSubscriptionAgreement {
   static getClassName = (): string => 'SignSubscriptionAgreement';
@@ -23,7 +24,11 @@ class SignSubscriptionAgreement {
 
   async execute(profileId: string, investmentId: string, clientIp: string) {
     const events: DomainEvent[] = [];
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, investmentId);
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(
+      profileId,
+      investmentId,
+      AgreementTypes.DIRECT_DEPOSIT,
+    );
 
     if (!subscriptionAgreement) {
       return false;

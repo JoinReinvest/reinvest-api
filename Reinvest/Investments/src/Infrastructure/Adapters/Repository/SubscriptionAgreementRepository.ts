@@ -5,6 +5,7 @@ import { SubscriptionAgreement } from 'Reinvest/Investments/src/Domain/Investmen
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { TemplateContentType } from 'Templates/Types';
+import { AgreementTypes } from 'Investments/Domain/Investments/Types';
 
 export class SubscriptionAgreementRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -33,13 +34,14 @@ export class SubscriptionAgreementRepository {
     return this.castToObject(subscriptionAgreement);
   }
 
-  async getSubscriptionAgreementByInvestmentId(profileId: string, investmentId: string) {
+  async getSubscriptionAgreementByInvestmentId(profileId: string, investmentId: string, agreementType: AgreementTypes) {
     const subscriptionAgreement = await this.databaseAdapterProvider
       .provide()
       .selectFrom(subscriptionAgreementTable)
       .selectAll()
       .where('investmentId', '=', investmentId)
       .where('profileId', '=', profileId)
+      .where('agreementType', '=', agreementType)
       .executeTakeFirst();
 
     if (!subscriptionAgreement) return null;

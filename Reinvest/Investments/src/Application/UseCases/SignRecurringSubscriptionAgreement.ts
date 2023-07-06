@@ -1,4 +1,4 @@
-import { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
+import { AgreementTypes, RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
@@ -31,7 +31,11 @@ class SignRecurringSubscriptionAgreement {
     }
 
     const recurringInvestmentId = recurringInvestment.getId();
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, recurringInvestmentId);
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(
+      profileId,
+      recurringInvestmentId,
+      AgreementTypes.RECURRING_INVESTMENT,
+    );
 
     if (!subscriptionAgreement) {
       return false;
