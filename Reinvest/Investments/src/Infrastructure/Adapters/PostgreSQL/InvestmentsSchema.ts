@@ -36,7 +36,7 @@ export interface SubscriptionAgreementTable {
   contentFieldsJson: JSONObject;
   dateCreated: Date;
   id: string;
-  investmentId: string | null;
+  investmentId: string;
   pdfDateCreated: Date | null;
   profileId: string;
   signedAt: Date | null;

@@ -1,7 +1,5 @@
 import * as handlebars from 'handlebars';
-
-import agreementHTMLTemplate from './Templates/AgreementTemplate';
-import { PdfTypes, Template } from './Types';
+import { HtmlTemplate, TemplateStructureType } from 'Templates/Types';
 
 handlebars.registerHelper('bold_text', function (str) {
   return new handlebars.SafeString(str);
@@ -11,13 +9,13 @@ handlebars.registerHelper('isdefined', function (value) {
   return value !== undefined;
 });
 
-class HTMLParser {
-  private type: PdfTypes;
-  private template: Template;
+export class HTMLParser {
+  private dataTemplate: TemplateStructureType;
+  private htmlTemplate: HtmlTemplate;
 
-  constructor(type: PdfTypes, template: Template) {
-    this.type = type;
-    this.template = template;
+  constructor(dataTemplate: TemplateStructureType, htmlTemplate: HtmlTemplate) {
+    this.dataTemplate = dataTemplate;
+    this.htmlTemplate = htmlTemplate;
   }
 
   private prepareLines(lines: string[]) {
@@ -32,16 +30,8 @@ class HTMLParser {
     return replacedLines;
   }
 
-  private getTemplate() {
-    switch (this.type) {
-      case PdfTypes.AGREEMENT: {
-        return agreementHTMLTemplate;
-      }
-    }
-  }
-
   private formatTemplate() {
-    const formattedTemplate = this.template.map(({ paragraphs, header }) => {
+    const formattedTemplate = this.dataTemplate.map(({ paragraphs, header }) => {
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
           lines: this.prepareLines(lines),
@@ -60,13 +50,9 @@ class HTMLParser {
     return formattedTemplate;
   }
 
-  getHTML() {
+  getHTML(): string {
     const formattedTemplate = this.formatTemplate();
 
-    const template = this.getTemplate();
-
-    return handlebars.compile(template)({ items: formattedTemplate });
+    return handlebars.compile(this.htmlTemplate)({ items: formattedTemplate });
   }
 }
-
-export default HTMLParser;

@@ -1,14 +1,14 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { SubscriptionAgreement } from 'Investments/Domain/Investments/SubscriptionAgreement';
 import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
-import { latestSubscriptionAgreementVersion } from 'Investments/Domain/SubscriptionAgreements/subscriptionAgreementsTemplates';
-import { DynamicType } from 'Investments/Domain/SubscriptionAgreements/types';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
+import { TemplateContentType } from 'Templates/Types';
 
 export type SubscriptionAgreementCreate = {
   accountId: string;
   agreementType: AgreementTypes;
-  contentFieldsJson: DynamicType;
+  contentFieldsJson: TemplateContentType;
   id: string;
   investmentId: string;
   profileId: string;
@@ -44,13 +44,10 @@ class CreateSubscriptionAgreement {
     const alreadyCreatedSubscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, investmentId);
 
     if (alreadyCreatedSubscriptionAgreement) {
-      const id = alreadyCreatedSubscriptionAgreement.getId();
-
-      return id;
+      return alreadyCreatedSubscriptionAgreement.getId();
     }
 
     const id = this.idGenerator.createUuid();
-
     const investment = await this.investmentsRepository.getInvestmentByProfileAndId(profileId, investmentId);
 
     if (!investment) {
@@ -58,23 +55,8 @@ class CreateSubscriptionAgreement {
     }
 
     const { accountId } = investment.toObject();
-
-    const subscription: SubscriptionAgreementCreate = {
-      id,
-      accountId: accountId,
-      profileId,
-      investmentId,
-      status: SubscriptionAgreementStatus.WAITING_FOR_SIGNATURE,
-      agreementType: AgreementTypes.DIRECT_DEPOSIT,
-      contentFieldsJson: mockedContentFieldsJson,
-      templateVersion: latestSubscriptionAgreementVersion,
-    };
-
-    const status = await this.subscriptionAgreementRepository.create(subscription);
-
-    if (!status) {
-      return false;
-    }
+    const subscriptionAgreement = SubscriptionAgreement.createForInvestment(id, profileId, accountId, investmentId, mockedContentFieldsJson);
+    await this.subscriptionAgreementRepository.store(subscriptionAgreement);
 
     return id;
   }

@@ -1,13 +1,7 @@
-import type { DynamicType, Template } from 'Investments/Domain/SubscriptionAgreements/types';
+import type { TemplateContentType, TemplateStructureType } from 'Templates/Types';
 
-class TemplateParser {
-  private template: Template;
-
-  constructor(template: Template) {
-    this.template = template;
-  }
-
-  private replace(str: string, data: DynamicType) {
+export class TemplateParser {
+  private static replace(str: string, data: TemplateContentType) {
     let copyStr = str;
 
     for (const property in data) {
@@ -22,18 +16,18 @@ class TemplateParser {
     return copyStr;
   }
 
-  private prepareLines(lines: string[], data: DynamicType) {
+  private static prepareLines(lines: string[], data: TemplateContentType) {
     const replacedLines = lines.map(line => this.replace(line, data));
 
     return replacedLines;
   }
 
-  parse(data: DynamicType): Template {
-    const template = this.template.map(({ paragraphs, header }) => {
+  static parse(template: TemplateStructureType, content: TemplateContentType): TemplateStructureType {
+    return template.map(({ paragraphs, header }) => {
       let updatedHeader = undefined;
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
-          lines: this.prepareLines(lines, data),
+          lines: this.prepareLines(lines, content),
         };
 
         if (isCheckedOption !== undefined) {
@@ -44,14 +38,10 @@ class TemplateParser {
       });
 
       if (header) {
-        updatedHeader = this.replace(header, data);
+        updatedHeader = this.replace(header, content);
       }
 
       return { header: updatedHeader, paragraphs: updatedParagraphs };
     });
-
-    return template;
   }
 }
-
-export default TemplateParser;

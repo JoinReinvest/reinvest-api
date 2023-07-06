@@ -64,16 +64,15 @@ export class CreateTrade {
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'Vertalo distribution created', vertaloDistribution);
       }
 
-      // TODO uncomment it when subscription agreement will be ready
       // upload subscription agreement to north capital trade
-      /** if (!trade.isSubscriptionAgreementUploaded()) {
+      if (!trade.isSubscriptionAgreementUploaded()) {
         const { tradeId, subscriptionAgreementId, profileId } = trade.getSubscriptionAgreementConfiguration();
         const { url } = await this.documentService.getDocumentFileLink(subscriptionAgreementId, profileId);
         const subscriptionAgreementState = await this.northCapitalAdapter.uploadSubscriptionAgreementToTrade(tradeId, url, subscriptionAgreementId);
         trade.setSubscriptionAgreementState({ subscriptionAgreementId, status: subscriptionAgreementState });
         await this.tradesRepository.updateTrade(trade);
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'Subscription agreement uploaded', subscriptionAgreementId);
-      }**/
+      }
 
       // init funds transfer
       if (!trade.isFundsTransferCreated()) {

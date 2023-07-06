@@ -25,7 +25,7 @@ class ListInvestmentsQuery {
   static getClassName = (): string => 'ListInvestmentsQuery';
 
   async listAllInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<InvestmentOverview[]> {
-    const investments = await this.investmentsRepository.listPaginatedInvestments(profileId, accountId, pagination);
+    const investments = await this.investmentsRepository.listPaginatedInvestmentsWithoutFee(profileId, accountId, pagination);
 
     return investments.map((investment: Investment): InvestmentOverview => {
       const { id, tradeId, dateCreated, amount, status } = investment.toObject();

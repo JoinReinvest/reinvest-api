@@ -1,4 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
+import { PdfEvents } from 'HKEKTypes/Pdf';
+import { PdfGeneratedEventHandler } from 'Investments/Infrastructure/Events/PdfGeneratedEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 
 export type InvestmentsTechnicalHandlerType = {
@@ -15,6 +17,7 @@ export type InvestmentsTechnicalHandlerType = {
   TransactionCanceled: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceledFailed: () => TechnicalToDomainEventsHandler['handle'];
   TransactionUnwinding: () => TechnicalToDomainEventsHandler['handle'];
+  [PdfEvents.PdfGenerated]: () => PdfGeneratedEventHandler['handle'];
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
@@ -31,4 +34,5 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TransactionUnwinding: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TransactionCanceledFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   GracePeriodEnded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  [PdfEvents.PdfGenerated]: container.delegateTo(PdfGeneratedEventHandler, 'handle'),
 });

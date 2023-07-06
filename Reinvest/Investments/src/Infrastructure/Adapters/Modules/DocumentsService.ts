@@ -1,5 +1,5 @@
-import { Documents } from 'Documents/index';
-import type { PdfTypes, Template } from 'Investments/Domain/SubscriptionAgreements/types';
+import { Documents } from "Documents/index";
+import type { PdfTypes, TemplateStructureType } from "Templates/Types";
 
 /**
  * Documents Module ACL
@@ -13,8 +13,8 @@ export class DocumentsService {
 
   public static getClassName = () => 'DocumentsService';
 
-  async generatePdf(profileId: string, subscriptionAgreementId: string, template: Template, type: PdfTypes) {
+  async generatePdf(profileId: string, subscriptionAgreementId: string, template: TemplateStructureType, type: PdfTypes) {
     return false;
-    // await this.documentsModule.api().generatePdf(profileId, subscriptionAgreementId, template, type);
+    // await this.documentsModule.api().generatePdf(profileId, subscriptionAgreementId, subscriptionAgreementTemplate, type);
   }
 }

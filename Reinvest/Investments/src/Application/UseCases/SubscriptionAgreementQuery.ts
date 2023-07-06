@@ -1,7 +1,5 @@
-import TemplateParser from 'Investments/Application/Service/TemplateParser';
-import { subscriptionAgreementsTemplate } from 'Investments/Domain/SubscriptionAgreements/subscriptionAgreementsTemplates';
-import type { DynamicType, SubscriptionAgreementTemplateVersions } from 'Investments/Domain/SubscriptionAgreements/types';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
+import { Template } from 'Templates/Template';
 
 class SubscriptionAgreementQuery {
   static getClassName = (): string => 'SubscriptionAgreementQuery';
@@ -19,11 +17,9 @@ class SubscriptionAgreementQuery {
       return false;
     }
 
-    const { contentFieldsJson, templateVersion, id, agreementType, status, dateCreated, signedAt } = subscriptionAgreement.toObject();
-
-    const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as SubscriptionAgreementTemplateVersions]);
-
-    const parsed = parser.parse(contentFieldsJson as DynamicType);
+    const { id, agreementType, status, dateCreated, signedAt } = subscriptionAgreement.toObject();
+    const { template, version, content } = subscriptionAgreement.forParser();
+    const agreementTemplate = new Template(template, content, version);
 
     return {
       id,
@@ -31,7 +27,7 @@ class SubscriptionAgreementQuery {
       status,
       createdAt: dateCreated,
       signedAt,
-      content: parsed,
+      content: agreementTemplate.toArray(),
     };
   }
 }

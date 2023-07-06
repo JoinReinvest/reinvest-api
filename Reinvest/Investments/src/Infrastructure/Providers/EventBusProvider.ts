@@ -1,4 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
+import { PdfKinds } from 'HKEKTypes/Pdf';
+import { AgreementsEventHandler } from 'Investments/Application/DomainEventHandler/AgreementsEventHandler';
 import { CheckIsGracePeriodEndedEventHandler } from 'Investments/Application/DomainEventHandler/CheckIsGracePeriodEndedEventHandler';
 import { FinalizeInvestmentEventHandler } from 'Investments/Application/DomainEventHandler/FinalizeInvestmentEventHandler';
 import { InvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/InvestmentStatusEventHandler';
@@ -7,6 +9,8 @@ import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/S
 import { TransactionEventHandler } from 'Investments/Application/DomainEventHandler/TransactionEventHandler';
 import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
+import { GenerateSubscriptionAgreement } from 'Investments/Application/UseCases/GenerateSubscriptionAgreement';
+import { SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 import { ReinvestmentCommands } from 'Investments/Domain/Reinvestments/ReinvestmentCommands';
 import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionCommands } from 'Investments/Domain/Transaction/TransactionCommands';
@@ -17,10 +21,12 @@ import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
+import { PdfGeneratedEventHandler } from 'Investments/Infrastructure/Events/PdfGeneratedEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -37,7 +43,9 @@ export default class EventBusProvider {
       .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler, InvestmentStatusEventHandler])
       .addSingleton(ReinvestmentEventHandler, [ReinvestmentRepository, ReinvestmentExecutor, SharesEventHandler])
       .addSingleton(CheckIsGracePeriodEndedEventHandler, [InvestmentsRepository, SimpleEventBus])
-      .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus]);
+      .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus])
+      .addSingleton(AgreementsEventHandler, [GenerateSubscriptionAgreement])
+      .addSingleton(PdfGeneratedEventHandler, [MarkSubscriptionAgreementAsGenerated]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus
@@ -79,6 +87,11 @@ export default class EventBusProvider {
         ReinvestmentCommands.TransferSharesForReinvestment,
         TransactionCommands.CancelTransaction,
       ])
-      .subscribe('GeneratePdfCommand', GeneratePdfEventHandler.getClassName());
+      .subscribeHandlerForKinds(AgreementsEventHandler.getClassName(), [
+        SubscriptionAgreementEvents.GenerateSubscriptionAgreementCommand,
+        SubscriptionAgreementEvents.RecurringSubscriptionAgreementSigned,
+        SubscriptionAgreementEvents.SubscriptionAgreementSigned,
+      ])
+      .subscribe(PdfKinds.GeneratePdf, GeneratePdfEventHandler.getClassName());
   }
 }

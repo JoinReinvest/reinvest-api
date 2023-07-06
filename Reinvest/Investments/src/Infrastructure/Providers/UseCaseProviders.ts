@@ -39,6 +39,8 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
 import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
 import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
+import { GenerateSubscriptionAgreement } from 'Investments/Application/UseCases/GenerateSubscriptionAgreement';
+import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -82,6 +84,8 @@ export default class UseCaseProviders {
     container.addSingleton(AbortInvestment, [InvestmentsRepository]);
     container.addSingleton(CancelInvestment, [InvestmentsRepository, SimpleEventBus]);
     container.addSingleton(ListInvestmentsQuery, [InvestmentsRepository]);
+    container.addSingleton(GenerateSubscriptionAgreement, [SubscriptionAgreementRepository]);
+    container.addSingleton(MarkSubscriptionAgreementAsGenerated, [SubscriptionAgreementRepository]);
     container.addSingleton(TransferInvestments, [InvestmentsRepository, SharesAndDividendService, IdGenerator]);
   }
 }

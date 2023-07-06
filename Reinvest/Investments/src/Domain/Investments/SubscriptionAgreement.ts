@@ -1,118 +1,136 @@
-import { JSONObject } from 'HKEKTypes/Generics';
+import { UUID } from 'HKEKTypes/Generics';
 import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
-import { SubscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { DateTime } from 'Money/DateTime';
+import { DomainEvent } from 'SimpleAggregator/Types';
+import { Template } from 'Templates/Template';
+import { TemplateContentType, Templates, TemplateVersion } from 'Templates/Types';
 
-type SubscriptionAgreementSchema = SubscriptionAgreementTable;
+export enum SubscriptionAgreementEvents {
+  SubscriptionAgreementSigned = 'SubscriptionAgreementSigned',
+  RecurringSubscriptionAgreementSigned = 'RecurringSubscriptionAgreementSigned',
+  GenerateSubscriptionAgreementCommand = 'GenerateSubscriptionAgreementCommand',
+}
+
+export type SubscriptionAgreementId = UUID;
+
+export type SubscriptionAgreementEvent = DomainEvent & {
+  data: {
+    profileId: UUID;
+  };
+  id: SubscriptionAgreementId;
+  kind: SubscriptionAgreementEvents;
+};
+
+type SubscriptionAgreementSchema = {
+  accountId: UUID;
+  agreementType: AgreementTypes;
+  contentFieldsJson: TemplateContentType;
+  dateCreated: DateTime;
+  id: UUID;
+  investmentId: UUID;
+  pdfDateCreated: DateTime | null;
+  profileId: UUID;
+  signedAt: DateTime | null;
+  signedByIP: string | null;
+  status: SubscriptionAgreementStatus;
+  templateVersion: TemplateVersion;
+};
 
 export class SubscriptionAgreement {
-  private accountId: string;
-  private agreementType: AgreementTypes;
-  private contentFieldsJson: JSONObject;
-  private dateCreated: Date;
-  private id: string;
-  private investmentId: string | null;
-  private pdfDateCreated: Date | null;
-  private profileId: string;
-  private signedAt: Date | null;
-  private signedByIP: string | null;
-  private status: SubscriptionAgreementStatus;
-  private templateVersion: number;
+  private readonly subscriptionAgreementSchema: SubscriptionAgreementSchema;
 
-  constructor(
-    id: string,
-    profileId: string,
-    investmentId: string | null,
-    status: SubscriptionAgreementStatus,
-    accountId: string,
-    dateCreated: Date,
-    agreementType: AgreementTypes,
-    signedAt: Date | null,
-    signedByIP: string | null,
-    pdfDateCreated: Date | null,
-    templateVersion: number,
-    contentFieldsJson: JSONObject,
-  ) {
-    this.accountId = accountId;
-    this.agreementType = agreementType;
-    this.contentFieldsJson = contentFieldsJson;
-    this.dateCreated = dateCreated;
-    this.id = id;
-    this.investmentId = investmentId;
-    this.pdfDateCreated = pdfDateCreated;
-    this.profileId = profileId;
-    this.signedAt = signedAt;
-    this.signedByIP = signedByIP;
-    this.status = status;
-    this.templateVersion = templateVersion;
-  }
-
-  static create(data: SubscriptionAgreementSchema) {
-    const {
-      id,
-      profileId,
-      investmentId,
-      status,
-      accountId,
-      dateCreated,
-      agreementType,
-      signedAt,
-      signedByIP,
-      pdfDateCreated,
-      templateVersion,
-      contentFieldsJson,
-    } = data;
-
-    return new SubscriptionAgreement(
-      id,
-      profileId,
-      investmentId,
-      status,
-      accountId,
-      dateCreated,
-      agreementType,
-      signedAt,
-      signedByIP,
-      pdfDateCreated,
-      templateVersion,
-      contentFieldsJson,
-    );
+  constructor(subscriptionAgreementSchema: SubscriptionAgreementSchema) {
+    this.subscriptionAgreementSchema = subscriptionAgreementSchema;
   }
 
   getId() {
-    return this.id;
+    return this.subscriptionAgreementSchema.id;
   }
 
-  setSignature(ip: string) {
-    this.status = SubscriptionAgreementStatus.SIGNED;
-    this.signedByIP = ip;
-    this.signedAt = new Date();
+  sign(ip: string) {
+    this.subscriptionAgreementSchema.status = SubscriptionAgreementStatus.SIGNED;
+    this.subscriptionAgreementSchema.signedByIP = ip;
+    this.subscriptionAgreementSchema.signedAt = DateTime.now();
   }
 
   isSigned() {
-    return this.status === SubscriptionAgreementStatus.SIGNED;
+    return this.subscriptionAgreementSchema.status === SubscriptionAgreementStatus.SIGNED;
   }
 
-  getDataForParser() {
+  forParser(): {
+    content: TemplateContentType;
+    template: Templates;
+    version: TemplateVersion;
+  } {
     return {
-      templateVersion: this.templateVersion,
-      contentFieldsJson: this.contentFieldsJson,
+      version: this.subscriptionAgreementSchema.templateVersion,
+      content: this.subscriptionAgreementSchema.contentFieldsJson,
+      template:
+        this.subscriptionAgreementSchema.agreementType === AgreementTypes.DIRECT_DEPOSIT
+          ? Templates.SUBSCRIPTION_AGREEMENT
+          : Templates.RECURRING_SUBSCRIPTION_AGREEMENT,
     };
   }
 
-  toObject() {
-    return {
-      id: this.id,
-      profileId: this.profileId,
-      investmentId: this.investmentId,
-      status: this.status,
-      accountId: this.accountId,
-      dateCreated: this.dateCreated,
-      agreementType: this.agreementType,
-      signedAt: this.signedAt,
-      signedByIP: this.signedByIP,
-      pdfDateCreated: this.pdfDateCreated,
-      templateVersion: this.templateVersion,
-      contentFieldsJson: this.contentFieldsJson,
-    };
+  toObject(): SubscriptionAgreementSchema {
+    return this.subscriptionAgreementSchema;
+  }
+
+  markAsGenerated(): void {
+    this.subscriptionAgreementSchema.pdfDateCreated = DateTime.now();
+  }
+
+  static createForInvestment(
+    id: UUID,
+    profileId: UUID,
+    accountId: UUID,
+    investmentId: UUID,
+    mockedContentFieldsJson: TemplateContentType,
+  ): SubscriptionAgreement {
+    const templateVersion = Template.getLatestTemplateVersion(Templates.SUBSCRIPTION_AGREEMENT);
+
+    return new SubscriptionAgreement({
+      id,
+      profileId,
+      accountId,
+      investmentId,
+      status: SubscriptionAgreementStatus.WAITING_FOR_SIGNATURE,
+      agreementType: AgreementTypes.DIRECT_DEPOSIT,
+      contentFieldsJson: mockedContentFieldsJson,
+      templateVersion,
+      dateCreated: DateTime.now(),
+      signedAt: null,
+      signedByIP: null,
+      pdfDateCreated: null,
+    });
+  }
+
+  static createForRecurringInvestment(
+    id: UUID,
+    profileId: UUID,
+    accountId: UUID,
+    recurringInvestmentId: UUID,
+    mockedContentFieldsJson: TemplateContentType,
+  ): SubscriptionAgreement {
+    const templateVersion = Template.getLatestTemplateVersion(Templates.RECURRING_SUBSCRIPTION_AGREEMENT);
+
+    return new SubscriptionAgreement({
+      id,
+      profileId,
+      accountId,
+      investmentId: recurringInvestmentId,
+      status: SubscriptionAgreementStatus.WAITING_FOR_SIGNATURE,
+      agreementType: AgreementTypes.RECURRING_INVESTMENT,
+      contentFieldsJson: mockedContentFieldsJson,
+      templateVersion,
+      dateCreated: DateTime.now(),
+      signedAt: null,
+      signedByIP: null,
+      pdfDateCreated: null,
+    });
+  }
+
+  static restore(schema: SubscriptionAgreementSchema): SubscriptionAgreement {
+    return new SubscriptionAgreement(schema);
   }
 }
