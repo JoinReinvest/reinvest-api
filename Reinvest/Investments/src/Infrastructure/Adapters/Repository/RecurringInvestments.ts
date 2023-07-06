@@ -5,6 +5,7 @@ import { RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Inves
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 
 export class RecurringInvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -45,12 +46,12 @@ export class RecurringInvestmentsRepository {
         .values({
           accountId,
           amount,
-          dateCreated: new Date(),
+          dateCreated: DateTime.now().toDate(),
           frequency,
           id,
           portfolioId,
           profileId,
-          startDate: new Date(startDate),
+          startDate: DateTime.from(startDate).toDate(),
           status,
           subscriptionAgreementId: null,
         })

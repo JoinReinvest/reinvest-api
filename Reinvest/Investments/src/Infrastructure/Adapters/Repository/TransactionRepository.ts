@@ -4,6 +4,7 @@ import { TransactionProcessManager } from 'Investments/Application/TransactionPr
 import { TransactionEvent } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsDatabaseAdapterProvider, transactionEventsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { TransactionEventsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { DateTime } from 'Money/DateTime';
 
 export class TransactionRepository implements TransactionRepositoryInterface {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -38,7 +39,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
         investmentId: event.id,
         eventKind: event.kind,
         eventStateJson: event.data,
-        dateCreated: new Date(),
+        dateCreated: DateTime.now().toDate(),
         id: this.iGenerator.createUuid(),
       })
       .execute();

@@ -6,6 +6,7 @@ import {
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { FinancialOperationRecord, FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
+import { DateTime } from 'Money/DateTime';
 
 export type FinancialOperation = {
   accountId: UUID;
@@ -37,7 +38,7 @@ export class FinancialOperationsRepository {
         id: financialOperationId,
         profileId: operation.profileId,
         accountId: operation.accountId,
-        createdDate: new Date(),
+        createdDate: DateTime.now().toDate(),
         operationType: operation.operationType,
         dataJson: {
           numberOfShares: operation.numberOfShares,
@@ -65,7 +66,7 @@ export class FinancialOperationsRepository {
       .insertInto(sadGlobalFinancialOperationsTable)
       .values({
         id: financialOperationId,
-        createdDate: new Date(),
+        createdDate: DateTime.now().toDate(),
         operationType: GlobalFinancialOperationType.NAV_CHANGED,
         dataJson: {
           numberOfShares,

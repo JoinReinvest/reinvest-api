@@ -3,6 +3,7 @@ import { BannedType, BanRepository } from 'LegalEntities/Adapter/Database/Reposi
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
 import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
+import { DateTime } from 'Money/DateTime';
 
 export class Ban {
   public static getClassName = (): string => 'Ban';
@@ -38,7 +39,7 @@ export class Ban {
       stakeholderId: null,
       type: BannedType.COMPANY,
       reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       dateCancelled: null,
       sensitiveNumber: ein ?? '',
       anonymizedSensitiveNumber: einAnonymized ?? '',
@@ -77,7 +78,7 @@ export class Ban {
       stakeholderId,
       type: BannedType.STAKEHOLDER,
       reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       dateCancelled: null,
       sensitiveNumber: ssn ?? '',
       anonymizedSensitiveNumber: ssnAnonymized ?? '',
@@ -108,7 +109,7 @@ export class Ban {
       stakeholderId: null,
       type: BannedType.PROFILE,
       reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       dateCancelled: null,
       sensitiveNumber: ssn ?? '',
       anonymizedSensitiveNumber: ssnAnonymized ?? '',

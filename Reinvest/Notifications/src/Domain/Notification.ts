@@ -1,4 +1,5 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 
 export enum NotificationsType {
   DIVIDEND_RECEIVED = 'DIVIDEND_RECEIVED',
@@ -75,7 +76,7 @@ export class Notification {
   static create(notificationInput: NotificationInput) {
     const notificationSchema = <NotificationSchema>{
       ...notificationInput,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       dateRead: null,
       isRead: false,
       isDismissible: notificationInput.dismissId === notificationInput.id,
@@ -94,7 +95,7 @@ export class Notification {
     }
 
     this.notificationSchema.isRead = true;
-    this.notificationSchema.dateRead = new Date();
+    this.notificationSchema.dateRead = DateTime.now().toDate();
   }
 
   toObject() {

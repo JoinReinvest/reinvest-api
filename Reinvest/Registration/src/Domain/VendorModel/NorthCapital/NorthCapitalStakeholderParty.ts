@@ -1,5 +1,5 @@
-import DateTime from 'date-and-time';
 import { DictionaryType } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { CrcService } from 'Registration/Domain/CrcService';
 import { StakeholderForSynchronization } from 'Registration/Domain/Model/Account';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
@@ -34,7 +34,7 @@ export class NorthCapitalStakeholderParty {
         middleInitial: data.name?.middleName,
         lastName: data.name.lastName,
         domicile: NorthCapitalMapper.mapDomicile(data.domicile),
-        dob: DateTime.format(DateTime.parse(data.dateOfBirth, 'YYYY-MM-DD'), 'MM-DD-YYYY'),
+        dob: DateTime.from(data.dateOfBirth).toFormattedDate('MM-DD-YYYY'),
         primAddress1: data.address.addressLine1,
         primAddress2: data.address?.addressLine2,
         primCity: data.address.city,

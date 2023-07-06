@@ -10,6 +10,7 @@ import {
   VerificationNorthCapitalObjectFailedEvent,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { mapVerificationStatus } from 'Verification/IntegrationLogic/NorthCapitalTypes';
+import { DateTime } from 'Money/DateTime';
 
 export type NorthCapitalConfig = {
   API_URL: string;
@@ -44,7 +45,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
 
       return [
         <VerificationNorthCapitalObjectFailedEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
@@ -77,7 +78,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
 
       return [
         <VerificationNorthCapitalObjectFailedEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
@@ -114,7 +115,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       }
 
       return <VerificationKycSetToPendingEvent>{
-        date: new Date(),
+        date: DateTime.now().toDate(),
         kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
         ncId: partyId,
       };
@@ -122,7 +123,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       console.error(error);
 
       return <VerificationNorthCapitalObjectFailedEvent>{
-        date: new Date(),
+        date: DateTime.now().toDate(),
         kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
         ncId: partyId,
         reason: error.message,
@@ -155,7 +156,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       if (kycStatus === 'Pending') {
         return [
           <VerificationKycSetToPendingEvent>{
-            date: new Date(),
+            date: DateTime.now().toDate(),
             kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
             ncId: partyId,
           },
@@ -165,7 +166,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       return [
         <ManualVerificationKycResult>{
           kind: VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           ncId: partyId,
           reasons: [],
           source: 'DIRECT',
@@ -173,7 +174,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
         },
         <ManualVerificationAmlResult>{
           kind: VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           ncId: partyId,
           reasons: [],
           source: 'DIRECT',
@@ -185,7 +186,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
 
       return [
         <VerificationNorthCapitalObjectFailedEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
@@ -212,7 +213,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       });
 
       return <VerificationKycSetToPendingEvent>{
-        date: new Date(),
+        date: DateTime.now().toDate(),
         kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
         ncId: partyId,
       };
@@ -220,7 +221,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       console.error(error);
 
       return <VerificationNorthCapitalObjectFailedEvent>{
-        date: new Date(),
+        date: DateTime.now().toDate(),
         kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
         ncId: partyId,
         reason: error.message,
@@ -253,7 +254,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       if (kycStatus === 'Pending') {
         return [
           <VerificationKycSetToPendingEvent>{
-            date: new Date(),
+            date: DateTime.now().toDate(),
             kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
             ncId: partyId,
           },
@@ -263,7 +264,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       return [
         <ManualVerificationKycResult>{
           kind: VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           ncId: partyId,
           reasons: [],
           source: 'DIRECT',
@@ -271,7 +272,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
         },
         <ManualVerificationAmlResult>{
           kind: VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           ncId: partyId,
           reasons: [],
           source: 'DIRECT',
@@ -283,7 +284,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
 
       return [
         <VerificationNorthCapitalObjectFailedEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
           ncId: partyId,
           reason: error.message,
@@ -302,7 +303,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     if (kycStatus === 'Pending') {
       return [
         <VerificationKycSetToPendingEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING,
           ncId: partyId,
         },
@@ -330,7 +331,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     return [
       <VerificationKycResultEvent>{
         kind: VerificationEvents.VERIFICATION_KYC_RESULT,
-        date: new Date(),
+        date: DateTime.now().toDate(),
         ncId: partyId,
         reasons: qualifiers,
         source: 'DIRECT',
@@ -339,7 +340,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
       },
       <VerificationAmlResultEvent>{
         kind: VerificationEvents.VERIFICATION_AML_RESULT,
-        date: new Date(),
+        date: DateTime.now().toDate(),
         ncId: partyId,
         reasons: [],
         source: 'DIRECT',
@@ -358,7 +359,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
     return [
       <VerificationAmlResultEvent>{
         kind: VerificationEvents.VERIFICATION_AML_RESULT,
-        date: new Date(),
+        date: DateTime.now().toDate(),
         ncId: partyId,
         reasons: [],
         source: 'DIRECT',

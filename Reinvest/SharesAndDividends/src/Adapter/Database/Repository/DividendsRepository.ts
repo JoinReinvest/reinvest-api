@@ -8,6 +8,7 @@ import { DividendsSelection, InvestorIncentiveDividendTable } from 'SharesAndDiv
 import { IncentiveReward, IncentiveRewardSchema, IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
 import { InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
 import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/Stats/StatsDividendsCalculationService';
+import { DateTime } from 'Money/DateTime';
 
 export class DividendsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -144,7 +145,7 @@ export class DividendsRepository {
     await this.databaseAdapterProvider
       .provide()
       .updateTable(sadInvestorIncentiveDividendTable)
-      .set({ status, accountId: accountId, actionDate: new Date() })
+      .set({ status, accountId: accountId, actionDate: DateTime.now().toDate() })
       .where('profileId', '=', profileId)
       .where('id', '=', dividendId)
       .execute();
@@ -154,7 +155,7 @@ export class DividendsRepository {
     await this.databaseAdapterProvider
       .provide()
       .updateTable(sadInvestorDividendsTable)
-      .set({ status, actionDate: new Date() })
+      .set({ status, actionDate: DateTime.now().toDate() })
       .where('profileId', '=', profileId)
       .where('id', '=', dividendId)
       .execute();

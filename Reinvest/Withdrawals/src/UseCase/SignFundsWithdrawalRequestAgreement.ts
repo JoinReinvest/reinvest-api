@@ -1,11 +1,11 @@
 import { DictionaryType } from 'HKEKTypes/Generics';
-import TemplateParser from 'Investments/Application/Service/TemplateParser';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { FundsWithdrawalRequestsAgreementsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsAgreementsRepository';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import { fundsWithdrawalAgreementTemplate } from 'Withdrawals/Domain/FundsWithdrawalRequest/agreementsTemplate';
 import { FundsWithdrawalAgreementTemplateVersions, PdfTypes } from 'Withdrawals/Domain/FundsWithdrawalRequest/types';
+import TemplateParser from 'Withdrawals/Service/TemplateParser';
 
 class SignFundsWithdrawalRequestAgreement {
   static getClassName = (): string => 'SignFundsWithdrawalRequestAgreement';

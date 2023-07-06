@@ -1,5 +1,6 @@
 import { VerificationEvents, VerificationRecoveredAdministrativeEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
+import { DateTime } from 'Money/DateTime';
 
 export class AdminVerificationActions {
   static getClassName = () => 'AdminVerificationActions';
@@ -18,7 +19,7 @@ export class AdminVerificationActions {
 
     verifier.handleVerificationEvent(<VerificationRecoveredAdministrativeEvent>{
       kind: VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       ncId: verifier.getPartyId(),
     });
 

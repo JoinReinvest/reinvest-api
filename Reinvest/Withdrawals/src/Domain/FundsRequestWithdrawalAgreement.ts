@@ -1,6 +1,7 @@
 import { JSONObject } from 'HKEKTypes/Generics';
 import { WithdrawalsFundsRequestsAgreementsTable } from 'Withdrawals/Adapter/Database/WithdrawalsSchema';
 import { WithdrawalsFundsRequestsAgreementsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequestsAgreement';
+import { DateTime } from 'Money/DateTime';
 
 type FundsRequestWithdrawalAgreementSchema = WithdrawalsFundsRequestsAgreementsTable;
 
@@ -72,7 +73,7 @@ export class FundsRequestWithdrawalAgreement {
 
     this.status = WithdrawalsFundsRequestsAgreementsStatuses.SIGNED;
     this.signedByIP = ip;
-    this.signedAt = new Date();
+    this.signedAt = DateTime.now().toDate();
   }
 
   isSigned() {

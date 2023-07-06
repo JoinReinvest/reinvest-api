@@ -4,6 +4,7 @@ import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/
 import { DividendData, SettledSharesData, WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import { WithdrawalsFundsRequestsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequests';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
+import { DateTime } from 'Money/DateTime';
 
 export type WithdrawalFundsRequestCreate = {
   accountId: UUID;
@@ -69,7 +70,7 @@ export class CreateWithdrawalFundsRequest {
       investorWithdrawalReason: null,
       payoutId: null,
       redemptionId: null,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       status: WithdrawalsFundsRequestsStatuses.DRAFT,
       dividendsJson: withdrawalsState.formatAwaitingDividends(),
       sharesJson: withdrawalsState.formatSettledShares(),

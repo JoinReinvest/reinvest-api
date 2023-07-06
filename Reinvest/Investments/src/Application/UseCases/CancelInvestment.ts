@@ -1,6 +1,7 @@
 import { InvestmentCanceled, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DateTime } from 'Money/DateTime';
 
 export class CancelInvestment {
   private readonly investmentsRepository: InvestmentsRepository;
@@ -26,7 +27,7 @@ export class CancelInvestment {
 
       await this.eventBus.publish(<InvestmentCanceled>{
         kind: TransactionEvents.INVESTMENT_CANCELED,
-        date: new Date(),
+        date: DateTime.now().toDate(),
         id: investmentId,
         data: {},
       });

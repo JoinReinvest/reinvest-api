@@ -1,8 +1,8 @@
 import { PhoneEvent, TOPTExpired, TOPTInvalid, TOPTTriesExceeded, TOPTVerified } from 'Identity/Domain/PhoneEvents';
+import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
+import { DateTime } from 'Money/DateTime';
 
 const TOPT_EXPIRATION_IN_MINUTES = 10;
-import DateTime from 'date-and-time';
-import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
 
 const MAX_TRIES = 3;
 
@@ -84,9 +84,9 @@ export class OneTimeToken {
   }
 
   private isExpired(): boolean {
-    const expiresAt = DateTime.addMinutes(this.createdAt, this.expirationInMinutes);
+    const expiresAt = DateTime.from(this.createdAt).addMinutes(this.expirationInMinutes).toDate();
 
-    return new Date() >= expiresAt;
+    return DateTime.now().toDate() >= expiresAt;
   }
 
   private event<Event>(kind: string, data: any = {}): Event {

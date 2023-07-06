@@ -44,7 +44,7 @@ export class Shares {
   static create(id: UUID, portfolioId: UUID, profileId: UUID, accountId: UUID, originId: UUID, price: Money, origin: SharesOrigin): Shares {
     return new Shares({
       accountId,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       dateFunding: null,
       dateFunded: null,
       dateRevoked: null,
@@ -76,7 +76,7 @@ export class Shares {
     }
 
     this.sharesSchema.status = SharesStatus.FUNDING;
-    this.sharesSchema.dateFunding = new Date();
+    this.sharesSchema.dateFunding = DateTime.now().toDate();
     this.sharesSchema.numberOfShares = shares;
     this.sharesSchema.unitPrice = unitPrice.getAmount();
   }
@@ -87,7 +87,7 @@ export class Shares {
     }
 
     this.sharesSchema.status = SharesStatus.FUNDED;
-    this.sharesSchema.dateFunded = new Date();
+    this.sharesSchema.dateFunded = DateTime.now().toDate();
   }
 
   setSettledState() {
@@ -96,12 +96,12 @@ export class Shares {
     }
 
     this.sharesSchema.status = SharesStatus.SETTLED;
-    this.sharesSchema.dateSettled = new Date();
+    this.sharesSchema.dateSettled = DateTime.now().toDate();
   }
 
   setRevokedState() {
     this.sharesSchema.status = SharesStatus.REVOKED;
-    this.sharesSchema.dateRevoked = new Date();
+    this.sharesSchema.dateRevoked = DateTime.now().toDate();
   }
 
   forDividendCalculation(): {

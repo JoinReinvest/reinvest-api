@@ -3,6 +3,7 @@ import { PortfolioDatabaseAdapterProvider, propertyTable } from 'Portfolio/Adapt
 import { Property, PropertySchema } from 'Reinvest/Portfolio/src/Domain/Property';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 export class PortfolioRepository {
   private databaseAdapterProvider: PortfolioDatabaseAdapterProvider;
@@ -100,7 +101,7 @@ export class PortfolioRepository {
         adminJson: JSON.stringify(adminJson),
         dealpathJson: JSON.stringify(dealpathJson),
         status,
-        lastUpdate: new Date(),
+        lastUpdate: DateTime.now().toDate(),
       })
       .where('id', '=', id)
       .execute();

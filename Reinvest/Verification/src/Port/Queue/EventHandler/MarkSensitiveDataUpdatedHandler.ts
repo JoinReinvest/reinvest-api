@@ -2,6 +2,7 @@ import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { VerificationEvents, VerificationUserObjectUpdatedEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
+import { DateTime } from 'Money/DateTime';
 
 export enum UpdatedObjectType {
   PROFILE = 'PROFILE',
@@ -57,7 +58,7 @@ export class MarkSensitiveDataUpdatedHandler implements EventHandler<DomainEvent
 
     verifier.handleVerificationEvent(<VerificationUserObjectUpdatedEvent>{
       kind: VerificationEvents.VERIFICATION_USER_OBJECT_UPDATED,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       ncId: verifier.getPartyId(),
     });
 
