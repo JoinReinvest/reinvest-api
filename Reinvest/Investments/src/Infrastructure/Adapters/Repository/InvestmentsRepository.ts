@@ -7,7 +7,7 @@ import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
 import { Investment } from 'Reinvest/Investments/src/Domain/Investments/Investment';
-import { InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { InvestmentStatus, InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -61,23 +61,24 @@ export class InvestmentsRepository {
     return this.castToObject(data, fee);
   }
 
-  async getInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<Investment[]> {
+  async listPaginatedInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<Investment[]> {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
       .selectAll()
-      .where(`${investmentsTable}.profileId`, '=', profileId)
-      .where(`${investmentsTable}.accountId`, '=', accountId)
+      .where(`profileId`, '=', profileId)
+      .where(`accountId`, '=', accountId)
+      .where('status', '!=', InvestmentStatus.ABORTED)
       .orderBy('dateCreated', 'desc')
       .limit(pagination.perPage)
       .offset(pagination.perPage * pagination.page)
       .execute();
 
-    if (!data) {
+    if (data.length === 0) {
       return [];
     }
 
-    return this.castToObjectWithFees(data);
+    return data.map((investment: InvestmentsTable) => this.castToObject(investment, null));
   }
 
   async getInvestmentForSummary(investmentId: string): Promise<InvestmentSummary | null> {
@@ -148,6 +149,11 @@ export class InvestmentsRepository {
 
   async castToObjectWithFees(data: InvestmentsTable[]): Promise<Investment[]> {
     const investmentIds = data.map(investment => investment.id);
+
+    if (investmentIds.length === 0) {
+      return [];
+    }
+
     const fees = await this.feesRepository.getFeesByInvestmentId(investmentIds);
     const investmentIdToFee: { [investmentId: UUID]: Fee } = {};
 
@@ -213,5 +219,20 @@ export class InvestmentsRepository {
     }
 
     return data.map((investment: InvestmentsTable) => this.castToObject(investment, null));
+  }
+
+  async getPendingInvestmentsIds(): Promise<UUID[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(investmentsTable)
+      .select(['id'])
+      .where(`status`, 'in', [InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED, InvestmentStatus.CANCELING])
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(investment => <UUID>investment.id);
   }
 }

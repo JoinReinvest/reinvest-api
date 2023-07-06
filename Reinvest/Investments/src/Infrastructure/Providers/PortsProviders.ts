@@ -9,7 +9,7 @@ import DeactivateRecurringInvestment from 'Investments/Application/UseCases/Deac
 import InitiateRecurringInvestment from 'Investments/Application/UseCases/InitiateRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
-import ListInvestments from 'Investments/Application/UseCases/ListInvestments';
+import ListInvestmentsQuery from 'Investments/Application/UseCases/ListInvestmentsQuery';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
 import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
 import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
@@ -46,7 +46,7 @@ export default class PortsProviders {
       InvestmentSummaryQuery,
       StartInvestment,
       AbortInvestment,
-      ListInvestments,
+      ListInvestmentsQuery,
       CancelInvestment,
       TransferInvestments,
     ]);

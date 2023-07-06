@@ -13,7 +13,6 @@ export enum EVSChartResolution {
 export enum FinancialOperationType {
   // in plus operations
   INVESTMENT = 'INVESTMENT',
-  REINVESTMENT = 'REINVESTMENT',
   TRANSFER_IN = 'TRANSFER_IN',
   // in minus operations
   WITHDRAWAL = 'WITHDRAWAL',
@@ -57,12 +56,11 @@ export class EVSDataPointsCalculationService {
       const dateKey = createdDate.format('YYYY-MM-DD');
 
       const { unitPrice, portfolioId, numberOfShares } = financialOperation.dataJson;
+
       // @ts-ignore
       const pricePerShare = new Money(parseInt(unitPrice));
 
-      //@ts-ignore
       if (portfolio[portfolioId] === undefined) {
-        // @ts-ignore
         portfolio[portfolioId] = {
           numberOfShares: 0,
           pricePerShare: pricePerShare,
@@ -81,15 +79,19 @@ export class EVSDataPointsCalculationService {
 
       switch (financialOperation.operationType) {
         case FinancialOperationType.INVESTMENT:
-        case FinancialOperationType.REINVESTMENT:
-          // @ts-ignore
-          portfolio[portfolioId].numberOfShares += numberOfShares;
-          // @ts-ignore
-          portfolio[portfolioId].pricePerShare = pricePerShare;
+          portfolio[portfolioId]!.numberOfShares += numberOfShares;
+          portfolio[portfolioId]!.pricePerShare = pricePerShare;
+          break;
+        case FinancialOperationType.TRANSFER_IN:
+          portfolio[portfolioId]!.numberOfShares += numberOfShares;
+          break;
+        case FinancialOperationType.TRANSFER_OUT:
+        case FinancialOperationType.WITHDRAWAL:
+        case FinancialOperationType.REVOKED:
+          portfolio[portfolioId]!.numberOfShares -= numberOfShares;
           break;
         case GlobalFinancialOperationType.NAV_CHANGED:
-          // @ts-ignore
-          portfolio[portfolioId].pricePerShare = pricePerShare;
+          portfolio[portfolioId]!.pricePerShare = pricePerShare;
           break;
         default:
           break;

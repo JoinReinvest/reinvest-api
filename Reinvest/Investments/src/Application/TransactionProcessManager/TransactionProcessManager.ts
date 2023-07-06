@@ -74,6 +74,8 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
         return this.decide(TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED);
       case TransactionEvents.INVESTMENT_SHARES_TRANSFERRED:
         return this.decide(TransactionDecisions.FINISH_INVESTMENT);
+      case TransactionEvents.INVESTMENT_FINISHED:
+        return this.decide(TransactionDecisions.DO_NOTHING);
       case TransactionEvents.INVESTMENT_CANCELED:
       case TransactionEvents.TRANSACTION_CANCELED_UNWINDING:
         return this.decide(TransactionDecisions.CANCEL_TRANSACTION);
@@ -124,6 +126,8 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
         return [TransactionEvents.MARKED_AS_READY_TO_DISBURSE].includes(kind);
       case TransactionDecisions.TRANSFER_SHARES_WHEN_TRADE_SETTLED:
         return [TransactionEvents.INVESTMENT_SHARES_TRANSFERRED].includes(kind);
+      case TransactionDecisions.FINISH_INVESTMENT:
+        return [TransactionEvents.INVESTMENT_FINISHED].includes(kind);
       case TransactionDecisions.CANCEL_TRANSACTION:
         return [
           TransactionEvents.TRANSACTION_CANCELED,

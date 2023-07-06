@@ -170,7 +170,7 @@ export class Investment {
 
   cancel(): void {
     if ([InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED].includes(this.investmentSchema.status)) {
-      this.investmentSchema.status = InvestmentStatus.CANCELED;
+      this.investmentSchema.status = InvestmentStatus.CANCELING;
 
       if (this.fee) {
         this.fee.abort();
@@ -179,7 +179,7 @@ export class Investment {
       return;
     }
 
-    if (this.investmentSchema.status === InvestmentStatus.CANCELED) {
+    if ([InvestmentStatus.CANCELED, InvestmentStatus.CANCELING].includes(this.investmentSchema.status)) {
       return;
     }
 
@@ -236,5 +236,20 @@ export class Investment {
     }
 
     return this.investmentSchema.originId;
+  }
+
+  fund(): void {
+    this.investmentSchema.status = InvestmentStatus.FUNDED;
+    this.investmentSchema.dateUpdated = DateTime.now();
+  }
+
+  completeCancellation(): void {
+    this.investmentSchema.status = InvestmentStatus.CANCELED;
+    this.investmentSchema.dateUpdated = DateTime.now();
+  }
+
+  complete(): void {
+    this.investmentSchema.status = InvestmentStatus.FINISHED;
+    this.investmentSchema.dateUpdated = DateTime.now();
   }
 }
