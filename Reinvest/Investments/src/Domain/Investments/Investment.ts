@@ -136,9 +136,9 @@ export class Investment {
     return this.fee.isApproved();
   }
 
-  startInvestment() {
+  startInvestment(): boolean {
     if (this.isStartedInvestment()) {
-      return true;
+      return false;
     }
 
     if (!this.isFeeApproved()) {

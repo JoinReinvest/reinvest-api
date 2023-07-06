@@ -39,6 +39,7 @@ export class InvestmentStatusEventHandler {
         await this.investmentRepository.store(investment);
         break;
       case TransactionEvents.INVESTMENT_FINISHED:
+        console.log(`[${investmentId}] Investment completed`);
         investment.complete();
         await this.investmentRepository.store(investment);
         break;
