@@ -17,15 +17,16 @@ export class SharesRepository {
 
   public static getClassName = (): string => 'SharesRepository';
 
-  async store(shares: Shares) {
-    const values = <SharesTable>shares.toObject();
+  async store(shares: Shares | Shares[]) {
+    const sharesToStore = !Array.isArray(shares) ? [shares] : shares;
+    const values = sharesToStore.map(shares => <SharesTable>shares.toObject());
 
     await this.databaseAdapterProvider
       .provide()
       .insertInto(sadSharesTable)
       .values(values)
       .onConflict(oc =>
-        oc.column('investmentId').doUpdateSet({
+        oc.constraint('shares_unique_origin_id').doUpdateSet({
           dateFunded: eb => eb.ref(`excluded.dateFunded`),
           dateFunding: eb => eb.ref(`excluded.dateFunding`),
           dateRevoked: eb => eb.ref(`excluded.dateRevoked`),
@@ -78,27 +79,12 @@ export class SharesRepository {
     return sharesPerPortfolio;
   }
 
-  async getSharesByInvestmentId(investmentId: string): Promise<Shares | null> {
+  async getSharesByOriginId(originId: string): Promise<Shares | null> {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(sadSharesTable)
-      .select([
-        'accountId',
-        'dateCreated',
-        'dateFunded',
-        'dateFunding',
-        'dateRevoked',
-        'dateSettled',
-        'id',
-        'investmentId',
-        'numberOfShares',
-        'portfolioId',
-        'price',
-        'profileId',
-        'status',
-        'unitPrice',
-      ])
-      .where('investmentId', '=', investmentId)
+      .selectAll()
+      .where('originId', '=', originId)
       .castTo<SharesSchema>()
       .executeTakeFirst();
 
@@ -281,5 +267,36 @@ export class SharesRepository {
     });
 
     return revokedDays;
+  }
+
+  async getAllAccountShares(profileId: UUID, accountId: UUID): Promise<Shares[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .selectAll()
+      .where('profileId', '=', profileId)
+      .where('accountId', '=', accountId)
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(Shares.restore);
+  }
+
+  async transferShares(toStore: Shares[]): Promise<void> {
+    const values = toStore.map(shares => <SharesTable>shares.toObject());
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(sadSharesTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.constraint('shares_unique_origin_id').doUpdateSet({
+          accountId: eb => eb.ref(`excluded.accountId`),
+        }),
+      )
+      .execute();
   }
 }

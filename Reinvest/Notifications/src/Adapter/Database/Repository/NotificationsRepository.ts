@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { NotificationsDatabaseAdapterProvider, notificationsTable } from 'Notifications/Adapter/Database/DatabaseAdapter';
 import { NotificationsTable } from 'Notifications/Adapter/Database/NotificationsSchema';
 import { Pagination } from 'Notifications/Application/Pagination';
@@ -151,5 +152,37 @@ export class NotificationsRepository {
     } catch (error: any) {
       return false;
     }
+  }
+
+  async getNotificationByUniqueId(profileId: UUID, notificationUniqueId: UUID): Promise<Notification | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(notificationsTable)
+      .selectAll()
+      .where(`uniqueId`, '=', notificationUniqueId)
+      .where(`profileId`, '=', profileId)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return Notification.restore(<NotificationSchema>data);
+  }
+
+  async transferNotification(notification: Notification): Promise<void> {
+    const values = <NotificationsTable>notification.toObject();
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(notificationsTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.column('uniqueId').doUpdateSet({
+          accountId: eb => eb.ref(`excluded.accountId`),
+        }),
+      )
+      .execute();
   }
 }

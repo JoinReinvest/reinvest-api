@@ -6,6 +6,7 @@ import { CreateNotification } from 'Notifications/Application/UseCase/CreateNoti
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
 import { NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
 import { ProcessStoredEvent } from 'Notifications/Application/UseCase/ProcessStoredEvent';
+import { TransferNotification } from 'Notifications/Application/UseCase/TransferNotification';
 import { Notifications } from 'Notifications/index';
 import { NotificationsController } from 'Notifications/Port/Api/NotificationsController';
 import { StoredEventsController } from 'Notifications/Port/Api/StoredEventsController';
@@ -19,7 +20,13 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     // api
-    container.addSingleton(NotificationsController, [CreateNotification, DismissNotifications, NotificationQuery, PushNotificationRepository]);
+    container.addSingleton(NotificationsController, [
+      CreateNotification,
+      DismissNotifications,
+      NotificationQuery,
+      PushNotificationRepository,
+      TransferNotification,
+    ]);
     container.addSingleton(StoredEventsController, [StoredEventRepository, ProcessStoredEvent, AccountActivitiesRepository, PushNotificationRepository]);
   }
 }

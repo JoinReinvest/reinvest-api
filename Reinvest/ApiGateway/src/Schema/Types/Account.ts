@@ -1,10 +1,13 @@
 import { JsonGraphQLError, SessionContext } from 'ApiGateway/index';
+import { Archiving } from 'Archiving/index';
 import { GraphQLError } from 'graphql/index';
 import { LegalEntities } from 'LegalEntities/index';
+import { Money } from 'Money/Money';
 import { Registration } from 'Registration/index';
 import type { UpdateCompanyAccountInput } from 'Reinvest/LegalEntities/src/Service/UpdateCompany';
 import type { UpdateIndividualAccountInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateIndividualAccount';
 import Modules from 'Reinvest/Modules';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 const schema = `
     #graphql
@@ -492,21 +495,30 @@ export const Account = {
         },
         { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
-        const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
+        const api = modules.getApi<Archiving.ApiType>(Archiving);
 
         const parentAccountId = await mapAccountIdToParentAccountIdIfRequired(profileId, accountId, modules);
         throwIfBanned(parentAccountId);
-        // const errors = await api.updateIndividualAccount(profileId, accountId, input);
-        //
-        // if (errors.length > 0) {
-        //   throw new JsonGraphQLError(errors);
-        // }
+
+        const status = await api.initArchivingBeneficiary(profileId, accountId);
+
+        if (!status) {
+          return {
+            archived: false,
+          };
+        }
+
+        const sadApi = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+        const { accountValueAmount: parentAccountAmount } = await sadApi.getAccountStats(profileId, parentAccountId);
+        const { accountValueAmount: beneficiaryAccountAmount } = await sadApi.getAccountStats(profileId, accountId);
+
+        const accountValue = Money.lowPrecision(parentAccountAmount + beneficiaryAccountAmount);
 
         return {
           archived: true,
           parentAccountUpdatedValue: {
-            value: 582000,
-            formatted: '$5,820.00',
+            value: accountValue.getAmount(),
+            formatted: accountValue.getFormattedAmount(),
           },
         };
       },

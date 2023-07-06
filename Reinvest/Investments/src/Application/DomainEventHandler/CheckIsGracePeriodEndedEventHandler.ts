@@ -21,7 +21,7 @@ export class CheckIsGracePeriodEndedEventHandler implements EventHandler<Transac
     }
 
     const investmentId = event.id;
-    const investment = await this.investmentRepository.get(investmentId);
+    const investment = await this.investmentRepository.getByInvestmentId(investmentId);
 
     if (!investment) {
       throw new Error(`Investment with id ${investmentId} not found`);

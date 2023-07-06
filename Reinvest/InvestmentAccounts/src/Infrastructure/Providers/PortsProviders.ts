@@ -7,6 +7,7 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { AccountManagementController } from 'InvestmentAccounts/Infrastructure/Ports/Controller/AccountManagementController';
 import { ConfigurationController } from 'InvestmentAccounts/Infrastructure/Ports/Controller/ConfigurationController';
 import { CreateProfileController } from 'InvestmentAccounts/Infrastructure/Ports/Controller/CreateProfileController';
+import { RemoveBeneficiary } from 'InvestmentAccounts/Application/RemoveBeneficiary';
 
 export default class PortsProviders {
   private config: InvestmentAccounts.Config;
@@ -18,7 +19,7 @@ export default class PortsProviders {
   public boot(container: ContainerInterface) {
     container
       .addSingleton(CreateProfileController, [CreateProfile])
-      .addSingleton(AccountManagementController, [OpenAccount])
+      .addSingleton(AccountManagementController, [OpenAccount, RemoveBeneficiary])
       .addSingleton(ConfigurationController, [CreateConfiguration, GetConfiguration]);
   }
 }

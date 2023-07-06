@@ -1,6 +1,7 @@
 import ScheduleInvestmentService from 'Investments/Application/Service/ScheduleInvestmentService';
 import type { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
+import { UUID } from 'HKEKTypes/Generics';
 
 class RecurringInvestmentQuery {
   private readonly recurringInvestmentsRepository: RecurringInvestmentsRepository;
@@ -11,8 +12,8 @@ class RecurringInvestmentQuery {
 
   static getClassName = (): string => 'RecurringInvestmentQuery';
 
-  async execute(accountId: string, recurringInvestmentStatus: RecurringInvestmentStatus) {
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, recurringInvestmentStatus);
+  async execute(profileId: UUID, accountId: string, recurringInvestmentStatus: RecurringInvestmentStatus) {
+    const recurringInvestment = await this.recurringInvestmentsRepository.get(profileId, accountId, recurringInvestmentStatus);
 
     if (!recurringInvestment) {
       return false;

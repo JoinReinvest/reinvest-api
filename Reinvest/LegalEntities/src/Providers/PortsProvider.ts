@@ -1,11 +1,9 @@
 import { ContainerInterface } from 'Container/Container';
-import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
 import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
-import { InvestmentAccountsService } from 'LegalEntities/Adapter/Modules/InvestmentAccountsService';
 import { LegalEntities } from 'LegalEntities/index';
 import { AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
 import { BeneficiaryAccountController } from 'LegalEntities/Port/Api/BeneficiaryAccountController';
@@ -17,9 +15,11 @@ import { ReadAccountController } from 'LegalEntities/Port/Api/ReadAccountControl
 import { UpdateAccountsController } from 'LegalEntities/Port/Api/UpdateAccountsController';
 import { UpdateForVerificationController } from 'LegalEntities/Port/Api/UpdateForVerificationController';
 import { UpdateProfileController } from 'LegalEntities/Port/Api/UpdateProfileController';
+import { ArchiveBeneficiary } from 'LegalEntities/UseCases/ArchiveBeneficiary';
 import { CompleteDraftAccount } from 'LegalEntities/UseCases/CompleteDraftAccount';
 import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
+import { OpenBeneficiary } from 'LegalEntities/UseCases/OpenBeneficiary';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
@@ -48,7 +48,7 @@ export class PortsProvider {
       .addSingleton(UpdateAccountsController, [UpdateIndividualAccount, UpdateCorporateAccount, UpdateTrustAccount, UpdateBeneficiaryAccount])
       .addSingleton(UpdateProfileController, [UpdateProfile])
       .addSingleton(ReadAccountController, [AccountRepository, AvatarQuery, BeneficiaryRepository])
-      .addSingleton(BeneficiaryAccountController, [IdGenerator, BeneficiaryRepository, InvestmentAccountsService, 'LegalEntitiesTransactionalAdapter'])
+      .addSingleton(BeneficiaryAccountController, [OpenBeneficiary, ArchiveBeneficiary])
       .addSingleton(DraftAccountsController, [
         CreateDraftAccount,
         CompleteDraftAccount,

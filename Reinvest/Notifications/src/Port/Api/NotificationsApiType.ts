@@ -11,6 +11,7 @@ export type NotificationsApiType = {
   listStoredEventsIds: StoredEventsController['listStoredEventsIds'];
   processStoredEvent: StoredEventsController['processStoredEvent'];
   registerPushNotificationDevice: StoredEventsController['registerPushNotificationDevice'];
+  transferNotificationToAccount: NotificationsController['transferNotificationToAccount'];
 };
 
 export const NotificationsApi = (container: ContainerInterface): NotificationsApiType => ({
@@ -22,4 +23,5 @@ export const NotificationsApi = (container: ContainerInterface): NotificationsAp
   processStoredEvent: container.delegateTo(StoredEventsController, 'processStoredEvent'),
   listAccountActivities: container.delegateTo(StoredEventsController, 'listAccountActivities'),
   registerPushNotificationDevice: container.delegateTo(StoredEventsController, 'registerPushNotificationDevice'),
+  transferNotificationToAccount: container.delegateTo(NotificationsController, 'transferNotificationToAccount'),
 });

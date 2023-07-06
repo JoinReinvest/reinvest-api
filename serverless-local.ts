@@ -12,6 +12,7 @@ import {
 } from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
 import { CronNotificationsFunction, CronNotificationsResources } from './devops/functions/cron/notifications/cron-notifications-config';
+import { CronPushEveryDayFunction, CronPushEveryDayResources } from './devops/functions/cron/pushEveryDayProcesses/cron-push-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { FirebaseFunction, FirebaseResources } from './devops/functions/firebase/queue-config';
@@ -77,6 +78,7 @@ const serverlessConfiguration: AWS = {
     cronDividendsCalculation: CronDividendsCalculationFunction,
     cronDividendsDistribution: CronDividendsDistributionFunction,
     cronNotificationsFunction: CronNotificationsFunction,
+    cronPushEveryDay: CronPushEveryDayFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     unauthorizedEndpoints: UnauthorizedEndpointsFunction,
@@ -107,6 +109,7 @@ const serverlessConfiguration: AWS = {
       ...PdfGeneratorResources,
       ...FirebaseResources,
       ...CronNotificationsResources,
+      ...CronPushEveryDayResources,
     },
     Outputs: {
       ...CognitoOutputs,

@@ -6,6 +6,7 @@ import { Money } from 'Money/Money';
 import type { USDInput } from 'Reinvest/ApiGateway/src/Schema/Types/Investments';
 import CreateDraftRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
+import { UUID } from 'HKEKTypes/Generics';
 
 export class RecurringInvestmentsController {
   private createDraftRecurringInvestmentUseCase: CreateDraftRecurringInvestment;
@@ -30,25 +31,25 @@ export class RecurringInvestmentsController {
 
   public static getClassName = (): string => 'RecurringInvestmentsController';
 
-  public async createDraftRecurringInvestment(portfolioId: string, profileId: string, accountId: string, money: USDInput, schedule: any) {
+  public async createDraftRecurringInvestment(portfolioId: UUID, profileId: UUID, accountId: UUID, money: USDInput, schedule: any) {
     const amount = new Money(money.value);
 
     return await this.createDraftRecurringInvestmentUseCase.execute(portfolioId, profileId, accountId, amount, schedule);
   }
 
-  public async getRecurringInvestment(accountId: string, status: RecurringInvestmentStatus) {
-    return await this.getRecurringInvestmentQueryUseCase.execute(accountId, status);
+  public async getRecurringInvestment(profileId: UUID, accountId: UUID, status: RecurringInvestmentStatus) {
+    return await this.getRecurringInvestmentQueryUseCase.execute(profileId, accountId, status);
   }
 
-  public async initiateRecurringInvestment(accountId: string) {
-    return await this.initiateRecurringInvestmentUseCase.execute(accountId);
+  public async initiateRecurringInvestment(profileId: UUID, accountId: UUID) {
+    return this.initiateRecurringInvestmentUseCase.execute(profileId, accountId);
   }
 
-  public async deactivateRecurringInvestment(accountId: string) {
-    return await this.deactivateRecurringInvestmentUseCase.execute(accountId);
+  public async deactivateRecurringInvestment(profileId: UUID, accountId: UUID) {
+    return this.deactivateRecurringInvestmentUseCase.execute(profileId, accountId);
   }
 
-  public async unsuspendRecurringInvestment(accountId: string) {
-    return await this.unsuspendRecurringInvestmentUseCase.execute(accountId);
+  public async unsuspendRecurringInvestment(profileId: UUID, accountId: UUID) {
+    return this.unsuspendRecurringInvestmentUseCase.execute(profileId, accountId);
   }
 }

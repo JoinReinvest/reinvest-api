@@ -22,7 +22,7 @@ export class SharesEventHandler {
     switch (event.kind) {
       case TransactionEvents.INVESTMENT_CREATED:
         const { portfolioId, profileId, accountId, amount } = event.data;
-        await this.sharesAndDividendsModule.createShares(portfolioId, profileId, accountId, objectId, amount);
+        await this.sharesAndDividendsModule.createShares(portfolioId, profileId, accountId, objectId, amount, 'INVESTMENT');
         break;
       case TransactionEvents.TRADE_CREATED:
         const { shares, unitSharePrice } = event.data;
@@ -46,7 +46,14 @@ export class SharesEventHandler {
           amount: reinvestmentAmount,
         } = (<DividendReinvestmentRequested>event).data;
 
-        await this.sharesAndDividendsModule.createShares(reinvestmentPortfolioId, reinvestmentProfileId, reinvestmentAccountId, objectId, reinvestmentAmount);
+        await this.sharesAndDividendsModule.createShares(
+          reinvestmentPortfolioId,
+          reinvestmentProfileId,
+          reinvestmentAccountId,
+          objectId,
+          reinvestmentAmount,
+          'DIVIDEND',
+        );
         await this.sharesAndDividendsModule.markDividendReinvested(reinvestmentProfileId, reinvestmentAccountId, objectId);
         break;
       case ReinvestmentEvents.SHARES_TRANSFERRED_FOR_REINVESTMENT:

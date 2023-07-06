@@ -10,9 +10,34 @@ export enum StoredEventKind {
   TrustAccountOpened = 'TrustAccountOpened',
   InvestmentProcessStarted = 'InvestmentProcessStarted',
   PaymentInitiated = 'PaymentInitiated',
+  ArchivingBeneficiaryStarted = 'ArchivingBeneficiaryStarted',
+  ArchivingBeneficiaryCompleted = 'ArchivingBeneficiaryCompleted',
+  TransferringBeneficiaryToParentCompleted = 'TransferringBeneficiaryToParentCompleted',
 }
 
 export const StoredEvents = <StoredEventsType>{
+  ArchivingBeneficiaryCompleted: {
+    accountActivity: {
+      data: ({ amountTransferred, numberOfShares, name, numberOfInvestments }) => ({
+        amountTransferred,
+        numberOfShares,
+        name,
+        numberOfInvestments,
+      }),
+      name: ({ numberOfShares }) => `Beneficiary archived. Transferred ${numberOfShares} shares to main account`,
+    },
+  },
+  TransferringBeneficiaryToParentCompleted: {
+    accountActivity: {
+      data: ({ amountTransferred, numberOfShares, name, numberOfInvestments }) => ({
+        amountTransferred,
+        numberOfShares,
+        name,
+        numberOfInvestments,
+      }),
+      name: ({ numberOfShares, name }) => `Beneficiary "${name}" is archived. ${numberOfShares} shares were transferred`,
+    },
+  },
   UserRegistered: {
     accountActivity: {
       data: () => ({}),
@@ -50,6 +75,29 @@ export const StoredEvents = <StoredEventsType>{
     push: {
       title: () => 'Investment started',
       body: investmentStartedBody,
+    },
+  },
+  ArchivingBeneficiaryStarted: {
+    accountActivity: {
+      data: ({ label, beneficiaryId, accountId }) => ({
+        label,
+        beneficiaryId,
+        accountId,
+      }),
+      name: ({ label }) => `Beneficiary ${label} is being archived`,
+    },
+    push: {
+      title: () => 'Archiving beneficiary started',
+      body: ({ label }) => `Beneficiary ${label} is being archived`,
+    },
+    inApp: {
+      header: () => 'Archiving beneficiary started',
+      body: ({ label }) => `Beneficiary ${label} is being archived`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+      onObject: ({ beneficiaryId }) => ({
+        onObjectId: beneficiaryId,
+        onObjectType: NotificationObjectType.ACCOUNT,
+      }),
     },
   },
   PaymentInitiated: {

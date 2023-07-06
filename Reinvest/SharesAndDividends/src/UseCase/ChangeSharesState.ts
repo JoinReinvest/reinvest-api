@@ -1,4 +1,3 @@
-import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { Money } from 'Money/Money';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { SharesAndDividendsDatabase } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
@@ -17,17 +16,14 @@ export enum SharesChangeState {
 export class ChangeSharesState {
   private sharesRepository: SharesRepository;
   private transactionAdapter: TransactionalAdapter<SharesAndDividendsDatabase>;
-  private idGenerator: IdGeneratorInterface;
   private financialOperationRepository: FinancialOperationsRepository;
 
   constructor(
     sharesRepository: SharesRepository,
-    idGenerator: IdGeneratorInterface,
     financialOperationRepository: FinancialOperationsRepository,
     transactionAdapter: TransactionalAdapter<SharesAndDividendsDatabase>,
   ) {
     this.sharesRepository = sharesRepository;
-    this.idGenerator = idGenerator;
     this.financialOperationRepository = financialOperationRepository;
     this.transactionAdapter = transactionAdapter;
   }
@@ -35,7 +31,7 @@ export class ChangeSharesState {
   static getClassName = () => 'ChangeSharesState';
 
   async execute(
-    investmentId: string,
+    originId: string,
     state: SharesChangeState,
     data?: {
       shares: number;
@@ -43,27 +39,27 @@ export class ChangeSharesState {
     },
   ): Promise<void> {
     try {
-      const shares = await this.sharesRepository.getSharesByInvestmentId(investmentId);
+      const shares = await this.sharesRepository.getSharesByOriginId(originId);
 
       if (!shares) {
-        throw new Error(`Shares with investmentId ${investmentId} not found`);
+        throw new Error(`Shares with originId ${originId} not found`);
       }
 
       if (state === SharesChangeState.FUNDING && data !== undefined) {
         const { profileId, accountId, portfolioId } = shares.toObject();
-        await this.transactionAdapter.transaction(`Update shares record for investment ${investmentId} in account ${accountId} to FUNDING state`, async () => {
+        await this.transactionAdapter.transaction(`Update shares record for originId ${originId} in account ${accountId} to FUNDING state`, async () => {
           shares.setFundingState(data.shares, Money.lowPrecision(data.unitPrice));
-          const financialOperationId = this.idGenerator.createUuid();
-          await this.financialOperationRepository.addInvestmentOperation(
-            FinancialOperationType.INVESTMENT,
-            financialOperationId,
-            profileId,
-            accountId,
-            portfolioId,
-            data.shares,
-            data.unitPrice,
-            investmentId,
-          );
+          await this.financialOperationRepository.addFinancialOperations([
+            {
+              operationType: FinancialOperationType.INVESTMENT,
+              profileId,
+              accountId,
+              portfolioId,
+              numberOfShares: data.shares,
+              unitPrice: data.unitPrice,
+              originId,
+            },
+          ]);
           await this.sharesRepository.store(shares);
         });
       }
@@ -79,22 +75,21 @@ export class ChangeSharesState {
       }
 
       if (state === SharesChangeState.REVOKED) {
+        if (shares.isRevoked()) {
+          return;
+        }
+
         shares.setRevokedState();
         await this.sharesRepository.store(shares);
-        // const financialOperationId = this.idGenerator.createUuid();
-        // await this.financialOperationRepository.addInvestmentOperation(
-        //   FinancialOperationType.REVOKED,
-        //   financialOperationId,
-        //   profileId,
-        //   accountId,
-        //   portfolioId,
-        //   data.shares,
-        //   data.unitPrice,
-        //   investmentId,
-        // );
+        await this.financialOperationRepository.addFinancialOperations([
+          {
+            operationType: FinancialOperationType.REVOKED,
+            ...shares.forFinancialOperation(),
+          },
+        ]);
       }
     } catch (error) {
-      console.error('[ChangeSharesState]', investmentId, state, error);
+      console.error('[ChangeSharesState]', originId, state, error);
     }
   }
 }

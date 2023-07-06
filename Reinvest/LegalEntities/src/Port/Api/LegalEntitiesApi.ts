@@ -9,10 +9,11 @@ import { UpdateAccountsController } from 'Reinvest/LegalEntities/src/Port/Api/Up
 import { UpdateForVerificationController } from 'Reinvest/LegalEntities/src/Port/Api/UpdateForVerificationController';
 
 export type LegalEntitiesApiType = {
+  archiveBeneficiary: BeneficiaryAccountController['archiveBeneficiary'];
   completeCompanyDraftAccount: DraftAccountsController['completeCompanyDraftAccount'];
   completeIndividualDraftAccount: DraftAccountsController['completeIndividualDraftAccount'];
-  completeProfile: CompleteProfileController['completeProfile'];
 
+  completeProfile: CompleteProfileController['completeProfile'];
   createDraftAccount: DraftAccountsController['createDraftAccount'];
   getAccountsOverview: ReadAccountController['getAccountsOverview'];
   getBeneficiaryAccountForSynchronization: ReadAccountController['getBeneficiaryAccountForSynchronization'];
@@ -21,8 +22,8 @@ export type LegalEntitiesApiType = {
   getCompanyForSynchronization: ReadAccountController['getCompanyForSynchronization'];
   getIndividualAccount: ReadAccountController['getIndividualAccount'];
   getIndividualAccountForSynchronization: ReadAccountController['getIndividualAccountForSynchronization'];
-  getProfile: GetProfileController['getProfile'];
 
+  getProfile: GetProfileController['getProfile'];
   getProfileAccountStructure: ReadAccountController['getProfileAccountStructure'];
   getProfileForSynchronization: GetProfileController['getProfileForSynchronization'];
   getStakeholderForSynchronization: ReadAccountController['getStakeholderForSynchronization'];
@@ -69,6 +70,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   openBeneficiaryAccount: container.delegateTo(BeneficiaryAccountController, 'openBeneficiaryAccount'),
   readBeneficiaryAccount: container.delegateTo(ReadAccountController, 'readBeneficiaryAccount'),
   getProfileAccountStructure: container.delegateTo(ReadAccountController, 'getProfileAccountStructure'),
+  archiveBeneficiary: container.delegateTo(BeneficiaryAccountController, 'archiveBeneficiary'),
 
   updateCompanyForVerification: container.delegateTo(UpdateForVerificationController, 'updateCompanyForVerification'),
   updateProfileForVerification: container.delegateTo(UpdateForVerificationController, 'updateProfileForVerification'),

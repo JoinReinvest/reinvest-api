@@ -6,9 +6,9 @@ import type {
   AgreementTypes,
   InvestmentsFeesStatus,
   InvestmentStatus,
+  Origin,
   RecurringInvestmentFrequency,
   RecurringInvestmentStatus,
-  ScheduledBy,
   SubscriptionAgreementStatus,
 } from 'Reinvest/Investments/src/Domain/Investments/Types';
 
@@ -20,11 +20,11 @@ export interface InvestmentsTable {
   dateStarted: Date | null;
   dateUpdated: Date;
   id: string;
+  origin: Origin;
+  originId: string | null;
   parentId: string | null;
   portfolioId: string;
   profileId: string;
-  recurringInvestmentId: string | null;
-  scheduledBy: ScheduledBy;
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
   tradeId: string;

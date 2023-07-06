@@ -7,16 +7,21 @@ import {
   LegalEntitiesDatabaseAdapterProvider,
 } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { BanRepository } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
 import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
+import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 import { InvestmentAccountsService } from 'LegalEntities/Adapter/Modules/InvestmentAccountsService';
 import { LegalEntities } from 'LegalEntities/index';
 import { UpdateCompany } from 'LegalEntities/Service/UpdateCompany';
+import { ArchiveBeneficiary } from 'LegalEntities/UseCases/ArchiveBeneficiary';
+import { Ban } from 'LegalEntities/UseCases/Ban';
 import { CompleteDraftAccount } from 'LegalEntities/UseCases/CompleteDraftAccount';
 import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
+import { OpenBeneficiary } from 'LegalEntities/UseCases/OpenBeneficiary';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
@@ -31,9 +36,6 @@ import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
-import { Ban } from 'LegalEntities/UseCases/Ban';
-import { BanRepository } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
-import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 
 export class AdapterServiceProvider {
   private config: LegalEntities.Config;
@@ -93,6 +95,8 @@ export class AdapterServiceProvider {
       .addSingleton(UpdateProfileForVerification, [ProfileRepository])
       .addSingleton(UpdateCompanyForVerification, [AccountRepository])
       .addSingleton(UpdateStakeholderForVerification, [AccountRepository])
-      .addSingleton(Ban, [AccountRepository, ProfileRepository, BanRepository, IdentityService]);
+      .addSingleton(Ban, [AccountRepository, ProfileRepository, BanRepository, IdentityService])
+      .addSingleton(OpenBeneficiary, [IdGenerator, BeneficiaryRepository, InvestmentAccountsService, 'LegalEntitiesTransactionalAdapter'])
+      .addSingleton(ArchiveBeneficiary, [BeneficiaryRepository, IdentityService, InvestmentAccountsService]);
   }
 }

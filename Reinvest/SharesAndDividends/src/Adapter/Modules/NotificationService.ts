@@ -59,6 +59,11 @@ export class NotificationService {
     await api.createNotification(profileId, accountId, type, header, body, dividendId, dividendId, NotificationObjectType.DIVIDEND, dividendId);
   }
 
+  async transferDividendNotificationToAccount(profileId: string, newAccountId: string, dividendId: string): Promise<void> {
+    const api = this.notificationsModule.api();
+    await api.transferNotificationToAccount(profileId, newAccountId, dividendId);
+  }
+
   async markNotificationAsRead(profileId: string, dismissId: string): Promise<void> {
     const api = this.notificationsModule.api();
     await api.dismissNotifications(profileId, [dismissId]);

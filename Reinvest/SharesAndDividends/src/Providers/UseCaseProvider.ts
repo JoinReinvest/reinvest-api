@@ -23,6 +23,8 @@ import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDi
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
+import { TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
+import { TransferDividends } from 'SharesAndDividends/UseCase/TransferDividends';
 
 export class UseCaseProvider {
   private config: SharesAndDividends.Config;
@@ -40,7 +42,9 @@ export class UseCaseProvider {
 
     // use cases
     container.addSingleton(CreateShares, [SharesRepository, IdGenerator]);
-    container.addSingleton(ChangeSharesState, [SharesRepository, IdGenerator, FinancialOperationsRepository, 'SharesAndDividendsTransactionalAdapter']);
+    container.addSingleton(TransferShares, [SharesRepository, FinancialOperationsRepository, IdGenerator]);
+    container.addSingleton(TransferDividends, [DividendsCalculationRepository, NotificationService, IdGenerator]);
+    container.addSingleton(ChangeSharesState, [SharesRepository, FinancialOperationsRepository, 'SharesAndDividendsTransactionalAdapter']);
     container.addSingleton(CreateIncentiveReward, [DividendsRepository, IdGenerator, NotificationService]);
     container.addSingleton(DeclareDividend, [IdGenerator, DividendsCalculationRepository, SharesRepository]);
     container.addSingleton(CalculateDividends, [IdGenerator, DividendsCalculationRepository, SharesRepository]);

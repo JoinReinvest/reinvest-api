@@ -1,138 +1,86 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { GracePeriod } from 'Investments/Domain/Investments/GracePeriod';
-import { InvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
-
-import { Fee, FeeSchema, VerificationFeeIds } from './Fee';
-import { InvestmentsFeesStatus, InvestmentStatus, ScheduledBy } from './Types';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
-import { JSONObjectOf } from 'HKEKTypes/Generics';
 
-type InvestmentSchema = InvestmentsTable;
+import { Fee } from './Fee';
+import { InvestmentStatus, Origin } from './Types';
 
-export type InvestmentWithFee = InvestmentSchema & {
-  abortedDate: Date | null;
-  approveDate: Date | null;
-  approvedByIP: string | null;
-  feeAmount: number | null;
-  feeDateCreated: Date | null;
-  feeId: string | null;
-  feeStatus: InvestmentsFeesStatus | null;
-  investmentId: string;
-  verificationFeeIdsJson: JSONObjectOf<VerificationFeeIds> | null;
+type InvestmentSchema = {
+  accountId: UUID;
+  amount: Money;
+  bankAccountId: UUID;
+  dateCreated: DateTime;
+  dateStarted: DateTime | null;
+  dateUpdated: DateTime;
+  id: UUID;
+  origin: Origin;
+  originId: UUID | null;
+  parentId: UUID | null;
+  portfolioId: UUID;
+  profileId: UUID;
+  status: InvestmentStatus;
+  subscriptionAgreementId: UUID | null;
+  tradeId: string;
 };
 
 export class Investment {
-  private accountId: string;
-  private amount: number;
-  private bankAccountId: string;
-  private dateCreated: Date;
-  private dateUpdated: Date;
-  private id: string;
-  private profileId: string;
-  private recurringInvestmentId: string | null;
-  private scheduledBy: ScheduledBy;
-  private status: InvestmentStatus;
-  private subscriptionAgreementId: string | null;
-  private tradeId: string;
-  private dateStarted: Date | null;
-  private gracePeriod: GracePeriod;
-  private portfolioId: string;
-  private parentId: string | null;
+  private investmentSchema: InvestmentSchema;
   private fee: Fee | null;
+  private gracePeriod: GracePeriod;
 
-  constructor(
-    accountId: string,
-    amount: number,
-    bankAccountId: string,
-    dateCreated: Date,
-    dateUpdated: Date,
-    id: string,
-    profileId: string,
-    recurringInvestmentId: string | null,
-    scheduledBy: ScheduledBy,
-    status: InvestmentStatus,
-    subscriptionAgreementId: string | null,
-    tradeId: string,
-    dateStarted: Date | null,
-    portfolioId: string,
-    parentId: string | null,
-  ) {
-    this.accountId = accountId;
-    this.amount = amount;
-    this.bankAccountId = bankAccountId;
-    this.dateCreated = dateCreated;
-    this.dateUpdated = dateUpdated;
-    this.id = id;
-    this.profileId = profileId;
-    this.recurringInvestmentId = recurringInvestmentId;
-    this.scheduledBy = scheduledBy;
-    this.status = status;
-    this.subscriptionAgreementId = subscriptionAgreementId;
-    this.tradeId = tradeId;
-    this.dateStarted = dateStarted;
-    this.portfolioId = portfolioId;
-    this.parentId = parentId;
-    this.gracePeriod = new GracePeriod(dateStarted);
-    this.fee = null;
+  constructor(investmentSchema: InvestmentSchema, fee: Fee | null) {
+    this.investmentSchema = investmentSchema;
+    this.fee = fee;
+    this.gracePeriod = new GracePeriod(investmentSchema.dateStarted ? investmentSchema.dateStarted.toDate() : null);
   }
 
-  static create(investmentData: InvestmentWithFee) {
-    const {
-      accountId,
-      amount,
-      bankAccountId,
-      dateCreated,
-      dateUpdated,
-      id,
-      profileId,
-      recurringInvestmentId,
-      scheduledBy,
-      status,
-      subscriptionAgreementId,
-      tradeId,
-      dateStarted,
-      portfolioId,
-      parentId,
-      feeId,
-    } = investmentData;
+  static create(
+    id: UUID,
+    amount: Money,
+    profileId: UUID,
+    accountId: UUID,
+    bankAccountId: UUID,
+    portfolioId: UUID,
+    tradeId: string,
+    origin: Origin,
+    originId: UUID | null,
+    parentId: UUID | null,
+    subscriptionAgreementId: UUID | null,
+    fee: Fee | null,
+  ) {
+    let status = InvestmentStatus.WAITING_FOR_INVESTMENT_START;
 
-    const investment = new Investment(
-      accountId,
-      amount,
-      bankAccountId,
-      dateCreated,
-      dateUpdated,
-      id,
-      profileId,
-      recurringInvestmentId,
-      scheduledBy,
-      status,
-      subscriptionAgreementId,
-      tradeId,
-      dateStarted,
-      portfolioId,
-      parentId,
-    );
-
-    if (feeId) {
-      const feeData = <FeeSchema>{
-        approveDate: investmentData.approveDate ? DateTime.from(investmentData.approveDate) : null,
-        abortedDate: investmentData.abortedDate ? DateTime.from(investmentData.abortedDate) : null,
-        approvedByIP: investmentData.approvedByIP,
-        accountId: investmentData.accountId,
-        profileId: investmentData.profileId,
-        amount: Money.lowPrecision(investmentData.feeAmount!),
-        dateCreated: DateTime.from(investmentData.feeDateCreated!),
-        id: investmentData.feeId,
-        status: investmentData.feeStatus,
-        investmentId: investmentData.investmentId,
-        verificationFeeIds: investmentData.verificationFeeIdsJson!,
-      };
-
-      investment.setFee(Fee.restoreFromSchema(feeData));
+    if (!subscriptionAgreementId) {
+      status = InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT;
+    } else if (fee && !fee.isApproved()) {
+      status = InvestmentStatus.WAITING_FOR_FEES_APPROVAL;
     }
 
-    return investment;
+    return new Investment(
+      {
+        accountId,
+        amount,
+        bankAccountId,
+        dateCreated: DateTime.now(),
+        dateUpdated: DateTime.now(),
+        dateStarted: null,
+        id,
+        origin,
+        originId,
+        parentId,
+        portfolioId,
+        profileId,
+        status,
+        subscriptionAgreementId,
+        tradeId,
+      },
+      fee,
+    );
+  }
+
+  static restore(investmentSchema: InvestmentSchema, fee: Fee | null = null) {
+    return new Investment(investmentSchema, fee);
   }
 
   setFee(fee: Fee) {
@@ -144,16 +92,19 @@ export class Investment {
   }
 
   assignSubscriptionAgreement(id: string) {
-    this.subscriptionAgreementId = id;
+    if (!this.investmentSchema.subscriptionAgreementId) {
+      this.investmentSchema.subscriptionAgreementId = id;
+      this.evaluateStatusBeforeStarted();
+    }
   }
 
   updateStatus(status: InvestmentStatus) {
-    this.status = status;
+    this.investmentSchema.status = status;
   }
 
   abort() {
     if (this.checkIfCanBeAborted()) {
-      this.status = InvestmentStatus.ABORTED;
+      this.investmentSchema.status = InvestmentStatus.ABORTED;
 
       if (this.fee) {
         this.fee.abort();
@@ -165,14 +116,16 @@ export class Investment {
 
   private checkIfCanBeAborted() {
     return (
-      this.status === InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT ||
-      this.status === InvestmentStatus.WAITING_FOR_FEES_APPROVAL ||
-      this.status === InvestmentStatus.WAITING_FOR_INVESTMENT_START
+      this.investmentSchema.status === InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT ||
+      this.investmentSchema.status === InvestmentStatus.WAITING_FOR_FEES_APPROVAL ||
+      this.investmentSchema.status === InvestmentStatus.WAITING_FOR_INVESTMENT_START
     );
   }
 
   approveFee(ip: string) {
-    this.fee?.approveFee(ip);
+    if (this.fee && !this.fee.isApproved()) {
+      this.fee?.approveFee(ip);
+    }
   }
 
   isFeeApproved() {
@@ -183,65 +136,120 @@ export class Investment {
     return this.fee.isApproved();
   }
 
-  getSubscriptionAgreementId() {
-    return this.subscriptionAgreementId;
-  }
-
   startInvestment() {
+    if (this.isStartedInvestment()) {
+      return true;
+    }
+
     if (!this.isFeeApproved()) {
       return false;
     }
 
-    this.dateStarted = new Date();
-    this.gracePeriod = new GracePeriod(this.dateStarted);
-    this.status = InvestmentStatus.IN_PROGRESS;
+    if (!this.investmentSchema.subscriptionAgreementId) {
+      return false;
+    }
+
+    this.investmentSchema.dateStarted = DateTime.now();
+    this.gracePeriod = new GracePeriod(this.investmentSchema.dateStarted.toDate());
+    this.investmentSchema.status = InvestmentStatus.IN_PROGRESS;
 
     return true;
   }
 
   isStartedInvestment() {
-    return this.status === InvestmentStatus.IN_PROGRESS && this.dateStarted !== null;
+    return this.investmentSchema.dateStarted !== null;
   }
 
-  toObject() {
-    return {
-      accountId: this.accountId,
-      amount: this.amount,
-      bankAccountId: this.bankAccountId,
-      dateCreated: this.dateCreated,
-      dateUpdated: this.dateUpdated,
-      id: this.id,
-      profileId: this.profileId,
-      recurringInvestmentId: this.recurringInvestmentId,
-      scheduledBy: this.scheduledBy,
-      status: this.status,
-      subscriptionAgreementId: this.subscriptionAgreementId,
-      dateStarted: this.dateStarted,
-      tradeId: this.tradeId,
-      portfolioId: this.portfolioId,
-      parentId: this.parentId,
-    };
+  toObject(): InvestmentSchema {
+    return this.investmentSchema;
   }
 
   isGracePeriodEnded() {
     return this.gracePeriod.isGracePeriodEnded();
   }
 
-  cancel(): boolean {
-    if ([InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED].includes(this.status)) {
-      this.status = InvestmentStatus.CANCELED;
+  cancel(): void {
+    if ([InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED].includes(this.investmentSchema.status)) {
+      this.investmentSchema.status = InvestmentStatus.CANCELING;
 
       if (this.fee) {
         this.fee.abort();
       }
 
-      return true;
+      return;
     }
 
-    if (this.status === InvestmentStatus.CANCELED) {
-      return true;
+    if ([InvestmentStatus.CANCELED, InvestmentStatus.CANCELING].includes(this.investmentSchema.status)) {
+      return;
     }
 
-    return false;
+    throw new Error('INVESTMENT_CANNOT_BE_CANCELED');
+  }
+
+  /**
+   * It creates new investment and copy all data from current investment
+   * It overrides accountId of current investment for the new account
+   */
+  transferInvestment(investmentTransferId: UUID, transferToAccountId: UUID): Investment {
+    const investmentToTransfer = { ...this.toObject() };
+    investmentToTransfer.id = investmentTransferId;
+    investmentToTransfer.status = InvestmentStatus.TRANSFERRED;
+    investmentToTransfer.origin = Origin.TRANSFER;
+    investmentToTransfer.originId = this.investmentSchema.id;
+    this.investmentSchema.accountId = transferToAccountId;
+    this.investmentSchema.parentId = null;
+
+    return Investment.restore(investmentToTransfer);
+  }
+
+  getId(): UUID {
+    return this.investmentSchema.id;
+  }
+
+  private evaluateStatusBeforeStarted() {
+    if (this.investmentSchema.dateStarted) {
+      return;
+    }
+
+    if (!this.investmentSchema.subscriptionAgreementId) {
+      this.investmentSchema.status = InvestmentStatus.WAITING_FOR_SUBSCRIPTION_AGREEMENT;
+
+      return;
+    }
+
+    if (!this.isFeeApproved()) {
+      this.investmentSchema.status = InvestmentStatus.WAITING_FOR_FEES_APPROVAL;
+
+      return;
+    }
+
+    this.investmentSchema.status = InvestmentStatus.WAITING_FOR_INVESTMENT_START;
+  }
+
+  isTransferred(): boolean {
+    return this.investmentSchema.status === InvestmentStatus.TRANSFERRED;
+  }
+
+  getOriginId(): UUID {
+    if (!this.investmentSchema.originId) {
+      throw new Error('INVESTMENT_ORIGIN_ID_NOT_SET');
+    }
+
+    return this.investmentSchema.originId;
+  }
+
+  fund(): void {
+    this.investmentSchema.status = InvestmentStatus.FUNDED;
+    this.investmentSchema.dateUpdated = DateTime.now();
+  }
+
+  completeCancellation(): void {
+    this.investmentSchema.status = InvestmentStatus.CANCELED;
+    this.investmentSchema.dateUpdated = DateTime.now();
+  }
+
+  complete(): void {
+    this.investmentSchema.status = InvestmentStatus.FINISHED;
+    this.investmentSchema.dateUpdated = DateTime.now();
   }
 }

@@ -25,6 +25,7 @@ import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } f
 import { CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs, CognitoEnvs } from './devops/serverless/cognito';
 import { margeWithApiGatewayUrl, ProviderEnvironment } from './devops/serverless/serverless-common';
 import { getAttribute, importOutput } from './devops/serverless/utils';
+import { CronPushEveryDayFunction, CronPushEveryDayResources } from './devops/functions/cron/pushEveryDayProcesses/cron-push-config';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
@@ -98,6 +99,7 @@ const serverlessConfiguration: AWS = {
     cronDividendsCalculation: CronDividendsCalculationFunction,
     cronDividendsDistribution: CronDividendsDistributionFunction,
     cronNotificationsFunction: CronNotificationsFunction,
+    cronPushEveryDay: CronPushEveryDayFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
@@ -124,6 +126,7 @@ const serverlessConfiguration: AWS = {
       ...PdfGeneratorResources,
       ...FirebaseResources,
       ...CronNotificationsResources,
+      ...CronPushEveryDayResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,
