@@ -1,3 +1,5 @@
+import { JSONObjectOf } from 'HKEKTypes/Generics';
+import { AgreementTypes } from 'Investments/Domain/Investments/Types';
 import { InvestmentsDatabaseAdapterProvider, subscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { SubscriptionAgreementTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 import { DateTime } from 'Money/DateTime';
@@ -5,8 +7,6 @@ import { SubscriptionAgreement } from 'Reinvest/Investments/src/Domain/Investmen
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { TemplateContentType } from 'Templates/Types';
-import { AgreementTypes } from 'Investments/Domain/Investments/Types';
-import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 export class SubscriptionAgreementRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -128,6 +128,7 @@ export class SubscriptionAgreementRepository {
             signedAt: eb => eb.ref(`excluded.signedAt`),
             signedByIP: eb => eb.ref(`excluded.signedByIP`),
             status: eb => eb.ref(`excluded.status`),
+            contentFieldsJson: eb => eb.ref(`excluded.contentFieldsJson`),
           }),
         )
         .execute();

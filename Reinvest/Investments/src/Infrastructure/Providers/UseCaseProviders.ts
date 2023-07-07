@@ -41,6 +41,7 @@ import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules
 import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
 import { GenerateSubscriptionAgreement } from 'Investments/Application/UseCases/GenerateSubscriptionAgreement';
 import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
+import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/Adapters/Modules/SubscriptionAgreementDataCollector';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -59,7 +60,12 @@ export default class UseCaseProviders {
     );
 
     container.addSingleton(CreateInvestment, [InvestmentsRepository, FeesRepository, VerificationService, IdGenerator, 'InvestmentsTransactionalAdapter']);
-    container.addSingleton(CreateSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, IdGenerator]);
+    container.addSingleton(CreateSubscriptionAgreement, [
+      SubscriptionAgreementRepository,
+      InvestmentsRepository,
+      SubscriptionAgreementDataCollector,
+      IdGenerator,
+    ]);
     container.addSingleton(SubscriptionAgreementQuery, [SubscriptionAgreementRepository]);
     container.addSingleton(InvestmentSummaryQuery, [InvestmentsRepository]);
     container.addSingleton(SignSubscriptionAgreement, [SubscriptionAgreementRepository, InvestmentsRepository, DocumentsService]);
@@ -75,7 +81,12 @@ export default class UseCaseProviders {
       'InvestmentsDatabaseAdapter',
     ]);
     container.addSingleton(RecurringInvestmentQuery, [RecurringInvestmentsRepository]);
-    container.addSingleton(CreateRecurringSubscriptionAgreement, [SubscriptionAgreementRepository, RecurringInvestmentsRepository, IdGenerator]);
+    container.addSingleton(CreateRecurringSubscriptionAgreement, [
+      SubscriptionAgreementRepository,
+      RecurringInvestmentsRepository,
+      SubscriptionAgreementDataCollector,
+      IdGenerator,
+    ]);
     container.addSingleton(InitiateRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(DeactivateRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(UnsuspendRecurringInvestment, [RecurringInvestmentsRepository]);

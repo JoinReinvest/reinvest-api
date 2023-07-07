@@ -7,11 +7,8 @@ export class TemplateParser {
     for (const property in data) {
       const key = `{(${property})}`;
       const val = data[property];
-
-      if (val) {
-        // @ts-ignore
-        copyStr = copyStr.replaceAll(key, val);
-      }
+      // @ts-ignore
+      copyStr = copyStr.replaceAll(key, val);
     }
 
     return copyStr;

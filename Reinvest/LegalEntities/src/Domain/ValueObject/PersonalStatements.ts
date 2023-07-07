@@ -142,6 +142,10 @@ export class FINRAMemberStatement extends PersonalStatement implements ToObject 
     };
   }
 
+  getFINRAInstitutionName(): string {
+    return this.name;
+  }
+
   getDetails(): string[] {
     return [this.name];
   }
@@ -162,6 +166,10 @@ export class TradingCompanyStakeholderStatement extends PersonalStatement implem
         tickerSymbols: this.tickerSymbols,
       },
     };
+  }
+
+  getInlinedTickerSymbols(): string {
+    return this.tickerSymbols.join(', ');
   }
 
   getDetails(): string[] {

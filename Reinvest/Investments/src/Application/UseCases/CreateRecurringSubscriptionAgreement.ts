@@ -1,8 +1,11 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { SubscriptionAgreement } from 'Investments/Domain/Investments/SubscriptionAgreement';
-import { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
+import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
+import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/Adapters/Modules/SubscriptionAgreementDataCollector';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
 import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
 import { Templates } from 'Templates/Types';
 
@@ -38,6 +41,7 @@ const mockedContentFieldsJson = <LatestTemplateContentFields[Templates.RECURRING
 
 class CreateRecurringSubscriptionAgreement {
   static getClassName = (): string => 'CreateRecurringSubscriptionAgreement';
+  private subscriptionAgreementDataCollector: SubscriptionAgreementDataCollector;
 
   private readonly subscriptionAgreementRepository: SubscriptionAgreementRepository;
   private readonly recurringInvestmentsRepository: RecurringInvestmentsRepository;
@@ -46,8 +50,10 @@ class CreateRecurringSubscriptionAgreement {
   constructor(
     subscriptionAgreementRepository: SubscriptionAgreementRepository,
     recurringInvestmentsRepository: RecurringInvestmentsRepository,
+    subscriptionAgreementDataCollector: SubscriptionAgreementDataCollector,
     idGenerator: IdGeneratorInterface,
   ) {
+    this.subscriptionAgreementDataCollector = subscriptionAgreementDataCollector;
     this.subscriptionAgreementRepository = subscriptionAgreementRepository;
     this.recurringInvestmentsRepository = recurringInvestmentsRepository;
     this.idGenerator = idGenerator;
@@ -62,8 +68,24 @@ class CreateRecurringSubscriptionAgreement {
       return false;
     }
 
-    const { id: investmentId } = recurringInvestment.toObject();
-    const subscriptionAgreement = SubscriptionAgreement.createForRecurringInvestment(id, profileId, accountId, investmentId, mockedContentFieldsJson);
+    const dateOfAgreement = DateTime.now();
+    const { id: investmentId, amount, portfolioId } = recurringInvestment.toObject();
+    const { frequency, startDate } = recurringInvestment.getSchedule();
+
+    const collectedFields = await this.subscriptionAgreementDataCollector.collectData(portfolioId, profileId, accountId);
+
+    const contentFields = <LatestTemplateContentFields[Templates.RECURRING_SUBSCRIPTION_AGREEMENT]>{
+      ...collectedFields,
+      investedAmount: Money.lowPrecision(amount).getFormattedAmount(),
+      dateOfAgreement: DateTime.now().toFormattedDate('MM/DD/YYYY'),
+      ipAddress: '',
+      signingTimestamp: '',
+      signingDate: '',
+      startDate: DateTime.from(startDate).toFormattedDate('MM/DD/YYYY'),
+      frequency: frequency === RecurringInvestmentFrequency.BI_WEEKLY ? 'BIWEEKLY' : frequency,
+    };
+
+    const subscriptionAgreement = SubscriptionAgreement.createForRecurringInvestment(id, profileId, accountId, investmentId, dateOfAgreement, contentFields);
     await this.subscriptionAgreementRepository.createOrUpdate(subscriptionAgreement);
 
     return id;

@@ -1,6 +1,7 @@
 import Container, { ContainerInterface } from 'Container/Container';
 import { Documents } from 'Documents/index';
 import { InvestmentsDatabaseAdapterInstanceProvider, InvestmentsDatabaseAdapterProvider } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
+import { LegalEntities } from 'LegalEntities/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
@@ -14,6 +15,7 @@ import AdaptersProviders from './Infrastructure/Providers/AdaptersProviders';
 import EventBusProvider from './Infrastructure/Providers/EventBusProvider';
 import PortsProviders from './Infrastructure/Providers/PortsProviders';
 import UseCaseProviders from './Infrastructure/Providers/UseCaseProviders';
+import { Portfolio } from 'Portfolio/index';
 
 export namespace Investments {
   export const moduleName = 'Investments';
@@ -25,6 +27,8 @@ export namespace Investments {
 
   export type ModulesDependencies = {
     documents: Documents.Main;
+    legalEntities: LegalEntities.Main;
+    portfolio: Portfolio.Main;
     sharesAndDividends: SharesAndDividends.Main;
     verification: Verification.Main;
   };
@@ -79,6 +83,8 @@ export namespace Investments {
       this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
       this.container.addAsValue('Documents', this.modules.documents);
       this.container.addAsValue('Verification', this.modules.verification);
+      this.container.addAsValue('LegalEntities', this.modules.legalEntities);
+      this.container.addAsValue('Portfolio', this.modules.portfolio);
       new AdaptersProviders(this.config).boot(this.container);
       new UseCaseProviders(this.config).boot(this.container);
       new PortsProviders(this.config).boot(this.container);

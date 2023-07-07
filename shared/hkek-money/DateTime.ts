@@ -82,4 +82,8 @@ export class DateTime {
   static isInFormat(date: string, format: string): boolean {
     return dayjs(date, format).isValid();
   }
+
+  toTimestamp(): number {
+    return this.date.unix();
+  }
 }

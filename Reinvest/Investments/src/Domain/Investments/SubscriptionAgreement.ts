@@ -3,8 +3,8 @@ import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/
 import { DateTime } from 'Money/DateTime';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { Template } from 'Templates/Template';
-import { TemplateContentType, Templates, TemplateVersion } from 'Templates/Types';
 import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
+import { TemplateContentType, Templates, TemplateVersion } from 'Templates/Types';
 
 export enum SubscriptionAgreementEvents {
   SubscriptionAgreementSigned = 'SubscriptionAgreementSigned',
@@ -48,10 +48,14 @@ export class SubscriptionAgreement {
     return this.subscriptionAgreementSchema.id;
   }
 
-  sign(ip: string) {
+  sign(ip: string): void {
+    const signedAt = DateTime.now();
     this.subscriptionAgreementSchema.status = SubscriptionAgreementStatus.SIGNED;
     this.subscriptionAgreementSchema.signedByIP = ip;
-    this.subscriptionAgreementSchema.signedAt = DateTime.now();
+    this.subscriptionAgreementSchema.signedAt = signedAt;
+    this.subscriptionAgreementSchema.contentFieldsJson.ipAddress = ip;
+    this.subscriptionAgreementSchema.contentFieldsJson.signingTimestamp = signedAt.toTimestamp().toString();
+    this.subscriptionAgreementSchema.contentFieldsJson.signingDate = signedAt.toFormattedDate('MM/DD/YYYY');
   }
 
   isSigned() {
@@ -86,6 +90,7 @@ export class SubscriptionAgreement {
     profileId: UUID,
     accountId: UUID,
     investmentId: UUID,
+    dateCreated: DateTime,
     contentFields: LatestTemplateContentFields[Templates.SUBSCRIPTION_AGREEMENT],
   ): SubscriptionAgreement {
     const templateVersion = Template.getLatestTemplateVersion(Templates.SUBSCRIPTION_AGREEMENT);
@@ -99,7 +104,7 @@ export class SubscriptionAgreement {
       agreementType: AgreementTypes.DIRECT_DEPOSIT,
       contentFieldsJson: contentFields,
       templateVersion,
-      dateCreated: DateTime.now(),
+      dateCreated,
       signedAt: null,
       signedByIP: null,
       pdfDateCreated: null,
@@ -111,7 +116,8 @@ export class SubscriptionAgreement {
     profileId: UUID,
     accountId: UUID,
     recurringInvestmentId: UUID,
-    mockedContentFieldsJson: LatestTemplateContentFields[Templates.RECURRING_SUBSCRIPTION_AGREEMENT],
+    dateCreated: DateTime,
+    contentFields: LatestTemplateContentFields[Templates.RECURRING_SUBSCRIPTION_AGREEMENT],
   ): SubscriptionAgreement {
     const templateVersion = Template.getLatestTemplateVersion(Templates.RECURRING_SUBSCRIPTION_AGREEMENT);
 
@@ -122,9 +128,9 @@ export class SubscriptionAgreement {
       investmentId: recurringInvestmentId,
       status: SubscriptionAgreementStatus.WAITING_FOR_SIGNATURE,
       agreementType: AgreementTypes.RECURRING_INVESTMENT,
-      contentFieldsJson: mockedContentFieldsJson,
+      contentFieldsJson: contentFields,
       templateVersion,
-      dateCreated: DateTime.now(),
+      dateCreated,
       signedAt: null,
       signedByIP: null,
       pdfDateCreated: null,

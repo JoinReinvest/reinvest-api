@@ -35,6 +35,7 @@ export interface RecurringSubscriptionAgreementContentFieldsV1 extends TemplateC
   dateOfAgreement: string;
   ipAddress: string;
   signingTimestamp: string;
+  signingDate: string;
 
   // scheduled investments
   startDate: string;
@@ -212,8 +213,13 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
           '{{{(nameOfOffering)}}}',
           'By: {{{(tendererCompanyName)}}}',
           'Name of Authorized Officer: {{{(firstName)} {(lastName)}}}',
-          'Signature of Authorized Officer (IP,timestamp): {{{(ipAddress)},{(signingTimestamp)}}}',
-          'Date: {{{(dateOfAgreement)}}}',
+          // @ts-ignore
+          (content: RecurringSubscriptionAgreementContentFieldsV1) =>
+            content.ipAddress != ''
+              ? 'Signature of Authorized Officer (IP,timestamp): {{{(ipAddress)},{(signingTimestamp)}}}'
+              : 'Signature of Authorized Officer (IP,timestamp):',
+          // @ts-ignore
+          (content: RecurringSubscriptionAgreementContentFieldsV1) => (content.signingDate != '' ? 'Date: {{{(signingDate)}}}' : 'Date: '),
         ],
       },
     ],

@@ -35,6 +35,7 @@ export interface SubscriptionAgreementContentFieldsV1 extends TemplateContentTyp
   dateOfAgreement: string;
   ipAddress: string;
   signingTimestamp: string;
+  signingDate: string;
 }
 
 /**
@@ -208,8 +209,13 @@ export const subscriptionAgreementTemplateV1: TemplateStructureType = [
           '{{{(nameOfOffering)}}}',
           'By: {{{(tendererCompanyName)}}}',
           'Name of Authorized Officer: {{{(firstName)} {(lastName)}}}',
-          'Signature of Authorized Officer (IP,timestamp): {{{(ipAddress)},{(signingTimestamp)}}}',
-          'Date: {{{(dateOfAgreement)}}}',
+          // @ts-ignore
+          (content: SubscriptionAgreementContentFieldsV1) =>
+            content.ipAddress != ''
+              ? 'Signature of Authorized Officer (IP,timestamp): {{{(ipAddress)},{(signingTimestamp)}}}'
+              : 'Signature of Authorized Officer (IP,timestamp):',
+          // @ts-ignore
+          (content: SubscriptionAgreementContentFieldsV1) => (content.signingDate != '' ? 'Date: {{{(signingDate)}}}' : 'Date: '),
         ],
       },
     ],
