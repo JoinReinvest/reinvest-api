@@ -6,6 +6,7 @@ import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { TemplateContentType } from 'Templates/Types';
 import { AgreementTypes } from 'Investments/Domain/Investments/Types';
+import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 export class SubscriptionAgreementRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -158,6 +159,7 @@ export class SubscriptionAgreementRepository {
 
     return {
       ...schema,
+      contentFieldsJson: schema.contentFieldsJson as JSONObjectOf<TemplateContentType>,
       dateCreated: schema.dateCreated.toDate(),
       signedAt: schema.signedAt?.toDate() || null,
       pdfDateCreated: schema.pdfDateCreated?.toDate() || null,

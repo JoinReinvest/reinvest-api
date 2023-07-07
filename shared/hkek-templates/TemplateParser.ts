@@ -9,6 +9,7 @@ export class TemplateParser {
       const val = data[property];
 
       if (val) {
+        // @ts-ignore
         copyStr = copyStr.replaceAll(key, val);
       }
     }
@@ -22,16 +23,24 @@ export class TemplateParser {
     return replacedLines;
   }
 
+  private static resolveIsCheckedOption(isCheckedOption: boolean | ((content: TemplateContentType) => boolean), content: TemplateContentType) {
+    if (typeof isCheckedOption === 'function') {
+      return isCheckedOption(content);
+    }
+
+    return isCheckedOption;
+  }
+
   static parse(template: TemplateStructureType, content: TemplateContentType): TemplateStructureType {
     return template.map(({ paragraphs, header }) => {
       let updatedHeader = undefined;
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
-          lines: this.prepareLines(lines, content),
+          lines: this.prepareLines(this.resolveLines(lines, content), content),
         };
 
         if (isCheckedOption !== undefined) {
-          Object.assign(obj, { isCheckedOption });
+          Object.assign(obj, { isCheckedOption: this.resolveIsCheckedOption(isCheckedOption, content) });
         }
 
         return obj;
@@ -43,5 +52,23 @@ export class TemplateParser {
 
       return { header: updatedHeader, paragraphs: updatedParagraphs };
     });
+  }
+
+  private static resolveLines(lines: (string | ((content: TemplateContentType) => string | null))[], content: TemplateContentType): string[] {
+    const resolvedLines = [];
+
+    for (const line of lines) {
+      if (typeof line === 'function') {
+        const resolvedLine = line(content);
+
+        if (resolvedLine) {
+          resolvedLines.push(resolvedLine);
+        }
+      } else {
+        resolvedLines.push(line);
+      }
+    }
+
+    return resolvedLines;
   }
 }

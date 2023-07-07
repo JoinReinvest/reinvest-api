@@ -3,7 +3,8 @@ import { SubscriptionAgreement } from 'Investments/Domain/Investments/Subscripti
 import { AgreementTypes, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
-import { TemplateContentType } from 'Templates/Types';
+import { TemplateContentType, Templates } from 'Templates/Types';
+import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
 
 export type SubscriptionAgreementCreate = {
   accountId: string;
@@ -16,11 +17,32 @@ export type SubscriptionAgreementCreate = {
   templateVersion: number;
 };
 
-const mockedContentFieldsJson = {
-  dateOfBirth: '03/24/2023',
-  email: 'john.smith@gmail.com',
-  fullName: 'John Smith',
-  telephoneNumber: '+17778887775',
+const mockedContentFieldsJson = <LatestTemplateContentFields[Templates.SUBSCRIPTION_AGREEMENT]>{
+  nameOfAsset: 'Community REIT',
+  nameOfOffering: 'Community REIT',
+  offeringsCircularLink: 'https://www.google.com',
+  tendererCompanyName: 'REINVEST Corp.',
+  purchaserName: 'John Smith',
+  firstName: 'John',
+  lastName: 'Smith',
+  dateOfBirth: '12/31/1978',
+  companyName: '-',
+  address: '123 Main St., New York, NY 10001',
+  // example SSN
+  sensitiveNumber: '123-45-6789',
+  isAccreditedInvestor: true,
+  isFINRAMember: true,
+  // example FINRA institution name
+  FINRAInstitutionName: 'Cleaning Ltd.',
+  isTradedCompanyHolder: true,
+  tickerSymbols: 'NASDAQ:RUN, NYSE:TDOC',
+  phoneNumber: '+1 (123) 456-7890',
+  email: 'john.smith@test.com',
+  investedAmount: '$1,000.00',
+  unitPrice: '$1.00',
+  dateOfAgreement: '12/24/2023',
+  ipAddress: '74.234.0.35',
+  signingTimestamp: '1632931200000',
 };
 
 class CreateSubscriptionAgreement {

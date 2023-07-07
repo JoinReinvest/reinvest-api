@@ -1,26 +1,39 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { SubscriptionAgreement } from 'Investments/Domain/Investments/SubscriptionAgreement';
-import { AgreementTypes, RecurringInvestmentStatus, SubscriptionAgreementStatus } from 'Investments/Domain/Investments/Types';
+import { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
-import type { TemplateContentType } from 'Templates/Types';
+import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
+import { Templates } from 'Templates/Types';
 
-export type RecurringInvestmentSubscriptionAgreementCreate = {
-  accountId: string;
-  agreementType: AgreementTypes;
-  contentFieldsJson: TemplateContentType;
-  id: string;
-  investmentId: string;
-  profileId: string;
-  status: SubscriptionAgreementStatus;
-  templateVersion: number;
-};
-
-const mockedContentFieldsJson = {
-  dateOfBirth: '03/24/2023',
-  email: 'john.smith@gmail.com',
-  fullName: 'John Smith',
-  telephoneNumber: '+17778887775',
+const mockedContentFieldsJson = <LatestTemplateContentFields[Templates.RECURRING_SUBSCRIPTION_AGREEMENT]>{
+  nameOfAsset: 'Community REIT',
+  nameOfOffering: 'Community REIT',
+  offeringsCircularLink: 'https://www.google.com',
+  tendererCompanyName: 'REINVEST Corp.',
+  purchaserName: 'John Smith',
+  firstName: 'John',
+  lastName: 'Smith',
+  dateOfBirth: '12/31/1978',
+  companyName: '-',
+  address: '123 Main St., New York, NY 10001',
+  // example SSN
+  sensitiveNumber: '123-45-6789',
+  isAccreditedInvestor: true,
+  isFINRAMember: true,
+  // example FINRA institution name
+  FINRAInstitutionName: 'Cleaning Ltd.',
+  isTradedCompanyHolder: true,
+  tickerSymbols: 'NASDAQ:RUN, NYSE:TDOC',
+  phoneNumber: '+1 (123) 456-7890',
+  email: 'john.smith@test.com',
+  investedAmount: '$1,000.00',
+  unitPrice: '$1.00',
+  dateOfAgreement: '12/24/2023',
+  ipAddress: '74.234.0.35',
+  signingTimestamp: '1632931200000',
+  startDate: '12/25/2023',
+  frequency: 'MONTHLY',
 };
 
 class CreateRecurringSubscriptionAgreement {

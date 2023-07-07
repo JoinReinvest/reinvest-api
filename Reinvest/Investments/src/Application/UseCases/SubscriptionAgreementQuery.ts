@@ -25,8 +25,8 @@ class SubscriptionAgreementQuery {
       id,
       type: agreementType,
       status,
-      createdAt: dateCreated,
-      signedAt,
+      createdAt: dateCreated.toIsoDateTime(),
+      signedAt: signedAt ? signedAt.toIsoDateTime() : null,
       content: agreementTemplate.toArray(),
     };
   }

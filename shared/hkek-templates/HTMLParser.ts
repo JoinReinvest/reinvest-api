@@ -34,7 +34,7 @@ export class HTMLParser {
     const formattedTemplate = this.dataTemplate.map(({ paragraphs, header }) => {
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
-          lines: this.prepareLines(lines),
+          lines: this.prepareLines(<string[]>lines),
         };
 
         if (isCheckedOption !== undefined) {

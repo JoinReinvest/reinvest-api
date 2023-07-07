@@ -4,6 +4,7 @@ import { DateTime } from 'Money/DateTime';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { Template } from 'Templates/Template';
 import { TemplateContentType, Templates, TemplateVersion } from 'Templates/Types';
+import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
 
 export enum SubscriptionAgreementEvents {
   SubscriptionAgreementSigned = 'SubscriptionAgreementSigned',
@@ -85,7 +86,7 @@ export class SubscriptionAgreement {
     profileId: UUID,
     accountId: UUID,
     investmentId: UUID,
-    mockedContentFieldsJson: TemplateContentType,
+    contentFields: LatestTemplateContentFields[Templates.SUBSCRIPTION_AGREEMENT],
   ): SubscriptionAgreement {
     const templateVersion = Template.getLatestTemplateVersion(Templates.SUBSCRIPTION_AGREEMENT);
 
@@ -96,7 +97,7 @@ export class SubscriptionAgreement {
       investmentId,
       status: SubscriptionAgreementStatus.WAITING_FOR_SIGNATURE,
       agreementType: AgreementTypes.DIRECT_DEPOSIT,
-      contentFieldsJson: mockedContentFieldsJson,
+      contentFieldsJson: contentFields,
       templateVersion,
       dateCreated: DateTime.now(),
       signedAt: null,
@@ -110,7 +111,7 @@ export class SubscriptionAgreement {
     profileId: UUID,
     accountId: UUID,
     recurringInvestmentId: UUID,
-    mockedContentFieldsJson: TemplateContentType,
+    mockedContentFieldsJson: LatestTemplateContentFields[Templates.RECURRING_SUBSCRIPTION_AGREEMENT],
   ): SubscriptionAgreement {
     const templateVersion = Template.getLatestTemplateVersion(Templates.RECURRING_SUBSCRIPTION_AGREEMENT);
 

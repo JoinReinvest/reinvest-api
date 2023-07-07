@@ -139,7 +139,14 @@
       "no-return-await": 1,
       "@typescript-eslint/no-empty-interface": 1,
       "security/detect-object-injection": 0,
-      "@typescript-eslint/no-non-null-assertion": 0
+      "@typescript-eslint/no-non-null-assertion": 0,
+      "quotes": [
+        0,
+        "single",
+        {
+          "avoidEscape": true
+        }
+      ]
     }
   },
   "prettier": "@hookooekoo/eslint-config/prettier.json"
