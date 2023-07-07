@@ -195,9 +195,86 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
       },
     ],
   },
+  {
+    header: 'CERTIFICATE OF ACCREDITED INVESTOR STATUS',
+    paragraphs: [
+      {
+        lines: [
+          'The signatory hereto is an "accredited investor", as that term is defined in Regulation D under the Securities\n' +
+            'Act of 1933, as amended (the "Act"). I have checked the box below indicating the basis on which I am\n' +
+            'representing my status as an "accredited investor":',
 
-  // TODO CERTIFICATE OF ACCREDITED INVESTOR STATUS
+          'A natural person whose net worth , either individually or jointly with that person’s spouse or a cohabitant of\n' +
+            'that person and who occupies a relationship generally equivalent to that of a spouse, at the time of such\n' +
+            'person’s purchase, exceeds $1,000,000;',
 
+          'A natural person who had individual income in excess of $200,000, or joint income with that person’s spouse\n' +
+            'or a cohabitant of that person and who occupies a relationship generally equivalent to that of a spouse in\n' +
+            'excess of $300,000, in the previous two calendar years and reasonably expects to reach the same income\n' +
+            'level in the current calendar year;',
+
+          'A director, executive officer, or general partner of the Company, the Managing Member, the Asset Manager.;',
+
+          'A bank as defined in section 3(a)(2) of the Act, or any savings and loan association or other institution as\n' +
+            'defined in section 3(a)(5)(A) of the Act whether acting in its individual or fiduciary capacity; a broker or dealer\n' +
+            'registered pursuant to section 15 of the Securities Exchange Act of 1934; a registered investment adviser\n' +
+            'under Section 203 of the Investment Advisers Act of 1940 (the “Advisers Act”); a state-registered investment\n' +
+            'adviser under the laws of the applicable jurisdiction; an investment adviser exempt from registration under\n' +
+            'Section 203(l) of the Advisers Act; an investment adviser exempt from registration under Section 203(m) of\n' +
+            'the Advisers Act; an insurance company as defined in section 2(a)(13) of the Act; an investment company\n' +
+            'registered under the Investment Company Act of 1940 or a business development company as defined in\n' +
+            'section 2(a)(48) of that Act; a Small Business Investment Company licensed by the U.S. Small Business\n' +
+            'Administration under section 301(c) or (d) of the Small Business Investment Act of 1958; a rural business\n' +
+            'investment company (RBIC), as defined in Section 384A of the Consolidated Farm and Rural Development Act\n' +
+            'as a company that is approved by the Secretary of Agriculture and has entered into a participation\n' +
+            'agreement with the Secretary; a plan established and maintained by a state, its political subdivisions, or anyagency or instrumentality of a state or its political subdivisions, for the benefit of its employees, if such plan\n' +
+            'has total assets in excess of $5,000,000; an employee benefit plan within the meaning of the Employee\n' +
+            'Retirement Income Security Act of 1974 if the investment decision is made by a plan fiduciary, as defined in\n' +
+            'section 3(21) of such act, which is either a bank, savings and loan association, insurance company, or\n' +
+            'registered investment adviser, or if the employee benefit plan has total assets in excess of $5,000,000 or, if a\n' +
+            'self-directed plan, with investment decisions made solely by persons that are accredited investors;',
+
+          'A private business development company as defined in section 202(a)(22) of the Advisers Act;',
+
+          'An organization described in section 501(c)(3) of the Internal Revenue Code, corporation, limited liability\n' +
+            'company, Massachusetts or similar business trust, or partnership, in each case not formed for the specific\n' +
+            'purpose of acquiring the securities offered, with total assets in excess of $5,000,000;',
+
+          'A trust, with total assets in excess of $5,000,000, not formed for the specific purpose of acquiring the\n' +
+            'securities offered, whose purchase is directed by a sophisticated person as described in § 230.506(b)(2)(ii)\n' +
+            'under the Act; or',
+
+          'An entity, of a type not described in any of items 4 through 7 above or item 15 below, not formed for the\n' +
+            'specific purpose of acquiring the securities offered, owning investments as defined in Rule 2a51-1(b) under\n' +
+            'the ICA, in excess of $5,000,000;',
+
+          'A natural person who holds in good standing of the General Securities Representative license (Series 7);',
+
+          'A natural person who holds in good standing of the Investment Adviser Representative license (Series 65);',
+
+          'A natural person who holds in good standing of the Private Securities Offerings Representative license (Series 82);',
+
+          'A natural person who is a “knowledgeable employee” as defined in Rule 3c-5(a)(4) under the ICA, which\n' +
+            'includes, among other persons, trustees and advisory board members (or persons serving in a similar\n' +
+            'capacity) of a Section 3(c)(1) or 3(c)(7) fund under the ICA or an affiliated person of the fund that oversees the\n' +
+            'fund’s investments, or an employee of the fund or the affiliated person of the fund (other than employees\n' +
+            'performing solely clerical, secretarial or administrative functions) who, in connection with his or her regular\n' +
+            'duties, has participated in the investment activities of the fund for at least 12 months;',
+
+          'A “family office” as defined in Rule 202(a)(11)(G)-1 under the Advisers Act (i.e., an entity established by a\n' +
+            'family to manage its assets, plan for its family’s financial future and provides other services to family\n' +
+            'members) that meets following requirements: (i) having at least $5,000,000 in assets under management, (ii)not being formed for the specific purpose of acquiring the securities offered and (iii) having its prospective\n' +
+            'investment be directed by a person or persons with knowledge and experience in financial and business\n' +
+            'matters that such family office is capable of evaluating the merits and risks of the prospective investment;',
+
+          'A “family client” as defined in Rule 202(a)(11)(G)-1 under the Advisers Act of a family office meeting the\n' +
+            'requirements above in item (13) and whose prospective investment is directed by such family office;',
+
+          'An entity in which all of the equity owners are accredited investors as described above.',
+        ],
+      },
+    ],
+  },
   {
     header: 'SIGNATURE PAGE TO THE SUBSCRIPTION AGREEMENT',
     paragraphs: [
