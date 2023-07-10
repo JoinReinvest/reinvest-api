@@ -1,6 +1,7 @@
 import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 import { ImmediateSynchronize } from 'Registration/IntegrationLogic/UseCase/ImmediateSynchronize';
+import { SynchronizeBeneficiaryAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeBeneficiaryAccount';
 import { SynchronizeCompany } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompany';
 import { SynchronizeCompanyAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount';
 import { SynchronizeIndividualAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount';
@@ -15,6 +16,7 @@ export class SynchronizationController {
   private synchronizeCompanyUseCase: SynchronizeCompany;
   private synchronizeStakeholderUseCase: SynchronizeStakeholder;
   private immediateSynchronizeUseCase: ImmediateSynchronize;
+  private synchronizeBeneficiaryUseCase: SynchronizeBeneficiaryAccount;
 
   constructor(
     mappingRegistryRepository: MappingRegistryRepository,
@@ -24,6 +26,7 @@ export class SynchronizationController {
     synchronizeCompanyUseCase: SynchronizeCompany,
     synchronizeStakeholderUseCase: SynchronizeStakeholder,
     immediateSynchronizeUseCase: ImmediateSynchronize,
+    synchronizeBeneficiaryUseCase: SynchronizeBeneficiaryAccount,
   ) {
     this.synchronizeProfileUseCase = synchronizeProfileUseCase;
     this.synchronizeIndividualAccountUseCase = synchronizeIndividualAccountUseCase;
@@ -32,6 +35,7 @@ export class SynchronizationController {
     this.synchronizeCompanyUseCase = synchronizeCompanyUseCase;
     this.synchronizeStakeholderUseCase = synchronizeStakeholderUseCase;
     this.immediateSynchronizeUseCase = immediateSynchronizeUseCase;
+    this.synchronizeBeneficiaryUseCase = synchronizeBeneficiaryUseCase;
   }
 
   public static getClassName = (): string => 'SynchronizationController';
@@ -53,6 +57,8 @@ export class SynchronizationController {
       case MappedType.CORPORATE_ACCOUNT:
       case MappedType.TRUST_ACCOUNT:
         return await this.synchronizeCompanyAccountUseCase.execute(record);
+      case MappedType.BENEFICIARY_ACCOUNT:
+        return await this.synchronizeBeneficiaryUseCase.execute(record);
       default:
         console.error(`[FAILED] Record type not implemented, recordId: ${record.getRecordId()}`);
 

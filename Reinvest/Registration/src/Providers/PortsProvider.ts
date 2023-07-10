@@ -57,6 +57,7 @@ export class PortsProvider {
         SynchronizeCompany,
         SynchronizeStakeholder,
         ImmediateSynchronize,
+        SynchronizeBeneficiaryAccount,
       ])
       .addSingleton(NorthCapitalDocumentSynchronizationQuery, [NorthCapitalDocumentsSynchronizationRepository])
       .addSingleton(NorthCapitalDocumentSynchronizationController, [NorthCapitalSynchronizer])
