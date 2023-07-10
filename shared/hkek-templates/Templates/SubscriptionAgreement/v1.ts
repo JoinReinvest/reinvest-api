@@ -65,8 +65,8 @@ export const subscriptionAgreementTemplateV1: TemplateStructureType = [
         lines: [
           '{{Legal name of Purchaser (Individual or Entity)}}: {(purchaserName)}',
           '{{Date of Agreement}}: {(dateOfAgreement)}',
-          '{{Number of Series {(investedAmount)} Interests subscribed for}}: {(purchaserName)}',
-          '{{Price of Series {(unitPrice)} Interests subscribed for}}: {(purchaserName)}',
+          '{{Number of Series {(nameOfAsset)} Interests subscribed for}}: {(investedAmount)}',
+          '{{Price of Series {(nameOfAsset)} Interests subscribed for}}: {(unitPrice)}',
           '{{Telephone Number}}: {(phoneNumber)}',
           '{{E-mail Address}}: {(email)}',
         ],
