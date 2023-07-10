@@ -16,6 +16,9 @@ export type InvestmentsTechnicalHandlerType = {
   TradeCreated: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceled: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceledFailed: () => TechnicalToDomainEventsHandler['handle'];
+  TransactionReverted: () => TechnicalToDomainEventsHandler['handle'];
+  TransactionRevertedFailed: () => TechnicalToDomainEventsHandler['handle'];
+  TransactionRevertedUnwinding: () => TechnicalToDomainEventsHandler['handle'];
   TransactionUnwinding: () => TechnicalToDomainEventsHandler['handle'];
   [PdfEvents.PdfGenerated]: () => PdfGeneratedEventHandler['handle'];
 };
@@ -35,4 +38,7 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TransactionCanceledFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   GracePeriodEnded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   [PdfEvents.PdfGenerated]: container.delegateTo(PdfGeneratedEventHandler, 'handle'),
+  TransactionReverted: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  TransactionRevertedFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  TransactionRevertedUnwinding: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
 });

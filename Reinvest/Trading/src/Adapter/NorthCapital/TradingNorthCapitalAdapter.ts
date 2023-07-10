@@ -110,7 +110,7 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
    * @param accountId
    * @param tradeState
    */
-  async updateTradeStatusForTests(tradeId: string, accountId: string, tradeState: 'SETTLED' | 'FUNDED'): Promise<any> {
+  async updateTradeStatusForTests(tradeId: string, accountId: string, tradeState: 'SETTLED' | 'FUNDED' | 'UNWIND SETTLED' | 'CREATED'): Promise<any> {
     const endpoint = 'tapiv3/index.php/v3/updateTradeStatus';
     const data = {
       tradeId,

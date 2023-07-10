@@ -7,6 +7,7 @@ import {
   createTrade,
   finalizeInvestment,
   markFundsAsReadyToDisburse,
+  revertTransaction,
   transferSharesWhenTradeSettled,
   verifyAccountForInvestment,
 } from 'Investments/Domain/Transaction/TransactionCommands';
@@ -18,6 +19,7 @@ import {
   CreateTradeDecision,
   FinalizeInvestmentDecision,
   MarkFundsAsReadyToDisburseDecision,
+  RevertTransactionDecision,
   TransactionDecisions,
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
@@ -88,6 +90,12 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.CANCEL_TRANSACTION].includes(decision.kind)) {
       await this.eventBus.publish(cancelTransaction(decision as CancelTransactionDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.REVERT_TRANSACTION].includes(decision.kind)) {
+      await this.eventBus.publish(revertTransaction(decision as RevertTransactionDecision));
 
       return;
     }

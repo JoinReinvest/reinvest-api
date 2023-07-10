@@ -11,6 +11,8 @@ export enum TransactionDecisions {
   FINISH_INVESTMENT = 'FINISH_INVESTMENT',
   CANCEL_TRANSACTION = 'CANCEL_TRANSACTION',
   DO_NOTHING = 'DO_NOTHING',
+  REVERT_TRANSACTION = 'REVERT_TRANSACTION',
+  RETRY_PAYMENT = 'RETRY_PAYMENT',
 }
 
 export type TransactionDecision = {
@@ -69,4 +71,8 @@ export type TransferSharesWhenTradeSettledDecision = TransactionDecision & {
 
 export type CancelTransactionDecision = TransactionDecision & {
   kind: TransactionDecisions.CANCEL_TRANSACTION;
+};
+
+export type RevertTransactionDecision = TransactionDecision & {
+  kind: TransactionDecisions.REVERT_TRANSACTION;
 };

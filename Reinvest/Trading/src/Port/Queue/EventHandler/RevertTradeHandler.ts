@@ -2,13 +2,13 @@ import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { UnwindTrade } from 'Trading/IntegrationLogic/UseCase/UnwindTrade';
 
-export enum CancelTradeEvent {
-  TransactionCanceled = 'TransactionCanceled',
-  TransactionUnwinding = 'TransactionUnwinding',
-  TransactionCanceledFailed = 'TransactionCanceledFailed',
+export enum RevertTradeEvent {
+  TransactionReverted = 'TransactionReverted',
+  TransactionRevertedUnwinding = 'TransactionRevertedUnwinding',
+  TransactionRevertedFailed = 'TransactionRevertedFailed',
 }
 
-export class CancelTradeHandler implements EventHandler<DomainEvent> {
+export class RevertTradeHandler implements EventHandler<DomainEvent> {
   private unwindTradeUseCase: UnwindTrade;
   private eventBus: EventBus;
 
@@ -17,10 +17,10 @@ export class CancelTradeHandler implements EventHandler<DomainEvent> {
     this.eventBus = eventBus;
   }
 
-  static getClassName = (): string => 'CancelTradeHandler';
+  static getClassName = (): string => 'RevertTradeHandler';
 
   public async handle(event: DomainEvent): Promise<void> {
-    if (event.kind !== 'CancelTransaction') {
+    if (event.kind !== 'RevertTransaction') {
       return;
     }
 
@@ -35,21 +35,21 @@ export class CancelTradeHandler implements EventHandler<DomainEvent> {
     switch (actionEvent.event) {
       case 'Unwound':
         await this.eventBus.publish({
-          kind: CancelTradeEvent.TransactionCanceled,
+          kind: RevertTradeEvent.TransactionReverted,
           id: event.id,
           data: {},
         });
         break;
       case 'Unwinding':
         await this.eventBus.publish({
-          kind: CancelTradeEvent.TransactionUnwinding,
+          kind: RevertTradeEvent.TransactionRevertedUnwinding,
           id: event.id,
           data: {},
         });
         break;
       case 'Failed':
         await this.eventBus.publish({
-          kind: CancelTradeEvent.TransactionCanceledFailed,
+          kind: RevertTradeEvent.TransactionRevertedFailed,
           id: event.id,
           data: {
             reason,

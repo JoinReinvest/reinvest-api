@@ -6,6 +6,7 @@ import {
   CreateTradeDecision,
   FinalizeInvestmentDecision,
   MarkFundsAsReadyToDisburseDecision,
+  RevertTransactionDecision,
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
 } from 'Investments/Domain/Transaction/TransactionDecisions';
@@ -21,6 +22,7 @@ export enum TransactionCommands {
   MarkFundsAsReadyToDisburse = 'MarkFundsAsReadyToDisburse',
   TransferSharesWhenTradeSettled = 'TransferSharesWhenTradeSettled',
   CancelTransaction = 'CancelTransaction',
+  RevertTransaction = 'RevertTransaction',
 }
 
 export const verifyAccountForInvestment = (decision: VerifyAccountDecision): DomainEvent => ({
@@ -81,5 +83,10 @@ export const transferSharesWhenTradeSettled = (decision: TransferSharesWhenTrade
 
 export const cancelTransaction = (decision: CancelTransactionDecision): DomainEvent => ({
   kind: TransactionCommands.CancelTransaction,
+  id: decision.investmentId,
+});
+
+export const revertTransaction = (decision: RevertTransactionDecision): DomainEvent => ({
+  kind: TransactionCommands.RevertTransaction,
   id: decision.investmentId,
 });

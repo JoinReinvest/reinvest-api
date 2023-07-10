@@ -61,10 +61,15 @@ export default class EventBusProvider {
         TransactionEvents.MARKED_AS_READY_TO_DISBURSE,
         TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
         TransactionEvents.INVESTMENT_CANCELED,
+        TransactionEvents.TRANSACTION_REVERTED,
+        TransactionEvents.TRANSACTION_REVERTED_UNWINDING,
+        TransactionEvents.TRANSACTION_REVERTED_FAILED,
         TransactionEvents.TRANSACTION_CANCELED,
         TransactionEvents.TRANSACTION_CANCELED_UNWINDING,
         TransactionEvents.TRANSACTION_CANCELED_FAILED,
         TransactionEvents.INVESTMENT_FINISHED,
+        TransactionEvents.VERIFICATION_REJECTED_FOR_INVESTMENT,
+        TransactionEvents.INVESTMENT_REJECTED_BY_PRINCIPAL,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [
@@ -86,6 +91,7 @@ export default class EventBusProvider {
         TransactionCommands.TransferSharesWhenTradeSettled,
         ReinvestmentCommands.TransferSharesForReinvestment,
         TransactionCommands.CancelTransaction,
+        TransactionCommands.RevertTransaction,
       ])
       .subscribeHandlerForKinds(AgreementsEventHandler.getClassName(), [
         SubscriptionAgreementEvents.GenerateSubscriptionAgreementCommand,
