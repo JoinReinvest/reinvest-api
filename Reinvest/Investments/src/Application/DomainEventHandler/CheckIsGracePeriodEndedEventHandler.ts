@@ -3,6 +3,7 @@ import { GracePeriodEnded, TransactionEvent, TransactionEvents } from 'Investmen
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 export class CheckIsGracePeriodEndedEventHandler implements EventHandler<TransactionEvent> {
   private investmentRepository: InvestmentsRepository;
@@ -27,14 +28,15 @@ export class CheckIsGracePeriodEndedEventHandler implements EventHandler<Transac
       throw new Error(`Investment with id ${investmentId} not found`);
     }
 
-    // TODO - uncomment it to add grace period validation
-    // if (investment && investment.isGracePeriodEnded()) {
-    await this.eventBus.publish(<GracePeriodEnded>{
-      kind: TransactionEvents.GRACE_PERIOD_ENDED,
-      id: investmentId,
-      date: new Date(),
-      data: {},
-    });
-    // }
+    console.log(`Awaiting grace period end for transaction ${investmentId}`);
+
+    if (investment && investment.isGracePeriodEnded()) {
+      await this.eventBus.publish(<GracePeriodEnded>{
+        kind: TransactionEvents.GRACE_PERIOD_ENDED,
+        id: investmentId,
+        date: DateTime.now().toDate(),
+        data: {},
+      });
+    }
   }
 }

@@ -1,4 +1,6 @@
-const agreementHTMLTemplate: string = `
+import { HtmlTemplate } from 'Templates/Types';
+
+export const GeneralAgreementHTMLTemplate: HtmlTemplate = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -39,5 +41,3 @@ const agreementHTMLTemplate: string = `
   </body>
 </html>
 `;
-
-export default agreementHTMLTemplate;

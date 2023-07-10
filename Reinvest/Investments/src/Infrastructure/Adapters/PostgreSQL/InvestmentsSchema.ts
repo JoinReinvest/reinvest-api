@@ -11,6 +11,7 @@ import type {
   RecurringInvestmentStatus,
   SubscriptionAgreementStatus,
 } from 'Reinvest/Investments/src/Domain/Investments/Types';
+import { TemplateContentType } from 'Templates/Types';
 
 export interface InvestmentsTable {
   accountId: string;
@@ -33,10 +34,10 @@ export interface InvestmentsTable {
 export interface SubscriptionAgreementTable {
   accountId: string;
   agreementType: AgreementTypes;
-  contentFieldsJson: JSONObject;
+  contentFieldsJson: JSONObjectOf<TemplateContentType>;
   dateCreated: Date;
   id: string;
-  investmentId: string | null;
+  investmentId: string;
   pdfDateCreated: Date | null;
   profileId: string;
   signedAt: Date | null;

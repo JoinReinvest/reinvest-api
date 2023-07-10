@@ -2,6 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
 import { OrderStatus, TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
+import { DateTime } from 'Money/DateTime';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -364,7 +365,7 @@ export class Trade {
   setDisbursementStateAsMarked() {
     this.tradeSchema.disbursementState = {
       status: 'MARKED',
-      markedDate: new Date(),
+      markedDate: DateTime.now().toDate(),
       completedDate: null,
     };
   }
@@ -375,7 +376,7 @@ export class Trade {
     }
 
     this.tradeSchema.disbursementState.status = 'COMPLETED';
-    this.tradeSchema.disbursementState.completedDate = new Date();
+    this.tradeSchema.disbursementState.completedDate = DateTime.now().toDate();
   }
 
   isTradeSettled(): boolean {
@@ -405,7 +406,7 @@ export class Trade {
 
   setVertaloPaymentState(paymentId: string) {
     this.tradeSchema.vertaloPaymentState = {
-      paymentMarkedDate: new Date(),
+      paymentMarkedDate: DateTime.now().toDate(),
       paymentId,
     };
   }
@@ -425,7 +426,7 @@ export class Trade {
   setVertaloSharesTransferState(holdingId: string) {
     this.tradeSchema.sharesTransferState = {
       holdingId,
-      transferDate: new Date(),
+      transferDate: DateTime.now().toDate(),
     };
   }
 
@@ -461,7 +462,7 @@ export class Trade {
     this.tradeSchema.cancelTradeState = {
       cancelState,
       originalCancelStatus: status as OrderStatus,
-      cancelDate: new Date(),
+      cancelDate: DateTime.now().toDate(),
     };
     this.tradeStatus = TradeStatus.fromResponse(status);
     // @ts-ignore

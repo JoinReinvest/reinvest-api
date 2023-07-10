@@ -70,4 +70,20 @@ export class DateTime {
   toFormattedDate(dateFormat: string) {
     return this.date.format(dateFormat);
   }
+
+  addSeconds(numberOfSeconds: number): DateTime {
+    return new DateTime(this.date.add(numberOfSeconds, 'second'));
+  }
+
+  addMinutes(expirationInMinutes: number): DateTime {
+    return new DateTime(this.date.add(expirationInMinutes, 'minute'));
+  }
+
+  static isInFormat(date: string, format: string): boolean {
+    return dayjs(date, format).isValid();
+  }
+
+  toTimestamp(): number {
+    return this.date.unix();
+  }
 }

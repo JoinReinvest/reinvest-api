@@ -7,6 +7,7 @@ import {
   VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
+import { DateTime } from 'Money/DateTime';
 
 export class VerificationEventMocks {
   private partyId: string;
@@ -183,7 +184,7 @@ export class VerificationEventMocks {
   private amlEvent = (partyId: string, status: VerificationStatus, eventId: number = 1, source = 'DIRECT', reasons = []) =>
     <VerificationAmlResultEvent>{
       kind: VerificationEvents.VERIFICATION_AML_RESULT,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       ncId: partyId,
       reasons,
       source,
@@ -194,7 +195,7 @@ export class VerificationEventMocks {
   private kycEvent = (partyId: string, status: VerificationStatus, eventId: number = 1, source = 'DIRECT', reasons = []) =>
     <VerificationKycResultEvent>{
       kind: VerificationEvents.VERIFICATION_KYC_RESULT,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       ncId: partyId,
       reasons,
       source,
@@ -205,7 +206,7 @@ export class VerificationEventMocks {
   private manualKycEvent = (partyId: string, status: VerificationStatus, source = 'DIRECT', reasons = []) =>
     <ManualVerificationKycResult>{
       kind: VerificationEvents.MANUAL_VERIFICATION_KYC_RESULT,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       ncId: partyId,
       reasons,
       source,
@@ -215,7 +216,7 @@ export class VerificationEventMocks {
   private manualAmlEvent = (partyId: string, status: VerificationStatus, source = 'DIRECT', reasons = []) =>
     <ManualVerificationAmlResult>{
       kind: VerificationEvents.MANUAL_VERIFICATION_AML_RESULT,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       ncId: partyId,
       reasons,
       source,
@@ -242,7 +243,7 @@ export class VerificationEventMocks {
   private kycSetToPendingEvent = (partyId: string) => this.event(partyId, VerificationEvents.VERIFICATION_KYC_SET_TO_PENDING);
 
   private event = (partyId: string, kind: VerificationEvents) => ({
-    date: new Date(),
+    date: DateTime.now().toDate(),
     kind,
     ncId: partyId,
   });

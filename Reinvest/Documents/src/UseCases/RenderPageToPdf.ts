@@ -2,6 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DocumentsPdfPageRepository } from 'Reinvest/Documents/src/Adapter/Repository/DocumentsPdfPageRepository';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 export enum PdfTypes {
   PAGE = 'PAGE',
@@ -34,7 +35,7 @@ class RenderPageToPdf {
       profileId,
       name,
       url,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
     };
 
     await this.documentsPdfPageRepository.create(renderedPage);

@@ -1,5 +1,6 @@
 import { Money } from 'Money/Money';
 import { SharesTransferState, VertaloDistributionState, VertaloPaymentState } from 'Trading/Domain/Trade';
+import { DateTime } from 'Money/DateTime';
 
 export type ReinvestmentTradeConfiguration = {
   accountId: string;
@@ -163,7 +164,7 @@ export class ReinvestmentTrade {
 
   setVertaloPaymentState(paymentId: string) {
     this.tradeSchema.vertaloPaymentState = {
-      paymentMarkedDate: new Date(),
+      paymentMarkedDate: DateTime.now().toDate(),
       paymentId,
     };
   }
@@ -183,7 +184,7 @@ export class ReinvestmentTrade {
   setVertaloSharesTransferState(holdingId: string) {
     this.tradeSchema.sharesTransferState = {
       holdingId,
-      transferDate: new Date(),
+      transferDate: DateTime.now().toDate(),
     };
   }
 

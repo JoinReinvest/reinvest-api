@@ -4,6 +4,7 @@ import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
 import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
+import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 import { LegalEntities } from 'LegalEntities/index';
 import { AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
 import { BeneficiaryAccountController } from 'LegalEntities/Port/Api/BeneficiaryAccountController';
@@ -12,6 +13,7 @@ import { DraftAccountQuery } from 'LegalEntities/Port/Api/DraftAccountQuery';
 import { DraftAccountsController } from 'LegalEntities/Port/Api/DraftAccountsController';
 import { GetProfileController } from 'LegalEntities/Port/Api/GetProfileController';
 import { ReadAccountController } from 'LegalEntities/Port/Api/ReadAccountController';
+import { SubscriptionAgreementDataController } from 'LegalEntities/Port/Api/SubscriptionAgreementDataController';
 import { UpdateAccountsController } from 'LegalEntities/Port/Api/UpdateAccountsController';
 import { UpdateForVerificationController } from 'LegalEntities/Port/Api/UpdateForVerificationController';
 import { UpdateProfileController } from 'LegalEntities/Port/Api/UpdateProfileController';
@@ -49,6 +51,7 @@ export class PortsProvider {
       .addSingleton(UpdateProfileController, [UpdateProfile])
       .addSingleton(ReadAccountController, [AccountRepository, AvatarQuery, BeneficiaryRepository])
       .addSingleton(BeneficiaryAccountController, [OpenBeneficiary, ArchiveBeneficiary])
+      .addSingleton(SubscriptionAgreementDataController, [AccountRepository, ProfileRepository, IdentityService, BeneficiaryRepository])
       .addSingleton(DraftAccountsController, [
         CreateDraftAccount,
         CompleteDraftAccount,

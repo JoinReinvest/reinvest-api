@@ -3,6 +3,7 @@ import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transac
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 class StartInvestment {
   private readonly investmentsRepository: InvestmentsRepository;
@@ -36,7 +37,7 @@ class StartInvestment {
       <InvestmentCreated>{
         id: investmentData.id,
         kind: TransactionEvents.INVESTMENT_CREATED,
-        date: new Date(),
+        date: DateTime.now().toDate(),
         data: {
           profileId,
           accountId: investmentData.accountId,

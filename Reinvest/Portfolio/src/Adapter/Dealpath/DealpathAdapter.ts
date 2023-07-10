@@ -4,6 +4,7 @@ import { Property } from 'Portfolio/Domain/Property';
 import { PropertyStatus } from 'Portfolio/Domain/types';
 
 import { GetPropertiesResponse, GetPropertyResponse } from './types';
+import { DateTime } from 'Money/DateTime';
 
 export type DealpathConfig = {
   API_URL: string;
@@ -49,7 +50,7 @@ export class DealpathAdapter {
             location,
           };
 
-          return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: new Date(), dealpathJson });
+          return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: DateTime.now().toDate(), dealpathJson });
         });
 
         return properties;
@@ -78,7 +79,7 @@ export class DealpathAdapter {
           location,
         };
 
-        return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: new Date(), dealpathJson });
+        return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: DateTime.now().toDate(), dealpathJson });
       }
 
       return null;

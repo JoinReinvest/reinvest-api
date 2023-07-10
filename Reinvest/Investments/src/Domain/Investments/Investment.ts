@@ -136,9 +136,9 @@ export class Investment {
     return this.fee.isApproved();
   }
 
-  startInvestment() {
+  startInvestment(): boolean {
     if (this.isStartedInvestment()) {
-      return true;
+      return false;
     }
 
     if (!this.isFeeApproved()) {
@@ -250,6 +250,11 @@ export class Investment {
 
   complete(): void {
     this.investmentSchema.status = InvestmentStatus.FINISHED;
+    this.investmentSchema.dateUpdated = DateTime.now();
+  }
+
+  settlingStarted() {
+    this.investmentSchema.status = InvestmentStatus.SETTLING;
     this.investmentSchema.dateUpdated = DateTime.now();
   }
 }

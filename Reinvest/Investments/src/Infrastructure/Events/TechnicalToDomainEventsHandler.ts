@@ -2,6 +2,7 @@ import { ReinvestmentEvents, SharesTransferredForReinvestment } from 'Investment
 import { TransactionCanceledFailed, TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent> {
   private eventBus: EventBus;
@@ -17,7 +18,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'AccountVerifiedForInvestment':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {
             accountId: event.data.accountId,
           },
@@ -27,7 +28,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'TradeCreated':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.TRADE_CREATED,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {
             ...event.data,
           },
@@ -37,7 +38,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'InvestmentFunded':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.INVESTMENT_FUNDED,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {},
           id: event.id,
         });
@@ -45,7 +46,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'InvestmentApproved':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.INVESTMENT_APPROVED,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {},
           id: event.id,
         });
@@ -53,7 +54,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'InvestmentMarkedAsReadyToDisburse':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.MARKED_AS_READY_TO_DISBURSE,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {},
           id: event.id,
         });
@@ -61,7 +62,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'InvestmentSharesTransferred':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {},
           id: event.id,
         });
@@ -69,7 +70,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'TransactionCanceled':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.TRANSACTION_CANCELED,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {},
           id: event.id,
         });
@@ -77,7 +78,7 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'TransactionUnwinding':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.TRANSACTION_CANCELED_UNWINDING,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {},
           id: event.id,
         });
@@ -85,17 +86,25 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
       case 'TransactionCanceledFailed':
         await this.eventBus.publish(<TransactionCanceledFailed>{
           kind: TransactionEvents.TRANSACTION_CANCELED_FAILED,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {
             reason: event.data.reason,
           },
           id: event.id,
         });
         break;
+      case 'GracePeriodEnded':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.GRACE_PERIOD_ENDED,
+          date: DateTime.now().toDate(),
+          data: {},
+          id: event.id,
+        });
+        break;
       case 'ReinvestmentSharesTransferred':
         await this.eventBus.publish(<SharesTransferredForReinvestment>{
           kind: ReinvestmentEvents.SHARES_TRANSFERRED_FOR_REINVESTMENT,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           data: {
             numberOfShares: event.data.shares,
             unitPrice: event.data.unitSharePrice,

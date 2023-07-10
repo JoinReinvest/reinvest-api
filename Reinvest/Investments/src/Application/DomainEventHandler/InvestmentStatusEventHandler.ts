@@ -11,7 +11,14 @@ export class InvestmentStatusEventHandler {
   static getClassName = (): string => 'InvestmentStatusEventHandler';
 
   async handle(event: TransactionEvent): Promise<void> {
-    if (![TransactionEvents.INVESTMENT_FUNDED, TransactionEvents.TRANSACTION_CANCELED, TransactionEvents.INVESTMENT_FINISHED].includes(event.kind)) {
+    if (
+      ![
+        TransactionEvents.INVESTMENT_FUNDED,
+        TransactionEvents.TRANSACTION_CANCELED,
+        TransactionEvents.INVESTMENT_FINISHED,
+        TransactionEvents.GRACE_PERIOD_ENDED,
+      ].includes(event.kind)
+    ) {
       return;
     }
 
@@ -32,7 +39,12 @@ export class InvestmentStatusEventHandler {
         await this.investmentRepository.store(investment);
         break;
       case TransactionEvents.INVESTMENT_FINISHED:
+        console.log(`[${investmentId}] Investment completed`);
         investment.complete();
+        await this.investmentRepository.store(investment);
+        break;
+      case TransactionEvents.GRACE_PERIOD_ENDED:
+        investment.settlingStarted();
         await this.investmentRepository.store(investment);
         break;
     }

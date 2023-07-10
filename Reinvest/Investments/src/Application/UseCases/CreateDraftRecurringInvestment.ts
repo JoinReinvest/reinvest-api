@@ -47,7 +47,7 @@ class CreateDraftRecurringInvestment {
 
       status = await this.transactionAdapter.transaction(`Delete recurring investment ${id} with subscription agreement if exist`, async () => {
         await this.recurringInvestmentsRepository.delete(accountId, profileId, id);
-        await this.subscriptionAgreementRepository.findByInvestmentIdAndDelete(accountId, id);
+        await this.subscriptionAgreementRepository.deleteByInvestmentId(accountId, id);
       });
     }
 

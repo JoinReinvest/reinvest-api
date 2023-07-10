@@ -1,6 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
+import { DateTime } from 'Money/DateTime';
 
 export enum CalculatedDividendStatus {
   AWAITING_DISTRIBUTION = 'AWAITING_DISTRIBUTION',
@@ -69,7 +70,7 @@ export class CalculatedDividend {
       this.accountId = accountId!;
       this.profileId = profileId!;
       this.sharesId = sharesId!;
-      this.calculationDate = new Date();
+      this.calculationDate = DateTime.now().toDate();
       this.status = this.mapSharesStatusToCalculatedDividendStatus(sharesStatus!);
     } else {
       this.id = schema.id;

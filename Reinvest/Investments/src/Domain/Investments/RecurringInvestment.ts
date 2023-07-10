@@ -85,10 +85,6 @@ export class RecurringInvestment {
     };
   }
 
-  getSubscriptionAgreeementId() {
-    return this.subscriptionAgreementId;
-  }
-
   isReadyToActivate() {
     return !!this.subscriptionAgreementId;
   }

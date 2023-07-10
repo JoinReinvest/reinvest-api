@@ -61,7 +61,7 @@ export class InvestmentsRepository {
     return this.castToObject(data, fee);
   }
 
-  async listPaginatedInvestments(profileId: string, accountId: string, pagination: Pagination): Promise<Investment[]> {
+  async listPaginatedInvestmentsWithoutFee(profileId: string, accountId: string, pagination: Pagination): Promise<Investment[]> {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
@@ -75,6 +75,22 @@ export class InvestmentsRepository {
       .execute();
 
     if (data.length === 0) {
+      return [];
+    }
+
+    return data.map((investment: InvestmentsTable) => this.castToObject(investment, null));
+  }
+
+  async getAllInvestmentsWithoutFees(profileId: string, accountId: string): Promise<Investment[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(investmentsTable)
+      .selectAll()
+      .where(`${investmentsTable}.profileId`, '=', profileId)
+      .where(`${investmentsTable}.accountId`, '=', accountId)
+      .execute();
+
+    if (!data) {
       return [];
     }
 
@@ -104,6 +120,21 @@ export class InvestmentsRepository {
     }
 
     return InvestmentSummary.create(investmentSummary as InvestmentSummarySchema);
+  }
+
+  async getPendingInvestmentsIds(): Promise<UUID[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(investmentsTable)
+      .select(['id'])
+      .where(`status`, 'in', [InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED, InvestmentStatus.CANCELING])
+      .execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(investment => <UUID>investment.id);
   }
 
   async store(investment: Investment, events: DomainEvent[] = []): Promise<boolean> {
@@ -139,56 +170,6 @@ export class InvestmentsRepository {
     }
   }
 
-  async publishEvents(events: DomainEvent[] = []): Promise<void> {
-    if (events.length === 0) {
-      return;
-    }
-
-    await this.eventsPublisher.publishMany(events);
-  }
-
-  async castToObjectWithFees(data: InvestmentsTable[]): Promise<Investment[]> {
-    const investmentIds = data.map(investment => investment.id);
-
-    if (investmentIds.length === 0) {
-      return [];
-    }
-
-    const fees = await this.feesRepository.getFeesByInvestmentId(investmentIds);
-    const investmentIdToFee: { [investmentId: UUID]: Fee } = {};
-
-    for (const fee of fees) {
-      investmentIdToFee[fee.getInvestmentId()] = fee;
-    }
-
-    return data.map((investment: InvestmentsTable) => this.castToObject(investment, investmentIdToFee[investment.id] ?? null));
-  }
-
-  castToObject(data: InvestmentsTable, fee: Fee | null): Investment {
-    return Investment.restore(
-      {
-        ...data,
-        amount: Money.lowPrecision(data.amount),
-        dateCreated: DateTime.from(data.dateCreated),
-        dateStarted: data.dateStarted ? DateTime.from(data.dateStarted) : null,
-        dateUpdated: DateTime.from(data.dateUpdated),
-      },
-      fee,
-    );
-  }
-
-  castToTable(object: Investment): InvestmentsTable {
-    const schema = object.toObject();
-
-    return {
-      ...schema,
-      amount: schema.amount.getAmount(),
-      dateCreated: schema.dateCreated.toDate(),
-      dateStarted: schema.dateStarted?.toDate() || null,
-      dateUpdated: schema.dateUpdated.toDate(),
-    };
-  }
-
   async transferInvestments(toStore: Investment[]): Promise<void> {
     const data = toStore.map((investment: Investment) => this.castToTable(investment));
 
@@ -205,34 +186,53 @@ export class InvestmentsRepository {
       .execute();
   }
 
-  async getAllInvestmentsWithoutFees(profileId: string, accountId: string): Promise<Investment[]> {
-    const data = await this.databaseAdapterProvider
-      .provide()
-      .selectFrom(investmentsTable)
-      .selectAll()
-      .where(`${investmentsTable}.profileId`, '=', profileId)
-      .where(`${investmentsTable}.accountId`, '=', accountId)
-      .execute();
-
-    if (!data) {
-      return [];
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
     }
 
-    return data.map((investment: InvestmentsTable) => this.castToObject(investment, null));
+    await this.eventsPublisher.publishMany(events);
   }
 
-  async getPendingInvestmentsIds(): Promise<UUID[]> {
-    const data = await this.databaseAdapterProvider
-      .provide()
-      .selectFrom(investmentsTable)
-      .select(['id'])
-      .where(`status`, 'in', [InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED, InvestmentStatus.CANCELING])
-      .execute();
+  private async castToObjectWithFees(data: InvestmentsTable[]): Promise<Investment[]> {
+    const investmentIds = data.map(investment => investment.id);
 
-    if (!data) {
+    if (investmentIds.length === 0) {
       return [];
     }
 
-    return data.map(investment => <UUID>investment.id);
+    const fees = await this.feesRepository.getFeesByInvestmentId(investmentIds);
+    const investmentIdToFee: { [investmentId: UUID]: Fee } = {};
+
+    for (const fee of fees) {
+      investmentIdToFee[fee.getInvestmentId()] = fee;
+    }
+
+    return data.map((investment: InvestmentsTable) => this.castToObject(investment, investmentIdToFee[investment.id] ?? null));
+  }
+
+  private castToObject(data: InvestmentsTable, fee: Fee | null): Investment {
+    return Investment.restore(
+      {
+        ...data,
+        amount: Money.lowPrecision(data.amount),
+        dateCreated: DateTime.from(data.dateCreated),
+        dateStarted: data.dateStarted ? DateTime.from(data.dateStarted) : null,
+        dateUpdated: DateTime.from(data.dateUpdated),
+      },
+      fee,
+    );
+  }
+
+  private castToTable(object: Investment): InvestmentsTable {
+    const schema = object.toObject();
+
+    return {
+      ...schema,
+      amount: schema.amount.getAmount(),
+      dateCreated: schema.dateCreated.toDate(),
+      dateStarted: schema.dateStarted?.toDate() || null,
+      dateUpdated: schema.dateUpdated.toDate(),
+    };
   }
 }

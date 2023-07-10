@@ -3,6 +3,7 @@ import { RegistrationDatabaseAdapterProvider, vertaloSynchronizationTable } from
 import { InsertableVertaloSynchronization, SelectableVertaloSynchronizationRecord } from 'Registration/Adapter/Database/RegistrationSchema';
 import { VertaloSynchronizationRecord } from 'Registration/Adapter/Vertalo/VertaloSynchronizationRecord';
 import { VertaloEntityType, VertaloIds, VertaloSynchronizationRecordType } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
+import { DateTime } from 'Money/DateTime';
 
 export class VertaloSynchronizationRepository {
   public static getClassName = (): string => 'VertaloSynchronizationRepository';
@@ -54,7 +55,7 @@ export class VertaloSynchronizationRepository {
       return;
     }
 
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const nextVersion = synchronizationRecord.getNextVersion();
     const currentVersion = synchronizationRecord.getVersion();
 

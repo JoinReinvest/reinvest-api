@@ -24,6 +24,7 @@ import {
 } from 'Investments/Domain/Transaction/TransactionDecisions';
 import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DateTime } from 'Money/DateTime';
 
 export class TransactionExecutor {
   private eventBus: EventBus;
@@ -96,7 +97,7 @@ export class TransactionExecutor {
         id: decision.investmentId,
         kind: TransactionEvents.INVESTMENT_FINISHED,
         data: {},
-        date: new Date(),
+        date: DateTime.now().toDate(),
       });
 
       return;

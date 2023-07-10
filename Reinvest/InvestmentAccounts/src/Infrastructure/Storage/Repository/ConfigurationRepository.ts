@@ -2,6 +2,7 @@ import { JSONObject } from 'HKEKTypes/Generics';
 import { investmentAccountConfiguration, InvestmentAccountDbProvider } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
 import type { AccountConfigurationCreate } from 'Reinvest/InvestmentAccounts/src/Application/CreateConfiguration';
 import { AutomaticDividendReinvestmentAgreement } from 'Reinvest/InvestmentAccounts/src/Domain/ValueObject/AutomaticDividendReinvestmentAgreement';
+import { DateTime } from 'Money/DateTime';
 
 export class ConfigurationRepository {
   public static getClassName = (): string => 'ConfigurationRepository';
@@ -21,8 +22,8 @@ export class ConfigurationRepository {
         .values({
           id,
           accountId,
-          dateCreated: new Date(),
-          dateUpdated: new Date(),
+          dateCreated: DateTime.now().toDate(),
+          dateUpdated: DateTime.now().toDate(),
           profileId,
           configType: type,
           configValueJson: <JSONObject>{ value },

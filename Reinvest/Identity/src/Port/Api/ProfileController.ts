@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { CognitoService } from 'Identity/Adapter/AWS/CognitoService';
 import { UserRepository } from 'Identity/Adapter/Database/Repository/UserRepository';
 import { BanList } from 'Identity/Port/Api/BanController';
@@ -79,5 +80,21 @@ export class ProfileController {
 
       return null;
     }
+  }
+
+  async getPhoneAndEmailData(profileId: UUID): Promise<{ email: string; phoneNumber: string }> {
+    const user = await this.userRepository.findUserByProfileId(profileId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const { email, cognitoUserId } = user;
+    const phoneNumber = await this.cognitoService.getPhoneNumber(cognitoUserId);
+
+    return {
+      email,
+      phoneNumber: phoneNumber ?? '',
+    };
   }
 }

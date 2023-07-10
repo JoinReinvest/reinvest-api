@@ -24,6 +24,7 @@ import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/Adapters/Modules/SubscriptionAgreementDataCollector';
 
 export default class AdaptersProviders {
   private config: Investments.Config;
@@ -46,7 +47,7 @@ export default class AdaptersProviders {
       .addAsValue(InvestmentsDatabaseAdapterInstanceProvider, createInvestmentsDatabaseAdapterProvider(this.config.database))
       .addSingleton(FeesRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(InvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, FeesRepository, SimpleEventBus])
-      .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(SubscriptionAgreementRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(TransactionRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
@@ -61,7 +62,8 @@ export default class AdaptersProviders {
     container
       .addSingleton(SharesAndDividendService, ['SharesAndDividends'])
       .addSingleton(DocumentsService, ['Documents'])
-      .addSingleton(VerificationService, ['Verification']);
+      .addSingleton(VerificationService, ['Verification'])
+      .addSingleton(SubscriptionAgreementDataCollector, ['LegalEntities', 'Portfolio']);
 
     // process manager
     container.addSingleton(TransactionExecutor, [SimpleEventBus]);

@@ -19,6 +19,7 @@ const schema = `
         CANCELED
         CANCELING
         TRANSFERRED
+        SETTLING
     }
 
     type InvestmentSummary {

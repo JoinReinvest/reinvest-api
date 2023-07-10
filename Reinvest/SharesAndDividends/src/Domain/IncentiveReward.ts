@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { Money } from 'Money/Money';
+import { DateTime } from 'Money/DateTime';
 
 const INCENTIVE_REWARD = new Money(1000); // $10
 
@@ -59,7 +60,7 @@ export class IncentiveReward {
   }
 
   static createReward(id: string, profileId: string, theOtherProfileId: string, rewardType: RewardType): IncentiveReward {
-    return new IncentiveReward(id, profileId, INCENTIVE_REWARD, new Date(), rewardType, theOtherProfileId);
+    return new IncentiveReward(id, profileId, INCENTIVE_REWARD, DateTime.now().toDate(), rewardType, theOtherProfileId);
   }
 
   setStatus(status: IncentiveRewardStatus, date: Date, assignedToAccountId: string) {
@@ -69,11 +70,11 @@ export class IncentiveReward {
   }
 
   setWithdrawn(accountId: string) {
-    this.setStatus(IncentiveRewardStatus.WITHDRAWN, new Date(), accountId);
+    this.setStatus(IncentiveRewardStatus.WITHDRAWN, DateTime.now().toDate(), accountId);
   }
 
   setReinvested(accountId: string) {
-    this.setStatus(IncentiveRewardStatus.REINVESTED, new Date(), accountId);
+    this.setStatus(IncentiveRewardStatus.REINVESTED, DateTime.now().toDate(), accountId);
   }
 
   getNotification() {

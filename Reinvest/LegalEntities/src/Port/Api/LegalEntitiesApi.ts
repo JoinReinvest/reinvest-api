@@ -4,6 +4,7 @@ import { CompleteProfileController } from 'LegalEntities/Port/Api/CompleteProfil
 import { DraftAccountsController } from 'LegalEntities/Port/Api/DraftAccountsController';
 import { GetProfileController } from 'LegalEntities/Port/Api/GetProfileController';
 import { ReadAccountController } from 'LegalEntities/Port/Api/ReadAccountController';
+import { SubscriptionAgreementDataController } from 'LegalEntities/Port/Api/SubscriptionAgreementDataController';
 import { UpdateProfileController } from 'LegalEntities/Port/Api/UpdateProfileController';
 import { UpdateAccountsController } from 'Reinvest/LegalEntities/src/Port/Api/UpdateAccountsController';
 import { UpdateForVerificationController } from 'Reinvest/LegalEntities/src/Port/Api/UpdateForVerificationController';
@@ -20,6 +21,7 @@ export type LegalEntitiesApiType = {
   getCompanyAccount: ReadAccountController['getCompanyAccount'];
   getCompanyAccountForSynchronization: ReadAccountController['getCompanyAccountForSynchronization'];
   getCompanyForSynchronization: ReadAccountController['getCompanyForSynchronization'];
+  getDataForSubscriptionAgreement: SubscriptionAgreementDataController['getDataForSubscriptionAgreement'];
   getIndividualAccount: ReadAccountController['getIndividualAccount'];
   getIndividualAccountForSynchronization: ReadAccountController['getIndividualAccountForSynchronization'];
 
@@ -71,6 +73,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   readBeneficiaryAccount: container.delegateTo(ReadAccountController, 'readBeneficiaryAccount'),
   getProfileAccountStructure: container.delegateTo(ReadAccountController, 'getProfileAccountStructure'),
   archiveBeneficiary: container.delegateTo(BeneficiaryAccountController, 'archiveBeneficiary'),
+  getDataForSubscriptionAgreement: container.delegateTo(SubscriptionAgreementDataController, 'getDataForSubscriptionAgreement'),
 
   updateCompanyForVerification: container.delegateTo(UpdateForVerificationController, 'updateCompanyForVerification'),
   updateProfileForVerification: container.delegateTo(UpdateForVerificationController, 'updateProfileForVerification'),

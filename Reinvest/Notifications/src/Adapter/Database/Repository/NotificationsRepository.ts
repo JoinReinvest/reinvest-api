@@ -4,6 +4,7 @@ import { NotificationsTable } from 'Notifications/Adapter/Database/Notifications
 import { Pagination } from 'Notifications/Application/Pagination';
 import { NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
 import { Notification, NotificationSchema } from 'Notifications/Domain/Notification';
+import { DateTime } from 'Money/DateTime';
 
 export class NotificationsRepository {
   private databaseAdapterProvider: NotificationsDatabaseAdapterProvider;
@@ -39,7 +40,7 @@ export class NotificationsRepository {
       .provide()
       .updateTable(notificationsTable)
       .set({
-        dateRead: new Date(),
+        dateRead: DateTime.now().toDate(),
         isRead: true,
       })
       .where('profileId', '=', profileId)

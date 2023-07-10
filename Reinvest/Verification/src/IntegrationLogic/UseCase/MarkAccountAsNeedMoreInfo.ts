@@ -3,6 +3,7 @@ import { PrincipalVerificationEvent, VerificationEvents } from 'Verification/Dom
 import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 export class MarkAccountAsNeedMoreInfo {
   private verifierService: VerifierService;
@@ -20,7 +21,7 @@ export class MarkAccountAsNeedMoreInfo {
       const { accountVerifier, verifiers } = await this.verifierService.createVerifiersForAccount(profileId, accountId);
       const principalNeedsMoreInfo = (partyId: string) =>
         <PrincipalVerificationEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.PRINCIPAL_NEED_MORE_INFO,
           ncId: partyId,
         };

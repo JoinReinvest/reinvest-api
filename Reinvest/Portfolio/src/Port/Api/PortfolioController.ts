@@ -10,6 +10,14 @@ type PortfolioDetails = {
   properties: DataJson[];
 };
 
+type SubscriptionAgreementPortfolioData = {
+  nameOfAsset: string;
+  nameOfOffering: string;
+  offeringsCircularLink: string;
+  tendererCompanyName: string;
+  unitPrice: string;
+};
+
 /**
  * Returns mock data for the active portfolio
  */
@@ -72,6 +80,16 @@ export class PortfolioController {
     return {
       unitSharePrice: 105,
       numberOfShares: 100000000,
+    };
+  }
+
+  async getDataForSubscriptionAgreement(portfolioId: UUID): Promise<SubscriptionAgreementPortfolioData> {
+    return {
+      nameOfAsset: 'Community REIT',
+      nameOfOffering: 'Community REIT',
+      offeringsCircularLink: 'https://link-to-offering-circular.com',
+      tendererCompanyName: 'REINVEST Corp.',
+      unitPrice: '$1.05',
     };
   }
 }

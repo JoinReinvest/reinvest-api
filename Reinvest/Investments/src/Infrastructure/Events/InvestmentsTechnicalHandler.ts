@@ -1,9 +1,12 @@
 import { ContainerInterface } from 'Container/Container';
+import { PdfEvents } from 'HKEKTypes/Pdf';
+import { PdfGeneratedEventHandler } from 'Investments/Infrastructure/Events/PdfGeneratedEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 
 export type InvestmentsTechnicalHandlerType = {
   AccountBannedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
   AccountVerifiedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
+  GracePeriodEnded: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentApproved: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentFunded: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentMarkedAsReadyToDisburse: () => TechnicalToDomainEventsHandler['handle'];
@@ -14,6 +17,7 @@ export type InvestmentsTechnicalHandlerType = {
   TransactionCanceled: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceledFailed: () => TechnicalToDomainEventsHandler['handle'];
   TransactionUnwinding: () => TechnicalToDomainEventsHandler['handle'];
+  [PdfEvents.PdfGenerated]: () => PdfGeneratedEventHandler['handle'];
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
@@ -29,4 +33,6 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TransactionCanceled: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TransactionUnwinding: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TransactionCanceledFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  GracePeriodEnded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  [PdfEvents.PdfGenerated]: container.delegateTo(PdfGeneratedEventHandler, 'handle'),
 });

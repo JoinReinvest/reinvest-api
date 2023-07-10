@@ -4,6 +4,7 @@ import { FundsWithdrawalRequestsAgreementsRepository } from 'Reinvest/Withdrawal
 import { FundsWithdrawalRequestsRepository } from 'Reinvest/Withdrawals/src/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { WithdrawalsFundsRequestsAgreementsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequestsAgreement';
 import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
+import { DateTime } from 'Money/DateTime';
 
 export type FundsWithdrawalAgreementAgreementCreate = {
   accountId: UUID;
@@ -60,7 +61,7 @@ export class CreateFundsWithdrawalAgreement {
       accountId,
       profileId,
       fundsRequestId: fundsWithdrawalRequestId,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       status: WithdrawalsFundsRequestsAgreementsStatuses.WAITING_FOR_SIGNATURE,
       contentFieldsJson: mockedContentFieldsJson,
       templateVersion: 1,
