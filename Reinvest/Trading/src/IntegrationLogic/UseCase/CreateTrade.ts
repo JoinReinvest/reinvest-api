@@ -52,6 +52,12 @@ export class CreateTrade {
         const northCapitalTrade = await this.northCapitalAdapter.createTrade(offeringId, northCapitalAccountId, shares, ip);
         trade.setTradeState(northCapitalTrade);
         await this.tradesRepository.updateTrade(trade);
+
+        if (trade.isPaymentMismatched()) {
+          console.error('payment mismatch!'); // todo handle payment mismatch
+          return;
+        }
+
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'NC Trade created', northCapitalTrade);
       }
 
@@ -81,10 +87,6 @@ export class CreateTrade {
         trade.setFundsTransferState(fundsTransfer);
         await this.tradesRepository.updateTrade(trade);
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'NC funds transfer created', fundsTransfer);
-
-        // if (trade.isPaymentMismatched()) {
-        console.error('payment mismatch!'); // todo handle payment mismatch
-        // }
 
         await this.eventBus.publish(
           storeEventCommand(trade.getProfileId(), 'PaymentInitiated', {

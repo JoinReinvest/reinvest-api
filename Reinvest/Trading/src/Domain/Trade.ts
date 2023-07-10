@@ -46,8 +46,6 @@ export type VertaloDistributionState = {
 
 export type FundsMoveState = {
   status: string;
-  transferAmount: string;
-  transferId: string;
 };
 
 export type SubscriptionAgreementState = {
@@ -486,5 +484,24 @@ export class Trade {
 
   getReinvestAccountId(): UUID {
     return this.tradeSchema.tradeConfiguration.accountId;
+  }
+
+  isPaymentMismatched(): boolean {
+    const investmentAmount = this.amount;
+    const tradePrice = this.tradeSchema.northCapitalTradeState?.tradePrice;
+
+    if (!tradePrice) {
+      return false;
+    }
+
+    const amountToPay = Money.lowPrecision(Math.round(parseFloat(tradePrice) * 100));
+    const diff = amountToPay.subtract(investmentAmount).getAmount();
+
+    if (diff != 0) {
+      // if diff is more/less than 0 cents then there is a mismatch
+      return true;
+    }
+
+    return false;
   }
 }
