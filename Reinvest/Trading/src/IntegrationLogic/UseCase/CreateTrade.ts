@@ -82,6 +82,10 @@ export class CreateTrade {
         await this.tradesRepository.updateTrade(trade);
         console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'NC funds transfer created', fundsTransfer);
 
+        // if (trade.isPaymentMismatched()) {
+        console.error('payment mismatch!'); // todo handle payment mismatch
+        // }
+
         await this.eventBus.publish(
           storeEventCommand(trade.getProfileId(), 'PaymentInitiated', {
             accountId: trade.getReinvestAccountId(),

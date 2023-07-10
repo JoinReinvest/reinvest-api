@@ -80,14 +80,14 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       const {
         statusCode,
         statusDesc,
-        TradeFinancialDetails: [{ fundStatus }],
+        TradeFinancialDetails: [{ fundStatus, totalAmount, RefNum }],
       } = response;
 
-      return { status: fundStatus };
+      return { status: fundStatus, transferAmount: totalAmount, transferId: RefNum };
     } catch (error: any) {
       if (error.statusCode && error.statusCode === '150') {
         // External Fund Move Already in Process for this trade.
-        return { status: 'Pending' };
+        return { status: 'Pending', transferAmount: amount.toUnit().toString(), transferId: '' };
       } else {
         throw new Error(error.message);
       }

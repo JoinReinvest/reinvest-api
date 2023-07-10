@@ -1,8 +1,8 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
 import { OrderStatus, TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
-import { DateTime } from 'Money/DateTime';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -46,6 +46,8 @@ export type VertaloDistributionState = {
 
 export type FundsMoveState = {
   status: string;
+  transferAmount: string;
+  transferId: string;
 };
 
 export type SubscriptionAgreementState = {
