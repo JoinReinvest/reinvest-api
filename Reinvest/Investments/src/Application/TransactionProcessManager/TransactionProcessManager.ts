@@ -67,6 +67,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           userTradeId,
         });
       case TransactionEvents.TRADE_CREATED:
+      case TransactionEvents.PAYMENT_RETRIED:
         return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED);
       case TransactionEvents.INVESTMENT_FUNDED:
         return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED);
@@ -133,13 +134,18 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
       case TransactionDecisions.CREATE_TRADE:
         return [TransactionEvents.TRADE_CREATED, TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.PAYMENT_MISMATCH].includes(kind); // cancel investment
       case TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED:
-        return [TransactionEvents.INVESTMENT_FUNDED, TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.PAYMENT_FAILED].includes(kind); // unwind investment
+        return [
+          TransactionEvents.INVESTMENT_FUNDED,
+          TransactionEvents.INVESTMENT_CANCELED,
+          TransactionEvents.PAYMENT_FAILED,
+          TransactionEvents.SECOND_PAYMENT_FAILED,
+        ].includes(kind);
       case TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED:
         return [TransactionEvents.INVESTMENT_APPROVED, TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.INVESTMENT_REJECTED_BY_PRINCIPAL].includes(
           kind,
         );
       case TransactionDecisions.RETRY_PAYMENT:
-        return [TransactionEvents.SECOND_PAYMENT_FAILED, TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.INVESTMENT_FUNDED].includes(kind);
+        return [TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.PAYMENT_RETRIED].includes(kind);
       case TransactionDecisions.CHECK_IF_GRACE_PERIOD_ENDED:
         return [TransactionEvents.GRACE_PERIOD_ENDED, TransactionEvents.INVESTMENT_CANCELED].includes(kind);
       case TransactionDecisions.MARK_FUNDS_AS_READY_TO_DISBURSE:

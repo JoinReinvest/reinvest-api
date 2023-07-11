@@ -17,6 +17,8 @@ import { MarkFundsAsReadyToDisburseHandler } from 'Trading/Port/Queue/EventHandl
 import { RevertTradeEvent, RevertTradeHandler } from 'Trading/Port/Queue/EventHandler/RevertTradeHandler';
 import { TransferSharesForReinvestmentHandler } from 'Trading/Port/Queue/EventHandler/TransferSharesForReinvestmentHandler';
 import { TransferSharesWhenTradeSettledHandler } from 'Trading/Port/Queue/EventHandler/TransferSharesWhenTradeSettledHandler';
+import { RetryPaymentHandler } from 'Trading/Port/Queue/EventHandler/RetryPaymentHandler';
+import { RetryPayment } from 'Trading/IntegrationLogic/UseCase/RetryPayment';
 
 export default class EventBusProvider {
   private config: Trading.Config;
@@ -34,12 +36,16 @@ export default class EventBusProvider {
     container.addSingleton(TransferSharesForReinvestmentHandler, [TransferSharesForReinvestment, SimpleEventBus]);
     container.addSingleton(CancelTradeHandler, [UnwindTrade, SimpleEventBus]);
     container.addSingleton(RevertTradeHandler, [UnwindTrade, SimpleEventBus]);
+    container.addSingleton(RetryPaymentHandler, [RetryPayment, SimpleEventBus]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
       STORE_EVENT_COMMAND,
       'TradeCreated',
       'TradePaymentMismatched',
+      'InvestmentPaymentFailed',
+      'PaymentRetried',
+      'InvestmentPaymentSecondFailed',
       'InvestmentFunded',
       'InvestmentApproved',
       'InvestmentRejected',

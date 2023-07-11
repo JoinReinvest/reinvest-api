@@ -51,6 +51,8 @@ export type VertaloDistributionState = {
 };
 
 export type FundsMoveState = {
+  accountId: string;
+  paymentId: string;
   status: string;
 };
 
@@ -94,6 +96,7 @@ export type TradeSchema = {
   fundsMoveState: FundsMoveState | null;
   investmentId: string;
   northCapitalTradeState: NorthCapitalTradeState | null;
+  retryPaymentState: FundsMoveState | null;
   sharesTransferState: SharesTransferState | null;
   subscriptionAgreementState: SubscriptionAgreementState | null;
   tradeConfiguration: TradeConfiguration;
@@ -542,5 +545,33 @@ export class Trade {
       date: DateTime.now().toIsoDateTime(),
       tradeId,
     };
+  }
+
+  getNorthCapitalPayment(): {
+    ncAccountId: string;
+    paymentId: string;
+  } | null {
+    if (!this.tradeSchema.fundsMoveState?.paymentId) {
+      return null;
+    }
+
+    let paymentId = this.tradeSchema.fundsMoveState!.paymentId;
+
+    if (this.isPaymentRetried()) {
+      paymentId = this.tradeSchema.retryPaymentState!.paymentId;
+    }
+
+    return {
+      ncAccountId: this.tradeSchema.fundsMoveState!.accountId,
+      paymentId,
+    };
+  }
+
+  isPaymentRetried(): boolean {
+    return this.tradeSchema.retryPaymentState !== null;
+  }
+
+  setPaymentRetried(retryPaymentState: FundsMoveState): void {
+    this.tradeSchema.retryPaymentState = retryPaymentState;
   }
 }

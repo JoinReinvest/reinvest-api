@@ -63,29 +63,30 @@ export class CreateTrade {
         await this.tradesRepository.updateTrade(trade);
       }
 
+      //  Automatic recreating trade with the latest NAV - available only if we don't have share price in the Subscription Agreement
+      //  if (trade.isPaymentMismatched()) {
+      //   console.error(`Payment mismatch for investment ${tradeConfiguration.investmentId}, share price: ${trade.getUnitPrice()}`);
+      //
+      //   // get the latest NAV
+      //   const { portfolioId } = trade.getInternalIds();
+      //   const latestNav = await this.registrationService.getAbsoluteCurrentNav(portfolioId);
+      //   trade.updateUnitSharePrice(latestNav);
+      //
+      //   // remove trade from north capital
+      //   const { ncAccountId, tradeId } = trade.getTradeToDelete();
+      //   const removeDetails = await this.northCapitalAdapter.removeTrade(ncAccountId, tradeId);
+      //
+      //   // create new trade in north capital with the latest NAV
+      //   await this.createTradeInNorthCapital(trade);
+      //   trade.setRemoveTradeDetails(removeDetails, tradeId);
+      //   await this.tradesRepository.updateTrade(trade);
+      //
+      //   console.error(`Recreate trade ${tradeConfiguration.investmentId} with new share price ${trade.getUnitPrice()} after payment mismatch`);
+      // }
+
+      // if payment mismatch, then revert the trade
       if (trade.isPaymentMismatched()) {
-        console.error(`Payment mismatch for investment ${tradeConfiguration.investmentId}, share price: ${trade.getUnitPrice()}`);
-
-        // get the latest NAV
-        const { portfolioId } = trade.getInternalIds();
-        const latestNav = await this.registrationService.getAbsoluteCurrentNav(portfolioId);
-        trade.updateUnitSharePrice(latestNav);
-
-        // remove trade from north capital
-        const { ncAccountId, tradeId } = trade.getTradeToDelete();
-        const removeDetails = await this.northCapitalAdapter.removeTrade(ncAccountId, tradeId);
-
-        // create new trade in north capital with the latest NAV
-        await this.createTradeInNorthCapital(trade);
-        trade.setRemoveTradeDetails(removeDetails, tradeId);
-        await this.tradesRepository.updateTrade(trade);
-
-        console.error(`Recreate trade ${tradeConfiguration.investmentId} with new share price ${trade.getUnitPrice()} after payment mismatch`);
-      }
-
-      // if still payment mismatch, then revert the trade
-      if (trade.isPaymentMismatched()) {
-        console.error(`There is still payment mismatch for trade ${tradeConfiguration.investmentId}. Trade will be reverted`);
+        console.error(`There is payment mismatch for trade ${tradeConfiguration.investmentId}. Trade will be reverted`);
 
         return {
           state: CreateTradeState.PAYMENT_MISMATCHED,

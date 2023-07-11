@@ -15,6 +15,7 @@ import { TransferSharesWhenTradeSettled } from 'Trading/IntegrationLogic/UseCase
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
 import { UnwindTrade } from 'Trading/IntegrationLogic/UseCase/UnwindTrade';
+import { RetryPayment } from 'Trading/IntegrationLogic/UseCase/RetryPayment';
 
 export class IntegrationServiceProvider {
   private config: Trading.Config;
@@ -38,5 +39,6 @@ export class IntegrationServiceProvider {
     container.addSingleton(TransferSharesWhenTradeSettled, [TradesRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter]);
     container.addSingleton(TransferSharesForReinvestment, [ReinvestmentRepository, TradingNorthCapitalAdapter, TradingVertaloAdapter, VendorsMappingService]);
     container.addSingleton(UnwindTrade, [TradesRepository, TradingNorthCapitalAdapter]);
+    container.addSingleton(RetryPayment, [TradesRepository, TradingNorthCapitalAdapter, SimpleEventBus]);
   }
 }

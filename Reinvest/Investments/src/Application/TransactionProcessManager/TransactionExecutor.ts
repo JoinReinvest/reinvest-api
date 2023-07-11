@@ -7,6 +7,7 @@ import {
   createTrade,
   finalizeInvestment,
   markFundsAsReadyToDisburse,
+  retryPayment,
   revertTransaction,
   transferSharesWhenTradeSettled,
   verifyAccountForInvestment,
@@ -19,14 +20,15 @@ import {
   CreateTradeDecision,
   FinalizeInvestmentDecision,
   MarkFundsAsReadyToDisburseDecision,
+  RetryPaymentDecision,
   RevertTransactionDecision,
   TransactionDecisions,
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
 } from 'Investments/Domain/Transaction/TransactionDecisions';
 import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
-import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DateTime } from 'Money/DateTime';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class TransactionExecutor {
   private eventBus: EventBus;
@@ -60,6 +62,12 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED].includes(decision.kind)) {
       await this.eventBus.publish(checkIsInvestmentFunded(decision as CheckIsInvestmentFundedDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.RETRY_PAYMENT].includes(decision.kind)) {
+      await this.eventBus.publish(retryPayment(decision as RetryPaymentDecision));
 
       return;
     }

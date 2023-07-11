@@ -6,6 +6,7 @@ import {
   CreateTradeDecision,
   FinalizeInvestmentDecision,
   MarkFundsAsReadyToDisburseDecision,
+  RetryPaymentDecision,
   RevertTransactionDecision,
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
@@ -21,6 +22,7 @@ export enum TransactionCommands {
   CheckIsGracePeriodEnded = 'CheckIsGracePeriodEnded',
   MarkFundsAsReadyToDisburse = 'MarkFundsAsReadyToDisburse',
   TransferSharesWhenTradeSettled = 'TransferSharesWhenTradeSettled',
+  RetryPayment = 'RetryPayment',
   CancelTransaction = 'CancelTransaction',
   RevertTransaction = 'RevertTransaction',
 }
@@ -59,6 +61,14 @@ export const createTrade = (decision: CreateTradeDecision): DomainEvent => ({
 export const checkIsInvestmentFunded = (decision: CheckIsInvestmentFundedDecision): DomainEvent => ({
   kind: TransactionCommands.CheckIsInvestmentFunded,
   id: decision.investmentId,
+});
+
+export const retryPayment = (decision: RetryPaymentDecision): DomainEvent => ({
+  kind: TransactionCommands.RetryPayment,
+  id: decision.investmentId,
+  data: {
+    retryAfterDate: decision.data.retryAfterDate.toIsoDateTime(),
+  },
 });
 
 export const checkIsInvestmentApproved = (decision: CheckIsInvestmentApprovedDecision): DomainEvent => ({

@@ -4,7 +4,7 @@ import NorthCapitalException from 'Registration/Adapter/NorthCapital/NorthCapita
 import { ExecutionNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import { FundsMoveState, NorthCapitalTradeState } from 'Trading/Domain/Trade';
 import { TradeApproval, TradeVerificationDecision } from 'Trading/Domain/TradeVerification';
-import { TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
+import { TradePaymentStatus, TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
 
 export type NorthCapitalConfig = {
   API_URL: string;
@@ -80,14 +80,14 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       const {
         statusCode,
         statusDesc,
-        TradeFinancialDetails: [{ fundStatus }],
+        TradeFinancialDetails: [{ fundStatus, RefNum }],
       } = response;
 
-      return { status: fundStatus };
+      return { status: fundStatus, paymentId: RefNum, accountId: accountId };
     } catch (error: any) {
       if (error.statusCode && error.statusCode === '150') {
         // External Fund Move Already in Process for this trade.
-        return { status: 'Pending' };
+        return { status: 'Pending', accountId: accountId, paymentId: '' };
       } else {
         throw new Error(error.message);
       }
@@ -334,6 +334,29 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
         status: 'error',
         details: error.getMessage(),
       };
+    }
+  }
+
+  async getPaymentState(accountId: string, paymentId: string): Promise<TradePaymentStatus> {
+    try {
+      const endpoint = 'tapiv3/index.php/v3/getExternalFundMoveInfo';
+      const data = {
+        RefNum: paymentId,
+        accountId,
+      };
+
+      const response = await this.postRequest(endpoint, data);
+      const {
+        statusCode,
+        statusDesc,
+        investorExternalAccountDetails: { fundStatus, error },
+      } = response;
+
+      return TradePaymentStatus.fromResponse(fundStatus);
+    } catch (error: any) {
+      console.error('Error getting payment status', error, { paymentId, accountId });
+
+      return TradePaymentStatus.fromResponse(null);
     }
   }
 }

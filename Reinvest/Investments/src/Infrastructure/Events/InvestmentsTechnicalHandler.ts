@@ -10,6 +10,8 @@ export type InvestmentsTechnicalHandlerType = {
   InvestmentApproved: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentFunded: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentMarkedAsReadyToDisburse: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentPaymentFailed: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentPaymentSecondFailed: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentRejected: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
   ReinvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
@@ -22,6 +24,7 @@ export type InvestmentsTechnicalHandlerType = {
   TransactionRevertedUnwinding: () => TechnicalToDomainEventsHandler['handle'];
   TransactionUnwinding: () => TechnicalToDomainEventsHandler['handle'];
   [PdfEvents.PdfGenerated]: () => PdfGeneratedEventHandler['handle'];
+  PaymentRetried: () => TechnicalToDomainEventsHandler['handle'];
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
@@ -31,6 +34,7 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TradePaymentMismatched: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentFunded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentApproved: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentPaymentSecondFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentMarkedAsReadyToDisburse: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentSharesTransferred: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   ReinvestmentSharesTransferred: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
@@ -43,4 +47,6 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TransactionReverted: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TransactionRevertedFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TransactionRevertedUnwinding: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentPaymentFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  PaymentRetried: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
 });

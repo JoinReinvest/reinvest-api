@@ -10,6 +10,7 @@ import { TransactionEventHandler } from 'Investments/Application/DomainEventHand
 import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { GenerateSubscriptionAgreement } from 'Investments/Application/UseCases/GenerateSubscriptionAgreement';
+import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
 import { SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 import { ReinvestmentCommands } from 'Investments/Domain/Reinvestments/ReinvestmentCommands';
 import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
@@ -26,7 +27,6 @@ import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Event
 import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
-import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -71,6 +71,9 @@ export default class EventBusProvider {
         TransactionEvents.VERIFICATION_REJECTED_FOR_INVESTMENT,
         TransactionEvents.INVESTMENT_REJECTED_BY_PRINCIPAL,
         TransactionEvents.PAYMENT_MISMATCH,
+        TransactionEvents.PAYMENT_FAILED,
+        TransactionEvents.PAYMENT_RETRIED,
+        TransactionEvents.SECOND_PAYMENT_FAILED,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [
@@ -93,6 +96,7 @@ export default class EventBusProvider {
         ReinvestmentCommands.TransferSharesForReinvestment,
         TransactionCommands.CancelTransaction,
         TransactionCommands.RevertTransaction,
+        TransactionCommands.RetryPayment,
       ])
       .subscribeHandlerForKinds(AgreementsEventHandler.getClassName(), [
         SubscriptionAgreementEvents.GenerateSubscriptionAgreementCommand,

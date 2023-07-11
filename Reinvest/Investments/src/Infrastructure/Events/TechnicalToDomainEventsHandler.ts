@@ -53,6 +53,30 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
           id: event.id,
         });
         break;
+      case 'PaymentRetried':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.PAYMENT_RETRIED,
+          date: DateTime.now().toDate(),
+          data: {},
+          id: event.id,
+        });
+        break;
+      case 'InvestmentPaymentFailed':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.PAYMENT_FAILED,
+          date: DateTime.now().toDate(),
+          data: {},
+          id: event.id,
+        });
+        break;
+      case 'InvestmentPaymentSecondFailed':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.SECOND_PAYMENT_FAILED,
+          date: DateTime.now().toDate(),
+          data: {},
+          id: event.id,
+        });
+        break;
       case 'InvestmentFunded':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.INVESTMENT_FUNDED,
