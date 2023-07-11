@@ -43,5 +43,13 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
         id: event.id,
       });
     }
+
+    if (result.state === 'PAYMENT_MISMATCHED') {
+      await this.eventBus.publish({
+        kind: 'TradePaymentMismatched',
+        data: {},
+        id: event.id,
+      });
+    }
   }
 }

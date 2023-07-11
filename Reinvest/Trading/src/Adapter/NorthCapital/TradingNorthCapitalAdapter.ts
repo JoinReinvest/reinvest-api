@@ -299,4 +299,41 @@ export class TradingNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       changeDate: RRApprovalDate,
     };
   }
+
+  async removeTrade(
+    accountId: string,
+    tradeId: string,
+  ): Promise<{
+    details: any;
+    status: string;
+  }> {
+    try {
+      const endpoint = 'tapiv3/index.php/v3/deleteTrade';
+      const data = {
+        tradeId,
+        accountId,
+      };
+
+      const response = await this.postRequest(endpoint, data);
+      const {
+        statusCode,
+        statusDesc,
+        tradeDetails: [removeDetails],
+      } = response;
+
+      const { orderStatus } = removeDetails;
+
+      return {
+        status: orderStatus,
+        details: removeDetails,
+      };
+    } catch (error: any) {
+      console.error('Error removing trade', error, { tradeId, accountId });
+
+      return {
+        status: 'error',
+        details: error.getMessage(),
+      };
+    }
+  }
 }

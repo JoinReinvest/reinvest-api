@@ -4,7 +4,7 @@ import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentSe
 import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
-import { TradeConfiguration, TradeSummary } from 'Trading/Domain/Trade';
+import { Trade, TradeConfiguration, TradeSummary } from 'Trading/Domain/Trade';
 
 export enum CreateTradeState {
   CREATED = 'CREATED',
@@ -59,20 +59,37 @@ export class CreateTrade {
 
       // create trade in north capital
       if (!trade.tradeExists()) {
-        const { offeringId, shares, ip, northCapitalAccountId } = trade.getNorthCapitalTradeConfiguration();
-        const northCapitalTrade = await this.northCapitalAdapter.createTrade(offeringId, northCapitalAccountId, shares, ip);
-        trade.setTradeState(northCapitalTrade);
+        await this.createTradeInNorthCapital(trade);
+        await this.tradesRepository.updateTrade(trade);
+      }
+
+      if (trade.isPaymentMismatched()) {
+        console.error(`Payment mismatch for investment ${tradeConfiguration.investmentId}, share price: ${trade.getUnitPrice()}`);
+
+        // get the latest NAV
+        const { portfolioId } = trade.getInternalIds();
+        const latestNav = await this.registrationService.getAbsoluteCurrentNav(portfolioId);
+        trade.updateUnitSharePrice(latestNav);
+
+        // remove trade from north capital
+        const { ncAccountId, tradeId } = trade.getTradeToDelete();
+        const removeDetails = await this.northCapitalAdapter.removeTrade(ncAccountId, tradeId);
+
+        // create new trade in north capital with the latest NAV
+        await this.createTradeInNorthCapital(trade);
+        trade.setRemoveTradeDetails(removeDetails, tradeId);
         await this.tradesRepository.updateTrade(trade);
 
-        if (trade.isPaymentMismatched()) {
-          console.error('payment mismatch!'); // todo handle payment mismatch
+        console.error(`Recreate trade ${tradeConfiguration.investmentId} with new share price ${trade.getUnitPrice()} after payment mismatch`);
+      }
 
-          return {
-            state: CreateTradeState.PAYMENT_MISMATCHED,
-          };
-        }
+      // if still payment mismatch, then revert the trade
+      if (trade.isPaymentMismatched()) {
+        console.error(`There is still payment mismatch for trade ${tradeConfiguration.investmentId}. Trade will be reverted`);
 
-        console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'NC Trade creaited', northCapitalTrade);
+        return {
+          state: CreateTradeState.PAYMENT_MISMATCHED,
+        };
       }
 
       // create vertalo distribution
@@ -138,5 +155,13 @@ export class CreateTrade {
         state: CreateTradeState.PROCESSING,
       };
     }
+  }
+
+  private async createTradeInNorthCapital(trade: Trade): Promise<void> {
+    const { offeringId, shares, ip, northCapitalAccountId } = trade.getNorthCapitalTradeConfiguration();
+    const northCapitalTrade = await this.northCapitalAdapter.createTrade(offeringId, northCapitalAccountId, shares, ip);
+    trade.setTradeState(northCapitalTrade);
+
+    console.info(`[Trade ${trade.getInvestmentId()}]`, 'NC Trade created', northCapitalTrade);
   }
 }

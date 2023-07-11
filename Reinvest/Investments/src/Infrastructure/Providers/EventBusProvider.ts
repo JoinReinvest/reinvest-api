@@ -70,6 +70,7 @@ export default class EventBusProvider {
         TransactionEvents.INVESTMENT_FINISHED,
         TransactionEvents.VERIFICATION_REJECTED_FOR_INVESTMENT,
         TransactionEvents.INVESTMENT_REJECTED_BY_PRINCIPAL,
+        TransactionEvents.PAYMENT_MISMATCH,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [

@@ -45,6 +45,14 @@ export class TechnicalToDomainEventsHandler implements EventHandler<DomainEvent>
           id: event.id,
         });
         break;
+      case 'TradePaymentMismatched':
+        await this.eventBus.publish(<TransactionEvent>{
+          kind: TransactionEvents.PAYMENT_MISMATCH,
+          date: DateTime.now().toDate(),
+          data: {},
+          id: event.id,
+        });
+        break;
       case 'InvestmentFunded':
         await this.eventBus.publish(<TransactionEvent>{
           kind: TransactionEvents.INVESTMENT_FUNDED,

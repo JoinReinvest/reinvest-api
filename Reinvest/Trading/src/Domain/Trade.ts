@@ -35,6 +35,12 @@ export type NorthCapitalTradeState = {
   tradeShares: string;
   tradeStatus: 'CREATED' | 'FUNDED' | 'SETTLED' | 'CANCELED' | 'UNWIND PENDING' | 'UNWIND SETTLED';
   tradeVerification: TradeVerificationState;
+  paymentMismatchTradeRemoved?: {
+    date: string;
+    details: any;
+    status: string;
+    tradeId: string;
+  };
 };
 
 export type VertaloDistributionState = {
@@ -137,6 +143,16 @@ export class Trade {
     this.shares = this.calculateShares(this.amount, this.unitSharePrice);
   }
 
+  updateUnitSharePrice(unitSharePrice: number) {
+    if (!this.tradeSchema.vendorsConfiguration) {
+      throw new Error('Vendors configuration is not set');
+    }
+
+    this.tradeSchema.vendorsConfiguration.unitSharePrice = unitSharePrice;
+    this.unitSharePrice = new Money(unitSharePrice);
+    this.shares = this.calculateShares(this.amount, this.unitSharePrice);
+  }
+
   setTradeState(tradeState: NorthCapitalTradeState) {
     this.tradeSchema.northCapitalTradeState = tradeState;
     this.tradeStatus = TradeStatus.fromResponse(tradeState.tradeStatus);
@@ -157,6 +173,16 @@ export class Trade {
 
   tradeExists(): boolean {
     return this.tradeStatus.isSet();
+  }
+
+  getTradeToDelete(): {
+    ncAccountId: string;
+    tradeId: string;
+  } {
+    return {
+      ncAccountId: this.tradeSchema.vendorsConfiguration!.northCapitalParentAccountId,
+      tradeId: this.tradeSchema.northCapitalTradeState!.tradeId,
+    };
   }
 
   getNorthCapitalTradeConfiguration(): {
@@ -503,5 +529,18 @@ export class Trade {
     }
 
     return false;
+  }
+
+  getUnitPrice() {
+    return this.unitSharePrice?.getFormattedAmount();
+  }
+
+  setRemoveTradeDetails(removeDetails: { details: any; status: string }, tradeId: string) {
+    this.tradeSchema.northCapitalTradeState!.paymentMismatchTradeRemoved = {
+      details: removeDetails.details,
+      status: removeDetails.status,
+      date: DateTime.now().toIsoDateTime(),
+      tradeId,
+    };
   }
 }

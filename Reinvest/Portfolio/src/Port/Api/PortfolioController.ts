@@ -83,6 +83,13 @@ export class PortfolioController {
     };
   }
 
+  async getAbsoluteCurrentNav(portfolioId: string): Promise<{ numberOfShares: number; unitSharePrice: number }> {
+    return {
+      unitSharePrice: 113,
+      numberOfShares: 100000000,
+    };
+  }
+
   async getDataForSubscriptionAgreement(portfolioId: UUID): Promise<SubscriptionAgreementPortfolioData> {
     return {
       nameOfAsset: 'Community REIT',

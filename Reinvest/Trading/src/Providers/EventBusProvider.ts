@@ -39,6 +39,7 @@ export default class EventBusProvider {
     eventBus.subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
       STORE_EVENT_COMMAND,
       'TradeCreated',
+      'TradePaymentMismatched',
       'InvestmentFunded',
       'InvestmentApproved',
       'InvestmentRejected',

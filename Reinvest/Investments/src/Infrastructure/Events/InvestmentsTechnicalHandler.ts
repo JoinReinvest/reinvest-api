@@ -14,6 +14,7 @@ export type InvestmentsTechnicalHandlerType = {
   InvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
   ReinvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
   TradeCreated: () => TechnicalToDomainEventsHandler['handle'];
+  TradePaymentMismatched: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceled: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceledFailed: () => TechnicalToDomainEventsHandler['handle'];
   TransactionReverted: () => TechnicalToDomainEventsHandler['handle'];
@@ -27,6 +28,7 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   AccountBannedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   AccountVerifiedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TradeCreated: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  TradePaymentMismatched: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentFunded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentApproved: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentMarkedAsReadyToDisburse: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
