@@ -6,6 +6,17 @@ import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/Trading
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { TradeConfiguration, TradeSummary } from 'Trading/Domain/Trade';
 
+export enum CreateTradeState {
+  CREATED = 'CREATED',
+  PAYMENT_MISMATCHED = 'PAYMENT_MISMATCHED',
+  PROCESSING = 'PROCESSING',
+}
+
+export type CreateTradeEvent = {
+  state: CreateTradeState;
+  summary?: TradeSummary;
+};
+
 export class CreateTrade {
   private tradesRepository: TradesRepository;
   private northCapitalAdapter: TradingNorthCapitalAdapter;
@@ -32,7 +43,7 @@ export class CreateTrade {
 
   static getClassName = () => 'CreateTrade';
 
-  async createTrade(tradeConfiguration: TradeConfiguration): Promise<TradeSummary | null> {
+  async createTrade(tradeConfiguration: TradeConfiguration): Promise<CreateTradeEvent> {
     try {
       const trade = await this.tradesRepository.getOrCreateTradeByInvestmentId(tradeConfiguration);
       console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'Start trade process', tradeConfiguration);
@@ -55,10 +66,13 @@ export class CreateTrade {
 
         if (trade.isPaymentMismatched()) {
           console.error('payment mismatch!'); // todo handle payment mismatch
-          return;
+
+          return {
+            state: CreateTradeState.PAYMENT_MISMATCHED,
+          };
         }
 
-        console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'NC Trade created', northCapitalTrade);
+        console.info(`[Trade ${tradeConfiguration.investmentId}]`, 'NC Trade creaited', northCapitalTrade);
       }
 
       // create vertalo distribution
@@ -113,11 +127,16 @@ export class CreateTrade {
         }
       }
 
-      return trade.getTradeSummary();
+      return {
+        state: CreateTradeState.CREATED,
+        summary: trade.getTradeSummary(),
+      };
     } catch (error) {
       console.error(`[Trade ${tradeConfiguration.investmentId}]`, 'Trade failed', tradeConfiguration, error);
 
-      return null;
+      return {
+        state: CreateTradeState.PROCESSING,
+      };
     }
   }
 }

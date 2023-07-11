@@ -64,19 +64,18 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
           '{{Legal name of Purchaser (Individual or Entity)}}: {(purchaserName)}',
           '{{Date of Agreement}}: {(dateOfAgreement)}',
           '{{Number of Series {(nameOfAsset)} Interests subscribed for}}: {(investedAmount)}',
-          '{{Price of Series {(nameOfAsset)} Interests subscribed for}}: {(unitPrice)}',
           '{{Telephone Number}}: {(phoneNumber)}',
           '{{E-mail Address}}: {(email)}',
         ],
       },
       {
-        lines: ['We/I accept REINVEST to create scheduled investments as specified by us/me as follows:'],
+        lines: ['{{I/We accept REINVEST to create scheduled investments as specified by us/me as follows:}}'],
       },
       {
-        lines: ['Start date: {{{(startDate)}}}', 'Frequency: {{{(frequency)}}}', 'Amount: {{{(investedAmount)}}}'],
+        lines: ['Start date: {{{(startDate)}}}', 'Frequency: {{{(frequency)}}}', 'Amount: {{{(investedAmount)}}}', 'Share count: as per current NAV'],
       },
       {
-        lines: ['By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound'],
+        lines: ['{{By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound}}'],
       },
     ],
   },

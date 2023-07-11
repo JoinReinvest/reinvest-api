@@ -31,14 +31,14 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
       parentId: event.data.parentId,
       userTradeId: event.data.userTradeId,
     };
-    const tradeSummary = await this.createTradeUseCase.createTrade(tradeConfiguration);
+    const result = await this.createTradeUseCase.createTrade(tradeConfiguration);
 
-    if (tradeSummary) {
+    if (result.state === 'CREATED') {
       await this.eventBus.publish({
         kind: 'TradeCreated',
         data: {
           accountId: event.data.accountId,
-          ...tradeSummary,
+          ...result.summary,
         },
         id: event.id,
       });
