@@ -1,3 +1,5 @@
+import { DateTime } from 'Money/DateTime';
+
 export enum TransactionDecisions {
   CREATE_TRADE = 'CREATE_TRADE',
   AWAITING_INVESTMENT = 'AWAITING_INVESTMENT',
@@ -11,6 +13,8 @@ export enum TransactionDecisions {
   FINISH_INVESTMENT = 'FINISH_INVESTMENT',
   CANCEL_TRANSACTION = 'CANCEL_TRANSACTION',
   DO_NOTHING = 'DO_NOTHING',
+  REVERT_TRANSACTION = 'REVERT_TRANSACTION',
+  RETRY_PAYMENT = 'RETRY_PAYMENT',
 }
 
 export type TransactionDecision = {
@@ -51,6 +55,13 @@ export type CheckIsInvestmentFundedDecision = TransactionDecision & {
   kind: TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED;
 };
 
+export type RetryPaymentDecision = TransactionDecision & {
+  data: {
+    retryAfterDate: DateTime;
+  };
+  kind: TransactionDecisions.RETRY_PAYMENT;
+};
+
 export type CheckIsInvestmentApprovedDecision = TransactionDecision & {
   kind: TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED;
 };
@@ -69,4 +80,8 @@ export type TransferSharesWhenTradeSettledDecision = TransactionDecision & {
 
 export type CancelTransactionDecision = TransactionDecision & {
   kind: TransactionDecisions.CANCEL_TRANSACTION;
+};
+
+export type RevertTransactionDecision = TransactionDecision & {
+  kind: TransactionDecisions.REVERT_TRANSACTION;
 };

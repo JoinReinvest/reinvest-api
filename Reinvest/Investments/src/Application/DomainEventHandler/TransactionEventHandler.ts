@@ -1,9 +1,9 @@
+import { InvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/InvestmentStatusEventHandler';
 import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/SharesEventHandler';
 import { TransactionRepositoryInterface } from 'Investments/Application/Repository/TransactionRepositoryInterface';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { TransactionEvent } from 'Investments/Domain/Transaction/TransactionEvents';
 import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
-import { InvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/InvestmentStatusEventHandler';
 
 export class TransactionEventHandler implements EventHandler<TransactionEvent> {
   private transactionRepository: TransactionRepositoryInterface;

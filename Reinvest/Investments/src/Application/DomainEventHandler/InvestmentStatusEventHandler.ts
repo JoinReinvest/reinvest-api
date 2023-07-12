@@ -15,6 +15,7 @@ export class InvestmentStatusEventHandler {
       ![
         TransactionEvents.INVESTMENT_FUNDED,
         TransactionEvents.TRANSACTION_CANCELED,
+        TransactionEvents.TRANSACTION_REVERTED,
         TransactionEvents.INVESTMENT_FINISHED,
         TransactionEvents.GRACE_PERIOD_ENDED,
       ].includes(event.kind)
@@ -36,6 +37,10 @@ export class InvestmentStatusEventHandler {
         break;
       case TransactionEvents.TRANSACTION_CANCELED:
         investment.completeCancellation();
+        await this.investmentRepository.store(investment);
+        break;
+      case TransactionEvents.TRANSACTION_REVERTED:
+        investment.revert();
         await this.investmentRepository.store(investment);
         break;
       case TransactionEvents.INVESTMENT_FINISHED:

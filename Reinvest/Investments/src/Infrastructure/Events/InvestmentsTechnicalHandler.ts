@@ -10,22 +10,31 @@ export type InvestmentsTechnicalHandlerType = {
   InvestmentApproved: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentFunded: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentMarkedAsReadyToDisburse: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentPaymentFailed: () => TechnicalToDomainEventsHandler['handle'];
+  InvestmentPaymentSecondFailed: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentRejected: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
   ReinvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
   TradeCreated: () => TechnicalToDomainEventsHandler['handle'];
+  TradePaymentMismatched: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceled: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceledFailed: () => TechnicalToDomainEventsHandler['handle'];
+  TransactionReverted: () => TechnicalToDomainEventsHandler['handle'];
+  TransactionRevertedFailed: () => TechnicalToDomainEventsHandler['handle'];
+  TransactionRevertedUnwinding: () => TechnicalToDomainEventsHandler['handle'];
   TransactionUnwinding: () => TechnicalToDomainEventsHandler['handle'];
   [PdfEvents.PdfGenerated]: () => PdfGeneratedEventHandler['handle'];
+  PaymentRetried: () => TechnicalToDomainEventsHandler['handle'];
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
   AccountBannedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   AccountVerifiedForInvestment: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   TradeCreated: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  TradePaymentMismatched: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentFunded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentApproved: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentPaymentSecondFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentMarkedAsReadyToDisburse: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentSharesTransferred: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   ReinvestmentSharesTransferred: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
@@ -35,4 +44,9 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TransactionCanceledFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   GracePeriodEnded: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   [PdfEvents.PdfGenerated]: container.delegateTo(PdfGeneratedEventHandler, 'handle'),
+  TransactionReverted: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  TransactionRevertedFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  TransactionRevertedUnwinding: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  InvestmentPaymentFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  PaymentRetried: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
 });

@@ -6,6 +6,8 @@ import {
   CreateTradeDecision,
   FinalizeInvestmentDecision,
   MarkFundsAsReadyToDisburseDecision,
+  RetryPaymentDecision,
+  RevertTransactionDecision,
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
 } from 'Investments/Domain/Transaction/TransactionDecisions';
@@ -20,7 +22,9 @@ export enum TransactionCommands {
   CheckIsGracePeriodEnded = 'CheckIsGracePeriodEnded',
   MarkFundsAsReadyToDisburse = 'MarkFundsAsReadyToDisburse',
   TransferSharesWhenTradeSettled = 'TransferSharesWhenTradeSettled',
+  RetryPayment = 'RetryPayment',
   CancelTransaction = 'CancelTransaction',
+  RevertTransaction = 'RevertTransaction',
 }
 
 export const verifyAccountForInvestment = (decision: VerifyAccountDecision): DomainEvent => ({
@@ -59,6 +63,14 @@ export const checkIsInvestmentFunded = (decision: CheckIsInvestmentFundedDecisio
   id: decision.investmentId,
 });
 
+export const retryPayment = (decision: RetryPaymentDecision): DomainEvent => ({
+  kind: TransactionCommands.RetryPayment,
+  id: decision.investmentId,
+  data: {
+    retryAfterDate: decision.data.retryAfterDate.toIsoDateTime(),
+  },
+});
+
 export const checkIsInvestmentApproved = (decision: CheckIsInvestmentApprovedDecision): DomainEvent => ({
   kind: TransactionCommands.CheckIsInvestmentApproved,
   id: decision.investmentId,
@@ -81,5 +93,10 @@ export const transferSharesWhenTradeSettled = (decision: TransferSharesWhenTrade
 
 export const cancelTransaction = (decision: CancelTransactionDecision): DomainEvent => ({
   kind: TransactionCommands.CancelTransaction,
+  id: decision.investmentId,
+});
+
+export const revertTransaction = (decision: RevertTransactionDecision): DomainEvent => ({
+  kind: TransactionCommands.RevertTransaction,
   id: decision.investmentId,
 });

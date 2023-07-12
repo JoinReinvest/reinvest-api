@@ -35,7 +35,9 @@ export class SharesEventHandler {
         await this.sharesAndDividendsModule.sharesSettled(objectId);
         break;
       case TransactionEvents.TRANSACTION_CANCELED:
+      case TransactionEvents.TRANSACTION_REVERTED:
       case TransactionEvents.TRANSACTION_CANCELED_UNWINDING:
+      case TransactionEvents.TRANSACTION_REVERTED_UNWINDING:
         await this.sharesAndDividendsModule.sharesRevoked(objectId);
         break;
       case ReinvestmentEvents.DIVIDEND_REINVESTMENT_REQUESTED:

@@ -11,6 +11,7 @@ export enum InvestmentStatus {
   CANCELED = 'CANCELED',
   TRANSFERRED = 'TRANSFERRED',
   SETTLING = 'SETTLING',
+  REVERTED = 'REVERTED',
 }
 
 export enum Origin {

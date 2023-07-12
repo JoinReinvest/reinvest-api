@@ -655,8 +655,8 @@ const northCapitalRouter = () => {
     try {
       const { investmentId, tradeState } = req.body;
 
-      if (!['SETTLED', 'FUNDED', 'UNWIND SETTLED'].includes(tradeState)) {
-        throw new Error('Invalid trade state, should be one of SETTLED, FUNDED, UNWIND SETTLED');
+      if (!['SETTLED', 'FUNDED', 'UNWIND SETTLED', 'CREATED'].includes(tradeState)) {
+        throw new Error('Invalid trade state, should be one of SETTLED, FUNDED, UNWIND SETTLED, CREATED');
       }
 
       const reinvestTrade = await databaseProvider

@@ -26,6 +26,7 @@ export interface InvestmentsTable {
   parentId: string | null;
   portfolioId: string;
   profileId: string;
+  reason: string | null;
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
   tradeId: string;

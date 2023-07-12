@@ -19,10 +19,19 @@ type InvestmentSchema = {
   parentId: UUID | null;
   portfolioId: UUID;
   profileId: UUID;
+  reason: string | null;
   status: InvestmentStatus;
   subscriptionAgreementId: UUID | null;
   tradeId: string;
 };
+
+export enum InvestmentFailedReason {
+  ACCOUNT_VERIFICATION_FAILED = 'ACCOUNT_VERIFICATION_FAILED',
+  INVESTMENT_CANCELED = 'INVESTMENT_CANCELED',
+  PAYMENT_MISMATCH = 'PAYMENT_MISMATCH',
+  PAYMENT_FAILED = 'PAYMENT_FAILED',
+  INVESTMENT_REJECTED_BY_PRINCIPAL = 'INVESTMENT_REJECTED_BY_PRINCIPAL',
+}
 
 export class Investment {
   private investmentSchema: InvestmentSchema;
@@ -74,6 +83,7 @@ export class Investment {
         status,
         subscriptionAgreementId,
         tradeId,
+        reason: null,
       },
       fee,
     );
@@ -96,10 +106,6 @@ export class Investment {
       this.investmentSchema.subscriptionAgreementId = id;
       this.evaluateStatusBeforeStarted();
     }
-  }
-
-  updateStatus(status: InvestmentStatus) {
-    this.investmentSchema.status = status;
   }
 
   abort() {
@@ -145,7 +151,7 @@ export class Investment {
       return false;
     }
 
-    if (!this.investmentSchema.subscriptionAgreementId) {
+    if (!this.isSubscriptionAgreementAssigned()) {
       return false;
     }
 
@@ -154,6 +160,10 @@ export class Investment {
     this.investmentSchema.status = InvestmentStatus.IN_PROGRESS;
 
     return true;
+  }
+
+  private isSubscriptionAgreementAssigned(): boolean {
+    return this.investmentSchema.subscriptionAgreementId !== null;
   }
 
   isStartedInvestment() {
@@ -255,6 +265,11 @@ export class Investment {
 
   settlingStarted() {
     this.investmentSchema.status = InvestmentStatus.SETTLING;
+    this.investmentSchema.dateUpdated = DateTime.now();
+  }
+
+  revert() {
+    this.investmentSchema.status = InvestmentStatus.REVERTED;
     this.investmentSchema.dateUpdated = DateTime.now();
   }
 }

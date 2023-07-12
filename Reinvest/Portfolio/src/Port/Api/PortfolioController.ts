@@ -78,7 +78,14 @@ export class PortfolioController {
 
   async getCurrentNav(portfolioId: string): Promise<{ numberOfShares: number; unitSharePrice: number }> {
     return {
-      unitSharePrice: 105,
+      unitSharePrice: 113,
+      numberOfShares: 100000000,
+    };
+  }
+
+  async getAbsoluteCurrentNav(portfolioId: string): Promise<{ numberOfShares: number; unitSharePrice: number }> {
+    return {
+      unitSharePrice: 113,
       numberOfShares: 100000000,
     };
   }

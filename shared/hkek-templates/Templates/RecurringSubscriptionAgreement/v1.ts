@@ -64,19 +64,12 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
           '{{Legal name of Purchaser (Individual or Entity)}}: {(purchaserName)}',
           '{{Date of Agreement}}: {(dateOfAgreement)}',
           '{{Number of Series {(nameOfAsset)} Interests subscribed for}}: {(investedAmount)}',
-          '{{Price of Series {(nameOfAsset)} Interests subscribed for}}: {(unitPrice)}',
           '{{Telephone Number}}: {(phoneNumber)}',
           '{{E-mail Address}}: {(email)}',
         ],
       },
       {
-        lines: ['We/I accept REINVEST to create scheduled investments as specified by us/me as follows:'],
-      },
-      {
-        lines: ['Start date: {{{(startDate)}}}', 'Frequency: {{{(frequency)}}}', 'Amount: {{{(investedAmount)}}}'],
-      },
-      {
-        lines: ['By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound'],
+        lines: ['{{By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound}}'],
       },
     ],
   },
@@ -103,6 +96,11 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
             'Agree to the terms and conditions contained in this Subscription Agreement and theOperating Agreement; and\n' +
             'Execute this Subscription Agreement intending to be legally bound by the terms and conditions contained in\n' +
             'this Subscription Agreement and in the Operating Agreement.',
+          '{{I/We accept REINVEST to create scheduled investments as specified by us/me as follows:}}',
+          'Start date: {{{(startDate)}}}',
+          'Frequency: {{{(frequency)}}}',
+          'Amount: {{{(investedAmount)}}}',
+          'Share count: as per current NAV',
           'Do not click "I AGREE" unless you agree to all of the terms and conditions contained in this Subscription Agreement\n' +
             'and the Operating Agreement.',
         ],
