@@ -7,8 +7,10 @@ import {
 } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 
 export type InvestmentDetails = {
+  accountId: string;
   bankAccountId: string;
   feeAmount: number | null;
+  feeApproveDate: Date | null;
   investmentAmount: number;
   ip: string | null;
   portfolioId: string;
@@ -32,7 +34,7 @@ export class InvestmentsQueryRepository {
     const investmentDetails = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
-      .fullJoin(subscriptionAgreementTable, `${subscriptionAgreementTable}.investmentId`, `${investmentsTable}.id`)
+      .fullJoin(subscriptionAgreementTable, `${subscriptionAgreementTable}.id`, `${investmentsTable}.subscriptionAgreementId`)
       .leftJoin(investmentsFeesTable, `${investmentsFeesTable}.investmentId`, `${investmentsTable}.id`)
       .select([
         `${investmentsTable}.amount as investmentAmount`,
@@ -42,9 +44,10 @@ export class InvestmentsQueryRepository {
         `${investmentsTable}.status`,
         `${investmentsTable}.tradeId`,
         `${investmentsTable}.profileId`,
+        `${investmentsTable}.accountId`,
       ])
       .select([`${subscriptionAgreementTable}.signedByIP as ip`, `${subscriptionAgreementTable}.pdfDateCreated as subscriptionAgreementPdfDateCreated`])
-      .select([`${investmentsFeesTable}.amount as feeAmount`])
+      .select([`${investmentsFeesTable}.amount as feeAmount`, `${investmentsFeesTable}.approveDate as feeApproveDate`])
       .where(`${investmentsTable}.id`, '=', investmentId)
       .castTo<InvestmentDetails>()
       .executeTakeFirst();

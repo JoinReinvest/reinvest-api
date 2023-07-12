@@ -12,3 +12,5 @@ export * as migration_20230601154000_subscription_agreement_unique from './inves
 export * as migration_20230627160400_update_fee_ids from './investments_12_update_fee_ids';
 export * as migration_20230704110500_investments_transfer_updates from './investments_13_investments_transfer_updates';
 export * as migration_20230710105700_investments_reason from './investments_14_investments_reason';
+export * as migration_20230712094200_recurring_investments_next_date from './investments_15_recurring_investments_next_date';
+export * as migration_20230712094201_recurring_investments_execution from './investments_16_recurring_investments_execution';

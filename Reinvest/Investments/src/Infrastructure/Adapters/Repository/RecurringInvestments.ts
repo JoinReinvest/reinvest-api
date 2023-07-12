@@ -1,11 +1,12 @@
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { InvestmentsDatabaseAdapterProvider, recurringInvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-import type { RecurringInvestmentDraftCreate } from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
-import { RecurringInvestment } from 'Reinvest/Investments/src/Domain/Investments/RecurringInvestment';
+import { RecurringInvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
+import { RecurringInvestment, RecurringInvestmentSchema } from 'Reinvest/Investments/src/Domain/Investments/RecurringInvestment';
 import { RecurringInvestmentStatus } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import type { DomainEvent } from 'SimpleAggregator/Types';
-import { UUID } from 'HKEKTypes/Generics';
-import { DateTime } from 'Money/DateTime';
 
 export class RecurringInvestmentsRepository {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -18,44 +19,44 @@ export class RecurringInvestmentsRepository {
 
   public static getClassName = (): string => 'RecurringInvestmentsRepository';
 
-  async get(profileId: UUID, accountId: UUID, status: RecurringInvestmentStatus) {
-    const recurringInvestment = await this.databaseAdapterProvider
+  async getRecurringInvestment(profileId: UUID, accountId: UUID, status: RecurringInvestmentStatus): Promise<RecurringInvestment | null> {
+    const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(recurringInvestmentsTable)
       .selectAll()
       .where('accountId', '=', accountId)
       .where('profileId', '=', profileId)
       .where('status', '=', status)
+      .limit(1)
       .executeTakeFirst();
 
-    if (!recurringInvestment) {
+    if (!data) {
       return null;
     }
 
-    return RecurringInvestment.create(recurringInvestment);
+    return this.castToObject(data);
   }
 
-  async create(recurringInvestment: RecurringInvestmentDraftCreate) {
-    const { id, accountId, profileId, portfolioId, money, startDate, frequency, status } = recurringInvestment;
-    const amount = money.getAmount();
+  async store(recurringInvestment: RecurringInvestment, events: DomainEvent[] = []) {
+    const values = this.castToTable(recurringInvestment);
 
     try {
       await this.databaseAdapterProvider
         .provide()
         .insertInto(recurringInvestmentsTable)
-        .values({
-          accountId,
-          amount,
-          dateCreated: DateTime.now().toDate(),
-          frequency,
-          id,
-          portfolioId,
-          profileId,
-          startDate: DateTime.from(startDate).toDate(),
-          status,
-          subscriptionAgreementId: null,
-        })
+        .values(values)
+        .onConflict(oc =>
+          oc.column('id').doUpdateSet({
+            status: eb => eb.ref(`excluded.status`),
+            nextDate: eb => eb.ref(`excluded.nextDate`),
+            subscriptionAgreementId: eb => eb.ref(`excluded.subscriptionAgreementId`),
+          }),
+        )
         .execute();
+
+      if (events.length > 0) {
+        await this.publishEvents(events);
+      }
 
       return true;
     } catch (error: any) {
@@ -83,27 +84,7 @@ export class RecurringInvestmentsRepository {
     }
   }
 
-  async assignSubscriptionAgreementAndUpdateStatus(investment: RecurringInvestment, events?: any) {
-    const { id, subscriptionAgreementId } = investment.toObject();
-    try {
-      await this.databaseAdapterProvider
-        .provide()
-        .updateTable(recurringInvestmentsTable)
-        .set({
-          subscriptionAgreementId,
-        })
-        .where('id', '=', id)
-        .execute();
-
-      return true;
-    } catch (error: any) {
-      console.error(`Cannot asign subscription agreement to recurring investment and update its status: ${error.message}`, error);
-
-      return false;
-    }
-  }
-
-  async updateStatus(recurringInvestment: RecurringInvestment) {
+  async updateStatus(recurringInvestment: RecurringInvestment): Promise<boolean> {
     const { id, status } = recurringInvestment.toObject();
     try {
       await this.databaseAdapterProvider
@@ -123,11 +104,73 @@ export class RecurringInvestmentsRepository {
     }
   }
 
-  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+  private async publishEvents(events: DomainEvent[] = []): Promise<void> {
     if (events.length === 0) {
       return;
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  private castToObject(tableData: RecurringInvestmentsTable): RecurringInvestment {
+    return RecurringInvestment.restore(<RecurringInvestmentSchema>{
+      ...tableData,
+      amount: Money.lowPrecision(tableData.amount),
+      dateCreated: DateTime.from(tableData.dateCreated),
+      startDate: DateTime.fromIsoDate(tableData.startDate),
+      nextDate: DateTime.fromIsoDate(tableData.nextDate),
+    });
+  }
+
+  private castToTable(object: RecurringInvestment): RecurringInvestmentsTable {
+    const data = object.toObject();
+
+    return <RecurringInvestmentsTable>{
+      ...data,
+      amount: data.amount.getAmount(),
+      dateCreated: data.dateCreated.toDate(),
+      startDate: data.startDate.toDate(),
+      nextDate: data.nextDate.toDate(),
+    };
+  }
+
+  async getActiveRecurringInvestmentReadyToExecute(pagination: Pagination): Promise<
+    {
+      accountId: UUID;
+      id: UUID;
+      profileId: UUID;
+    }[]
+  > {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(recurringInvestmentsTable)
+      .select(['id', 'profileId', 'accountId'])
+      .where('status', '=', RecurringInvestmentStatus.ACTIVE)
+      .where('nextDate', '<=', DateTime.now().toDate())
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .execute();
+
+    if (data.length === 0) {
+      return [];
+    }
+
+    return data;
+  }
+
+  async getRecurringInvestmentById(recurringInvestmentId: UUID): Promise<RecurringInvestment | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(recurringInvestmentsTable)
+      .selectAll()
+      .where('id', '=', recurringInvestmentId)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return this.castToObject(data);
   }
 }

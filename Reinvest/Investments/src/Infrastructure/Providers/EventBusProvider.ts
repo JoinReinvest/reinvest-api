@@ -97,6 +97,7 @@ export default class EventBusProvider {
         TransactionCommands.CancelTransaction,
         TransactionCommands.RevertTransaction,
         TransactionCommands.RetryPayment,
+        'CreateNotification',
       ])
       .subscribeHandlerForKinds(AgreementsEventHandler.getClassName(), [
         SubscriptionAgreementEvents.GenerateSubscriptionAgreementCommand,

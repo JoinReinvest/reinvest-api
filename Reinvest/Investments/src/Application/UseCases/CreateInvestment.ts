@@ -1,9 +1,8 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import { Fee, VerificationFeeIds } from 'Investments/Domain/Investments/Fee';
 import { Investment } from 'Investments/Domain/Investments/Investment';
-import { InvestmentStatus, Origin } from 'Investments/Domain/Investments/Types';
-import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
+import { Origin } from 'Investments/Domain/Investments/Types';
+import { InvestmentFeeService } from 'Investments/Domain/Service/InvestmentFeeService';
 import { InvestmentsDatabase } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
@@ -11,34 +10,22 @@ import TradeId from 'Investments/Infrastructure/ValueObject/TradeId';
 import { Money } from 'Money/Money';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 
-export type InvestmentCreate = {
-  accountId: string;
-  bankAccountId: string;
-  id: string;
-  origin: Origin;
-  parentId: string | null;
-  portfolioId: string;
-  profileId: string;
-  status: InvestmentStatus;
-  tradeId: string;
-};
-
-class CreateInvestment {
+export class CreateInvestment {
   static getClassName = (): string => 'CreateInvestment';
-  private verificationService: VerificationService;
   private feeRepository: FeesRepository;
   private investmentsRepository: InvestmentsRepository;
   private idGenerator: IdGeneratorInterface;
   private transactionalAdapter: TransactionalAdapter<InvestmentsDatabase>;
+  private feeService: InvestmentFeeService;
 
   constructor(
     investmentsRepository: InvestmentsRepository,
     feeRepository: FeesRepository,
-    verificationService: VerificationService,
+    feeService: InvestmentFeeService,
     idGenerator: IdGeneratorInterface,
     transactionalAdapter: TransactionalAdapter<InvestmentsDatabase>,
   ) {
-    this.verificationService = verificationService;
+    this.feeService = feeService;
     this.feeRepository = feeRepository;
     this.investmentsRepository = investmentsRepository;
     this.idGenerator = idGenerator;
@@ -63,7 +50,7 @@ class CreateInvestment {
       null,
       null,
     );
-    const fee = await this.calculateFee(amount, profileId, parentId ?? accountId, investmentId);
+    const fee = await this.feeService.calculateFee(amount, profileId, parentId ?? accountId, investmentId);
 
     if (fee) {
       investment.setFee(fee);
@@ -73,35 +60,4 @@ class CreateInvestment {
 
     return investmentId;
   }
-
-  private async calculateFee(amount: Money, profileId: UUID, accountId: UUID, investmentId: UUID): Promise<Fee | null> {
-    const fees = await this.verificationService.payFeesForInvestment(amount, profileId, accountId);
-
-    if (fees.length === 0) {
-      return null;
-    }
-
-    let feeAmount = Money.zero();
-    const feesReferences: VerificationFeeIds = {
-      fees: [],
-    };
-
-    for (const fee of fees) {
-      feeAmount = feeAmount.add(fee.amount);
-      feesReferences.fees.push({
-        amount: fee.amount.getAmount(),
-        verificationFeeId: fee.verificationFeeId,
-      });
-    }
-
-    if (feeAmount.isZero()) {
-      return null;
-    }
-
-    const feeId = this.idGenerator.createUuid();
-
-    return Fee.create(accountId, feeAmount, feeId, investmentId, profileId, feesReferences);
-  }
 }
-
-export default CreateInvestment;

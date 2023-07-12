@@ -27,6 +27,7 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
     }
 
     const {
+      accountId,
       ip,
       tradeId,
       profileId,
@@ -37,6 +38,7 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
       bankAccountId,
       investmentAmount,
       feeAmount,
+      feeApproveDate,
     } = investmentDetails;
 
     if (status !== InvestmentStatus.IN_PROGRESS) {
@@ -62,13 +64,39 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
       return;
     }
 
-    // TODO add info if the investment is for beneficiary
+    if (feeAmount && !feeApproveDate) {
+      const uniqueId = `fee-${investmentId}`;
+      const command = {
+        kind: 'CreateNotification',
+        data: {
+          accountId: accountId,
+          profileId: profileId,
+          notificationType: 'FEES_APPROVAL_REQUIRED',
+          header: 'Fees approval required [COPY-TO-UPDATE]',
+          body: 'One of your investment does not have fees approved. Please approve fees to continue investing.',
+          dismissId: null,
+          onObjectId: investmentId,
+          onObjectType: 'INVESTMENT',
+          uniqueId: uniqueId,
+          pushNotification: {
+            title: 'Fees approval required [COPY-TO-UPDATE]',
+            body: 'One of your investment does not have fees approved. Please approve fees to continue investing.',
+          },
+        },
+        id: event.id,
+      };
+
+      await this.eventBus.publish(command);
+
+      return;
+    }
+
     await this.eventBus.publish(<InvestmentFinalized>{
       kind: TransactionEvents.INVESTMENT_FINALIZED,
       data: {
         amount: investmentAmount,
         fees: !feeAmount ? 0 : feeAmount,
-        ip: '8.8.8.8', // TODO - get ip from subscription agreement when implemented
+        ip,
         bankAccountId,
         subscriptionAgreementId,
         portfolioId,

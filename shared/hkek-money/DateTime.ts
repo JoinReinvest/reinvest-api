@@ -11,6 +11,10 @@ export class DateTime {
     return new DateTime(dayjs());
   }
 
+  static nowIsoDate(): DateTime {
+    return DateTime.fromIsoDate(DateTime.now().toDate());
+  }
+
   static from(date: Date | string): DateTime {
     return new DateTime(dayjs(date));
   }
@@ -85,5 +89,9 @@ export class DateTime {
 
   toTimestamp(): number {
     return this.date.unix();
+  }
+
+  add(value: number, type: 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second'): DateTime {
+    return new DateTime(this.date.add(value, type));
   }
 }

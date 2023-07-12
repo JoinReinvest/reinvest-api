@@ -1,9 +1,8 @@
+import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 import { AgreementTypes, RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
-import { DomainEvent } from 'SimpleAggregator/Types';
-import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 
 class SignRecurringSubscriptionAgreement {
   static getClassName = (): string => 'SignRecurringSubscriptionAgreement';
@@ -22,9 +21,8 @@ class SignRecurringSubscriptionAgreement {
     this.documentsService = documentsService;
   }
 
-  async execute(profileId: string, accountId: string, clientIp: string) {
-    const events: DomainEvent[] = [];
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(profileId, accountId, RecurringInvestmentStatus.DRAFT);
+  async execute(profileId: string, accountId: string, clientIp: string): Promise<boolean> {
+    const recurringInvestment = await this.recurringInvestmentsRepository.getRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
 
     if (!recurringInvestment) {
       return false;
@@ -51,21 +49,15 @@ class SignRecurringSubscriptionAgreement {
     const subscriptionAgreementId = subscriptionAgreement.getId();
     recurringInvestment.assignSubscriptionAgreement(subscriptionAgreementId);
 
-    const isAssigned = await this.recurringInvestmentsRepository.assignSubscriptionAgreementAndUpdateStatus(recurringInvestment);
-
-    if (isAssigned) {
-      events.push(<SubscriptionAgreementEvent>{
+    return this.recurringInvestmentsRepository.store(recurringInvestment, [
+      <SubscriptionAgreementEvent>{
         id: subscriptionAgreementId,
         kind: SubscriptionAgreementEvents.RecurringSubscriptionAgreementSigned,
         data: {
           profileId,
         },
-      });
-
-      await this.recurringInvestmentsRepository.publishEvents(events);
-    }
-
-    return isAssigned;
+      },
+    ]);
   }
 }
 

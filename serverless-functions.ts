@@ -12,6 +12,8 @@ import {
 } from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
 import { CronNotificationsFunction, CronNotificationsResources } from './devops/functions/cron/notifications/cron-notifications-config';
+import { CronPushEveryDayFunction, CronPushEveryDayResources } from './devops/functions/cron/pushEveryDayProcesses/cron-push-config';
+import { CronRecurringInvestmentsFunction, CronRecurringInvestmentsResources } from './devops/functions/cron/recurringInvestments/recurring-investments-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { FirebaseFunction, FirebaseResources } from './devops/functions/firebase/queue-config';
@@ -25,7 +27,6 @@ import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } f
 import { CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs, CognitoEnvs } from './devops/serverless/cognito';
 import { margeWithApiGatewayUrl, ProviderEnvironment } from './devops/serverless/serverless-common';
 import { getAttribute, importOutput } from './devops/serverless/utils';
-import { CronPushEveryDayFunction, CronPushEveryDayResources } from './devops/functions/cron/pushEveryDayProcesses/cron-push-config';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
@@ -100,6 +101,7 @@ const serverlessConfiguration: AWS = {
     cronDividendsDistribution: CronDividendsDistributionFunction,
     cronNotificationsFunction: CronNotificationsFunction,
     cronPushEveryDay: CronPushEveryDayFunction,
+    cronRecurringInvestments: CronRecurringInvestmentsFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
@@ -123,6 +125,7 @@ const serverlessConfiguration: AWS = {
       ...CronVendorsSyncResources,
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
+      ...CronRecurringInvestmentsResources,
       ...PdfGeneratorResources,
       ...FirebaseResources,
       ...CronNotificationsResources,

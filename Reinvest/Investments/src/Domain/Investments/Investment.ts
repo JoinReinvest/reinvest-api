@@ -142,12 +142,12 @@ export class Investment {
     return this.fee.isApproved();
   }
 
-  startInvestment(): boolean {
+  startInvestment(ignoreFee = false): boolean {
     if (this.isStartedInvestment()) {
       return false;
     }
 
-    if (!this.isFeeApproved()) {
+    if (!ignoreFee && !this.isFeeApproved()) {
       return false;
     }
 

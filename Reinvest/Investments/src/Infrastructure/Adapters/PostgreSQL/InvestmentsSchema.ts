@@ -1,5 +1,6 @@
 import { JSONObject, JSONObjectOf } from 'HKEKTypes/Generics';
 import { VerificationFeeIds } from 'Investments/Domain/Investments/Fee';
+import { RecurringInvestmentExecutionInvestmentStatus } from 'Investments/Domain/Investments/RecurringInvestmentExecution';
 import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import type {
@@ -75,11 +76,21 @@ export interface RecurringInvestmentsTable {
   dateCreated: Date;
   frequency: RecurringInvestmentFrequency;
   id: string;
+  nextDate: Date;
   portfolioId: string;
   profileId: string;
   startDate: Date;
   status: RecurringInvestmentStatus;
   subscriptionAgreementId: string | null;
+}
+
+export interface RecurringInvestmentsExecutionTable {
+  dateCreated: Date;
+  executionDate: Date;
+  id: string;
+  investmentId: string;
+  investmentStatus: RecurringInvestmentExecutionInvestmentStatus;
+  recurringInvestmentId: string;
 }
 
 export interface ReinvestmentEventsTable {

@@ -2,7 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { Pagination } from 'Investments/Application/Pagination';
 import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
-import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
+import { CreateInvestment } from 'Investments/Application/UseCases/CreateInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import ListInvestmentsQuery, { InvestmentOverview } from 'Investments/Application/UseCases/ListInvestmentsQuery';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
