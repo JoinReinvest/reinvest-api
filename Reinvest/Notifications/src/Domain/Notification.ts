@@ -20,6 +20,7 @@ export enum NotificationsType {
 export enum NotificationObjectType {
   ACCOUNT = 'ACCOUNT',
   INVESTMENT = 'INVESTMENT',
+  RECURRING_INVESTMENT = 'RECURRING_INVESTMENT',
   DIVIDEND = 'DIVIDEND',
 }
 

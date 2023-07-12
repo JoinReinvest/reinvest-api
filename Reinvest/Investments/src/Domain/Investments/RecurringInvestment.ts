@@ -115,4 +115,8 @@ export class RecurringInvestment {
   setNextExecutionDate(lastExecutionDate: DateTime): void {
     this.schema.nextDate = this.getNextExecutionDate(lastExecutionDate);
   }
+
+  suspend(): void {
+    this.schema.status = RecurringInvestmentStatus.SUSPENDED;
+  }
 }

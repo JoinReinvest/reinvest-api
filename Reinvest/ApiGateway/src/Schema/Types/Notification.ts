@@ -27,6 +27,7 @@ const schema = `
         INVESTMENT
         DIVIDEND
         ACCOUNT
+        RECURRING_INVESTMENT
     }
 
     type NotificationObject {

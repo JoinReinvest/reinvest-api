@@ -39,6 +39,7 @@ import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/A
 import { InvestmentFeeService } from 'Investments/Domain/Service/InvestmentFeeService';
 import { CreateInvestmentFromRecurringInvestment } from 'Investments/Application/UseCases/CreateInvestmentFromRecurringInvestment';
 import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
+import { SuspendRecurringInvestment } from 'Investments/Application/UseCases/SuspendRecurringInvestment';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -60,6 +61,7 @@ export default class UseCaseProviders {
       'InvestmentsTransactionalAdapter',
       IdGenerator,
     ]);
+    container.addSingleton(SuspendRecurringInvestment, [RecurringInvestmentsRepository, RecurringInvestmentExecutionRepository]);
     container.addSingleton(CreateSubscriptionAgreement, [
       SubscriptionAgreementRepository,
       InvestmentsRepository,

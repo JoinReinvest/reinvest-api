@@ -70,4 +70,37 @@ export class RecurringInvestmentExecutionRepository {
       dateCreated: data.dateCreated.toDate(),
     };
   }
+
+  async getByInvestmentId(investmentId: UUID): Promise<RecurringInvestmentExecution | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(recurringInvestmentsExecutionTable)
+      .selectAll()
+      .where('investmentId', '=', investmentId)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return this.castToObject(data);
+  }
+
+  async getLastExecutions(recurringId: UUID, limit: number): Promise<RecurringInvestmentExecution[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(recurringInvestmentsExecutionTable)
+      .selectAll()
+      .where('recurringInvestmentId', '=', recurringId)
+      .orderBy('executionDate', 'desc')
+      .limit(limit)
+      .execute();
+
+    if (data.length === 0) {
+      return [];
+    }
+
+    return data.map(record => this.castToObject(record));
+  }
 }

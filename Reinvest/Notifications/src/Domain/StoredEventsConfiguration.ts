@@ -13,6 +13,7 @@ export enum StoredEventKind {
   ArchivingBeneficiaryStarted = 'ArchivingBeneficiaryStarted',
   ArchivingBeneficiaryCompleted = 'ArchivingBeneficiaryCompleted',
   TransferringBeneficiaryToParentCompleted = 'TransferringBeneficiaryToParentCompleted',
+  RecurringInvestmentSuspended = 'RecurringInvestmentSuspended',
 }
 
 export const StoredEvents = <StoredEventsType>{
@@ -122,6 +123,28 @@ export const StoredEvents = <StoredEventsType>{
     push: {
       title: ({ tradeId }) => `Payment initiated for trade ${tradeId}`,
       body: paymentInitiatedBody,
+    },
+  },
+  RecurringInvestmentSuspended: {
+    accountActivity: {
+      data: ({ recurringId, reason }) => ({
+        recurringId,
+        reason,
+      }),
+      name: ({ reason }) => `Recurring investment suspended. Reason: ${reason}`,
+    },
+    inApp: {
+      header: () => `Recurring investment suspended.`,
+      body: ({ reason }) => `${reason}`,
+      notificationType: NotificationsType.RECURRING_INVESTMENT_FAILED,
+      onObject: ({ recurringId }) => ({
+        onObjectId: recurringId,
+        onObjectType: NotificationObjectType.RECURRING_INVESTMENT,
+      }),
+    },
+    push: {
+      title: () => `Recurring investment suspended.`,
+      body: ({ reason }) => `${reason}`,
     },
   },
 };

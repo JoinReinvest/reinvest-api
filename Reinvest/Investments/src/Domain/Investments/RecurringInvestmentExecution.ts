@@ -4,7 +4,10 @@ import { DateTime } from 'Money/DateTime';
 export enum RecurringInvestmentExecutionInvestmentStatus {
   PENDING = 'PENDING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
-  PAYMENT_SUCCESSFUL = 'PAYMENT_SUCCESSFUL',
+  PAYMENT_SUCCEEDED = 'PAYMENT_SUCCEEDED',
+  FAILED = 'FAILED',
+  CANCELED = 'CANCELED',
+  COMPLETED = 'COMPLETED',
 }
 
 export interface RecurringInvestmentExecutionSchema {
@@ -44,5 +47,37 @@ export class RecurringInvestmentExecution {
 
   getExecutionDate(): DateTime {
     return this.schema.executionDate;
+  }
+
+  paymentSucceeded() {
+    this.schema.investmentStatus = RecurringInvestmentExecutionInvestmentStatus.PAYMENT_SUCCEEDED;
+  }
+
+  canceled() {
+    this.schema.investmentStatus = RecurringInvestmentExecutionInvestmentStatus.CANCELED;
+  }
+
+  paymentFailed() {
+    this.schema.investmentStatus = RecurringInvestmentExecutionInvestmentStatus.PAYMENT_FAILED;
+  }
+
+  failed() {
+    if (this.schema.investmentStatus === RecurringInvestmentExecutionInvestmentStatus.PAYMENT_FAILED) {
+      return;
+    }
+
+    this.schema.investmentStatus = RecurringInvestmentExecutionInvestmentStatus.FAILED;
+  }
+
+  completed() {
+    this.schema.investmentStatus = RecurringInvestmentExecutionInvestmentStatus.COMPLETED;
+  }
+
+  getRecurringId(): UUID {
+    return this.schema.recurringInvestmentId;
+  }
+
+  isPaymentFailed(): boolean {
+    return this.schema.investmentStatus === RecurringInvestmentExecutionInvestmentStatus.PAYMENT_FAILED;
   }
 }
