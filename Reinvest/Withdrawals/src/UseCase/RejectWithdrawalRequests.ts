@@ -11,7 +11,7 @@ class RejectWithdrawalRequests {
 
   async execute(id: string, decisionReason: string): Promise<boolean> {
     try {
-      const fundsWithdrawalRequests = await this.fundsWithdrawalRequestsRepository.getFundsWithdrawalRequestToAcceptOrReject(id);
+      const fundsWithdrawalRequests = await this.fundsWithdrawalRequestsRepository.getRequestedFundsWithdrawalRequests(id);
 
       if (!fundsWithdrawalRequests) {
         return false;

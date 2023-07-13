@@ -171,7 +171,7 @@ export class FundsWithdrawalRequestsRepository {
     return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
   }
 
-  async getFundsWithdrawalRequestToAcceptOrReject(id: UUID): Promise<FundsWithdrawalRequest | null> {
+  async getRequestedFundsWithdrawalRequests(id: UUID): Promise<FundsWithdrawalRequest | null> {
     const fundsWithdrawalRequest = await this.databaseAdapterProvider
       .provide()
       .selectFrom(withdrawalsFundsRequestsTable)
