@@ -13,7 +13,7 @@ const schema = `
         @access: Admin, Executive
         Recover verification of an object after failed request manually
         """
-        recoverVerification(objectId: String): Boolean
+        recoverVerification(objectId: ID!): Boolean
     }
 `;
 

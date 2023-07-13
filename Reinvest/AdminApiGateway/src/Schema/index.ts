@@ -9,8 +9,10 @@ import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constr
 import { PortfolioSchema } from 'Reinvest/AdminApiGateway/src/Schema/Types/Portfolio';
 
 import { DocumentTypes } from './Types/DocumentTypes';
+import { Withdrawals } from 'AdminApiGateway/Schema/Types/Withdrawals';
+import { Money } from 'ApiGateway/Schema/Scalars/Money';
 
-const executableSchemas = [EmailAddress, DateScalar];
+const executableSchemas = [EmailAddress, DateScalar, Money];
 const nonExecutableTypeDefs = mergeTypeDefs([
   constraintDirectiveTypeDefs,
   Shared.typeDefs,
@@ -18,12 +20,14 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   DividendsSchema.typeDefs,
   PortfolioSchema.typeDefs,
   DocumentTypes.typeDefs,
+  Withdrawals.typeDefs,
 ]);
 const nonExecutableResolvers = mergeResolvers([
   AdminVerificationSchema.resolvers,
   DividendsSchema.resolvers,
   PortfolioSchema.resolvers,
   DocumentTypes.resolvers,
+  Withdrawals.resolvers,
 ]);
 
 let schema = mergeSchemas({
