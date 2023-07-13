@@ -1,5 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { PortfolioController } from 'Portfolio/Port/Api/PortfolioController';
+import { PortfolioUpdatesController } from 'Portfolio/Port/Api/PortfolioUpdatesController';
 
 export type PortfolioApiType = {
   getAbsoluteCurrentNav: PortfolioController['getAbsoluteCurrentNav'];
@@ -12,6 +13,8 @@ export type PortfolioApiType = {
   getProperties: PortfolioController['getProperties'];
   synchronizePortfolio: PortfolioController['synchronizePortfolio'];
   updateProperty: PortfolioController['updateProperty'];
+  addPortfolioUpdate: PortfolioUpdatesController['add'];
+  deletePortfolioUpdate: PortfolioUpdatesController['delete'];
 };
 
 export const PortfolioApi = (container: ContainerInterface): PortfolioApiType => ({
@@ -25,4 +28,6 @@ export const PortfolioApi = (container: ContainerInterface): PortfolioApiType =>
   getPortfolioVendorsConfiguration: container.delegateTo(PortfolioController, 'getPortfolioVendorsConfiguration'),
   getDataForSubscriptionAgreement: container.delegateTo(PortfolioController, 'getDataForSubscriptionAgreement'),
   getAbsoluteCurrentNav: container.delegateTo(PortfolioController, 'getAbsoluteCurrentNav'),
+  addPortfolioUpdate: container.delegateTo(PortfolioUpdatesController, 'add'),
+  deletePortfolioUpdate: container.delegateTo(PortfolioUpdatesController, 'delete'),
 });
