@@ -1,11 +1,13 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
+import AcceptWithdrawalRequests from 'Withdrawals/UseCase/AcceptWithdrawalRequests';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
 import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
+import RejectWithdrawalRequests from 'Withdrawals/UseCase/RejectWithdrawalRequests';
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
 import { WithdrawDividend } from 'Withdrawals/UseCase/WithdrawDividend';
-import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 
 export class WithdrawalsController {
   private withdrawalsQuery: WithdrawalsQuery;
@@ -14,6 +16,8 @@ export class WithdrawalsController {
   private withdrawDividendUseCase: WithdrawDividend;
   private abortFundsWithdrawalRequestUseCase: AbortFundsWithdrawalRequest;
   private requestFundWithdrawalUseCase: RequestFundWithdrawal;
+  private acceptWithdrawalRequestsUseCase: AcceptWithdrawalRequests;
+  private rejectWithdrawalRequestsUseCase: RejectWithdrawalRequests;
 
   constructor(
     withdrawalsQuery: WithdrawalsQuery,
@@ -22,6 +26,8 @@ export class WithdrawalsController {
     withdrawDividendUseCase: WithdrawDividend,
     abortFundsWithdrawalRequestUseCase: AbortFundsWithdrawalRequest,
     requestFundWithdrawalUseCase: RequestFundWithdrawal,
+    acceptWithdrawalRequestsUseCase: AcceptWithdrawalRequests,
+    rejectWithdrawalRequestsUseCase: RejectWithdrawalRequests,
   ) {
     this.withdrawalsQuery = withdrawalsQuery;
     this.createWithdrawalFundsRequestUseCase = createWithdrawalFundsRequestUseCase;
@@ -29,6 +35,8 @@ export class WithdrawalsController {
     this.withdrawDividendUseCase = withdrawDividendUseCase;
     this.abortFundsWithdrawalRequestUseCase = abortFundsWithdrawalRequestUseCase;
     this.requestFundWithdrawalUseCase = requestFundWithdrawalUseCase;
+    this.acceptWithdrawalRequestsUseCase = acceptWithdrawalRequestsUseCase;
+    this.rejectWithdrawalRequestsUseCase = rejectWithdrawalRequestsUseCase;
   }
 
   static getClassName = () => 'WithdrawalsController';
@@ -81,6 +89,26 @@ export class WithdrawalsController {
 
     for (const dividendId of dividendIds) {
       statuses.push(await this.withdrawDividendUseCase.execute(profileId, accountId, dividendId));
+    }
+
+    return statuses.some(status => status === true);
+  }
+
+  async acceptWithdrawalRequests(ids: UUID[]): Promise<boolean> {
+    const statuses = [];
+
+    for (const id of ids) {
+      statuses.push(await this.acceptWithdrawalRequestsUseCase.execute(id));
+    }
+
+    return statuses.some(status => status === true);
+  }
+
+  async rejectWithdrawalRequests(ids: UUID[], decisionReason: string): Promise<boolean> {
+    const statuses = [];
+
+    for (const id of ids) {
+      statuses.push(await this.rejectWithdrawalRequestsUseCase.execute(id, decisionReason));
     }
 
     return statuses.some(status => status === true);

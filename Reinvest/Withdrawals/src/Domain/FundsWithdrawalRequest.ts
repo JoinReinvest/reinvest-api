@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { Money } from 'Money/Money';
 
 import { WithdrawalsFundsRequestsStatuses } from './WithdrawalsFundsRequests';
-import { Money } from 'Money/Money';
 
 export type SettledSharesData = {
   currentNavPerShare: number;
@@ -184,6 +184,17 @@ export class FundsWithdrawalRequest {
     } else {
       this.status = WithdrawalsFundsRequestsStatuses.ABORTED;
     }
+  }
+
+  accept(): void {
+    this.status = WithdrawalsFundsRequestsStatuses.ACCEPTED;
+    this.dateDecision = new Date();
+  }
+
+  reject(decisionReason: string): void {
+    this.status = WithdrawalsFundsRequestsStatuses.REJECTED;
+    this.dateDecision = new Date();
+    this.adminDecisionReason = decisionReason;
   }
 
   request() {

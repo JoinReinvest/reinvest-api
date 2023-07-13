@@ -77,6 +77,49 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
+  async accept(fundsWithdrawalRequest: FundsWithdrawalRequest): Promise<boolean> {
+    const { status, dateDecision } = fundsWithdrawalRequest.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(withdrawalsFundsRequestsTable)
+        .set({
+          status,
+          dateDecision,
+        })
+        .where('id', '=', fundsWithdrawalRequest.getId())
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot create funds withdrawal request: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async reject(fundsWithdrawalRequest: FundsWithdrawalRequest): Promise<boolean> {
+    const { status, dateDecision, adminDecisionReason } = fundsWithdrawalRequest.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(withdrawalsFundsRequestsTable)
+        .set({
+          status,
+          dateDecision,
+          adminDecisionReason,
+        })
+        .where('id', '=', fundsWithdrawalRequest.getId())
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot create funds withdrawal request: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
   async get(profileId: UUID, accountId: UUID): Promise<FundsWithdrawalRequest | null> {
     try {
       const fundsWithdrawalRequest = await this.databaseAdapterProvider
@@ -118,6 +161,22 @@ export class FundsWithdrawalRequestsRepository {
       .where('profileId', '=', profileId)
       .where('accountId', '=', accountId)
       .where('status', 'in', [WithdrawalsFundsRequestsStatuses.DRAFT, WithdrawalsFundsRequestsStatuses.REQUESTED])
+      .castTo<FundsWithdrawalRequestSchema>()
+      .executeTakeFirst();
+
+    if (!fundsWithdrawalRequest) {
+      return null;
+    }
+
+    return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
+  }
+
+  async getFundsWithdrawalRequestToAcceptOrReject(id: UUID): Promise<FundsWithdrawalRequest | null> {
+    const fundsWithdrawalRequest = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .where('id', '=', id)
+      .where('status', '=', WithdrawalsFundsRequestsStatuses.REQUESTED)
       .castTo<FundsWithdrawalRequestSchema>()
       .executeTakeFirst();
 
