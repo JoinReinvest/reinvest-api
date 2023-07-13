@@ -10,3 +10,7 @@ export interface PropertySchema {
   portfolioId: UUID;
   status: PropertyStatus;
 }
+
+export interface UpdatesSchema {
+  portfolioId: string
+}

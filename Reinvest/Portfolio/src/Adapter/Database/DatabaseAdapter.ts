@@ -1,11 +1,12 @@
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 
-import { PropertySchema } from './PropertySchema';
+import {PropertySchema, UpdatesSchema} from './PropertySchema';
 
 export const propertyTable = 'portfolio_property';
-
+export const updatesTable = 'portfolio_updates';
 export interface PortfolioDatabase {
   [propertyTable]: PropertySchema;
+  [updatesTable]: UpdatesSchema;
 }
 
 export const PortfolioDatabaseAdapterInstanceProvider = 'PortfolioDatabaseAdapterProvider';
