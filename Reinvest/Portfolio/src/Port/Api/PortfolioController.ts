@@ -1,5 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { DataJson } from 'Portfolio/Domain/types';
+import { RegisterPortfolio } from 'Portfolio/UseCase/RegisterPortfolio';
 import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
 import { UpdateProperty, UpdatePropertyInput } from 'Portfolio/UseCase/UpdateProperty';
 import { GetProperties } from 'Reinvest/Portfolio/src/UseCase/GetProperties';
@@ -23,11 +24,18 @@ export class PortfolioController {
   private synchronizePortfolioUseCase: SynchronizePortfolio;
   private updatePropertyUseCase: UpdateProperty;
   private getPropertiesUseCase: GetProperties;
+  private registerPortfolioUseCase: RegisterPortfolio;
 
-  constructor(synchronizePortfolioUseCase: SynchronizePortfolio, updatePropertyUseCase: UpdateProperty, getPropertiesUseCase: GetProperties) {
+  constructor(
+    synchronizePortfolioUseCase: SynchronizePortfolio,
+    updatePropertyUseCase: UpdateProperty,
+    getPropertiesUseCase: GetProperties,
+    registerPortfolioUseCase: RegisterPortfolio,
+  ) {
     this.synchronizePortfolioUseCase = synchronizePortfolioUseCase;
     this.updatePropertyUseCase = updatePropertyUseCase;
     this.getPropertiesUseCase = getPropertiesUseCase;
+    this.registerPortfolioUseCase = registerPortfolioUseCase;
   }
 
   static getClassName = (): string => 'PortfolioController';
@@ -98,5 +106,29 @@ export class PortfolioController {
       nameOfOffering: 'Community REIT',
       offeringsCircularLink: 'https://link-to-offering-circular.com',
     };
+  }
+
+  async registerPortfolio(
+    name: string,
+    northCapitalOfferingId: string,
+    vertaloAllocationId: string,
+    linkToOfferingCircular: string,
+  ): Promise<{
+    errors: string[];
+    portfolioId: string | null;
+  }> {
+    try {
+      const portfolioId = await this.registerPortfolioUseCase.execute(name, northCapitalOfferingId, vertaloAllocationId, linkToOfferingCircular);
+
+      return {
+        errors: [],
+        portfolioId,
+      };
+    } catch (error: any) {
+      return {
+        errors: [error.message],
+        portfolioId: null,
+      };
+    }
   }
 }

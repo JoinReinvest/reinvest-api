@@ -79,6 +79,8 @@ export function boot(): Modules {
         database: databaseConfig,
         queue: queueConfig,
         dealpathConfig,
+        northCapital: northCapitalConfig,
+        vertalo: vertaloConfig,
       } as Portfolio.Config,
       {
         documents: modules.get(Documents.moduleName) as Documents.Main,

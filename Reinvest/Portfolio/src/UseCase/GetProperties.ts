@@ -1,13 +1,13 @@
 import { FileLink } from 'Documents/Adapter/S3/FileLinkService';
 import { UUID } from 'HKEKTypes/Generics';
-import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
+import { PropertyRepository } from 'Portfolio/Adapter/Database/Repository/PropertyRepository';
 import { DocumentsService } from 'Reinvest/Portfolio/src/Adapter/Documents/DocumentsService';
 
 export class GetProperties {
-  private portfolioRepository: PortfolioRepository;
+  private portfolioRepository: PropertyRepository;
   private documents: DocumentsService;
 
-  constructor(portfolioRepository: PortfolioRepository, documents: DocumentsService) {
+  constructor(portfolioRepository: PropertyRepository, documents: DocumentsService) {
     this.portfolioRepository = portfolioRepository;
     this.documents = documents;
   }
