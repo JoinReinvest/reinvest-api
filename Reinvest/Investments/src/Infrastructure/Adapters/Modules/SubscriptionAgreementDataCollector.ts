@@ -6,8 +6,6 @@ type PortfolioData = {
   nameOfAsset: string;
   nameOfOffering: string;
   offeringsCircularLink: string;
-  tendererCompanyName: string;
-  unitPrice: string;
 };
 
 type LegalEntitiesData = {

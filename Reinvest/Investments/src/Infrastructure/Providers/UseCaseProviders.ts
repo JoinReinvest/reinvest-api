@@ -40,6 +40,7 @@ import { InvestmentFeeService } from 'Investments/Domain/Service/InvestmentFeeSe
 import { CreateInvestmentFromRecurringInvestment } from 'Investments/Application/UseCases/CreateInvestmentFromRecurringInvestment';
 import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
 import { SuspendRecurringInvestment } from 'Investments/Application/UseCases/SuspendRecurringInvestment';
+import { PortfolioService } from 'Investments/Infrastructure/Adapters/Modules/PortfolioService';
 
 export default class UseCaseProviders {
   private config: Investments.Config;
@@ -52,7 +53,14 @@ export default class UseCaseProviders {
     container.addSingleton(IdGenerator);
     container.addSingleton(InvestmentFeeService, [VerificationService, IdGenerator]);
 
-    container.addSingleton(CreateInvestment, [InvestmentsRepository, FeesRepository, InvestmentFeeService, IdGenerator, 'InvestmentsTransactionalAdapter']);
+    container.addSingleton(CreateInvestment, [
+      InvestmentsRepository,
+      FeesRepository,
+      InvestmentFeeService,
+      IdGenerator,
+      'InvestmentsTransactionalAdapter',
+      PortfolioService,
+    ]);
     container.addSingleton(CreateInvestmentFromRecurringInvestment, [
       RecurringInvestmentsRepository,
       RecurringInvestmentExecutionRepository,
@@ -60,6 +68,7 @@ export default class UseCaseProviders {
       InvestmentFeeService,
       'InvestmentsTransactionalAdapter',
       IdGenerator,
+      PortfolioService,
     ]);
     container.addSingleton(SuspendRecurringInvestment, [RecurringInvestmentsRepository, RecurringInvestmentExecutionRepository]);
     container.addSingleton(CreateSubscriptionAgreement, [

@@ -42,7 +42,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
   }
 
   makeDecision(): TransactionDecision {
-    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId, parentId, userTradeId, lastEventDate } =
+    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId, parentId, userTradeId, lastEventDate, unitPrice } =
       this.eventsAnalysis();
 
     if (!lastEvent || !this.profileId) {
@@ -65,6 +65,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           portfolioId,
           parentId,
           userTradeId,
+          unitPrice,
         });
       case TransactionEvents.TRADE_CREATED:
       case TransactionEvents.PAYMENT_RETRIED:
@@ -193,6 +194,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     portfolioId: string | null;
     subscriptionAgreementId: string | null;
     userTradeId: string | null;
+    unitPrice: number | null;
   } {
     let amount = null;
     let fees = null;
@@ -205,6 +207,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     let parentId = null;
     let userTradeId = null;
     let lastEventDate = null;
+    let unitPrice = null;
 
     for (const event of this.events) {
       lastEvent = event;
@@ -223,6 +226,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           subscriptionAgreementId = event.data.subscriptionAgreementId;
           portfolioId = event.data.portfolioId;
           userTradeId = event.data.userTradeId;
+          unitPrice = event.data.unitPrice;
           break;
         default:
           break;
@@ -241,6 +245,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
       parentId,
       userTradeId,
       lastEventDate,
+      unitPrice,
     };
   }
 }

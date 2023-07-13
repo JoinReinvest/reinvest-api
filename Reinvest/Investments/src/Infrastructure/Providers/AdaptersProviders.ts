@@ -26,6 +26,7 @@ import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/Adapters/Modules/SubscriptionAgreementDataCollector';
 import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
+import { PortfolioService } from 'Investments/Infrastructure/Adapters/Modules/PortfolioService';
 
 export default class AdaptersProviders {
   private config: Investments.Config;
@@ -65,6 +66,7 @@ export default class AdaptersProviders {
       .addSingleton(SharesAndDividendService, ['SharesAndDividends'])
       .addSingleton(DocumentsService, ['Documents'])
       .addSingleton(VerificationService, ['Verification'])
+      .addSingleton(PortfolioService, ['Portfolio'])
       .addSingleton(SubscriptionAgreementDataCollector, ['LegalEntities', 'Portfolio']);
 
     // process manager

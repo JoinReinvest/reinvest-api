@@ -14,8 +14,6 @@ type SubscriptionAgreementPortfolioData = {
   nameOfAsset: string;
   nameOfOffering: string;
   offeringsCircularLink: string;
-  tendererCompanyName: string;
-  unitPrice: string;
 };
 
 /**
@@ -54,6 +52,10 @@ export class PortfolioController {
     return this.getActivePortfolio();
   }
 
+  async getCurrentSharePrice(portfolioId: UUID): Promise<number> {
+    return 107;
+  }
+
   async getPortfolioDetails(portfolioId: string): Promise<PortfolioDetails> {
     const portfolio = await this.getPortfolio(portfolioId);
 
@@ -78,14 +80,14 @@ export class PortfolioController {
 
   async getCurrentNav(portfolioId: string): Promise<{ numberOfShares: number; unitSharePrice: number }> {
     return {
-      unitSharePrice: 113,
+      unitSharePrice: 107,
       numberOfShares: 100000000,
     };
   }
 
   async getAbsoluteCurrentNav(portfolioId: string): Promise<{ numberOfShares: number; unitSharePrice: number }> {
     return {
-      unitSharePrice: 113,
+      unitSharePrice: 107,
       numberOfShares: 100000000,
     };
   }
@@ -95,8 +97,6 @@ export class PortfolioController {
       nameOfAsset: 'Community REIT',
       nameOfOffering: 'Community REIT',
       offeringsCircularLink: 'https://link-to-offering-circular.com',
-      tendererCompanyName: 'REINVEST Corp.',
-      unitPrice: '$1.05',
     };
   }
 }

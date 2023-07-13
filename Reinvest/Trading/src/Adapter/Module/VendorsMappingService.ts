@@ -15,7 +15,7 @@ export class VendorsMappingService {
   static getClassName = () => 'VendorsMappingService';
 
   async getVendorsConfiguration(portfolioId: string, bankAccountId: string, accountId: string, parentId: string): Promise<VendorsConfiguration> {
-    const { offeringId, allocationId, unitSharePrice } = await this.getPortfolioMapping(portfolioId);
+    const { offeringId, allocationId } = await this.getPortfolioMapping(portfolioId);
     const { accountEmail, northCapitalAccountId } = await this.getAccountMapping(accountId);
     let parentEmail = accountEmail;
     let northCapitalParentAccountId = northCapitalAccountId as string;
@@ -33,7 +33,6 @@ export class VendorsMappingService {
       allocationId,
       bankAccountName,
       northCapitalAccountId,
-      unitSharePrice,
       accountEmail,
       parentEmail,
       northCapitalParentAccountId,
@@ -47,7 +46,8 @@ export class VendorsMappingService {
   }
 
   async getReinvestmentVendorsConfiguration(portfolioId: string, accountId: string): Promise<ReinvestmentVendorsConfiguration> {
-    const { allocationId, unitSharePrice } = await this.getPortfolioMapping(portfolioId);
+    const { allocationId } = await this.getPortfolioMapping(portfolioId);
+    const { unitSharePrice } = await this.portfolio.api().getCurrentNav(portfolioId);
     const { accountEmail } = await this.getAccountMapping(accountId);
 
     return {
@@ -59,12 +59,10 @@ export class VendorsMappingService {
 
   private async getPortfolioMapping(portfolioId: string) {
     const { ncOfferingId, vertaloAllocationId } = await this.portfolio.api().getPortfolioVendorsConfiguration(portfolioId);
-    const { unitSharePrice } = await this.portfolio.api().getCurrentNav(portfolioId);
 
     return {
       offeringId: ncOfferingId,
       allocationId: vertaloAllocationId,
-      unitSharePrice: unitSharePrice,
     };
   }
 

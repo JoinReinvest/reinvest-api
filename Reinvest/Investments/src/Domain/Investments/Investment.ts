@@ -23,6 +23,7 @@ type InvestmentSchema = {
   status: InvestmentStatus;
   subscriptionAgreementId: UUID | null;
   tradeId: string;
+  unitPrice: Money;
 };
 
 export enum InvestmentFailedReason {
@@ -57,6 +58,7 @@ export class Investment {
     parentId: UUID | null,
     subscriptionAgreementId: UUID | null,
     fee: Fee | null,
+    unitPrice: Money,
   ) {
     let status = InvestmentStatus.WAITING_FOR_INVESTMENT_START;
 
@@ -84,6 +86,7 @@ export class Investment {
         subscriptionAgreementId,
         tradeId,
         reason: null,
+        unitPrice,
       },
       fee,
     );
@@ -271,5 +274,9 @@ export class Investment {
   revert() {
     this.investmentSchema.status = InvestmentStatus.REVERTED;
     this.investmentSchema.dateUpdated = DateTime.now();
+  }
+
+  getFormattedUnitPrice(): string {
+    return this.investmentSchema.unitPrice.getFormattedAmount();
   }
 }

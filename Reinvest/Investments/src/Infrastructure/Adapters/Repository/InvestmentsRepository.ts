@@ -219,6 +219,8 @@ export class InvestmentsRepository {
         dateCreated: DateTime.from(data.dateCreated),
         dateStarted: data.dateStarted ? DateTime.from(data.dateStarted) : null,
         dateUpdated: DateTime.from(data.dateUpdated),
+        // @ts-ignore
+        unitPrice: Money.lowPrecision(parseInt(data.unitPrice)),
       },
       fee,
     );
@@ -233,6 +235,7 @@ export class InvestmentsRepository {
       dateCreated: schema.dateCreated.toDate(),
       dateStarted: schema.dateStarted?.toDate() || null,
       dateUpdated: schema.dateUpdated.toDate(),
+      unitPrice: schema.unitPrice.getAmount(),
     };
   }
 }

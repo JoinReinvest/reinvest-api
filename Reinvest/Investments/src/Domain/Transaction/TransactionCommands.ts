@@ -55,6 +55,7 @@ export const createTrade = (decision: CreateTradeDecision): DomainEvent => ({
     portfolioId: decision.data.portfolioId,
     parentId: decision.data.parentId,
     userTradeId: decision.data.userTradeId,
+    unitPrice: decision.data.unitPrice,
   },
 });
 

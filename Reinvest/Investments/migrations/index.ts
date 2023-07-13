@@ -14,3 +14,4 @@ export * as migration_20230704110500_investments_transfer_updates from './invest
 export * as migration_20230710105700_investments_reason from './investments_14_investments_reason';
 export * as migration_20230712094200_recurring_investments_next_date from './investments_15_recurring_investments_next_date';
 export * as migration_20230712094201_recurring_investments_execution from './investments_16_recurring_investments_execution';
+export * as migration_20230713134800_add_investment_unit_price from './investments_17_add_investment_unit_price';
