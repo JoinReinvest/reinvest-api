@@ -12,7 +12,7 @@ class DeactivateRecurringInvestment {
   static getClassName = (): string => 'DeactivateRecurringInvestment';
 
   async execute(profileId: UUID, accountId: string) {
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(profileId, accountId, RecurringInvestmentStatus.ACTIVE);
+    const recurringInvestment = await this.recurringInvestmentsRepository.getRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.ACTIVE);
 
     if (!recurringInvestment) {
       return false;

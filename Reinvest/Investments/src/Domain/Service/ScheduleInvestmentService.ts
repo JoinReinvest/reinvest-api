@@ -1,43 +1,43 @@
-import dayjs from 'dayjs';
+import { IsoDateString } from 'HKEKTypes/Generics';
 import { RecurringInvestmentFrequency } from 'Investments/Domain/Investments/Types';
+import { DateTime } from 'Money/DateTime';
 
 const DATES_TO_CREATE = 7;
 
 class ScheduleInvestmentService {
-  private startDate: string;
+  private startDate: DateTime;
   private frequency: RecurringInvestmentFrequency;
 
-  constructor(startDate: string | Date, frequency: RecurringInvestmentFrequency) {
-    this.startDate = dayjs(startDate).format('YYYY-MM-DD');
+  constructor(startDate: DateTime, frequency: RecurringInvestmentFrequency) {
+    this.startDate = startDate;
     this.frequency = frequency;
   }
 
-  getSimulation() {
-    const dates = [this.startDate];
+  getSimulation(): IsoDateString[] {
+    const dates = [this.startDate.toIsoDate()];
     const { multiplier, type } = this.getTypeAndValueToMultiplier();
 
     for (let i = 1; i <= DATES_TO_CREATE; i++) {
-      const date = dayjs(this.startDate)
-        .add(i * multiplier, type)
-        .format('YYYY-MM-DD');
+      const date = this.startDate.add(i * multiplier, type).toIsoDate();
       dates.push(date);
     }
 
     return dates;
   }
 
-  getNextInvestmentDate() {
+  getNextInvestmentDate(lastExecutionDate: DateTime | null): DateTime {
     const { multiplier, type } = this.getTypeAndValueToMultiplier();
-    const startDate = dayjs(this.startDate);
 
-    const now = dayjs(dayjs().format('YYYY-MM-DD'));
-    let nextDate = startDate;
-
-    while (nextDate.isBefore(now)) {
-      nextDate = nextDate.add(multiplier, type);
+    if (!lastExecutionDate) {
+      return this.startDate;
     }
 
-    return nextDate.format('YYYY-MM-DD');
+    let nextDate = this.startDate;
+    do {
+      nextDate = nextDate.add(multiplier, type);
+    } while (nextDate.isBefore(lastExecutionDate));
+
+    return nextDate;
   }
 
   private getTypeAndValueToMultiplier(): { multiplier: number; type: 'week' | 'month' } {

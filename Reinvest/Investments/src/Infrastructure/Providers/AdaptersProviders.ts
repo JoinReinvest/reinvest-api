@@ -25,6 +25,7 @@ import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEv
 import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/Adapters/Modules/SubscriptionAgreementDataCollector';
+import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
 
 export default class AdaptersProviders {
   private config: Investments.Config;
@@ -53,6 +54,7 @@ export default class AdaptersProviders {
       .addSingleton(RecurringInvestmentsRepository, [InvestmentsDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(ReinvestmentRepository, [InvestmentsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(InvestmentsQueryRepository, [InvestmentsDatabaseAdapterInstanceProvider])
+      .addSingleton(RecurringInvestmentExecutionRepository, [InvestmentsDatabaseAdapterInstanceProvider])
       .addObjectFactory(
         'InvestmentsTransactionalAdapter',
         (databaseProvider: InvestmentsDatabaseAdapterProvider) => new TransactionalAdapter<InvestmentsDatabase>(databaseProvider),

@@ -2,7 +2,7 @@ import { ContainerInterface } from 'Container/Container';
 import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
-import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
+import { CreateInvestment } from 'Investments/Application/UseCases/CreateInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import DeactivateRecurringInvestment from 'Investments/Application/UseCases/DeactivateRecurringInvestment';
@@ -31,6 +31,7 @@ import CreateRecurringInvestment from 'Reinvest/Investments/src/Application/UseC
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
+import { CreateInvestmentFromRecurringInvestment } from 'Investments/Application/UseCases/CreateInvestmentFromRecurringInvestment';
 
 export default class PortsProviders {
   private config: Investments.Config;
@@ -65,6 +66,7 @@ export default class PortsProviders {
       InitiateRecurringInvestment,
       DeactivateRecurringInvestment,
       UnsuspendRecurringInvestment,
+      CreateInvestmentFromRecurringInvestment,
     ]);
     container.addSingleton(DividendsController, [ReinvestDividend]);
     container.addSingleton(TransactionController, [PushTransaction]);

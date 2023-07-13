@@ -27,6 +27,9 @@ import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Event
 import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { RecurringInvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/RecurringInvestmentStatusEventHandler';
+import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
+import { SuspendRecurringInvestment } from 'Investments/Application/UseCases/SuspendRecurringInvestment';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -45,7 +48,8 @@ export default class EventBusProvider {
       .addSingleton(CheckIsGracePeriodEndedEventHandler, [InvestmentsRepository, SimpleEventBus])
       .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus])
       .addSingleton(AgreementsEventHandler, [GenerateSubscriptionAgreement])
-      .addSingleton(PdfGeneratedEventHandler, [MarkSubscriptionAgreementAsGenerated]);
+      .addSingleton(PdfGeneratedEventHandler, [MarkSubscriptionAgreementAsGenerated])
+      .addSingleton(RecurringInvestmentStatusEventHandler, [RecurringInvestmentExecutionRepository, SuspendRecurringInvestment]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus
@@ -76,6 +80,14 @@ export default class EventBusProvider {
         TransactionEvents.SECOND_PAYMENT_FAILED,
       ])
 
+      .subscribeHandlerForKinds(RecurringInvestmentStatusEventHandler.getClassName(), [
+        TransactionEvents.INVESTMENT_FUNDED,
+        TransactionEvents.INVESTMENT_CANCELED,
+        TransactionEvents.TRANSACTION_REVERTED,
+        TransactionEvents.INVESTMENT_FINISHED,
+        TransactionEvents.SECOND_PAYMENT_FAILED,
+      ])
+
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [
         ReinvestmentEvents.DIVIDEND_REINVESTMENT_REQUESTED,
         ReinvestmentEvents.SHARES_TRANSFERRED_FOR_REINVESTMENT,
@@ -97,6 +109,7 @@ export default class EventBusProvider {
         TransactionCommands.CancelTransaction,
         TransactionCommands.RevertTransaction,
         TransactionCommands.RetryPayment,
+        'CreateNotification',
       ])
       .subscribeHandlerForKinds(AgreementsEventHandler.getClassName(), [
         SubscriptionAgreementEvents.GenerateSubscriptionAgreementCommand,

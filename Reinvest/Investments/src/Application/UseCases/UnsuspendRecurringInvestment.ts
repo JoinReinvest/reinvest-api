@@ -12,7 +12,7 @@ class UnsuspendRecurringInvestment {
   static getClassName = (): string => 'UnsuspendRecurringInvestment';
 
   async execute(profileId: UUID, accountId: string) {
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(profileId, accountId, RecurringInvestmentStatus.SUSPENDED);
+    const recurringInvestment = await this.recurringInvestmentsRepository.getRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.SUSPENDED);
 
     if (!recurringInvestment) {
       return false;

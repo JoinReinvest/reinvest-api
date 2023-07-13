@@ -13,6 +13,7 @@ import {
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
 import { CronNotificationsFunction, CronNotificationsResources } from './devops/functions/cron/notifications/cron-notifications-config';
 import { CronPushEveryDayFunction, CronPushEveryDayResources } from './devops/functions/cron/pushEveryDayProcesses/cron-push-config';
+import { CronRecurringInvestmentsFunction, CronRecurringInvestmentsResources } from './devops/functions/cron/recurringInvestments/recurring-investments-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { FirebaseFunction, FirebaseResources } from './devops/functions/firebase/queue-config';
@@ -79,6 +80,7 @@ const serverlessConfiguration: AWS = {
     cronDividendsDistribution: CronDividendsDistributionFunction,
     cronNotificationsFunction: CronNotificationsFunction,
     cronPushEveryDay: CronPushEveryDayFunction,
+    cronRecurringInvestments: CronRecurringInvestmentsFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     unauthorizedEndpoints: UnauthorizedEndpointsFunction,
@@ -106,6 +108,7 @@ const serverlessConfiguration: AWS = {
       ...CronVendorsSyncResources,
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
+      ...CronRecurringInvestmentsResources,
       ...PdfGeneratorResources,
       ...FirebaseResources,
       ...CronNotificationsResources,
