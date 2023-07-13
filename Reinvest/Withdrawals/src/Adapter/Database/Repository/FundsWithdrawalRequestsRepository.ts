@@ -77,7 +77,7 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
-  async accept(fundsWithdrawalRequest: FundsWithdrawalRequest): Promise<boolean> {
+  async accept(fundsWithdrawalRequest: FundsWithdrawalRequest, id: UUID): Promise<boolean> {
     const { status, dateDecision } = fundsWithdrawalRequest.toObject();
     try {
       await this.databaseAdapterProvider
@@ -87,7 +87,7 @@ export class FundsWithdrawalRequestsRepository {
           status,
           dateDecision,
         })
-        .where('id', '=', fundsWithdrawalRequest.getId())
+        .where('id', '=', id)
         .execute();
 
       return true;
@@ -98,7 +98,7 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
-  async reject(fundsWithdrawalRequest: FundsWithdrawalRequest): Promise<boolean> {
+  async reject(fundsWithdrawalRequest: FundsWithdrawalRequest, id: UUID): Promise<boolean> {
     const { status, dateDecision, adminDecisionReason } = fundsWithdrawalRequest.toObject();
     try {
       await this.databaseAdapterProvider
@@ -109,7 +109,7 @@ export class FundsWithdrawalRequestsRepository {
           dateDecision,
           adminDecisionReason,
         })
-        .where('id', '=', fundsWithdrawalRequest.getId())
+        .where('id', '=', id)
         .execute();
 
       return true;

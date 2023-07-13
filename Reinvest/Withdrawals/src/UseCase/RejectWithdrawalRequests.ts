@@ -19,7 +19,7 @@ class RejectWithdrawalRequests {
 
       fundsWithdrawalRequests.reject(decisionReason);
 
-      const status = await this.fundsWithdrawalRequestsRepository.reject(fundsWithdrawalRequests);
+      const status = await this.fundsWithdrawalRequestsRepository.reject(fundsWithdrawalRequests, id);
 
       return status;
     } catch (e) {

@@ -19,7 +19,7 @@ class AcceptWithdrawalRequests {
 
       fundsWithdrawalRequests.accept();
 
-      const status = await this.fundsWithdrawalRequestsRepository.accept(fundsWithdrawalRequests);
+      const status = await this.fundsWithdrawalRequestsRepository.accept(fundsWithdrawalRequests, id);
 
       return status;
     } catch (e) {
