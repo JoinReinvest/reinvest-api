@@ -10,14 +10,18 @@ import { LegalEntitiesBannedList } from 'LegalEntities/Adapter/Database/LegalEnt
 import { BannedEntity, BannedType } from 'LegalEntities/Domain/BannedEntity';
 import { BannedView } from 'LegalEntities/Port/Api/BanController';
 import { DateTime } from 'Money/DateTime';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class BanRepository {
   private databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider;
   private idGenerator: IdGeneratorInterface;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, idGenerator: IdGeneratorInterface) {
+  constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, idGenerator: IdGeneratorInterface, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
     this.idGenerator = idGenerator;
+    this.eventBus = eventBus;
   }
 
   public static getClassName = (): string => 'BanRepository';
@@ -55,7 +59,7 @@ export class BanRepository {
     return bannedRecord;
   }
 
-  async addBannedRecord(bannedRecord: Partial<LegalEntitiesBannedList>): Promise<void> {
+  async addBannedRecord(bannedRecord: Partial<LegalEntitiesBannedList>, events: DomainEvent[] = []): Promise<void> {
     const activeBannedRecord = await this.getActiveBannedRecord(
       bannedRecord.type!,
       bannedRecord.profileId!,
@@ -71,6 +75,10 @@ export class BanRepository {
     const values = <LegalEntitiesBannedList>{ ...bannedRecord, id };
 
     await this.databaseAdapterProvider.provide().insertInto(legalEntitiesBannedListTable).values(values).execute();
+
+    if (events.length > 0) {
+      await this.eventBus.publishMany(events);
+    }
   }
 
   async listBanned(pagination: Pagination): Promise<BannedView[]> {

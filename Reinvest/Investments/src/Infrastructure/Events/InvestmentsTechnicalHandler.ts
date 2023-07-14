@@ -1,11 +1,14 @@
 import { ContainerInterface } from 'Container/Container';
 import { PdfEvents } from 'HKEKTypes/Pdf';
+import { DisableRecurringInvestmentCommandHandler } from 'Investments/Infrastructure/Events/DisableRecurringInvestmentCommandHandler';
 import { PdfGeneratedEventHandler } from 'Investments/Infrastructure/Events/PdfGeneratedEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 
 export type InvestmentsTechnicalHandlerType = {
   AccountBannedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
   AccountVerifiedForInvestment: () => TechnicalToDomainEventsHandler['handle'];
+  DisableAllRecurringInvestment: () => DisableRecurringInvestmentCommandHandler['handle'];
+  DisableRecurringInvestment: () => DisableRecurringInvestmentCommandHandler['handle'];
   GracePeriodEnded: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentApproved: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentFunded: () => TechnicalToDomainEventsHandler['handle'];
@@ -14,8 +17,6 @@ export type InvestmentsTechnicalHandlerType = {
   InvestmentPaymentSecondFailed: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentRejected: () => TechnicalToDomainEventsHandler['handle'];
   InvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
-  ReinvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
-  TradeCreated: () => TechnicalToDomainEventsHandler['handle'];
   TradePaymentMismatched: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceled: () => TechnicalToDomainEventsHandler['handle'];
   TransactionCanceledFailed: () => TechnicalToDomainEventsHandler['handle'];
@@ -25,6 +26,8 @@ export type InvestmentsTechnicalHandlerType = {
   TransactionUnwinding: () => TechnicalToDomainEventsHandler['handle'];
   [PdfEvents.PdfGenerated]: () => PdfGeneratedEventHandler['handle'];
   PaymentRetried: () => TechnicalToDomainEventsHandler['handle'];
+  ReinvestmentSharesTransferred: () => TechnicalToDomainEventsHandler['handle'];
+  TradeCreated: () => TechnicalToDomainEventsHandler['handle'];
 };
 
 export const investmentsTechnicalHandler = (container: ContainerInterface): InvestmentsTechnicalHandlerType => ({
@@ -49,4 +52,6 @@ export const investmentsTechnicalHandler = (container: ContainerInterface): Inve
   TransactionRevertedUnwinding: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   InvestmentPaymentFailed: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
   PaymentRetried: container.delegateTo(TechnicalToDomainEventsHandler, 'handle'),
+  DisableRecurringInvestment: container.delegateTo(DisableRecurringInvestmentCommandHandler, 'handle'),
+  DisableAllRecurringInvestment: container.delegateTo(DisableRecurringInvestmentCommandHandler, 'handle'),
 });

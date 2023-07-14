@@ -22,6 +22,8 @@ export default class EventBusProvider {
       'LegalEntityDocumentRemoved',
       'LegalEntityAvatarRemoved',
       'SensitiveDataUpdated',
+      'DisableRecurringInvestment',
+      'DisableAllRecurringInvestment',
     ]);
   }
 }

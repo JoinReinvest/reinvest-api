@@ -140,7 +140,7 @@ export class Shares {
     };
   }
 
-  forSharesSettledEvent(): {
+  forSharesChangedEvent(): {
     profileId: UUID;
   } {
     return {

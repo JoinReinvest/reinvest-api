@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
-import { DateTime } from 'Money/DateTime';
 
 export enum CalculatedDividendStatus {
   AWAITING_DISTRIBUTION = 'AWAITING_DISTRIBUTION',
@@ -168,6 +168,18 @@ export class CalculatedDividend {
         return CalculatedDividendStatus.REVOKED;
       default:
         return CalculatedDividendStatus.LOCKED;
+    }
+  }
+
+  unlockDividend(): void {
+    if (this.status === CalculatedDividendStatus.LOCKED) {
+      this.status = CalculatedDividendStatus.AWAITING_DISTRIBUTION;
+    }
+  }
+
+  revokeDividend(): void {
+    if (this.status === CalculatedDividendStatus.LOCKED) {
+      this.status = CalculatedDividendStatus.REVOKED;
     }
   }
 }
