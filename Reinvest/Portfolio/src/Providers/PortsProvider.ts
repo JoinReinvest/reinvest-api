@@ -8,6 +8,7 @@ import { GetProperties } from 'Reinvest/Portfolio/src/UseCase/GetProperties';
 import { PortfolioUpdatesRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioUpdatesRepository';
 import { DeletePortfolioUpdate } from 'Portfolio/UseCase/DeletePortfolioUpdate';
 import { CreatePortfolioUpdate } from 'Portfolio/UseCase/CreatePortfolioUpdate';
+import {GetPortfolioUpdates} from "Portfolio/UseCase/GetPortfolioUpdates";
 
 export class PortsProvider {
   private config: Portfolio.Config;
@@ -19,6 +20,6 @@ export class PortsProvider {
   public boot(container: ContainerInterface) {
     // api
     container.addSingleton(PortfolioController, [SynchronizePortfolio, UpdateProperty, GetProperties]);
-    container.addSingleton(PortfolioUpdatesController, [PortfolioUpdatesRepository, DeletePortfolioUpdate, CreatePortfolioUpdate]);
+    container.addSingleton(PortfolioUpdatesController, [PortfolioUpdatesRepository, DeletePortfolioUpdate, CreatePortfolioUpdate, GetPortfolioUpdates]);
   }
 }

@@ -1,5 +1,4 @@
 import {PortfolioDatabaseAdapterProvider, updatesTable} from 'Portfolio/Adapter/Database/DatabaseAdapter';
-import {Property} from "Portfolio/Domain/Property";
 import {PortfolioUpdate, PortfolioUpdateSchema} from "Portfolio/Domain/PortfolioUpdate";
 
 export class PortfolioUpdatesRepository {

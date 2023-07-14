@@ -15,6 +15,7 @@ export type PortfolioApiType = {
   updateProperty: PortfolioController['updateProperty'];
   addPortfolioUpdate: PortfolioUpdatesController['add'];
   deletePortfolioUpdate: PortfolioUpdatesController['delete'];
+  getAllPortfolioUpdates: PortfolioUpdatesController['getAll'];
 };
 
 export const PortfolioApi = (container: ContainerInterface): PortfolioApiType => ({
@@ -30,4 +31,5 @@ export const PortfolioApi = (container: ContainerInterface): PortfolioApiType =>
   getAbsoluteCurrentNav: container.delegateTo(PortfolioController, 'getAbsoluteCurrentNav'),
   addPortfolioUpdate: container.delegateTo(PortfolioUpdatesController, 'add'),
   deletePortfolioUpdate: container.delegateTo(PortfolioUpdatesController, 'delete'),
+  getAllPortfolioUpdates: container.delegateTo(PortfolioUpdatesController, 'getAll'),
 });
