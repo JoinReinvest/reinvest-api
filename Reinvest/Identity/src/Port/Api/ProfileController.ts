@@ -1,4 +1,4 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { CognitoService } from 'Identity/Adapter/AWS/CognitoService';
 import { UserRepository } from 'Identity/Adapter/Database/Repository/UserRepository';
 import { BanList } from 'Identity/Port/Api/BanController';
@@ -28,18 +28,38 @@ export class ProfileController {
         return null;
       }
 
-      const banList = <BanList>(user.bannedIdsJson ?? { list: [] });
-
-      return {
-        profileId: user.profileId,
-        isBannedAccount: (accountId: string) => banList.list.includes(accountId),
-        isBannedProfile: () => banList.list.includes(user.profileId),
-      };
+      return this.mapUser(user);
     } catch (error: any) {
       console.log(error.message);
 
       return null;
     }
+  }
+
+  async getProfileByProfileId(profileId: string): Promise<UserProfile | null> {
+    try {
+      const user = await this.userRepository.getUserProfileByProfileId(profileId);
+
+      if (!user) {
+        return null;
+      }
+
+      return this.mapUser(user);
+    } catch (error: any) {
+      console.log(error.message);
+
+      return null;
+    }
+  }
+
+  private mapUser(user: { bannedIdsJson: JSONObjectOf<BanList>; profileId: string }): UserProfile {
+    const banList = <BanList>(user.bannedIdsJson ?? { list: [] });
+
+    return {
+      profileId: user.profileId,
+      isBannedAccount: (accountId: string) => banList.list.includes(accountId),
+      isBannedProfile: () => banList.list.includes(user.profileId),
+    };
   }
 
   async getProfileByEmail(email: string): Promise<{ profileId: string } | null> {

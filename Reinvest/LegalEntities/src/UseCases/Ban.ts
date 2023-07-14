@@ -1,7 +1,8 @@
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
-import { BannedType, BanRepository } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
+import { BanRepository } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
 import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
+import { BannedType } from 'LegalEntities/Domain/BannedEntity';
 import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { DateTime } from 'Money/DateTime';
 
@@ -119,5 +120,68 @@ export class Ban {
     await this.identityService.addBannedId(profileId, profileId);
 
     return;
+  }
+
+  async banUser(profileId: string, reason: string): Promise<boolean> {
+    const profile = await this.profileRepository.findProfile(profileId);
+
+    if (!profile) {
+      console.error(`Banning profile ${profileId} failed: profile not found`);
+
+      return false;
+    }
+
+    const profileObject = profile.toObject();
+    const ssn = profileObject.ssnObject?.hashed;
+    const ssnAnonymized = profileObject.ssnObject?.anonymized;
+
+    await this.banRepository.addBannedRecord({
+      profileId,
+      accountId: null,
+      stakeholderId: null,
+      type: BannedType.PROFILE,
+      reasons: reason,
+      dateCreated: DateTime.now().toDate(),
+      dateCancelled: null,
+      sensitiveNumber: ssn ?? '',
+      anonymizedSensitiveNumber: ssnAnonymized ?? '',
+      status: 'ACTIVE',
+    });
+
+    await this.identityService.addBannedId(profileId, profileId);
+
+    return true;
+  }
+
+  async banAccount(accountId: string, reason: string): Promise<boolean> {
+    const account = await this.accountRepository.findCompanyAccountByAccountId(accountId);
+
+    if (!account) {
+      console.error(`Banning account ${accountId} failed: company account not found`);
+
+      return false;
+    }
+
+    const accountSchema = account.toObject();
+    const ein = accountSchema.einHash;
+    const einAnonymized = accountSchema.ein.anonymized;
+    const profileId = accountSchema.profileId;
+
+    await this.banRepository.addBannedRecord({
+      profileId,
+      accountId,
+      stakeholderId: null,
+      type: BannedType.COMPANY,
+      reasons: reason,
+      dateCreated: DateTime.now().toDate(),
+      dateCancelled: null,
+      sensitiveNumber: ein ?? '',
+      anonymizedSensitiveNumber: einAnonymized ?? '',
+      status: 'ACTIVE',
+    });
+
+    await this.identityService.addBannedId(profileId, accountId);
+
+    return true;
   }
 }

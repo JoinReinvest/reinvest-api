@@ -156,7 +156,6 @@ const schema = `
         bankAccountStatus: BankAccountStatus
     }
 
-
     input UpdateCompanyAccountInput {
         address: AddressInput
         annualRevenue: AnnualRevenueInput

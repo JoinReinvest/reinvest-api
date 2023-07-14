@@ -1,9 +1,10 @@
-import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
+import { JSONObjectOf, Pagination, UUID } from 'HKEKTypes/Generics';
 import { IdentityDatabaseAdapterProvider, userTable } from 'Identity/Adapter/Database/IdentityDatabaseAdapter';
 import { IdentityUser, InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
 import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/UserException';
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 import { BanList } from 'Identity/Port/Api/BanController';
+import { User } from 'Identity/Port/Api/UserController';
 
 export class UserRepository {
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
@@ -49,6 +50,21 @@ export class UserRepository {
       .selectFrom(userTable)
       .select(['profileId', 'bannedIdsJson'])
       .where('cognitoUserId', '=', cognitoUserId)
+      .limit(1)
+      .executeTakeFirst();
+
+    return user ?? null;
+  }
+
+  public async getUserProfileByProfileId(profileId: string): Promise<{
+    bannedIdsJson: JSONObjectOf<BanList>;
+    profileId: string;
+  } | null> {
+    const user = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(userTable)
+      .select(['profileId', 'bannedIdsJson'])
+      .where('profileId', '=', profileId)
       .limit(1)
       .executeTakeFirst();
 
@@ -103,5 +119,29 @@ export class UserRepository {
       .executeTakeFirst();
 
     return result ? result.inviterProfileId : null;
+  }
+
+  async listUsers(pagination: Pagination): Promise<User[]> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(userTable)
+      .select(['id', 'profileId', 'email', 'createdAt', 'bannedIdsJson'])
+      .orderBy('createdAt', 'desc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .execute();
+
+    if (result.length === 0) {
+      return [];
+    }
+
+    return result.map(user => ({
+      id: user.id,
+      profileId: user.profileId,
+      email: user.email,
+      createdAt: user.createdAt,
+      // @ts-ignore
+      isBanned: user.bannedIdsJson !== null && user.bannedIdsJson.list && user.bannedIdsJson.list.includes(user.profileId),
+    }));
   }
 }
