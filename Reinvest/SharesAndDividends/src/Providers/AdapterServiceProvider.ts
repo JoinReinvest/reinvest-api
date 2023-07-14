@@ -8,6 +8,7 @@ import {
   SharesAndDividendsDatabaseAdapterInstanceProvider,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
+import { ConfigurationRepository } from 'SharesAndDividends/Adapter/Database/Repository/ConfigurationRepository';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
@@ -46,5 +47,6 @@ export class AdapterServiceProvider {
       );
     container.addSingleton(PortfolioService, ['Portfolio']);
     container.addSingleton(NotificationService, ['Notifications']);
+    container.addSingleton(ConfigurationRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider]);
   }
 }

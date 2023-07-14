@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import type { DividendDetails } from 'SharesAndDividends/Domain/types';
 import { DividendsListQuery } from 'SharesAndDividends/UseCase/DividendsListQuery';
-import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
+import { AutoReinvestDividend, DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
 import { TransferDividends, TransferredDividends } from 'SharesAndDividends/UseCase/TransferDividends';
@@ -47,5 +47,9 @@ export class DividendsController {
 
   async transferDividends(profileId: UUID, transferFromAccount: UUID, transferToAccount: UUID): Promise<TransferredDividends[]> {
     return this.transferDividendsUseCase.execute(profileId, transferFromAccount, transferToAccount);
+  }
+
+  async getDividendsReadyForAutomaticReinvestment(): Promise<AutoReinvestDividend[]> {
+    return this.dividendsQuery.getDividendsReadyForAutomaticReinvestment();
   }
 }

@@ -1,6 +1,6 @@
 import { JSONObject } from 'HKEKTypes/Generics';
-import { AccountConfiguration } from 'InvestmentAccounts/Domain/Configuration/AccountConfiguration';
-import { ConfigurationTypes } from 'InvestmentAccounts/Domain/Configuration/ConfigurationTypes';
+import { AccountConfiguration } from 'SharesAndDividends/Domain/Configuration/AccountConfiguration';
+import { ConfigurationTypes } from 'SharesAndDividends/Domain/Configuration/ConfigurationTypes';
 
 export class AutomaticDividendReinvestmentAgreement implements AccountConfiguration {
   profileId: string;

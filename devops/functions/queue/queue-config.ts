@@ -62,6 +62,7 @@ export const QueueResources = {
               ...S3PoliciesWithImport,
               ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
               SMSPolicy,
+              ...SQSSendPolicy,
               {
                 Effect: 'Allow',
                 Action: ['sqs:ReceiveMessage', 'sqs:DeleteMessage', 'sqs:GetQueueAttributes', 'sqs:SendMessage', 'sqs:SendMessageBatch'],

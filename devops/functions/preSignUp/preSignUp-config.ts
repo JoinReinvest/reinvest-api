@@ -1,6 +1,7 @@
 import { CloudwatchPolicies } from '../../serverless/cloudwatch';
 import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
+import { SQSSendPolicy } from '../queue/queue-config';
 
 const cognitoUserPool: {
   cognitoUserPool: {
@@ -46,7 +47,7 @@ export const CognitoPreSignUpResources = {
         {
           PolicyName: 'PreSignUpLambdaPolicy',
           PolicyDocument: {
-            Statement: [...CloudwatchPolicies, ...EniPolicies],
+            Statement: [...CloudwatchPolicies, ...EniPolicies, ...SQSSendPolicy],
           },
         },
       ],

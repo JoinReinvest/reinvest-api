@@ -4,7 +4,7 @@ import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDivid
 export class DividendsController {
   private reinvestDividendUseCase: ReinvestDividend;
 
-  constructor(reinvestDividendUseCase: ReinvestDividend) {
+  constructor(reinvestDividendUseCase: ReinvestDividend, reinvestDividendAutomaticallyUseCase: ReinvestDividend) {
     this.reinvestDividendUseCase = reinvestDividendUseCase;
   }
 

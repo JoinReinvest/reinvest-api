@@ -1,5 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { ConfigurationRepository } from 'SharesAndDividends/Adapter/Database/Repository/ConfigurationRepository';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
@@ -10,6 +11,7 @@ import { SharesAndDividends } from 'SharesAndDividends/index';
 import { AccountStateQuery } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { CalculateDividends } from 'SharesAndDividends/UseCase/CalculateDividends';
 import { ChangeSharesState } from 'SharesAndDividends/UseCase/ChangeSharesState';
+import CreateConfiguration from 'SharesAndDividends/UseCase/CreateConfiguration';
 import { CreateDividendDistribution } from 'SharesAndDividends/UseCase/CreateDividendDistribution';
 import { CreateIncentiveReward } from 'SharesAndDividends/UseCase/CreateIncentiveReward';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
@@ -20,11 +22,12 @@ import { DividendsListQuery } from 'SharesAndDividends/UseCase/DividendsListQuer
 import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
 import { FinishDividendsCalculation } from 'SharesAndDividends/UseCase/FinishDividendsCalculation';
 import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDividendsDistribution';
+import GetConfiguration from 'SharesAndDividends/UseCase/GetConfiguration';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
-import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
-import { TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
+import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 import { TransferDividends } from 'SharesAndDividends/UseCase/TransferDividends';
+import { TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
 
 export class UseCaseProvider {
   private config: SharesAndDividends.Config;
@@ -61,5 +64,6 @@ export class UseCaseProvider {
     container.addSingleton(MarkDividendAsReinvested, [DividendsRepository, NotificationService]);
     container.addSingleton(MarkDividendAsWithdrawn, [DividendsRepository, NotificationService]);
     container.addSingleton(AccountStateQuery, [DividendsRepository, SharesRepository, PortfolioService]);
+    container.addSingleton(CreateConfiguration, [ConfigurationRepository, IdGenerator]).addSingleton(GetConfiguration, [ConfigurationRepository]);
   }
 }
