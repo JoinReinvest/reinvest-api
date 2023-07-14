@@ -67,6 +67,8 @@ export class RegisterPortfolio {
         id: navId,
         data: {
           portfolioId,
+          unitPrice: unitPriceNumber,
+          numberOfShares,
         },
       },
     ]);

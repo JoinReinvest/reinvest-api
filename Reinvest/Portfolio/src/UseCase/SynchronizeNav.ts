@@ -56,6 +56,8 @@ export class SynchronizeNav {
         kind: 'NAV_UPDATED',
         id: navId,
         data: {
+          unitPrice: unitPriceNumber,
+          numberOfShares,
           portfolioId,
         },
       },
