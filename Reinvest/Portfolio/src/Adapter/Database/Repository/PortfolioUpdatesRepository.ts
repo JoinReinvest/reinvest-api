@@ -1,5 +1,6 @@
 import {PortfolioDatabaseAdapterProvider, updatesTable} from 'Portfolio/Adapter/Database/DatabaseAdapter';
-import {Property, PropertySchema} from "Portfolio/Domain/Property";
+import {Property} from "Portfolio/Domain/Property";
+import {PortfolioUpdate, PortfolioUpdateSchema} from "Portfolio/Domain/PortfolioUpdate";
 
 export class PortfolioUpdatesRepository {
   private databaseAdapterProvider: PortfolioDatabaseAdapterProvider;
@@ -34,16 +35,14 @@ export class PortfolioUpdatesRepository {
           .provide()
           .selectFrom(updatesTable)
           .selectAll()
-          .castTo<PropertySchema>()
+          .castTo<PortfolioUpdateSchema>()
           .execute();
 
       if (!updatesData.length) {
         return null;
       }
 
-      const updates = updatesData.map(property => Property.create(property));
-
-      return updates;
+      return updatesData.map(property => PortfolioUpdate.create(property));
     } catch (error: any) {
       console.error(error);
 
