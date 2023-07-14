@@ -1,5 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { SharesAndDividends } from 'SharesAndDividends/index';
+import { ConfigurationController } from 'SharesAndDividends/Port/Api/ConfigurationController';
 import { DividendsCalculationController } from 'SharesAndDividends/Port/Api/DividendsCalculationController';
 import { DividendsController } from 'SharesAndDividends/Port/Api/DividendsController';
 import { IncentiveRewardController } from 'SharesAndDividends/Port/Api/IncentiveRewardController';
@@ -8,6 +9,7 @@ import { StatsController } from 'SharesAndDividends/Port/Api/StatsController';
 import { AccountStateQuery } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { CalculateDividends } from 'SharesAndDividends/UseCase/CalculateDividends';
 import { ChangeSharesState } from 'SharesAndDividends/UseCase/ChangeSharesState';
+import CreateConfiguration from 'SharesAndDividends/UseCase/CreateConfiguration';
 import { CreateDividendDistribution } from 'SharesAndDividends/UseCase/CreateDividendDistribution';
 import { CreateIncentiveReward } from 'SharesAndDividends/UseCase/CreateIncentiveReward';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
@@ -18,11 +20,12 @@ import { DividendsListQuery } from 'SharesAndDividends/UseCase/DividendsListQuer
 import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
 import { FinishDividendsCalculation } from 'SharesAndDividends/UseCase/FinishDividendsCalculation';
 import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDividendsDistribution';
+import GetConfiguration from 'SharesAndDividends/UseCase/GetConfiguration';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
-import { TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
 import { TransferDividends } from 'SharesAndDividends/UseCase/TransferDividends';
+import { TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
 
 export class PortsProvider {
   private config: SharesAndDividends.Config;
@@ -46,5 +49,6 @@ export class PortsProvider {
       FinishDividendsCalculation,
       FinishDividendsDistribution,
     ]);
+    container.addSingleton(ConfigurationController, [CreateConfiguration, GetConfiguration]);
   }
 }

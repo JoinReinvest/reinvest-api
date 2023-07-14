@@ -14,3 +14,4 @@ export * as migration_20230609130100_sad_add_indexes from './sad_13_sad_add_inde
 export * as migration_20230704134800_sad_add_transferred_id from './sad_14_sad_add_transferred_id';
 export * as migration_20230704160300_sad_add_transferred_id_to_dividend from './sad_15_sad_add_transferred_id_to_dividend';
 export * as migration_20230705093200_sad_add_unique_id_financial_operations from './sad_16_sad_add_unique_id_financial_operations';
+export * as migration_20230714115900_sad_migrate_investment_config_to_sad from './sad_17_sad_migrate_investment_config_to_sad';

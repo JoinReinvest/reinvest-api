@@ -1,6 +1,7 @@
 import { CloudwatchPolicies } from '../../../serverless/cloudwatch';
 import { getAttribute, getResourceName } from '../../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../../serverless/vpc';
+import { SQSSendPolicy } from '../../queue/queue-config';
 
 export const CronDividendsDistributionFunction = {
   handler: `devops/functions/cron/dividendsDistribution/handler.main`,
@@ -42,6 +43,7 @@ export const CronDividendsDistributionResources = {
             Statement: [
               ...CloudwatchPolicies,
               ...EniPolicies,
+              ...SQSSendPolicy,
               {
                 Effect: 'Allow',
                 Action: ['lambda:InvokeFunction'],

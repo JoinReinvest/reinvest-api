@@ -5,6 +5,7 @@ import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Databa
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 import { FinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export enum SharesChangeState {
   FUNDED = SharesStatus.FUNDED,
@@ -71,7 +72,13 @@ export class ChangeSharesState {
 
       if (state === SharesChangeState.SETTLED) {
         shares.setSettledState();
-        await this.sharesRepository.store(shares);
+        await this.sharesRepository.store(shares, [
+          <DomainEvent>{
+            id: shares.getId(),
+            kind: 'SharesSettled',
+            data: shares.forSharesSettledEvent(),
+          },
+        ]);
       }
 
       if (state === SharesChangeState.REVOKED) {

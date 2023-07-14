@@ -1,15 +1,15 @@
 import { JSONObject } from 'HKEKTypes/Generics';
-import { investmentAccountConfiguration, InvestmentAccountDbProvider } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
-import type { AccountConfigurationCreate } from 'Reinvest/InvestmentAccounts/src/Application/CreateConfiguration';
-import { AutomaticDividendReinvestmentAgreement } from 'Reinvest/InvestmentAccounts/src/Domain/ValueObject/AutomaticDividendReinvestmentAgreement';
 import { DateTime } from 'Money/DateTime';
+import { sadAccountsConfiguration, SharesAndDividendsDatabaseAdapterProvider } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
+import { AutomaticDividendReinvestmentAgreement } from 'SharesAndDividends/Domain/Configuration/AutomaticDividendReinvestmentAgreement';
+import type { AccountConfigurationCreate } from 'SharesAndDividends/UseCase/CreateConfiguration';
 
 export class ConfigurationRepository {
   public static getClassName = (): string => 'ConfigurationRepository';
 
-  private databaseAdapterProvider: InvestmentAccountDbProvider;
+  private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
 
-  constructor(databaseAdapterProvider: InvestmentAccountDbProvider) {
+  constructor(databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 
@@ -18,7 +18,7 @@ export class ConfigurationRepository {
     try {
       await this.databaseAdapterProvider
         .provide()
-        .insertInto(investmentAccountConfiguration)
+        .insertInto(sadAccountsConfiguration)
         .values({
           id,
           accountId,
@@ -41,7 +41,7 @@ export class ConfigurationRepository {
   async getLastConfiguration(profileId: string, accountId: string): Promise<AutomaticDividendReinvestmentAgreement | false> {
     const lastConfiguration = await this.databaseAdapterProvider
       .provide()
-      .selectFrom(investmentAccountConfiguration)
+      .selectFrom(sadAccountsConfiguration)
       .select(['id', 'profileId', 'accountId', 'configValueJson', 'dateUpdated', 'dateCreated', 'configType'])
       .where('accountId', '=', accountId)
       .where('profileId', '=', profileId)

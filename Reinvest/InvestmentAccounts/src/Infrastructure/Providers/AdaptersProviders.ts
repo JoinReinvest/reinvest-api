@@ -7,7 +7,6 @@ import {
   investmentAccountsDatabaseProviderName,
 } from 'InvestmentAccounts/Infrastructure/Storage/DatabaseAdapter';
 import { ProfileQuery } from 'InvestmentAccounts/Infrastructure/Storage/Queries/ProfileQuery';
-import { ConfigurationRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ConfigurationRepository';
 import { ProfileRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ProfileRepository';
 import ProfileQueryService, { QueryProfileRepository } from 'InvestmentAccounts/ProfileQueryService';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
@@ -41,8 +40,7 @@ export default class AdaptersProviders {
         (databaseProvider: InvestmentAccountDbProvider) => new AggregateRepository<InvestmentAccountDbProvider>(databaseProvider),
         [investmentAccountsDatabaseProviderName],
       )
-      .addSingleton(ProfileRepository, ['ProfileAggregateRepository', 'InvestmentAccountsTransactionalAdapter', SimpleEventBus])
-      .addSingleton(ConfigurationRepository, [investmentAccountsDatabaseProviderName]);
+      .addSingleton(ProfileRepository, ['ProfileAggregateRepository', 'InvestmentAccountsTransactionalAdapter', SimpleEventBus]);
     container
       .addSingleton(ProfileQuery, [investmentAccountsDatabaseProviderName])
       .addSingleton(QueryProfileRepository)

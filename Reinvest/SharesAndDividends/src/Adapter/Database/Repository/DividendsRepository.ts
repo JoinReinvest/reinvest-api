@@ -1,14 +1,17 @@
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import {
+  sadAccountsConfiguration,
   sadInvestorDividendsTable,
   sadInvestorIncentiveDividendTable,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { DividendsSelection, InvestorIncentiveDividendTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
+import { ConfigurationTypes } from 'SharesAndDividends/Domain/Configuration/ConfigurationTypes';
 import { IncentiveReward, IncentiveRewardSchema, IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
-import { InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
+import { AUTO_REINVESTMENT_DAYS_THRESHOLD, InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
 import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/Stats/StatsDividendsCalculationService';
-import { DateTime } from 'Money/DateTime';
+import { AutoReinvestDividend } from 'SharesAndDividends/UseCase/DividendsQuery';
 
 export class DividendsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -193,5 +196,39 @@ export class DividendsRepository {
     }
 
     return data;
+  }
+
+  async findDividendsReadyForAutomaticReinvestment(): Promise<AutoReinvestDividend[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadInvestorDividendsTable)
+      .select(eb => [
+        `${sadInvestorDividendsTable}.id`,
+        `${sadInvestorDividendsTable}.accountId`,
+        `${sadInvestorDividendsTable}.profileId`,
+        eb
+          .selectFrom(sadAccountsConfiguration)
+          .select(`${sadAccountsConfiguration}.configValueJson`)
+          .whereRef(`${sadAccountsConfiguration}.accountId`, '=', `${sadInvestorDividendsTable}.accountId`)
+          .where(`${sadAccountsConfiguration}.configType`, '=', ConfigurationTypes.AUTOMATIC_DIVIDEND_REINVESTMENT_OPT_IN_OUT)
+          .orderBy(`${sadAccountsConfiguration}.dateUpdated`, 'desc')
+          .limit(1)
+          .as('configValueJson'),
+      ])
+      .where(`${sadInvestorDividendsTable}.status`, '=', [InvestorDividendStatus.AWAITING_ACTION])
+      .where(`${sadInvestorDividendsTable}.createdDate`, '<=', DateTime.now().subtractDays(AUTO_REINVESTMENT_DAYS_THRESHOLD).toDate())
+      .execute();
+
+    if (data.length === 0) {
+      return [];
+    }
+
+    return data
+      .filter(record => !!record.configValueJson && record.configValueJson.value === true)
+      .map(record => ({
+        accountId: record.accountId,
+        profileId: record.profileId,
+        dividendId: record.id,
+      }));
   }
 }

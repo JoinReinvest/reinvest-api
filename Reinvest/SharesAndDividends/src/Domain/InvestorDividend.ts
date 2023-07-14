@@ -2,6 +2,8 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 
+export const AUTO_REINVESTMENT_DAYS_THRESHOLD = 30;
+
 export type CalculatedDividendsList = {
   list: UUID[];
 };

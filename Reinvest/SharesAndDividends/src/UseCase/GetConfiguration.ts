@@ -1,5 +1,5 @@
-import { ConfigurationTypes } from 'InvestmentAccounts/Domain/Configuration/ConfigurationTypes';
-import { ConfigurationRepository } from 'InvestmentAccounts/Infrastructure/Storage/Repository/ConfigurationRepository';
+import { ConfigurationRepository } from 'SharesAndDividends/Adapter/Database/Repository/ConfigurationRepository';
+import { ConfigurationTypes } from 'SharesAndDividends/Domain/Configuration/ConfigurationTypes';
 
 export type AccountConfigurationCreate = {
   accountId: string;

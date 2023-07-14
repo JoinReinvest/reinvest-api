@@ -1,9 +1,9 @@
+import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { IdentityDatabaseAdapterProvider, userTable } from 'Identity/Adapter/Database/IdentityDatabaseAdapter';
 import { IdentityUser, InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
 import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/UserException';
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 import { BanList } from 'Identity/Port/Api/BanController';
-import { JSONObjectOf } from 'HKEKTypes/Generics';
 
 export class UserRepository {
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
@@ -91,5 +91,17 @@ export class UserRepository {
       })
       .where('id', '=', id)
       .execute();
+  }
+
+  async getUserInviter(inviteeProfileId: UUID): Promise<UUID | null> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(`${userTable} as invitee`)
+      .fullJoin(`${userTable} as inviter`, `invitee.invitedByIncentiveToken`, 'inviter.userIncentiveToken')
+      .select('inviter.profileId as inviterProfileId')
+      .where('invitee.profileId', '=', inviteeProfileId)
+      .executeTakeFirst();
+
+    return result ? result.inviterProfileId : null;
   }
 }

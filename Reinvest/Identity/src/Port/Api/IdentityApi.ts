@@ -12,13 +12,15 @@ export type IdentityApiType = {
   getProfileByEmail: ProfileController['getProfileByEmail'];
   getUserInvitationLink: IncentiveTokenController['getUserInvitationLink'];
 
+  getUserInviter: ProfileController['getUserInviter'];
   isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
+
   isPhoneNumberCompleted: PhoneController['isPhoneNumberCompleted'];
 
   registerUser: UserRegistrationController['registerUser'];
-
   setPhoneNumber: PhoneController['setPhoneNumber'];
   updateEmailAddress: ProfileController['updateEmailAddress'];
+
   verifyPhoneNumber: PhoneController['verifyPhoneNumber'];
 };
 
@@ -36,4 +38,5 @@ export const identityApi = (container: ContainerInterface): IdentityApiType => (
   getProfileByEmail: container.delegateTo(ProfileController, 'getProfileByEmail'),
   addBannedId: container.delegateTo(BanController, 'addBannedId'),
   getPhoneAndEmailData: container.delegateTo(ProfileController, 'getPhoneAndEmailData'),
+  getUserInviter: container.delegateTo(ProfileController, 'getUserInviter'),
 });
