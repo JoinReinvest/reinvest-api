@@ -32,7 +32,7 @@ export class PortfolioNorthCapitalAdapter extends ExecutionNorthCapitalAdapter {
       return {
         offeringName: details.issueName,
         // @ts-ignore
-        unitPrice: parseInt(parseFloat(details.unitPrice) * 100, 10),
+        unitPrice: Math.round(parseFloat(details.unitPrice) * 100),
         numberOfShares: parseFloat(details.totalShares),
       };
     } catch (error: any) {
