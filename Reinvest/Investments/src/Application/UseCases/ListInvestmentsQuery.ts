@@ -1,8 +1,7 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { Investment } from 'Investments/Domain/Investments/Investment';
 import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
-import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
 
 export type InvestmentOverview = {
   amount: {
@@ -43,8 +42,8 @@ class ListInvestmentsQuery {
     });
   }
 
-  async getPendingInvestmentsIds(): Promise<UUID[]> {
-    return this.investmentsRepository.getPendingInvestmentsIds();
+  async getPendingInvestmentsIds(pagination: Pagination): Promise<UUID[]> {
+    return this.investmentsRepository.getPendingInvestmentsIds(pagination);
   }
 }
 

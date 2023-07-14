@@ -67,7 +67,7 @@ export class DateTime {
     return this.date.isAfter(dayjs(), 'day');
   }
 
-  private subtractDays(days: number): DateTime {
+  subtractDays(days: number): DateTime {
     return new DateTime(this.date.subtract(days, 'day'));
   }
 

@@ -63,6 +63,7 @@ export type InvestmentFinalized = TransactionEvent & {
     ip: string;
     portfolioId: string;
     subscriptionAgreementId: string;
+    unitPrice: number;
   };
   kind: TransactionEvents.INVESTMENT_FINALIZED;
 };

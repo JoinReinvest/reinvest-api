@@ -39,6 +39,7 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
       investmentAmount,
       feeAmount,
       feeApproveDate,
+      unitPrice,
     } = investmentDetails;
 
     if (status !== InvestmentStatus.IN_PROGRESS) {
@@ -101,6 +102,7 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
         subscriptionAgreementId,
         portfolioId,
         userTradeId: tradeId,
+        unitPrice,
       },
       id: investmentId,
     });

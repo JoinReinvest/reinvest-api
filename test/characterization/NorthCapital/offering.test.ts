@@ -45,7 +45,7 @@ context('Given I am an issuer and I am an admin', () => {
         targetAmount: '74000000.000000',
         minAmount: '1.000000',
         maxAmount: '74000000.000000',
-        unitPrice: '1.050000',
+        unitPrice: '1.130000',
         startDate: '01-01-2022',
         endDate: '12-31-2032',
         offeringStatus: 'Approved',

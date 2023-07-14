@@ -97,4 +97,8 @@ export class ProfileController {
       phoneNumber: phoneNumber ?? '',
     };
   }
+
+  async getUserInviter(profileId: UUID): Promise<UUID | null> {
+    return this.userRepository.getUserInviter(profileId);
+  }
 }

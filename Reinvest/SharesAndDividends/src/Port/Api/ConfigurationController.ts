@@ -1,5 +1,5 @@
-import CreateConfiguration from 'Reinvest/InvestmentAccounts/src/Application/CreateConfiguration';
-import GetConfiguration from 'Reinvest/InvestmentAccounts/src/Application/GetConfiguration';
+import CreateConfiguration from 'SharesAndDividends/UseCase/CreateConfiguration';
+import GetConfiguration from 'SharesAndDividends/UseCase/GetConfiguration';
 
 export class ConfigurationController {
   public static getClassName = (): string => 'ConfigurationController';

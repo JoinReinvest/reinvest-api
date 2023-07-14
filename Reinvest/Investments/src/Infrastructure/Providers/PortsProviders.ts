@@ -3,6 +3,7 @@ import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
 import { CreateInvestment } from 'Investments/Application/UseCases/CreateInvestment';
+import { CreateInvestmentFromRecurringInvestment } from 'Investments/Application/UseCases/CreateInvestmentFromRecurringInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import DeactivateRecurringInvestment from 'Investments/Application/UseCases/DeactivateRecurringInvestment';
@@ -17,6 +18,7 @@ import SignRecurringSubscriptionAgreement from 'Investments/Application/UseCases
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
+import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
 import UnsuspendRecurringInvestment from 'Investments/Application/UseCases/UnsuspendRecurringInvestment';
 import { Investments } from 'Investments/index';
 import { DividendsController } from 'Investments/Infrastructure/Ports/DividendsController';
@@ -30,8 +32,6 @@ import { TransactionController } from 'Investments/Infrastructure/Ports/Transact
 import CreateRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
-import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
-import { CreateInvestmentFromRecurringInvestment } from 'Investments/Application/UseCases/CreateInvestmentFromRecurringInvestment';
 
 export default class PortsProviders {
   private config: Investments.Config;

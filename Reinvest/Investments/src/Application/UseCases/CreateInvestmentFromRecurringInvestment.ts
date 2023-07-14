@@ -5,6 +5,7 @@ import { RecurringInvestmentExecution } from 'Investments/Domain/Investments/Rec
 import { Origin } from 'Investments/Domain/Investments/Types';
 import { InvestmentFeeService } from 'Investments/Domain/Service/InvestmentFeeService';
 import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { PortfolioService } from 'Investments/Infrastructure/Adapters/Modules/PortfolioService';
 import { InvestmentsDatabase } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
@@ -24,6 +25,7 @@ export class CreateInvestmentFromRecurringInvestment {
   private transactionAdapter: TransactionalAdapter<InvestmentsDatabase>;
   private feeService: InvestmentFeeService;
   private recurringInvestmentExecutionRepository: RecurringInvestmentExecutionRepository;
+  private portfolioService: PortfolioService;
 
   constructor(
     recurringInvestmentsRepository: RecurringInvestmentsRepository,
@@ -32,6 +34,7 @@ export class CreateInvestmentFromRecurringInvestment {
     feeService: InvestmentFeeService,
     transactionAdapter: TransactionalAdapter<InvestmentsDatabase>,
     idGenerator: IdGeneratorInterface,
+    portfolioService: PortfolioService,
   ) {
     this.feeService = feeService;
     this.recurringInvestmentExecutionRepository = recurringInvestmentExecutionRepository;
@@ -39,6 +42,7 @@ export class CreateInvestmentFromRecurringInvestment {
     this.transactionAdapter = transactionAdapter;
     this.recurringInvestmentsRepository = recurringInvestmentsRepository;
     this.idGenerator = idGenerator;
+    this.portfolioService = portfolioService;
   }
 
   async execute(recurringInvestmentId: UUID, bankAccountId: UUID, parentId: UUID | null): Promise<void> {
@@ -61,6 +65,7 @@ export class CreateInvestmentFromRecurringInvestment {
     const investmentId = this.idGenerator.createUuid();
     const tradeId = this.idGenerator.createNumericId(TradeId.getTradeIdSize());
     const { amount, profileId, accountId, portfolioId, subscriptionAgreementId } = recurringInvestment.toObject();
+    const unitPrice = await this.portfolioService.getCurrentSharePrice(portfolioId);
 
     const investment = Investment.create(
       investmentId,
@@ -75,6 +80,7 @@ export class CreateInvestmentFromRecurringInvestment {
       parentId,
       subscriptionAgreementId,
       null,
+      unitPrice,
     );
 
     const recurringInvestmentExecutionId = this.idGenerator.createUuid();

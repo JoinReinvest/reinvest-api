@@ -73,39 +73,27 @@ export function boot(): Modules {
   );
 
   modules.register(
+    InvestmentAccounts.moduleName,
+    InvestmentAccounts.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as InvestmentAccounts.Config),
+  );
+
+  modules.register(
     Portfolio.moduleName,
     Portfolio.create(
       {
         database: databaseConfig,
         queue: queueConfig,
         dealpathConfig,
+        northCapital: northCapitalConfig,
+        vertalo: vertaloConfig,
       } as Portfolio.Config,
       {
         documents: modules.get(Documents.moduleName) as Documents.Main,
       },
     ),
-  );
-
-  modules.register(
-    SharesAndDividends.moduleName,
-    SharesAndDividends.create(
-      {
-        database: databaseConfig,
-        queue: queueConfig,
-      } as SharesAndDividends.Config,
-      {
-        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
-        notifications: modules.get(Notifications.moduleName) as Notifications.Main,
-      },
-    ),
-  );
-
-  modules.register(
-    InvestmentAccounts.moduleName,
-    InvestmentAccounts.create({
-      database: databaseConfig,
-      queue: queueConfig,
-    } as InvestmentAccounts.Config),
   );
 
   modules.register(
@@ -120,6 +108,21 @@ export function boot(): Modules {
       } as Identity.Config,
       {
         investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    SharesAndDividends.moduleName,
+    SharesAndDividends.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as SharesAndDividends.Config,
+      {
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        notifications: modules.get(Notifications.moduleName) as Notifications.Main,
+        identity: modules.get(Identity.moduleName) as Identity.Main,
       },
     ),
   );

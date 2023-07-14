@@ -1,5 +1,5 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
+import { PropertyRepository } from 'Portfolio/Adapter/Database/Repository/PropertyRepository';
 import { ImpactMetrics, KeyMetrics, PropertyAddress, PropertyLocation } from 'Portfolio/Domain/types';
 import { ValidationErrorEnum, ValidationErrorType } from 'Portfolio/Domain/Validation';
 import { DomainEvent } from 'SimpleAggregator/Types';
@@ -20,9 +20,9 @@ export type UpdatePropertyInput = {
 };
 
 export class UpdateProperty {
-  private portfolioRepository: PortfolioRepository;
+  private portfolioRepository: PropertyRepository;
 
-  constructor(portfolioRepository: PortfolioRepository) {
+  constructor(portfolioRepository: PropertyRepository) {
     this.portfolioRepository = portfolioRepository;
   }
 
