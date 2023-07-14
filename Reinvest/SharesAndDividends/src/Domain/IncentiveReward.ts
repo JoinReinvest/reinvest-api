@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
-import { Money } from 'Money/Money';
 import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
 
+export const MINIMUM_INVESTMENT_AMOUNT_TO_GET_REWARD = new Money(100000); // $1000
 const INCENTIVE_REWARD = new Money(1000); // $10
 
 export type IncentiveRewardSchema = {

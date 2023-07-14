@@ -5,6 +5,7 @@ import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Datab
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
+import { IdentityService } from 'SharesAndDividends/Adapter/Modules/IdentityService';
 import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 import { PortfolioService } from 'SharesAndDividends/Adapter/Modules/PortfolioService';
 import { SharesAndDividends } from 'SharesAndDividends/index';
@@ -23,6 +24,7 @@ import { DividendsQuery } from 'SharesAndDividends/UseCase/DividendsQuery';
 import { FinishDividendsCalculation } from 'SharesAndDividends/UseCase/FinishDividendsCalculation';
 import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDividendsDistribution';
 import GetConfiguration from 'SharesAndDividends/UseCase/GetConfiguration';
+import { GiveIncentiveRewardIfRequirementsAreMet } from 'SharesAndDividends/UseCase/GiveIncentiveRewardIfRequirementsAreMet';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
 import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
@@ -65,5 +67,6 @@ export class UseCaseProvider {
     container.addSingleton(MarkDividendAsWithdrawn, [DividendsRepository, NotificationService]);
     container.addSingleton(AccountStateQuery, [DividendsRepository, SharesRepository, PortfolioService]);
     container.addSingleton(CreateConfiguration, [ConfigurationRepository, IdGenerator]).addSingleton(GetConfiguration, [ConfigurationRepository]);
+    container.addSingleton(GiveIncentiveRewardIfRequirementsAreMet, [DividendsRepository, IdentityService, SharesRepository, CreateIncentiveReward]);
   }
 }
