@@ -181,7 +181,7 @@ export class Investment {
     return this.gracePeriod.isGracePeriodEnded();
   }
 
-  cancel(): void {
+  cancel(): boolean {
     if ([InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED].includes(this.investmentSchema.status)) {
       this.investmentSchema.status = InvestmentStatus.CANCELING;
 
@@ -189,11 +189,11 @@ export class Investment {
         this.fee.abort();
       }
 
-      return;
+      return true;
     }
 
     if ([InvestmentStatus.CANCELED, InvestmentStatus.CANCELING].includes(this.investmentSchema.status)) {
-      return;
+      return false;
     }
 
     throw new Error('INVESTMENT_CANNOT_BE_CANCELED');

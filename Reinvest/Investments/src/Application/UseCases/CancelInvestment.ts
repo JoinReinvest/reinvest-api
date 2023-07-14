@@ -1,7 +1,7 @@
 import { InvestmentCanceled, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
-import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DateTime } from 'Money/DateTime';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class CancelInvestment {
   private readonly investmentsRepository: InvestmentsRepository;
@@ -22,15 +22,18 @@ export class CancelInvestment {
         return false;
       }
 
-      investment.cancel();
-      await this.investmentsRepository.store(investment);
+      const cancelStatus = investment.cancel();
 
-      await this.eventBus.publish(<InvestmentCanceled>{
-        kind: TransactionEvents.INVESTMENT_CANCELED,
-        date: DateTime.now().toDate(),
-        id: investmentId,
-        data: {},
-      });
+      if (cancelStatus) {
+        await this.investmentsRepository.store(investment);
+
+        await this.eventBus.publish(<InvestmentCanceled>{
+          kind: TransactionEvents.INVESTMENT_CANCELED,
+          date: DateTime.now().toDate(),
+          id: investmentId,
+          data: {},
+        });
+      }
 
       return true;
     } catch (error: any) {

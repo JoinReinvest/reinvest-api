@@ -11,6 +11,7 @@ export type InvestmentOverview = {
   createdAt: string;
   id: UUID;
   status: InvestmentStatus;
+  subscriptionAgreementId: UUID | null;
   tradeId: string;
 };
 
@@ -27,7 +28,7 @@ class ListInvestmentsQuery {
     const investments = await this.investmentsRepository.listPaginatedInvestmentsWithoutFee(profileId, accountId, pagination);
 
     return investments.map((investment: Investment): InvestmentOverview => {
-      const { id, tradeId, dateCreated, amount, status } = investment.toObject();
+      const { id, tradeId, dateCreated, amount, status, subscriptionAgreementId } = investment.toObject();
 
       return {
         id,
@@ -38,6 +39,7 @@ class ListInvestmentsQuery {
           formatted: amount.getFormattedAmount(),
           value: amount.getAmount(),
         },
+        subscriptionAgreementId,
       };
     });
   }
