@@ -5,6 +5,7 @@ export async function up(db: Kysely<PortfolioDatabase>): Promise<void> {
   await db.schema
     .createTable(portfolioTable)
     .addColumn('id', 'uuid', col => col.primaryKey())
+    .addColumn('name', 'varchar(255)', col => col.notNull())
     .addColumn('northCapitalOfferingId', 'varchar(255)', col => col.notNull())
     .addColumn('offeringName', 'varchar(255)', col => col.notNull())
     .addColumn('vertaloAllocationId', 'varchar(255)', col => col.notNull())

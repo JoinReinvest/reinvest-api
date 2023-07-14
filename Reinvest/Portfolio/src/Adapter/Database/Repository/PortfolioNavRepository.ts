@@ -4,13 +4,17 @@ import { Money } from 'Money/Money';
 import { navTable, PortfolioDatabaseAdapterProvider } from 'Portfolio/Adapter/Database/DatabaseAdapter';
 import { PortfolioNavTable } from 'Portfolio/Adapter/Database/PortfolioDatabaseSchema';
 import { Nav, NavSchema } from 'Portfolio/Domain/Nav';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class PortfolioNavRepository {
   public static getClassName = (): string => 'PortfolioNavRepository';
   private databaseAdapterProvider: PortfolioDatabaseAdapterProvider;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventBus = eventBus;
   }
 
   async getTheLatestNav(portfolioId: UUID): Promise<Nav | null> {
@@ -30,10 +34,14 @@ export class PortfolioNavRepository {
     return this.castToObject(data);
   }
 
-  async store(nav: Nav): Promise<boolean> {
+  async store(nav: Nav, events: DomainEvent[] = []): Promise<boolean> {
     const values = this.castToTable(nav);
     try {
       await this.databaseAdapterProvider.provide().insertInto(navTable).values(values).execute();
+
+      if (events.length > 0) {
+        await this.eventBus.publishMany(events);
+      }
 
       return true;
     } catch (error: any) {
@@ -47,7 +55,8 @@ export class PortfolioNavRepository {
     return Nav.restore(<NavSchema>{
       ...tableData,
       dateSynchronization: DateTime.from(tableData.dateSynchronization),
-      unitPrice: Money.lowPrecision(tableData.unitPrice),
+      // @ts-ignore
+      unitPrice: Money.lowPrecision(parseInt(tableData.unitPrice, 10)),
     });
   }
 
@@ -59,5 +68,21 @@ export class PortfolioNavRepository {
       dateSynchronization: data.dateSynchronization.toDate(),
       unitPrice: data.unitPrice.getAmount(),
     };
+  }
+
+  async getNavHistory(portfolioId: string): Promise<Nav[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(navTable)
+      .selectAll()
+      .where('portfolioId', '=', portfolioId)
+      .orderBy('dateSynchronization', 'desc')
+      .execute();
+
+    if (data.length === 0) {
+      return [];
+    }
+
+    return data.map(nav => this.castToObject(nav));
   }
 }

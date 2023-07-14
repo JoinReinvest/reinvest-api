@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { createPortfolioDatabaseAdapterProvider, PortfolioDatabaseAdapterInstanceProvider } from 'Portfolio/Adapter/Database/DatabaseAdapter';
 import { PortfolioNavRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioNavRepository';
 import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
@@ -20,6 +21,7 @@ export class AdapterServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
+    container.addSingleton(IdGenerator);
     container
       .addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container))
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
@@ -30,7 +32,7 @@ export class AdapterServiceProvider {
       .addAsValue(PortfolioDatabaseAdapterInstanceProvider, createPortfolioDatabaseAdapterProvider(this.config.database))
       .addSingleton(PropertyRepository, [PortfolioDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(PortfolioRepository, [PortfolioDatabaseAdapterInstanceProvider])
-      .addSingleton(PortfolioNavRepository, [PortfolioDatabaseAdapterInstanceProvider]);
+      .addSingleton(PortfolioNavRepository, [PortfolioDatabaseAdapterInstanceProvider, SimpleEventBus]);
 
     container.addSingleton(DocumentsService, ['Documents']);
 

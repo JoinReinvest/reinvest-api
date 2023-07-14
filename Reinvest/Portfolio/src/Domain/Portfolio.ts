@@ -4,6 +4,7 @@ export type PortfolioSchema = {
   assetName: string;
   id: UUID;
   linkToOfferingCircular: string;
+  name: string;
   northCapitalOfferingId: string;
   offeringName: string;
   status: 'ACTIVE';
@@ -17,8 +18,25 @@ export class Portfolio {
     this.schema = schema;
   }
 
-  static create(schema: PortfolioSchema) {
-    return new Portfolio(schema);
+  static create(
+    id: UUID,
+    name: string,
+    northCapitalOfferingId: string,
+    offeringName: string,
+    vertaloAllocationId: string,
+    assetName: string,
+    linkToOfferingCircular: string,
+  ): Portfolio {
+    return new Portfolio({
+      id,
+      name,
+      northCapitalOfferingId,
+      offeringName,
+      vertaloAllocationId,
+      assetName,
+      linkToOfferingCircular,
+      status: 'ACTIVE',
+    });
   }
 
   static restore(schema: PortfolioSchema) {
@@ -27,5 +45,9 @@ export class Portfolio {
 
   toObject(): PortfolioSchema {
     return this.schema;
+  }
+
+  getOfferingId(): string {
+    return this.schema.northCapitalOfferingId;
   }
 }

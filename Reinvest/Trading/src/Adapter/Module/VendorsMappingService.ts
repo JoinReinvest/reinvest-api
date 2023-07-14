@@ -40,19 +40,24 @@ export class VendorsMappingService {
   }
 
   async getAbsoluteCurrentNav(portfolioId: string): Promise<number> {
-    const { unitSharePrice } = await this.portfolio.api().getAbsoluteCurrentNav(portfolioId);
+    await this.portfolio.api().synchronizeNav(portfolioId);
+    const {
+      unitPrice: { value },
+    } = await this.portfolio.api().getCurrentNav(portfolioId);
 
-    return unitSharePrice;
+    return value;
   }
 
   async getReinvestmentVendorsConfiguration(portfolioId: string, accountId: string): Promise<ReinvestmentVendorsConfiguration> {
     const { allocationId } = await this.getPortfolioMapping(portfolioId);
-    const { unitSharePrice } = await this.portfolio.api().getCurrentNav(portfolioId);
+    const {
+      unitPrice: { value },
+    } = await this.portfolio.api().getCurrentNav(portfolioId);
     const { accountEmail } = await this.getAccountMapping(accountId);
 
     return {
       allocationId,
-      unitSharePrice,
+      unitSharePrice: value,
       accountEmail,
     };
   }

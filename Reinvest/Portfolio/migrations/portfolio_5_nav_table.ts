@@ -6,7 +6,7 @@ export async function up(db: Kysely<PortfolioDatabase>): Promise<void> {
     .createTable(navTable)
     .addColumn('id', 'uuid', col => col.primaryKey())
     .addColumn('portfolioId', 'uuid', col => col.notNull())
-    .addColumn('numberOfShares', 'int8', col => col.notNull())
+    .addColumn('numberOfShares', 'float8', col => col.notNull())
     .addColumn('unitPrice', 'int8', col => col.notNull())
     .addColumn('dateSynchronization', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .execute();

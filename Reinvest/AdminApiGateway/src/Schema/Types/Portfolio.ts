@@ -76,10 +76,23 @@ const schema = `
         POIs: [POIInput]
     }
 
+    type Nav {
+        dateSynchronization: ISODateTime
+        unitPrice: USD
+        numberOfShares: Float
+    }
+
     type PortfolioDetails {
-        id: String
+        id: ID
         name: String
+        northCapitalOfferingId: String
+        offeringName: String
+        vertaloAllocationId: String
+        assetName: String
+        linkToOfferingCircular: String
         properties: [Property]
+        currentNav: Nav
+        navHistory: [Nav]
     }
 
     type Query {
@@ -98,11 +111,9 @@ const schema = `
         """
         [MVP] Currently we can have only one portfolio in the system. This mutation will create a new portfolio and set it as active and disallow to create another one.
         """
-        registerPortfolio(name: String!, northCapitalOfferingId: String!, vertaloAllocationId: String!, linkToOfferingCircular: String!): ID!
+        registerPortfolio(name: String!, northCapitalOfferingId: String!, vertaloAllocationId: String!, linkToOfferingCircular: String!): PortfolioDetails
 
-        updateOfferingCircular(linkToOfferingCircular: String!): Boolean!
-
-        synchronizePortfolioNav: Boolean!
+        synchronizePortfolioNav: Nav
     }
 `;
 
@@ -167,30 +178,13 @@ export const PortfolioSchema = {
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-
         const result = await api.registerPortfolio(name, northCapitalOfferingId, vertaloAllocationId, linkToOfferingCircular);
 
         if (result.errors.length > 0) {
           throw new JsonGraphQLError(result.errors);
         }
 
-        return result.portfolioId;
-      },
-      updateOfferingCircular: async (parent: any, { linkToOfferingCircular }: any, { modules, isAdmin }: AdminSessionContext) => {
-        if (!isAdmin) {
-          throw new GraphQLError('Access denied');
-        }
-
-        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-
-        const { portfolioId } = await api.getActivePortfolio();
-        // const errors = await api.updateOfferingCircular(portfolioId, linkToOfferingCircular);
-
-        // if (errors.length > 0) {
-        // return false;
-        // }
-
-        return true;
+        return api.getPortfolioDetails(result.portfolioId!);
       },
       synchronizePortfolioNav: async (parent: any, data: any, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
@@ -200,13 +194,9 @@ export const PortfolioSchema = {
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
         const { portfolioId } = await api.getActivePortfolio();
-        // const errors = await api.synchronizePortfolioNav(portfolioId, linkToOfferingCircular);
+        await api.synchronizeNav(portfolioId);
 
-        // if (errors.length > 0) {
-        // return false;
-        // }
-
-        return true;
+        return api.getCurrentNav(portfolioId);
       },
     },
   },

@@ -11,8 +11,10 @@ export class PortfolioService {
   }
 
   async getCurrentSharePrice(portfolioId: UUID): Promise<Money> {
-    const price = await this.portfolioModule.api().getCurrentSharePrice(portfolioId);
+    const {
+      unitPrice: { value },
+    } = await this.portfolioModule.api().getCurrentNav(portfolioId);
 
-    return Money.lowPrecision(price);
+    return Money.lowPrecision(value);
   }
 }

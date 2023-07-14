@@ -43,10 +43,15 @@ const schema = `
         location: Location
     }
 
+    type Nav {
+        unitPrice: USD
+    }
+
     type PortfolioDetails {
         id: String
         name: String
         properties: [Property]
+        currentNav: Nav
     }
 
     type Query {

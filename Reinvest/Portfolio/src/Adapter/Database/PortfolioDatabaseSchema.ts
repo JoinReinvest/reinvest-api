@@ -15,6 +15,7 @@ export interface PortfolioTable {
   assetName: string;
   id: UUID;
   linkToOfferingCircular: string;
+  name: string;
   northCapitalOfferingId: string;
   offeringName: string;
   status: 'ACTIVE';

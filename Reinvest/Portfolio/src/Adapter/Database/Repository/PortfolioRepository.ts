@@ -28,11 +28,7 @@ export class PortfolioRepository {
         .provide()
         .insertInto(portfolioTable)
         .values(values)
-        .onConflict(oc =>
-          oc.constraint('id').doUpdateSet({
-            linkToOfferingCircular: eb => eb.ref(`excluded.linkToOfferingCircular`),
-          }),
-        )
+        .onConflict(oc => oc.column('id').doNothing())
         .execute();
 
       return true;
@@ -57,7 +53,7 @@ export class PortfolioRepository {
     };
   }
 
-  async getActivePortfolio() {
+  async getActivePortfolio(): Promise<Portfolio | null> {
     const data = await this.databaseAdapterProvider.provide().selectFrom(portfolioTable).selectAll().where('status', '=', 'ACTIVE').executeTakeFirst();
 
     if (!data) {
