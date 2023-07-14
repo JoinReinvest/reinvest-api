@@ -1,11 +1,10 @@
 import {PortfolioDatabaseAdapterProvider, updatesTable} from 'Portfolio/Adapter/Database/DatabaseAdapter';
-import {SimpleEventBus} from 'SimpleAggregator/EventBus/EventBus';
 import {Property, PropertySchema} from "Portfolio/Domain/Property";
 
 export class PortfolioUpdatesRepository {
   private databaseAdapterProvider: PortfolioDatabaseAdapterProvider;
 
-  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
+  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 

@@ -6,6 +6,9 @@ import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
 import { UpdateProperty } from 'Portfolio/UseCase/UpdateProperty';
 import { DocumentsService } from 'Reinvest/Portfolio/src/Adapter/Documents/DocumentsService';
 import { GetProperties } from 'Reinvest/Portfolio/src/UseCase/GetProperties';
+import { CreatePortfolioUpdate } from 'Reinvest/Portfolio/src/UseCase/CreatePortfolioUpdate';
+import { DeletePortfolioUpdate } from 'Reinvest/Portfolio/src/UseCase/DeletePortfolioUpdate';
+import {PortfolioUpdatesRepository} from "Portfolio/Adapter/Database/Repository/PortfolioUpdatesRepository";
 
 export class UseCaseProvider {
   private config: Portfolio.Config;
@@ -18,5 +21,8 @@ export class UseCaseProvider {
     container.addSingleton(SynchronizePortfolio, [PortfolioRepository, DealpathAdapter]);
     container.addSingleton(UpdateProperty, [PortfolioRepository]);
     container.addSingleton(GetProperties, [PortfolioRepository, DocumentsService]);
+    container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository])
+    container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository])
+    container.addSingleton(DeletePortfolioUpdate, [PortfolioUpdatesRepository])
   }
 }
