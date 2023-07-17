@@ -22,7 +22,7 @@ import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
 import { cognitoPreSignUpFunction, CognitoPreSignUpResources } from './devops/functions/preSignUp/preSignUp-config';
 import { QueueFunction, QueueResources } from './devops/functions/queue/queue-config';
-import { SegmentFunction, SegmentResources } from './devops/functions/segment/queue-config'
+import { SegmentFunction, SegmentResources } from './devops/functions/segment/queue-config';
 import { TestsFunction, TestsLambdaResources } from './devops/functions/tests/tests-config';
 import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } from './devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config';
 import { CognitoAuthorizerName, CognitoClientResources, CognitoOutputs, CognitoResources } from './devops/serverless/cognito';
@@ -52,6 +52,7 @@ const serverlessConfiguration: AWS = {
       SQS_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-notification',
       SQS_PDF_GENERATOR_URL: 'http://localhost:9324/000000000000/development-sqs-pdf-generator',
       SQS_FIREBASE_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-firebase',
+      SQS_SEGMENT_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-segment',
       IT_IS_LOCAL: 'true',
     },
     logs: {

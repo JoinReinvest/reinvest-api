@@ -58,6 +58,12 @@ export const StoredEvents = <StoredEventsType>{
       subject: () => 'Welcome to our app!',
       body: ({ userName }) => `Dear ${userName}, welcome to our platform. Let's start your financial growth journey.`,
     },
+    analyticEvent: {
+      eventName: 'UserRegistered',
+      sendIdentity: () => true,
+      identityData: ({ userName }) => ({ userName }),
+      data: ({ userName }) => ({ userName }),
+    },
   },
   CorporateAccountOpened: {
     accountActivity: {

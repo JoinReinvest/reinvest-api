@@ -21,6 +21,7 @@ export namespace Notifications {
     email: EmailConfiguration;
     firebaseQueue: QueueConfig;
     queue: QueueConfig;
+    segmentQueue: QueueConfig;
   };
 
   export type ModulesDependencies = {

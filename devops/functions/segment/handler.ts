@@ -1,35 +1,46 @@
-import { Analytics } from '@segment/analytics-node'
+import { Analytics } from '@segment/analytics-node';
 import { SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
-import { SEGMENT_API_KEY } from 'Reinvest/config'
+import { logger } from 'Logger/logger';
+import { DateTime } from 'Money/DateTime';
+import { SEGMENT_API_KEY, SENTRY_CONFIG } from 'Reinvest/config';
 
+console = logger(SENTRY_CONFIG);
 const analytics = new Analytics({ writeKey: SEGMENT_API_KEY });
+
+export type SegmentEventData = {
+  eventName: string;
+  profileId: string;
+  sendIdentity: boolean;
+  data?: Record<string, any>;
+  identityData?: Record<string, any>;
+};
 
 export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;
 
   try {
-    const { userId, eventName, timestamp, data, sendIdentify } = JSON.parse(record.body);
+    const { profileId, identityData, eventName, data, sendIdentity } = JSON.parse(record.body) as SegmentEventData;
+    const timestamp = DateTime.now().toDate();
 
-    if(sendIdentify){
+    if (sendIdentity) {
       analytics.identify({
-        userId,
-        traits: data, // https://segment.com/docs/connections/spec/identify/#traits
-        timestamp
+        userId: profileId,
+        traits: identityData ?? {}, // https://segment.com/docs/connections/spec/identify/#traits
+        timestamp,
       });
     }
 
     // https://segment.com/docs/connections/sources/catalog/libraries/server/node/#track
     analytics.track({
-      userId,
+      userId: profileId,
       event: eventName,
-      properties: data,
-      timestamp
+      properties: data ?? {},
+      timestamp,
     });
 
-    analytics.on('error', (err) => console.error(err))
+    analytics.on('error', err => console.error(err));
 
-    await analytics.closeAndFlush({ timeout: 5000 })
-
+    await analytics.closeAndFlush({ timeout: 5000 });
   } catch (error: any) {
     console.log(error);
   }
