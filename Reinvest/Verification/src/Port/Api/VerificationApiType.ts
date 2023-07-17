@@ -1,10 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
 import { VerifyAccount } from 'Verification/IntegrationLogic/UseCase/VerifyAccount';
 import { AdminVerificationActions } from 'Verification/Port/Api/AdminVerificationActions';
-import { VerificationFeesController } from 'Verification/Port/Api/VerificationFeesController';
 import { NorthCapitalVerificationEvents } from 'Verification/Port/Api/NorthCapitalVerificationEvents';
 import { PrincipalApprovals } from 'Verification/Port/Api/PrincipalApprovals';
 import { UserVerificationActions } from 'Verification/Port/Api/UserVerificationActions';
+import { VerificationFeesController } from 'Verification/Port/Api/VerificationFeesController';
 
 export type VerificationApiType = {
   canObjectBeUpdated: UserVerificationActions['canObjectBeUpdated'];
@@ -16,6 +16,7 @@ export type VerificationApiType = {
   payFeesForInvestment: VerificationFeesController['payFeesForInvestment'];
   recoverVerification: AdminVerificationActions['recoverVerification'];
   verifyAccount: VerifyAccount['verify'];
+  withdrawFees: VerificationFeesController['withdrawFees'];
 };
 
 export const verificationApi = (container: ContainerInterface): VerificationApiType => ({
@@ -28,4 +29,5 @@ export const verificationApi = (container: ContainerInterface): VerificationApiT
   markAccountAsDisapproved: container.delegateTo(PrincipalApprovals, 'markAccountAsDisapproved'),
   markAccountAsNeedMoreInfo: container.delegateTo(PrincipalApprovals, 'markAccountAsNeedMoreInfo'),
   payFeesForInvestment: container.delegateTo(VerificationFeesController, 'payFeesForInvestment'),
+  withdrawFees: container.delegateTo(VerificationFeesController, 'withdrawFees'),
 });

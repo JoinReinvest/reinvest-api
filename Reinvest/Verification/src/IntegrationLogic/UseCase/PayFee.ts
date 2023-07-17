@@ -1,13 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { VerificationFeesRepository } from 'Verification/Adapter/Database/Repository/VerificationFeesRepository';
-
-const MAX_EXTRA_TRANSFER_FEE_PERCENT = 0.06; // 6%
-
-export type InvestmentFee = {
-  amount: number;
-  verificationFeeId: UUID;
-};
+import { InvestmentFee, MAX_EXTRA_TRANSFER_FEE_PERCENT } from 'Verification/Domain/ValueObject/Fee';
 
 export class PayFee {
   private verificationFeeRepository: VerificationFeesRepository;
