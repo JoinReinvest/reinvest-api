@@ -24,9 +24,15 @@ export type StoredEventSchema = {
   status: StoredEventStatus;
 };
 
+export type GlobalValues = {
+  email: string;
+  label: string;
+};
+
 export class StoredEvent {
   private storedEventSchema: StoredEventSchema;
   private storedEventConfiguration: StoredEventConfigurationType;
+  private globalValues: GlobalValues | null = null;
 
   constructor(storedEventSchema: StoredEventSchema) {
     this.storedEventSchema = storedEventSchema;
@@ -79,25 +85,6 @@ export class StoredEvent {
     return !!this.storedEventConfiguration.push && this.storedEventSchema.datePushed === null;
   }
 
-  getAccountActivity(): {
-    accountId: UUID | null;
-    data: JSONObject;
-    date: DateTime;
-    name: string;
-    profileId: UUID;
-  } {
-    const accountActivity = this.storedEventConfiguration.accountActivity;
-    const data = accountActivity!.data(this.storedEventSchema.payload);
-
-    return {
-      accountId: <UUID>this.storedEventSchema.payload['accountId'] ?? null,
-      data,
-      date: this.storedEventSchema.dateCreated,
-      name: accountActivity!.name(this.storedEventSchema.payload),
-      profileId: this.storedEventSchema.profileId,
-    };
-  }
-
   markAccountActivityAsProcessed() {
     this.storedEventSchema.dateAccountActivity = DateTime.now();
   }
@@ -110,12 +97,36 @@ export class StoredEvent {
     this.storedEventSchema.dateInApp = DateTime.now();
   }
 
+  markEmailAsProcessed() {
+    this.storedEventSchema.dateEmailed = DateTime.now();
+  }
+
   markAsProcessed() {
     this.storedEventSchema.status = StoredEventStatus.PROCESSED;
   }
 
   markAsFailed() {
     this.storedEventSchema.status = StoredEventStatus.FAILED;
+  }
+
+  getAccountActivity(): {
+    accountId: UUID | null;
+    data: JSONObject;
+    date: DateTime;
+    name: string;
+    profileId: UUID;
+  } {
+    const accountActivity = this.storedEventConfiguration.accountActivity;
+    const payload = this.getPayload();
+    const data = accountActivity!.data(payload);
+
+    return {
+      accountId: <UUID>payload['accountId'] ?? null,
+      data,
+      date: this.storedEventSchema.dateCreated,
+      name: accountActivity!.name(payload),
+      profileId: this.storedEventSchema.profileId,
+    };
   }
 
   getNotification(): CreateNewNotificationInput {
@@ -125,22 +136,19 @@ export class StoredEvent {
       throw new Error(`Notification configuration not found for type: ${this.storedEventSchema.kind}`);
     }
 
-    const { onObjectId, onObjectType } = inAppNotificationConfiguration.onObject(this.storedEventSchema.payload);
+    const payload = this.getPayload();
+    const { onObjectId, onObjectType } = inAppNotificationConfiguration.onObject(payload);
 
     return {
-      accountId: <UUID>this.storedEventSchema.payload['accountId'] ?? null,
-      body: inAppNotificationConfiguration.body(this.storedEventSchema.payload),
-      header: inAppNotificationConfiguration.header(this.storedEventSchema.payload),
+      accountId: <UUID>payload['accountId'] ?? null,
+      body: inAppNotificationConfiguration.body(payload),
+      header: inAppNotificationConfiguration.header(payload),
       notificationType: inAppNotificationConfiguration.notificationType,
       onObjectId,
       onObjectType,
       profileId: this.storedEventSchema.profileId,
       uniqueId: this.storedEventSchema.id,
     };
-  }
-
-  getId(): UUID {
-    return this.storedEventSchema.id;
   }
 
   getPushNotification(): {
@@ -154,10 +162,40 @@ export class StoredEvent {
       throw new Error(`Push notification configuration not found for type: ${this.storedEventSchema.kind}`);
     }
 
+    const payload = this.getPayload();
+
     return {
-      body: pushNotificationConfiguration.body(this.storedEventSchema.payload),
+      body: pushNotificationConfiguration.body(payload),
       profileId: this.storedEventSchema.profileId,
-      title: pushNotificationConfiguration.title(this.storedEventSchema.payload),
+      title: pushNotificationConfiguration.title(payload),
     };
+  }
+
+  getEmailNotification() {
+    const payload = this.getPayload();
+  }
+
+  private getPayload(): DictionaryType {
+    return { ...(this.globalValues ?? { label: 'Investor' }), ...this.storedEventSchema.payload };
+  }
+
+  getId(): UUID {
+    return this.storedEventSchema.id;
+  }
+
+  getProfileId(): UUID {
+    return this.storedEventSchema.profileId;
+  }
+
+  setGlobalValues(globalValues: GlobalValues | null): void {
+    this.globalValues = globalValues;
+  }
+
+  getUserEmail(): string | null {
+    if (!this.globalValues || !this.globalValues.email) {
+      return null;
+    }
+
+    return this.globalValues.email;
   }
 }

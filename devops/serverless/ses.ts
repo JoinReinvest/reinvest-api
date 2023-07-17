@@ -1,13 +1,13 @@
-import { WelcomeTemplate } from './emailTemplates/welcome';
+import { NotificationTemplate } from './emailTemplates/notification';
 
 export const SesResources = {
-  WelcomeTemplate: {
+  NotificationTemplate: {
     Type: 'AWS::SES::Template',
     Properties: {
       Template: {
-        TemplateName: 'WelcomeTemplate',
-        SubjectPart: 'Welcome in the REINVEST Community',
-        HtmlPart: WelcomeTemplate,
+        TemplateName: 'NotificationTemplate',
+        SubjectPart: '{{subject}}',
+        HtmlPart: NotificationTemplate,
       },
     },
   },
