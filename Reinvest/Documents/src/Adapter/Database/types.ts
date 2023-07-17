@@ -8,3 +8,8 @@ export interface DocumentsRenderedPagePdfSchema {
   profileId: UUID;
   url: string;
 }
+
+export interface CalculationsSchema {
+  id: UUID;
+  data: string;
+}

@@ -1,5 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { DatabaseAdapterProvider, DocumentsDatabaseAdapterInstance } from 'Documents/Adapter/Database/DatabaseAdapter';
+import { CalculationsRepository } from 'Documents/Adapter/Repository/CalculationsRepository'
 import { DocumentsPdfPageRepository } from 'Documents/Adapter/Repository/DocumentsPdfPageRepository';
 import { FileLinkService } from 'Documents/Adapter/S3/FileLinkService';
 import { S3Adapter } from 'Documents/Adapter/S3/S3Adapter';
@@ -27,7 +28,8 @@ export class AdapterServiceProvider {
     // database
     container
       .addAsValue(DocumentsDatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
-      .addSingleton(DocumentsPdfPageRepository, [DocumentsDatabaseAdapterInstance, SimpleEventBus]);
+      .addSingleton(DocumentsPdfPageRepository, [DocumentsDatabaseAdapterInstance, SimpleEventBus])
+      .addSingleton(CalculationsRepository, [DocumentsDatabaseAdapterInstance]);
 
     // s3
     container

@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { CalculationsController } from 'Documents/Port/Api/CalculationsController'
 import { FileLinksController } from 'Documents/Port/Api/FileLinksController';
 import { PdfController } from 'Documents/Port/Api/PdfController';
 
@@ -13,6 +14,8 @@ export type DocumentsApiType = {
   getRenderedPageLink: PdfController['getRenderedPageLink'];
   listRenderedPages: PdfController['listRenderedPages'];
   renderPageToPdf: PdfController['renderPageToPdf'];
+  addCalculation: CalculationsController['add'];
+  getCalculation: CalculationsController['get'];
 };
 
 export const DocumentsApi = (container: ContainerInterface): DocumentsApiType => ({
@@ -26,4 +29,6 @@ export const DocumentsApi = (container: ContainerInterface): DocumentsApiType =>
   getImageLink: container.delegateTo(FileLinksController, 'getImageLink'),
   getAvatarLink: container.delegateTo(FileLinksController, 'getAvatarLink'),
   getDocumentLink: container.delegateTo(FileLinksController, 'getDocumentLink'),
+  addCalculation: container.delegateTo(CalculationsController, 'add'),
+  getCalculation: container.delegateTo(CalculationsController, 'get'),
 });
