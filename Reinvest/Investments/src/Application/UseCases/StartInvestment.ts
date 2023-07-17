@@ -2,6 +2,8 @@ import { UUID } from 'HKEKTypes/Generics';
 import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
+import { DateTime } from 'Money/DateTime';
 
 class StartInvestment {
   private readonly investmentsRepository: InvestmentsRepository;
@@ -19,18 +21,8 @@ class StartInvestment {
       return false;
     }
 
-    if (investment.isStartedInvestment()) {
-      return true;
-    }
-
     if (approveFees) {
       investment.approveFee(ip);
-    }
-
-    const subscriptionAgreementId = investment.getSubscriptionAgreementId();
-
-    if (!subscriptionAgreementId) {
-      return false;
     }
 
     const isStarted = investment.startInvestment();
@@ -41,29 +33,29 @@ class StartInvestment {
 
     const investmentData = investment.toObject();
 
-    const events = [
+    const events: DomainEvent[] = [
       <InvestmentCreated>{
         id: investmentData.id,
         kind: TransactionEvents.INVESTMENT_CREATED,
-        date: new Date(),
+        date: DateTime.now().toDate(),
         data: {
           profileId,
           accountId: investmentData.accountId,
           portfolioId: investmentData.portfolioId,
           parentId: investmentData.parentId,
-          amount: investmentData.amount,
+          amount: investmentData.amount.getAmount(),
         },
       },
       storeEventCommand(profileId, 'InvestmentProcessStarted', {
         accountId: investmentData.accountId,
-        amount: investmentData.amount,
+        amount: investmentData.amount.getAmount(),
         tradeId: investmentData.tradeId,
-        origin: investmentData.recurringInvestmentId ? 'Recurring investment' : 'Direct deposit',
+        origin: investmentData.origin,
         investmentId: investmentData.id,
       }),
     ];
 
-    return this.investmentsRepository.updateInvestment(investment, approveFees, events);
+    return this.investmentsRepository.store(investment, events);
   }
 }
 

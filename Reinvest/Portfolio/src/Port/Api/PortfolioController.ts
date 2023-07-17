@@ -1,13 +1,22 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { NavView } from 'Portfolio/Domain/Nav';
 import { DataJson } from 'Portfolio/Domain/types';
+import { PortfolioQuery } from 'Portfolio/UseCase/PortfolioQuery';
+import { RegisterPortfolio } from 'Portfolio/UseCase/RegisterPortfolio';
+import { SynchronizeNav } from 'Portfolio/UseCase/SynchronizeNav';
 import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
 import { UpdateProperty, UpdatePropertyInput } from 'Portfolio/UseCase/UpdateProperty';
-import { GetProperties } from 'Reinvest/Portfolio/src/UseCase/GetProperties';
 
 type PortfolioDetails = {
   id: string;
   name: string;
   properties: DataJson[];
+};
+
+type SubscriptionAgreementPortfolioData = {
+  nameOfAsset: string;
+  nameOfOffering: string;
+  offeringsCircularLink: string;
 };
 
 /**
@@ -16,12 +25,22 @@ type PortfolioDetails = {
 export class PortfolioController {
   private synchronizePortfolioUseCase: SynchronizePortfolio;
   private updatePropertyUseCase: UpdateProperty;
-  private getPropertiesUseCase: GetProperties;
+  private portfolioQuery: PortfolioQuery;
+  private registerPortfolioUseCase: RegisterPortfolio;
+  private synchronizeNavUseCase: SynchronizeNav;
 
-  constructor(synchronizePortfolioUseCase: SynchronizePortfolio, updatePropertyUseCase: UpdateProperty, getPropertiesUseCase: GetProperties) {
+  constructor(
+    synchronizePortfolioUseCase: SynchronizePortfolio,
+    updatePropertyUseCase: UpdateProperty,
+    portfolioQuery: PortfolioQuery,
+    registerPortfolioUseCase: RegisterPortfolio,
+    synchronizeNavUseCase: SynchronizeNav,
+  ) {
     this.synchronizePortfolioUseCase = synchronizePortfolioUseCase;
     this.updatePropertyUseCase = updatePropertyUseCase;
-    this.getPropertiesUseCase = getPropertiesUseCase;
+    this.portfolioQuery = portfolioQuery;
+    this.registerPortfolioUseCase = registerPortfolioUseCase;
+    this.synchronizeNavUseCase = synchronizeNavUseCase;
   }
 
   static getClassName = (): string => 'PortfolioController';
@@ -35,43 +54,66 @@ export class PortfolioController {
   }
 
   async getActivePortfolio(): Promise<{ portfolioId: string; portfolioName: string }> {
-    return { portfolioId: '34ccfe14-dc18-40df-a1d6-04f33b9fa7f4', portfolioName: 'Community REIT' };
+    return this.portfolioQuery.getActivePortfolio();
   }
 
-  async getProperties(portfolioId: UUID) {
-    return this.getPropertiesUseCase.execute(portfolioId);
-  }
-
-  async getPortfolio(portfolioId: string): Promise<{ portfolioId: string; portfolioName: string }> {
-    return this.getActivePortfolio();
-  }
-
-  async getPortfolioDetails(portfolioId: string): Promise<PortfolioDetails> {
-    const portfolio = await this.getPortfolio(portfolioId);
-
-    const properties = await this.getProperties(portfolio.portfolioId);
-
-    return {
-      id: portfolio.portfolioId,
-      name: portfolio.portfolioName,
-      properties: properties,
-    };
+  async getPortfolioDetails(portfolioId: string): Promise<PortfolioDetails | null> {
+    return this.portfolioQuery.getPortfolioDetails(portfolioId);
   }
 
   async getPortfolioVendorsConfiguration(portfolioId: string): Promise<{
     ncOfferingId: string;
     vertaloAllocationId: string;
   }> {
+    const portfolio = await this.portfolioQuery.getPortfolio(portfolioId);
+    const data = portfolio.toObject();
+
     return {
-      ncOfferingId: '1290029',
-      vertaloAllocationId: '6a03167e-28d1-4378-b881-a5ade307b81b',
+      ncOfferingId: data.northCapitalOfferingId,
+      vertaloAllocationId: data.vertaloAllocationId,
     };
   }
 
-  async getCurrentNav(portfolioId: string): Promise<{ numberOfShares: number; unitSharePrice: number }> {
+  async getCurrentNav(portfolioId: string): Promise<NavView> {
+    return this.portfolioQuery.getCurrentNav(portfolioId);
+  }
+
+  async getDataForSubscriptionAgreement(portfolioId: UUID): Promise<SubscriptionAgreementPortfolioData> {
+    const portfolio = await this.portfolioQuery.getPortfolio(portfolioId);
+    const data = portfolio.toObject();
+
     return {
-      unitSharePrice: 105,
-      numberOfShares: 100000000,
+      nameOfAsset: data.assetName,
+      nameOfOffering: data.offeringName,
+      offeringsCircularLink: data.linkToOfferingCircular,
     };
+  }
+
+  async registerPortfolio(
+    name: string,
+    northCapitalOfferingId: string,
+    vertaloAllocationId: string,
+    linkToOfferingCircular: string,
+  ): Promise<{
+    errors: string[];
+    portfolioId: string | null;
+  }> {
+    try {
+      const portfolioId = await this.registerPortfolioUseCase.execute(name, northCapitalOfferingId, vertaloAllocationId, linkToOfferingCircular);
+
+      return {
+        errors: [],
+        portfolioId,
+      };
+    } catch (error: any) {
+      return {
+        errors: [error.message],
+        portfolioId: null,
+      };
+    }
+  }
+
+  async synchronizeNav(portfolioId: UUID): Promise<boolean> {
+    return this.synchronizeNavUseCase.execute(portfolioId);
   }
 }

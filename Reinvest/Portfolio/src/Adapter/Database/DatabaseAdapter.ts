@@ -1,11 +1,14 @@
+import { PortfolioDatabaseSchema, PortfolioNavTable, PortfolioTable } from 'Portfolio/Adapter/Database/PortfolioDatabaseSchema';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 
-import { PropertySchema } from './PropertySchema';
-
 export const propertyTable = 'portfolio_property';
+export const portfolioTable = 'portfolio_portfolio';
+export const navTable = 'portfolio_nav';
 
 export interface PortfolioDatabase {
-  [propertyTable]: PropertySchema;
+  [navTable]: PortfolioNavTable;
+  [portfolioTable]: PortfolioTable;
+  [propertyTable]: PortfolioDatabaseSchema;
 }
 
 export const PortfolioDatabaseAdapterInstanceProvider = 'PortfolioDatabaseAdapterProvider';

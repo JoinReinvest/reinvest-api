@@ -16,6 +16,7 @@ import {
 } from 'Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 import { NorthCapitalSynchronizationMapping } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
+import { DateTime } from 'Money/DateTime';
 
 export class NorthCapitalSynchronizationRepository {
   public static getClassName = (): string => 'NorthCapitalSynchronizationRepository';
@@ -65,7 +66,7 @@ export class NorthCapitalSynchronizationRepository {
       return;
     }
 
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const nextVersion = synchronizationRecord.getNextVersion();
     const currentVersion = synchronizationRecord.getVersion();
 

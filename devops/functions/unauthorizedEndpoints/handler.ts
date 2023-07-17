@@ -1,9 +1,12 @@
 import * as bodyParser from 'body-parser';
 import express from 'express';
+import { Investments } from 'Investments/index';
+import { Portfolio } from 'Portfolio/index';
 import { boot } from 'Reinvest/bootstrap';
 import { Identity } from 'Reinvest/Identity/src';
 import { IdentityApiType } from 'Reinvest/Identity/src/Port/Api/IdentityApi';
 import serverless from 'serverless-http';
+import { Trading } from 'Trading/index';
 import { Verification } from 'Verification/index';
 
 const app = express();
@@ -47,6 +50,35 @@ app.post('/webhooks/updateParty', async function (req: any, res: any) {
   const aml = !amlStatus || !northCapitalVerificationStatuses.includes(amlStatus) ? null : amlStatus;
   await verificationModule.handleNorthCapitalVerificationEvent(partyId);
 
+  await modules.close();
+
+  res.json({ status: true });
+});
+
+app.post('/webhooks/updateOffering', async function (req: any, res: any) {
+  const modules = boot();
+  const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+
+  const { portfolioId } = await api.getActivePortfolio();
+  await api.synchronizeNav(portfolioId);
+
+  await modules.close();
+
+  res.json({ status: true });
+});
+
+app.post('/webhooks/updateTrade', async function (req: any, res: any) {
+  const modules = boot();
+  const { tradeId } = req.body;
+  const investmentApi = modules.getApi<Investments.ApiType>(Investments);
+  const tradingApi = modules.getApi<Trading.ApiType>(Trading);
+  const investmentId = await tradingApi.getInvestmentIdByTradeId(tradeId);
+
+  if (!investmentId) {
+    return;
+  }
+
+  await investmentApi.pushTransaction(investmentId);
   await modules.close();
 
   res.json({ status: true });

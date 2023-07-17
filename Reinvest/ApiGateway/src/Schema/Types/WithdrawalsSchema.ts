@@ -11,7 +11,7 @@ const schema = `
         PENDING
         REINVESTED
         PAID_OUT
-        WITHDRAWING
+        PAYING_OUT
     }
 
     type Dividend {

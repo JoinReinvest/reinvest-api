@@ -2,6 +2,7 @@ import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { PrincipalVerificationEvent, VerificationEvents } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
+import { DateTime } from 'Money/DateTime';
 
 export class MarkAccountAsDisapproved {
   private verifierService: VerifierService;
@@ -19,7 +20,7 @@ export class MarkAccountAsDisapproved {
       const { accountVerifier, verifiers } = await this.verifierService.createVerifiersForAccount(profileId, accountId);
       const principalDisapproved = (partyId: string) =>
         <PrincipalVerificationEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.PRINCIPAL_DISAPPROVED,
           ncId: partyId,
         };

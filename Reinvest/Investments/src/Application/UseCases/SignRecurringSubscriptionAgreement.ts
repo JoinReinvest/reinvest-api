@@ -1,12 +1,8 @@
-import TemplateParser from 'Investments/Application/Service/TemplateParser';
-import { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
-import { recurringSubscriptionAgreementsTemplates } from 'Investments/Domain/SubscriptionAgreements/recurringSubscriptionAgreementsTemplates';
-import type { DynamicType, RecurringSubscriptionAgreementTemplateVersions } from 'Investments/Domain/SubscriptionAgreements/types';
+import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
+import { AgreementTypes, RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
-import { PdfTypes } from 'Reinvest/Documents/src/Port/Api/PdfController';
-import { DomainEvent } from 'SimpleAggregator/Types';
 
 class SignRecurringSubscriptionAgreement {
   static getClassName = (): string => 'SignRecurringSubscriptionAgreement';
@@ -25,55 +21,43 @@ class SignRecurringSubscriptionAgreement {
     this.documentsService = documentsService;
   }
 
-  async execute(profileId: string, accountId: string, clientIp: string) {
-    const events: DomainEvent[] = [];
-
-    const recurringInvestment = await this.recurringInvestmentsRepository.get(accountId, RecurringInvestmentStatus.DRAFT);
+  async execute(profileId: string, accountId: string, clientIp: string): Promise<boolean> {
+    const recurringInvestment = await this.recurringInvestmentsRepository.getRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
 
     if (!recurringInvestment) {
       return false;
     }
 
     const recurringInvestmentId = recurringInvestment.getId();
-
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, recurringInvestmentId);
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(
+      profileId,
+      recurringInvestmentId,
+      AgreementTypes.RECURRING_INVESTMENT,
+    );
 
     if (!subscriptionAgreement) {
       return false;
     }
 
-    subscriptionAgreement.setSignature(clientIp);
-
-    const isSigned = await this.subscriptionAgreementRepository.signSubscriptionAgreement(subscriptionAgreement);
+    subscriptionAgreement.sign(clientIp);
+    const isSigned = await this.subscriptionAgreementRepository.store(subscriptionAgreement);
 
     if (!isSigned) {
       return false;
     }
 
     const subscriptionAgreementId = subscriptionAgreement.getId();
-
     recurringInvestment.assignSubscriptionAgreement(subscriptionAgreementId);
 
-    const isAssigned = await this.recurringInvestmentsRepository.assignSubscriptionAgreementAndUpdateStatus(recurringInvestment);
-
-    if (isAssigned) {
-      const { contentFieldsJson, templateVersion } = subscriptionAgreement.getDataForParser();
-
-      const parser = new TemplateParser(recurringSubscriptionAgreementsTemplates[templateVersion as RecurringSubscriptionAgreementTemplateVersions]);
-
-      const parsed = parser.parse(contentFieldsJson as DynamicType);
-
-      await this.documentsService.generatePdf(profileId, subscriptionAgreementId, parsed, PdfTypes.AGREEMENT);
-
-      events.push({
+    return this.recurringInvestmentsRepository.store(recurringInvestment, [
+      <SubscriptionAgreementEvent>{
         id: subscriptionAgreementId,
-        kind: 'RecurringInvestmentSubscriptionAgreementSigned',
-      });
-
-      await this.recurringInvestmentsRepository.publishEvents(events);
-    }
-
-    return isAssigned;
+        kind: SubscriptionAgreementEvents.RecurringSubscriptionAgreementSigned,
+        data: {
+          profileId,
+        },
+      },
+    ]);
   }
 }
 

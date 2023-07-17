@@ -19,6 +19,7 @@ export interface TradesTable {
   fundsMoveStateJson: JSONObjectOf<FundsMoveState> | null;
   investmentId: string;
   northCapitalTradeStateJson: JSONObjectOf<NorthCapitalTradeState> | null;
+  retryPaymentStateJson: JSONObjectOf<FundsMoveState> | null;
   sharesTransferJson: JSONObjectOf<SharesTransferState> | null;
   subscriptionAgreementStateJson: JSONObjectOf<SubscriptionAgreementState> | null;
   tradeConfigurationJson: JSONObjectOf<TradeConfiguration>;

@@ -1,13 +1,9 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import {
-  northCapitalDocumentsSynchronizationTable,
-  RegistrationDatabaseAdapterProvider,
-  registrationMappingRegistryTable,
-} from 'Registration/Adapter/Database/DatabaseAdapter';
+import { northCapitalDocumentsSynchronizationTable, RegistrationDatabaseAdapterProvider } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { InsertableNorthCapitalDocumentsSynchronization } from 'Registration/Adapter/Database/RegistrationSchema';
-import { MappedRecordStatus } from 'Registration/Domain/Model/Mapping/MappedType';
 import { DocumentSchema } from 'Registration/Domain/Model/ReinvestTypes';
 import { DocumentSyncState, NorthCapitalDocumentToSync, NorthCapitalObjectType } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
+import { DateTime } from 'Money/DateTime';
 
 export class NorthCapitalDocumentsSynchronizationRepository {
   public static getClassName = (): string => 'NorthCapitalDocumentsSynchronizationRepository';
@@ -32,8 +28,8 @@ export class NorthCapitalDocumentsSynchronizationRepository {
           documentFilename: document.fileName,
           version: 0,
           state: DocumentSyncState.DIRTY,
-          createdDate: new Date(),
-          updatedDate: new Date(),
+          createdDate: DateTime.now().toDate(),
+          updatedDate: DateTime.now().toDate(),
         },
     );
 
@@ -94,7 +90,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
   }
 
   async setClean(document: NorthCapitalDocumentToSync): Promise<boolean> {
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const currentVersion = document.version;
 
     try {
@@ -120,7 +116,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
   }
 
   async setFailed(document: NorthCapitalDocumentToSync): Promise<void> {
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const currentVersion = document.version;
 
     try {
@@ -142,7 +138,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
   }
 
   async moveToTheEndOfQueue(document: NorthCapitalDocumentToSync): Promise<void> {
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const currentVersion = document.version;
 
     try {

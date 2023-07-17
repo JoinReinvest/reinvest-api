@@ -81,6 +81,12 @@ export class Address implements ToObject {
     }
   }
 
+  getInlinedAddress(): string {
+    const addressLine = this.addressLine2 ? `${this.addressLine1} ${this.addressLine2}` : this.addressLine1;
+
+    return `${addressLine}, ${this.city}, ${this.state}, ${this.zipCode}`;
+  }
+
   toObject(): any {
     return {
       addressLine1: this.addressLine1.toString(),

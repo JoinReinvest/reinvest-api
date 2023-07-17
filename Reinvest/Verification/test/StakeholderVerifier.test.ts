@@ -9,6 +9,7 @@ import {
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/StakeholderVerifier';
+import { DateTime } from 'Money/DateTime';
 
 const partyId = 'some-uuid';
 const accountId = 'some-account-uuid';
@@ -16,7 +17,7 @@ const verificationId = 1;
 
 const amlEvent = <VerificationAmlResultEvent>{
   kind: VerificationEvents.VERIFICATION_AML_RESULT,
-  date: new Date(),
+  date: DateTime.now().toDate(),
   ncId: partyId,
   reasons: [],
   source: 'DIRECT',
@@ -26,7 +27,7 @@ const amlEvent = <VerificationAmlResultEvent>{
 
 const kycEvent = <VerificationKycResultEvent>{
   kind: VerificationEvents.VERIFICATION_KYC_RESULT,
-  date: new Date(),
+  date: DateTime.now().toDate(),
   ncId: partyId,
   reasons: [],
   source: 'DIRECT',
@@ -35,7 +36,7 @@ const kycEvent = <VerificationKycResultEvent>{
 };
 
 const errorEvent = <VerificationNorthCapitalObjectFailedEvent>{
-  date: new Date(),
+  date: DateTime.now().toDate(),
   kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
   ncId: partyId,
   reason: 'Error reason',
@@ -50,6 +51,7 @@ const cleanVerifierState = () =>
         id: 'some-uuid',
         type: VerifierType.STAKEHOLDER,
       },
+      decisionId: 'some-id',
     },
     events: { list: [] },
     id: 'some-uuid',

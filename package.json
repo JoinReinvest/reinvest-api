@@ -56,6 +56,8 @@
     "local:invoke:cronDividendsCalculation": "NODE_ENV=development sls invoke local -s development --function cronDividendsCalculation --config serverless-local.ts",
     "local:invoke:cronNotificationsFunction": "NODE_ENV=development sls invoke local -s development --function cronNotificationsFunction --config serverless-local.ts",
     "local:invoke:cronDividendsDistribution": "NODE_ENV=development sls invoke local -s development --function cronDividendsDistribution --config serverless-local.ts",
+    "local:invoke:cronRecurringInvestments": "NODE_ENV=development sls invoke local -s development --function cronRecurringInvestments --config serverless-local.ts",
+    "local:invoke:cronPushEveryDay": "NODE_ENV=development sls invoke local -s development --function cronPushEveryDay --config serverless-local.ts",
     "local:invoke:migrateUp": "NODE_ENV=development sls invoke local -s development --function migration --config serverless-local.ts",
     "local:invoke:migrateDown": "NODE_ENV=development sls invoke local -s development --function migration --data 'down' --config serverless-local.ts",
     "local:server": "docker-compose -f docker-compose.yml up",
@@ -70,6 +72,7 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.259.0",
     "@aws-sdk/client-lambda": "^3.303.0",
     "@aws-sdk/client-s3": "^3.303.0",
+    "@aws-sdk/client-ses": "^3.370.0",
     "@aws-sdk/client-sns": "^3.303.0",
     "@aws-sdk/client-sqs": "^3.303.0",
     "@aws-sdk/lib-storage": "^3.350.0",
@@ -85,7 +88,6 @@
     "@types/dinero.js": "^1.9.0",
     "apollo-server-errors": "^3.3.1",
     "axios": "^1.3.4",
-    "date-and-time": "^2.4.3",
     "dayjs": "^1.11.7",
     "dinero.js": "^1.9.1",
     "dotenv": "^16.0.3",
@@ -141,7 +143,14 @@
       "no-return-await": 1,
       "@typescript-eslint/no-empty-interface": 1,
       "security/detect-object-injection": 0,
-      "@typescript-eslint/no-non-null-assertion": 0
+      "@typescript-eslint/no-non-null-assertion": 0,
+      "quotes": [
+        0,
+        "single",
+        {
+          "avoidEscape": true
+        }
+      ]
     }
   },
   "prettier": "@hookooekoo/eslint-config/prettier.json"

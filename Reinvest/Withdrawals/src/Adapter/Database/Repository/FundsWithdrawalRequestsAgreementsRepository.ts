@@ -2,6 +2,7 @@ import { JSONObject, UUID } from 'HKEKTypes/Generics';
 import { FundsRequestWithdrawalAgreement } from 'Reinvest/Withdrawals/src/Domain/FundsRequestWithdrawalAgreement';
 import type { FundsWithdrawalAgreementAgreementCreate } from 'Reinvest/Withdrawals/src/UseCase/CreateFundsWithdrawalAgreement';
 import { WithdrawalsDatabaseAdapterProvider, withdrawalsFundsRequestsAgreementsTable } from 'Withdrawals/Adapter/Database/DatabaseAdapter';
+import { DateTime } from 'Money/DateTime';
 
 export class FundsWithdrawalRequestsAgreementsRepository {
   private databaseAdapterProvider: WithdrawalsDatabaseAdapterProvider;
@@ -79,7 +80,7 @@ export class FundsWithdrawalRequestsAgreementsRepository {
           oc.constraint('funds_request_id_unique').doUpdateSet({
             id,
             status,
-            dateCreated: new Date(),
+            dateCreated: DateTime.now().toDate(),
             signedAt: null,
             signedByIP: null,
             pdfDateCreated: null,

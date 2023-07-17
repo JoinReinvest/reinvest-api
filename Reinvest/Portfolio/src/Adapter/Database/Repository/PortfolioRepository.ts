@@ -1,120 +1,65 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { PortfolioDatabaseAdapterProvider, propertyTable } from 'Portfolio/Adapter/Database/DatabaseAdapter';
-import { Property, PropertySchema } from 'Reinvest/Portfolio/src/Domain/Property';
-import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
-import { DomainEvent } from 'SimpleAggregator/Types';
+import { PortfolioDatabaseAdapterProvider, portfolioTable } from 'Portfolio/Adapter/Database/DatabaseAdapter';
+import { PortfolioTable } from 'Portfolio/Adapter/Database/PortfolioDatabaseSchema';
+import { Portfolio, PortfolioSchema } from 'Portfolio/Domain/Portfolio';
 
 export class PortfolioRepository {
+  public static getClassName = (): string => 'PortfolioRepository';
   private databaseAdapterProvider: PortfolioDatabaseAdapterProvider;
-  private eventsPublisher: SimpleEventBus;
 
-  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider, eventsPublisher: SimpleEventBus) {
+  constructor(databaseAdapterProvider: PortfolioDatabaseAdapterProvider) {
     this.databaseAdapterProvider = databaseAdapterProvider;
-    this.eventsPublisher = eventsPublisher;
   }
 
-  public static getClassName = (): string => 'PortfolioRepository';
+  async getById(portfolioId: UUID): Promise<Portfolio | null> {
+    const data = await this.databaseAdapterProvider.provide().selectFrom(portfolioTable).selectAll().where('id', '=', portfolioId).executeTakeFirst();
 
-  async getById(id: number): Promise<Property | null> {
-    try {
-      const propertyData = await this.databaseAdapterProvider
-        .provide()
-        .selectFrom(propertyTable)
-        .selectAll()
-        .where('id', '=', id)
-        .castTo<PropertySchema>()
-        .executeTakeFirst();
-
-      if (!propertyData) {
-        return null;
-      }
-
-      const property = Property.create(propertyData);
-
-      return property;
-    } catch (error: any) {
-      console.error(error);
-
+    if (!data) {
       return null;
     }
+
+    return this.castToObject(data);
   }
 
-  async getAll(portfolioId: UUID) {
-    try {
-      const propertiesData = await this.databaseAdapterProvider
-        .provide()
-        .selectFrom(propertyTable)
-        .selectAll()
-        .where('portfolioId', '=', portfolioId)
-        .castTo<PropertySchema>()
-        .execute();
-
-      if (!propertiesData.length) {
-        return null;
-      }
-
-      const properties = propertiesData.map(property => Property.create(property));
-
-      return properties;
-    } catch (error: any) {
-      console.error(error);
-
-      return false;
-    }
-  }
-
-  async createProperty(property: Property) {
-    const { id, portfolioId, status, lastUpdate, dataJson, adminJson, dealpathJson } = property.toObject();
-
+  async store(portfolio: Portfolio): Promise<boolean> {
+    const values = this.castToTable(portfolio);
     try {
       await this.databaseAdapterProvider
         .provide()
-        .insertInto(propertyTable)
-        .values({
-          id,
-          portfolioId,
-          lastUpdate,
-          status,
-          dataJson: JSON.stringify(dataJson),
-          adminJson: JSON.stringify(adminJson),
-          dealpathJson: JSON.stringify(dealpathJson),
-        })
+        .insertInto(portfolioTable)
+        .values(values)
+        .onConflict(oc => oc.column('id').doNothing())
         .execute();
 
       return true;
     } catch (error: any) {
-      console.error(error);
+      console.error(`Cannot store portfolio details`, error);
 
       return false;
     }
   }
 
-  async updateProperty(property: Property, events?: DomainEvent[]): Promise<void> {
-    const { id, dataJson, adminJson, dealpathJson, status } = property.toObject();
-
-    await this.databaseAdapterProvider
-      .provide()
-      .updateTable(propertyTable)
-      .set({
-        dataJson: JSON.stringify(dataJson),
-        adminJson: JSON.stringify(adminJson),
-        dealpathJson: JSON.stringify(dealpathJson),
-        status,
-        lastUpdate: new Date(),
-      })
-      .where('id', '=', id)
-      .execute();
-
-    if (events?.length) {
-      await this.publishEvents(events);
-    }
+  private castToObject(tableData: PortfolioTable): Portfolio {
+    return Portfolio.restore(<PortfolioSchema>{
+      ...tableData,
+    });
   }
 
-  async publishEvents(events: DomainEvent[] = []): Promise<void> {
-    if (events.length === 0) {
-      return;
+  private castToTable(object: Portfolio): PortfolioTable {
+    const data = object.toObject();
+
+    return <PortfolioTable>{
+      ...data,
+    };
+  }
+
+  async getActivePortfolio(): Promise<Portfolio | null> {
+    const data = await this.databaseAdapterProvider.provide().selectFrom(portfolioTable).selectAll().where('status', '=', 'ACTIVE').executeTakeFirst();
+
+    if (!data) {
+      return null;
     }
 
-    await this.eventsPublisher.publishMany(events);
+    return this.castToObject(data);
   }
 }

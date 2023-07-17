@@ -14,8 +14,10 @@
       "HKEKTypes/*": ["./shared/hkek-types/*"],
       "Logger/*": ["./shared/hkek-logger/*"],
       "Money/*": ["./shared/hkek-money/*"],
+      "Templates/*": ["./shared/hkek-templates/*"],
 
       "ApiGateway/*": ["./Reinvest/ApiGateway/src/*"],
+      "Archiving/*": ["./Reinvest/Archiving/src/*"],
       "AdminApiGateway/*": ["./Reinvest/AdminApiGateway/src/*"],
       "InvestmentAccounts/*": ["./Reinvest/InvestmentAccounts/src/*"],
       "LegalEntities/*": ["./Reinvest/LegalEntities/src/*"],

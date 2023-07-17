@@ -1,109 +1,122 @@
-import { RecurringInvestmentSchedule } from 'Investments/Domain/ValueObject/RecuringInvestmentSchedule';
-import { RecurringInvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { UUID } from 'HKEKTypes/Generics';
+import ScheduleInvestmentService from 'Investments/Domain/Service/ScheduleInvestmentService';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 
-import { RecurringInvestmentStatus } from './Types';
+import { RecurringInvestmentFrequency, RecurringInvestmentStatus } from './Types';
 
-type RecurringInvestmentSchema = RecurringInvestmentsTable;
+export interface RecurringInvestmentSchema {
+  accountId: UUID;
+  amount: Money;
+  dateCreated: DateTime;
+  frequency: RecurringInvestmentFrequency;
+  id: UUID;
+  nextDate: DateTime;
+  portfolioId: UUID;
+  profileId: UUID;
+  startDate: DateTime;
+  status: RecurringInvestmentStatus;
+  subscriptionAgreementId: UUID | null;
+}
 
 export class RecurringInvestment {
-  private schedule: RecurringInvestmentSchedule;
-  private accountId: string;
-  private amount: number;
-  private dateCreated: Date;
-  private id: string;
-  private portfolioId: string;
-  private profileId: string;
-  private status: RecurringInvestmentStatus;
-  private subscriptionAgreementId: string | null;
+  private schema: RecurringInvestmentSchema;
 
-  constructor(
-    schedule: RecurringInvestmentSchedule,
-    accountId: string,
-    amount: number,
-    dateCreated: Date,
-    id: string,
-    portfolioId: string,
-    profileId: string,
-    status: RecurringInvestmentStatus,
-    subscriptionAgreementId: string | null,
-  ) {
-    this.schedule = schedule;
-    this.accountId = accountId;
-    this.amount = amount;
-    this.dateCreated = dateCreated;
-    this.id = id;
-    this.portfolioId = portfolioId;
-    this.profileId = profileId;
-    this.status = status;
-    this.subscriptionAgreementId = subscriptionAgreementId;
+  constructor(schema: RecurringInvestmentSchema) {
+    this.schema = schema;
   }
 
-  static create(data: RecurringInvestmentSchema) {
-    const { accountId, amount, dateCreated, frequency, id, portfolioId, profileId, startDate, status, subscriptionAgreementId } = data;
-
-    const schedule = RecurringInvestmentSchedule.create({ startDate, frequency });
-
-    return new RecurringInvestment(schedule, accountId, amount, dateCreated, id, portfolioId, profileId, status, subscriptionAgreementId);
+  static create(
+    id: UUID,
+    profileId: UUID,
+    accountId: UUID,
+    portfolioId: UUID,
+    frequency: RecurringInvestmentFrequency,
+    startDate: DateTime,
+    amount: Money,
+  ): RecurringInvestment {
+    return new RecurringInvestment({
+      accountId,
+      amount,
+      dateCreated: DateTime.now(),
+      frequency,
+      id,
+      portfolioId,
+      profileId,
+      startDate,
+      nextDate: startDate,
+      status: RecurringInvestmentStatus.DRAFT,
+      subscriptionAgreementId: null,
+    });
   }
 
-  getAmount() {
-    const amount = new Money(this.amount);
+  static restore(schema: RecurringInvestmentSchema): RecurringInvestment {
+    return new RecurringInvestment(schema);
+  }
 
+  getAmount(): {
+    formatted: string;
+    value: number;
+  } {
     return {
-      formatted: amount.getFormattedAmount(),
-      value: amount.getAmount(),
+      formatted: this.schema.amount.getFormattedAmount(),
+      value: this.schema.amount.getAmount(),
     };
   }
 
-  assignSubscriptionAgreement(id: string) {
-    this.subscriptionAgreementId = id;
+  assignSubscriptionAgreement(id: UUID) {
+    this.schema.subscriptionAgreementId = id;
   }
 
   deactivate() {
-    this.status = RecurringInvestmentStatus.INACTIVE;
+    this.schema.status = RecurringInvestmentStatus.INACTIVE;
   }
 
   activate() {
-    this.status = RecurringInvestmentStatus.ACTIVE;
+    this.schema.status = RecurringInvestmentStatus.ACTIVE;
   }
 
   getStatus() {
-    return this.status;
+    return this.schema.status;
+  }
+
+  setNextDate(date: DateTime): void {
+    this.schema.nextDate = date;
   }
 
   getId() {
-    return this.id;
-  }
-
-  getSchedule() {
-    const { frequency, startDate } = this.schedule.toObject();
-
-    return {
-      frequency,
-      startDate,
-    };
-  }
-
-  getSubscriptionAgreeementId() {
-    return this.subscriptionAgreementId;
+    return this.schema.id;
   }
 
   isReadyToActivate() {
-    return !!this.subscriptionAgreementId;
+    return !!this.schema.subscriptionAgreementId;
   }
 
-  toObject() {
-    return {
-      accountId: this.accountId,
-      amount: this.amount,
-      dateCreated: this.dateCreated,
-      schedule: this.schedule,
-      id: this.id,
-      portfolioId: this.portfolioId,
-      profileId: this.profileId,
-      status: this.status,
-      subscriptionAgreementId: this.subscriptionAgreementId,
-    };
+  toObject(): RecurringInvestmentSchema {
+    return this.schema;
+  }
+
+  isActive(): boolean {
+    return this.schema.status === RecurringInvestmentStatus.ACTIVE;
+  }
+
+  getNextExecutionDate(lastExecutionDate: DateTime | null): DateTime {
+    const calculationService = new ScheduleInvestmentService(this.schema.startDate, this.schema.frequency);
+
+    return calculationService.getNextInvestmentDate(lastExecutionDate);
+  }
+
+  canBeExecuted(lastExecutionDate: DateTime | null): boolean {
+    const nextExecutionDate = this.getNextExecutionDate(lastExecutionDate);
+
+    return nextExecutionDate.isBeforeOrEqual(DateTime.nowIsoDate());
+  }
+
+  setNextExecutionDate(lastExecutionDate: DateTime): void {
+    this.schema.nextDate = this.getNextExecutionDate(lastExecutionDate);
+  }
+
+  suspend(): void {
+    this.schema.status = RecurringInvestmentStatus.SUSPENDED;
   }
 }

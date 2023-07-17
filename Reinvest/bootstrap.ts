@@ -1,3 +1,4 @@
+import { Archiving } from 'Archiving/index';
 import { Documents } from 'Documents/index';
 import { CognitoConfig } from 'Identity/Adapter/AWS/CognitoService';
 import { SNSConfig } from 'Identity/Adapter/AWS/SmsService';
@@ -5,6 +6,7 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { Investments } from 'Investments/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { logger } from 'Logger/logger';
+import { EmailConfiguration } from 'Notifications/Adapter/SES/EmailSender';
 import { Notifications } from 'Notifications/index';
 import { DealpathConfig } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
 import { Portfolio } from 'Portfolio/index';
@@ -16,6 +18,7 @@ import {
   COGNITO_CONFIG,
   DATABASE_CONFIG,
   DEALPATH_CONFIG,
+  EMAIL_CONFIG,
   EMAIL_DOMAIN,
   FIREBASE_SQS_CONFIG,
   NORTH_CAPITAL_CONFIG,
@@ -52,15 +55,7 @@ export function boot(): Modules {
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
   const dealpathConfig = DEALPATH_CONFIG as DealpathConfig;
-
-  modules.register(
-    Notifications.moduleName,
-    Notifications.create({
-      database: databaseConfig,
-      queue: queueConfig,
-      firebaseQueue: firebaseQueue,
-    } as Notifications.Config),
-  );
+  const emailConfiguration = EMAIL_CONFIG as EmailConfiguration;
 
   modules.register(
     Documents.moduleName,
@@ -73,39 +68,27 @@ export function boot(): Modules {
   );
 
   modules.register(
+    InvestmentAccounts.moduleName,
+    InvestmentAccounts.create({
+      database: databaseConfig,
+      queue: queueConfig,
+    } as InvestmentAccounts.Config),
+  );
+
+  modules.register(
     Portfolio.moduleName,
     Portfolio.create(
       {
         database: databaseConfig,
         queue: queueConfig,
         dealpathConfig,
+        northCapital: northCapitalConfig,
+        vertalo: vertaloConfig,
       } as Portfolio.Config,
       {
         documents: modules.get(Documents.moduleName) as Documents.Main,
       },
     ),
-  );
-
-  modules.register(
-    SharesAndDividends.moduleName,
-    SharesAndDividends.create(
-      {
-        database: databaseConfig,
-        queue: queueConfig,
-      } as SharesAndDividends.Config,
-      {
-        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
-        notifications: modules.get(Notifications.moduleName) as Notifications.Main,
-      },
-    ),
-  );
-
-  modules.register(
-    InvestmentAccounts.moduleName,
-    InvestmentAccounts.create({
-      database: databaseConfig,
-      queue: queueConfig,
-    } as InvestmentAccounts.Config),
   );
 
   modules.register(
@@ -120,6 +103,36 @@ export function boot(): Modules {
       } as Identity.Config,
       {
         investmentAccounts: modules.get(InvestmentAccounts.moduleName) as InvestmentAccounts.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    Notifications.moduleName,
+    Notifications.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+        firebaseQueue: firebaseQueue,
+        email: emailConfiguration,
+      } as Notifications.Config,
+      {
+        identity: modules.get(Identity.moduleName) as Identity.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    SharesAndDividends.moduleName,
+    SharesAndDividends.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as SharesAndDividends.Config,
+      {
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        notifications: modules.get(Notifications.moduleName) as Notifications.Main,
+        identity: modules.get(Identity.moduleName) as Identity.Main,
       },
     ),
   );
@@ -181,6 +194,8 @@ export function boot(): Modules {
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         documents: modules.get(Documents.moduleName) as Documents.Main,
         verification: modules.get(Verification.moduleName) as Verification.Main,
+        legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
       },
     ),
   );
@@ -212,6 +227,22 @@ export function boot(): Modules {
       } as Withdrawals.Config,
       {
         documents: modules.get(Documents.moduleName) as Documents.Main,
+        sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
+        registration: modules.get(Registration.moduleName) as Registration.Main,
+      },
+    ),
+  );
+
+  modules.register(
+    Archiving.moduleName,
+    Archiving.create(
+      {
+        database: databaseConfig,
+        queue: queueConfig,
+      } as Archiving.Config,
+      {
+        legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
+        investments: modules.get(Investments.moduleName) as Investments.Main,
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         registration: modules.get(Registration.moduleName) as Registration.Main,
       },

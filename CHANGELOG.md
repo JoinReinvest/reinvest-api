@@ -1,5 +1,17 @@
 # REINVEST API CHANGELOG
 
+## 1.18.1 - 07/05/2023
+
+* No MOCKS anymore
+    * `archiveBeneficiaryAccount` - it transfers all investments, dividends and shares to the main account, but it can
+      take some time to completed (asynchronous process)
+* `InvestmentSummary` returns extra field `InvestmentStatus`
+* `InvestmentStatus` has new values:
+    * CANCELING - the investment is being canceled
+    * TRANSFERRED - the investment has been transferred to the main account from the beneficiary - currently there is no
+      way to see this status, as beneficiary is archived immediately after transfer
+    * The ABORTED status was removed from the list of statuses
+
 ## 1.18.0 - 07/03/2023
 
 * New mutation:

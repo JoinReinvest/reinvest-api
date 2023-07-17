@@ -1,16 +1,18 @@
+import { IsoDateString } from 'HKEKTypes/Generics';
 import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
 import type { RecurringInvestmentFrequency } from 'Investments/Domain/Investments/Types';
+import { DateTime } from 'Money/DateTime';
 
 export class ScheduleSimulationController {
-  private scheduleSimulationQueryUseCase: ScheduleSimulationQuery;
+  private scheduleSimulationQuery: ScheduleSimulationQuery;
 
-  constructor(scheduleSimulationQueryUseCase: ScheduleSimulationQuery) {
-    this.scheduleSimulationQueryUseCase = scheduleSimulationQueryUseCase;
+  constructor(scheduleSimulationQuery: ScheduleSimulationQuery) {
+    this.scheduleSimulationQuery = scheduleSimulationQuery;
   }
 
   public static getClassName = (): string => 'ScheduleSimulationController';
 
-  public async getScheduleSimulation(startDate: string, frequency: RecurringInvestmentFrequency) {
-    return await this.scheduleSimulationQueryUseCase.execute(startDate, frequency);
+  public async getScheduleSimulation(startDate: string, frequency: RecurringInvestmentFrequency): Promise<IsoDateString[]> {
+    return this.scheduleSimulationQuery.execute(DateTime.fromIsoDate(startDate), frequency);
   }
 }

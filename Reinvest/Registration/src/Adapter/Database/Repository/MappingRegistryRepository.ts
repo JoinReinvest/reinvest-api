@@ -5,6 +5,7 @@ import { InsertableMappingRegistry, SelectableMappedRecord } from 'Registration/
 import { EmailCreator } from 'Registration/Domain/EmailCreator';
 import { MappedRecord, MappedRecordType } from 'Registration/Domain/Model/Mapping/MappedRecord';
 import { MappedRecordStatus, MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
+import { DateTime } from 'Money/DateTime';
 
 const LOCK_TIME_SECONDS = 30;
 export const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
@@ -147,7 +148,7 @@ export class MappingRegistryRepository {
   }
 
   async lockRecord(record: MappedRecord) {
-    const lockedUntil = new Date();
+    const lockedUntil = DateTime.now().toDate();
     lockedUntil.setSeconds(lockedUntil.getSeconds() + LOCK_TIME_SECONDS);
     const currentVersion = record.getVersion();
     try {
@@ -157,7 +158,7 @@ export class MappingRegistryRepository {
         .set({ lockedUntil })
         .where('recordId', '=', record.getRecordId())
         .where('version', '=', currentVersion)
-        .where(qb => qb.where('lockedUntil', '<=', new Date()).orWhere('lockedUntil', 'is', null))
+        .where(qb => qb.where('lockedUntil', '<=', DateTime.now().toDate()).orWhere('lockedUntil', 'is', null))
         .returning(['lockedUntil'])
         .executeTakeFirstOrThrow();
 
@@ -189,7 +190,7 @@ export class MappingRegistryRepository {
   }
 
   async setClean(record: MappedRecord) {
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const currentVersion = record.getVersion();
     const nextVersion = record.getNextVersion();
 
@@ -221,7 +222,7 @@ export class MappingRegistryRepository {
    * @param record
    */
   async setDirty(record: MappedRecord) {
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const nextVersion = record.getNextVersion();
 
     try {
@@ -253,7 +254,7 @@ export class MappingRegistryRepository {
         .updateTable(registrationMappingRegistryTable)
         .set({
           lockedUntil: null,
-          updatedDate: new Date(),
+          updatedDate: DateTime.now().toDate(),
         })
         .where('recordId', '=', record.getRecordId())
         .where('version', '=', record.getVersion())

@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { InvestmentsFeesTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 import { DateTime } from 'Money/DateTime';
@@ -13,7 +14,7 @@ export class FeesRepository {
     this.databaseAdapterProvider = databaseAdapterProvider;
   }
 
-  async getFeeByInvestmentId(investmentId: string): Promise<Fee | null> {
+  async getFeeByInvestmentId(investmentId: UUID): Promise<Fee | null> {
     const feeData = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsFeesTable)
@@ -26,6 +27,16 @@ export class FeesRepository {
     }
 
     return this.restoreFeeFromSchema(feeData);
+  }
+
+  async getFeesByInvestmentId(investmentIds: UUID[]): Promise<Fee[]> {
+    const fees = await this.databaseAdapterProvider.provide().selectFrom(investmentsFeesTable).selectAll().where('investmentId', 'in', investmentIds).execute();
+
+    if (!fees) {
+      return [];
+    }
+
+    return fees.map(fee => this.restoreFeeFromSchema(fee));
   }
 
   async storeFee(fee: Fee) {
@@ -60,6 +71,7 @@ export class FeesRepository {
       ...feeSchema,
       amount: feeSchema.amount.getAmount(),
       approveDate: feeSchema.approveDate ? feeSchema.approveDate.toDate() : null,
+      abortedDate: feeSchema.abortedDate ? feeSchema.abortedDate.toDate() : null,
       dateCreated: feeSchema.dateCreated.toDate(),
       verificationFeeIdsJson: verificationFeeIds,
     };
@@ -71,6 +83,7 @@ export class FeesRepository {
       ...feeSchema,
       amount: Money.lowPrecision(feeSchema.amount),
       approveDate: feeSchema.approveDate ? DateTime.from(feeSchema.approveDate) : null,
+      abortedDate: feeSchema.abortedDate ? DateTime.from(feeSchema.abortedDate) : null,
       dateCreated: DateTime.from(feeSchema.dateCreated),
       verificationFeeIds: verificationFeeIdsJson,
     };

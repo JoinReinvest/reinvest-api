@@ -1,8 +1,10 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { NotificationsDatabaseAdapterProvider, notificationsTable } from 'Notifications/Adapter/Database/DatabaseAdapter';
 import { NotificationsTable } from 'Notifications/Adapter/Database/NotificationsSchema';
 import { Pagination } from 'Notifications/Application/Pagination';
 import { NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
 import { Notification, NotificationSchema } from 'Notifications/Domain/Notification';
+import { DateTime } from 'Money/DateTime';
 
 export class NotificationsRepository {
   private databaseAdapterProvider: NotificationsDatabaseAdapterProvider;
@@ -38,7 +40,7 @@ export class NotificationsRepository {
       .provide()
       .updateTable(notificationsTable)
       .set({
-        dateRead: new Date(),
+        dateRead: DateTime.now().toDate(),
         isRead: true,
       })
       .where('profileId', '=', profileId)
@@ -151,5 +153,37 @@ export class NotificationsRepository {
     } catch (error: any) {
       return false;
     }
+  }
+
+  async getNotificationByUniqueId(profileId: UUID, notificationUniqueId: UUID): Promise<Notification | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(notificationsTable)
+      .selectAll()
+      .where(`uniqueId`, '=', notificationUniqueId)
+      .where(`profileId`, '=', profileId)
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return Notification.restore(<NotificationSchema>data);
+  }
+
+  async transferNotification(notification: Notification): Promise<void> {
+    const values = <NotificationsTable>notification.toObject();
+
+    await this.databaseAdapterProvider
+      .provide()
+      .insertInto(notificationsTable)
+      .values(values)
+      .onConflict(oc =>
+        oc.column('uniqueId').doUpdateSet({
+          accountId: eb => eb.ref(`excluded.accountId`),
+        }),
+      )
+      .execute();
   }
 }

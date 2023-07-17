@@ -1,26 +1,27 @@
+import { InvestmentFeeService } from 'Investments/Domain/Service/InvestmentFeeService';
 import { InvestmentCanceled, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsDatabase } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { DateTime } from 'Money/DateTime';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class CancelInvestment {
   private readonly investmentsRepository: InvestmentsRepository;
-  private readonly feesRepository: FeesRepository;
-  private readonly transactionAdapter: TransactionalAdapter<InvestmentsDatabase>;
   private eventBus: EventBus;
+  private investmentFeeService: InvestmentFeeService;
+  private transactionAdapter: TransactionalAdapter<InvestmentsDatabase>;
 
   constructor(
     investmentsRepository: InvestmentsRepository,
-    feesRepository: FeesRepository,
-    transactionAdapter: TransactionalAdapter<InvestmentsDatabase>,
     eventBus: EventBus,
+    investmentFeeService: InvestmentFeeService,
+    transactionAdapter: TransactionalAdapter<InvestmentsDatabase>,
   ) {
     this.investmentsRepository = investmentsRepository;
-    this.feesRepository = feesRepository;
-    this.transactionAdapter = transactionAdapter;
     this.eventBus = eventBus;
+    this.investmentFeeService = investmentFeeService;
+    this.transactionAdapter = transactionAdapter;
   }
 
   static getClassName = (): string => 'CancelInvestment';
@@ -33,27 +34,20 @@ export class CancelInvestment {
         return false;
       }
 
-      const cancelStatus = investment.cancel();
+      return await this.transactionAdapter.transaction(`Abort transaction ${investmentId}`, async () => {
+        const cancelStatus = investment.cancel();
 
-      if (!cancelStatus) {
-        return false;
-      }
+        if (cancelStatus) {
+          await this.investmentFeeService.withdrawFee(investment.getFee());
+          await this.investmentsRepository.store(investment);
 
-      return this.transactionAdapter.transaction(`Cancel investment ${investmentId} with related fee if exist`, async () => {
-        await this.investmentsRepository.updateStatus(investment);
-
-        const fee = investment.getFee();
-
-        if (fee) {
-          await this.feesRepository.storeFee(fee);
+          await this.eventBus.publish(<InvestmentCanceled>{
+            kind: TransactionEvents.INVESTMENT_CANCELED,
+            date: DateTime.now().toDate(),
+            id: investmentId,
+            data: {},
+          });
         }
-
-        await this.eventBus.publish(<InvestmentCanceled>{
-          kind: TransactionEvents.INVESTMENT_CANCELED,
-          date: new Date(),
-          id: investmentId,
-          data: {},
-        });
       });
     } catch (error: any) {
       console.log(`Cancel investment ${investmentId} error`, error);

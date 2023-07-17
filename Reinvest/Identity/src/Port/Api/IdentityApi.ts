@@ -3,21 +3,31 @@ import { BanController } from 'Identity/Port/Api/BanController';
 import { IncentiveTokenController } from 'Identity/Port/Api/IncentiveTokenController';
 import { PhoneController } from 'Identity/Port/Api/PhoneController';
 import { ProfileController } from 'Identity/Port/Api/ProfileController';
+import { UserController } from 'Identity/Port/Api/UserController';
 import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationController';
 
 export type IdentityApiType = {
   addBannedId: BanController['addBannedId'];
+  getPhoneAndEmailData: ProfileController['getPhoneAndEmailData'];
   getProfile: ProfileController['getProfile'];
   getProfileByEmail: ProfileController['getProfileByEmail'];
+  getProfileByProfileId: ProfileController['getProfileByProfileId'];
+  getUserData: ProfileController['getUserData'];
   getUserInvitationLink: IncentiveTokenController['getUserInvitationLink'];
+  getUserInviter: ProfileController['getUserInviter'];
 
   isIncentiveTokenValid: IncentiveTokenController['isIncentiveTokenValid'];
   isPhoneNumberCompleted: PhoneController['isPhoneNumberCompleted'];
 
-  registerUser: UserRegistrationController['registerUser'];
+  listUsers: UserController['listUsers'];
 
+  registerUser: UserRegistrationController['registerUser'];
+  removeBannedId: BanController['removeBannedId'];
   setPhoneNumber: PhoneController['setPhoneNumber'];
+
+  setUserLabel: ProfileController['setUserLabel'];
   updateEmailAddress: ProfileController['updateEmailAddress'];
+
   verifyPhoneNumber: PhoneController['verifyPhoneNumber'];
 };
 
@@ -34,4 +44,11 @@ export const identityApi = (container: ContainerInterface): IdentityApiType => (
   isPhoneNumberCompleted: container.delegateTo(PhoneController, 'isPhoneNumberCompleted'),
   getProfileByEmail: container.delegateTo(ProfileController, 'getProfileByEmail'),
   addBannedId: container.delegateTo(BanController, 'addBannedId'),
+  getPhoneAndEmailData: container.delegateTo(ProfileController, 'getPhoneAndEmailData'),
+  getUserInviter: container.delegateTo(ProfileController, 'getUserInviter'),
+  listUsers: container.delegateTo(UserController, 'listUsers'),
+  getProfileByProfileId: container.delegateTo(ProfileController, 'getProfileByProfileId'),
+  removeBannedId: container.delegateTo(BanController, 'removeBannedId'),
+  getUserData: container.delegateTo(ProfileController, 'getUserData'),
+  setUserLabel: container.delegateTo(ProfileController, 'setUserLabel'),
 });

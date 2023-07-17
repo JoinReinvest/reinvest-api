@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import VertaloException from 'test/characterization/Vertalo/VertaloException';
+import { DateTime } from 'Money/DateTime';
 
 export type VertaloConfig = {
   API_URL: string;
@@ -27,7 +28,7 @@ export abstract class ExecutionVertaloAdapter {
   }
 
   private async getToken(): Promise<string> {
-    if (this.authorizationToken.role === 'empty' || <Date>this.tokenValidBefore < new Date()) {
+    if (this.authorizationToken.role === 'empty' || <Date>this.tokenValidBefore < DateTime.now().toDate()) {
       const {
         token: { access_token },
         roles: { data: roles },
@@ -46,7 +47,9 @@ export abstract class ExecutionVertaloAdapter {
 
   private setToken(token: string, role: Roles): void {
     this.authorizationToken = { token, role };
-    this.tokenValidBefore = new Date(new Date().getTime() + 60 * 60000);
+    this.tokenValidBefore = DateTime.now()
+      .addSeconds(60 * 60000)
+      .toDate();
   }
 
   private clearToken(): void {

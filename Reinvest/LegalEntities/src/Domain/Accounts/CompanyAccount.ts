@@ -184,6 +184,10 @@ export class CompanyAccount {
     return getAccountLabel(this.accountType, this.companyName);
   }
 
+  getCompanyName(): string {
+    return this.companyName?.getLabel() ?? '';
+  }
+
   getStakeholderById(id: string): Stakeholder | null {
     const stakeholder = this.stakeholders?.getStakeholderById(new Uuid(id));
 
@@ -271,6 +275,14 @@ export class CompanyAccount {
 
   getAvatar(): Avatar | null {
     return this.avatar;
+  }
+
+  getRawEIN(): string {
+    try {
+      return this.ein?.decrypt() ?? 'N/A';
+    } catch (error) {
+      return 'N/A';
+    }
   }
 }
 

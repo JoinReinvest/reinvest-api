@@ -1,9 +1,11 @@
 import { ContainerInterface } from 'Container/Container';
 import { Portfolio } from 'Portfolio/index';
 import { PortfolioController } from 'Portfolio/Port/Api/PortfolioController';
+import { PortfolioQuery } from 'Portfolio/UseCase/PortfolioQuery';
+import { RegisterPortfolio } from 'Portfolio/UseCase/RegisterPortfolio';
+import { SynchronizeNav } from 'Portfolio/UseCase/SynchronizeNav';
 import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
 import { UpdateProperty } from 'Portfolio/UseCase/UpdateProperty';
-import { GetProperties } from 'Reinvest/Portfolio/src/UseCase/GetProperties';
 
 export class PortsProvider {
   private config: Portfolio.Config;
@@ -14,6 +16,6 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     // api
-    container.addSingleton(PortfolioController, [SynchronizePortfolio, UpdateProperty, GetProperties]);
+    container.addSingleton(PortfolioController, [SynchronizePortfolio, UpdateProperty, PortfolioQuery, RegisterPortfolio, SynchronizeNav]);
   }
 }
