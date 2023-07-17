@@ -1,7 +1,7 @@
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
+import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 import { IncentiveRewardStatus } from 'SharesAndDividends/Domain/IncentiveReward';
 import { InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
-import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 
 export class MarkDividendAsReinvested {
   private dividendsRepository: DividendsRepository;

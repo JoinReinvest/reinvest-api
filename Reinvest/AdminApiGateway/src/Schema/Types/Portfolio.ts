@@ -68,8 +68,18 @@ const schema = `
         location: Location
     }
     
+    input PortfolioUpdateInput {
+        image: FileLink
+        title: String!
+        body: String
+        createdAt: ISODateTime!
+    }
+    
     type PortfolioUpdate {
-        portfolioId: ID!
+        image: GetDocumentLink
+        title: String!
+        body: String
+        createdAt: ISODateTime!
     }
 
     input PropertyInput {
@@ -127,7 +137,7 @@ const schema = `
         """
         [MOCK]
         """
-        addPortfolioUpdate(portfolioId: ID!): Boolean
+        addPortfolioUpdate(input: PortfolioUpdateInput!): Boolean
         
         """
         [MOCK]
@@ -143,8 +153,15 @@ type UpdatePropertyDetailsInput = {
 };
 
 type AddPortfolioUpdateInput = {
-    portfolioId: string;
-}
+  image: { id: string };
+  title: string;
+  body: string;
+  createdAt: Date;
+};
+
+type DeletePortfolioUpdateInput = {
+  portfolioId: string;
+};
 
 export const PortfolioSchema = {
   typeDefs: schema,
@@ -169,6 +186,7 @@ export const PortfolioSchema = {
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
         const test = await api.getAllPortfolioUpdates();
+
         return test;
       },
     },
@@ -201,13 +219,13 @@ export const PortfolioSchema = {
 
         return true;
       },
-      addPortfolioUpdate: async (parent: any, { portfolioId }: AddPortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
+      addPortfolioUpdate: async (parent: any, input: AddPortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const errors = await api.addPortfolioUpdate(portfolioId);
+        const errors = await api.addPortfolioUpdate(input);
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);
@@ -215,7 +233,7 @@ export const PortfolioSchema = {
 
         return true;
       },
-      deletePortfolioUpdate: async (parent: any, { portfolioId }: AddPortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
+      deletePortfolioUpdate: async (parent: any, { portfolioId }: DeletePortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }

@@ -1,6 +1,6 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import { ConfigurationTypes } from 'SharesAndDividends/Domain/Configuration/ConfigurationTypes';
 import { ConfigurationRepository } from 'SharesAndDividends/Adapter/Database/Repository/ConfigurationRepository';
+import { ConfigurationTypes } from 'SharesAndDividends/Domain/Configuration/ConfigurationTypes';
 
 export type AccountConfigurationCreate = {
   accountId: string;

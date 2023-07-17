@@ -1,4 +1,5 @@
 import { PortfolioDatabaseAdapterProvider, updatesTable } from 'Portfolio/Adapter/Database/DatabaseAdapter';
+import { PortfolioUpdatesTable } from 'Portfolio/Adapter/Database/PropertyTable';
 import { PortfolioUpdate, PortfolioUpdateSchema } from 'Portfolio/Domain/PortfolioUpdate';
 
 export class PortfolioUpdatesRepository {
@@ -10,14 +11,14 @@ export class PortfolioUpdatesRepository {
 
   public static getClassName = (): string => 'PortfolioUpdatesRepository';
 
-  async add(portfolioId: string) {
+  async add(portfolioUpdate: PortfolioUpdate) {
+    const values = this.castToTable(portfolioUpdate);
     try {
       await this.databaseAdapterProvider
         .provide()
         .insertInto(updatesTable)
-        .values({
-          portfolioId,
-        })
+        .values(values)
+        .onConflict(oc => oc.column('portfolioId').doNothing())
         .execute();
 
       return true;
@@ -54,5 +55,13 @@ export class PortfolioUpdatesRepository {
 
       return false;
     }
+  }
+
+  private castToTable(object: PortfolioUpdate): PortfolioUpdatesTable {
+    const data = object.toObject();
+
+    return <PortfolioUpdatesTable>{
+      ...data,
+    };
   }
 }

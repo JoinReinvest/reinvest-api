@@ -38,7 +38,7 @@ export class UseCaseProvider {
       IdGenerator,
     ]);
     container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository]);
-    container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository]);
+    container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository, PortfolioRepository]);
     container.addSingleton(DeletePortfolioUpdate, [PortfolioUpdatesRepository]);
     container.addSingleton(GetPortfolioUpdates, [PortfolioUpdatesRepository]);
   }

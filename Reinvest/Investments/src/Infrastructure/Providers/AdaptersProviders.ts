@@ -4,7 +4,10 @@ import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProces
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import { Investments } from 'Investments/index';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
+import { PortfolioService } from 'Investments/Infrastructure/Adapters/Modules/PortfolioService';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
+import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/Adapters/Modules/SubscriptionAgreementDataCollector';
+import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
 import {
   createInvestmentsDatabaseAdapterProvider,
   InvestmentsDatabase,
@@ -14,19 +17,16 @@ import {
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
 import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
-import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
+import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
-import { VerificationService } from 'Investments/Infrastructure/Adapters/Modules/VerificationService';
-import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
-import { SubscriptionAgreementDataCollector } from 'Investments/Infrastructure/Adapters/Modules/SubscriptionAgreementDataCollector';
-import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
-import { PortfolioService } from 'Investments/Infrastructure/Adapters/Modules/PortfolioService';
 
 export default class AdaptersProviders {
   private config: Investments.Config;

@@ -1,8 +1,8 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import { DocumentsPdfPageRepository } from 'Reinvest/Documents/src/Adapter/Repository/DocumentsPdfPageRepository';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { DateTime } from 'Money/DateTime';
 
 export enum PdfTypes {
   PAGE = 'PAGE',

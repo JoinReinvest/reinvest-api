@@ -1,6 +1,6 @@
+import { DateTime } from 'Money/DateTime';
 import { VerificationEvents, VerificationRequestedObjectUpdatedEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
-import { DateTime } from 'Money/DateTime';
 
 export class UserVerificationActions {
   static getClassName = () => 'UserVerificationActions';

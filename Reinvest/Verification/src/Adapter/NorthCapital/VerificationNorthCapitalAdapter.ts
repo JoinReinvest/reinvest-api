@@ -1,3 +1,4 @@
+import { DateTime } from 'Money/DateTime';
 import { ExecutionNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/ExecutionNorthCapitalAdapter';
 import {
   ManualVerificationAmlResult,
@@ -10,7 +11,6 @@ import {
   VerificationNorthCapitalObjectFailedEvent,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { mapVerificationStatus } from 'Verification/IntegrationLogic/NorthCapitalTypes';
-import { DateTime } from 'Money/DateTime';
 
 export type NorthCapitalConfig = {
   API_URL: string;

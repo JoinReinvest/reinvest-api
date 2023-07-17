@@ -1,17 +1,25 @@
-import {UUID} from "../../../../shared/hkek-types/Generics";
+import { UUID } from '../../../../shared/hkek-types/Generics';
 
 export type PortfolioUpdateSchema = {
-    portfolioId: UUID;
+  createdAt: Date;
+  image: { id: string };
+  portfolioId: UUID;
+  title: string;
+  body?: string;
 };
 
 export class PortfolioUpdate {
-    private portfolioId: UUID;
+  private portfolioUpdateSchema: PortfolioUpdateSchema;
 
-    constructor(portfolioId: UUID) {
-        this.portfolioId = portfolioId;
-    }
+  constructor(portfolioUpdate: PortfolioUpdateSchema) {
+    this.portfolioUpdateSchema = portfolioUpdate;
+  }
 
-    static create({portfolioId}: PortfolioUpdateSchema) {
-        return new PortfolioUpdate(portfolioId);
-    }
+  static create(schema: PortfolioUpdateSchema) {
+    return new PortfolioUpdate(schema);
+  }
+
+  toObject(): PortfolioUpdateSchema {
+    return this.portfolioUpdateSchema;
+  }
 }

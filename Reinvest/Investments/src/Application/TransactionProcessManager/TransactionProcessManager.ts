@@ -193,8 +193,8 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     parentId: string | null;
     portfolioId: string | null;
     subscriptionAgreementId: string | null;
-    userTradeId: string | null;
     unitPrice: number | null;
+    userTradeId: string | null;
   } {
     let amount = null;
     let fees = null;
