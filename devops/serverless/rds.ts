@@ -37,7 +37,7 @@ export const RdsResources = {
       PreferredMaintenanceWindow: 'Sat:02:00-Sat:03:00',
       DeletionProtection: true,
       AvailabilityZone: getPrivateAZ(),
-      DBInstanceIdentifier: getResourceName('postgresql'),
+      DBInstanceIdentifier: getResourceName('postgres'),
       AllocatedStorage: '${env:POSTGRESQL_AWS_DB_STORAGE_GB}',
       DBInstanceClass: '${env:POSTGRESQL_AWS_DB_INSTANCE}',
       Engine: 'postgres',
