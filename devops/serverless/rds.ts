@@ -1,4 +1,4 @@
-import { exportOutput, getAttribute, getResourceName, getResourceNameTag } from './utils';
+import { exportOutput, getAttribute, getResourceName, getResourceNameTag, importOutput } from './utils';
 import { getPrivateAZ, getPrivateSubnetRefs, getVpcCidr, getVpcRef } from './vpc';
 
 export const RdsResources = {
@@ -53,13 +53,23 @@ export const RdsResources = {
 
 export const RdsOutputs = {
   DatabaseName: {
-    Value: getResourceName('db', '_'),
+    Value: importOutput('DatabaseName'),
     Description: 'Database name',
     ...exportOutput('DatabaseName'),
   },
   DatabaseHost: {
-    Value: getAttribute('RdsPostgresDBInstance', 'Endpoint.Address'),
+    Value: importOutput('DatabaseHost'),
     Description: 'Database host',
     ...exportOutput('DatabaseHost'),
+  },
+  RdsDatabaseName: {
+    Value: getResourceName('db', '_'),
+    Description: 'Database name',
+    ...exportOutput('RdsDatabaseName'),
+  },
+  RdsDatabaseHost: {
+    Value: getAttribute('RdsPostgresDBInstance', 'Endpoint.Address'),
+    Description: 'Database host',
+    ...exportOutput('RdsDatabaseHost'),
   },
 };
