@@ -29,14 +29,15 @@ export class CalculationsRepository {
 
     async get (id: UUID) {
         try {
-            await this.documentsDatabaseAdapterProvider
+            const calculationData = await this.documentsDatabaseAdapterProvider
                 .provide()
                 .selectFrom(calculationsTable)
                 .select(['data'])
                 .where('id', '=', id)
-                .execute()
+                .limit(1)
+                .executeTakeFirst();
 
-            return true
+            return calculationData?.data || false
         } catch (err: any) {
             return false
         }

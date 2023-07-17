@@ -1,5 +1,4 @@
 import { CalculationsRepository } from 'Documents/Adapter/Repository/CalculationsRepository'
-import AddCalculation from 'Documents/UseCases/AddCalculation'
 import { UUID } from 'HKEKTypes/Generics'
 
 class GetCalculation {

@@ -14,13 +14,13 @@ export class CalculationsController {
         this.getCalculation = getCalculation
     }
 
-    public async add (data: string): Promise<boolean> {
+    public async add (data: string): Promise<boolean | string> {
         const newID = this.idGenerator.createUuid()
 
         try {
              await this.addCalculation.execute( newID, data);
 
-            return true
+            return newID
         } catch (error: any) {
             console.error(`Problem with saving calculations`, error)
 
@@ -28,11 +28,11 @@ export class CalculationsController {
         }
     }
 
-    public async get (id: string): Promise<boolean> {
+    public async get (id: string): Promise<boolean | string> {
         try {
-            await this.getCalculation.execute( id);
+            const calculationData = await this.getCalculation.execute( id);
 
-            return true
+            return calculationData
         } catch (error: any) {
             console.error(`Problem with getting calculations`, error)
 
