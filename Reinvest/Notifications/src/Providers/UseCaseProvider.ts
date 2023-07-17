@@ -1,16 +1,17 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdentityService } from 'Identity/Adapter/Module/IdentityService';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
 import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
+import { EmailSender } from 'Notifications/Adapter/SES/EmailSender';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
 import { NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
 import { ProcessStoredEvent } from 'Notifications/Application/UseCase/ProcessStoredEvent';
 import { TransferNotification } from 'Notifications/Application/UseCase/TransferNotification';
 import { Notifications } from 'Notifications/index';
-import { IdentityService } from 'Identity/Adapter/Module/IdentityService';
 
 export class UseCaseProvider {
   private config: Notifications.Config;
@@ -30,6 +31,7 @@ export class UseCaseProvider {
       CreateNotification,
       PushNotificationRepository,
       IdentityService,
+      EmailSender,
     ]);
   }
 }

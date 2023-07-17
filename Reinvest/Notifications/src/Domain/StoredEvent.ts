@@ -26,7 +26,7 @@ export type StoredEventSchema = {
 
 export type GlobalValues = {
   email: string;
-  label: string;
+  userName: string;
 };
 
 export class StoredEvent {
@@ -137,7 +137,12 @@ export class StoredEvent {
     }
 
     const payload = this.getPayload();
-    const { onObjectId, onObjectType } = inAppNotificationConfiguration.onObject(payload);
+    const { onObjectId, onObjectType } = inAppNotificationConfiguration.onObject
+      ? inAppNotificationConfiguration.onObject(payload)
+      : {
+          onObjectType: null,
+          onObjectId: null,
+        };
 
     return {
       accountId: <UUID>payload['accountId'] ?? null,
@@ -172,11 +177,22 @@ export class StoredEvent {
   }
 
   getEmailNotification() {
+    const emailConfiguration = this.storedEventConfiguration.email;
+
+    if (!emailConfiguration) {
+      throw new Error(`Email notification configuration not found for type: ${this.storedEventSchema.kind}`);
+    }
+
     const payload = this.getPayload();
+
+    return {
+      subject: emailConfiguration.subject(payload),
+      body: emailConfiguration.body(payload),
+    };
   }
 
   private getPayload(): DictionaryType {
-    return { ...(this.globalValues ?? { label: 'Investor' }), ...this.storedEventSchema.payload };
+    return { ...(this.globalValues ?? { userName: 'Investor' }), ...this.storedEventSchema.payload };
   }
 
   getId(): UUID {

@@ -6,7 +6,7 @@ type InAppNotificationType = {
   body: (payload: DictionaryType) => string;
   header: (payload: DictionaryType) => string;
   notificationType: NotificationsType;
-  onObject: (payload: DictionaryType) => {
+  onObject?: (payload: DictionaryType) => {
     onObjectId: string | null;
     onObjectType: NotificationObjectType | null;
   };

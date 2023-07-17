@@ -109,8 +109,8 @@ export class ProcessStoredEvent {
       return false;
     }
 
-    // const { subject, body } = storedEvent.getEmailNotification();
-
+    const { subject, body } = storedEvent.getEmailNotification();
+    await this.emailSender.sendNotificationEmail(email, subject, body);
     storedEvent.markEmailAsProcessed();
 
     return true;

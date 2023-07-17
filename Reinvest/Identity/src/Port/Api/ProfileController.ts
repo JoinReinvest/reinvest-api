@@ -36,7 +36,7 @@ export class ProfileController {
     }
   }
 
-  async getUserData(profileId: UUID): Promise<{ email: string; label: string } | null> {
+  async getUserData(profileId: UUID): Promise<{ email: string; userName: string } | null> {
     try {
       const user = await this.userRepository.getUserProfileByProfileId(profileId);
 
@@ -46,7 +46,7 @@ export class ProfileController {
 
       return {
         email: user.email,
-        label: user.label,
+        userName: user.label,
       };
     } catch (error: any) {
       console.log(error.message);
