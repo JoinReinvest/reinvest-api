@@ -67,6 +67,10 @@ const schema = `
         POIs: [POI]
         location: Location
     }
+    
+    type PortfolioUpdate {
+        portfolioId: ID!
+    }
 
     input PropertyInput {
         keyMetrics: KeyMetricsInput
@@ -100,6 +104,11 @@ const schema = `
         [MOCK] returns all information about properties in the portfolio
         """
         getPortfolioDetails: PortfolioDetails
+        
+        """
+        [MOCK] returns all portfolio updates
+        """
+        getAllPortfolioUpdates: [PortfolioUpdate]
     }
 
     type Mutation {
@@ -114,6 +123,16 @@ const schema = `
         registerPortfolio(name: String!, northCapitalOfferingId: String!, vertaloAllocationId: String!, linkToOfferingCircular: String!): PortfolioDetails
 
         synchronizePortfolioNav: Nav
+        
+        """
+        [MOCK]
+        """
+        addPortfolioUpdate(portfolioId: ID!): Boolean
+        
+        """
+        [MOCK]
+        """
+        deletePortfolioUpdate(portfolioId: ID!): Boolean
     }
 `;
 
@@ -122,6 +141,10 @@ type UpdatePropertyDetailsInput = {
   portfolioId: string;
   propertyId: number;
 };
+
+type AddPortfolioUpdateInput = {
+    portfolioId: string;
+}
 
 export const PortfolioSchema = {
   typeDefs: schema,
@@ -137,6 +160,16 @@ export const PortfolioSchema = {
         const { portfolioId } = await api.getActivePortfolio();
 
         return api.getPortfolioDetails(portfolioId);
+      },
+      getAllPortfolioUpdates: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+
+        const test = await api.getAllPortfolioUpdates();
+        return test;
       },
     },
     Mutation: {
@@ -161,6 +194,34 @@ export const PortfolioSchema = {
 
         const { portfolioId } = await api.getActivePortfolio();
         const errors = await api.updateProperty(input, propertyId, portfolioId);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return true;
+      },
+      addPortfolioUpdate: async (parent: any, { portfolioId }: AddPortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const errors = await api.addPortfolioUpdate(portfolioId);
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return true;
+      },
+      deletePortfolioUpdate: async (parent: any, { portfolioId }: AddPortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const errors = await api.deletePortfolioUpdate(portfolioId);
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);

@@ -13,3 +13,4 @@ yarn-error.log
 .current-aws-profile
 chromium-*.zip
 chromium-*.tar
+reinvest-*.pem
