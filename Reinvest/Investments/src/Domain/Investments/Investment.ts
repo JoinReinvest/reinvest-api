@@ -26,13 +26,14 @@ type InvestmentSchema = {
   unitPrice: Money;
 };
 
-export enum InvestmentFailedReason {
+/**
+ export enum InvestmentFailedReason {
   ACCOUNT_VERIFICATION_FAILED = 'ACCOUNT_VERIFICATION_FAILED',
   INVESTMENT_CANCELED = 'INVESTMENT_CANCELED',
   PAYMENT_MISMATCH = 'PAYMENT_MISMATCH',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
   INVESTMENT_REJECTED_BY_PRINCIPAL = 'INVESTMENT_REJECTED_BY_PRINCIPAL',
-}
+}*/
 
 export class Investment {
   private investmentSchema: InvestmentSchema;

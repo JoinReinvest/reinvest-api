@@ -11,6 +11,7 @@ import { PortfolioService } from 'SharesAndDividends/Adapter/Modules/PortfolioSe
 import { SharesAndDividends } from 'SharesAndDividends/index';
 import { AccountStateQuery } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { CalculateDividends } from 'SharesAndDividends/UseCase/CalculateDividends';
+import { ChangeLockedCalculatedDividendStatus } from 'SharesAndDividends/UseCase/ChangeLockedCalculatedDividendStatus';
 import { ChangeSharesState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import CreateConfiguration from 'SharesAndDividends/UseCase/CreateConfiguration';
 import { CreateDividendDistribution } from 'SharesAndDividends/UseCase/CreateDividendDistribution';
@@ -68,5 +69,6 @@ export class UseCaseProvider {
     container.addSingleton(AccountStateQuery, [DividendsRepository, SharesRepository, PortfolioService]);
     container.addSingleton(CreateConfiguration, [ConfigurationRepository, IdGenerator]).addSingleton(GetConfiguration, [ConfigurationRepository]);
     container.addSingleton(GiveIncentiveRewardIfRequirementsAreMet, [DividendsRepository, IdentityService, SharesRepository, CreateIncentiveReward]);
+    container.addSingleton(ChangeLockedCalculatedDividendStatus, [DividendsCalculationRepository]);
   }
 }

@@ -76,7 +76,7 @@ export class ChangeSharesState {
           <DomainEvent>{
             id: shares.getId(),
             kind: 'SharesSettled',
-            data: shares.forSharesSettledEvent(),
+            data: shares.forSharesChangedEvent(),
           },
         ]);
       }
@@ -87,7 +87,13 @@ export class ChangeSharesState {
         }
 
         shares.setRevokedState();
-        await this.sharesRepository.store(shares);
+        await this.sharesRepository.store(shares, [
+          <DomainEvent>{
+            id: shares.getId(),
+            kind: 'SharesRevoked',
+            data: shares.forSharesChangedEvent(),
+          },
+        ]);
         await this.financialOperationRepository.addFinancialOperations([
           {
             operationType: FinancialOperationType.REVOKED,

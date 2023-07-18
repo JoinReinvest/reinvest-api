@@ -1,7 +1,7 @@
 import { exportOutput, getAttribute, getResourceName, getResourceNameTag } from './utils';
 import { getPrivateAZ, getPrivateSubnetRefs, getVpcCidr, getVpcRef } from './vpc';
 
-export const RdsResources = {
+const RdsResourcesConfiguration = {
   RdsSecurityGroup: {
     Type: 'AWS::EC2::SecurityGroup',
     Properties: {
@@ -31,8 +31,12 @@ export const RdsResources = {
     DeletionPolicy: '${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}',
     UpdateReplacePolicy: '${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}',
     Properties: {
+      StorageEncrypted: true,
+      BackupRetentionPeriod: 7,
+      PreferredBackupWindow: '01:00-02:00',
+      PreferredMaintenanceWindow: 'Sat:02:00-Sat:03:00',
+      DeletionProtection: true,
       AvailabilityZone: getPrivateAZ(),
-      DBInstanceIdentifier: getResourceName('postgresql'),
       AllocatedStorage: '${env:POSTGRESQL_AWS_DB_STORAGE_GB}',
       DBInstanceClass: '${env:POSTGRESQL_AWS_DB_INSTANCE}',
       Engine: 'postgres',
@@ -46,15 +50,25 @@ export const RdsResources = {
   },
 };
 
+if (process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER) {
+  // @ts-ignore
+  RdsResourcesConfiguration.RdsPostgresDBInstance.Properties['DBSnapshotIdentifier'] = process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER;
+  // @ts-ignore
+  delete RdsResourcesConfiguration.RdsPostgresDBInstance.Properties['DBName'];
+}
+
+export const RdsResources = RdsResourcesConfiguration;
+
+// do not use these outputs in other stacks! In other way the snapshot restore will not work!
 export const RdsOutputs = {
   DatabaseName: {
     Value: getResourceName('db', '_'),
-    Description: 'Database name',
+    Description: 'Database name - do not use this output in other stacks! In other way the snapshot restore will not work!',
     ...exportOutput('DatabaseName'),
   },
   DatabaseHost: {
     Value: getAttribute('RdsPostgresDBInstance', 'Endpoint.Address'),
-    Description: 'Database host',
+    Description: 'Database host - do not use this output in other stacks! In other way the snapshot restore will not work!',
     ...exportOutput('DatabaseHost'),
   },
 };

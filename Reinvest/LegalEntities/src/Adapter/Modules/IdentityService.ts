@@ -23,4 +23,8 @@ export class IdentityService {
   async removeBannedId(profileId: string, bannedId: string): Promise<void> {
     await this.identityModule.api().removeBannedId(profileId, bannedId);
   }
+
+  async setUserLabel(profileId: UUID, label: string): Promise<void> {
+    await this.identityModule.api().setUserLabel(profileId, label);
+  }
 }
