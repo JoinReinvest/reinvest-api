@@ -37,7 +37,6 @@ const RdsResourcesConfiguration = {
       PreferredMaintenanceWindow: 'Sat:02:00-Sat:03:00',
       DeletionProtection: true,
       AvailabilityZone: getPrivateAZ(),
-      DBInstanceIdentifier: getResourceName('postgresql'),
       AllocatedStorage: '${env:POSTGRESQL_AWS_DB_STORAGE_GB}',
       DBInstanceClass: '${env:POSTGRESQL_AWS_DB_INSTANCE}',
       Engine: 'postgres',
@@ -58,18 +57,18 @@ if (process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER) {
   delete RdsResourcesConfiguration.RdsPostgresDBInstance.Properties['DBName'];
 }
 
-console.log({ Properties: RdsResourcesConfiguration.RdsPostgresDBInstance.Properties });
 export const RdsResources = RdsResourcesConfiguration;
 
+// do not use these outputs in other stacks! In other way the snapshot restore will not work!
 export const RdsOutputs = {
   DatabaseName: {
     Value: getResourceName('db', '_'),
-    Description: 'Database name',
+    Description: 'Database name - do not use this output in other stacks! In other way the snapshot restore will not work!',
     ...exportOutput('DatabaseName'),
   },
   DatabaseHost: {
     Value: getAttribute('RdsPostgresDBInstance', 'Endpoint.Address'),
-    Description: 'Database host',
+    Description: 'Database host - do not use this output in other stacks! In other way the snapshot restore will not work!',
     ...exportOutput('DatabaseHost'),
   },
 };
