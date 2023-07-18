@@ -47,6 +47,7 @@ export class RetryPayment {
             amount: amount.getAmount(),
             fee: fee.getAmount(),
             tradeId: userTradeId,
+            date: DateTime.now().toIsoDateTime(),
           }),
         );
       }

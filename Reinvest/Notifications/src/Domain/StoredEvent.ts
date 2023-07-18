@@ -123,7 +123,7 @@ export class StoredEvent {
   } {
     const accountActivity = this.storedEventConfiguration.accountActivity;
     const payload = this.getPayload();
-    const data = accountActivity!.data(payload);
+    const data = accountActivity?.data ? accountActivity.data(payload) : {};
 
     return {
       accountId: <UUID>payload['accountId'] ?? null,
@@ -149,6 +149,9 @@ export class StoredEvent {
           onObjectId: null,
         };
 
+    const uniqueId = payload?.uniqueId ?? this.storedEventSchema.id;
+    const dismissId = payload?.dismissId ?? null;
+
     return {
       accountId: <UUID>payload['accountId'] ?? null,
       body: inAppNotificationConfiguration.body(payload),
@@ -157,7 +160,8 @@ export class StoredEvent {
       onObjectId,
       onObjectType,
       profileId: this.storedEventSchema.profileId,
-      uniqueId: this.storedEventSchema.id,
+      uniqueId: uniqueId,
+      dismissId: dismissId,
     };
   }
 
@@ -219,7 +223,9 @@ export class StoredEvent {
   }
 
   private getPayload(): DictionaryType {
-    return { ...(this.globalValues ?? { userName: 'Investor' }), ...this.storedEventSchema.payload };
+    const { email, ...globals } = this.globalValues ?? {};
+
+    return { ...(globals ?? { userName: 'Investor' }), ...this.storedEventSchema.payload };
   }
 
   getId(): UUID {

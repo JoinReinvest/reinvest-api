@@ -1,4 +1,6 @@
 import { Updateable } from 'kysely';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 import { tradesTable, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { TradesTable } from 'Trading/Adapter/Database/TradingSchema';
 import {
@@ -18,9 +20,11 @@ import {
 
 export class TradesRepository {
   private databaseAdapterProvider: TradingDatabaseAdapterProvider;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: TradingDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: TradingDatabaseAdapterProvider, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventBus = eventBus;
   }
 
   public static getClassName = (): string => 'TradesRepository';
@@ -150,5 +154,9 @@ export class TradesRepository {
     }
 
     return Trade.create(this.mapToTradeSchema(data));
+  }
+
+  async publishEvent(event: DomainEvent): Promise<void> {
+    await this.eventBus.publish(event);
   }
 }
