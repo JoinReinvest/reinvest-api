@@ -31,7 +31,7 @@ export const RdsResources = {
     DeletionPolicy: '${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}',
     UpdateReplacePolicy: '${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}',
     Properties: {
-      StorageEncrypted: true,
+      StorageEncrypted: false,
       BackupRetentionPeriod: 7,
       PreferredBackupWindow: '01:00-02:00',
       PreferredMaintenanceWindow: 'Sat:02:00-Sat:03:00',
