@@ -5,6 +5,8 @@ build
 .env
 .env.*
 !.env.dist
+!.env.saas.dist
+!.env.functions.dist
 test/.env.characterization
 test/artifacts/*
 yarn-error.log
