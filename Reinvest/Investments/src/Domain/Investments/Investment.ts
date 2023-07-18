@@ -26,13 +26,14 @@ type InvestmentSchema = {
   unitPrice: Money;
 };
 
-export enum InvestmentFailedReason {
+/**
+ export enum InvestmentFailedReason {
   ACCOUNT_VERIFICATION_FAILED = 'ACCOUNT_VERIFICATION_FAILED',
   INVESTMENT_CANCELED = 'INVESTMENT_CANCELED',
   PAYMENT_MISMATCH = 'PAYMENT_MISMATCH',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
   INVESTMENT_REJECTED_BY_PRINCIPAL = 'INVESTMENT_REJECTED_BY_PRINCIPAL',
-}
+}*/
 
 export class Investment {
   private investmentSchema: InvestmentSchema;
@@ -181,7 +182,7 @@ export class Investment {
     return this.gracePeriod.isGracePeriodEnded();
   }
 
-  cancel(): void {
+  cancel(): boolean {
     if ([InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED].includes(this.investmentSchema.status)) {
       this.investmentSchema.status = InvestmentStatus.CANCELING;
 
@@ -189,11 +190,11 @@ export class Investment {
         this.fee.abort();
       }
 
-      return;
+      return true;
     }
 
     if ([InvestmentStatus.CANCELED, InvestmentStatus.CANCELING].includes(this.investmentSchema.status)) {
-      return;
+      return false;
     }
 
     throw new Error('INVESTMENT_CANNOT_BE_CANCELED');

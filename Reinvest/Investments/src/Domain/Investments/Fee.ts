@@ -80,4 +80,8 @@ export class Fee {
   toObject(): FeeSchema {
     return this.feeSchema;
   }
+
+  getFeeReferences(): VerificationReference[] {
+    return this.feeSchema.verificationFeeIds.fees;
+  }
 }

@@ -173,4 +173,20 @@ export class RecurringInvestmentsRepository {
 
     return this.castToObject(data);
   }
+
+  async getUserAllActiveRecurringInvestments(profileId: UUID): Promise<RecurringInvestment[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(recurringInvestmentsTable)
+      .selectAll()
+      .where('profileId', '=', profileId)
+      .where('status', '=', RecurringInvestmentStatus.ACTIVE)
+      .execute();
+
+    if (data.length === 0) {
+      return [];
+    }
+
+    return data.map(record => this.castToObject(record));
+  }
 }

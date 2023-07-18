@@ -5,6 +5,7 @@ import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 import { BannedType } from 'LegalEntities/Domain/BannedEntity';
 import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { DateTime } from 'Money/DateTime';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class Ban {
   public static getClassName = (): string => 'Ban';
@@ -34,18 +35,30 @@ export class Ban {
     const einAnonymized = accountSchema.ein.anonymized;
     const profileId = accountSchema.profileId;
 
-    await this.banRepository.addBannedRecord({
-      profileId,
-      accountId,
-      stakeholderId: null,
-      type: BannedType.COMPANY,
-      reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
-      dateCreated: DateTime.now().toDate(),
-      dateCancelled: null,
-      sensitiveNumber: ein ?? '',
-      anonymizedSensitiveNumber: einAnonymized ?? '',
-      status: 'ACTIVE',
-    });
+    await this.banRepository.addBannedRecord(
+      {
+        profileId,
+        accountId,
+        stakeholderId: null,
+        type: BannedType.COMPANY,
+        reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
+        dateCreated: DateTime.now().toDate(),
+        dateCancelled: null,
+        sensitiveNumber: ein ?? '',
+        anonymizedSensitiveNumber: einAnonymized ?? '',
+        status: 'ACTIVE',
+      },
+      [
+        <DomainEvent>{
+          kind: 'DisableRecurringInvestment',
+          id: accountId,
+          data: {
+            accountId,
+            profileId,
+          },
+        },
+      ],
+    );
 
     await this.identityService.addBannedId(profileId, accountId);
 
@@ -73,18 +86,30 @@ export class Ban {
     const ssn = (<SensitiveNumberSchema>stakeholderSchema.ssn).hashed;
     const ssnAnonymized = (<SensitiveNumberSchema>stakeholderSchema.ssn).anonymized;
 
-    await this.banRepository.addBannedRecord({
-      profileId,
-      accountId,
-      stakeholderId,
-      type: BannedType.STAKEHOLDER,
-      reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
-      dateCreated: DateTime.now().toDate(),
-      dateCancelled: null,
-      sensitiveNumber: ssn ?? '',
-      anonymizedSensitiveNumber: ssnAnonymized ?? '',
-      status: 'ACTIVE',
-    });
+    await this.banRepository.addBannedRecord(
+      {
+        profileId,
+        accountId,
+        stakeholderId,
+        type: BannedType.STAKEHOLDER,
+        reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
+        dateCreated: DateTime.now().toDate(),
+        dateCancelled: null,
+        sensitiveNumber: ssn ?? '',
+        anonymizedSensitiveNumber: ssnAnonymized ?? '',
+        status: 'ACTIVE',
+      },
+      [
+        <DomainEvent>{
+          kind: 'DisableRecurringInvestment',
+          id: accountId,
+          data: {
+            accountId,
+            profileId,
+          },
+        },
+      ],
+    );
 
     await this.identityService.addBannedId(profileId, accountId);
 
@@ -104,18 +129,29 @@ export class Ban {
     const ssn = profileObject.ssnObject?.hashed;
     const ssnAnonymized = profileObject.ssnObject?.anonymized;
 
-    await this.banRepository.addBannedRecord({
-      profileId,
-      accountId: null,
-      stakeholderId: null,
-      type: BannedType.PROFILE,
-      reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
-      dateCreated: DateTime.now().toDate(),
-      dateCancelled: null,
-      sensitiveNumber: ssn ?? '',
-      anonymizedSensitiveNumber: ssnAnonymized ?? '',
-      status: 'ACTIVE',
-    });
+    await this.banRepository.addBannedRecord(
+      {
+        profileId,
+        accountId: null,
+        stakeholderId: null,
+        type: BannedType.PROFILE,
+        reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
+        dateCreated: DateTime.now().toDate(),
+        dateCancelled: null,
+        sensitiveNumber: ssn ?? '',
+        anonymizedSensitiveNumber: ssnAnonymized ?? '',
+        status: 'ACTIVE',
+      },
+      [
+        <DomainEvent>{
+          kind: 'DisableAllRecurringInvestment',
+          id: profileId,
+          data: {
+            profileId,
+          },
+        },
+      ],
+    );
 
     await this.identityService.addBannedId(profileId, profileId);
 
@@ -135,18 +171,29 @@ export class Ban {
     const ssn = profileObject.ssnObject?.hashed;
     const ssnAnonymized = profileObject.ssnObject?.anonymized;
 
-    await this.banRepository.addBannedRecord({
-      profileId,
-      accountId: null,
-      stakeholderId: null,
-      type: BannedType.PROFILE,
-      reasons: reason,
-      dateCreated: DateTime.now().toDate(),
-      dateCancelled: null,
-      sensitiveNumber: ssn ?? '',
-      anonymizedSensitiveNumber: ssnAnonymized ?? '',
-      status: 'ACTIVE',
-    });
+    await this.banRepository.addBannedRecord(
+      {
+        profileId,
+        accountId: null,
+        stakeholderId: null,
+        type: BannedType.PROFILE,
+        reasons: reason,
+        dateCreated: DateTime.now().toDate(),
+        dateCancelled: null,
+        sensitiveNumber: ssn ?? '',
+        anonymizedSensitiveNumber: ssnAnonymized ?? '',
+        status: 'ACTIVE',
+      },
+      [
+        <DomainEvent>{
+          kind: 'DisableAllRecurringInvestment',
+          id: profileId,
+          data: {
+            profileId,
+          },
+        },
+      ],
+    );
 
     await this.identityService.addBannedId(profileId, profileId);
 
@@ -167,18 +214,30 @@ export class Ban {
     const einAnonymized = accountSchema.ein.anonymized;
     const profileId = accountSchema.profileId;
 
-    await this.banRepository.addBannedRecord({
-      profileId,
-      accountId,
-      stakeholderId: null,
-      type: BannedType.COMPANY,
-      reasons: reason,
-      dateCreated: DateTime.now().toDate(),
-      dateCancelled: null,
-      sensitiveNumber: ein ?? '',
-      anonymizedSensitiveNumber: einAnonymized ?? '',
-      status: 'ACTIVE',
-    });
+    await this.banRepository.addBannedRecord(
+      {
+        profileId,
+        accountId,
+        stakeholderId: null,
+        type: BannedType.COMPANY,
+        reasons: reason,
+        dateCreated: DateTime.now().toDate(),
+        dateCancelled: null,
+        sensitiveNumber: ein ?? '',
+        anonymizedSensitiveNumber: einAnonymized ?? '',
+        status: 'ACTIVE',
+      },
+      [
+        <DomainEvent>{
+          kind: 'DisableRecurringInvestment',
+          id: accountId,
+          data: {
+            accountId,
+            profileId,
+          },
+        },
+      ],
+    );
 
     await this.identityService.addBannedId(profileId, accountId);
 

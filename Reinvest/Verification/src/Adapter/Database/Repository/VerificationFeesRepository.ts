@@ -89,6 +89,7 @@ export class VerificationFeesRepository {
         .selectAll()
         .where(`status`, 'in', [VerificationFeeStatus.NOT_ASSIGNED, VerificationFeeStatus.PARTIALLY_ASSIGNED])
         .where(eb => eb.where(`profileId`, '=', profileId).orWhere(`accountId`, '=', accountId))
+        .orderBy('status', 'desc') // partially assigned first
         .execute();
 
       if (!data) {
@@ -101,5 +102,15 @@ export class VerificationFeesRepository {
 
       return [];
     }
+  }
+
+  async getFeesByIds(feesId: UUID[]): Promise<VerificationFee[]> {
+    const data = await this.databaseAdapterProvider.provide().selectFrom(verificationFeesTable).selectAll().where(`id`, 'in', feesId).execute();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.map(record => <VerificationFee>this.mapToVerificationFee(record));
   }
 }

@@ -2,6 +2,7 @@ import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
 import { mergeSchemas } from '@graphql-tools/schema';
 import { AdminVerificationSchema } from 'AdminApiGateway/Schema/Types/AdminVerification';
 import { DividendsSchema } from 'AdminApiGateway/Schema/Types/Dividends';
+import { InvestmentsSchema } from 'AdminApiGateway/Schema/Types/Investments';
 import { Shared } from 'AdminApiGateway/Schema/Types/Shared';
 import { UsersSchema } from 'AdminApiGateway/Schema/Types/Users';
 import { Withdrawals } from 'AdminApiGateway/Schema/Types/Withdrawals';
@@ -23,7 +24,7 @@ const nonExecutableTypeDefs = mergeTypeDefs([
   DocumentTypes.typeDefs,
   Withdrawals.typeDefs,
   UsersSchema.typeDefs,
-  // InvestmentsSchema.typeDefs,
+  InvestmentsSchema.typeDefs,
 ]);
 const nonExecutableResolvers = mergeResolvers([
   AdminVerificationSchema.resolvers,
@@ -32,7 +33,7 @@ const nonExecutableResolvers = mergeResolvers([
   DocumentTypes.resolvers,
   Withdrawals.resolvers,
   UsersSchema.resolvers,
-  // InvestmentsSchema.resolvers,
+  InvestmentsSchema.resolvers,
 ]);
 
 let schema = mergeSchemas({

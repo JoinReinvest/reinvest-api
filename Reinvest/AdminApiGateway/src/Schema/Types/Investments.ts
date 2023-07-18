@@ -1,3 +1,7 @@
+import { AdminSessionContext } from 'AdminApiGateway/index';
+import { GraphQLError } from 'graphql';
+import { Investments } from 'Investments/index';
+
 const schema = `
     #graphql
     enum BankAccountStatus {
@@ -30,23 +34,19 @@ const schema = `
 
     type Investment {
         id: ID!
-        accountId: ID!
-        profileId: ID!
         tradeId: String!
         createdAt: ISODateTime!
-        amount: USD!
         status: InvestmentStatus!
-        investmentFees: USD
         subscriptionAgreementId: ID
-        bankAccount: BankAccount
+        amount: USD!
     }
 
     type Query {
-        getUserInvestments(profileId: ID!): [Investment]
+        listUserInvestments(profileId: ID!, accountId: ID!, pagination: Pagination = {page: 0, perPage: 30}): [Investment]
     }
 
     type Mutation {
-        cancelUserInvestment(profileId: ID!, investmentId: ID!): Investment
+        cancelUserInvestment(profileId: ID!, investmentId: ID!): Boolean
     }
 `;
 
@@ -54,18 +54,26 @@ export const InvestmentsSchema = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      // getPortfolioDetails: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
-      //   if (!isAdmin) {
-      //     throw new GraphQLError('Access denied');
-      //   }
-      //
-      //   const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-      //
-      //   const { portfolioId } = await api.getActivePortfolio();
-      //
-      //   return api.getPortfolioDetails(portfolioId);
-      // },
+      listUserInvestments: async (parent: any, { profileId, accountId, pagination }: any, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Investments.ApiType>(Investments);
+
+        return api.listInvestments(profileId, accountId, pagination);
+      },
     },
-    Mutation: {},
+    Mutation: {
+      cancelUserInvestment: async (parent: any, { profileId, investmentId }: any, { modules, isExecutive }: AdminSessionContext) => {
+        if (!isExecutive) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Investments.ApiType>(Investments);
+
+        return api.cancelInvestment(profileId, investmentId);
+      },
+    },
   },
 };
