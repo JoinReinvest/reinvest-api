@@ -1,7 +1,7 @@
 import { exportOutput, getAttribute, getResourceName, getResourceNameTag } from './utils';
 import { getPrivateAZ, getPrivateSubnetRefs, getVpcCidr, getVpcRef } from './vpc';
 
-export const RdsResources = {
+const RdsResourcesConfiguration = {
   RdsSecurityGroup: {
     Type: 'AWS::EC2::SecurityGroup',
     Properties: {
@@ -31,7 +31,7 @@ export const RdsResources = {
     DeletionPolicy: '${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}',
     UpdateReplacePolicy: '${env:POSTGRESQL_AWS_DB_RETENTION_POLICY}',
     Properties: {
-      StorageEncrypted: false,
+      StorageEncrypted: true,
       BackupRetentionPeriod: 7,
       PreferredBackupWindow: '01:00-02:00',
       PreferredMaintenanceWindow: 'Sat:02:00-Sat:03:00',
@@ -50,6 +50,16 @@ export const RdsResources = {
     },
   },
 };
+
+if (process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER) {
+  // @ts-ignore
+  RdsResourcesConfiguration.RdsPostgresDBInstance.Properties['DBSnapshotIdentifier'] = process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER;
+  // @ts-ignore
+  delete RdsResourcesConfiguration.RdsPostgresDBInstance.Properties['DBName'];
+}
+
+console.log({ Properties: RdsResourcesConfiguration.RdsPostgresDBInstance.Properties });
+export const RdsResources = RdsResourcesConfiguration;
 
 export const RdsOutputs = {
   DatabaseName: {

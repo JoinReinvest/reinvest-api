@@ -19,6 +19,7 @@
     "bdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.feature.ts'",
     "tdd": "ts-mocha -r tsconfig-paths/register -p tsconfig.json --timeout 10000 'Reinvest/**/*.test.ts'",
     "development:deploy:saas": "NODE_ENV=development serverless deploy -s development --config serverless-saas.ts",
+    "development:restore:snapshot": "NODE_ENV=development sh ./devops/local/restoreSnapshot.sh",
     "database:deploy:saas": "NODE_ENV=database serverless deploy -s database --config serverless-saas.ts",
     "development:deploy:functions": "NODE_ENV=development serverless deploy -s development --config serverless-functions.ts",
     "development:invoke:migrateUp": "NODE_ENV=development sls invoke -s development --function migration --config serverless-functions.ts",
