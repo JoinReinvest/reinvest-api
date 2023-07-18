@@ -1,6 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { PortfolioDatabaseAdapterProvider, portfolioTable } from 'Portfolio/Adapter/Database/DatabaseAdapter';
-import { PortfolioTable } from 'Portfolio/Adapter/Database/PortfolioDatabaseSchema';
+import { PortfolioTable } from 'Portfolio/Adapter/Database/PropertyTable';
 import { Portfolio, PortfolioSchema } from 'Portfolio/Domain/Portfolio';
 
 export class PortfolioRepository {

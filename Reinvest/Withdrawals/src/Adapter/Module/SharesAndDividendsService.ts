@@ -1,9 +1,9 @@
-import { UUID } from "HKEKTypes/Generics";
-import { DateTime } from "Money/DateTime";
-import { Money } from "Money/Money";
-import { SharesAndDividends } from "SharesAndDividends/index";
-import { DividendDetails } from "Withdrawals/Domain/DividendWithdrawalRequest";
-import { CurrentAccountState } from "Withdrawals/UseCase/WithdrawalsQuery";
+import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
+import { SharesAndDividends } from 'SharesAndDividends/index';
+import { DividendDetails } from 'Withdrawals/Domain/DividendWithdrawalRequest';
+import { CurrentAccountState } from 'Withdrawals/UseCase/WithdrawalsQuery';
 
 /**
  * SharesAndDividends Module ACL

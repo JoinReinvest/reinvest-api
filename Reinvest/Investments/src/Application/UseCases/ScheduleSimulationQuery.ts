@@ -1,6 +1,6 @@
 import { IsoDateString } from 'HKEKTypes/Generics';
-import ScheduleInvestmentService from 'Investments/Domain/Service/ScheduleInvestmentService';
 import type { RecurringInvestmentFrequency } from 'Investments/Domain/Investments/Types';
+import ScheduleInvestmentService from 'Investments/Domain/Service/ScheduleInvestmentService';
 import { DateTime } from 'Money/DateTime';
 
 class ScheduleSimulationQuery {

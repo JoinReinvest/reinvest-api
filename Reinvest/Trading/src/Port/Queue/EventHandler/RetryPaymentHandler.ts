@@ -1,7 +1,7 @@
+import { DateTime } from 'Money/DateTime';
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { RetryPayment } from 'Trading/IntegrationLogic/UseCase/RetryPayment';
-import { DateTime } from 'Money/DateTime';
 
 export class RetryPaymentHandler implements EventHandler<DomainEvent> {
   static getClassName = (): string => 'RetryPaymentHandler';

@@ -1,6 +1,6 @@
+import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 import { Registration } from 'Registration/index';
 import { AccountStructure } from 'Verification/Domain/ValueObject/AccountStructure';
-import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 
 export type PartyMapping = {
   accountId: string | null;

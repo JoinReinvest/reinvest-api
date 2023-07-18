@@ -1,6 +1,6 @@
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { SharesTransferState, VertaloDistributionState, VertaloPaymentState } from 'Trading/Domain/Trade';
-import { DateTime } from 'Money/DateTime';
 
 export type ReinvestmentTradeConfiguration = {
   accountId: string;

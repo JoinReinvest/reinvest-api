@@ -1,11 +1,11 @@
 import { ArchivingBeneficiaryRepository } from 'Archiving/Adapter/Database/Repository/ArchivingBeneficiaryRepository';
 import { InvestmentsService } from 'Archiving/Adapter/Modules/InvestmentsService';
 import { LegalEntitiesService } from 'Archiving/Adapter/Modules/LegalEntitiesService';
+import { RegistrationService } from 'Archiving/Adapter/Modules/RegistrationService';
 import { SharesAndDividendsService } from 'Archiving/Adapter/Modules/SharesAndDividendsService';
+import { ArchivedBeneficiary } from 'Archiving/Domain/ArchivedBeneficiary';
 import { UUID } from 'HKEKTypes/Generics';
 import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
-import { ArchivedBeneficiary } from 'Archiving/Domain/ArchivedBeneficiary';
-import { RegistrationService } from 'Archiving/Adapter/Modules/RegistrationService';
 
 export class ArchiveBeneficiary {
   static getClassName = (): string => 'ArchiveBeneficiary';

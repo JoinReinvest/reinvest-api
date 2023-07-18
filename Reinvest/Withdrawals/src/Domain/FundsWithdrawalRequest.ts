@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { Money } from 'Money/Money';
 
 import { WithdrawalsFundsRequestsStatuses } from './WithdrawalsFundsRequests';
-import { Money } from 'Money/Money';
 
 export type SettledSharesData = {
   currentNavPerShare: number;

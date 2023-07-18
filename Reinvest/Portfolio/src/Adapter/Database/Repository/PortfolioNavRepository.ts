@@ -2,7 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { navTable, PortfolioDatabaseAdapterProvider } from 'Portfolio/Adapter/Database/DatabaseAdapter';
-import { PortfolioNavTable } from 'Portfolio/Adapter/Database/PortfolioDatabaseSchema';
+import { PortfolioNavTable } from 'Portfolio/Adapter/Database/PropertyTable';
 import { Nav, NavSchema } from 'Portfolio/Domain/Nav';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
