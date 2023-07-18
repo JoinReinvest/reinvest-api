@@ -17,6 +17,10 @@ import { UpdateProperty } from 'Portfolio/UseCase/UpdateProperty';
 import { DocumentsService } from 'Reinvest/Portfolio/src/Adapter/Documents/DocumentsService';
 import { CreatePortfolioUpdate } from 'Reinvest/Portfolio/src/UseCase/CreatePortfolioUpdate';
 import { DeletePortfolioUpdate } from 'Reinvest/Portfolio/src/UseCase/DeletePortfolioUpdate';
+import { AddPortfolioAuthor } from 'Portfolio/UseCase/AddPortfolioAuthor';
+import { PortfolioAuthorsRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioAuthors';
+import { DeletePortfolioAuthor } from 'Portfolio/UseCase/DeletePortfolioAuthor';
+import { GetPortfolioAuthors } from 'Portfolio/UseCase/GetPortfolioAuthors';
 
 export class UseCaseProvider {
   private config: Portfolio.Config;
@@ -41,5 +45,8 @@ export class UseCaseProvider {
     container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository, PortfolioRepository, IdGenerator]);
     container.addSingleton(DeletePortfolioUpdate, [PortfolioUpdatesRepository]);
     container.addSingleton(GetPortfolioUpdates, [PortfolioUpdatesRepository]);
+    container.addSingleton(GetPortfolioAuthors, [PortfolioAuthorsRepository]);
+    container.addSingleton(AddPortfolioAuthor, [PortfolioAuthorsRepository, PortfolioRepository, IdGenerator]);
+    container.addSingleton(DeletePortfolioAuthor, [PortfolioAuthorsRepository]);
   }
 }

@@ -13,6 +13,7 @@ import { Portfolio } from 'Portfolio/index';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { PortfolioAuthorsRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioAuthors';
 
 export class AdapterServiceProvider {
   private config: Portfolio.Config;
@@ -34,7 +35,8 @@ export class AdapterServiceProvider {
       .addSingleton(PortfolioRepository, [PortfolioDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(PropertyRepository, [PortfolioDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(PortfolioNavRepository, [PortfolioDatabaseAdapterInstanceProvider, SimpleEventBus])
-      .addSingleton(PortfolioUpdatesRepository, [PortfolioDatabaseAdapterInstanceProvider]);
+      .addSingleton(PortfolioUpdatesRepository, [PortfolioDatabaseAdapterInstanceProvider])
+      .addSingleton(PortfolioAuthorsRepository, [PortfolioDatabaseAdapterInstanceProvider]);
 
     container.addSingleton(DocumentsService, ['Documents']);
 

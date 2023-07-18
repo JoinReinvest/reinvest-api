@@ -3,3 +3,4 @@ export * as migration_20230628133300_change_id_type from './portfolio_2_change_i
 export * as migration_20230713160400_register_portfolio from './portfolio_3_register_portfolio';
 export * as migration_20230713160401_nav_table from './portfolio_4_nav_table';
 export * as migration_20230717104400_create_updates from './portfolio_5_update';
+export * as migration_20230718113500_create_portfolio_authors from './portfolio_6_create_portfolio_authors';

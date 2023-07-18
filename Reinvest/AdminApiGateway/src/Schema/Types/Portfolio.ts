@@ -73,6 +73,12 @@ const schema = `
         title: String!
         body: String
         createdAt: ISODateTime!
+        portfolioAuthorId: ID!
+    }
+    
+    input PortfolioAuthorInput {
+        avatar: FileLink
+        name: String!
     }
     
     type PortfolioUpdate {
@@ -80,6 +86,12 @@ const schema = `
         title: String!
         body: String
         createdAt: ISODateTime!
+    }
+    
+    type PortfolioAuthor {
+        avatar: GetDocumentLink
+        name: String!
+        id: ID!
     }
 
     input PropertyInput {
@@ -119,6 +131,11 @@ const schema = `
         [MOCK] returns all portfolio updates
         """
         getAllPortfolioUpdates: [PortfolioUpdate]
+        
+        """
+        [MOCK] returns all portfolio authors
+        """
+        getAllPortfolioAuthors: [PortfolioAuthor]
     }
 
     type Mutation {
@@ -140,9 +157,19 @@ const schema = `
         addPortfolioUpdate(input: PortfolioUpdateInput!): Boolean
         
         """
+        Create portfolio author
+        """
+        addPortfolioAuthor(input: PortfolioAuthorInput!): Boolean
+        
+        """
         [MOCK]
         """
         deletePortfolioUpdate(portfolioUpdateId: ID!): Boolean
+        
+        """
+        [MOCK]
+        """
+        deletePortfolioAuthor(portfolioAuthorId: ID!): Boolean
     }
 `;
 
@@ -158,11 +185,23 @@ type AddPortfolioUpdateInput = {
     createdAt: Date;
     image: { id: string };
     title: string;
+    portfolioAuthorId: string;
+  };
+};
+
+type AddPortfolioAuthorInput = {
+  input: {
+    avatar: { id: string };
+    name: string;
   };
 };
 
 type DeletePortfolioUpdateInput = {
   portfolioUpdateId: string;
+};
+
+type DeletePortfolioAuthorInput = {
+  portfolioAuthorId: string;
 };
 
 export const PortfolioSchema = {
@@ -181,6 +220,15 @@ export const PortfolioSchema = {
         return api.getPortfolioDetails(portfolioId);
       },
       getAllPortfolioUpdates: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+
+        return await api.getAllPortfolioUpdates();
+      },
+      getAllPortfolioAuthors: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }
@@ -226,6 +274,34 @@ export const PortfolioSchema = {
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
         const errors = await api.addPortfolioUpdate({ ...input });
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return true;
+      },
+      addPortfolioAuthor: async (parent: any, { input }: AddPortfolioAuthorInput, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+        console.log('input', input);
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const errors = await api.addPortfolioAuthor({ ...input });
+
+        if (errors.length > 0) {
+          throw new JsonGraphQLError(errors);
+        }
+
+        return true;
+      },
+      deletePortfolioAuthor: async (parent: any, { portfolioAuthorId }: DeletePortfolioAuthorInput, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+        const errors = await api.deletePortfolioAuthor(portfolioAuthorId);
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);

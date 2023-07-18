@@ -17,7 +17,7 @@ export class DeletePortfolioUpdate {
     if (!id) {
       errors.push(<ValidationErrorType>{
         type: ValidationErrorEnum.EMPTY_VALUE,
-        field: 'portfolioId',
+        field: 'id',
       });
 
       return errors;

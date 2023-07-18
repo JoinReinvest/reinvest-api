@@ -37,3 +37,8 @@ export interface PortfolioUpdatesTable {
   portfolioId: UUID;
   title: string;
 }
+
+export interface PortfolioAuthorsTable {
+  id: UUID;
+  name: string;
+}

@@ -11,6 +11,11 @@ import { RegisterPortfolio } from 'Portfolio/UseCase/RegisterPortfolio';
 import { SynchronizeNav } from 'Portfolio/UseCase/SynchronizeNav';
 import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
 import { UpdateProperty } from 'Portfolio/UseCase/UpdateProperty';
+import { PortfolioAuthorsController } from 'Portfolio/Port/Api/PortfolioAuthorsController';
+import { PortfolioAuthorsRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioAuthors';
+import { AddPortfolioAuthor } from 'Portfolio/UseCase/AddPortfolioAuthor';
+import { DeletePortfolioAuthor } from 'Portfolio/UseCase/DeletePortfolioAuthor';
+import { GetPortfolioAuthors } from 'Portfolio/UseCase/GetPortfolioAuthors';
 
 export class PortsProvider {
   private config: Portfolio.Config;
@@ -23,5 +28,6 @@ export class PortsProvider {
     // api
     container.addSingleton(PortfolioController, [SynchronizePortfolio, UpdateProperty, PortfolioQuery, RegisterPortfolio, SynchronizeNav]);
     container.addSingleton(PortfolioUpdatesController, [PortfolioUpdatesRepository, DeletePortfolioUpdate, CreatePortfolioUpdate, GetPortfolioUpdates]);
+    container.addSingleton(PortfolioAuthorsController, [PortfolioAuthorsRepository, AddPortfolioAuthor, DeletePortfolioAuthor, GetPortfolioAuthors]);
   }
 }
