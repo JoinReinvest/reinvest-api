@@ -67,6 +67,19 @@ export class CheckIsTradeFunded {
           const paymentState = await this.northCapitalAdapter.getPaymentState(ncAccountId, paymentId);
 
           if (paymentState.isFailed()) {
+            const { amount, fee, userTradeId } = trade.getFundsTransferConfiguration();
+
+            await this.tradesRepository.publishEvent(
+              storeEventCommand(trade.getProfileId(), 'PaymentFailed', {
+                accountId: trade.getReinvestAccountId(),
+                investmentId,
+                amount: amount.getAmount(),
+                fee: fee.getAmount(),
+                tradeId: userTradeId,
+                date: DateTime.now().toIsoDateTime(),
+              }),
+            );
+
             return {
               status: trade.isPaymentRetried() ? 'second-fail' : 'failed',
             };

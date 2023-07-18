@@ -20,6 +20,12 @@ export enum StoredEventKind {
   RecurringInvestmentSuspended = 'RecurringInvestmentSuspended',
   SharesIssued = 'SharesIssued',
   VerificationFailed = 'VerificationFailed',
+  PaymentFailed = 'PaymentFailed',
+  DividendReinvested = 'DividendReinvested',
+  DividendWithdrawn = 'DividendWithdrawn',
+  WithdrawalRequestRejected = 'WithdrawalRequestRejected',
+  WithdrawalRequestApproved = 'WithdrawalRequestApproved',
+  WithdrawalRequestSent = 'WithdrawalRequestSent',
 }
 
 export const StoredEvents = <StoredEventsType>{
@@ -191,8 +197,8 @@ export const StoredEvents = <StoredEventsType>{
       }),
     },
     push: {
-      title: ({ tradeId }) => `Payment initiated!`,
-      body: () => '',
+      title: () => `Payment initiated!`,
+      body: ({ tradeId }) => `Your recent investment ${tradeId} has started successfully`,
     },
     email: {
       subject: () => 'Payment started',
@@ -222,7 +228,7 @@ export const StoredEvents = <StoredEventsType>{
     },
     push: {
       title: () => `Payment processed!`,
-      body: () => '',
+      body: ({ tradeId }) => `Your recent investment ${tradeId}has completed successfully`,
     },
     email: {
       subject: () => 'Payment successful',
@@ -252,7 +258,7 @@ export const StoredEvents = <StoredEventsType>{
     },
     push: {
       title: () => `Transaction canceled.`,
-      body: () => '',
+      body: ({ tradeId }) => `Your recent investment ${tradeId} transaction is canceled`,
     },
     email: {
       subject: () => 'Transaction Canceled',
@@ -303,7 +309,7 @@ export const StoredEvents = <StoredEventsType>{
     },
     push: {
       title: () => `Shares issued!`,
-      body: () => '',
+      body: ({ tradeId }) => 'Your recent investment ${tradeId} shares have been issued',
     },
     email: {
       subject: () => 'Shares transferred',
@@ -335,7 +341,7 @@ export const StoredEvents = <StoredEventsType>{
     },
     push: {
       title: () => `Data update required.`,
-      body: () => '',
+      body: () => 'Accurate information is required to continue',
     },
     email: {
       subject: () => 'Information needed',
@@ -343,6 +349,130 @@ export const StoredEvents = <StoredEventsType>{
     },
     analyticEvent: {
       eventName: 'VerificationFailed',
+      data: data => data,
+    },
+  },
+  PaymentFailed: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your funds transfer has failed.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+      onObject: ({ investmentId }) => ({
+        onObjectId: investmentId,
+        onObjectType: NotificationObjectType.INVESTMENT,
+      }),
+    },
+    push: {
+      title: () => `Funds transfer failed.`,
+      body: ({ tradeId }) => `Your recent investment ${tradeId} funds transfer failed`,
+    },
+    email: {
+      subject: () => 'Transfer failed',
+      body: ({ userName, amount, tradeId, date }) => `Dear ${userName}, your funds transfer of ${Money.lowPrecision(
+        amount,
+      ).getFormattedAmount()} has failed.<br/>${transactionAndTimeBody(tradeId, date)}
+      `,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Funds transfer failed for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'PaymentFailed',
+      data: data => data,
+    },
+  },
+  DividendReinvested: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your dividends have been reinvested.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => 'Dividend Reinvested',
+      body: ({ userName, amount, date }) => `Dear ${userName}, your dividends ${Money.lowPrecision(
+        amount,
+      ).getFormattedAmount()} have been successfully reinvested.<br/>${timeBody(date)}
+      `,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Dividends reinvested for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'DividendReinvested',
+      data: data => data,
+    },
+  },
+  DividendWithdrawn: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your dividends have been successfully withdrawn.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => 'Dividend Withdrawn',
+      body: ({ userName, amount, date }) => `Dear ${userName}, your dividends ${Money.lowPrecision(
+        amount,
+      ).getFormattedAmount()} have been successfully withdrawn to your linked account..<br/>${timeBody(date)}
+      `,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Dividends withdrawn for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'DividendWithdrawn',
+      data: data => data,
+    },
+  },
+  WithdrawalRequestRejected: {
+    inApp: {
+      header: ({ userName }) => `Sorry ${userName}, your withdrawal request has been rejected.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    push: {
+      title: () => `Withdrawal request rejected.`,
+      body: () => ``,
+    },
+    email: {
+      subject: () => 'Funds Withdrawal request status',
+      body: ({ userName, amount }) => `Dear ${userName}, unfortunately, your withdrawal request for ${Money.lowPrecision(
+        amount,
+      ).getFormattedAmount()} has been rejected. Please contact support for further assistance.
+      `,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Withdrawal request rejected for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'WithdrawalRequestRejected',
+      data: data => data,
+    },
+  },
+  WithdrawalRequestApproved: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your withdrawal request has been approved.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    push: {
+      title: () => `Withdrawal request approved.`,
+      body: () => ``,
+    },
+    email: {
+      subject: () => 'Withdrawal Approved!',
+      body: ({ userName }) => `Dear ${userName}, unfortunately, your withdrawal request has been approved. The funds will be transferred shortly.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Withdrawal request approved for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'WithdrawalRequestApproved',
+      data: data => data,
+    },
+  },
+  WithdrawalRequestSent: {
+    analyticEvent: {
+      eventName: 'WithdrawalRequestSent',
       data: data => data,
     },
   },
@@ -356,7 +486,10 @@ function investmentStartedBody({ amount, tradeId }: DictionaryType): string {
 }
 
 function transactionAndTimeBody(tradeId: string, date: string): string {
-  return `Transaction ID: ${tradeId}<br/>
-      Time: ${DateTime.from(date).toFormattedDate('HH:mm:ss')}<br/>
+  return `Transaction ID: ${tradeId}<br/>${timeBody(date)}`;
+}
+
+function timeBody(date: string): string {
+  return `Time: ${DateTime.from(date).toFormattedDate('HH:mm:ss')}<br/>
       Date: ${DateTime.from(date).toFormattedDate('MM/DD/YYYY')}`;
 }
