@@ -1,9 +1,9 @@
 import { DocumentsDatabaseAdapterProvider, documentsRenderedPagePdfTable } from 'Documents/Adapter/Database/DatabaseAdapter';
 import { RenderPageToPdfCreate } from 'Documents/UseCases/RenderPageToPdf';
 import { Pagination, UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { DateTime } from 'Money/DateTime';
 
 export class DocumentsPdfPageRepository {
   public static getClassName = (): string => 'DocumentsPdfPageRepository';

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { DateTime } from 'Money/DateTime';
 import { VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
   VerificationAmlResultEvent,
@@ -9,7 +10,6 @@ import {
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { StakeholderVerifier } from 'Verification/IntegrationLogic/Verifier/StakeholderVerifier';
-import { DateTime } from 'Money/DateTime';
 
 const partyId = 'some-uuid';
 const accountId = 'some-account-uuid';

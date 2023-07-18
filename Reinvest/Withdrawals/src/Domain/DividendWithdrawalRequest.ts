@@ -1,6 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { Money } from 'Money/Money';
 import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
 
 export type DividendDetails = {
   amount: Money;

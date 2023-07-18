@@ -1,11 +1,11 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
 import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
 import { WithdrawDividend } from 'Withdrawals/UseCase/WithdrawDividend';
-import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 
 export class WithdrawalsController {
   private withdrawalsQuery: WithdrawalsQuery;

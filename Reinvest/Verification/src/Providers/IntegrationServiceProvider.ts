@@ -8,9 +8,9 @@ import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapit
 import { Verification } from 'Verification/index';
 import { PayFee } from 'Verification/IntegrationLogic/UseCase/PayFee';
 import { RegisterFee } from 'Verification/IntegrationLogic/UseCase/RegisterFee';
+import { WithdrawFee } from 'Verification/IntegrationLogic/UseCase/WithdrawFee';
 import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/VerifierExecutor';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
-import { WithdrawFee } from 'Verification/IntegrationLogic/UseCase/WithdrawFee';
 
 export class IntegrationServiceProvider {
   private config: Verification.Config;

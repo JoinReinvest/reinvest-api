@@ -1,5 +1,5 @@
 /* eslint-disable typescript-sort-keys/interface */
-import { TemplateContentType, TemplateStructureType } from "Templates/Types";
+import { TemplateContentType, TemplateStructureType } from 'Templates/Types';
 
 export interface SubscriptionAgreementContentFieldsV1 extends TemplateContentType {
   // portfolio

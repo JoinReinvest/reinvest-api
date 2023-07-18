@@ -1,5 +1,5 @@
-import { UUID } from "HKEKTypes/Generics";
-import { Identity } from "Identity/index";
+import { UUID } from 'HKEKTypes/Generics';
+import { Identity } from 'Identity/index';
 
 /**
  * Identity Module ACL

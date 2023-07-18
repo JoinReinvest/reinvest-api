@@ -1,8 +1,8 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { VerificationDatabaseAdapterProvider, verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 import { InsertableVerifierRecord, VerifierRecord } from 'Verification/Adapter/Database/VerificationSchema';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
-import { DateTime } from 'Money/DateTime';
 
 export class VerificationAdapter {
   private databaseAdapterProvider: VerificationDatabaseAdapterProvider;

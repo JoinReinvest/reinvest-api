@@ -6,31 +6,31 @@ import {
   AdminSetUserPasswordCommand,
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
-  ListUsersCommand
-} from "@aws-sdk/client-cognito-identity-provider";
-import { Archiving } from "Archiving/index"; // dependencies
-import * as bodyParser from "body-parser";
-import express from "express";
-import { PhoneNumber } from "Identity/Domain/PhoneNumber";
-import { Investments } from "Investments/index";
-import { RegistrationDatabase } from "Registration/Adapter/Database/DatabaseAdapter";
-import { boot } from "Reinvest/bootstrap";
-import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from "Reinvest/config";
-import { IdentityDatabase, userTable } from "Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter";
-import { InvestmentAccountsDatabase } from "Reinvest/InvestmentAccounts/src/Infrastructure/Storage/DatabaseAdapter";
-import { LegalEntitiesDatabase } from "Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter";
-import { Registration } from "Reinvest/Registration/src";
-import { NorthCapitalAdapter } from "Reinvest/Registration/src/Adapter/NorthCapital/NorthCapitalAdapter";
-import { VertaloAdapter } from "Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter";
-import serverless from "serverless-http";
-import { DatabaseProvider, PostgreSQLConfig } from "shared/hkek-postgresql/DatabaseProvider";
-import { QueueSender } from "shared/hkek-sqs/QueueSender";
-import { SharesAndDividends } from "SharesAndDividends/index"; // dependencies
-import { tradesTable } from "Trading/Adapter/Database/DatabaseAdapter"; // dependencies
-import { TradingNorthCapitalAdapter } from "Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter"; // dependencies
-import { verifierRecordsTable } from "Verification/Adapter/Database/DatabaseAdapter";
+  ListUsersCommand,
+} from '@aws-sdk/client-cognito-identity-provider';
+import { Archiving } from 'Archiving/index'; // dependencies
+import * as bodyParser from 'body-parser';
+import express from 'express';
+import { PhoneNumber } from 'Identity/Domain/PhoneNumber';
+import { Investments } from 'Investments/index';
+import { RegistrationDatabase } from 'Registration/Adapter/Database/DatabaseAdapter';
+import { boot } from 'Reinvest/bootstrap';
+import { COGNITO_CONFIG, DATABASE_CONFIG, NORTH_CAPITAL_CONFIG, SQS_CONFIG, VERTALO_CONFIG } from 'Reinvest/config';
+import { IdentityDatabase, userTable } from 'Reinvest/Identity/src/Adapter/Database/IdentityDatabaseAdapter';
+import { InvestmentAccountsDatabase } from 'Reinvest/InvestmentAccounts/src/Infrastructure/Storage/DatabaseAdapter';
+import { LegalEntitiesDatabase } from 'Reinvest/LegalEntities/src/Adapter/Database/DatabaseAdapter';
+import { Registration } from 'Reinvest/Registration/src';
+import { NorthCapitalAdapter } from 'Reinvest/Registration/src/Adapter/NorthCapital/NorthCapitalAdapter';
+import { VertaloAdapter } from 'Reinvest/Registration/src/Adapter/Vertalo/VertaloAdapter';
+import serverless from 'serverless-http';
+import { DatabaseProvider, PostgreSQLConfig } from 'shared/hkek-postgresql/DatabaseProvider';
+import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { SharesAndDividends } from 'SharesAndDividends/index'; // dependencies
+import { tradesTable } from 'Trading/Adapter/Database/DatabaseAdapter'; // dependencies
+import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter'; // dependencies
+import { verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
-import { main as postSignUp } from "../postSignUp/handler"; // dependencies
+import { main as postSignUp } from '../postSignUp/handler'; // dependencies
 // dependencies
 type AllDatabases = IdentityDatabase & LegalEntitiesDatabase & InvestmentAccountsDatabase & RegistrationDatabase;
 const databaseProvider: DatabaseProvider<AllDatabases> = new DatabaseProvider<AllDatabases>(DATABASE_CONFIG as PostgreSQLConfig);

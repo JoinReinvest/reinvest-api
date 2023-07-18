@@ -1,7 +1,7 @@
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 import { TradeConfiguration } from 'Trading/Domain/Trade';
+import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 
 export class CreateTradeHandler implements EventHandler<DomainEvent> {
   private createTradeUseCase: CreateTrade;

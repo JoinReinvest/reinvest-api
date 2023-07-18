@@ -522,16 +522,16 @@ export default class NorthCapitalRequester {
   async updateOffering(
     offeringId: string,
     params: {
+      endDate: string;
       issueName: string;
       issueType: string;
-      targetAmount: string;
-      minAmount: string;
       maxAmount: string;
-      unitPrice: string;
-      startDate: string;
-      endDate: string;
+      minAmount: string;
       offeringStatus: string;
       offeringText: string;
+      startDate: string;
+      targetAmount: string;
+      unitPrice: string;
     },
   ): Promise<any> {
     const endpoint = 'tapiv3/index.php/v3/updateOffering';

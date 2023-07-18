@@ -14,9 +14,9 @@ import { AdapterServiceProvider } from 'Trading/Providers/AdapterServiceProvider
 import EventBusProvider from 'Trading/Providers/EventBusProvider';
 import { IntegrationServiceProvider } from 'Trading/Providers/IntegrationServiceProvider';
 import { PortsProvider } from 'Trading/Providers/PortsProvider';
+import { Verification } from 'Verification/index';
 
 import * as TradingMigrations from '../migrations';
-import { Verification } from 'Verification/index';
 
 export namespace Trading {
   export const moduleName = 'Trading';

@@ -1,8 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { ReinvestmentRepository } from 'Trading/Adapter/Database/Repository/ReinvestmentRepository';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
 import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
+import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { Trading } from 'Trading/index';
@@ -10,12 +12,10 @@ import { CheckIsTradeApproved } from 'Trading/IntegrationLogic/UseCase/CheckIsTr
 import { CheckIsTradeFunded } from 'Trading/IntegrationLogic/UseCase/CheckIsTradeFunded';
 import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 import { MarkFundsAsReadyToDisburse } from 'Trading/IntegrationLogic/UseCase/MarkFundsAsReadyToDisburse';
+import { RetryPayment } from 'Trading/IntegrationLogic/UseCase/RetryPayment';
 import { TransferSharesForReinvestment } from 'Trading/IntegrationLogic/UseCase/TransferSharesForReinvestment';
 import { TransferSharesWhenTradeSettled } from 'Trading/IntegrationLogic/UseCase/TransferSharesWhenTradeSettled';
-import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
-import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
 import { UnwindTrade } from 'Trading/IntegrationLogic/UseCase/UnwindTrade';
-import { RetryPayment } from 'Trading/IntegrationLogic/UseCase/RetryPayment';
 
 export class IntegrationServiceProvider {
   private config: Trading.Config;
