@@ -1,4 +1,4 @@
-import { exportOutput, getAttribute, getResourceName, getResourceNameTag, importOutput } from './utils';
+import { exportOutput, getAttribute, getResourceName, getResourceNameTag } from './utils';
 import { getPrivateAZ, getPrivateSubnetRefs, getVpcCidr, getVpcRef } from './vpc';
 
 export const RdsResources = {
@@ -40,7 +40,7 @@ export const RdsResources = {
       DBInstanceIdentifier: getResourceName('postgres'),
       AllocatedStorage: '${env:POSTGRESQL_AWS_DB_STORAGE_GB}',
       DBInstanceClass: '${env:POSTGRESQL_AWS_DB_INSTANCE}',
-      Engine: 'postgres',
+      Engine: 'postgresql',
       DBName: getResourceName('db', '_'),
       MasterUsername: '${env:POSTGRESQL_MAIN_USER}',
       MasterUserPassword: '${env:POSTGRESQL_MAIN_PASSWORD}',
@@ -53,23 +53,13 @@ export const RdsResources = {
 
 export const RdsOutputs = {
   DatabaseName: {
-    Value: importOutput('DatabaseName'),
+    Value: getResourceName('db', '_'),
     Description: 'Database name',
     ...exportOutput('DatabaseName'),
   },
   DatabaseHost: {
-    Value: importOutput('DatabaseHost'),
-    Description: 'Database host',
-    ...exportOutput('DatabaseHost'),
-  },
-  RdsDatabaseName: {
-    Value: getResourceName('db', '_'),
-    Description: 'Database name',
-    ...exportOutput('RdsDatabaseName'),
-  },
-  RdsDatabaseHost: {
     Value: getAttribute('RdsPostgresDBInstance', 'Endpoint.Address'),
     Description: 'Database host',
-    ...exportOutput('RdsDatabaseHost'),
+    ...exportOutput('DatabaseHost'),
   },
 };
