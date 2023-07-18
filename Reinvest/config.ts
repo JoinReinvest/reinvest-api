@@ -67,6 +67,12 @@ export const FIREBASE_SQS_CONFIG = {
   isLocal: process.env.IT_IS_LOCAL === 'true',
 };
 
+export const SEGMENT_SQS_CONFIG = {
+  region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+  queueUrl: process.env.SQS_SEGMENT_QUEUE_URL as string,
+  isLocal: process.env.IT_IS_LOCAL === 'true',
+};
+
 export const LAMBDA_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',
@@ -80,4 +86,10 @@ export const SENTRY_CONFIG = {
 
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
 
+export const EMAIL_CONFIG = {
+  sourceEmail: process.env.EMAIL_SEND_FROM as string,
+  replyToEmail: process.env.EMAIL_REPLY_TO as string,
+  region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+};
 // export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;
+export const SEGMENT_API_KEY = process.env.SEGMENT_API_KEY as string;

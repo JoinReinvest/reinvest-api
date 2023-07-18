@@ -119,7 +119,7 @@ export class Trade {
     const { amount, fees, unitPrice } = this.tradeSchema.tradeConfiguration;
 
     // @ts-ignore
-    this.unitSharePrice = new Money(parseInt(unitPrice, 10));
+    this.unitSharePrice = new Money(unitPrice);
     this.amount = new Money(amount);
     this.fees = new Money(fees);
 

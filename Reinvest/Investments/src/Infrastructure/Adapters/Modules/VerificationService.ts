@@ -1,4 +1,5 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { VerificationReference } from 'Investments/Domain/Investments/Fee';
 import { Money } from 'Money/Money';
 import { Verification } from 'Verification/index';
 
@@ -26,5 +27,14 @@ export class VerificationService {
       amount: Money.lowPrecision(fee.amount),
       verificationFeeId: fee.verificationFeeId,
     }));
+  }
+
+  async withdrawFees(fees: VerificationReference[]): Promise<void> {
+    const feesToWithdraw = fees.map(fee => ({
+      verificationFeeId: fee.verificationFeeId,
+      amount: fee.amount,
+    }));
+
+    await this.verificationModule.api().withdrawFees(feesToWithdraw);
   }
 }

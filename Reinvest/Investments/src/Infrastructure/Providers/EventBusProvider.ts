@@ -4,13 +4,16 @@ import { AgreementsEventHandler } from 'Investments/Application/DomainEventHandl
 import { CheckIsGracePeriodEndedEventHandler } from 'Investments/Application/DomainEventHandler/CheckIsGracePeriodEndedEventHandler';
 import { FinalizeInvestmentEventHandler } from 'Investments/Application/DomainEventHandler/FinalizeInvestmentEventHandler';
 import { InvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/InvestmentStatusEventHandler';
+import { RecurringInvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/RecurringInvestmentStatusEventHandler';
 import { ReinvestmentEventHandler } from 'Investments/Application/DomainEventHandler/ReinvestmentEventHandler';
 import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/SharesEventHandler';
 import { TransactionEventHandler } from 'Investments/Application/DomainEventHandler/TransactionEventHandler';
 import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
+import DeactivateRecurringInvestment from 'Investments/Application/UseCases/DeactivateRecurringInvestment';
 import { GenerateSubscriptionAgreement } from 'Investments/Application/UseCases/GenerateSubscriptionAgreement';
 import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
+import { SuspendRecurringInvestment } from 'Investments/Application/UseCases/SuspendRecurringInvestment';
 import { SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 import { ReinvestmentCommands } from 'Investments/Domain/Reinvestments/ReinvestmentCommands';
 import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
@@ -20,16 +23,15 @@ import { Investments } from 'Investments/index';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
 import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
+import { DisableRecurringInvestmentCommandHandler } from 'Investments/Infrastructure/Events/DisableRecurringInvestmentCommandHandler';
 import { PdfGeneratedEventHandler } from 'Investments/Infrastructure/Events/PdfGeneratedEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
-import { RecurringInvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/RecurringInvestmentStatusEventHandler';
-import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
-import { SuspendRecurringInvestment } from 'Investments/Application/UseCases/SuspendRecurringInvestment';
 
 export default class EventBusProvider {
   private config: Investments.Config;
@@ -49,7 +51,8 @@ export default class EventBusProvider {
       .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus])
       .addSingleton(AgreementsEventHandler, [GenerateSubscriptionAgreement])
       .addSingleton(PdfGeneratedEventHandler, [MarkSubscriptionAgreementAsGenerated])
-      .addSingleton(RecurringInvestmentStatusEventHandler, [RecurringInvestmentExecutionRepository, SuspendRecurringInvestment]);
+      .addSingleton(RecurringInvestmentStatusEventHandler, [RecurringInvestmentExecutionRepository, SuspendRecurringInvestment])
+      .addSingleton(DisableRecurringInvestmentCommandHandler, [DeactivateRecurringInvestment]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus

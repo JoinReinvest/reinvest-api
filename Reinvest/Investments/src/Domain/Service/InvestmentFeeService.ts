@@ -42,4 +42,14 @@ export class InvestmentFeeService {
 
     return Fee.create(accountId, feeAmount, feeId, investmentId, profileId, feesReferences);
   }
+
+  async withdrawFee(fee: Fee | null): Promise<void> {
+    if (!fee) {
+      return;
+    }
+
+    const fees = fee.getFeeReferences();
+
+    await this.verificationService.withdrawFees(fees);
+  }
 }

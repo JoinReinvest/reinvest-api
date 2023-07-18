@@ -6,12 +6,6 @@ export type PushNotification = {
   token: string;
 };
 
-export type PushNotificationCommand = {
-  body: string;
-  profileId: string;
-  title: string;
-};
-
 export class PushNotificationAdapter {
   public static getClassName = (): string => 'PushNotificationAdapter';
   private pushNotificationQueueSender: QueueSender;

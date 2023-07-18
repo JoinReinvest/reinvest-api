@@ -24,6 +24,7 @@ import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { OpenBeneficiary } from 'LegalEntities/UseCases/OpenBeneficiary';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { Unban } from 'LegalEntities/UseCases/Unban';
 import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
@@ -64,7 +65,7 @@ export class AdapterServiceProvider {
       .addSingleton(ProfileRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(DraftAccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(AccountRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
-      .addSingleton(BanRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator])
+      .addSingleton(BanRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, IdGenerator, SimpleEventBus])
       .addSingleton(BeneficiaryRepository, [LegalEntitiesDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addObjectFactory(
         'LegalEntitiesTransactionalAdapter',
@@ -96,6 +97,7 @@ export class AdapterServiceProvider {
       .addSingleton(UpdateCompanyForVerification, [AccountRepository])
       .addSingleton(UpdateStakeholderForVerification, [AccountRepository])
       .addSingleton(Ban, [AccountRepository, ProfileRepository, BanRepository, IdentityService])
+      .addSingleton(Unban, [BanRepository, IdentityService])
       .addSingleton(OpenBeneficiary, [IdGenerator, BeneficiaryRepository, InvestmentAccountsService, 'LegalEntitiesTransactionalAdapter'])
       .addSingleton(ArchiveBeneficiary, [BeneficiaryRepository, IdentityService, InvestmentAccountsService]);
   }

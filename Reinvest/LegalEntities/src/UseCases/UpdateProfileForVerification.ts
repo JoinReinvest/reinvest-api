@@ -55,6 +55,14 @@ export class UpdateProfileForVerification {
         switch (step) {
           case 'name':
             profile.setName(PersonalName.create(data as PersonalNameInput));
+            events.push(<DomainEvent>{
+              kind: 'ProfileNameUpdated',
+              data: {
+                profileId,
+                label: profile.getFullName(),
+              },
+              id: profileId,
+            });
             break;
           case 'dateOfBirth':
             profile.setDateOfBirth(DateOfBirth.create(data as DateOfBirthInput));

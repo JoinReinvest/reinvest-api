@@ -150,7 +150,7 @@ export class DividendsCalculationRepository {
 
     await this.databaseAdapterProvider
       .provide()
-      .insertInto(sadCalculatedDividendsTable) // todo change it to multiple update?
+      .insertInto(sadCalculatedDividendsTable)
       .values(recordsToStore)
       .onConflict(oc =>
         oc.column('id').doUpdateSet({
@@ -369,5 +369,19 @@ export class DividendsCalculationRepository {
     }
 
     return investorDividendsTable;
+  }
+
+  async getLockedDividendsBySharesId(sharesId: UUID): Promise<CalculatedDividend[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadCalculatedDividendsTable)
+      .selectAll()
+      .where('sharesId', '=', sharesId)
+      .where('status', '=', 'LOCKED')
+      .execute();
+
+    return data.map(
+      (calculatedDividend: CalculatedDividendsTable): CalculatedDividend => CalculatedDividend.restore(<CalculatedDividendSchema>calculatedDividend),
+    );
   }
 }
