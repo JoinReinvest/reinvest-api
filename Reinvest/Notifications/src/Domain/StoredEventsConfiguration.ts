@@ -42,7 +42,27 @@ export const StoredEvents = <StoredEventsType>{
   UserRegistered: {
     accountActivity: {
       data: () => ({}),
-      name: () => `REINVEST User registered`,
+      name: ({ userName }) => `${userName} joined our platform.`,
+    },
+    push: {
+      title: ({ userName }) => `Welcome to our app, ${userName}!`,
+      body: () => '',
+    },
+
+    inApp: {
+      header: ({ userName }) => `Welcome, ${userName}!`,
+      body: () => ` Let's get started with your investing journey.`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => 'Welcome to our app!',
+      body: ({ userName }) => `Dear ${userName}, welcome to our platform. Let's start your financial growth journey.`,
+    },
+    analyticEvent: {
+      eventName: 'UserRegistered',
+      sendIdentity: () => true,
+      identityData: ({ userName }) => ({ userName }),
+      data: ({ userName }) => ({ userName }),
     },
   },
   CorporateAccountOpened: {

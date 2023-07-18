@@ -22,6 +22,7 @@ export class UserRepository {
     cognitoUserId: string,
     email: string,
     invitedByIncentiveToken: IncentiveToken | null,
+    label: string,
   ): Promise<void | never> {
     try {
       await this.databaseAdapterProvider
@@ -34,6 +35,7 @@ export class UserRepository {
           email,
           invitedByIncentiveToken: invitedByIncentiveToken === null ? null : invitedByIncentiveToken.get(),
           userIncentiveToken: userIncentiveToken.get(),
+          label,
         })
         .execute();
     } catch (error: any) {
@@ -58,12 +60,14 @@ export class UserRepository {
 
   public async getUserProfileByProfileId(profileId: string): Promise<{
     bannedIdsJson: JSONObjectOf<BanList>;
+    email: string;
+    label: string;
     profileId: string;
   } | null> {
     const user = await this.databaseAdapterProvider
       .provide()
       .selectFrom(userTable)
-      .select(['profileId', 'bannedIdsJson'])
+      .select(['profileId', 'bannedIdsJson', 'email', 'label'])
       .where('profileId', '=', profileId)
       .limit(1)
       .executeTakeFirst();
@@ -143,5 +147,16 @@ export class UserRepository {
       // @ts-ignore
       isBanned: user.bannedIdsJson !== null && user.bannedIdsJson.list && user.bannedIdsJson.list.includes(user.profileId),
     }));
+  }
+
+  async updateUserLabel(profileId: UUID, label: string): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        label,
+      })
+      .where('profileId', '=', profileId)
+      .execute();
   }
 }

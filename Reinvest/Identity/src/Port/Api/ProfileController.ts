@@ -36,6 +36,29 @@ export class ProfileController {
     }
   }
 
+  async getUserData(profileId: UUID): Promise<{ email: string; userName: string } | null> {
+    try {
+      const user = await this.userRepository.getUserProfileByProfileId(profileId);
+
+      if (!user) {
+        return null;
+      }
+
+      return {
+        email: user.email,
+        userName: user.label,
+      };
+    } catch (error: any) {
+      console.log(error.message);
+
+      return null;
+    }
+  }
+
+  async setUserLabel(profileId: UUID, label: string): Promise<void> {
+    await this.userRepository.updateUserLabel(profileId, label);
+  }
+
   async getProfileByProfileId(profileId: string): Promise<UserProfile | null> {
     try {
       const user = await this.userRepository.getUserProfileByProfileId(profileId);

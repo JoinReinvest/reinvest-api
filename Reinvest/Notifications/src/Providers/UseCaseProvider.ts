@@ -1,9 +1,12 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdentityService } from 'Identity/Adapter/Module/IdentityService';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { AnalyticsAdapter } from 'Notifications/Adapter/AnalyticsAdapter';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
 import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
+import { EmailSender } from 'Notifications/Adapter/SES/EmailSender';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
 import { NotificationQuery } from 'Notifications/Application/UseCase/NotificationQuery';
@@ -23,6 +26,14 @@ export class UseCaseProvider {
     container.addSingleton(TransferNotification, [NotificationsRepository]);
     container.addSingleton(DismissNotifications, [NotificationsRepository]);
     container.addSingleton(NotificationQuery, [NotificationsRepository]);
-    container.addSingleton(ProcessStoredEvent, [StoredEventRepository, AccountActivitiesRepository, CreateNotification, PushNotificationRepository]);
+    container.addSingleton(ProcessStoredEvent, [
+      StoredEventRepository,
+      AccountActivitiesRepository,
+      CreateNotification,
+      PushNotificationRepository,
+      IdentityService,
+      EmailSender,
+      AnalyticsAdapter,
+    ]);
   }
 }

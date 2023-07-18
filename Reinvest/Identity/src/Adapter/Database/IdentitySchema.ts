@@ -9,6 +9,7 @@ export interface IdentityUser {
   email: string;
   id: string;
   invitedByIncentiveToken: string;
+  label: string;
   profileId: string;
   userIncentiveToken: string;
 }
