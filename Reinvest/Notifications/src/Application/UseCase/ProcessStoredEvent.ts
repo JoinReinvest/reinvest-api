@@ -1,5 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdentityService } from 'Identity/Adapter/Module/IdentityService';
+import { AnalyticsAdapter } from 'Notifications/Adapter/AnalyticsAdapter';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
@@ -15,6 +16,7 @@ export class ProcessStoredEvent {
   private pushNotificationRepository: PushNotificationRepository;
   private identityService: IdentityService;
   private emailSender: EmailSender;
+  private analyticsAdapter: AnalyticsAdapter;
 
   constructor(
     storedEventRepository: StoredEventRepository,
@@ -23,6 +25,7 @@ export class ProcessStoredEvent {
     pushNotificationRepository: PushNotificationRepository,
     identityService: IdentityService,
     emailSender: EmailSender,
+    analyticsAdapter: AnalyticsAdapter,
   ) {
     this.storedEventRepository = storedEventRepository;
     this.accountActivitiesRepository = accountActivitiesRepository;
@@ -30,6 +33,7 @@ export class ProcessStoredEvent {
     this.pushNotificationRepository = pushNotificationRepository;
     this.identityService = identityService;
     this.emailSender = emailSender;
+    this.analyticsAdapter = analyticsAdapter;
   }
 
   static getClassName = () => 'ProcessStoredEvent';
@@ -109,11 +113,17 @@ export class ProcessStoredEvent {
       return false;
     }
 
-    const { subject, body } = storedEvent.getEmailNotification();
-    await this.emailSender.sendNotificationEmail(email, subject, body);
-    storedEvent.markEmailAsProcessed();
+    try {
+      const { subject, body } = storedEvent.getEmailNotification();
+      await this.emailSender.sendNotificationEmail(email, subject, body);
+      storedEvent.markEmailAsProcessed();
 
-    return true;
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot process email notification for stored event ${storedEvent.getId()}`, error);
+
+      return false;
+    }
   }
 
   private async processPushNotification(storedEvent: StoredEvent): Promise<boolean> {
@@ -137,6 +147,21 @@ export class ProcessStoredEvent {
   }
 
   private async processAnalyticEvent(storedEvent: StoredEvent): Promise<boolean> {
-    return true;
+    if (!storedEvent.shouldProcessAnalyticEvent()) {
+      return true;
+    }
+
+    try {
+      const analyticsCommand = storedEvent.getAnalyticsCommand();
+      await this.analyticsAdapter.send(analyticsCommand);
+
+      storedEvent.markAnalyticEventAsProcessed();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot process analytic event for stored event ${storedEvent.getId()}`, error);
+
+      return false;
+    }
   }
 }

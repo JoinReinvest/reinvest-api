@@ -1,8 +1,11 @@
 import { SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
 import admin from 'firebase-admin';
+import { logger } from 'Logger/logger';
+import { SENTRY_CONFIG } from 'Reinvest/config';
 
 import { firebaseServiceAccount } from './accountService';
 
+console = logger(SENTRY_CONFIG);
 admin.initializeApp({
   credential: admin.credential.cert(firebaseServiceAccount),
 });

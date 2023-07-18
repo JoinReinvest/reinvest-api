@@ -1,6 +1,7 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdentityService } from 'Identity/Adapter/Module/IdentityService';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { AnalyticsAdapter } from 'Notifications/Adapter/AnalyticsAdapter';
 import { createNotificationsDatabaseAdapterProvider, NotificationsDatabaseAdapterInstanceProvider } from 'Notifications/Adapter/Database/DatabaseAdapter';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
@@ -27,7 +28,9 @@ export class AdapterServiceProvider {
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
       .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender])
       .addObjectFactory('PushNotificationQueueSender', () => new QueueSender(this.config.firebaseQueue), [])
-      .addSingleton(PushNotificationAdapter, ['PushNotificationQueueSender']);
+      .addSingleton(PushNotificationAdapter, ['PushNotificationQueueSender'])
+      .addObjectFactory('AnalyticsQueueSender', () => new QueueSender(this.config.segmentQueue), [])
+      .addSingleton(AnalyticsAdapter, ['AnalyticsQueueSender']);
 
     container.addAsValue('EmailConfig', this.config.email).addSingleton(EmailSender, ['EmailConfig']);
 

@@ -1,6 +1,7 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdentityService } from 'Identity/Adapter/Module/IdentityService';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { AnalyticsAdapter } from 'Notifications/Adapter/AnalyticsAdapter';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { NotificationsRepository } from 'Notifications/Adapter/Database/Repository/NotificationsRepository';
 import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
@@ -32,6 +33,7 @@ export class UseCaseProvider {
       PushNotificationRepository,
       IdentityService,
       EmailSender,
+      AnalyticsAdapter,
     ]);
   }
 }

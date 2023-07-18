@@ -24,8 +24,10 @@ type AccountActivityType = {
   name: (payload: DictionaryType) => string;
 };
 type AnalyticEventType = {
-  data: (payload: DictionaryType) => JSONObject;
-  name: (payload: DictionaryType) => string;
+  eventName: string;
+  data?: (payload: DictionaryType) => JSONObject;
+  identityData?: (payload: DictionaryType) => JSONObject;
+  sendIdentity?: (payload: DictionaryType) => boolean;
 };
 
 export type StoredEventConfigurationType = {
@@ -36,6 +38,4 @@ export type StoredEventConfigurationType = {
   push?: PushNotificationType;
 };
 
-export type StoredEventsType = {
-  [kind in StoredEventKind]: StoredEventConfigurationType;
-};
+export type StoredEventsType = Record<StoredEventKind, StoredEventConfigurationType>;

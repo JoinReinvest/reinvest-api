@@ -43,8 +43,8 @@ const serverlessConfiguration: AWS = {
       ...CognitoOutputs,
       ...VpcOutputs,
       ...S3Outputs,
-      ...RdsOutputs,
       ...BastionOutputs,
+      ...RdsOutputs, // do not use these outputs in other stacks! In other way the snapshot restore will not work!
     },
   },
   custom: {
@@ -58,8 +58,6 @@ const serverlessConfiguration: AWS = {
         CognitoUserPoolID: 'CognitoUserPoolID',
         CognitoIssuerUrl: 'CognitoIssuerUrl',
         BastionHostName: 'BastionHostName',
-        DatabaseName: 'DatabaseName',
-        DatabaseHost: 'DatabaseHost',
         S3_BUCKET_DOCUMENTS: 'S3_BUCKET_DOCUMENTS',
         S3_BUCKET_AVATARS: 'S3_BUCKET_AVATARS',
       },

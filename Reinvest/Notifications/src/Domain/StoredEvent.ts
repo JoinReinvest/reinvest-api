@@ -1,5 +1,6 @@
 import { DictionaryType, JSONObject, UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
+import { AnalyticsCommand } from 'Notifications/Adapter/AnalyticsAdapter';
 import { CreateNewNotificationInput } from 'Notifications/Application/UseCase/CreateNotification';
 import { StoredEventKind, StoredEvents } from 'Notifications/Domain/StoredEventsConfiguration';
 import { StoredEventConfigurationType } from 'Notifications/Domain/StoredEventTypes';
@@ -101,6 +102,10 @@ export class StoredEvent {
     this.storedEventSchema.dateEmailed = DateTime.now();
   }
 
+  markAnalyticEventAsProcessed() {
+    this.storedEventSchema.dateAnalytics = DateTime.now();
+  }
+
   markAsProcessed() {
     this.storedEventSchema.status = StoredEventStatus.PROCESSED;
   }
@@ -188,6 +193,28 @@ export class StoredEvent {
     return {
       subject: emailConfiguration.subject(payload),
       body: emailConfiguration.body(payload),
+    };
+  }
+
+  getAnalyticsCommand(): AnalyticsCommand {
+    const config = this.storedEventConfiguration.analyticEvent;
+
+    if (!config) {
+      throw new Error(`Analytics configuration not found for type: ${this.storedEventSchema.kind}`);
+    }
+
+    const payload = this.getPayload();
+    const eventName = config.eventName;
+    const data = config.data ? config.data(payload) : {};
+    const identityData = config.identityData ? config.identityData(payload) : {};
+    const sendIdentity = config.sendIdentity ? config.sendIdentity(payload) : false;
+
+    return {
+      profileId: this.storedEventSchema.profileId,
+      eventName,
+      data,
+      identityData,
+      sendIdentity,
     };
   }
 

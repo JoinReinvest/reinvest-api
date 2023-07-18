@@ -24,6 +24,7 @@ import {
   NORTH_CAPITAL_CONFIG,
   PDF_GENERATOR_SQS_CONFIG,
   S3_CONFIG,
+  SEGMENT_SQS_CONFIG,
   SENTRY_CONFIG,
   SNS_CONFIG,
   SQS_CONFIG,
@@ -51,6 +52,7 @@ export function boot(): Modules {
   const queueConfig = SQS_CONFIG as QueueConfig;
   const pdfGeneratorQueue = PDF_GENERATOR_SQS_CONFIG as QueueConfig;
   const firebaseQueue = FIREBASE_SQS_CONFIG as QueueConfig;
+  const segmentQueue = SEGMENT_SQS_CONFIG as QueueConfig;
   const northCapitalConfig = NORTH_CAPITAL_CONFIG as NorthCapitalConfig;
   const vertaloConfig = VERTALO_CONFIG as VertaloConfig;
   const dealpathConfig = DEALPATH_CONFIG as DealpathConfig;
@@ -114,6 +116,7 @@ export function boot(): Modules {
         queue: queueConfig,
         firebaseQueue: firebaseQueue,
         email: emailConfiguration,
+        segmentQueue: segmentQueue,
       } as Notifications.Config,
       {
         identity: modules.get(Identity.moduleName) as Identity.Main,
