@@ -11,11 +11,17 @@ export class GetPortfolioUpdates {
 
   public async execute() {
     const portfolioUpdates = await this.portfolioUpdatesRepository.getAll();
+    const portfolioUpdatesData = [];
 
     if (!portfolioUpdates || portfolioUpdates.length === 0) {
       return [];
     }
 
-    return portfolioUpdates;
+    for (const update of portfolioUpdates) {
+      const data = update.toObject();
+      portfolioUpdatesData.push(data);
+    }
+
+    return portfolioUpdatesData;
   }
 }

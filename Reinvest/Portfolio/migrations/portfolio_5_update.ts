@@ -8,7 +8,7 @@ export async function up(db: Kysely<LegalEntitiesDatabase>): Promise<void> {
     .addColumn('id', 'uuid', col => col.primaryKey())
     .addColumn('portfolioId', 'uuid', col => col.notNull())
     .addColumn('title', 'varchar(255)', col => col.notNull())
-    .addColumn('body', 'varchar(255)')
+    .addColumn('body', 'varchar(255)', col => col.defaultTo(null))
     .addColumn('image', 'json', col => col.defaultTo(null))
     .addColumn('createdAt', 'timestamp', col => col.notNull().defaultTo(sql`now()`))
     .execute();

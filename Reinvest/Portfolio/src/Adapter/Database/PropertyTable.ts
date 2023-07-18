@@ -31,5 +31,9 @@ export interface PortfolioNavTable {
 }
 
 export interface PortfolioUpdatesTable {
-  portfolioId: string;
+  body: string;
+  createdAt: Date;
+  id: UUID;
+  portfolioId: UUID;
+  title: string;
 }

@@ -11,10 +11,10 @@ export class DeletePortfolioUpdate {
 
   public static getClassName = (): string => 'DeletePortfolioUpdate';
 
-  public async execute(portfolioId: UUID): Promise<ValidationErrorType[]> {
+  public async execute(id: UUID): Promise<ValidationErrorType[]> {
     const errors: ValidationErrorType[] = [];
 
-    if (!portfolioId) {
+    if (!id) {
       errors.push(<ValidationErrorType>{
         type: ValidationErrorEnum.EMPTY_VALUE,
         field: 'portfolioId',
@@ -23,7 +23,7 @@ export class DeletePortfolioUpdate {
       return errors;
     }
 
-    await this.portfolioUpdatesRepository.delete(portfolioId);
+    await this.portfolioUpdatesRepository.delete(id);
 
     return errors;
   }

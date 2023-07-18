@@ -142,7 +142,7 @@ const schema = `
         """
         [MOCK]
         """
-        deletePortfolioUpdate(portfolioId: ID!): Boolean
+        deletePortfolioUpdate(portfolioUpdateId: ID!): Boolean
     }
 `;
 
@@ -153,14 +153,16 @@ type UpdatePropertyDetailsInput = {
 };
 
 type AddPortfolioUpdateInput = {
-  image: { id: string };
-  title: string;
-  body: string;
-  createdAt: Date;
+  input: {
+    body: string;
+    createdAt: Date;
+    image: { id: string };
+    title: string;
+  };
 };
 
 type DeletePortfolioUpdateInput = {
-  portfolioId: string;
+  portfolioUpdateId: string;
 };
 
 export const PortfolioSchema = {
@@ -185,9 +187,7 @@ export const PortfolioSchema = {
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
-        const test = await api.getAllPortfolioUpdates();
-
-        return test;
+        return await api.getAllPortfolioUpdates();
       },
     },
     Mutation: {
@@ -219,13 +219,13 @@ export const PortfolioSchema = {
 
         return true;
       },
-      addPortfolioUpdate: async (parent: any, input: AddPortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
+      addPortfolioUpdate: async (parent: any, { input }: AddPortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const errors = await api.addPortfolioUpdate(input);
+        const errors = await api.addPortfolioUpdate({ ...input });
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);
@@ -233,13 +233,13 @@ export const PortfolioSchema = {
 
         return true;
       },
-      deletePortfolioUpdate: async (parent: any, { portfolioId }: DeletePortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
+      deletePortfolioUpdate: async (parent: any, { portfolioUpdateId }: DeletePortfolioUpdateInput, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const errors = await api.deletePortfolioUpdate(portfolioId);
+        const errors = await api.deletePortfolioUpdate(portfolioUpdateId);
 
         if (errors.length > 0) {
           throw new JsonGraphQLError(errors);

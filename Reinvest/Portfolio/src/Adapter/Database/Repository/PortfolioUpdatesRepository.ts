@@ -1,3 +1,4 @@
+import * as console from 'console';
 import { PortfolioDatabaseAdapterProvider, updatesTable } from 'Portfolio/Adapter/Database/DatabaseAdapter';
 import { PortfolioUpdatesTable } from 'Portfolio/Adapter/Database/PropertyTable';
 import { PortfolioUpdate, PortfolioUpdateSchema } from 'Portfolio/Domain/PortfolioUpdate';
@@ -18,7 +19,7 @@ export class PortfolioUpdatesRepository {
         .provide()
         .insertInto(updatesTable)
         .values(values)
-        .onConflict(oc => oc.column('portfolioId').doNothing())
+        .onConflict(oc => oc.column('id').doNothing())
         .execute();
 
       return true;
@@ -45,9 +46,9 @@ export class PortfolioUpdatesRepository {
     }
   }
 
-  async delete(portfolioId: string) {
+  async delete(id: string) {
     try {
-      await this.databaseAdapterProvider.provide().deleteFrom(updatesTable).where('portfolioId', '=', portfolioId).execute();
+      await this.databaseAdapterProvider.provide().deleteFrom(updatesTable).where('id', '=', id).execute();
 
       return true;
     } catch (error: any) {
