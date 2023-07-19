@@ -3,10 +3,11 @@ import { UUID } from '../../../../shared/hkek-types/Generics';
 export type PortfolioUpdateSchema = {
   createdAt: Date;
   id: UUID;
-  image: { id: string };
+  image: { id: string; url: string };
   portfolioId: UUID;
   title: string;
   body?: string;
+  portfolioAuthorId: UUID;
 };
 
 export class PortfolioUpdate {
