@@ -10,10 +10,11 @@ import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndD
 import { Withdrawals } from 'Withdrawals/index';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
 import { CreateFundsWithdrawalAgreement } from 'Withdrawals/UseCase/CreateFundsWithdrawalAgreement';
+import CreatePayoutDocument from 'Withdrawals/UseCase/CreatePayoutDocument';
+import CreateRedemptionFormDocument from 'Withdrawals/UseCase/CreateRedemptionFormDocument';
 import CreateWithdrawal from 'Withdrawals/UseCase/CreateWithdrawal';
-import CreateWithdrawalDocument from 'Withdrawals/UseCase/CreateWithdrawalDocument';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
-import GenerateRedemptionForm from 'Withdrawals/UseCase/GenerateRedemptionForm';
+import GenerateWithdrawalDocument from 'Withdrawals/UseCase/GenerateWithdrawalDocument';
 import GetFundsWithdrawalAgreement from 'Withdrawals/UseCase/GetFundsWithdrawalAgreement';
 import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
 import { MarkDocumentAsGenerated } from 'Withdrawals/UseCase/MarkDocumentAsGenerated';
@@ -44,11 +45,12 @@ export class UseCaseServiceProvider {
       WithdrawalsRepository,
       FundsWithdrawalRequestsRepository,
       DividendsRequestsRepository,
-      CreateWithdrawalDocument,
       'WithdrawalTransactionalAdapter',
       IdGenerator,
     ]);
-    container.addSingleton(GenerateRedemptionForm, [WithdrawalsDocumentsRepository]);
+    container.addSingleton(CreateRedemptionFormDocument, [WithdrawalsDocumentsRepository]);
+    container.addSingleton(CreatePayoutDocument, [WithdrawalsDocumentsRepository]);
+    container.addSingleton(GenerateWithdrawalDocument, [WithdrawalsDocumentsRepository]);
     container.addSingleton(MarkDocumentAsGenerated, [WithdrawalsDocumentsRepository]);
   }
 }

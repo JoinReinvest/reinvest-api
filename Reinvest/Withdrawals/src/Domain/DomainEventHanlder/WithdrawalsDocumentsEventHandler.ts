@@ -1,15 +1,15 @@
 import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
-import GenerateRedemptionForm from 'Withdrawals/UseCase/GenerateRedemptionForm';
+import GenerateWithdrawalDocument from 'Withdrawals/UseCase/GenerateWithdrawalDocument';
 
 import { WithdrawalsDocumentsEvent, WithdrawalsDocumentsEvents } from '../WithdrawalsDocuments';
 
 export class WithdrawalsDocumentsEventHandler implements EventHandler<WithdrawalsDocumentsEvent> {
   static getClassName = (): string => 'WithdrawalsDocumentsEventHandler';
 
-  private generateRedemptionForm: GenerateRedemptionForm;
+  private generateWithdrawalDocument: GenerateWithdrawalDocument;
 
-  constructor(generateRedemptionForm: GenerateRedemptionForm) {
-    this.generateRedemptionForm = generateRedemptionForm;
+  constructor(generateWithdrawalDocument: GenerateWithdrawalDocument) {
+    this.generateWithdrawalDocument = generateWithdrawalDocument;
   }
 
   async handle(event: WithdrawalsDocumentsEvent): Promise<void> {
@@ -17,6 +17,6 @@ export class WithdrawalsDocumentsEventHandler implements EventHandler<Withdrawal
       return;
     }
 
-    await this.generateRedemptionForm.execute(event.data.type, event.id);
+    await this.generateWithdrawalDocument.execute(event.data.type, event.id);
   }
 }

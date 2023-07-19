@@ -6,14 +6,14 @@ import { WithdrawalsDocumentsTypes } from 'Withdrawals/Domain/WithdrawalsDocumen
 
 const CATALOG_NAME = 'admin';
 
-class GenerateRedemptionForm {
+class GenerateWithdrawalDocument {
   private readonly withdrawalsDocumentsRepository: WithdrawalsDocumentsRepository;
 
   constructor(withdrawalsDocumentsRepository: WithdrawalsDocumentsRepository) {
     this.withdrawalsDocumentsRepository = withdrawalsDocumentsRepository;
   }
 
-  static getClassName = (): string => 'GenerateRedemptionForm';
+  static getClassName = (): string => 'GenerateWithdrawalDocument';
 
   async execute(type: WithdrawalsDocumentsTypes, id: UUID): Promise<void> {
     const withdrawalsDocument = await this.withdrawalsDocumentsRepository.getById(id);
@@ -45,4 +45,4 @@ class GenerateRedemptionForm {
   }
 }
 
-export default GenerateRedemptionForm;
+export default GenerateWithdrawalDocument;

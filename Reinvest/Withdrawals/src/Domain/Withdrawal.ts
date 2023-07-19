@@ -1,5 +1,21 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
+import { DomainEvent } from 'SimpleAggregator/Types';
+
+export enum WithdrawalsEvents {
+  WithdrawalCreated = 'WithdrawalCreated',
+}
+
+export type WithdrawalsEvent = DomainEvent & {
+  data: {
+    listOfDividends: UUIDsList;
+    listOfWithdrawals: UUIDsList;
+    payoutId: UUID;
+    redemptionId: UUID;
+  };
+  id: UUID;
+  kind: WithdrawalsEvents;
+};
 
 export enum WithdrawalsStatuses {
   PENDING = 'PENDING',

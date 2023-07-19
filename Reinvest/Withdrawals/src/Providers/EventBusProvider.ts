@@ -4,10 +4,14 @@ import { WithdrawalDocumentPdfGeneratedEventHandler } from 'Reinvest/Withdrawals
 import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
 import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { CreateDocumentsEventHandler } from 'Withdrawals/Domain/DomainEventHanlder/CreateDocumentsEventHandler';
 import { WithdrawalsDocumentsEventHandler } from 'Withdrawals/Domain/DomainEventHanlder/WithdrawalsDocumentsEventHandler';
+import { WithdrawalsEvents } from 'Withdrawals/Domain/Withdrawal';
 import { WithdrawalsDocumentsEvents } from 'Withdrawals/Domain/WithdrawalsDocuments';
 import { Withdrawals } from 'Withdrawals/index';
-import GenerateRedemptionForm from 'Withdrawals/UseCase/GenerateRedemptionForm';
+import CreatePayoutDocument from 'Withdrawals/UseCase/CreatePayoutDocument';
+import CreateRedemptionFormDocument from 'Withdrawals/UseCase/CreateRedemptionFormDocument';
+import GenerateWithdrawalDocument from 'Withdrawals/UseCase/GenerateWithdrawalDocument';
 import { MarkDocumentAsGenerated } from 'Withdrawals/UseCase/MarkDocumentAsGenerated';
 
 export default class EventBusProvider {
@@ -19,12 +23,14 @@ export default class EventBusProvider {
 
   public boot(container: ContainerInterface) {
     container
-      .addSingleton(WithdrawalsDocumentsEventHandler, [GenerateRedemptionForm])
+      .addSingleton(CreateDocumentsEventHandler, [CreateRedemptionFormDocument, CreatePayoutDocument])
+      .addSingleton(WithdrawalsDocumentsEventHandler, [GenerateWithdrawalDocument])
       .addSingleton(WithdrawalDocumentPdfGeneratedEventHandler, [MarkDocumentAsGenerated]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus
       .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [STORE_EVENT_COMMAND, 'GeneratePdfCommand'])
+      .subscribeHandlerForKinds(CreateDocumentsEventHandler.getClassName(), [WithdrawalsEvents.WithdrawalCreated])
       .subscribeHandlerForKinds(WithdrawalsDocumentsEventHandler.getClassName(), [WithdrawalsDocumentsEvents.WithdrawalsDocumentCreated])
       .subscribe(PdfKinds.GeneratePdf, GeneratePdfEventHandler.getClassName());
   }

@@ -37,23 +37,8 @@ const MOCK_REDEMPTION_CONTENT_FIELDS = {
   ],
 };
 
-const MOCK_PAYOUT_CONTENT_FIELDS = {
-  data: [
-    {
-      accountId: 'AccountId 1',
-      amount: 'Amount 1',
-      northCapitalAccountNumber: 'North Capital Account Number 1',
-    },
-    {
-      accountId: 'AccountId 2',
-      amount: 'Amount 2',
-      northCapitalAccountNumber: 'North Capital Account Number 2',
-    },
-  ],
-};
-
-class CreateWithdrawalDocument {
-  static getClassName = (): string => 'CreateWithdrawalDocument';
+class CreateRedemptionFormDocument {
+  static getClassName = (): string => 'CreateRedemptionFormDocument';
 
   private readonly withdrawalsDocumentsRepository: WithdrawalsDocumentsRepository;
 
@@ -64,7 +49,11 @@ class CreateWithdrawalDocument {
   async execute(id: UUID, type: WithdrawalsDocumentsTypes, list: UUIDsList) {
     const events: DomainEvent[] = [];
 
-    const contentFieldsJson = type === WithdrawalsDocumentsTypes.REDEMPTION ? MOCK_REDEMPTION_CONTENT_FIELDS : MOCK_PAYOUT_CONTENT_FIELDS;
+    if (!list.list.length) {
+      return true;
+    }
+
+    const contentFieldsJson = MOCK_REDEMPTION_CONTENT_FIELDS;
 
     const withdrawalDocument = WithdrawalsDocuments.create({
       id,
@@ -96,4 +85,4 @@ class CreateWithdrawalDocument {
   }
 }
 
-export default CreateWithdrawalDocument;
+export default CreateRedemptionFormDocument;

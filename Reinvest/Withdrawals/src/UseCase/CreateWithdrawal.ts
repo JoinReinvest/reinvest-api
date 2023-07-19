@@ -1,15 +1,12 @@
-import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DateTime } from 'Money/DateTime';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { DomainEvent } from 'SimpleAggregator/Types';
+import { WithdrawalsDatabase } from 'Withdrawals/Adapter/Database/DatabaseAdapter';
 import { DividendsRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/DividendsRequestsRepository';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { WithdrawalsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsRepository';
-import { Withdrawal, WithdrawalsStatuses } from 'Withdrawals/Domain/Withdrawal';
-
-import { WithdrawalsDatabase } from '../Adapter/Database/DatabaseAdapter';
-import { WithdrawalsDocumentsTypes } from '../Domain/WithdrawalsDocuments';
-import CreateWithdrawalDocument from './CreateWithdrawalDocument';
+import { Withdrawal, WithdrawalsEvents, WithdrawalsStatuses } from 'Withdrawals/Domain/Withdrawal';
 
 class CreateWithdrawal {
   static getClassName = (): string => 'CreateWithdrawal';
@@ -17,7 +14,6 @@ class CreateWithdrawal {
   private readonly withdrawalsRepository: WithdrawalsRepository;
   private readonly fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository;
   private readonly dividendsRequestsRepository: DividendsRequestsRepository;
-  private readonly createWithdrawalDocument: CreateWithdrawalDocument;
   private transactionAdapter: TransactionalAdapter<WithdrawalsDatabase>;
   private readonly idGenerator: IdGeneratorInterface;
 
@@ -25,19 +21,19 @@ class CreateWithdrawal {
     withdrawalsRepository: WithdrawalsRepository,
     fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository,
     dividendsRequestsRepository: DividendsRequestsRepository,
-    createWithdrawalDocument: CreateWithdrawalDocument,
     transactionAdapter: TransactionalAdapter<WithdrawalsDatabase>,
     idGenerator: IdGeneratorInterface,
   ) {
     this.withdrawalsRepository = withdrawalsRepository;
     this.fundsWithdrawalRequestsRepository = fundsWithdrawalRequestsRepository;
     this.dividendsRequestsRepository = dividendsRequestsRepository;
-    this.createWithdrawalDocument = createWithdrawalDocument;
     this.transactionAdapter = transactionAdapter;
     this.idGenerator = idGenerator;
   }
 
   async execute() {
+    const events: DomainEvent[] = [];
+
     const id = this.idGenerator.createUuid();
     const redemptionId = this.idGenerator.createUuid();
     const payoutId = this.idGenerator.createUuid();
@@ -73,21 +69,18 @@ class CreateWithdrawal {
       }
     });
 
-    if (listOfWithdrawals.list.length) {
-      const isRedemptionCreated = await this.createWithdrawalDocument.execute(redemptionId, WithdrawalsDocumentsTypes.REDEMPTION, listOfWithdrawals);
+    events.push({
+      id,
+      kind: WithdrawalsEvents.WithdrawalCreated,
+      data: {
+        listOfDividends,
+        listOfWithdrawals,
+        redemptionId,
+        payoutId,
+      },
+    });
 
-      if (!isRedemptionCreated) {
-        return false;
-      }
-    }
-
-    if (listOfDividends.list.length) {
-      const isPayoutCreated = await this.createWithdrawalDocument.execute(redemptionId, WithdrawalsDocumentsTypes.PAYOUT, listOfDividends);
-
-      if (!isPayoutCreated) {
-        return false;
-      }
-    }
+    await this.withdrawalsRepository.publishEvents(events);
 
     return id;
   }
