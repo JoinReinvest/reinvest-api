@@ -154,22 +154,24 @@ const schema = `
         synchronizePortfolioNav: Nav
         
         """
-        [MOCK]
+        Create portfolio update.
+        As image id please use id from createImageFileLinks mutation
         """
         addPortfolioUpdate(input: PortfolioUpdateInput!): Boolean
         
         """
-        Create portfolio author
+        Create portfolio author.
+        As avatar id please use id from createAvatarFileLinks mutation
         """
         addPortfolioAuthor(input: PortfolioAuthorInput!): Boolean
         
         """
-        [MOCK]
+        Remove portfolio update from database
         """
         deletePortfolioUpdate(portfolioUpdateId: ID!): Boolean
         
         """
-        [MOCK]
+        Remove author from database
         """
         deletePortfolioAuthor(portfolioAuthorId: ID!): Boolean
     }
