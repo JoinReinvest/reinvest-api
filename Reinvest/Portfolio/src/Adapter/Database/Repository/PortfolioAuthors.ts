@@ -63,6 +63,22 @@ export class PortfolioAuthorsRepository {
     }
   }
 
+  async get(id: string) {
+    try {
+      const portfolioAuthorsData = await this.databaseAdapterProvider.provide().selectFrom(portfolioAuthorsTable).selectAll().where('id', '=', id).castTo<PortfolioAuthorSchema>().executeTakeFirst();
+
+      if (!portfolioAuthorsData) {
+        return null;
+      }
+
+      return PortfolioAuthor.create(portfolioAuthorsData);
+    } catch (error: any) {
+      console.error(error);
+
+      return false;
+    }
+  }
+
   private castToTable(object: PortfolioAuthor): PortfolioAuthorsTable {
     const data = object.toObject();
 
