@@ -23,12 +23,7 @@ export class AddPortfolioAuthor {
   public static getClassName = (): string => 'AddPortfolioAuthor';
 
   public async execute(input: PortfolioAuthorInput): Promise<ValidationErrorType[]> {
-    const activePortfolio = await this.portfolioRepository.getActivePortfolio();
     const errors: ValidationErrorType[] = [];
-
-    if (activePortfolio) {
-      throw new Error('Active portfolio already exists');
-    }
 
     const portfolioAuthorId = this.idGenerator.createUuid();
     const portfolioAuthor = PortfolioAuthor.create({ id: portfolioAuthorId, ...input });
