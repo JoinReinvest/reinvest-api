@@ -94,6 +94,7 @@ const schema = `
         body: String
         createdAt: ISODateTime
         author: PortfolioAuthor
+        id: ID!
     }
     
     input PropertyInput {
