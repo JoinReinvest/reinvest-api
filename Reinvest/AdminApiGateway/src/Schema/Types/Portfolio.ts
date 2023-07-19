@@ -81,19 +81,21 @@ const schema = `
         name: String!
     }
     
-    type PortfolioUpdate {
-        image: GetDocumentLink
-        title: String!
-        body: String
-        createdAt: ISODateTime!
-    }
     
     type PortfolioAuthor {
         avatar: GetDocumentLink
-        name: String!
+        name: String
         id: ID!
     }
 
+    type PortfolioUpdate {
+        image: GetDocumentLink
+        title: String
+        body: String
+        createdAt: ISODateTime
+        author: PortfolioAuthor
+    }
+    
     input PropertyInput {
         keyMetrics: KeyMetricsInput
         impactMetrics: ImpactMetricsInput
@@ -225,8 +227,7 @@ export const PortfolioSchema = {
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-
-        return await api.getAllPortfolioUpdates();
+        return api.getAllPortfolioUpdates();
       },
       getAllPortfolioAuthors: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
@@ -235,7 +236,7 @@ export const PortfolioSchema = {
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
-        return await api.getAllPortfolioUpdates();
+        return await api.getAllPortfolioAuthors();
       },
     },
     Mutation: {
