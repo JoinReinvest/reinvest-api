@@ -19,6 +19,7 @@ export interface PayoutContentFieldsV1 extends TemplateContentType {
  */
 export const payoutTemplateV1: TemplateStructureType<PayoutDataType> = [
   {
+    paragraphs: [],
     // @ts-ignore
     tableContent: (content: PayoutContentFieldsV1) => content.data,
   },

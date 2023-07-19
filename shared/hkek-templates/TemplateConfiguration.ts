@@ -1,3 +1,7 @@
+import {
+  FundsWithdrawalRequestAgreementContentFieldsV1,
+  fundsWithdrawalRequestAgreementTemplateV1,
+} from 'Templates/Templates/FundsWithdrawalRequestAgreement/v1';
 import { GeneralAgreementHTMLTemplate } from 'Templates/Templates/HtmlGeneralTemplates/GeneralAgreementTemplate';
 import { PayoutHTMLTemplate } from 'Templates/Templates/HtmlGeneralTemplates/PayoutTemplate';
 import { RedemptionFormHTMLTemplate } from 'Templates/Templates/HtmlGeneralTemplates/RedemptionFormTemplate';
@@ -12,6 +16,7 @@ export const TemplateCurrentVersions: Record<Templates, TemplateVersion> = {
   [Templates.RECURRING_SUBSCRIPTION_AGREEMENT]: 1,
   [Templates.REDEMPTION_FORM]: 1,
   [Templates.PAYOUT]: 1,
+  [Templates.WITHDRAWAL_AGREEMENT]: 1,
 };
 
 export type LatestTemplateContentFields = {
@@ -19,6 +24,7 @@ export type LatestTemplateContentFields = {
   [Templates.RECURRING_SUBSCRIPTION_AGREEMENT]: RecurringSubscriptionAgreementContentFieldsV1;
   [Templates.REDEMPTION_FORM]: RedemptionFormContentFieldsV1;
   [Templates.PAYOUT]: PayoutContentFieldsV1;
+  [Templates.WITHDRAWAL_AGREEMENT]: FundsWithdrawalRequestAgreementContentFieldsV1;
 };
 
 export const TemplateMapping: Record<Templates, TemplateMappingType> = {
@@ -44,6 +50,12 @@ export const TemplateMapping: Record<Templates, TemplateMappingType> = {
     1: {
       template: payoutTemplateV1,
       html: PayoutHTMLTemplate,
+    },
+  },
+  [Templates.WITHDRAWAL_AGREEMENT]: {
+    1: {
+      template: fundsWithdrawalRequestAgreementTemplateV1,
+      html: GeneralAgreementHTMLTemplate,
     },
   },
 };
