@@ -45,7 +45,7 @@ export class UseCaseProvider {
     container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository]);
     container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository, PortfolioRepository, IdGenerator]);
     container.addSingleton(DeletePortfolioUpdate, [PortfolioUpdatesRepository]);
-    container.addSingleton(GetPortfolioUpdates, [PortfolioUpdatesRepository, PortfolioAuthorsRepository, DocumentsService]);
+    container.addSingleton(GetPortfolioUpdates, [PortfolioUpdatesRepository, PortfolioAuthorsRepository, DocumentsService, PortfolioRepository]);
     container.addSingleton(GetPortfolioAuthors, [PortfolioAuthorsRepository, DocumentsService]);
     container.addSingleton(AddPortfolioAuthor, [PortfolioAuthorsRepository, PortfolioRepository, IdGenerator]);
     container.addSingleton(DeletePortfolioAuthor, [PortfolioAuthorsRepository]);

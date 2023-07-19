@@ -26,7 +26,7 @@ export class GetPortfolioAuthors {
       const { avatar } = data;
 
       if (avatar) {
-        const imgLink = <FileLink>await this.documents.getImageFileLink({ id: avatar.id, path: avatar.url });
+        const imgLink = <FileLink>await this.documents.getImageFileLink({ id: avatar.id, path: "authors" });
         Object.assign(data.avatar, { url: imgLink.url, id: avatar.id });
       }
 
