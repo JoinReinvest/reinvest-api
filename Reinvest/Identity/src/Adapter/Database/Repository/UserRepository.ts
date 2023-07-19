@@ -5,12 +5,16 @@ import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/U
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 import { BanList } from 'Identity/Port/Api/BanController';
 import { User } from 'Identity/Port/Api/UserController';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class UserRepository {
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventBus = eventBus;
   }
 
   public static getClassName = (): string => 'UserRepository';
@@ -158,5 +162,9 @@ export class UserRepository {
       })
       .where('profileId', '=', profileId)
       .execute();
+  }
+
+  async publishEvent(event: DomainEvent): Promise<void> {
+    await this.eventBus.publish(event);
   }
 }

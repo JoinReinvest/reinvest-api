@@ -2,6 +2,7 @@ import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { CognitoService } from 'Identity/Adapter/AWS/CognitoService';
 import { UserRepository } from 'Identity/Adapter/Database/Repository/UserRepository';
 import { BanList } from 'Identity/Port/Api/BanController';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export type UserProfile = {
   isBannedAccount: (accountId: string) => boolean;
@@ -116,6 +117,12 @@ export class ProfileController {
       }
 
       await this.userRepository.updateUserEmail(userId, newEmail);
+      const profile = await this.userRepository.getUserProfile(userId);
+
+      if (profile) {
+        const { profileId } = profile;
+        await this.userRepository.publishEvent(storeEventCommand(profileId, 'EmailUpdated', { email: newEmail }));
+      }
 
       return true;
     } catch (error: any) {

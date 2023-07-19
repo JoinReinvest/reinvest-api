@@ -1,5 +1,6 @@
 import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class InvestmentStatusEventHandler {
   private investmentRepository: InvestmentsRepository;
@@ -40,13 +41,22 @@ export class InvestmentStatusEventHandler {
         await this.investmentRepository.store(investment);
         break;
       case TransactionEvents.TRANSACTION_REVERTED:
-        investment.revert();
-        await this.investmentRepository.store(investment);
+        if (investment.revert()) {
+          await this.investmentRepository.store(investment, [
+            storeEventCommand(investment.getProfileId(), 'InvestmentFailed', investment.forInvestmentEvent()),
+          ]);
+        }
+
         break;
       case TransactionEvents.INVESTMENT_FINISHED:
         console.log(`[${investmentId}] Investment completed`);
-        investment.complete();
-        await this.investmentRepository.store(investment);
+
+        if (investment.complete()) {
+          await this.investmentRepository.store(investment, [
+            storeEventCommand(investment.getProfileId(), 'InvestmentCompleted', investment.forInvestmentEvent()),
+          ]);
+        }
+
         break;
       case TransactionEvents.GRACE_PERIOD_ENDED:
         investment.settlingStarted();

@@ -45,7 +45,7 @@ const schema = `
         id: ID!
         notificationType: NotificationType!
         header: String!
-        body: String!
+        body: String
         date: ISODateTime!
         isRead: Boolean!
         isDismissible: Boolean!

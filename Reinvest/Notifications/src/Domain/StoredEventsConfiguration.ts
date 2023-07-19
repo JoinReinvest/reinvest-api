@@ -1,4 +1,3 @@
-import { DictionaryType } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { NotificationObjectType, NotificationsType } from 'Notifications/Domain/Notification';
@@ -11,6 +10,7 @@ export enum StoredEventKind {
   CorporateAccountOpened = 'CorporateAccountOpened',
   TrustAccountOpened = 'TrustAccountOpened',
   InvestmentProcessStarted = 'InvestmentProcessStarted',
+  RecurringInvestmentProcessStarted = 'RecurringInvestmentProcessStarted',
   PaymentInitiated = 'PaymentInitiated',
   PaymentFinished = 'PaymentFinished',
   TransactionCanceled = 'TransactionCanceled',
@@ -26,48 +26,61 @@ export enum StoredEventKind {
   WithdrawalRequestRejected = 'WithdrawalRequestRejected',
   WithdrawalRequestApproved = 'WithdrawalRequestApproved',
   WithdrawalRequestSent = 'WithdrawalRequestSent',
+  ProfileCompleted = 'ProfileCompleted',
+  InvestmentCompleted = 'InvestmentCompleted',
+  InvestmentFailed = 'InvestmentFailed',
+  RecurringInvestmentCreated = 'RecurringInvestmentCreated',
+  RecurringInvestmentDeactivated = 'RecurringInvestmentDeactivated',
+  ReferralRewardReceived = 'ReferralRewardReceived',
+  DividendReceived = 'DividendReceived',
+  AccountUpdated = 'AccountUpdated',
+  AccountBanned = 'AccountBanned',
+  AccountUnbanned = 'AccountUnbanned',
+  ProfileBanned = 'ProfileBanned',
+  ProfileUnbanned = 'ProfileUnbanned',
+  EmailUpdated = 'EmailUpdated',
+  FeesApprovalRequired = 'FeesApprovalRequired',
 }
 
 export const StoredEvents = <StoredEventsType>{
-  ArchivingBeneficiaryCompleted: {
-    accountActivity: {
-      data: ({ amountTransferred, numberOfShares, name, numberOfInvestments }) => ({
-        amountTransferred,
-        numberOfShares,
-        name,
-        numberOfInvestments,
-      }),
-      name: ({ numberOfShares }) => `Beneficiary archived. Transferred ${numberOfShares} shares to main account`,
-    },
-  },
   TransferringBeneficiaryToParentCompleted: {
-    accountActivity: {
-      data: ({ amountTransferred, numberOfShares, name, numberOfInvestments }) => ({
-        amountTransferred,
-        numberOfShares,
-        name,
-        numberOfInvestments,
+    inApp: {
+      header: ({ userName }) => `${userName}, the transfer of your beneficiary has been completed.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+      onObject: ({ accountId }) => ({
+        onObjectId: accountId,
+        onObjectType: NotificationObjectType.ACCOUNT,
       }),
-      name: ({ numberOfShares, name }) => `Beneficiary "${name}" is archived. ${numberOfShares} shares were transferred`,
+    },
+    push: {
+      title: () => `Beneficiary transferred.`,
+      body: () => '',
+    },
+    accountActivity: {
+      name: ({ userName }) => `Beneficiary transferred for ${userName}`,
+    },
+    analyticEvent: {
+      eventName: 'TransferringBeneficiaryToParentCompleted',
+      data: data => data,
     },
   },
   UserRegistered: {
-    accountActivity: {
-      name: ({ userName }) => `${userName} joined our platform.`,
-    },
-    push: {
-      title: ({ userName }) => `Welcome to our app, ${userName}!`,
-      body: () => '',
-    },
-
     inApp: {
       header: ({ userName }) => `Welcome, ${userName}!`,
       body: () => ` Let's get started with your investing journey.`,
       notificationType: NotificationsType.GENERIC_NOTIFICATION,
     },
+    push: {
+      title: ({ userName }) => `Welcome to our app, ${userName}!`,
+      body: () => '',
+    },
     email: {
       subject: () => 'Welcome to REINVEST Community!',
       body: ({ userName }) => `Dear ${userName}, welcome to our platform. Let's start your financial growth journey.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `${userName} joined our platform.`,
     },
     analyticEvent: {
       eventName: 'UserRegistered',
@@ -149,6 +162,19 @@ export const StoredEvents = <StoredEventsType>{
     },
   },
   InvestmentProcessStarted: {
+    inApp: {
+      header: ({ userName }) => `${userName}`,
+      body: () => `Your investment process has been started.`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    push: {
+      title: () => 'Investment process started.',
+      body: () => '',
+    },
+    email: {
+      subject: () => `Investment Initiated`,
+      body: ({ userName }) => `Dear ${userName}, your investment process has been initiated. We will keep you updated on the progress.`,
+    },
     accountActivity: {
       data: ({ amount, tradeId, origin, investmentId }) => ({
         amount,
@@ -156,34 +182,42 @@ export const StoredEvents = <StoredEventsType>{
         origin,
         investmentId,
       }),
-      name: investmentStartedBody,
+      name: ({ userName }) => `Investment process started for ${userName}.`,
     },
-    push: {
-      title: () => 'Investment started',
-      body: investmentStartedBody,
+    analyticEvent: {
+      eventName: 'InvestmentProcessStarted',
+      data: data => data,
     },
   },
   ArchivingBeneficiaryStarted: {
-    accountActivity: {
-      data: ({ label, beneficiaryId, accountId }) => ({
-        label,
-        beneficiaryId,
-        accountId,
-      }),
-      name: ({ label }) => `Beneficiary ${label} is being archived`,
-    },
-    push: {
-      title: () => 'Archiving beneficiary started',
-      body: ({ label }) => `Beneficiary ${label} is being archived`,
-    },
     inApp: {
-      header: () => 'Archiving beneficiary started',
-      body: ({ label }) => `Beneficiary ${label} is being archived`,
+      header: ({ userName }) => `${userName}, the process of archiving your beneficiary has started.`,
+      body: () => '',
       notificationType: NotificationsType.GENERIC_NOTIFICATION,
       onObject: ({ beneficiaryId }) => ({
         onObjectId: beneficiaryId,
         onObjectType: NotificationObjectType.ACCOUNT,
       }),
+    },
+    push: {
+      title: () => 'Archiving beneficiary started.',
+      body: () => ``,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Archiving of beneficiary started for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'ArchivingBeneficiaryStarted',
+      data: data => data,
+    },
+  },
+  ArchivingBeneficiaryCompleted: {
+    accountActivity: {
+      name: ({ userName }) => `Beneficiary archived for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'ArchivingBeneficiaryCompleted',
+      data: data => data,
     },
   },
   PaymentInitiated: {
@@ -273,28 +307,6 @@ export const StoredEvents = <StoredEventsType>{
     analyticEvent: {
       eventName: 'TransactionCanceled',
       data: data => data,
-    },
-  },
-  RecurringInvestmentSuspended: {
-    accountActivity: {
-      data: ({ recurringId, reason }) => ({
-        recurringId,
-        reason,
-      }),
-      name: ({ reason }) => `Recurring investment suspended. Reason: ${reason}`,
-    },
-    inApp: {
-      header: () => `Recurring investment suspended.`,
-      body: ({ reason }) => `${reason}`,
-      notificationType: NotificationsType.RECURRING_INVESTMENT_FAILED,
-      onObject: ({ recurringId }) => ({
-        onObjectId: recurringId,
-        onObjectType: NotificationObjectType.RECURRING_INVESTMENT,
-      }),
-    },
-    push: {
-      title: () => `Recurring investment suspended.`,
-      body: ({ reason }) => `${reason}`,
     },
   },
   SharesIssued: {
@@ -476,14 +488,359 @@ export const StoredEvents = <StoredEventsType>{
       data: data => data,
     },
   },
+  ProfileCompleted: {
+    inApp: {
+      header: ({ userName }) => `${userName}`,
+      body: () => `Your profile has been created successfully.`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => `Profile Created`,
+      body: ({ label }) => `Dear ${label}, your profile has been created successfully.`,
+    },
+    accountActivity: {
+      name: ({ label }) => `${label}'s profile was created.`,
+    },
+    analyticEvent: {
+      eventName: 'ProfileCompleted',
+      sendIdentity: () => true,
+      identityData: data => data,
+      data: data => data,
+    },
+  },
+  InvestmentCompleted: {
+    inApp: {
+      header: ({ userName }) => `${userName}`,
+      body: () => `Your investment process was successful.`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    push: {
+      title: () => 'Investment process successful.',
+      body: () => '',
+    },
+    email: {
+      subject: () => `Investment Successful`,
+      body: ({ userName }) => `Dear ${userName}, we are happy to inform you that your investment process was successful.`,
+    },
+    accountActivity: {
+      data: ({ amount, tradeId, origin, investmentId }) => ({
+        amount,
+        tradeId,
+        origin,
+        investmentId,
+      }),
+      name: ({ userName }) => `Investment process was successful for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'InvestmentCompleted',
+      data: data => data,
+    },
+  },
+  InvestmentFailed: {
+    inApp: {
+      header: ({ userName }) => `${userName}`,
+      body: () => `Your recent investment process has failed. Please try again.`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    push: {
+      title: () => 'Investment process failed.',
+      body: () => '',
+    },
+    email: {
+      subject: () => `Investment process failure`,
+      body: ({ userName }) =>
+        `Dear ${userName}, we're sorry to inform you that your recent investment process failed. Please try again or contact support if the problem persists.`,
+    },
+    accountActivity: {
+      data: ({ amount, tradeId, origin, investmentId }) => ({
+        amount,
+        tradeId,
+        origin,
+        investmentId,
+      }),
+      name: ({ userName }) => `Investment process failed for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'InvestmentFailed',
+      data: data => data,
+    },
+  },
+  RecurringInvestmentProcessStarted: {
+    inApp: {
+      header: ({ userName }) => `${userName}`,
+      body: () => `The scheduled investment process has started.`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => `Scheduled investment started`,
+      body: ({ userName }) => `Dear ${userName} the scheduled investment process has started. We'll notify you once it's complete.`,
+    },
+    accountActivity: {
+      data: ({ amount, tradeId, origin, investmentId }) => ({
+        amount,
+        tradeId,
+        origin,
+        investmentId,
+      }),
+      name: ({ userName }) => `Scheduled investment process started for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'RecurringInvestmentProcessStarted',
+      data: data => data,
+    },
+  },
+  RecurringInvestmentCreated: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your recurring investment schedule has been created.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => `Recurring Investment scheduled`,
+      body: ({ userName }) => `Dear ${userName}, your recurring investment schedule has been created successfully.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Recurring investment schedule created for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'RecurringInvestmentCreated',
+      data: data => data,
+    },
+  },
+  RecurringInvestmentDeactivated: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your recurring investment schedule has been canceled.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => `Recurring investment schedule canceled`,
+      body: ({ userName }) => `Dear ${userName}, your recurring investment schedule has been canceled.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Recurring investment schedule canceled for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'RecurringInvestmentDeactivated',
+      data: data => data,
+    },
+  },
+  RecurringInvestmentSuspended: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your recurring investment schedule has been suspended.`,
+      body: () => '',
+      notificationType: NotificationsType.RECURRING_INVESTMENT_FAILED,
+      onObject: ({ recurringId }) => ({
+        onObjectId: recurringId,
+        onObjectType: NotificationObjectType.RECURRING_INVESTMENT,
+      }),
+    },
+    push: {
+      title: () => `Investment schedule suspended.`,
+      body: () => '',
+    },
+    email: {
+      subject: () => `Recurring investment suspended`,
+      body: ({ userName }) => `Dear ${userName}, your recurring investment schedule has been temporarily suspended.`,
+    },
+    accountActivity: {
+      name: () => 'Recurring investment schedule suspended',
+    },
+    analyticEvent: {
+      eventName: 'RecurringInvestmentSuspended',
+      data: data => data,
+    },
+  },
+  ReferralRewardReceived: {
+    inApp: {
+      header: ({ userName }) => `Congratulations ${userName}`,
+      body: () => "You've received a referral reward!",
+      notificationType: NotificationsType.REWARD_DIVIDEND_RECEIVED,
+      onObject: ({ rewardId }) => ({
+        onObjectId: rewardId,
+        onObjectType: NotificationObjectType.DIVIDEND,
+      }),
+    },
+    push: {
+      title: () => `Referral reward received!`,
+      body: () => '',
+    },
+    accountActivity: {
+      name: ({ userName }) => `Referral reward received by ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'ReferralRewardReceived',
+      data: data => data,
+    },
+  },
+  DividendReceived: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your dividends have been updated. Please check your account.`,
+      body: () => '',
+      notificationType: NotificationsType.DIVIDEND_RECEIVED,
+      onObject: ({ dividendId }) => ({
+        onObjectId: dividendId,
+        onObjectType: NotificationObjectType.DIVIDEND,
+      }),
+    },
+    push: {
+      title: () => `Dividends updated.`,
+      body: () => '',
+    },
+    email: {
+      subject: () => `Dividends update`,
+      body: ({ userName }) => `Dear ${userName}, your dividends have been updated. Please log in to your account for more details.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Dividends updated for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'DividendReceived',
+      data: data => data,
+    },
+  },
+  AccountUpdated: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your account has been updated successfully.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+      onObject: ({ accountId }) => ({
+        onObjectId: accountId,
+        onObjectType: NotificationObjectType.ACCOUNT,
+      }),
+    },
+    email: {
+      subject: () => `Account updated`,
+      body: ({ userName }) => `Dear ${userName}, your account has been updated successfully.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `${userName}'s account was updated.`,
+    },
+    analyticEvent: {
+      eventName: 'AccountUpdated',
+      data: data => data,
+    },
+  },
+  AccountBanned: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your account has been banned due to policy violation.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+      onObject: ({ accountId }) => ({
+        onObjectId: accountId,
+        onObjectType: NotificationObjectType.ACCOUNT,
+      }),
+    },
+    email: {
+      subject: () => `Account banned`,
+      body: ({ userName }) => `Dear ${userName}, your account has been banned due to a policy violation. Please contact support for more information.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Account banned for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'AccountBanned',
+      data: data => data,
+    },
+  },
+  ProfileBanned: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your profile has been banned due to policy violation.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => `Profile banned`,
+      body: ({ userName }) => `Dear ${userName}, your profile has been banned due to a policy violation. Please contact support for more information.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Profile banned for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'ProfileBanned',
+      data: data => data,
+    },
+  },
+  AccountUnbanned: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your account has been unbanned. Please adhere to our policies.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+      onObject: ({ accountId }) => ({
+        onObjectId: accountId,
+        onObjectType: NotificationObjectType.ACCOUNT,
+      }),
+    },
+    email: {
+      subject: () => `Account unbanned`,
+      body: ({ userName }) => `Dear ${userName}, your account has been unbanned. Please ensure you adhere to our policies going forward.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Account unbanned for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'AccountUnbanned',
+      data: data => data,
+    },
+  },
+  ProfileUnbanned: {
+    inApp: {
+      header: ({ userName }) => `${userName}, your profile has been unbanned. Please adhere to our policies.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => `Profile unbanned`,
+      body: ({ userName }) => `Dear ${userName}, your profile has been unbanned. Please ensure you adhere to our policies going forward.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Profile unbanned for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'ProfileUnbanned',
+      data: data => data,
+    },
+  },
+  EmailUpdated: {
+    inApp: {
+      header: ({ userName }) => `Your email has been updated successfully, ${userName}.`,
+      body: () => '',
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => `Email updated`,
+      body: ({ userName }) => `Dear ${userName}, your email has been updated successfully.`,
+    },
+    accountActivity: {
+      name: ({ userName }) => `Email updated for ${userName}.`,
+    },
+    analyticEvent: {
+      eventName: 'EmailUpdated',
+      data: data => data,
+      identityData: data => data,
+      sendIdentity: () => true,
+    },
+  },
+  FeesApprovalRequired: {
+    inApp: {
+      header: ({ userName }) => `${userName}, please approve the fees to proceed.`,
+      body: () => '',
+      notificationType: NotificationsType.FEES_APPROVAL_REQUIRED,
+      onObject: ({ investmentId }) => ({
+        onObjectId: investmentId,
+        onObjectType: NotificationObjectType.INVESTMENT,
+      }),
+    },
+    push: {
+      title: () => `Fees approval required.`,
+      body: () => '',
+    },
+    email: {
+      subject: () => 'Fee approval requirement',
+      body: ({ userName }) => `Dear ${userName}, please approve the fees for your recent transaction to proceed.`,
+    },
+  },
 };
-
-function investmentStartedBody({ amount, tradeId }: DictionaryType): string {
-  const castedAmount = parseInt(amount);
-  const formattedAmount = Money.lowPrecision(castedAmount).getFormattedAmount();
-
-  return `Trade ${tradeId} started with amount ${formattedAmount}`;
-}
 
 function transactionAndTimeBody(tradeId: string, date: string): string {
   return `Transaction ID: ${tradeId}<br/>${timeBody(date)}`;

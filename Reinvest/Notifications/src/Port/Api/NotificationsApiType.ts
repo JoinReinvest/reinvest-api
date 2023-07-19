@@ -3,7 +3,7 @@ import { NotificationsController } from 'Notifications/Port/Api/NotificationsCon
 import { StoredEventsController } from 'Notifications/Port/Api/StoredEventsController';
 
 export type NotificationsApiType = {
-  createNotification: NotificationsController['createNotification'];
+  createStoredEvent: NotificationsController['createStoredEvent'];
   dismissNotifications: NotificationsController['dismissNotifications'];
   getNotifications: NotificationsController['getNotifications'];
   getNotificationsStats: NotificationsController['getNotificationsStats'];
@@ -15,7 +15,7 @@ export type NotificationsApiType = {
 };
 
 export const NotificationsApi = (container: ContainerInterface): NotificationsApiType => ({
-  createNotification: container.delegateTo(NotificationsController, 'createNotification'),
+  createStoredEvent: container.delegateTo(NotificationsController, 'createStoredEvent'),
   dismissNotifications: container.delegateTo(NotificationsController, 'dismissNotifications'),
   getNotifications: container.delegateTo(NotificationsController, 'getNotifications'),
   getNotificationsStats: container.delegateTo(NotificationsController, 'getNotificationsStats'),

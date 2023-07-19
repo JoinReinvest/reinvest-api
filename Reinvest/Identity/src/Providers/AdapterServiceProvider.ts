@@ -46,7 +46,7 @@ export class AdapterServiceProvider {
       )
       .addSingleton(PhoneRepository, [DatabaseAdapterProvider, TransactionalAdapter, SmsService, CognitoService])
       .addSingleton(IncentiveTokenRepository, [DatabaseAdapterProvider, UniqueTokenGenerator])
-      .addSingleton(UserRepository, [DatabaseAdapterProvider]);
+      .addSingleton(UserRepository, [DatabaseAdapterProvider, SimpleEventBus]);
     container.addSingleton(ProfileService, ['InvestmentAccounts']);
   }
 }

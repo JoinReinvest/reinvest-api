@@ -213,6 +213,10 @@ export class StoredEvent {
     const identityData = config.identityData ? config.identityData(payload) : {};
     const sendIdentity = config.sendIdentity ? config.sendIdentity(payload) : false;
 
+    if (sendIdentity && !!this.getUserEmail()) {
+      identityData['email'] = this.getUserEmail()!;
+    }
+
     return {
       profileId: this.storedEventSchema.profileId,
       eventName,

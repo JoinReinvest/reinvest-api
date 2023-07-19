@@ -91,28 +91,6 @@ export class CreateInvestmentFromRecurringInvestment {
       thisExecutionDate,
     );
 
-    const events: DomainEvent[] = [
-      <InvestmentCreated>{
-        id: investmentId,
-        kind: TransactionEvents.INVESTMENT_CREATED,
-        date: DateTime.now().toDate(),
-        data: {
-          profileId,
-          accountId: accountId,
-          portfolioId: portfolioId,
-          parentId: parentId,
-          amount: amount.getAmount(),
-        },
-      },
-      storeEventCommand(profileId, 'RecurringInvestmentProcessStarted', {
-        accountId: accountId,
-        amount: amount.getAmount(),
-        tradeId: tradeId,
-        origin: Origin.SCHEDULER,
-        investmentId: investmentId,
-      }),
-    ];
-
     await this.transactionAdapter.transaction(`Create investment ${investmentId} from recurring investment ${recurringInvestmentId}`, async () => {
       const fee = await this.feeService.calculateFee(amount, profileId, accountId, investmentId);
 
@@ -124,6 +102,22 @@ export class CreateInvestmentFromRecurringInvestment {
       await this.recurringInvestmentsRepository.store(recurringInvestment);
       await this.investmentRepository.store(investment);
       await this.recurringInvestmentExecutionRepository.store(currentInvestmentExecution);
+
+      const events: DomainEvent[] = [
+        <InvestmentCreated>{
+          id: investmentId,
+          kind: TransactionEvents.INVESTMENT_CREATED,
+          date: DateTime.now().toDate(),
+          data: {
+            profileId,
+            accountId: accountId,
+            portfolioId: portfolioId,
+            parentId: parentId,
+            amount: amount.getAmount(),
+          },
+        },
+        storeEventCommand(investment.getProfileId(), 'RecurringInvestmentProcessStarted', investment.forInvestmentEvent()),
+      ];
 
       await this.investmentRepository.publishEvents(events);
     });

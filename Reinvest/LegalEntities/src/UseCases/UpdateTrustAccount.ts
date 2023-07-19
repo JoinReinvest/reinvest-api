@@ -1,6 +1,9 @@
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { UpdateCompany, UpdateCompanyAccountInput } from 'LegalEntities/Service/UpdateCompany';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
+
 export class UpdateTrustAccount {
   public static getClassName = (): string => 'UpdateTrustAccount';
   private accountRepository: AccountRepository;
@@ -26,6 +29,14 @@ export class UpdateTrustAccount {
     const { errors: updateErrors, events } = await this.updateCompany.update(corporateAccount, input, profileId);
 
     await this.accountRepository.updateCompanyAccount(corporateAccount, events);
+
+    events.push(
+      storeEventCommand(profileId, 'AccountUpdated', {
+        accountId,
+        type: AccountType.TRUST,
+        updatedFields: Object.keys(input),
+      }),
+    );
 
     return [...errors, ...updateErrors];
   }

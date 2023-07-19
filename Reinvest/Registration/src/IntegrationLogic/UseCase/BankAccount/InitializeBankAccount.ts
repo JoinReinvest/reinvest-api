@@ -3,23 +3,27 @@ import { BankAccountRepository } from 'Registration/Adapter/Database/Repository/
 import { RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 import { NorthCapitalAdapter } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { BankAccount, PlaidLink } from 'Registration/Domain/Model/BankAccount';
+import { ImmediateSynchronize } from 'Registration/IntegrationLogic/UseCase/ImmediateSynchronize';
 
 export class InitializeBankAccount {
   private bankAccountRepository: BankAccountRepository;
   private registryQueryRepository: RegistryQueryRepository;
   private northCapitalAdapter: NorthCapitalAdapter;
   private idGenerator: IdGeneratorInterface;
+  private immediateSynchronizeUseCase: ImmediateSynchronize;
 
   constructor(
     bankAccountRepository: BankAccountRepository,
     registryQueryRepository: RegistryQueryRepository,
     northCapitalAdapter: NorthCapitalAdapter,
     idGenerator: IdGeneratorInterface,
+    immediateSynchronizeUseCase: ImmediateSynchronize,
   ) {
     this.registryQueryRepository = registryQueryRepository;
     this.bankAccountRepository = bankAccountRepository;
     this.northCapitalAdapter = northCapitalAdapter;
     this.idGenerator = idGenerator;
+    this.immediateSynchronizeUseCase = immediateSynchronizeUseCase;
   }
 
   static getClassName = () => 'InitializeBankAccount';
@@ -39,11 +43,16 @@ export class InitializeBankAccount {
       }
 
       // find north capital id for the account
-      const northCapitalId = await this.registryQueryRepository.findNorthCapitalAccountId(profileId, accountId);
+      let northCapitalId = await this.registryQueryRepository.findNorthCapitalAccountId(profileId, accountId);
 
       if (!northCapitalId) {
-        // TODO if north capital id not exists, trigger registration process - if it fails, reject the request
-        throw new Error('North Capital account not synchronized');
+        // TODO still something not work here
+        await this.immediateSynchronizeUseCase.immediatelySynchronizeAccount(profileId, accountId);
+        northCapitalId = await this.registryQueryRepository.findNorthCapitalAccountId(profileId, accountId);
+
+        if (!northCapitalId) {
+          throw new Error('North Capital account not synchronized');
+        }
       }
 
       const bankAccountId = this.idGenerator.createUuid();

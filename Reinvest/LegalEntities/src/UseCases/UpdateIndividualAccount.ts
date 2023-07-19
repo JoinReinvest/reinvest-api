@@ -1,9 +1,11 @@
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { Employer, EmployerInput } from 'LegalEntities/Domain/ValueObject/Employer';
 import { EmploymentStatus, EmploymentStatusInput } from 'LegalEntities/Domain/ValueObject/EmploymentStatus';
 import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { NetIncome, NetWorth, ValueRangeInput } from 'LegalEntities/Domain/ValueObject/ValueRange';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type UpdateIndividualAccountInput = {
@@ -90,6 +92,14 @@ export class UpdateIndividualAccount {
           }
         }
       }
+
+      events.push(
+        storeEventCommand(profileId, 'AccountUpdated', {
+          accountId,
+          type: AccountType.INDIVIDUAL,
+          updatedFields: inputKeys,
+        }),
+      );
 
       await this.accountRepository.updateIndividualAccount(account, events);
     } catch (error: any) {
