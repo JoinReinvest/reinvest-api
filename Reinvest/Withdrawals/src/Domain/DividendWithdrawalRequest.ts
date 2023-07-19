@@ -15,9 +15,9 @@ export type DividendRequestSchema = {
 
   eligibleAmount: number;
   id: UUID;
-  payoutId: UUID | null;
   profileId: UUID;
   status: DividendWithdrawalDecision;
+  withdrawalId: UUID | null;
 };
 
 export enum DividendWithdrawalDecision {
@@ -43,8 +43,16 @@ export class DividendWithdrawalRequest {
     this.dividendRequestSchema.dateDecided = DateTime.now().toDate();
   }
 
+  getId(): UUID {
+    return this.dividendRequestSchema.id;
+  }
+
   getObject(): DividendRequestSchema {
     return this.dividendRequestSchema;
+  }
+
+  assignWithdrawalId(id: UUID) {
+    this.dividendRequestSchema.withdrawalId = id;
   }
 
   static restore(dividendRequestSchema: DividendRequestSchema): DividendWithdrawalRequest {
@@ -59,7 +67,7 @@ export class DividendWithdrawalRequest {
       dividendId: dividend.id,
       eligibleAmount: dividend.amount.getAmount(),
       id,
-      payoutId: null,
+      withdrawalId: null,
       profileId,
       status: DividendWithdrawalDecision.REQUESTED,
     });

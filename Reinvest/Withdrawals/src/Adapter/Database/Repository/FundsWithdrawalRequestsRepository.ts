@@ -102,6 +102,26 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
+  async assignWithdrawalId(fundsWithdrawalRequest: FundsWithdrawalRequest) {
+    const { withdrawalId } = fundsWithdrawalRequest.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(withdrawalsFundsRequestsTable)
+        .set({
+          withdrawalId,
+        })
+        .where('id', '=', fundsWithdrawalRequest.getId())
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot assign withdrawalId: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
   async publishEvents(events: DomainEvent[] = []): Promise<void> {
     if (events.length === 0) {
       return;
@@ -126,5 +146,24 @@ export class FundsWithdrawalRequestsRepository {
     }
 
     return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
+  }
+
+  async getAllAcceptedWithdrawalRequests(): Promise<FundsWithdrawalRequest[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('withdrawalId', '=', null)
+      .where('status', '=', WithdrawalsFundsRequestsStatuses.ACCEPTED)
+      .castTo<FundsWithdrawalRequestSchema>()
+      .execute();
+
+    if (!data.length) {
+      return [];
+    }
+
+    const fundsWithdrawalRequests = data.map(fundsWithdrawalRequest => FundsWithdrawalRequest.create(fundsWithdrawalRequest));
+
+    return fundsWithdrawalRequests;
   }
 }

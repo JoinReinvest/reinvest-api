@@ -4,6 +4,7 @@ import { WithdrawalsAgreementController } from 'Withdrawals/Port/Api/Withdrawals
 import { WithdrawalsController } from 'Withdrawals/Port/Api/WithdrawalsController';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
 import { CreateFundsWithdrawalAgreement } from 'Withdrawals/UseCase/CreateFundsWithdrawalAgreement';
+import CreateWithdrawal from 'Withdrawals/UseCase/CreateWithdrawal';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
 import GetFundsWithdrawalAgreement from 'Withdrawals/UseCase/GetFundsWithdrawalAgreement';
 import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
@@ -28,6 +29,7 @@ export class PortsProvider {
       WithdrawDividend,
       AbortFundsWithdrawalRequest,
       RequestFundWithdrawal,
+      CreateWithdrawal,
     ]);
     container.addSingleton(WithdrawalsAgreementController, [CreateFundsWithdrawalAgreement, GetFundsWithdrawalAgreement, SignFundsWithdrawalRequestAgreement]);
   }

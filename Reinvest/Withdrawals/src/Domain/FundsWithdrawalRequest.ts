@@ -31,17 +31,16 @@ export type FundsWithdrawalRequestSchema = {
   id: UUID;
   investorWithdrawalReason: string | null;
   numberOfShares: number;
-  payoutId: UUID | null;
   profileId: UUID;
-  redemptionId: UUID | null;
   sharesJson: SettledSharesData[];
   status: WithdrawalsFundsRequestsStatuses;
   totalDividends: number;
   totalFee: number;
   totalFunds: number;
+  withdrawalId: UUID | null;
 };
 
-export enum WithdrawalStatus {
+export enum FundsWithdrawalStatus {
   AWAITING_SIGNING_AGREEMENT = 'AWAITING_SIGNING_AGREEMENT',
   DRAFT = 'DRAFT',
   AWAITING_DECISION = 'AWAITING_DECISION',
@@ -73,9 +72,8 @@ export class FundsWithdrawalRequest {
   private id: UUID;
   private investorWithdrawalReason: string | null;
   private numberOfShares: number;
-  private payoutId: UUID | null;
   private profileId: UUID;
-  private redemptionId: UUID | null;
+  private withdrawalId: UUID | null;
   private sharesJson: SettledSharesData[];
   private status: WithdrawalsFundsRequestsStatuses;
   private totalDividends: number;
@@ -94,9 +92,8 @@ export class FundsWithdrawalRequest {
     id: UUID,
     investorWithdrawalReason: string | null,
     numberOfShares: number,
-    payoutId: UUID | null,
     profileId: UUID,
-    redemptionId: UUID | null,
+    withdrawalId: UUID | null,
     sharesJson: SettledSharesData[],
     status: WithdrawalsFundsRequestsStatuses,
     totalDividends: number,
@@ -114,9 +111,8 @@ export class FundsWithdrawalRequest {
     this.id = id;
     this.investorWithdrawalReason = investorWithdrawalReason;
     this.numberOfShares = numberOfShares;
-    this.payoutId = payoutId;
     this.profileId = profileId;
-    this.redemptionId = redemptionId;
+    this.withdrawalId = withdrawalId;
     this.sharesJson = sharesJson;
     this.status = status;
     this.totalDividends = totalDividends;
@@ -137,9 +133,8 @@ export class FundsWithdrawalRequest {
       id,
       investorWithdrawalReason,
       numberOfShares,
-      payoutId,
       profileId,
-      redemptionId,
+      withdrawalId,
       sharesJson,
       status,
       totalDividends,
@@ -159,9 +154,8 @@ export class FundsWithdrawalRequest {
       id,
       investorWithdrawalReason,
       numberOfShares,
-      payoutId,
       profileId,
-      redemptionId,
+      withdrawalId,
       sharesJson,
       status,
       totalDividends,
@@ -198,22 +192,26 @@ export class FundsWithdrawalRequest {
     this.status = WithdrawalsFundsRequestsStatuses.REQUESTED;
   }
 
-  getWithdrawalStatus(): WithdrawalStatus {
+  assignWithdrawalId(id: UUID) {
+    this.withdrawalId = id;
+  }
+
+  getWithdrawalStatus(): FundsWithdrawalStatus {
     switch (this.status) {
       case WithdrawalsFundsRequestsStatuses.REQUESTED:
-        return WithdrawalStatus.AWAITING_DECISION;
+        return FundsWithdrawalStatus.AWAITING_DECISION;
       case WithdrawalsFundsRequestsStatuses.ACCEPTED:
-        return WithdrawalStatus.APPROVED;
+        return FundsWithdrawalStatus.APPROVED;
       case WithdrawalsFundsRequestsStatuses.REJECTED:
-        return WithdrawalStatus.REJECTED;
+        return FundsWithdrawalStatus.REJECTED;
       case WithdrawalsFundsRequestsStatuses.DRAFT:
         if (!this.agreementId) {
-          return WithdrawalStatus.AWAITING_SIGNING_AGREEMENT;
+          return FundsWithdrawalStatus.AWAITING_SIGNING_AGREEMENT;
         } else {
-          return WithdrawalStatus.DRAFT;
+          return FundsWithdrawalStatus.DRAFT;
         }
       default:
-        return WithdrawalStatus.DRAFT;
+        return FundsWithdrawalStatus.DRAFT;
     }
   }
 
@@ -230,9 +228,8 @@ export class FundsWithdrawalRequest {
       id: this.id,
       investorWithdrawalReason: this.investorWithdrawalReason,
       numberOfShares: this.numberOfShares,
-      payoutId: this.payoutId,
       profileId: this.profileId,
-      redemptionId: this.redemptionId,
+      withdrawalId: this.withdrawalId,
       sharesJson: this.sharesJson,
       status: this.status,
       totalDividends: this.totalDividends,

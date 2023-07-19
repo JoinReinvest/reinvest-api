@@ -1,6 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
+import CreateWithdrawal from 'Withdrawals/UseCase/CreateWithdrawal';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
 import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
@@ -14,6 +15,7 @@ export class WithdrawalsController {
   private withdrawDividendUseCase: WithdrawDividend;
   private abortFundsWithdrawalRequestUseCase: AbortFundsWithdrawalRequest;
   private requestFundWithdrawalUseCase: RequestFundWithdrawal;
+  private createWithdrawalUseCase: CreateWithdrawal;
 
   constructor(
     withdrawalsQuery: WithdrawalsQuery,
@@ -22,6 +24,7 @@ export class WithdrawalsController {
     withdrawDividendUseCase: WithdrawDividend,
     abortFundsWithdrawalRequestUseCase: AbortFundsWithdrawalRequest,
     requestFundWithdrawalUseCase: RequestFundWithdrawal,
+    createWithdrawalUseCase: CreateWithdrawal,
   ) {
     this.withdrawalsQuery = withdrawalsQuery;
     this.createWithdrawalFundsRequestUseCase = createWithdrawalFundsRequestUseCase;
@@ -29,6 +32,7 @@ export class WithdrawalsController {
     this.withdrawDividendUseCase = withdrawDividendUseCase;
     this.abortFundsWithdrawalRequestUseCase = abortFundsWithdrawalRequestUseCase;
     this.requestFundWithdrawalUseCase = requestFundWithdrawalUseCase;
+    this.createWithdrawalUseCase = createWithdrawalUseCase;
   }
 
   static getClassName = () => 'WithdrawalsController';
@@ -74,6 +78,10 @@ export class WithdrawalsController {
 
   async requestFundWithdrawal(profileId: UUID, accountId: UUID) {
     return this.requestFundWithdrawalUseCase.execute(profileId, accountId);
+  }
+
+  async prepareWithdrawalDocuments() {
+    return this.createWithdrawalUseCase.execute();
   }
 
   async withdrawDividends(profileId: UUID, accountId: UUID, dividendIds: UUID[]): Promise<boolean> {

@@ -1,5 +1,5 @@
 import * as handlebars from 'handlebars';
-import { HtmlTemplate, TemplateStructureType } from 'Templates/Types';
+import { HtmlTemplate, Templates, TemplateStructureType } from 'Templates/Types';
 
 handlebars.registerHelper('bold_text', function (str) {
   return new handlebars.SafeString(str);
@@ -30,7 +30,7 @@ export class HTMLParser {
     return replacedLines;
   }
 
-  private formatTemplate() {
+  private getAgreementFormattedTemplate() {
     const formattedTemplate = this.dataTemplate.map(({ paragraphs, header }) => {
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
@@ -50,8 +50,37 @@ export class HTMLParser {
     return formattedTemplate;
   }
 
-  getHTML(): string {
-    const formattedTemplate = this.formatTemplate();
+  private getRedemptionFormattedTemplate() {
+    const formattedTemplate = this.dataTemplate.map(({ paragraphs, tableContent }) => {
+      const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
+        const obj = {
+          lines: this.prepareLines(<string[]>lines),
+        };
+
+        if (isCheckedOption !== undefined) {
+          Object.assign(obj, { isCheckedOption });
+        }
+
+        return obj;
+      });
+
+      return { paragraphs: updatedParagraphs, tableContent };
+    });
+
+    return formattedTemplate;
+  }
+
+  private getFormattedTemplate(templateName: Templates) {
+    switch (templateName) {
+      case Templates.SUBSCRIPTION_AGREEMENT:
+      case Templates.RECURRING_SUBSCRIPTION_AGREEMENT:
+        return this.getAgreementFormattedTemplate();
+      case Templates.REDEMPTION_FORM:
+        return this.getRedemptionFormattedTemplate();
+    }
+  }
+  getHTML(templateName: Templates): string {
+    const formattedTemplate = this.getFormattedTemplate(templateName);
 
     return handlebars.compile(this.htmlTemplate)({ items: formattedTemplate });
   }

@@ -45,7 +45,7 @@ const schema = `
         isCompleted: Boolean!
     }
 
-    enum WithdrawalStatus {
+    enum FundsWithdrawalStatus {
         PENDING
         READY_TO_SEND
         COMPLETED
@@ -53,7 +53,7 @@ const schema = `
 
     type Withdrawal {
         id: ID!
-        status: WithdrawalStatus!
+        status: FundsWithdrawalStatus!
         "Use getAdminDocument to download"
         redemptionId: ID!
         "Use getAdminDocument to download"

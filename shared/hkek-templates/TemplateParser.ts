@@ -29,8 +29,10 @@ export class TemplateParser {
   }
 
   static parse(template: TemplateStructureType, content: TemplateContentType): TemplateStructureType {
-    return template.map(({ paragraphs, header }) => {
+    return template.map(({ paragraphs, tableContent, header }) => {
       let updatedHeader = undefined;
+      let tableContentData = undefined;
+
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
           lines: this.prepareLines(this.resolveLines(lines, content), content),
@@ -43,11 +45,15 @@ export class TemplateParser {
         return obj;
       });
 
+      if (tableContent) {
+        tableContentData = tableContent(content);
+      }
+
       if (header) {
         updatedHeader = this.replace(header, content);
       }
 
-      return { header: updatedHeader, paragraphs: updatedParagraphs };
+      return { header: updatedHeader, paragraphs: updatedParagraphs, tableContentData };
     });
   }
 
