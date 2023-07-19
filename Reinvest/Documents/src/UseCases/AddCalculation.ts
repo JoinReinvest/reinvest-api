@@ -9,8 +9,8 @@ class AddCalculation {
         this.calculationsRepository = calculationsRepository
     }
 
-    async execute (id: UUID, data: string) {
-        return this.calculationsRepository.create(id, data)
+    async execute (id: UUID, email:string, data: string) {
+        return this.calculationsRepository.create(id, email, data)
     }
 }
 

@@ -10,13 +10,14 @@ export class CalculationsRepository {
         this.documentsDatabaseAdapterProvider = documentsDatabaseAdapterProvider
     }
 
-    async create (id: UUID, data: string) {
+    async create (id: UUID, email: string, data: string) {
         try {
             await this.documentsDatabaseAdapterProvider
                 .provide()
                 .insertInto(calculationsTable)
                 .values({
                     id,
+                    email,
                     data,
                 })
                 .execute()
@@ -35,7 +36,7 @@ export class CalculationsRepository {
                 .select(['data'])
                 .where('id', '=', id)
                 .limit(1)
-                .executeTakeFirst();
+                .executeTakeFirst()
 
             return calculationData?.data || false
         } catch (err: any) {

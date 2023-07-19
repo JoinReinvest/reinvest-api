@@ -87,7 +87,7 @@ app.post('/webhooks/updateTrade', async function (req: any, res: any) {
 
 app.post('/calculations', async function (req: any, res: any) {
     const modules = boot()
-    const calculationData = req.body
+    const { profileId, calculations } = req.body
 
     const documentsApi = modules.getApi<Documents.ApiType>(Documents)
 
@@ -95,7 +95,7 @@ app.post('/calculations', async function (req: any, res: any) {
         return
     }
 
-    const calculationId = await documentsApi.addCalculation(calculationData)
+    const calculationId = await documentsApi.addCalculation(profileId, calculations)
 
     await modules.close()
 
@@ -117,6 +117,23 @@ app.post('/calculations/:id', async function (req: any, res: any) {
     await modules.close()
 
     res.json({ status: true, data: calculationData })
+})
+
+app.post('/create-pdf/', async function (req: any, res: any) {
+    const modules = boot()
+    const { url } = req.params
+
+    const documentsApi = modules.getApi<Documents.ApiType>(Documents)
+
+    if (!documentsApi) {
+        return
+    }
+
+    const documentId = await documentsApi.renderPageToPdf(url, 'calculation', url)
+
+    await modules.close()
+
+    res.json({ status: true, data: documentId })
 })
 
 export const main = serverless(app)
