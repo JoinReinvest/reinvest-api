@@ -1,5 +1,6 @@
 import { AdminSessionContext } from 'AdminApiGateway/index';
 import { GraphQLError } from 'graphql';
+import { Withdrawals as WithdrawalsApi } from 'Withdrawals/index';
 
 const schema = `
     #graphql
@@ -115,19 +116,27 @@ export const Withdrawals = {
       },
     },
     Mutation: {
-      acceptWithdrawalRequests: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+      acceptWithdrawalRequests: async (parent: any, { ids }: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
-        return null;
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+
+        const status = api.acceptWithdrawalRequests(ids);
+
+        return status;
       },
-      rejectWithdrawalRequests: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+      rejectWithdrawalRequests: async (parent: any, { ids, reason }: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
-        return null;
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+
+        const status = api.rejectWithdrawalRequests(ids, reason);
+
+        return status;
       },
       prepareWithdrawalDocuments: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {

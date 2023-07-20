@@ -180,6 +180,17 @@ export class FundsWithdrawalRequest {
     }
   }
 
+  accept(): void {
+    this.status = WithdrawalsFundsRequestsStatuses.ACCEPTED;
+    this.dateDecision = new Date();
+  }
+
+  reject(decisionReason: string): void {
+    this.status = WithdrawalsFundsRequestsStatuses.REJECTED;
+    this.dateDecision = new Date();
+    this.adminDecisionReason = decisionReason;
+  }
+
   request() {
     if (!this.isAgreementAssigned()) {
       throw new Error(WithdrawalError.WITHDRAWAL_AGREEMENT_NOT_SIGNED);
