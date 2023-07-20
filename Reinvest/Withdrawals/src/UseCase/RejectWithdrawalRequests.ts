@@ -1,3 +1,4 @@
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 
 class RejectWithdrawalRequests {
@@ -17,11 +18,13 @@ class RejectWithdrawalRequests {
         return false;
       }
 
-      fundsWithdrawalRequests.reject(decisionReason);
+      if (fundsWithdrawalRequests.reject(decisionReason)) {
+        await this.fundsWithdrawalRequestsRepository.reject(fundsWithdrawalRequests, id);
+        const { profileId, ...data } = fundsWithdrawalRequests.forEvent();
+        await this.fundsWithdrawalRequestsRepository.publishEvents([storeEventCommand(profileId, 'WithdrawalRequestRejected', data)]);
+      }
 
-      const status = await this.fundsWithdrawalRequestsRepository.reject(fundsWithdrawalRequests, id);
-
-      return status;
+      return true;
     } catch (e) {
       console.log(e);
 

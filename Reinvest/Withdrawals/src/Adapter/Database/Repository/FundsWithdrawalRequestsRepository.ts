@@ -1,4 +1,4 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { FundsWithdrawalRequest, FundsWithdrawalRequestSchema } from 'Reinvest/Withdrawals/src/Domain/FundsWithdrawalRequest';
 import { WithdrawalsFundsRequestsStatuses } from 'Reinvest/Withdrawals/src/Domain/WithdrawalsFundsRequests';
 import { WithdrawalFundsRequestCreate } from 'Reinvest/Withdrawals/src/UseCase/CreateWithdrawalFundsRequest';
@@ -145,6 +145,25 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
+  async listPendingWithdrawalRequests(pagination: Pagination): Promise<FundsWithdrawalRequest[]> {
+    const results = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('status', '=', WithdrawalsFundsRequestsStatuses.REQUESTED)
+      .orderBy('dateCreated', 'asc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .castTo<FundsWithdrawalRequestSchema>()
+      .execute();
+
+    if (results.length === 0) {
+      return [];
+    }
+
+    return results.map(result => FundsWithdrawalRequest.create(result));
+  }
+
   async assignWithdrawalId(fundsWithdrawalRequest: FundsWithdrawalRequest) {
     const { withdrawalId } = fundsWithdrawalRequest.toObject();
     try {
@@ -195,6 +214,7 @@ export class FundsWithdrawalRequestsRepository {
     const fundsWithdrawalRequest = await this.databaseAdapterProvider
       .provide()
       .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
       .where('id', '=', id)
       .where('status', '=', WithdrawalsFundsRequestsStatuses.REQUESTED)
       .castTo<FundsWithdrawalRequestSchema>()

@@ -1,4 +1,4 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { MoneyView, UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 
@@ -18,7 +18,20 @@ export type DividendData = {
   totalFeeAmount: number;
 };
 
-export type WithdrawalView = {};
+export type WithdrawalView = {
+  accountId: UUID;
+  accountValue: MoneyView;
+  agreementId: UUID | null;
+  createdDate: string;
+  decisionDate: string | null;
+  decisionMessage: string | null;
+  eligibleForWithdrawal: MoneyView;
+  id: UUID;
+  investorWithdrawalReason: string;
+  penaltiesFee: MoneyView;
+  profileId: UUID;
+  status: FundsWithdrawalStatus;
+};
 
 export type FundsWithdrawalRequestSchema = {
   accountId: UUID;
@@ -181,15 +194,27 @@ export class FundsWithdrawalRequest {
     }
   }
 
-  accept(): void {
+  accept(): boolean {
+    if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
+      return false;
+    }
+
     this.status = WithdrawalsFundsRequestsStatuses.ACCEPTED;
-    this.dateDecision = new Date();
+    this.dateDecision = DateTime.now().toDate();
+
+    return true;
   }
 
-  reject(decisionReason: string): void {
+  reject(decisionReason: string): boolean {
+    if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
+      return false;
+    }
+
     this.status = WithdrawalsFundsRequestsStatuses.REJECTED;
-    this.dateDecision = new Date();
+    this.dateDecision = DateTime.now().toDate();
     this.adminDecisionReason = decisionReason;
+
+    return true;
   }
 
   request() {
@@ -256,9 +281,14 @@ export class FundsWithdrawalRequest {
 
   getWithdrawalView(): WithdrawalView {
     return {
+      id: this.id,
+      accountId: this.accountId,
+      profileId: this.profileId,
+      agreementId: this.agreementId,
       status: this.getWithdrawalStatus(),
-      createdDate: this.dateCreated,
-      decisionDate: this.dateDecision,
+      createdDate: DateTime.from(this.dateCreated).toIsoDateTime(),
+      investorWithdrawalReason: this.investorWithdrawalReason ?? '',
+      decisionDate: this.dateDecision ? DateTime.from(this.dateDecision).toIsoDateTime() : null,
       decisionMessage: this.adminDecisionReason,
       eligibleForWithdrawal: {
         value: this.eligibleFunds.getAmount(),
@@ -292,6 +322,18 @@ export class FundsWithdrawalRequest {
       date: DateTime.from(this.dateCreated),
       shareCount: this.numberOfShares,
       withdrawalAmount: this.eligibleFunds.getFormattedAmount(),
+    };
+  }
+
+  forEvent() {
+    return {
+      profileId: this.profileId,
+      accountId: this.accountId,
+      adminDecisionReason: this.adminDecisionReason,
+      agreementId: this.agreementId,
+      dateCreated: this.dateCreated,
+      dateDecision: this.dateDecision,
+      amount: this.eligibleFunds.getFormattedAmount(),
     };
   }
 }

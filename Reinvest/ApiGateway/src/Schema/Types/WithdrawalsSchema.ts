@@ -64,6 +64,7 @@ const schema = `
         investorWithdrawalReason: String
         createdDate: ISODateTime!
         decisionDate: ISODateTime
+        agreementId: ID
     }
 
     type Query {
@@ -182,9 +183,19 @@ export const WithdrawalsSchema = {
         return api.withdrawDividends(profileId, accountId, dividendIds);
       },
 
-      createFundsWithdrawalRequest: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
+      createFundsWithdrawalRequest: async (
+        parent: any,
+        {
+          accountId,
+          investorWithdrawalReason,
+        }: {
+          accountId: string;
+          investorWithdrawalReason: string | null;
+        },
+        { profileId, modules }: SessionContext,
+      ) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
-        const error = await api.createWithdrawalFundsRequest(profileId, accountId);
+        const error = await api.createWithdrawalFundsRequest(profileId, accountId, investorWithdrawalReason);
 
         if (error) {
           throw new GraphQLError(error);

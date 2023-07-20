@@ -8,7 +8,7 @@ import { CreateFundsWithdrawalAgreement } from 'Withdrawals/UseCase/CreateFundsW
 import CreateWithdrawal from 'Withdrawals/UseCase/CreateWithdrawal';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
 import GetFundsWithdrawalAgreement from 'Withdrawals/UseCase/GetFundsWithdrawalAgreement';
-import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
+import { FundsWithdrawalRequestsQuery } from 'Withdrawals/UseCase/FundsWithdrawalRequestsQuery';
 import RejectWithdrawalRequests from 'Withdrawals/UseCase/RejectWithdrawalRequests';
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
 import SignFundsWithdrawalRequestAgreement from 'Withdrawals/UseCase/SignFundsWithdrawalRequestAgreement';
@@ -27,7 +27,7 @@ export class PortsProvider {
     container.addSingleton(WithdrawalsController, [
       WithdrawalsQuery,
       CreateWithdrawalFundsRequest,
-      GetFundsWithdrawalRequest,
+      FundsWithdrawalRequestsQuery,
       WithdrawDividend,
       AbortFundsWithdrawalRequest,
       RequestFundWithdrawal,

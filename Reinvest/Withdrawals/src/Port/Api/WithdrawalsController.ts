@@ -1,11 +1,11 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
-import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
+import { WithdrawalError, WithdrawalView } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
 import AcceptWithdrawalRequests from 'Withdrawals/UseCase/AcceptWithdrawalRequests';
 import CreateWithdrawal from 'Withdrawals/UseCase/CreateWithdrawal';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
-import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
+import { FundsWithdrawalRequestsQuery } from 'Withdrawals/UseCase/FundsWithdrawalRequestsQuery';
 import RejectWithdrawalRequests from 'Withdrawals/UseCase/RejectWithdrawalRequests';
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
@@ -14,7 +14,7 @@ import { WithdrawDividend } from 'Withdrawals/UseCase/WithdrawDividend';
 export class WithdrawalsController {
   private withdrawalsQuery: WithdrawalsQuery;
   private createWithdrawalFundsRequestUseCase: CreateWithdrawalFundsRequest;
-  private getFundsWithdrawalRequestUseCase: GetFundsWithdrawalRequest;
+  private withdrawalRequestsQuery: FundsWithdrawalRequestsQuery;
   private withdrawDividendUseCase: WithdrawDividend;
   private abortFundsWithdrawalRequestUseCase: AbortFundsWithdrawalRequest;
   private requestFundWithdrawalUseCase: RequestFundWithdrawal;
@@ -25,7 +25,7 @@ export class WithdrawalsController {
   constructor(
     withdrawalsQuery: WithdrawalsQuery,
     createWithdrawalFundsRequestUseCase: CreateWithdrawalFundsRequest,
-    getFundsWithdrawalRequestUseCase: GetFundsWithdrawalRequest,
+    fundsWithdrawalRequestsQuery: FundsWithdrawalRequestsQuery,
     withdrawDividendUseCase: WithdrawDividend,
     abortFundsWithdrawalRequestUseCase: AbortFundsWithdrawalRequest,
     requestFundWithdrawalUseCase: RequestFundWithdrawal,
@@ -35,7 +35,7 @@ export class WithdrawalsController {
   ) {
     this.withdrawalsQuery = withdrawalsQuery;
     this.createWithdrawalFundsRequestUseCase = createWithdrawalFundsRequestUseCase;
-    this.getFundsWithdrawalRequestUseCase = getFundsWithdrawalRequestUseCase;
+    this.withdrawalRequestsQuery = fundsWithdrawalRequestsQuery;
     this.withdrawDividendUseCase = withdrawDividendUseCase;
     this.abortFundsWithdrawalRequestUseCase = abortFundsWithdrawalRequestUseCase;
     this.requestFundWithdrawalUseCase = requestFundWithdrawalUseCase;
@@ -72,9 +72,9 @@ export class WithdrawalsController {
     };
   }
 
-  async createWithdrawalFundsRequest(profileId: UUID, accountId: UUID): Promise<WithdrawalError | null> {
+  async createWithdrawalFundsRequest(profileId: UUID, accountId: UUID, investorWithdrawalReason: string | null): Promise<WithdrawalError | null> {
     try {
-      await this.createWithdrawalFundsRequestUseCase.execute(profileId, accountId);
+      await this.createWithdrawalFundsRequestUseCase.execute(profileId, accountId, investorWithdrawalReason);
 
       return null;
     } catch (error: any) {
@@ -89,7 +89,7 @@ export class WithdrawalsController {
   }
 
   async getFundsWithdrawalRequest(profileId: UUID, accountId: UUID) {
-    return this.getFundsWithdrawalRequestUseCase.execute(profileId, accountId);
+    return this.withdrawalRequestsQuery.getFundsWithdrawalRequest(profileId, accountId);
   }
 
   async abortFundsWithdrawalRequest(profileId: UUID, accountId: UUID) {
@@ -132,5 +132,9 @@ export class WithdrawalsController {
     }
 
     return statuses.some(status => status === true);
+  }
+
+  async listFundsWithdrawalsPendingRequests(pagination: Pagination): Promise<WithdrawalView[]> {
+    return this.withdrawalRequestsQuery.listFundsWithdrawalsPendingRequests(pagination);
   }
 }

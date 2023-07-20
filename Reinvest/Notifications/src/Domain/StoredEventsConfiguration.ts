@@ -447,10 +447,8 @@ export const StoredEvents = <StoredEventsType>{
     },
     email: {
       subject: () => 'Funds Withdrawal request status',
-      body: ({ userName, amount }) => `Dear ${userName}, unfortunately, your withdrawal request for ${Money.lowPrecision(
-        amount,
-      ).getFormattedAmount()} has been rejected. Please contact support for further assistance.
-      `,
+      body: ({ userName, amount }) =>
+        `Dear ${userName}, unfortunately, your withdrawal request for ${amount} has been rejected. Please contact support for further assistance.`,
     },
     accountActivity: {
       name: ({ userName }) => `Withdrawal request rejected for ${userName}.`,
@@ -472,7 +470,7 @@ export const StoredEvents = <StoredEventsType>{
     },
     email: {
       subject: () => 'Withdrawal Approved!',
-      body: ({ userName }) => `Dear ${userName}, unfortunately, your withdrawal request has been approved. The funds will be transferred shortly.`,
+      body: ({ userName }) => `Dear ${userName}, your withdrawal request has been approved. The funds will be transferred shortly.`,
     },
     accountActivity: {
       name: ({ userName }) => `Withdrawal request approved for ${userName}.`,

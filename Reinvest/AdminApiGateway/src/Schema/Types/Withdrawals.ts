@@ -16,7 +16,7 @@ const schema = `
         id: ID!
         profileId: ID!
         accountId: ID!
-        agreementId: ID!
+        agreementId: ID
         status: FundsWithdrawalRequestStatus!
         eligibleForWithdrawal: USD!
         accountValue: USD!
@@ -65,13 +65,13 @@ const schema = `
 
     type Query {
         "[MOCK]"
-        listFundsWithdrawalsRequests(pagination: Pagination): [FundsWithdrawalRequest]
+        listFundsWithdrawalsRequests(pagination: Pagination = {page: 0, perPage: 100}): [FundsWithdrawalRequest]
 
         "[MOCK]"
-        listDividendWithdrawals(pagination: Pagination): [DividendWithdrawal]
+        listDividendWithdrawals(pagination: Pagination = {page: 0, perPage: 100}): [DividendWithdrawal]
 
         "[MOCK]"
-        listWithdrawals(pagination: Pagination): [Withdrawal]
+        listWithdrawals(pagination: Pagination = {page: 0, perPage: 100}): [Withdrawal]
     }
 
     type Mutation {
@@ -93,12 +93,14 @@ export const Withdrawals = {
   typeDefs: schema,
   resolvers: {
     Query: {
-      listFundsWithdrawalsRequests: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+      listFundsWithdrawalsRequests: async (parent: any, { pagination }: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
-        return null;
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+
+        return api.listFundsWithdrawalsPendingRequests(pagination);
       },
       listDividendWithdrawals: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {

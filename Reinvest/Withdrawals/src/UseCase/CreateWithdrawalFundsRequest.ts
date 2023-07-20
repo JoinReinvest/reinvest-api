@@ -16,15 +16,15 @@ export type WithdrawalFundsRequestCreate = {
   dividendsJson: DividendData[];
   eligibleFunds: number;
   id: UUID;
-  investorWithdrawalReason: null;
+  investorWithdrawalReason: string | null;
   numberOfShares: number;
   profileId: UUID;
-  withdrawalId: null;
   sharesJson: SettledSharesData[];
   status: WithdrawalsFundsRequestsStatuses;
   totalDividends: number;
   totalFee: number;
   totalFunds: number;
+  withdrawalId: null;
 };
 
 export class CreateWithdrawalFundsRequest {
@@ -40,7 +40,7 @@ export class CreateWithdrawalFundsRequest {
 
   static getClassName = () => 'CreateWithdrawalFundsRequest';
 
-  async execute(profileId: UUID, accountId: UUID): Promise<void | never> {
+  async execute(profileId: UUID, accountId: UUID, investorWithdrawalReason: string | null): Promise<void | never> {
     const pendingWithdrawalRequest = await this.fundsWithdrawalRequestsRepository.getPendingWithdrawalRequest(profileId, accountId);
 
     if (pendingWithdrawalRequest && pendingWithdrawalRequest.isRequested()) {
@@ -66,7 +66,7 @@ export class CreateWithdrawalFundsRequest {
       adminDecisionReason: null,
       agreementId: null,
       dateDecision: null,
-      investorWithdrawalReason: null,
+      investorWithdrawalReason: investorWithdrawalReason,
       withdrawalId: null,
       dateCreated: DateTime.now().toDate(),
       status: WithdrawalsFundsRequestsStatuses.DRAFT,
