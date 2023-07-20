@@ -5,6 +5,12 @@ import { Portfolio } from 'Reinvest/Portfolio/src';
 
 const schema = `
     #graphql
+    type GetAvatarLink {
+        id: ID
+        url: String
+        initials: String
+    }
+    
     type Query {
         "Returns document link by id"
         getUserDocument(profileId: ID!, documentId: ID!): GetDocumentLink

@@ -83,7 +83,7 @@ const schema = `
     
     
     type PortfolioAuthor {
-        avatar: GetDocumentLink
+        avatar: GetAvatarLink
         name: String
         id: ID!
     }
