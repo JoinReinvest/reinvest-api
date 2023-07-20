@@ -49,6 +49,9 @@ export class GetPortfolioUpdates {
         portfolioUpdatesData.push({ ...data, author: null });
       } else {
         const avatarData = author.toObject();
+        const avatarInitials = this.getAuthorInitials(avatarData.name);
+
+        Object.assign(avatarData.avatar, { initials: avatarInitials });
 
         if (avatarData.avatar) {
           const imgLink = <FileLink>await this.documents.getImageFileLink({ id: avatarData.avatar.id, path: "authors" });
@@ -60,5 +63,12 @@ export class GetPortfolioUpdates {
     }
 
     return portfolioUpdatesData;
+  }
+
+  private getAuthorInitials(name: string): string {
+    const nameParts = name.split(' ');
+    const initials = nameParts.map((part) => part.charAt(0));
+
+    return initials.join('');
   }
 }
