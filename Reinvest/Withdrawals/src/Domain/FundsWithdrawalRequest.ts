@@ -9,6 +9,7 @@ export type SettledSharesData = {
   id: UUID;
   numberOfShares: number;
   transactionDate: string;
+  transferredFrom: string | null;
   unitPrice: number;
 };
 

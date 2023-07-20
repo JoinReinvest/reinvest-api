@@ -5,19 +5,19 @@ import { WithdrawalDocumentsDataCollector } from 'Withdrawals/Adapter/Module/Wit
 import { WithdrawalsDocuments, WithdrawalsDocumentsEvents } from 'Withdrawals/Domain/WithdrawalsDocuments';
 
 const MOCK_REDEMPTION_CONTENT_FIELDS = {
-  issuerName: 'Issuer Name',
+  issuerName: 'Reinvest corp.',
   assetName: 'Community REIT',
   authorizedRepresentativeName: 'Brandon Rule',
   date: '07/20/2023',
   data: [
     {
-      securityName: 'SecurityName 1',
-      unitPrice: 'unitPrice 1',
-      securityholderName: 'securityholderName 1',
-      securityholderEmail: 'securityholderEmail 1',
-      currentDistributionUnits: 1,
-      newDistributionUnits: 1,
-      dateOfRedemption: 'dateOfRedemption 1',
+      securityName: 'SecurityName 1', // portfolio
+      unitPrice: 'unitPrice 1', // sad
+      securityholderName: 'securityholderName 1', // profile name
+      securityholderEmail: 'securityholderEmail 1', // can be beneficiary! - registration/mapping_registry
+      currentDistributionUnits: 1, // sad/number of shares
+      newDistributionUnits: 0,
+      dateOfRedemption: 'dateOfRedemption 1', // withdrawal date
     },
     {
       securityName: 'SecurityName 2',

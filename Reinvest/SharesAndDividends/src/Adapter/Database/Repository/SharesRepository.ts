@@ -220,7 +220,7 @@ export class SharesRepository {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(sadSharesTable)
-      .select(['numberOfShares', 'dateFunding', 'unitPrice', 'id', 'portfolioId'])
+      .select(['numberOfShares', 'dateFunding', 'unitPrice', 'id', 'portfolioId', 'transferredFrom'])
       .where('profileId', '=', profileId)
       .where('accountId', '=', accountId)
       .where('status', '=', SharesStatus.SETTLED)

@@ -73,13 +73,14 @@ export class EligibleWithdrawalsState {
   }
 
   formatSettledShares() {
-    return this.settledShares.map(({ id, currentNavPerShare, numberOfShares, transactionDate, unitPrice }) => {
+    return this.settledShares.map(({ id, currentNavPerShare, numberOfShares, transactionDate, unitPrice, transferredFrom }) => {
       return {
         id,
         currentNavPerShare: currentNavPerShare.getAmount(),
         numberOfShares: numberOfShares,
         unitPrice: unitPrice.getAmount(),
         transactionDate: transactionDate.toIsoDate(),
+        transferredFrom,
       };
     });
   }

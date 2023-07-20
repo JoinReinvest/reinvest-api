@@ -22,7 +22,7 @@ export class CreateDocumentsEventHandler implements EventHandler<WithdrawalsEven
 
     const withdrawalId = event.data.withdrawalId;
 
-    // await this.createRedemptionFormDocument.execute(withdrawalId);
+    await this.createRedemptionFormDocument.execute(withdrawalId);
     await this.createPayoutDocument.execute(withdrawalId);
   }
 }
