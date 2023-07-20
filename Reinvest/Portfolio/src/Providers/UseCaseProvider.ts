@@ -21,6 +21,7 @@ import { AddPortfolioAuthor } from 'Portfolio/UseCase/AddPortfolioAuthor';
 import { PortfolioAuthorsRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioAuthors';
 import { DeletePortfolioAuthor } from 'Portfolio/UseCase/DeletePortfolioAuthor';
 import { GetPortfolioAuthors } from 'Portfolio/UseCase/GetPortfolioAuthors';
+import { PortfolioAuthorByIdQuery } from 'Portfolio/UseCase/PortfolioAuthorByIdQuery';
 
 export class UseCaseProvider {
   private config: Portfolio.Config;
@@ -44,9 +45,10 @@ export class UseCaseProvider {
     container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository]);
     container.addSingleton(CreatePortfolioUpdate, [PortfolioUpdatesRepository, PortfolioRepository, IdGenerator]);
     container.addSingleton(DeletePortfolioUpdate, [PortfolioUpdatesRepository]);
-    container.addSingleton(GetPortfolioUpdates, [PortfolioUpdatesRepository]);
-    container.addSingleton(GetPortfolioAuthors, [PortfolioAuthorsRepository]);
+    container.addSingleton(GetPortfolioUpdates, [PortfolioUpdatesRepository, PortfolioAuthorsRepository, DocumentsService, PortfolioRepository]);
+    container.addSingleton(GetPortfolioAuthors, [PortfolioAuthorsRepository, DocumentsService]);
     container.addSingleton(AddPortfolioAuthor, [PortfolioAuthorsRepository, PortfolioRepository, IdGenerator]);
     container.addSingleton(DeletePortfolioAuthor, [PortfolioAuthorsRepository]);
+    container.addSingleton(PortfolioAuthorByIdQuery, [PortfolioAuthorsRepository, PortfolioAuthorsRepository, DocumentsService]);
   }
 }

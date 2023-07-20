@@ -1,6 +1,4 @@
-import * as console from 'console';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import { FileInput } from 'LegalEntities/Domain/ValueObject/Document';
 import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
 import { PortfolioUpdatesRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioUpdatesRepository';
 import { PortfolioUpdate } from 'Portfolio/Domain/PortfolioUpdate';
@@ -30,14 +28,13 @@ export class CreatePortfolioUpdate {
     const activePortfolio = await this.portfolioRepository.getActivePortfolio();
     const errors: ValidationErrorType[] = [];
 
-    if (activePortfolio) {
-      throw new Error('Active portfolio already exists');
+    if (!activePortfolio) {
+      throw new Error('Active portfolio does not exist');
     }
 
-    // hard-coded for now to match the data on all environments
-    const portfolioId = '34ccfe14-dc18-40df-a1d6-04f33b9fa7f4';
+    const activePortfolioData = activePortfolio.toObject();
     const portfolioUpdateId = this.idGenerator.createUuid();
-    const portfolioUpdate = PortfolioUpdate.create({ portfolioId, id: portfolioUpdateId, ...input });
+    const portfolioUpdate = PortfolioUpdate.create({ portfolioId: activePortfolioData.id, id: portfolioUpdateId, ...input });
 
     await this.portfolioUpdatesRepository.add(portfolioUpdate);
 

@@ -23,6 +23,16 @@ const schema = `
         createImageFileLinks(
             numberOfLinks: Int! @constraint(min:1, max: 10)
         ): [PutFileLink]
+        
+        """
+        Create file links for author's avatars.
+        In the response, it returns the "id" and "url".
+        Use "url" for PUT request to upload the file directly to AWS S3. The url has expiration date!
+        Use "id" wherever system needs the reference to uploaded file.
+        """
+        createAuthorFileLinks(
+            numberOfLinks: Int! @constraint(min:1, max: 10)
+        ): [PutFileLink]
     }
 `;
 
@@ -73,6 +83,15 @@ export const DocumentTypes = {
         const { portfolioId } = await portfolioApi.getActivePortfolio();
 
         return api.createImageFileLinks(numberOfLinks, portfolioId);
+      },
+      createAuthorFileLinks: async (parent: any, { numberOfLinks }: { numberOfLinks: number }, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new JsonGraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Documents.ApiType>(Documents);
+
+        return api.createImageFileLinks(numberOfLinks, "authors");
       },
     },
   },
