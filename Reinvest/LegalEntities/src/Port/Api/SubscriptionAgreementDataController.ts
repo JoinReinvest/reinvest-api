@@ -10,11 +10,13 @@ import { DateTime } from 'Money/DateTime';
 
 export type SubscriptionAgreementData = {
   address: string;
+  companyAddress: string | null;
   companyName: string;
   dateOfBirth: string;
   email: string;
   firstName: string;
   isAccreditedInvestor: boolean;
+  isCompany: boolean;
   isFINRAMember: boolean;
   isTradedCompanyHolder: boolean;
   lastName: string;
@@ -23,6 +25,15 @@ export type SubscriptionAgreementData = {
   sensitiveNumber: string;
   FINRAInstitutionName?: string;
   tickerSymbols?: string;
+};
+
+export type WithdrawalAgreementData = {
+  address: string;
+  authorizedOfficer: string;
+  email: string;
+  isCompany: boolean;
+  phoneNumber: string;
+  sharesOwnerName: string;
 };
 
 export class SubscriptionAgreementDataController {
@@ -58,9 +69,27 @@ export class SubscriptionAgreementDataController {
     };
   }
 
+  public async getDataForWithdrawalAgreement(profileId: UUID, accountId: UUID): Promise<WithdrawalAgreementData> {
+    const { profile, account, isIndividual } = await this.getProfileAndAccount(profileId, accountId);
+    const { firstName, lastName, address, companyAddress, companyName, isCompany } = await this.getInvestorData(profile, account, isIndividual);
+    const { phoneNumber, email } = await this.getInvestorIdentityData(profileId);
+
+    const addressToUse = isCompany! ? companyAddress! : address!;
+
+    return {
+      authorizedOfficer: `${firstName} ${lastName}`,
+      sharesOwnerName: isCompany! ? companyName! : `${firstName} ${lastName}`,
+      isCompany: isCompany!,
+      address: addressToUse ?? 'N/A',
+      email: email ?? 'N/A',
+      phoneNumber: phoneNumber ?? 'N/A',
+    };
+  }
+
   private async getInvestorData(profile: Profile, account: CompanyAccount | null, isIndividual: boolean): Promise<Partial<SubscriptionAgreementData>> {
     const { name, dateOfBirth } = profile.toObject();
-    const address = profile.getAddress();
+    const profileAddress = profile.getAddress();
+    const companyAddress = account ? account.getAddress() : null;
 
     return {
       purchaserName: isIndividual ? profile.getFullName() : account!.getCompanyName(),
@@ -68,7 +97,9 @@ export class SubscriptionAgreementDataController {
       lastName: name!.lastName,
       dateOfBirth: DateTime.from(dateOfBirth!).toFormattedDate('MM/DD/YYYY')!,
       companyName: isIndividual ? '-' : account!.getCompanyName(),
-      address: address!.getInlinedAddress(),
+      isCompany: !isIndividual,
+      address: profileAddress!.getInlinedAddress(),
+      companyAddress: companyAddress ? companyAddress.getInlinedAddress() : null,
       sensitiveNumber: isIndividual ? profile.getRawSSN()! : account!.getRawEIN()!,
     };
   }

@@ -7,6 +7,7 @@ import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/
 import { WithdrawalsDocumentsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsDocumentsRepository';
 import { WithdrawalsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsRepository';
 import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
+import { WithdrawalDocumentsDataCollector } from 'Withdrawals/Adapter/Module/WithdrawalDocumentsDataCollector';
 import { Withdrawals } from 'Withdrawals/index';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
 import AcceptWithdrawalRequests from 'Withdrawals/UseCase/AcceptWithdrawalRequests';
@@ -19,6 +20,7 @@ import GenerateWithdrawalDocument from 'Withdrawals/UseCase/GenerateWithdrawalDo
 import GetFundsWithdrawalAgreement from 'Withdrawals/UseCase/GetFundsWithdrawalAgreement';
 import { GetFundsWithdrawalRequest } from 'Withdrawals/UseCase/GetFundsWithdrawalRequest';
 import { MarkDocumentAsGenerated } from 'Withdrawals/UseCase/MarkDocumentAsGenerated';
+import { MarkWithdrawalAgreementAsGenerated } from 'Withdrawals/UseCase/MarkWithdrawalAgreementAsGenerated';
 import RejectWithdrawalRequests from 'Withdrawals/UseCase/RejectWithdrawalRequests';
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
@@ -37,7 +39,12 @@ export class UseCaseServiceProvider {
     container.addSingleton(WithdrawalsQuery, [SharesAndDividendsService]);
     container.addSingleton(CreateWithdrawalFundsRequest, [IdGenerator, FundsWithdrawalRequestsRepository, WithdrawalsQuery]);
     container.addSingleton(GetFundsWithdrawalRequest, [FundsWithdrawalRequestsRepository, WithdrawalsQuery]);
-    container.addSingleton(CreateFundsWithdrawalAgreement, [IdGenerator, FundsWithdrawalRequestsRepository, FundsWithdrawalRequestsAgreementsRepository]);
+    container.addSingleton(CreateFundsWithdrawalAgreement, [
+      IdGenerator,
+      FundsWithdrawalRequestsRepository,
+      FundsWithdrawalRequestsAgreementsRepository,
+      WithdrawalDocumentsDataCollector,
+    ]);
     container.addSingleton(GetFundsWithdrawalAgreement, [FundsWithdrawalRequestsAgreementsRepository, FundsWithdrawalRequestsRepository]);
     container.addSingleton(WithdrawDividend, [SharesAndDividendsService, DividendsRequestsRepository, 'WithdrawalTransactionalAdapter', IdGenerator]);
     container.addSingleton(SignFundsWithdrawalRequestAgreement, [FundsWithdrawalRequestsAgreementsRepository, FundsWithdrawalRequestsRepository]);
@@ -54,6 +61,7 @@ export class UseCaseServiceProvider {
     container.addSingleton(CreatePayoutDocument, [WithdrawalsDocumentsRepository]);
     container.addSingleton(GenerateWithdrawalDocument, [WithdrawalsDocumentsRepository]);
     container.addSingleton(MarkDocumentAsGenerated, [WithdrawalsDocumentsRepository]);
+    container.addSingleton(MarkWithdrawalAgreementAsGenerated, [FundsWithdrawalRequestsAgreementsRepository]);
     container.addSingleton(AcceptWithdrawalRequests, [FundsWithdrawalRequestsRepository]);
     container.addSingleton(RejectWithdrawalRequests, [FundsWithdrawalRequestsRepository]);
   }

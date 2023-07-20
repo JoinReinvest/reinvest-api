@@ -21,9 +21,9 @@ export class WithdrawalsAgreementController {
 
   static getClassName = () => 'WithdrawalsAgreementController';
 
-  async createFundsWithdrawalAgreement(profileId: UUID, accountId: UUID): Promise<WithdrawalError | null> {
+  async createFundsWithdrawalAgreement(profileId: UUID, accountId: UUID, portfolioId: UUID): Promise<WithdrawalError | null> {
     try {
-      await this.createFundsWithdrawalAgreementUseCase.execute(profileId, accountId);
+      await this.createFundsWithdrawalAgreementUseCase.execute(profileId, accountId, portfolioId);
 
       return null;
     } catch (error: any) {

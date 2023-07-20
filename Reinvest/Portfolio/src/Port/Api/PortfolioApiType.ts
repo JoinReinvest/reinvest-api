@@ -1,16 +1,16 @@
 import { ContainerInterface } from 'Container/Container';
+import { PortfolioAuthorsController } from 'Portfolio/Port/Api/PortfolioAuthorsController';
 import { PortfolioController } from 'Portfolio/Port/Api/PortfolioController';
 import { PortfolioUpdatesController } from 'Portfolio/Port/Api/PortfolioUpdatesController';
-import { PortfolioAuthorsController } from 'Portfolio/Port/Api/PortfolioAuthorsController';
 
 export type PortfolioApiType = {
-  addPortfolioUpdate: PortfolioUpdatesController['add'];
   addPortfolioAuthor: PortfolioAuthorsController['add'];
-  deletePortfolioUpdate: PortfolioUpdatesController['delete'];
+  addPortfolioUpdate: PortfolioUpdatesController['add'];
   deletePortfolioAuthor: PortfolioAuthorsController['delete'];
+  deletePortfolioUpdate: PortfolioUpdatesController['delete'];
   getActivePortfolio: PortfolioController['getActivePortfolio'];
-  getAllPortfolioUpdates: PortfolioUpdatesController['getAll'];
   getAllPortfolioAuthors: PortfolioUpdatesController['getAll'];
+  getAllPortfolioUpdates: PortfolioUpdatesController['getAll'];
   getCurrentNav: PortfolioController['getCurrentNav'];
   getDataForSubscriptionAgreement: PortfolioController['getDataForSubscriptionAgreement'];
   getPortfolioDetails: PortfolioController['getPortfolioDetails'];

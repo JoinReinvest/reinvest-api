@@ -1,4 +1,5 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { Money } from 'Money/Money';
 import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
 import AcceptWithdrawalRequests from 'Withdrawals/UseCase/AcceptWithdrawalRequests';
@@ -49,7 +50,18 @@ export class WithdrawalsController {
     const eligibleWithdrawalsState = await this.withdrawalsQuery.prepareEligibleWithdrawalsState(profileId, accountId);
 
     if (!eligibleWithdrawalsState) {
-      return null;
+      const zero = Money.zero();
+      const amount = {
+        value: zero.getAmount(),
+        formatted: zero.getFormattedAmount(),
+      };
+
+      return {
+        canWithdraw: false,
+        eligibleForWithdrawal: amount,
+        accountValue: amount,
+        penaltiesFee: amount,
+      };
     }
 
     return {

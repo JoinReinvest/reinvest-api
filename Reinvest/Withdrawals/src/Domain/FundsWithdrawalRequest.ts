@@ -1,4 +1,5 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 
 import { WithdrawalsFundsRequestsStatuses } from './WithdrawalsFundsRequests';
@@ -280,5 +281,17 @@ export class FundsWithdrawalRequest {
 
   isAgreementAssigned(): boolean {
     return !!this.agreementId;
+  }
+
+  getWithdrawalDetails(): {
+    date: DateTime;
+    shareCount: number;
+    withdrawalAmount: string;
+  } {
+    return {
+      date: DateTime.from(this.dateCreated),
+      shareCount: this.numberOfShares,
+      withdrawalAmount: this.eligibleFunds.getFormattedAmount(),
+    };
   }
 }

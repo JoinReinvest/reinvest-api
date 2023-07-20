@@ -18,9 +18,8 @@ export type WithdrawalFundsRequestCreate = {
   id: UUID;
   investorWithdrawalReason: null;
   numberOfShares: number;
-  payoutId: null;
   profileId: UUID;
-  redemptionId: null;
+  withdrawalId: null;
   sharesJson: SettledSharesData[];
   status: WithdrawalsFundsRequestsStatuses;
   totalDividends: number;
@@ -68,8 +67,7 @@ export class CreateWithdrawalFundsRequest {
       agreementId: null,
       dateDecision: null,
       investorWithdrawalReason: null,
-      payoutId: null,
-      redemptionId: null,
+      withdrawalId: null,
       dateCreated: DateTime.now().toDate(),
       status: WithdrawalsFundsRequestsStatuses.DRAFT,
       dividendsJson: withdrawalsState.formatAwaitingDividends(),

@@ -1,5 +1,6 @@
-import type { JSONObject, JSONObjectOf, UUID } from 'HKEKTypes/Generics';
-import { TemplateContentType } from 'Templates/Types';
+import type { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
+import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
+import { TemplateContentType, Templates } from 'Templates/Types';
 import { DividendWithdrawalDecision } from 'Withdrawals/Domain/DividendWithdrawalRequest';
 import { UUIDsList, WithdrawalsStatuses } from 'Withdrawals/Domain/Withdrawal';
 import type { WithdrawalsDocumentsStatuses, WithdrawalsDocumentsTypes } from 'Withdrawals/Domain/WithdrawalsDocuments';
@@ -29,7 +30,7 @@ export interface WithdrawalsFundsRequestsTable {
 
 export interface WithdrawalsFundsRequestsAgreementsTable {
   accountId: UUID;
-  contentFieldsJson: JSONObject;
+  contentFieldsJson: JSONObjectOf<LatestTemplateContentFields[Templates.WITHDRAWAL_AGREEMENT]>;
   dateCreated: Date;
   fundsRequestId: UUID | null;
   id: string;
@@ -52,6 +53,7 @@ export interface WithdrawalsDividendsRequestsTable {
   status: DividendWithdrawalDecision;
   withdrawalId: UUID | null;
 }
+
 export interface WithdrawalsTable {
   dateCompleted: Date | null;
   dateCreated: Date;

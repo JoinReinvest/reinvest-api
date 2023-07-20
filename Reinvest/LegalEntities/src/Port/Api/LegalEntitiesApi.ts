@@ -25,6 +25,7 @@ export type LegalEntitiesApiType = {
   getCompanyAccountForSynchronization: ReadAccountController['getCompanyAccountForSynchronization'];
   getCompanyForSynchronization: ReadAccountController['getCompanyForSynchronization'];
   getDataForSubscriptionAgreement: SubscriptionAgreementDataController['getDataForSubscriptionAgreement'];
+  getDataForWithdrawalAgreement: SubscriptionAgreementDataController['getDataForWithdrawalAgreement'];
 
   getIndividualAccount: ReadAccountController['getIndividualAccount'];
   getIndividualAccountForSynchronization: ReadAccountController['getIndividualAccountForSynchronization'];
@@ -57,6 +58,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   getProfile: container.delegateTo(GetProfileController, 'getProfile'),
   getProfileForSynchronization: container.delegateTo(GetProfileController, 'getProfileForSynchronization'),
   completeProfile: container.delegateTo(CompleteProfileController, 'completeProfile'),
+  getDataForWithdrawalAgreement: container.delegateTo(SubscriptionAgreementDataController, 'getDataForWithdrawalAgreement'),
 
   listDrafts: container.delegateTo(DraftAccountsController, 'listDrafts'),
   createDraftAccount: container.delegateTo(DraftAccountsController, 'createDraftAccount'),

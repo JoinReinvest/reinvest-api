@@ -31,7 +31,7 @@ export class Template {
   toHtml() {
     const htmlParser = new HTMLParser(this.toArray(), this.getHtmlTemplate());
 
-    return htmlParser.getHTML(this.template);
+    return htmlParser.getHTML();
   }
 
   getVersion(): TemplateVersion {

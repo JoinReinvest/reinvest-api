@@ -173,7 +173,7 @@ export class FundsWithdrawalRequestsRepository {
     await this.eventsPublisher.publishMany(events);
   }
 
-  async getPendingWithdrawalRequest(profileId: UUID, accountId: UUID) {
+  async getPendingWithdrawalRequest(profileId: UUID, accountId: UUID): Promise<FundsWithdrawalRequest | null> {
     const fundsWithdrawalRequest = await this.databaseAdapterProvider
       .provide()
       .selectFrom(withdrawalsFundsRequestsTable)

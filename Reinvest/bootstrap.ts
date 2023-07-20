@@ -226,11 +226,14 @@ export function boot(): Modules {
       {
         database: databaseConfig,
         queue: queueConfig,
+        pdfGeneratorQueue: pdfGeneratorQueue,
       } as Withdrawals.Config,
       {
         documents: modules.get(Documents.moduleName) as Documents.Main,
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         registration: modules.get(Registration.moduleName) as Registration.Main,
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
       },
     ),
   );

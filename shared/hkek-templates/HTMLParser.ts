@@ -1,5 +1,5 @@
 import * as handlebars from 'handlebars';
-import { HtmlTemplate, Templates, TemplateStructureType } from 'Templates/Types';
+import { HtmlTemplate, TemplateStructureType } from 'Templates/Types';
 
 handlebars.registerHelper('bold_text', function (str) {
   return new handlebars.SafeString(str);
@@ -30,8 +30,8 @@ export class HTMLParser {
     return replacedLines;
   }
 
-  private getAgreementFormattedTemplate() {
-    const formattedTemplate = this.dataTemplate.map(({ paragraphs, header }) => {
+  private getFormattedTemplate() {
+    return this.dataTemplate.map(({ paragraphs, header }) => {
       const updatedParagraphs = paragraphs.map(({ lines, isCheckedOption }) => {
         const obj = {
           lines: this.prepareLines(<string[]>lines),
@@ -46,8 +46,6 @@ export class HTMLParser {
 
       return { header, paragraphs: updatedParagraphs };
     });
-
-    return formattedTemplate;
   }
 
   private getRedemptionFormattedTemplate() {
@@ -70,17 +68,8 @@ export class HTMLParser {
     return formattedTemplate;
   }
 
-  private getFormattedTemplate(templateName: Templates) {
-    switch (templateName) {
-      case Templates.SUBSCRIPTION_AGREEMENT:
-      case Templates.RECURRING_SUBSCRIPTION_AGREEMENT:
-        return this.getAgreementFormattedTemplate();
-      case Templates.REDEMPTION_FORM:
-        return this.getRedemptionFormattedTemplate();
-    }
-  }
-  getHTML(templateName: Templates): string {
-    const formattedTemplate = this.getFormattedTemplate(templateName);
+  getHTML(): string {
+    const formattedTemplate = this.getFormattedTemplate();
 
     return handlebars.compile(this.htmlTemplate)({ items: formattedTemplate });
   }
