@@ -1,4 +1,5 @@
 import { S3Adapter } from 'Documents/Adapter/S3/S3Adapter';
+import { CacheService } from 'Documents/Service/CacheService';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 
 export type FileLink = {
@@ -14,10 +15,12 @@ export enum FileType {
 export class FileLinkService {
   public static getClassName = (): string => 'FileLinkService';
   private adapter: S3Adapter;
+  private cacheService: CacheService;
   private idGenerator: IdGeneratorInterface;
 
-  constructor(adapter: S3Adapter, idGenerator: IdGeneratorInterface) {
+  constructor(adapter: S3Adapter, cacheService: CacheService, idGenerator: IdGeneratorInterface) {
     this.adapter = adapter;
+    this.cacheService = cacheService;
     this.idGenerator = idGenerator;
   }
 
@@ -51,19 +54,21 @@ export class FileLinkService {
   }
 
   async getAvatarFileLink(id: string, catalog: string): Promise<FileLink> {
-    const url = await this.adapter.getSignedGetUrl(FileType.AVATAR, catalog, id);
+    const url = await this.cacheService.getCache(id, catalog, async (expiresIn: number) =>
+      this.adapter.getSignedGetUrl(expiresIn, FileType.AVATAR, catalog, id),
+    );
 
     return { id, url };
   }
 
   async getImageLink(id: string, catalog: string): Promise<FileLink> {
-    const url = await this.adapter.getImageUrl(id, catalog);
+    const url = await this.cacheService.getCache(id, catalog, async (expiresIn: number) => this.adapter.getImageUrl(expiresIn, id, catalog));
 
     return { id, url };
   }
 
   async getDocumentFileLink(id: string, catalog: string): Promise<FileLink> {
-    const url = await this.adapter.getSignedGetUrl(FileType.DOCUMENT, catalog, id);
+    const url = await this.adapter.getSignedGetUrl(3600, FileType.DOCUMENT, catalog, id);
 
     return { id, url };
   }

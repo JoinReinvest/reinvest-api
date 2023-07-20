@@ -1,11 +1,13 @@
 import { Kysely } from 'kysely/dist/esm';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 
-import { DocumentsRenderedPagePdfSchema } from './types';
+import { DocumentsImageCacheSchema, DocumentsRenderedPagePdfSchema } from './types';
 
 export const documentsRenderedPagePdfTable = 'documents_rendered_page_pdf_table';
+export const documentsImageCacheTable = 'documents_image_cache_table';
 
 export interface DocumentsDatabase {
+  [documentsImageCacheTable]: DocumentsImageCacheSchema;
   [documentsRenderedPagePdfTable]: DocumentsRenderedPagePdfSchema;
 }
 

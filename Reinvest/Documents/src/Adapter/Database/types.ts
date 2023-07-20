@@ -8,3 +8,12 @@ export interface DocumentsRenderedPagePdfSchema {
   profileId: UUID;
   url: string;
 }
+
+export interface DocumentsImageCacheSchema {
+  bucketName: string;
+  catalog: string;
+  expirationDate: Date;
+  fileName: string;
+  id: UUID;
+  url: string;
+}
