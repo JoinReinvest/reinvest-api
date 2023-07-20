@@ -39,11 +39,11 @@ const schema = `
         id: ID!
         profileId: ID!
         accountId: ID!
-        eligibleAmount: USD!
+        dividendId: ID
+        eligibleAmount: String!
         status: DividendWithdrawalStatus!
         dateCreated: ISODateTime
-        dateDecision: ISODateTime
-        isCompleted: Boolean!
+        dateDecided: ISODateTime
     }
 
     enum FundsWithdrawalStatus {
@@ -55,8 +55,8 @@ const schema = `
     type Withdrawal {
         id: ID!
         status: FundsWithdrawalStatus!
-        "Use getAdminDocument to download"
-        redemptionId: ID!
+        "Use getAdminDocument to download - if there were not funds withdrawals requests, then it will be null"
+        redemptionId: ID
         "Use getAdminDocument to download"
         payoutId: ID!
         dateCreated: ISODateTime!
@@ -64,27 +64,37 @@ const schema = `
     }
 
     type Query {
-        "[MOCK]"
+        "List pending investors withdrawal requests. Requests must be accepted or rejected by executive"
         listFundsWithdrawalsRequests(pagination: Pagination = {page: 0, perPage: 100}): [FundsWithdrawalRequest]
 
-        "[MOCK]"
+        "List all investors dividends withdrawals requests"
         listDividendWithdrawals(pagination: Pagination = {page: 0, perPage: 100}): [DividendWithdrawal]
 
-        "[MOCK]"
+        "List all withdrawals processes created by 'prepareWithdrawalDocuments' mutation"
         listWithdrawals(pagination: Pagination = {page: 0, perPage: 100}): [Withdrawal]
     }
 
     type Mutation {
-        "[MOCK]"
+        "It accepts funds withdrawals request sent by investors"
         acceptWithdrawalRequests(ids: [ID!]!): Boolean!
 
-        "[MOCK]"
+        "It rejects funds withdrawals request sent by investors"
         rejectWithdrawalRequests(ids: [ID!]!, reason: String!): Boolean!
 
-        "[MOCK]"
+        """
+        It takes all accepted funds withdrawal and dividends withdrawal requests and generates documents
+        that must be sent to Vertalo (redemption form) and North Capital (payout form) by admin to manually execute
+        shares redemptions and transfer money to investors.
+        """
         prepareWithdrawalDocuments: ID!
 
-        "[MOCK]"
+        """
+        It pushes the process of preparing withdrawal documents (id returned by 'prepareWithdrawalDocuments' mutation)
+        in case if it was interrupted or failed.
+        """
+        pushPreparingWithdrawalDocuments(withdrawalId: ID!): Boolean!
+
+        "It marks withdrawal process as completed - it should be done only if all documents were sent to Vertalo and North Capital"
         markWithdrawalCompleted(withdrawalId: ID!): Boolean!
     }
 `;
@@ -102,19 +112,23 @@ export const Withdrawals = {
 
         return api.listFundsWithdrawalsPendingRequests(pagination);
       },
-      listDividendWithdrawals: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+      listDividendWithdrawals: async (parent: any, { pagination }: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
-        return null;
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+
+        return api.listDividendsWithdrawalsRequests(pagination);
       },
-      listWithdrawals: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+      listWithdrawals: async (parent: any, { pagination }: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
-        return null;
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+
+        return api.listWithdrawalsDocuments(pagination);
       },
     },
     Mutation: {
@@ -125,9 +139,7 @@ export const Withdrawals = {
 
         const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
 
-        const status = api.acceptWithdrawalRequests(ids);
-
-        return status;
+        return api.acceptWithdrawalRequests(ids);
       },
       rejectWithdrawalRequests: async (parent: any, { ids, reason }: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
@@ -136,23 +148,36 @@ export const Withdrawals = {
 
         const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
 
-        const status = api.rejectWithdrawalRequests(ids, reason);
-
-        return status;
+        return api.rejectWithdrawalRequests(ids, reason);
       },
       prepareWithdrawalDocuments: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
-        return null;
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+
+        return api.prepareWithdrawalDocuments();
       },
-      markWithdrawalCompleted: async (parent: any, data: any, { modules, isExecutive }: AdminSessionContext) => {
+      pushPreparingWithdrawalDocuments: async (parent: any, { withdrawalId }: any, { modules, isExecutive }: AdminSessionContext) => {
         if (!isExecutive) {
           throw new GraphQLError('Access denied');
         }
 
-        return null;
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+        await api.pushWithdrawalDocuments(withdrawalId);
+
+        return true;
+      },
+      markWithdrawalCompleted: async (parent: any, { withdrawalId }: any, { modules, isExecutive }: AdminSessionContext) => {
+        if (!isExecutive) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<WithdrawalsApi.ApiType>(WithdrawalsApi);
+        await api.markWithdrawalAsCompleted(withdrawalId);
+
+        return true;
       },
     },
   },

@@ -1,20 +1,14 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { DateTime } from 'Money/DateTime';
-import { DomainEvent } from 'SimpleAggregator/Types';
 import { WithdrawalsDocumentsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsDocumentsRepository';
-import { UUIDsList } from 'Withdrawals/Domain/Withdrawal';
-import {
-  WithdrawalsDocuments,
-  WithdrawalsDocumentsEvents,
-  WithdrawalsDocumentsStatuses,
-  WithdrawalsDocumentsTypes,
-} from 'Withdrawals/Domain/WithdrawalsDocuments';
+import { WithdrawalsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsRepository';
+import { WithdrawalDocumentsDataCollector } from 'Withdrawals/Adapter/Module/WithdrawalDocumentsDataCollector';
+import { WithdrawalsDocuments, WithdrawalsDocumentsEvents } from 'Withdrawals/Domain/WithdrawalsDocuments';
 
 const MOCK_REDEMPTION_CONTENT_FIELDS = {
   issuerName: 'Issuer Name',
-  signature: 'signature',
-  authorizedRepresentativeName: 'Authorized Representative Name',
-  date: 'Date',
+  assetName: 'Community REIT',
+  authorizedRepresentativeName: 'Brandon Rule',
+  date: '07/20/2023',
   data: [
     {
       securityName: 'SecurityName 1',
@@ -41,47 +35,63 @@ class CreateRedemptionFormDocument {
   static getClassName = (): string => 'CreateRedemptionFormDocument';
 
   private readonly withdrawalsDocumentsRepository: WithdrawalsDocumentsRepository;
+  private withdrawalsRepository: WithdrawalsRepository;
+  private withdrawalCollector: WithdrawalDocumentsDataCollector;
 
-  constructor(withdrawalsDocumentsRepository: WithdrawalsDocumentsRepository) {
+  constructor(
+    withdrawalsDocumentsRepository: WithdrawalsDocumentsRepository,
+    withdrawalsRepository: WithdrawalsRepository,
+    withdrawalCollector: WithdrawalDocumentsDataCollector,
+  ) {
     this.withdrawalsDocumentsRepository = withdrawalsDocumentsRepository;
+    this.withdrawalsRepository = withdrawalsRepository;
+    this.withdrawalCollector = withdrawalCollector;
   }
 
-  async execute(id: UUID, type: WithdrawalsDocumentsTypes, list: UUIDsList) {
-    const events: DomainEvent[] = [];
+  async execute(withdrawalId: UUID): Promise<void> {
+    const withdrawal = await this.withdrawalsRepository.getById(withdrawalId);
 
-    if (!list.list.length) {
-      return true;
+    if (!withdrawal) {
+      throw new Error(`Withdrawal with id ${withdrawalId} not found`);
     }
 
-    const contentFieldsJson = MOCK_REDEMPTION_CONTENT_FIELDS;
+    const { documentId, listOfWithdrawals } = withdrawal.getRedemptions();
 
-    const withdrawalDocument = WithdrawalsDocuments.create({
-      id,
-      type,
-      dateCreated: DateTime.now(),
-      dateCompleted: null,
-      status: WithdrawalsDocumentsStatuses.CREATED,
-      pdfDateCreated: null,
-      contentFieldsJson,
-    });
+    if (!documentId || listOfWithdrawals.list.length === 0) {
+      return;
+    }
 
-    const status = this.withdrawalsDocumentsRepository.create(withdrawalDocument);
+    // const existingDocument = await this.withdrawalsDocumentsRepository.getById(documentId);
+
+    // if (existingDocument) {
+    //   // fallback if document exist - sending event push generating document pdf
+    //   if (!existingDocument.isGenerated()) {
+    //     await this.sendEvent(documentId);
+    //   }
+    //
+    //   return;
+    // }
+
+    const contentFields = MOCK_REDEMPTION_CONTENT_FIELDS;
+    const withdrawalDocument = WithdrawalsDocuments.createRedemptions(documentId, withdrawalId, contentFields);
+
+    const status = await this.withdrawalsDocumentsRepository.store(withdrawalDocument);
 
     if (!status) {
-      return false;
+      throw new Error(`Withdrawal redemption document with id ${documentId} not created`);
     }
 
-    events.push({
-      id,
-      kind: WithdrawalsDocumentsEvents.WithdrawalsDocumentCreated,
-      data: {
-        type,
+    await this.sendEvent(documentId);
+  }
+
+  async sendEvent(documentId: UUID) {
+    await this.withdrawalsDocumentsRepository.publishEvents([
+      {
+        id: documentId,
+        kind: WithdrawalsDocumentsEvents.WithdrawalsDocumentCreated,
+        data: {},
       },
-    });
-
-    await this.withdrawalsDocumentsRepository.publishEvents(events);
-
-    return true;
+    ]);
   }
 }
 

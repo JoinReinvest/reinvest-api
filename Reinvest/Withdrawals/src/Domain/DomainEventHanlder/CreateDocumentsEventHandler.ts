@@ -20,7 +20,9 @@ export class CreateDocumentsEventHandler implements EventHandler<WithdrawalsEven
       return;
     }
 
-    await this.createRedemptionFormDocument.execute(event.data.redemptionId, event.data.type, event.data.listOfWithdrawals);
-    await this.createPayoutDocument.execute(event.data.payoutId, event.data.type, event.data.listOfDividends);
+    const withdrawalId = event.data.withdrawalId;
+
+    // await this.createRedemptionFormDocument.execute(withdrawalId);
+    await this.createPayoutDocument.execute(withdrawalId);
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable typescript-sort-keys/interface */
-import { TemplateContentType, TemplateStructureType } from 'Templates/Types';
+import { TemplateContentType, TemplateStructureType } from "Templates/Types";
 
 export type PayoutDataType = {
   accountId: string;
@@ -21,6 +21,9 @@ export const payoutTemplateV1: TemplateStructureType<PayoutDataType> = [
   {
     paragraphs: [],
     // @ts-ignore
-    tableContent: (content: PayoutContentFieldsV1) => content.data,
+    tableContent: (content: PayoutContentFieldsV1) => ({
+      header: ['Account Id', 'Amount', 'North Capital Account Number'],
+      data: content.data.map(item => [item.accountId, item.amount, item.northCapitalAccountNumber]),
+    }),
   },
 ];

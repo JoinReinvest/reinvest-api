@@ -21,6 +21,7 @@ export type RegistrationApiType = {
   immediatelySynchronizeAllAccountStructure: SynchronizationController['immediatelySynchronizeAllAccountStructure'];
   listDocumentsToSynchronize: NorthCapitalDocumentSynchronizationQuery['listDocumentsToSynchronize'];
   listObjectsToSync: SynchronizationQuery['listObjectsToSync'];
+  mapAccountsToNorthCapitalPayoutData: BankAccountQuery['mapAccountsToNorthCapitalPayoutData'];
   readBankAccount: BankAccountController['readBankAccount'];
   resynchronizeCompanyAccount: SynchronizationController['resynchronizeCompanyAccount'];
   resynchronizeIndividualAccount: SynchronizationController['resynchronizeIndividualAccount'];
@@ -54,4 +55,5 @@ export const registrationApi = (container: ContainerInterface): RegistrationApiT
   resynchronizeIndividualAccount: container.delegateTo(SynchronizationController, 'resynchronizeIndividualAccount'),
   getMappingByPartyId: container.delegateTo(RegistryQuery, 'getMappingByPartyId'),
   getVertaloConfigurationForAccount: container.delegateTo(RegistryQuery, 'getVertaloConfigurationForAccount'),
+  mapAccountsToNorthCapitalPayoutData: container.delegateTo(BankAccountQuery, 'mapAccountsToNorthCapitalPayoutData'),
 });

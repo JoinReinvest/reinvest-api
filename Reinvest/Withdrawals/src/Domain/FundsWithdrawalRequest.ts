@@ -18,7 +18,7 @@ export type DividendData = {
   totalFeeAmount: number;
 };
 
-export type WithdrawalView = {
+export type WithdrawalRequestView = {
   accountId: UUID;
   accountValue: MoneyView;
   agreementId: UUID | null;
@@ -279,7 +279,7 @@ export class FundsWithdrawalRequest {
     return this.status === WithdrawalsFundsRequestsStatuses.REQUESTED;
   }
 
-  getWithdrawalView(): WithdrawalView {
+  getWithdrawalView(): WithdrawalRequestView {
     return {
       id: this.id,
       accountId: this.accountId,
@@ -334,6 +334,18 @@ export class FundsWithdrawalRequest {
       dateCreated: this.dateCreated,
       dateDecision: this.dateDecision,
       amount: this.eligibleFunds.getFormattedAmount(),
+    };
+  }
+
+  forPayoutTemplate(): {
+    accountId: UUID;
+    amount: Money;
+    profileId: UUID;
+  } {
+    return {
+      profileId: this.profileId,
+      accountId: this.accountId,
+      amount: this.eligibleFunds,
     };
   }
 }

@@ -9,8 +9,12 @@ export type WithdrawalsApiType = {
   createWithdrawalFundsRequest: WithdrawalsController['createWithdrawalFundsRequest'];
   getFundsWithdrawalAgreement: WithdrawalsAgreementController['getFundsWithdrawalAgreement'];
   getFundsWithdrawalRequest: WithdrawalsController['getFundsWithdrawalRequest'];
+  listDividendsWithdrawalsRequests: WithdrawalsController['listDividendsWithdrawalsRequests'];
   listFundsWithdrawalsPendingRequests: WithdrawalsController['listFundsWithdrawalsPendingRequests'];
+  listWithdrawalsDocuments: WithdrawalsController['listWithdrawalsDocuments'];
+  markWithdrawalAsCompleted: WithdrawalsController['markWithdrawalAsCompleted'];
   prepareWithdrawalDocuments: WithdrawalsController['prepareWithdrawalDocuments'];
+  pushWithdrawalDocuments: WithdrawalsController['pushWithdrawalDocuments'];
   rejectWithdrawalRequests: WithdrawalsController['rejectWithdrawalRequests'];
   requestFundWithdrawal: WithdrawalsController['requestFundWithdrawal'];
   signFundsWithdrawalAgreement: WithdrawalsAgreementController['signFundsWithdrawalAgreement'];
@@ -22,6 +26,9 @@ export const WithdrawalsApi = (container: ContainerInterface): WithdrawalsApiTyp
   getFundsWithdrawalAgreement: container.delegateTo(WithdrawalsAgreementController, 'getFundsWithdrawalAgreement'),
   createFundsWithdrawalAgreement: container.delegateTo(WithdrawalsAgreementController, 'createFundsWithdrawalAgreement'),
   signFundsWithdrawalAgreement: container.delegateTo(WithdrawalsAgreementController, 'signFundsWithdrawalAgreement'),
+  pushWithdrawalDocuments: container.delegateTo(WithdrawalsController, 'pushWithdrawalDocuments'),
+  listWithdrawalsDocuments: container.delegateTo(WithdrawalsController, 'listWithdrawalsDocuments'),
+  listDividendsWithdrawalsRequests: container.delegateTo(WithdrawalsController, 'listDividendsWithdrawalsRequests'),
   getFundsWithdrawalRequest: container.delegateTo(WithdrawalsController, 'getFundsWithdrawalRequest'),
   prepareWithdrawalDocuments: container.delegateTo(WithdrawalsController, 'prepareWithdrawalDocuments'),
   acceptWithdrawalRequests: container.delegateTo(WithdrawalsController, 'acceptWithdrawalRequests'),
@@ -32,4 +39,5 @@ export const WithdrawalsApi = (container: ContainerInterface): WithdrawalsApiTyp
   withdrawDividends: container.delegateTo(WithdrawalsController, 'withdrawDividends'),
   abortFundsWithdrawalRequest: container.delegateTo(WithdrawalsController, 'abortFundsWithdrawalRequest'),
   requestFundWithdrawal: container.delegateTo(WithdrawalsController, 'requestFundWithdrawal'),
+  markWithdrawalAsCompleted: container.delegateTo(WithdrawalsController, 'markWithdrawalAsCompleted'),
 });

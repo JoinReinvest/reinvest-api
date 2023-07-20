@@ -19,25 +19,21 @@ export class WithdrawalsDocumentsRepository {
 
   public static getClassName = (): string => 'WithdrawalsDocumentsRepository';
 
-  async create(withdrawalDocument: WithdrawalsDocuments) {
+  async store(withdrawalDocument: WithdrawalsDocuments) {
     const schema = this.castToTable(withdrawalDocument);
 
     try {
-      await this.databaseAdapterProvider.provide().insertInto(withdrawalsDocumentsTable).values(schema).execute();
-
-      return true;
-    } catch (error: any) {
-      console.error(`Cannot create withdrawal document: ${error.message}`, error);
-
-      return false;
-    }
-  }
-
-  async update(withdrawalDocument: WithdrawalsDocuments) {
-    const schema = this.castToTable(withdrawalDocument);
-
-    try {
-      await this.databaseAdapterProvider.provide().updateTable(withdrawalsDocumentsTable).set(schema).where('id', '=', schema.id).execute();
+      await this.databaseAdapterProvider
+        .provide()
+        .insertInto(withdrawalsDocumentsTable)
+        .values(schema)
+        .onConflict(oc =>
+          oc.column('id').doUpdateSet({
+            status: eb => eb.ref(`excluded.status`),
+            pdfDateCreated: eb => eb.ref(`excluded.pdfDateCreated`),
+          }),
+        )
+        .execute();
 
       return true;
     } catch (error: any) {
@@ -71,11 +67,10 @@ export class WithdrawalsDocumentsRepository {
   }
 
   private castToObject(data: WithdrawalsDocumentsTable): WithdrawalsDocuments {
-    return WithdrawalsDocuments.create({
+    return WithdrawalsDocuments.restore({
       ...data,
       contentFieldsJson: <TemplateContentType>data.contentFieldsJson,
       dateCreated: DateTime.from(data.dateCreated),
-      dateCompleted: data.dateCompleted ? DateTime.from(data.dateCompleted) : null,
       pdfDateCreated: data.pdfDateCreated ? DateTime.from(data.pdfDateCreated) : null,
     });
   }
@@ -87,8 +82,23 @@ export class WithdrawalsDocumentsRepository {
       ...schema,
       contentFieldsJson: schema.contentFieldsJson as JSONObjectOf<TemplateContentType>,
       dateCreated: schema.dateCreated.toDate(),
-      dateCompleted: schema.dateCompleted?.toDate() || null,
       pdfDateCreated: schema.pdfDateCreated?.toDate() || null,
     };
+  }
+
+  async getGeneratedDocuments(withdrawalId: UUID): Promise<UUID[]> {
+    const documents = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsDocumentsTable)
+      .select(['id'])
+      .where('withdrawalId', '=', withdrawalId)
+      .where('pdfDateCreated', 'is not', null)
+      .execute();
+
+    if (!documents.length) {
+      return [];
+    }
+
+    return documents.map(document => document.id);
   }
 }

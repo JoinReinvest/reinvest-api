@@ -1,11 +1,15 @@
 import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
-import { WithdrawalError, WithdrawalView } from 'Withdrawals/Domain/FundsWithdrawalRequest';
+import { DividendRequestView } from 'Withdrawals/Domain/DividendWithdrawalRequest';
+import { WithdrawalError, WithdrawalRequestView } from 'Withdrawals/Domain/FundsWithdrawalRequest';
+import { WithdrawalView } from 'Withdrawals/Domain/Withdrawal';
 import AbortFundsWithdrawalRequest from 'Withdrawals/UseCase/AbortFundsWithdrawalRequest';
 import AcceptWithdrawalRequests from 'Withdrawals/UseCase/AcceptWithdrawalRequests';
 import CreateWithdrawal from 'Withdrawals/UseCase/CreateWithdrawal';
 import { CreateWithdrawalFundsRequest } from 'Withdrawals/UseCase/CreateWithdrawalFundsRequest';
 import { FundsWithdrawalRequestsQuery } from 'Withdrawals/UseCase/FundsWithdrawalRequestsQuery';
+import { MarkWithdrawalAsCompleted } from 'Withdrawals/UseCase/MarkWithdrawalAsCompleted';
+import { PushWithdrawalsDocumentCreation } from 'Withdrawals/UseCase/PushWithdrawalsDocumentCreation';
 import RejectWithdrawalRequests from 'Withdrawals/UseCase/RejectWithdrawalRequests';
 import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
@@ -21,6 +25,8 @@ export class WithdrawalsController {
   private createWithdrawalUseCase: CreateWithdrawal;
   private acceptWithdrawalRequestsUseCase: AcceptWithdrawalRequests;
   private rejectWithdrawalRequestsUseCase: RejectWithdrawalRequests;
+  private pushWithdrawalsDocumentCreationUseCase: PushWithdrawalsDocumentCreation;
+  private markWithdrawalAsCompletedUseCase: MarkWithdrawalAsCompleted;
 
   constructor(
     withdrawalsQuery: WithdrawalsQuery,
@@ -32,6 +38,8 @@ export class WithdrawalsController {
     createWithdrawalUseCase: CreateWithdrawal,
     acceptWithdrawalRequestsUseCase: AcceptWithdrawalRequests,
     rejectWithdrawalRequestsUseCase: RejectWithdrawalRequests,
+    pushWithdrawalsDocumentCreationUseCase: PushWithdrawalsDocumentCreation,
+    markWithdrawalAsCompletedUseCase: MarkWithdrawalAsCompleted,
   ) {
     this.withdrawalsQuery = withdrawalsQuery;
     this.createWithdrawalFundsRequestUseCase = createWithdrawalFundsRequestUseCase;
@@ -42,6 +50,8 @@ export class WithdrawalsController {
     this.createWithdrawalUseCase = createWithdrawalUseCase;
     this.acceptWithdrawalRequestsUseCase = acceptWithdrawalRequestsUseCase;
     this.rejectWithdrawalRequestsUseCase = rejectWithdrawalRequestsUseCase;
+    this.pushWithdrawalsDocumentCreationUseCase = pushWithdrawalsDocumentCreationUseCase;
+    this.markWithdrawalAsCompletedUseCase = markWithdrawalAsCompletedUseCase;
   }
 
   static getClassName = () => 'WithdrawalsController';
@@ -104,6 +114,10 @@ export class WithdrawalsController {
     return this.createWithdrawalUseCase.execute();
   }
 
+  async pushWithdrawalDocuments(withdrawalId: UUID): Promise<void> {
+    await this.pushWithdrawalsDocumentCreationUseCase.execute(withdrawalId);
+  }
+
   async withdrawDividends(profileId: UUID, accountId: UUID, dividendIds: UUID[]): Promise<boolean> {
     const statuses = [];
 
@@ -134,7 +148,19 @@ export class WithdrawalsController {
     return statuses.some(status => status === true);
   }
 
-  async listFundsWithdrawalsPendingRequests(pagination: Pagination): Promise<WithdrawalView[]> {
+  async listFundsWithdrawalsPendingRequests(pagination: Pagination): Promise<WithdrawalRequestView[]> {
     return this.withdrawalRequestsQuery.listFundsWithdrawalsPendingRequests(pagination);
+  }
+
+  async listDividendsWithdrawalsRequests(pagination: Pagination): Promise<DividendRequestView[]> {
+    return this.withdrawalRequestsQuery.listDividendsWithdrawalsRequests(pagination);
+  }
+
+  async listWithdrawalsDocuments(pagination: Pagination): Promise<WithdrawalView[]> {
+    return this.withdrawalsQuery.listWithdrawals(pagination);
+  }
+
+  async markWithdrawalAsCompleted(withdrawalId: UUID): Promise<void> {
+    await this.markWithdrawalAsCompletedUseCase.execute(withdrawalId);
   }
 }

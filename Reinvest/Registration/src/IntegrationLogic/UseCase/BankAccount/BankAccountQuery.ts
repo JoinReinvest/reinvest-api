@@ -1,5 +1,6 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { BankAccountRepository } from 'Registration/Adapter/Database/Repository/BankAccountRepository';
-import { BankAccount } from 'Registration/Domain/Model/BankAccount';
+import { BankAccount, BankAccountMapping } from 'Registration/Domain/Model/BankAccount';
 
 export type BankAccountResponse = {
   accountNumber: string | null;
@@ -60,5 +61,11 @@ export class BankAccountQuery {
       bankName: bankAccount.getBankName(),
       bankAccountStatus: bankAccount.getStatus(),
     };
+  }
+
+  async mapAccountsToNorthCapitalPayoutData(accountIds: UUID[]): Promise<BankAccountMapping[]> {
+    const bankAccounts = await this.bankAccountRepository.getBankAccountsForAccounts(accountIds);
+
+    return bankAccounts.map(bankAccount => bankAccount.forBankAccountMapping());
   }
 }

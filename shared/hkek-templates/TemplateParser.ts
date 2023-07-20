@@ -1,4 +1,5 @@
 import type { TemplateContentType, TemplateStructureType } from 'Templates/Types';
+import { ParsedStructureType } from 'Templates/Types';
 
 export class TemplateParser {
   private static replace(str: string, data: TemplateContentType) {
@@ -28,7 +29,7 @@ export class TemplateParser {
     return isCheckedOption;
   }
 
-  static parse(template: TemplateStructureType, content: TemplateContentType): TemplateStructureType {
+  static parse(template: TemplateStructureType, content: TemplateContentType): ParsedStructureType {
     return template.map(({ paragraphs, tableContent, header }) => {
       let updatedHeader = undefined;
       let tableContentData = undefined;
@@ -53,7 +54,7 @@ export class TemplateParser {
         updatedHeader = this.replace(header, content);
       }
 
-      return { header: updatedHeader, paragraphs: updatedParagraphs, tableContentData };
+      return { header: updatedHeader, paragraphs: updatedParagraphs, tableContent: tableContentData };
     });
   }
 

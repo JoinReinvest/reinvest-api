@@ -4,7 +4,22 @@ export type TemplateStructureType<T = any> = {
     isCheckedOption?: boolean | ((content: TemplateContentType) => boolean);
   }[];
   header?: string;
-  tableContent?: T | ((content: TemplateContentType) => T);
+  tableContent?: (content: TemplateContentType) => {
+    data: string[];
+    header?: string[];
+  };
+}[];
+
+export type ParsedStructureType = {
+  paragraphs: {
+    lines: string[];
+    isCheckedOption?: boolean;
+  }[];
+  header?: string;
+  tableContent?: {
+    data: string[];
+    header?: string[];
+  };
 }[];
 
 export type TemplateContentType = Record<string, string | boolean | undefined | number | object>;

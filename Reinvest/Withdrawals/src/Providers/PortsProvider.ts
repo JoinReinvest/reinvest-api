@@ -14,6 +14,8 @@ import { RequestFundWithdrawal } from 'Withdrawals/UseCase/RequestFundWithdrawal
 import SignFundsWithdrawalRequestAgreement from 'Withdrawals/UseCase/SignFundsWithdrawalRequestAgreement';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
 import { WithdrawDividend } from 'Withdrawals/UseCase/WithdrawDividend';
+import { PushWithdrawalsDocumentCreation } from 'Withdrawals/UseCase/PushWithdrawalsDocumentCreation';
+import { MarkWithdrawalAsCompleted } from 'Withdrawals/UseCase/MarkWithdrawalAsCompleted';
 
 export class PortsProvider {
   private config: Withdrawals.Config;
@@ -34,6 +36,8 @@ export class PortsProvider {
       CreateWithdrawal,
       AcceptWithdrawalRequests,
       RejectWithdrawalRequests,
+      PushWithdrawalsDocumentCreation,
+      MarkWithdrawalAsCompleted,
     ]);
     container.addSingleton(WithdrawalsAgreementController, [CreateFundsWithdrawalAgreement, GetFundsWithdrawalAgreement, SignFundsWithdrawalRequestAgreement]);
   }

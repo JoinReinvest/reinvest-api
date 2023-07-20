@@ -1,5 +1,5 @@
 /* eslint-disable typescript-sort-keys/interface */
-import { TemplateContentType, TemplateStructureType } from 'Templates/Types';
+import { TemplateContentType, TemplateStructureType } from "Templates/Types";
 
 export type RedemptionFormDataType = {
   securityName: string;
@@ -12,8 +12,8 @@ export type RedemptionFormDataType = {
 };
 
 export interface RedemptionFormContentFieldsV1 extends TemplateContentType {
+  assetName: string;
   issuerName: string;
-  signature: string;
   authorizedRepresentativeName: string;
   date: string;
   data: RedemptionFormDataType[];
@@ -30,20 +30,39 @@ export const redemptionFormTemplateV1: TemplateStructureType<RedemptionFormDataT
     paragraphs: [
       {
         lines: [
-          'We, the undersigned, authorize Vertalo, Inc. as the transfer agent of record for {(???)}, to redeem the followin holdings.',
+          'We, the undersigned, authorize Vertalo, Inc. as the transfer agent of record for {{{(assetName)}}}, to redeem the following holdings.',
           'As of the date of this confirmations, we authorize Vertalo, Inc. to adjust the below-mentioned holdings',
         ],
       },
     ],
     // @ts-ignore
-    tableContent: (content: RedemptionFormContentFieldsV1) => content.data,
+    tableContent: (content: RedemptionFormContentFieldsV1) => ({
+      header: [
+        'Security Name',
+        'Unit Price',
+        'Securityholder Name',
+        'Securityholder Email',
+        'Current Distribution Units',
+        'New Distribution Units',
+        'Date of Redemption',
+      ],
+      data: content.data.map(item => [
+        item.securityName,
+        item.unitPrice,
+        item.securityholderName,
+        item.securityholderEmail,
+        item.currentDistributionUnits,
+        item.newDistributionUnits,
+        item.dateOfRedemption,
+      ]),
+    }),
   },
   {
     paragraphs: [
       {
         lines: [
           '{{Issuer Name}}: {(issuerName)}',
-          '{{Signature}}: {(signature)}',
+          '{{Signature}}: ___________________________',
           '{{Authorized Representative Name}}: {(authorizedRepresentativeName)}',
           '{{Date}}: {(date)}',
         ],

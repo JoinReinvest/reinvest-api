@@ -1,3 +1,4 @@
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { WithdrawalsDatabaseAdapterProvider, withdrawalsDividendsRequestsTable } from 'Withdrawals/Adapter/Database/DatabaseAdapter';
 import { DividendWithdrawalDecision, DividendWithdrawalRequest } from 'Withdrawals/Domain/DividendWithdrawalRequest';
 
@@ -31,7 +32,7 @@ export class DividendsRequestsRepository {
       .provide()
       .selectFrom(withdrawalsDividendsRequestsTable)
       .selectAll()
-      .where('withdrawalId', '=', null)
+      .where('withdrawalId', 'is', null)
       .where('status', 'in', [DividendWithdrawalDecision.ACCEPTED, DividendWithdrawalDecision.AUTO_ACCEPTED])
       .execute();
 
@@ -39,9 +40,7 @@ export class DividendsRequestsRepository {
       return [];
     }
 
-    const dividendsRequests = data.map(dividendsRequest => DividendWithdrawalRequest.restore(dividendsRequest));
-
-    return dividendsRequests;
+    return data.map(dividendsRequest => DividendWithdrawalRequest.restore(dividendsRequest));
   }
 
   async assignWithdrawalId(dividendRequest: DividendWithdrawalRequest) {
@@ -62,5 +61,36 @@ export class DividendsRequestsRepository {
 
       return false;
     }
+  }
+
+  async listDividendsWithdrawalsRequests(pagination: Pagination): Promise<DividendWithdrawalRequest[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsDividendsRequestsTable)
+      .selectAll()
+      .orderBy('dateCreated', 'desc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .execute();
+
+    if (!data.length) {
+      return [];
+    }
+
+    return data.map(dividendsRequest => DividendWithdrawalRequest.restore(dividendsRequest));
+  }
+
+  async getDividendsRequests(requestIds: UUID[]): Promise<DividendWithdrawalRequest[]> {
+    if (!requestIds.length) {
+      return [];
+    }
+
+    const data = await this.databaseAdapterProvider.provide().selectFrom(withdrawalsDividendsRequestsTable).selectAll().where('id', 'in', requestIds).execute();
+
+    if (!data.length) {
+      return [];
+    }
+
+    return data.map(dividendsRequest => DividendWithdrawalRequest.restore(dividendsRequest));
   }
 }

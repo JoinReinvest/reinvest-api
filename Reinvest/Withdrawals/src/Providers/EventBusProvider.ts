@@ -31,7 +31,10 @@ export default class EventBusProvider {
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus
       .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [STORE_EVENT_COMMAND, 'GeneratePdfCommand'])
-      .subscribeHandlerForKinds(CreateDocumentsEventHandler.getClassName(), [WithdrawalsEvents.WithdrawalCreated])
+      .subscribeHandlerForKinds(CreateDocumentsEventHandler.getClassName(), [
+        WithdrawalsEvents.WithdrawalCreated,
+        WithdrawalsEvents.PushWithdrawalsDocumentCreation,
+      ])
       .subscribeHandlerForKinds(WithdrawalsDocumentsEventHandler.getClassName(), [WithdrawalsDocumentsEvents.WithdrawalsDocumentCreated])
       .subscribe(PdfKinds.GeneratePdf, GeneratePdfEventHandler.getClassName());
   }

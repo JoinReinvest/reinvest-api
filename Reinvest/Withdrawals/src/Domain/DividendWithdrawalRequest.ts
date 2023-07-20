@@ -20,6 +20,17 @@ export type DividendRequestSchema = {
   withdrawalId: UUID | null;
 };
 
+export type DividendRequestView = {
+  accountId: UUID;
+  dateCreated: string;
+  dateDecided: string | null;
+  dividendId: UUID;
+  eligibleAmount: string;
+  id: UUID;
+  profileId: UUID;
+  status: DividendWithdrawalDecision;
+};
+
 export enum DividendWithdrawalDecision {
   REQUESTED = 'REQUESTED',
   ACCEPTED = 'ACCEPTED',
@@ -71,5 +82,30 @@ export class DividendWithdrawalRequest {
       profileId,
       status: DividendWithdrawalDecision.REQUESTED,
     });
+  }
+
+  getView(): DividendRequestView {
+    return {
+      accountId: this.dividendRequestSchema.accountId,
+      dateCreated: DateTime.from(this.dividendRequestSchema.dateCreated).toIsoDateTime(),
+      dateDecided: this.dividendRequestSchema.dateDecided ? DateTime.from(this.dividendRequestSchema.dateDecided).toIsoDateTime() : null,
+      dividendId: this.dividendRequestSchema.dividendId,
+      eligibleAmount: Money.lowPrecision(this.dividendRequestSchema.eligibleAmount).getFormattedAmount(),
+      id: this.dividendRequestSchema.id,
+      profileId: this.dividendRequestSchema.profileId,
+      status: this.dividendRequestSchema.status,
+    };
+  }
+
+  forPayoutTemplate(): {
+    accountId: UUID;
+    amount: Money;
+    profileId: UUID;
+  } {
+    return {
+      profileId: this.dividendRequestSchema.profileId,
+      accountId: this.dividendRequestSchema.accountId,
+      amount: Money.lowPrecision(this.dividendRequestSchema.eligibleAmount),
+    };
   }
 }

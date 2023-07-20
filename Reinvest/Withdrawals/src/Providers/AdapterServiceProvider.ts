@@ -55,6 +55,6 @@ export class AdapterServiceProvider {
     // modules
     container.addSingleton(SharesAndDividendsService, ['SharesAndDividends']);
     container.addSingleton(WithdrawalsDocumentService, ['Documents']);
-    container.addSingleton(WithdrawalDocumentsDataCollector, ['LegalEntities', 'Portfolio']);
+    container.addSingleton(WithdrawalDocumentsDataCollector, ['LegalEntities', 'Portfolio', 'Registration']);
   }
 }

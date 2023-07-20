@@ -232,7 +232,7 @@ export class FundsWithdrawalRequestsRepository {
       .provide()
       .selectFrom(withdrawalsFundsRequestsTable)
       .selectAll()
-      .where('withdrawalId', '=', null)
+      .where('withdrawalId', 'is', null)
       .where('status', '=', WithdrawalsFundsRequestsStatuses.ACCEPTED)
       .castTo<FundsWithdrawalRequestSchema>()
       .execute();
@@ -241,8 +241,26 @@ export class FundsWithdrawalRequestsRepository {
       return [];
     }
 
-    const fundsWithdrawalRequests = data.map(fundsWithdrawalRequest => FundsWithdrawalRequest.create(fundsWithdrawalRequest));
+    return data.map(fundsWithdrawalRequest => FundsWithdrawalRequest.create(fundsWithdrawalRequest));
+  }
 
-    return fundsWithdrawalRequests;
+  async getFundsWithdrawalsRequests(requestIds: UUID[]): Promise<FundsWithdrawalRequest[]> {
+    if (!requestIds.length) {
+      return [];
+    }
+
+    const results = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('id', 'in', requestIds)
+      .castTo<FundsWithdrawalRequestSchema>()
+      .execute();
+
+    if (!results.length) {
+      return [];
+    }
+
+    return results.map(result => FundsWithdrawalRequest.create(result));
   }
 }
