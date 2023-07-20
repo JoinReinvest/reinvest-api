@@ -91,16 +91,12 @@ app.post('/calculations', async function (req: any, res: any) {
 
     const documentsApi = modules.getApi<Documents.ApiType>(Documents)
     const identityApi = modules.getApi<Identity.ApiType>(Identity)
-    console.log(token)
     const profileId = await identityApi.profileIdDecrypt(token)
     console.log(profileId)
 
     if (!documentsApi || !profileId) {
         return
     }
-
-
-console.log(profileId)
 
     const calculationId = await documentsApi.addCalculation(profileId as string, calculations)
     await modules.close()

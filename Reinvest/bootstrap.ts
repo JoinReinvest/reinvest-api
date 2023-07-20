@@ -13,21 +13,21 @@ import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
 import {
-  CHROMIUM_ENDPOINT,
-  COGNITO_CONFIG,
-  DATABASE_CONFIG,
-  DEALPATH_CONFIG,
-  EMAIL_DOMAIN,
-  FIREBASE_SQS_CONFIG,
-  NORTH_CAPITAL_CONFIG,
-  PDF_GENERATOR_SQS_CONFIG,
-  S3_CONFIG,
-  SENTRY_CONFIG,
-  SNS_CONFIG,
-  SQS_CONFIG,
-  VERTALO_CONFIG,
-  WEB_APP_URL,
-} from 'Reinvest/config';
+    CHROMIUM_ENDPOINT,
+    COGNITO_CONFIG,
+    DATABASE_CONFIG,
+    DEALPATH_CONFIG,
+    EMAIL_DOMAIN,
+    FIREBASE_SQS_CONFIG,
+    NORTH_CAPITAL_CONFIG,
+    PDF_GENERATOR_SQS_CONFIG, PROFILEID_HASH_KEY,
+    S3_CONFIG,
+    SENTRY_CONFIG,
+    SNS_CONFIG,
+    SQS_CONFIG,
+    VERTALO_CONFIG,
+    WEB_APP_URL,
+} from 'Reinvest/config'
 import { Identity } from 'Reinvest/Identity/src';
 import Modules from 'Reinvest/Modules';
 import { Registration } from 'Reinvest/Registration/src';
@@ -104,6 +104,7 @@ export function boot(): Modules {
         SNS: snsConfig,
         Cognito: cognitoConfig,
         webAppUrl: WEB_APP_URL,
+        profileIdHashKey: PROFILEID_HASH_KEY,
         queue: queueConfig,
       } as Identity.Config,
       {

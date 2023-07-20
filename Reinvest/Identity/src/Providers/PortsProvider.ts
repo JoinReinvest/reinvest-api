@@ -21,9 +21,10 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     container.addAsValue('webAppUrl', this.config.webAppUrl);
+    container.addAsValue('profileIdEncryptToken', this.config.profileIdHashKey)
     //controllers
     container
-      .addSingleton(ProfileHashController)
+      .addSingleton(ProfileHashController, ['profileIdEncryptToken'])
       .addSingleton(ProfileController, [UserRepository, CognitoService])
       .addSingleton(PhoneController, [PhoneRegistrationService, CognitoService])
       .addSingleton(UserRegistrationController, [UserRegistrationService])

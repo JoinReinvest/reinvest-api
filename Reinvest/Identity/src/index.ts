@@ -22,6 +22,7 @@ export namespace Identity {
     database: PostgreSQLConfig;
     queue: QueueConfig;
     webAppUrl: string;
+    profileIdHashKey: string;
   };
 
   export type ModulesDependencies = {
