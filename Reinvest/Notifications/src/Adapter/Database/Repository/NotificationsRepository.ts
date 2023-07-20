@@ -1,10 +1,10 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { NotificationsDatabaseAdapterProvider, notificationsTable } from 'Notifications/Adapter/Database/DatabaseAdapter';
 import { NotificationsTable } from 'Notifications/Adapter/Database/NotificationsSchema';
 import { Pagination } from 'Notifications/Application/Pagination';
 import { NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
 import { Notification, NotificationSchema } from 'Notifications/Domain/Notification';
-import { DateTime } from 'Money/DateTime';
 
 export class NotificationsRepository {
   private databaseAdapterProvider: NotificationsDatabaseAdapterProvider;

@@ -1,5 +1,5 @@
-import { Documents } from "Documents/index";
-import type { PdfTypes, TemplateStructureType } from "Templates/Types";
+import { Documents } from 'Documents/index';
+import type { PdfTypes, TemplateStructureType } from 'Templates/Types';
 
 /**
  * Documents Module ACL

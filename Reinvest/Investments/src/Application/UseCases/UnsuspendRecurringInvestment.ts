@@ -1,6 +1,6 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { RecurringInvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
-import { UUID } from 'HKEKTypes/Generics';
 
 class UnsuspendRecurringInvestment {
   private readonly recurringInvestmentsRepository: RecurringInvestmentsRepository;

@@ -1,6 +1,6 @@
 import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
-import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DateTime } from 'Money/DateTime';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class TempController {
   private eventBus: EventBus;

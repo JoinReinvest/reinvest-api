@@ -2,6 +2,7 @@ import Container, { ContainerInterface } from 'Container/Container';
 import { Documents } from 'Documents/index';
 import { InvestmentsDatabaseAdapterInstanceProvider, InvestmentsDatabaseAdapterProvider } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { LegalEntities } from 'LegalEntities/index';
+import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
@@ -15,7 +16,6 @@ import AdaptersProviders from './Infrastructure/Providers/AdaptersProviders';
 import EventBusProvider from './Infrastructure/Providers/EventBusProvider';
 import PortsProviders from './Infrastructure/Providers/PortsProviders';
 import UseCaseProviders from './Infrastructure/Providers/UseCaseProviders';
-import { Portfolio } from 'Portfolio/index';
 
 export namespace Investments {
   export const moduleName = 'Investments';

@@ -3,6 +3,7 @@ import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { Investment } from 'Investments/Domain/Investments/Investment';
 import { Origin } from 'Investments/Domain/Investments/Types';
 import { InvestmentFeeService } from 'Investments/Domain/Service/InvestmentFeeService';
+import { PortfolioService } from 'Investments/Infrastructure/Adapters/Modules/PortfolioService';
 import { InvestmentsDatabase } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
@@ -17,6 +18,7 @@ export class CreateInvestment {
   private idGenerator: IdGeneratorInterface;
   private transactionalAdapter: TransactionalAdapter<InvestmentsDatabase>;
   private feeService: InvestmentFeeService;
+  private portfolioService: PortfolioService;
 
   constructor(
     investmentsRepository: InvestmentsRepository,
@@ -24,17 +26,20 @@ export class CreateInvestment {
     feeService: InvestmentFeeService,
     idGenerator: IdGeneratorInterface,
     transactionalAdapter: TransactionalAdapter<InvestmentsDatabase>,
+    portfolioService: PortfolioService,
   ) {
     this.feeService = feeService;
     this.feeRepository = feeRepository;
     this.investmentsRepository = investmentsRepository;
     this.idGenerator = idGenerator;
     this.transactionalAdapter = transactionalAdapter;
+    this.portfolioService = portfolioService;
   }
 
   async execute(portfolioId: UUID, profileId: UUID, accountId: UUID, bankAccountId: UUID, amount: Money, parentId: UUID | null) {
     const investmentId = this.idGenerator.createUuid();
     const tradeId = this.idGenerator.createNumericId(TradeId.getTradeIdSize());
+    const unitPrice = await this.portfolioService.getCurrentSharePrice(portfolioId);
 
     const investment = Investment.create(
       investmentId,
@@ -49,6 +54,7 @@ export class CreateInvestment {
       parentId,
       null,
       null,
+      unitPrice,
     );
     const fee = await this.feeService.calculateFee(amount, profileId, parentId ?? accountId, investmentId);
 

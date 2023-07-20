@@ -1,9 +1,9 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import { northCapitalDocumentsSynchronizationTable, RegistrationDatabaseAdapterProvider } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { InsertableNorthCapitalDocumentsSynchronization } from 'Registration/Adapter/Database/RegistrationSchema';
 import { DocumentSchema } from 'Registration/Domain/Model/ReinvestTypes';
 import { DocumentSyncState, NorthCapitalDocumentToSync, NorthCapitalObjectType } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
-import { DateTime } from 'Money/DateTime';
 
 export class NorthCapitalDocumentsSynchronizationRepository {
   public static getClassName = (): string => 'NorthCapitalDocumentsSynchronizationRepository';

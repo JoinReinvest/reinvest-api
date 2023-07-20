@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { DateTime } from 'Money/DateTime';
 import { VerificationEventMocks } from 'Reinvest/Verification/test/VerificationEventMocks';
 import { VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
@@ -11,7 +12,6 @@ import {
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { ProfileVerifier } from 'Verification/IntegrationLogic/Verifier/ProfileVerifier';
-import { DateTime } from 'Money/DateTime';
 
 const partyId = 'some-uuid';
 const verificationId = 1;

@@ -87,6 +87,8 @@ export class CreateTrade {
       // if payment mismatch, then revert the trade
       if (trade.isPaymentMismatched()) {
         console.error(`There is payment mismatch for trade ${tradeConfiguration.investmentId}. Trade will be reverted`);
+        const { portfolioId } = trade.getInternalIds();
+        await this.registrationService.getAbsoluteCurrentNav(portfolioId); // push sync to get the latest NAV for future trades
 
         return {
           state: CreateTradeState.PAYMENT_MISMATCHED,

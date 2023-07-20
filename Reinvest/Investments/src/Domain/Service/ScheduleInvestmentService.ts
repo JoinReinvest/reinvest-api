@@ -35,7 +35,7 @@ class ScheduleInvestmentService {
     let nextDate = this.startDate;
     do {
       nextDate = nextDate.add(multiplier, type);
-    } while (nextDate.isBefore(lastExecutionDate));
+    } while (nextDate.isBeforeOrEqual(lastExecutionDate));
 
     return nextDate;
   }

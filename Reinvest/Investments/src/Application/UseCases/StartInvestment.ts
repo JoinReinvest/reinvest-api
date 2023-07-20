@@ -1,9 +1,9 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { DateTime } from 'Money/DateTime';
 import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { DateTime } from 'Money/DateTime';
 
 class StartInvestment {
   private readonly investmentsRepository: InvestmentsRepository;

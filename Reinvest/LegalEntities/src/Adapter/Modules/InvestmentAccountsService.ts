@@ -1,7 +1,7 @@
-import { UUID } from "HKEKTypes/Generics";
-import { AccountType as InvestmentAccountType } from "InvestmentAccounts/Domain/ProfileAggregate/AccountType";
-import { InvestmentAccounts } from "InvestmentAccounts/index";
-import { AccountType } from "LegalEntities/Domain/AccountType";
+import { UUID } from 'HKEKTypes/Generics';
+import { AccountType as InvestmentAccountType } from 'InvestmentAccounts/Domain/ProfileAggregate/AccountType';
+import { InvestmentAccounts } from 'InvestmentAccounts/index';
+import { AccountType } from 'LegalEntities/Domain/AccountType';
 
 /**
  * Investment Accounts Module ACL

@@ -1,8 +1,7 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { Investment } from 'Investments/Domain/Investments/Investment';
 import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
-import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
 
 export type InvestmentOverview = {
   amount: {
@@ -12,6 +11,7 @@ export type InvestmentOverview = {
   createdAt: string;
   id: UUID;
   status: InvestmentStatus;
+  subscriptionAgreementId: UUID | null;
   tradeId: string;
 };
 
@@ -28,7 +28,7 @@ class ListInvestmentsQuery {
     const investments = await this.investmentsRepository.listPaginatedInvestmentsWithoutFee(profileId, accountId, pagination);
 
     return investments.map((investment: Investment): InvestmentOverview => {
-      const { id, tradeId, dateCreated, amount, status } = investment.toObject();
+      const { id, tradeId, dateCreated, amount, status, subscriptionAgreementId } = investment.toObject();
 
       return {
         id,
@@ -39,12 +39,13 @@ class ListInvestmentsQuery {
           formatted: amount.getFormattedAmount(),
           value: amount.getAmount(),
         },
+        subscriptionAgreementId,
       };
     });
   }
 
-  async getPendingInvestmentsIds(): Promise<UUID[]> {
-    return this.investmentsRepository.getPendingInvestmentsIds();
+  async getPendingInvestmentsIds(pagination: Pagination): Promise<UUID[]> {
+    return this.investmentsRepository.getPendingInvestmentsIds(pagination);
   }
 }
 

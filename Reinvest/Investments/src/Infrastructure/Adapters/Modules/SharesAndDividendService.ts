@@ -1,7 +1,7 @@
 import { SharesServiceInterface } from 'Investments/Application/DomainEventHandler/SharesServiceInterface';
 import { DividendDetails } from 'Investments/Domain/Reinvestments/Dividends';
-import { SharesAndDividends } from 'SharesAndDividends/index';
 import { SharesOrigin } from 'SharesAndDividends/Domain/Shares';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 export class SharesAndDividendService implements SharesServiceInterface {
   private sharesAndDividendsModule: SharesAndDividends.Main;

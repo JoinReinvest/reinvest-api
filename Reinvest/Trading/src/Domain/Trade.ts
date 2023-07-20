@@ -15,6 +15,7 @@ export type TradeConfiguration = {
   portfolioId: string;
   profileId: string;
   subscriptionAgreementId: string;
+  unitPrice: number;
   userTradeId: string;
 };
 export type VendorsConfiguration = {
@@ -25,7 +26,6 @@ export type VendorsConfiguration = {
   northCapitalParentAccountId: string;
   offeringId: string;
   parentEmail: string;
-  unitSharePrice: number;
 };
 
 export type NorthCapitalTradeState = {
@@ -110,20 +110,20 @@ export class Trade {
   private readonly amount: Money;
   private readonly fees: Money;
   private tradeSchema: TradeSchema;
-  private unitSharePrice: Money | null;
-  private shares: number | null;
+  private unitSharePrice: Money;
+  private shares: number;
   private tradeStatus: TradeStatus;
 
   constructor(tradeSchema: TradeSchema) {
     this.tradeSchema = tradeSchema;
-    const { amount, fees } = this.tradeSchema.tradeConfiguration;
-    const unitSharePrice = this.tradeSchema.vendorsConfiguration?.unitSharePrice;
+    const { amount, fees, unitPrice } = this.tradeSchema.tradeConfiguration;
 
-    this.unitSharePrice = unitSharePrice ? new Money(unitSharePrice) : null;
+    // @ts-ignore
+    this.unitSharePrice = new Money(unitPrice);
     this.amount = new Money(amount);
     this.fees = new Money(fees);
 
-    this.shares = this.unitSharePrice ? this.calculateShares(this.amount, this.unitSharePrice) : null;
+    this.shares = this.calculateShares(this.amount, this.unitSharePrice);
     this.tradeStatus = TradeStatus.fromResponse(this.tradeSchema.northCapitalTradeState ? this.tradeSchema.northCapitalTradeState?.tradeStatus : null);
   }
 
@@ -142,18 +142,6 @@ export class Trade {
 
   setVendorsConfiguration(vendorsConfiguration: VendorsConfiguration) {
     this.tradeSchema.vendorsConfiguration = vendorsConfiguration;
-    this.unitSharePrice = new Money(vendorsConfiguration.unitSharePrice);
-    this.shares = this.calculateShares(this.amount, this.unitSharePrice);
-  }
-
-  updateUnitSharePrice(unitSharePrice: number) {
-    if (!this.tradeSchema.vendorsConfiguration) {
-      throw new Error('Vendors configuration is not set');
-    }
-
-    this.tradeSchema.vendorsConfiguration.unitSharePrice = unitSharePrice;
-    this.unitSharePrice = new Money(unitSharePrice);
-    this.shares = this.calculateShares(this.amount, this.unitSharePrice);
   }
 
   setTradeState(tradeState: NorthCapitalTradeState) {

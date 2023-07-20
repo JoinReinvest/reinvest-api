@@ -140,6 +140,14 @@ export class Shares {
     };
   }
 
+  forSharesChangedEvent(): {
+    profileId: UUID;
+  } {
+    return {
+      profileId: this.sharesSchema.profileId,
+    };
+  }
+
   getId(): UUID {
     return this.sharesSchema.id;
   }

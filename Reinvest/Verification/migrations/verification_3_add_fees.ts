@@ -1,5 +1,5 @@
-import { Kysely, sql } from "kysely";
-import { VerificationDatabase, verificationFeesTable } from "Verification/Adapter/Database/DatabaseAdapter";
+import { Kysely, sql } from 'kysely';
+import { VerificationDatabase, verificationFeesTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 
 /**
  *   id: UUID;

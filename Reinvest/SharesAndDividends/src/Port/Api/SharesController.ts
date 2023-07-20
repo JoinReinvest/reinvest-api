@@ -1,10 +1,10 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
+import { SharesOrigin } from 'SharesAndDividends/Domain/Shares';
 import { AccountState, AccountStateQuery } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { ChangeSharesState, SharesChangeState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
 import { TransferredOrigins, TransferredShares, TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
-import { SharesOrigin } from 'SharesAndDividends/Domain/Shares';
 
 export class SharesController {
   private createSharesUseCase: CreateShares;

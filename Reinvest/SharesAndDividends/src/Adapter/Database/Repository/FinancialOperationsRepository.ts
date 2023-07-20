@@ -1,12 +1,12 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import {
   sadFinancialOperationsTable,
   sadGlobalFinancialOperationsTable,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { FinancialOperationRecord, FinancialOperationType, GlobalFinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
-import { DateTime } from 'Money/DateTime';
 
 export type FinancialOperation = {
   accountId: UUID;
@@ -75,6 +75,28 @@ export class FinancialOperationsRepository {
         },
       })
       .execute();
+  }
+
+  async getLastNavChanged(): Promise<{ numberOfShares: number; unitPrice: number } | null> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadGlobalFinancialOperationsTable)
+      .select('dataJson')
+      .where('operationType', '=', GlobalFinancialOperationType.NAV_CHANGED)
+      .orderBy('createdDate', 'desc')
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return {
+      // @ts-ignore
+      numberOfShares: parseFloat(data.dataJson.numberOfShares),
+      // @ts-ignore
+      unitPrice: parseInt(data.dataJson.unitPrice, 10),
+    };
   }
 
   async getFinancialOperationsForAccount(profileId: string, accountId: string): Promise<FinancialOperationRecord[]> {

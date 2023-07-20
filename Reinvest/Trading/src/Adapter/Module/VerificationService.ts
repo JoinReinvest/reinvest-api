@@ -1,5 +1,5 @@
-import { UUID } from "HKEKTypes/Generics";
-import { Verification } from "Verification/index";
+import { UUID } from 'HKEKTypes/Generics';
+import { Verification } from 'Verification/index';
 
 /**
  * Verification Module ACL

@@ -141,4 +141,14 @@ export class TradesRepository {
       cancelTradeJson: schema.cancelTradeState,
     };
   }
+
+  async getTradeByTradeId(tradeId: string): Promise<Trade | null> {
+    const data = await this.databaseAdapterProvider.provide().selectFrom(tradesTable).selectAll().where('tradeId', '=', tradeId).executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return Trade.create(this.mapToTradeSchema(data));
+  }
 }

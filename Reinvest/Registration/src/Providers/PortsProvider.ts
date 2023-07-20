@@ -14,6 +14,7 @@ import { SynchronizeCompany } from 'Registration/IntegrationLogic/UseCase/Synchr
 import { SynchronizeCompanyAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeCompanyAccount';
 import { SynchronizeIndividualAccount } from 'Registration/IntegrationLogic/UseCase/SynchronizeIndividualAccount';
 import { SynchronizeProfile } from 'Registration/IntegrationLogic/UseCase/SynchronizeProfile';
+import { SynchronizeRegistryRecords } from 'Registration/IntegrationLogic/UseCase/SynchronizeRegistryRecords';
 import { SynchronizeStakeholder } from 'Registration/IntegrationLogic/UseCase/SynchronizeStakeholder';
 import { BankAccountController } from 'Registration/Port/Api/BankAccountController';
 import { NorthCapitalDocumentSynchronizationController } from 'Registration/Port/Api/NorthCapitalDocumentSynchronizationController';
@@ -25,7 +26,6 @@ import { BeneficiaryAccountOpenedEventHandler } from 'Registration/Port/Queue/Ev
 import { CompanyAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/CompanyAccountOpenedEventHandler';
 import { IndividualAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler';
 import { ProfileCompletedEventHandler } from 'Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler';
-import { SynchronizeRegistryRecords } from 'Registration/IntegrationLogic/UseCase/SynchronizeRegistryRecords';
 
 export class PortsProvider {
   private config: Registration.Config;

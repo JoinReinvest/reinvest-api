@@ -1,6 +1,6 @@
 import { JSONObjectOf } from 'HKEKTypes/Generics';
-import { BannedType } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
 import { BeneficiaryName } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
+import { BannedType } from 'LegalEntities/Domain/BannedEntity';
 import { AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
 
 export interface LegalEntitiesProfile {

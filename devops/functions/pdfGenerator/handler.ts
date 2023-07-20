@@ -1,6 +1,7 @@
 import { SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
 import { PdfEvents, PdfKinds } from 'HKEKTypes/Pdf';
-import { CHROMIUM_ENDPOINT, S3_CONFIG, SQS_CONFIG } from 'Reinvest/config';
+import { logger } from 'Logger/logger';
+import { CHROMIUM_ENDPOINT, S3_CONFIG, SENTRY_CONFIG, SQS_CONFIG } from 'Reinvest/config';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 
 import { GeneratePdf } from './src/GeneratePdf';
@@ -8,6 +9,7 @@ import { MakeScreenshotToPdf } from './src/MakeScreenshotToPdf';
 import { PdfGenerator } from './src/Puppeteer/PdfGenerator';
 import { S3Adapter } from './src/S3/S3Adapter';
 
+console = logger(SENTRY_CONFIG);
 export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;
 

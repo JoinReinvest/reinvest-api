@@ -11,11 +11,14 @@ enum CURRENCY {
 
 export class Money {
   private readonly value: DineroFactory.Dinero;
+  private readonly amount: number;
   private readonly precision: PRECISION;
   private readonly currency: CURRENCY;
 
   // default precision is low, so we must provide value in cents, ie 100 for one dollar
-  constructor(public readonly amount: number, currency: CURRENCY = CURRENCY.USD, precision: PRECISION = PRECISION.LOW) {
+  constructor(amount: number, currency: CURRENCY = CURRENCY.USD, precision: PRECISION = PRECISION.LOW) {
+    // @ts-ignore
+    this.amount = parseInt(amount, 10);
     this.value = DineroFactory({ amount: this.amount, currency, precision });
     this.precision = precision;
     this.currency = currency;

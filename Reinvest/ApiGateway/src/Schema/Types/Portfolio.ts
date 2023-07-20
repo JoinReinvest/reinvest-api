@@ -1,5 +1,6 @@
 import { SessionContext } from 'ApiGateway/index';
 import { Portfolio } from 'Portfolio/index';
+import { AdminSessionContext } from 'AdminApiGateway/index';
 
 const schema = `
     #graphql
@@ -31,6 +32,20 @@ const schema = `
         city: String
         zip: String
     }
+    
+    type PortfolioAuthor {
+        avatar: GetDocumentLink
+        name: String!
+        id: ID!
+    }
+    
+    type PortfolioUpdate {
+        image: GetDocumentLink
+        title: String!
+        body: String
+        createdAt: ISODateTime!
+        author: PortfolioAuthor
+    }
 
     type Property {
         name: String
@@ -43,10 +58,15 @@ const schema = `
         location: Location
     }
 
+    type Nav {
+        unitPrice: USD
+    }
+
     type PortfolioDetails {
         id: String
         name: String
         properties: [Property]
+        currentNav: Nav
     }
 
     type Query {
@@ -54,6 +74,11 @@ const schema = `
         Returns all information about properties in the portfolio
         """
         getPortfolioDetails: PortfolioDetails
+        
+        """
+        Returns all portfolio updates
+        """
+        getAllPortfolioUpdates: [PortfolioUpdate]
     }
 `;
 
@@ -66,6 +91,11 @@ export const PortfolioSchema = {
         const activePortfolio = await api.getActivePortfolio(); // For the future - id of portfolio should come from the request
 
         return api.getPortfolioDetails(activePortfolio.portfolioId);
+      },
+      getAllPortfolioUpdates: async (parent: any, { data }: any, { modules, isAdmin }: AdminSessionContext) => {
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+
+        return await api.getAllPortfolioUpdates();
       },
     },
   },

@@ -59,6 +59,7 @@ class CreateSubscriptionAgreement {
       ipAddress: '',
       signingTimestamp: '',
       signingDate: '',
+      unitPrice: investment.getFormattedUnitPrice(),
     };
     const subscriptionAgreement = SubscriptionAgreement.createForInvestment(id, profileId, accountId, investmentId, dateOfAgreement, contentFields);
     await this.subscriptionAgreementRepository.store(subscriptionAgreement);

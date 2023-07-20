@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
-import VertaloException from 'test/characterization/Vertalo/VertaloException';
 import { DateTime } from 'Money/DateTime';
+import VertaloException from 'test/characterization/Vertalo/VertaloException';
 
 export type VertaloConfig = {
   API_URL: string;

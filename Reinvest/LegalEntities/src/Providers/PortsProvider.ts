@@ -1,5 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { AccountRepository } from 'LegalEntities/Adapter/Database/Repository/AccountRepository';
+import { BanRepository } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
 import { BeneficiaryRepository } from 'LegalEntities/Adapter/Database/Repository/BeneficiaryRepository';
 import { DraftAccountRepository } from 'LegalEntities/Adapter/Database/Repository/DraftAccountRepository';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
@@ -7,6 +8,7 @@ import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService
 import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 import { LegalEntities } from 'LegalEntities/index';
 import { AvatarQuery } from 'LegalEntities/Port/Api/AvatarQuery';
+import { BanController } from 'LegalEntities/Port/Api/BanController';
 import { BeneficiaryAccountController } from 'LegalEntities/Port/Api/BeneficiaryAccountController';
 import { CompleteProfileController } from 'LegalEntities/Port/Api/CompleteProfileController';
 import { DraftAccountQuery } from 'LegalEntities/Port/Api/DraftAccountQuery';
@@ -18,12 +20,14 @@ import { UpdateAccountsController } from 'LegalEntities/Port/Api/UpdateAccountsC
 import { UpdateForVerificationController } from 'LegalEntities/Port/Api/UpdateForVerificationController';
 import { UpdateProfileController } from 'LegalEntities/Port/Api/UpdateProfileController';
 import { ArchiveBeneficiary } from 'LegalEntities/UseCases/ArchiveBeneficiary';
+import { Ban } from 'LegalEntities/UseCases/Ban';
 import { CompleteDraftAccount } from 'LegalEntities/UseCases/CompleteDraftAccount';
 import { CompleteProfile } from 'LegalEntities/UseCases/CompleteProfile';
 import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
 import { OpenBeneficiary } from 'LegalEntities/UseCases/OpenBeneficiary';
 import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
 import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
+import { Unban } from 'LegalEntities/UseCases/Unban';
 import { UpdateBeneficiaryAccount } from 'LegalEntities/UseCases/UpdateBeneficiaryAccount';
 import { UpdateCompanyForVerification } from 'LegalEntities/UseCases/UpdateCompanyForVerification';
 import { UpdateCorporateAccount } from 'LegalEntities/UseCases/UpdateCorporateAccount';
@@ -59,6 +63,7 @@ export class PortsProvider {
         TransformDraftAccountIntoRegularAccount,
         RemoveDraftAccount,
       ])
-      .addSingleton(UpdateForVerificationController, [UpdateProfileForVerification, UpdateCompanyForVerification, UpdateStakeholderForVerification]);
+      .addSingleton(UpdateForVerificationController, [UpdateProfileForVerification, UpdateCompanyForVerification, UpdateStakeholderForVerification])
+      .addSingleton(BanController, [BanRepository, Ban, Unban]);
   }
 }

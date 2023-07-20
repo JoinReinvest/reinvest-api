@@ -1,5 +1,6 @@
 import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { TradeConfiguration } from 'Trading/Domain/Trade';
 import { CreateTrade } from 'Trading/IntegrationLogic/UseCase/CreateTrade';
 
 export class CreateTradeHandler implements EventHandler<DomainEvent> {
@@ -18,7 +19,7 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
       return;
     }
 
-    const tradeConfiguration = {
+    const tradeConfiguration = <TradeConfiguration>{
       accountId: event.data.accountId,
       profileId: event.data.profileId,
       amount: event.data.amount,
@@ -30,6 +31,7 @@ export class CreateTradeHandler implements EventHandler<DomainEvent> {
       portfolioId: event.data.portfolioId,
       parentId: event.data.parentId,
       userTradeId: event.data.userTradeId,
+      unitPrice: event.data.unitPrice,
     };
     const result = await this.createTradeUseCase.createTrade(tradeConfiguration);
 

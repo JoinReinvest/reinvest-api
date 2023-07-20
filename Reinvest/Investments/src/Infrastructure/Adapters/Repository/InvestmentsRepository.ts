@@ -1,11 +1,10 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { Fee } from 'Investments/Domain/Investments/Fee';
 import { InvestmentsDatabaseAdapterProvider, investmentsFeesTable, investmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { InvestmentsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
 import { InvestmentSummary } from 'Investments/Infrastructure/ValueObject/InvestmentSummary';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
-import { Pagination } from 'Reinvest/Investments/src/Application/Pagination';
 import { Investment } from 'Reinvest/Investments/src/Domain/Investments/Investment';
 import { InvestmentStatus, InvestmentSummarySchema } from 'Reinvest/Investments/src/Domain/Investments/Types';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -122,12 +121,14 @@ export class InvestmentsRepository {
     return InvestmentSummary.create(investmentSummary as InvestmentSummarySchema);
   }
 
-  async getPendingInvestmentsIds(): Promise<UUID[]> {
+  async getPendingInvestmentsIds(pagination: Pagination): Promise<UUID[]> {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(investmentsTable)
       .select(['id'])
       .where(`status`, 'in', [InvestmentStatus.IN_PROGRESS, InvestmentStatus.FUNDED, InvestmentStatus.CANCELING])
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
       .execute();
 
     if (!data) {
@@ -219,6 +220,8 @@ export class InvestmentsRepository {
         dateCreated: DateTime.from(data.dateCreated),
         dateStarted: data.dateStarted ? DateTime.from(data.dateStarted) : null,
         dateUpdated: DateTime.from(data.dateUpdated),
+        // @ts-ignore
+        unitPrice: Money.lowPrecision(parseInt(data.unitPrice)),
       },
       fee,
     );
@@ -233,6 +236,7 @@ export class InvestmentsRepository {
       dateCreated: schema.dateCreated.toDate(),
       dateStarted: schema.dateStarted?.toDate() || null,
       dateUpdated: schema.dateUpdated.toDate(),
+      unitPrice: schema.unitPrice.getAmount(),
     };
   }
 }

@@ -1,7 +1,7 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { WithdrawalsFundsRequestsAgreementsTable } from 'Withdrawals/Adapter/Database/WithdrawalsSchema';
 import { WithdrawalsFundsRequestsAgreementsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequestsAgreement';
-import { DateTime } from 'Money/DateTime';
 
 type FundsRequestWithdrawalAgreementSchema = WithdrawalsFundsRequestsAgreementsTable;
 

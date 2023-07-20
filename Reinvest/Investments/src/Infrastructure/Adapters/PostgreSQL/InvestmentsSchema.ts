@@ -31,6 +31,7 @@ export interface InvestmentsTable {
   status: InvestmentStatus;
   subscriptionAgreementId: string | null;
   tradeId: string;
+  unitPrice: number;
 }
 
 export interface SubscriptionAgreementTable {
