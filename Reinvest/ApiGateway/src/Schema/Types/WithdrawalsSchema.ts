@@ -29,7 +29,7 @@ const schema = `
     }
 
     type DividendsList {
-        dividendsList: [DividendOverview]!
+        dividendsList: [DividendOverview]
     }
 
     type FundsWithdrawalSimulation {
@@ -72,7 +72,7 @@ const schema = `
         """
         List all dividends
         """
-        listDividends(accountId: ID!): DividendsList!
+        listDividends(accountId: ID!): DividendsList
 
         """
         Simulate funds withdrawal. It returns the simulation of withdrawal without any changes in the system.
@@ -155,9 +155,8 @@ export const WithdrawalsSchema = {
       },
       listDividends: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
-        const list = await api.getDividendsList(profileId, accountId);
 
-        return list;
+        return { dividendsList: await api.getDividendsList(profileId, accountId) };
       },
       getFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);

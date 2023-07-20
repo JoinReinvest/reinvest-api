@@ -6,7 +6,8 @@ import { LockedCalculatedDividendEventHandler } from 'SharesAndDividends/Port/Qu
 import { NavUpdateEventHandler } from 'SharesAndDividends/Port/Queue/NavUpdateEventHandler';
 import { ChangeLockedCalculatedDividendStatus } from 'SharesAndDividends/UseCase/ChangeLockedCalculatedDividendStatus';
 import { GiveIncentiveRewardIfRequirementsAreMet } from 'SharesAndDividends/UseCase/GiveIncentiveRewardIfRequirementsAreMet';
-import { EventBus, SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
+import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
   private config: SharesAndDividends.Config;
@@ -21,7 +22,9 @@ export default class EventBusProvider {
     container.addSingleton(LockedCalculatedDividendEventHandler, [ChangeLockedCalculatedDividendStatus]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
-    eventBus.subscribe('SharesSettled', IncentiveRewardEventHandler.getClassName());
-    eventBus.subscribeHandlerForKinds(LockedCalculatedDividendEventHandler.getClassName(), ['SharesSettled', 'SharesRevoked']);
+    eventBus
+      .subscribe('SharesSettled', IncentiveRewardEventHandler.getClassName())
+      .subscribeHandlerForKinds(LockedCalculatedDividendEventHandler.getClassName(), ['SharesSettled', 'SharesRevoked'])
+      .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [STORE_EVENT_COMMAND]);
   }
 }

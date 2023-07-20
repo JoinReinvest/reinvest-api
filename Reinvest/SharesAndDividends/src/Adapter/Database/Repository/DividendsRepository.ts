@@ -113,13 +113,12 @@ export class DividendsRepository {
     profileId: string,
     accountId: string,
   ): Promise<
-    | {
-        amount: number;
-        createdDate: Date;
-        id: string;
-        status: IncentiveRewardStatus | InvestorDividendStatus;
-      }[]
-    | null
+    {
+      amount: number;
+      createdDate: Date;
+      id: string;
+      status: IncentiveRewardStatus | InvestorDividendStatus;
+    }[]
   > {
     const db = this.databaseAdapterProvider.provide();
     const data = await db
@@ -131,14 +130,14 @@ export class DividendsRepository {
           .selectFrom(sadInvestorIncentiveDividendTable)
           .select(['id', 'amount', 'createdDate', 'status'])
           .where('profileId', '=', <any>profileId)
-          .where('accountId', '=', <any>accountId),
+          .where(eb => eb.where('accountId', '=', <any>accountId).orWhere('accountId', 'is', null)),
       )
       .where('profileId', '=', profileId)
       .where('accountId', '=', accountId)
       .execute();
 
-    if (!data) {
-      return null;
+    if (data.length === 0) {
+      return [];
     }
 
     return data;

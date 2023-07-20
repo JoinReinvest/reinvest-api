@@ -33,7 +33,7 @@ export class DividendsController {
     return this.dividendsQuery.getDividend(profileId, dividendId);
   }
 
-  async getDividendsList(profileId: string, accountId: string): Promise<DividendDetails[] | null> {
+  async getDividendsList(profileId: string, accountId: string): Promise<DividendDetails[]> {
     return this.dividendsListQueryUseCase.getList(profileId, accountId);
   }
 
