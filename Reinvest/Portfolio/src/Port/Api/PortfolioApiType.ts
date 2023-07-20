@@ -1,26 +1,40 @@
 import { ContainerInterface } from 'Container/Container';
 import { PortfolioController } from 'Portfolio/Port/Api/PortfolioController';
+import { PortfolioUpdatesController } from 'Portfolio/Port/Api/PortfolioUpdatesController';
+import { PortfolioAuthorsController } from 'Portfolio/Port/Api/PortfolioAuthorsController';
 
 export type PortfolioApiType = {
+  addPortfolioUpdate: PortfolioUpdatesController['add'];
+  addPortfolioAuthor: PortfolioAuthorsController['add'];
+  deletePortfolioUpdate: PortfolioUpdatesController['delete'];
+  deletePortfolioAuthor: PortfolioAuthorsController['delete'];
   getActivePortfolio: PortfolioController['getActivePortfolio'];
+  getAllPortfolioUpdates: PortfolioUpdatesController['getAll'];
+  getAllPortfolioAuthors: PortfolioUpdatesController['getAll'];
   getCurrentNav: PortfolioController['getCurrentNav'];
   getDataForSubscriptionAgreement: PortfolioController['getDataForSubscriptionAgreement'];
-  getPortfolio: PortfolioController['getPortfolio'];
   getPortfolioDetails: PortfolioController['getPortfolioDetails'];
   getPortfolioVendorsConfiguration: PortfolioController['getPortfolioVendorsConfiguration'];
-  getProperties: PortfolioController['getProperties'];
+  registerPortfolio: PortfolioController['registerPortfolio'];
+  synchronizeNav: PortfolioController['synchronizeNav'];
   synchronizePortfolio: PortfolioController['synchronizePortfolio'];
   updateProperty: PortfolioController['updateProperty'];
 };
 
 export const PortfolioApi = (container: ContainerInterface): PortfolioApiType => ({
   synchronizePortfolio: container.delegateTo(PortfolioController, 'synchronizePortfolio'),
-  getProperties: container.delegateTo(PortfolioController, 'getProperties'),
   updateProperty: container.delegateTo(PortfolioController, 'updateProperty'),
   getActivePortfolio: container.delegateTo(PortfolioController, 'getActivePortfolio'),
   getPortfolioDetails: container.delegateTo(PortfolioController, 'getPortfolioDetails'),
   getCurrentNav: container.delegateTo(PortfolioController, 'getCurrentNav'),
-  getPortfolio: container.delegateTo(PortfolioController, 'getPortfolio'),
   getPortfolioVendorsConfiguration: container.delegateTo(PortfolioController, 'getPortfolioVendorsConfiguration'),
   getDataForSubscriptionAgreement: container.delegateTo(PortfolioController, 'getDataForSubscriptionAgreement'),
+  registerPortfolio: container.delegateTo(PortfolioController, 'registerPortfolio'),
+  synchronizeNav: container.delegateTo(PortfolioController, 'synchronizeNav'),
+  addPortfolioUpdate: container.delegateTo(PortfolioUpdatesController, 'add'),
+  addPortfolioAuthor: container.delegateTo(PortfolioAuthorsController, 'add'),
+  deletePortfolioUpdate: container.delegateTo(PortfolioUpdatesController, 'delete'),
+  deletePortfolioAuthor: container.delegateTo(PortfolioAuthorsController, 'delete'),
+  getAllPortfolioUpdates: container.delegateTo(PortfolioUpdatesController, 'getAll'),
+  getAllPortfolioAuthors: container.delegateTo(PortfolioAuthorsController, 'getAll'),
 });

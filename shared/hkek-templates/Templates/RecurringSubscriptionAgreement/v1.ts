@@ -1,12 +1,11 @@
 /* eslint-disable typescript-sort-keys/interface */
-import { TemplateContentType, TemplateStructureType } from "Templates/Types";
+import { TemplateContentType, TemplateStructureType } from 'Templates/Types';
 
 export interface RecurringSubscriptionAgreementContentFieldsV1 extends TemplateContentType {
   // portfolio
   nameOfAsset: string;
   nameOfOffering: string;
   offeringsCircularLink: string;
-  tendererCompanyName: string;
 
   // legal entities
   purchaserName: string;
@@ -31,7 +30,6 @@ export interface RecurringSubscriptionAgreementContentFieldsV1 extends TemplateC
 
   // investments
   investedAmount: string;
-  unitPrice: string;
   dateOfAgreement: string;
   ipAddress: string;
   signingTimestamp: string;
@@ -64,19 +62,12 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
           '{{Legal name of Purchaser (Individual or Entity)}}: {(purchaserName)}',
           '{{Date of Agreement}}: {(dateOfAgreement)}',
           '{{Number of Series {(nameOfAsset)} Interests subscribed for}}: {(investedAmount)}',
-          '{{Price of Series {(nameOfAsset)} Interests subscribed for}}: {(unitPrice)}',
           '{{Telephone Number}}: {(phoneNumber)}',
           '{{E-mail Address}}: {(email)}',
         ],
       },
       {
-        lines: ['We/I accept REINVEST to create scheduled investments as specified by us/me as follows:'],
-      },
-      {
-        lines: ['Start date: {{{(startDate)}}}', 'Frequency: {{{(frequency)}}}', 'Amount: {{{(investedAmount)}}}'],
-      },
-      {
-        lines: ['By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound'],
+        lines: ['{{By clicking “I Agree” I, Purchaser, have executed this Subscription Agreement intended to be legally bound}}'],
       },
     ],
   },
@@ -85,7 +76,7 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
     paragraphs: [
       {
         lines: [
-          'This Subscription Agreement and the Operating Agreement are legal agreements between you and {{{(tendererCompanyName)}}}\n' +
+          'This Subscription Agreement and the Operating Agreement are legal agreements between you and {{REINVEST Corp.}}\n' +
             '(company name) pertaining to your investment in {{{(nameOfAsset)}}} (series name). Your investment in membership interests\n' +
             'in {{{(investedAmount)}}} (the "Series (name) Interests") is contingent upon you accepting all of terms and conditions contained\n' +
             'in this Subscription Agreement and the Operating Agreement. The offering of the Series (name) Interests (the\n' +
@@ -103,6 +94,11 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
             'Agree to the terms and conditions contained in this Subscription Agreement and theOperating Agreement; and\n' +
             'Execute this Subscription Agreement intending to be legally bound by the terms and conditions contained in\n' +
             'this Subscription Agreement and in the Operating Agreement.',
+          '{{I/We accept REINVEST to create scheduled investments as specified by us/me as follows:}}',
+          'Start date: {{{(startDate)}}}',
+          'Frequency: {{{(frequency)}}}',
+          'Amount: {{{(investedAmount)}}}',
+          'Share count: as per current NAV',
           'Do not click "I AGREE" unless you agree to all of the terms and conditions contained in this Subscription Agreement\n' +
             'and the Operating Agreement.',
         ],
@@ -288,7 +284,7 @@ export const recurringSubscriptionAgreementTemplateV1: TemplateStructureType = [
             'the information under the "SUMMARY" section above is true and correct.',
           'Accepted:',
           '{{{(nameOfOffering)}}}',
-          'By: {{{(tendererCompanyName)}}}',
+          'By: {{REINVEST Corp.}}',
           'Name of Authorized Officer: {{{(firstName)} {(lastName)}}}',
           // @ts-ignore
           (content: RecurringSubscriptionAgreementContentFieldsV1) =>

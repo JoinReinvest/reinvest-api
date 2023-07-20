@@ -7,6 +7,8 @@ import {
   createTrade,
   finalizeInvestment,
   markFundsAsReadyToDisburse,
+  retryPayment,
+  revertTransaction,
   transferSharesWhenTradeSettled,
   verifyAccountForInvestment,
 } from 'Investments/Domain/Transaction/TransactionCommands';
@@ -18,13 +20,15 @@ import {
   CreateTradeDecision,
   FinalizeInvestmentDecision,
   MarkFundsAsReadyToDisburseDecision,
+  RetryPaymentDecision,
+  RevertTransactionDecision,
   TransactionDecisions,
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
 } from 'Investments/Domain/Transaction/TransactionDecisions';
 import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
-import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DateTime } from 'Money/DateTime';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class TransactionExecutor {
   private eventBus: EventBus;
@@ -62,6 +66,12 @@ export class TransactionExecutor {
       return;
     }
 
+    if ([TransactionDecisions.RETRY_PAYMENT].includes(decision.kind)) {
+      await this.eventBus.publish(retryPayment(decision as RetryPaymentDecision));
+
+      return;
+    }
+
     if ([TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED].includes(decision.kind)) {
       await this.eventBus.publish(checkIsInvestmentApproved(decision as CheckIsInvestmentApprovedDecision));
 
@@ -88,6 +98,12 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.CANCEL_TRANSACTION].includes(decision.kind)) {
       await this.eventBus.publish(cancelTransaction(decision as CancelTransactionDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.REVERT_TRANSACTION].includes(decision.kind)) {
+      await this.eventBus.publish(revertTransaction(decision as RevertTransactionDecision));
 
       return;
     }

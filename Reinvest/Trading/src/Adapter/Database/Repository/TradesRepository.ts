@@ -53,6 +53,7 @@ export class TradesRepository {
         'tradeId',
         'vertaloPaymentJson',
         'cancelTradeJson',
+        'retryPaymentStateJson',
       ])
       .where('investmentId', '=', investmentId)
       .executeTakeFirst();
@@ -82,6 +83,7 @@ export class TradesRepository {
         tradeId: null,
         vertaloPaymentJson: null,
         cancelTradeJson: null,
+        retryPaymentStateJson: null,
       })
       .execute();
 
@@ -114,6 +116,7 @@ export class TradesRepository {
       sharesTransferState: trade.sharesTransferJson as unknown as SharesTransferState,
       vertaloPaymentState: trade.vertaloPaymentJson as unknown as VertaloPaymentState,
       cancelTradeState: trade.cancelTradeJson as unknown as CancelTradeState,
+      retryPaymentState: trade.retryPaymentStateJson as unknown as FundsMoveState,
     };
   }
 
@@ -127,6 +130,7 @@ export class TradesRepository {
       northCapitalTradeStateJson: schema.northCapitalTradeState,
       subscriptionAgreementStateJson: schema.subscriptionAgreementState,
       vertaloDistributionStateJson: schema.vertaloDistributionState,
+      retryPaymentStateJson: schema.retryPaymentState,
       // @ts-ignore
       disbursementJson: schema.disbursementState,
       // @ts-ignore
@@ -136,5 +140,15 @@ export class TradesRepository {
       // @ts-ignore
       cancelTradeJson: schema.cancelTradeState,
     };
+  }
+
+  async getTradeByTradeId(tradeId: string): Promise<Trade | null> {
+    const data = await this.databaseAdapterProvider.provide().selectFrom(tradesTable).selectAll().where('tradeId', '=', tradeId).executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return Trade.create(this.mapToTradeSchema(data));
   }
 }

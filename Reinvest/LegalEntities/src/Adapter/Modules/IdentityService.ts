@@ -1,5 +1,5 @@
-import { UUID } from "HKEKTypes/Generics";
-import { Identity } from "Identity/index";
+import { UUID } from 'HKEKTypes/Generics';
+import { Identity } from 'Identity/index';
 
 /**
  * Identity Module ACL
@@ -18,5 +18,13 @@ export class IdentityService {
 
   async getPhoneAndEmailData(profileId: UUID): Promise<{ email: string; phoneNumber: string }> {
     return this.identityModule.api().getPhoneAndEmailData(profileId);
+  }
+
+  async removeBannedId(profileId: string, bannedId: string): Promise<void> {
+    await this.identityModule.api().removeBannedId(profileId, bannedId);
+  }
+
+  async setUserLabel(profileId: UUID, label: string): Promise<void> {
+    await this.identityModule.api().setUserLabel(profileId, label);
   }
 }

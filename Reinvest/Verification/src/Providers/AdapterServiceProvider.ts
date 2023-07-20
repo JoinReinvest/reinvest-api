@@ -1,14 +1,14 @@
 import { ContainerInterface } from 'Container/Container';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import { createVerificationDatabaseAdapterProvider, VerificationDatabaseAdapterInstanceProvider } from 'Verification/Adapter/Database/DatabaseAdapter';
 import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
+import { VerificationFeesRepository } from 'Verification/Adapter/Database/Repository/VerificationFeesRepository';
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { VerificationNorthCapitalAdapter } from 'Verification/Adapter/NorthCapital/VerificationNorthCapitalAdapter';
 import { Verification } from 'Verification/index';
-import { VerificationFeesRepository } from 'Verification/Adapter/Database/Repository/VerificationFeesRepository';
-import { IdGenerator } from 'IdGenerator/IdGenerator';
 
 export class AdapterServiceProvider {
   private config: Verification.Config;

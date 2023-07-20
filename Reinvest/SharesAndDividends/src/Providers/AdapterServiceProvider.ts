@@ -8,10 +8,12 @@ import {
   SharesAndDividendsDatabaseAdapterInstanceProvider,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
+import { ConfigurationRepository } from 'SharesAndDividends/Adapter/Database/Repository/ConfigurationRepository';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
+import { IdentityService } from 'SharesAndDividends/Adapter/Modules/IdentityService';
 import { NotificationService } from 'SharesAndDividends/Adapter/Modules/NotificationService';
 import { PortfolioService } from 'SharesAndDividends/Adapter/Modules/PortfolioService';
 import { SharesAndDividends } from 'SharesAndDividends/index';
@@ -35,7 +37,7 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(SharesAndDividendsDatabaseAdapterInstanceProvider, createSharesAndDividendsDatabaseAdapterProvider(this.config.database))
-      .addSingleton(SharesRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
+      .addSingleton(SharesRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider, SimpleEventBus])
       .addSingleton(FinancialOperationsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(DividendsRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
       .addSingleton(DividendsCalculationRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider])
@@ -46,5 +48,7 @@ export class AdapterServiceProvider {
       );
     container.addSingleton(PortfolioService, ['Portfolio']);
     container.addSingleton(NotificationService, ['Notifications']);
+    container.addSingleton(IdentityService, ['Identity']);
+    container.addSingleton(ConfigurationRepository, [SharesAndDividendsDatabaseAdapterInstanceProvider]);
   }
 }

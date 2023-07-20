@@ -19,10 +19,25 @@ export class CheckIsInvestmentFundedHandler implements EventHandler<DomainEvent>
     }
 
     const investmentId = event.id;
+    const paymentStatus = await this.checkIsTradeFundedUseCase.execute(investmentId);
 
-    if (await this.checkIsTradeFundedUseCase.execute(investmentId)) {
+    if (paymentStatus.status === 'success') {
       await this.eventBus.publish({
         kind: 'InvestmentFunded',
+        id: investmentId,
+      });
+    }
+
+    if (paymentStatus.status === 'failed') {
+      await this.eventBus.publish({
+        kind: 'InvestmentPaymentFailed',
+        id: investmentId,
+      });
+    }
+
+    if (paymentStatus.status === 'second-fail') {
+      await this.eventBus.publish({
+        kind: 'InvestmentPaymentSecondFailed',
         id: investmentId,
       });
     }

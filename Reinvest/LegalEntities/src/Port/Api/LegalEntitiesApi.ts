@@ -1,4 +1,5 @@
 import { ContainerInterface } from 'Container/Container';
+import { BanController } from 'LegalEntities/Port/Api/BanController';
 import { BeneficiaryAccountController } from 'LegalEntities/Port/Api/BeneficiaryAccountController';
 import { CompleteProfileController } from 'LegalEntities/Port/Api/CompleteProfileController';
 import { DraftAccountsController } from 'LegalEntities/Port/Api/DraftAccountsController';
@@ -11,9 +12,11 @@ import { UpdateForVerificationController } from 'Reinvest/LegalEntities/src/Port
 
 export type LegalEntitiesApiType = {
   archiveBeneficiary: BeneficiaryAccountController['archiveBeneficiary'];
+  banAccount: BanController['banAccount'];
+  banUser: BanController['banUser'];
+
   completeCompanyDraftAccount: DraftAccountsController['completeCompanyDraftAccount'];
   completeIndividualDraftAccount: DraftAccountsController['completeIndividualDraftAccount'];
-
   completeProfile: CompleteProfileController['completeProfile'];
   createDraftAccount: DraftAccountsController['createDraftAccount'];
   getAccountsOverview: ReadAccountController['getAccountsOverview'];
@@ -22,28 +25,30 @@ export type LegalEntitiesApiType = {
   getCompanyAccountForSynchronization: ReadAccountController['getCompanyAccountForSynchronization'];
   getCompanyForSynchronization: ReadAccountController['getCompanyForSynchronization'];
   getDataForSubscriptionAgreement: SubscriptionAgreementDataController['getDataForSubscriptionAgreement'];
+
   getIndividualAccount: ReadAccountController['getIndividualAccount'];
   getIndividualAccountForSynchronization: ReadAccountController['getIndividualAccountForSynchronization'];
-
   getProfile: GetProfileController['getProfile'];
   getProfileAccountStructure: ReadAccountController['getProfileAccountStructure'];
   getProfileForSynchronization: GetProfileController['getProfileForSynchronization'];
   getStakeholderForSynchronization: ReadAccountController['getStakeholderForSynchronization'];
+  listBanned: BanController['listBanned'];
   listDrafts: DraftAccountsController['listDrafts'];
   mapAccountIdToParentAccountIdIfRequired: ReadAccountController['mapAccountIdToParentAccountIdIfRequired'];
   openBeneficiaryAccount: BeneficiaryAccountController['openBeneficiaryAccount'];
   readBeneficiaryAccount: ReadAccountController['readBeneficiaryAccount'];
+
   readDraft: DraftAccountsController['readDraft'];
   removeDraft: DraftAccountsController['removeDraft'];
   transformDraftAccountIntoRegularAccount: DraftAccountsController['transformDraftAccountIntoRegularAccount'];
-
+  unban: BanController['unban'];
   updateBeneficiaryAccount: UpdateAccountsController['updateBeneficiaryAccount'];
+
   updateCompanyForVerification: UpdateForVerificationController['updateCompanyForVerification'];
   updateCorporateAccount: UpdateAccountsController['updateCorporateAccount'];
   updateIndividualAccount: UpdateAccountsController['updateIndividualAccount'];
   updateProfile: UpdateProfileController['updateProfile'];
   updateProfileForVerification: UpdateForVerificationController['updateProfileForVerification'];
-
   updateStakeholderForVerification: UpdateForVerificationController['updateStakeholderForVerification'];
   updateTrustAccount: UpdateAccountsController['updateTrustAccount'];
 };
@@ -84,4 +89,8 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   updateCorporateAccount: container.delegateTo(UpdateAccountsController, 'updateCorporateAccount'),
   updateTrustAccount: container.delegateTo(UpdateAccountsController, 'updateTrustAccount'),
   updateBeneficiaryAccount: container.delegateTo(UpdateAccountsController, 'updateBeneficiaryAccount'),
+  listBanned: container.delegateTo(BanController, 'listBanned'),
+  banUser: container.delegateTo(BanController, 'banUser'),
+  unban: container.delegateTo(BanController, 'unban'),
+  banAccount: container.delegateTo(BanController, 'banAccount'),
 });

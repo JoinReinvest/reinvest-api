@@ -44,7 +44,7 @@ export class SubscriptionAgreement {
     this.subscriptionAgreementSchema = subscriptionAgreementSchema;
   }
 
-  getId() {
+  getId(): UUID {
     return this.subscriptionAgreementSchema.id;
   }
 

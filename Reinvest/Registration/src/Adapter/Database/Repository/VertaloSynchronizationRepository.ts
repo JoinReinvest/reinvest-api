@@ -1,9 +1,9 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import { RegistrationDatabaseAdapterProvider, vertaloSynchronizationTable } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { InsertableVertaloSynchronization, SelectableVertaloSynchronizationRecord } from 'Registration/Adapter/Database/RegistrationSchema';
 import { VertaloSynchronizationRecord } from 'Registration/Adapter/Vertalo/VertaloSynchronizationRecord';
 import { VertaloEntityType, VertaloIds, VertaloSynchronizationRecordType } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
-import { DateTime } from 'Money/DateTime';
 
 export class VertaloSynchronizationRepository {
   public static getClassName = (): string => 'VertaloSynchronizationRepository';

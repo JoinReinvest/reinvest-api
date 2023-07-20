@@ -1,7 +1,14 @@
 import dayjs from 'dayjs';
+import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { DividendDetails, DividendState } from 'SharesAndDividends/Domain/types';
+
+export type AutoReinvestDividend = {
+  accountId: UUID;
+  dividendId: UUID;
+  profileId: UUID;
+};
 
 export class DividendsQuery {
   private dividendsRepository: DividendsRepository;
@@ -41,5 +48,9 @@ export class DividendsQuery {
       id,
       status: dividendStatus,
     };
+  }
+
+  async getDividendsReadyForAutomaticReinvestment(): Promise<AutoReinvestDividend[]> {
+    return this.dividendsRepository.findDividendsReadyForAutomaticReinvestment();
   }
 }

@@ -1,9 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
+import { TradingController } from 'Trading/Port/Api/TradingController';
 
 export type TradingApiType = {
-  // canObjectBeUpdated: UserTradingActions['canObjectBeUpdated'];
+  getInvestmentIdByTradeId: TradingController['getInvestmentIdByTradeId'];
 };
 
 export const TradingApi = (container: ContainerInterface): TradingApiType => ({
-  // canObjectBeUpdated: container.delegateTo(UserTradingActions, 'canObjectBeUpdated'),
+  getInvestmentIdByTradeId: container.delegateTo(TradingController, 'getInvestmentIdByTradeId'),
 });

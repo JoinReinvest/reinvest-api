@@ -1,7 +1,7 @@
+import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { PrincipalVerificationEvent, VerificationEvents } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
-import { DateTime } from 'Money/DateTime';
 
 export class MarkAccountAsApproved {
   private verifierService: VerifierService;

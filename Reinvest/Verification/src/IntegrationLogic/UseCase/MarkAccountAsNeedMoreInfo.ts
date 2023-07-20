@@ -1,9 +1,9 @@
+import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 import { PrincipalVerificationEvent, VerificationEvents } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
 import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
-import { DomainEvent } from 'SimpleAggregator/Types';
-import { DateTime } from 'Money/DateTime';
 
 export class MarkAccountAsNeedMoreInfo {
   private verifierService: VerifierService;

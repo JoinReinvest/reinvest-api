@@ -1,6 +1,9 @@
 import { TransactionDecision, TransactionDecisions } from 'Investments/Domain/Transaction/TransactionDecisions';
 import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { TransactionProcessManagerTypes } from 'Investments/Domain/Transaction/TransactionProcessManagerTypes';
+import { DateTime } from 'Money/DateTime';
+
+const RETRY_PAYMENT_AFTER_DAYS = 1;
 
 export class TransactionProcessManager implements TransactionProcessManagerTypes {
   private readonly investmentId: string;
@@ -39,7 +42,8 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
   }
 
   makeDecision(): TransactionDecision {
-    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId, parentId, userTradeId } = this.eventsAnalysis();
+    const { lastEvent, amount, fees, accountId, ip, bankAccountId, subscriptionAgreementId, portfolioId, parentId, userTradeId, lastEventDate, unitPrice } =
+      this.eventsAnalysis();
 
     if (!lastEvent || !this.profileId) {
       return this.decide(TransactionDecisions.AWAITING_INVESTMENT);
@@ -61,8 +65,10 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           portfolioId,
           parentId,
           userTradeId,
+          unitPrice,
         });
       case TransactionEvents.TRADE_CREATED:
+      case TransactionEvents.PAYMENT_RETRIED:
         return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED);
       case TransactionEvents.INVESTMENT_FUNDED:
         return this.decide(TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED);
@@ -76,12 +82,24 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
         return this.decide(TransactionDecisions.FINISH_INVESTMENT);
       case TransactionEvents.INVESTMENT_FINISHED:
         return this.decide(TransactionDecisions.DO_NOTHING);
+      case TransactionEvents.PAYMENT_FAILED:
+        return this.decide(TransactionDecisions.RETRY_PAYMENT, {
+          retryAfterDate: lastEventDate ? lastEventDate!.addDays(RETRY_PAYMENT_AFTER_DAYS) : DateTime.now().addDays(RETRY_PAYMENT_AFTER_DAYS),
+        });
+      case TransactionEvents.PAYMENT_MISMATCH:
+      case TransactionEvents.SECOND_PAYMENT_FAILED:
+      case TransactionEvents.VERIFICATION_REJECTED_FOR_INVESTMENT:
+      case TransactionEvents.INVESTMENT_REJECTED_BY_PRINCIPAL:
+      case TransactionEvents.TRANSACTION_REVERTED_UNWINDING:
+        return this.decide(TransactionDecisions.REVERT_TRANSACTION);
       case TransactionEvents.INVESTMENT_CANCELED:
       case TransactionEvents.TRANSACTION_CANCELED_UNWINDING:
         return this.decide(TransactionDecisions.CANCEL_TRANSACTION);
       case TransactionEvents.TRANSACTION_CANCELED:
+      case TransactionEvents.TRANSACTION_REVERTED:
         return this.decide(TransactionDecisions.DO_NOTHING);
       case TransactionEvents.TRANSACTION_CANCELED_FAILED:
+      case TransactionEvents.TRANSACTION_REVERTED_FAILED:
         return this.decide(TransactionDecisions.DO_NOTHING); // TODO something?
       default:
         break;
@@ -110,16 +128,25 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
         return [
           TransactionEvents.ACCOUNT_VERIFIED_FOR_INVESTMENT,
           TransactionEvents.INVESTMENT_CANCELED,
-          TransactionEvents.ACCOUNT_VERIFICATION_REJECTED_FOR_INVESTMENT, // abort investment
+          TransactionEvents.VERIFICATION_REJECTED_FOR_INVESTMENT,
         ].includes(kind);
       case TransactionDecisions.FINALIZE_INVESTMENT:
         return [TransactionEvents.INVESTMENT_FINALIZED, TransactionEvents.INVESTMENT_CANCELED].includes(kind);
       case TransactionDecisions.CREATE_TRADE:
-        return [TransactionEvents.TRADE_CREATED, TransactionEvents.INVESTMENT_CANCELED].includes(kind); // cancel investment
+        return [TransactionEvents.TRADE_CREATED, TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.PAYMENT_MISMATCH].includes(kind); // cancel investment
       case TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED:
-        return [TransactionEvents.INVESTMENT_FUNDED, TransactionEvents.INVESTMENT_CANCELED].includes(kind); // unwind investment
+        return [
+          TransactionEvents.INVESTMENT_FUNDED,
+          TransactionEvents.INVESTMENT_CANCELED,
+          TransactionEvents.PAYMENT_FAILED,
+          TransactionEvents.SECOND_PAYMENT_FAILED,
+        ].includes(kind);
       case TransactionDecisions.CHECK_IS_INVESTMENT_APPROVED:
-        return [TransactionEvents.INVESTMENT_APPROVED, TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.INVESTMENT_REJECTED].includes(kind);
+        return [TransactionEvents.INVESTMENT_APPROVED, TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.INVESTMENT_REJECTED_BY_PRINCIPAL].includes(
+          kind,
+        );
+      case TransactionDecisions.RETRY_PAYMENT:
+        return [TransactionEvents.INVESTMENT_CANCELED, TransactionEvents.PAYMENT_RETRIED].includes(kind);
       case TransactionDecisions.CHECK_IF_GRACE_PERIOD_ENDED:
         return [TransactionEvents.GRACE_PERIOD_ENDED, TransactionEvents.INVESTMENT_CANCELED].includes(kind);
       case TransactionDecisions.MARK_FUNDS_AS_READY_TO_DISBURSE:
@@ -133,6 +160,12 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           TransactionEvents.TRANSACTION_CANCELED,
           TransactionEvents.TRANSACTION_CANCELED_FAILED,
           TransactionEvents.TRANSACTION_CANCELED_UNWINDING,
+        ].includes(kind);
+      case TransactionDecisions.REVERT_TRANSACTION:
+        return [
+          TransactionEvents.TRANSACTION_REVERTED,
+          TransactionEvents.TRANSACTION_REVERTED_FAILED,
+          TransactionEvents.TRANSACTION_REVERTED_UNWINDING,
         ].includes(kind);
       default:
         return false;
@@ -156,9 +189,11 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     fees: number | null;
     ip: string | null;
     lastEvent: TransactionEvent | null;
+    lastEventDate: DateTime | null;
     parentId: string | null;
     portfolioId: string | null;
     subscriptionAgreementId: string | null;
+    unitPrice: number | null;
     userTradeId: string | null;
   } {
     let amount = null;
@@ -171,9 +206,12 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
     let portfolioId = null;
     let parentId = null;
     let userTradeId = null;
+    let lastEventDate = null;
+    let unitPrice = null;
 
     for (const event of this.events) {
       lastEvent = event;
+      lastEventDate = event.date ? DateTime.from(event.date) : DateTime.now();
       switch (event.kind) {
         case TransactionEvents.INVESTMENT_CREATED:
           accountId = event.data.accountId;
@@ -188,6 +226,7 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
           subscriptionAgreementId = event.data.subscriptionAgreementId;
           portfolioId = event.data.portfolioId;
           userTradeId = event.data.userTradeId;
+          unitPrice = event.data.unitPrice;
           break;
         default:
           break;
@@ -205,6 +244,8 @@ export class TransactionProcessManager implements TransactionProcessManagerTypes
       portfolioId,
       parentId,
       userTradeId,
+      lastEventDate,
+      unitPrice,
     };
   }
 }

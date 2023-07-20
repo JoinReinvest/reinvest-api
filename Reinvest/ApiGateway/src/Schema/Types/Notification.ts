@@ -14,6 +14,7 @@ const schema = `
         INVESTMENT_FAILED
         INVESTMENT_FUNDS_RECEIVED
         RECURRING_INVESTMENT_FAILED
+        FEES_APPROVAL_REQUIRED
 
         VERIFICATION_FAILED
         FUNDS_WITHDRAWAL_REJECTED
@@ -26,6 +27,7 @@ const schema = `
         INVESTMENT
         DIVIDEND
         ACCOUNT
+        RECURRING_INVESTMENT
     }
 
     type NotificationObject {

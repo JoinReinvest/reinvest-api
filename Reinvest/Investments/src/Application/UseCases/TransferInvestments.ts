@@ -1,7 +1,7 @@
-import { UUID } from "HKEKTypes/Generics";
-import { IdGeneratorInterface } from "IdGenerator/IdGenerator";
-import { SharesAndDividendService } from "Investments/Infrastructure/Adapters/Modules/SharesAndDividendService";
-import { InvestmentsRepository } from "Investments/Infrastructure/Adapters/Repository/InvestmentsRepository";
+import { UUID } from 'HKEKTypes/Generics';
+import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
+import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 
 // from id to id
 export type TransferredInvestments = {

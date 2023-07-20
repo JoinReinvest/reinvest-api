@@ -1,12 +1,11 @@
 /* eslint-disable typescript-sort-keys/interface */
-import { TemplateContentType, TemplateStructureType } from "Templates/Types";
+import { TemplateContentType, TemplateStructureType } from 'Templates/Types';
 
 export interface SubscriptionAgreementContentFieldsV1 extends TemplateContentType {
   // portfolio
   nameOfAsset: string;
   nameOfOffering: string;
   offeringsCircularLink: string;
-  tendererCompanyName: string;
 
   // legal entities
   purchaserName: string;
@@ -81,7 +80,7 @@ export const subscriptionAgreementTemplateV1: TemplateStructureType = [
     paragraphs: [
       {
         lines: [
-          'This Subscription Agreement and the Operating Agreement are legal agreements between you and {{{(tendererCompanyName)}}}\n' +
+          'This Subscription Agreement and the Operating Agreement are legal agreements between you and {{REINVEST Corp.}}\n' +
             '(company name) pertaining to your investment in {{{(nameOfAsset)}}} (series name). Your investment in membership interests\n' +
             'in {{{(investedAmount)}}} (the "Series (name) Interests") is contingent upon you accepting all of terms and conditions contained\n' +
             'in this Subscription Agreement and the Operating Agreement. The offering of the Series (name) Interests (the\n' +
@@ -284,7 +283,7 @@ export const subscriptionAgreementTemplateV1: TemplateStructureType = [
             'the information under the "SUMMARY" section above is true and correct.',
           'Accepted:',
           '{{{(nameOfOffering)}}}',
-          'By: {{{(tendererCompanyName)}}}',
+          'By: {{REINVEST Corp.}}',
           'Name of Authorized Officer: {{{(firstName)} {(lastName)}}}',
           // @ts-ignore
           (content: SubscriptionAgreementContentFieldsV1) =>

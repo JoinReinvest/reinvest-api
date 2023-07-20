@@ -1,8 +1,8 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { TradeVerification, TradeVerificationState } from 'Trading/Domain/TradeVerification';
 import { OrderStatus, TradeStatus } from 'Trading/IntegrationLogic/NorthCapitalTypes';
-import { DateTime } from 'Money/DateTime';
 
 export type TradeConfiguration = {
   accountId: string;
@@ -15,6 +15,7 @@ export type TradeConfiguration = {
   portfolioId: string;
   profileId: string;
   subscriptionAgreementId: string;
+  unitPrice: number;
   userTradeId: string;
 };
 export type VendorsConfiguration = {
@@ -25,7 +26,6 @@ export type VendorsConfiguration = {
   northCapitalParentAccountId: string;
   offeringId: string;
   parentEmail: string;
-  unitSharePrice: number;
 };
 
 export type NorthCapitalTradeState = {
@@ -35,6 +35,12 @@ export type NorthCapitalTradeState = {
   tradeShares: string;
   tradeStatus: 'CREATED' | 'FUNDED' | 'SETTLED' | 'CANCELED' | 'UNWIND PENDING' | 'UNWIND SETTLED';
   tradeVerification: TradeVerificationState;
+  paymentMismatchTradeRemoved?: {
+    date: string;
+    details: any;
+    status: string;
+    tradeId: string;
+  };
 };
 
 export type VertaloDistributionState = {
@@ -45,6 +51,8 @@ export type VertaloDistributionState = {
 };
 
 export type FundsMoveState = {
+  accountId: string;
+  paymentId: string;
   status: string;
 };
 
@@ -88,6 +96,7 @@ export type TradeSchema = {
   fundsMoveState: FundsMoveState | null;
   investmentId: string;
   northCapitalTradeState: NorthCapitalTradeState | null;
+  retryPaymentState: FundsMoveState | null;
   sharesTransferState: SharesTransferState | null;
   subscriptionAgreementState: SubscriptionAgreementState | null;
   tradeConfiguration: TradeConfiguration;
@@ -101,20 +110,20 @@ export class Trade {
   private readonly amount: Money;
   private readonly fees: Money;
   private tradeSchema: TradeSchema;
-  private unitSharePrice: Money | null;
-  private shares: number | null;
+  private unitSharePrice: Money;
+  private shares: number;
   private tradeStatus: TradeStatus;
 
   constructor(tradeSchema: TradeSchema) {
     this.tradeSchema = tradeSchema;
-    const { amount, fees } = this.tradeSchema.tradeConfiguration;
-    const unitSharePrice = this.tradeSchema.vendorsConfiguration?.unitSharePrice;
+    const { amount, fees, unitPrice } = this.tradeSchema.tradeConfiguration;
 
-    this.unitSharePrice = unitSharePrice ? new Money(unitSharePrice) : null;
+    // @ts-ignore
+    this.unitSharePrice = new Money(unitPrice);
     this.amount = new Money(amount);
     this.fees = new Money(fees);
 
-    this.shares = this.unitSharePrice ? this.calculateShares(this.amount, this.unitSharePrice) : null;
+    this.shares = this.calculateShares(this.amount, this.unitSharePrice);
     this.tradeStatus = TradeStatus.fromResponse(this.tradeSchema.northCapitalTradeState ? this.tradeSchema.northCapitalTradeState?.tradeStatus : null);
   }
 
@@ -133,8 +142,6 @@ export class Trade {
 
   setVendorsConfiguration(vendorsConfiguration: VendorsConfiguration) {
     this.tradeSchema.vendorsConfiguration = vendorsConfiguration;
-    this.unitSharePrice = new Money(vendorsConfiguration.unitSharePrice);
-    this.shares = this.calculateShares(this.amount, this.unitSharePrice);
   }
 
   setTradeState(tradeState: NorthCapitalTradeState) {
@@ -157,6 +164,16 @@ export class Trade {
 
   tradeExists(): boolean {
     return this.tradeStatus.isSet();
+  }
+
+  getTradeToDelete(): {
+    ncAccountId: string;
+    tradeId: string;
+  } {
+    return {
+      ncAccountId: this.tradeSchema.vendorsConfiguration!.northCapitalParentAccountId,
+      tradeId: this.tradeSchema.northCapitalTradeState!.tradeId,
+    };
   }
 
   getNorthCapitalTradeConfiguration(): {
@@ -484,5 +501,65 @@ export class Trade {
 
   getReinvestAccountId(): UUID {
     return this.tradeSchema.tradeConfiguration.accountId;
+  }
+
+  isPaymentMismatched(): boolean {
+    const investmentAmount = this.amount;
+    const tradePrice = this.tradeSchema.northCapitalTradeState?.tradePrice;
+
+    if (!tradePrice) {
+      return false;
+    }
+
+    const amountToPay = Money.lowPrecision(Math.round(parseFloat(tradePrice) * 100));
+    const diff = amountToPay.subtract(investmentAmount).getAmount();
+
+    if (diff != 0) {
+      // if diff is more/less than 0 cents then there is a mismatch
+      return true;
+    }
+
+    return false;
+  }
+
+  getUnitPrice() {
+    return this.unitSharePrice?.getFormattedAmount();
+  }
+
+  setRemoveTradeDetails(removeDetails: { details: any; status: string }, tradeId: string) {
+    this.tradeSchema.northCapitalTradeState!.paymentMismatchTradeRemoved = {
+      details: removeDetails.details,
+      status: removeDetails.status,
+      date: DateTime.now().toIsoDateTime(),
+      tradeId,
+    };
+  }
+
+  getNorthCapitalPayment(): {
+    ncAccountId: string;
+    paymentId: string;
+  } | null {
+    if (!this.tradeSchema.fundsMoveState?.paymentId) {
+      return null;
+    }
+
+    let paymentId = this.tradeSchema.fundsMoveState!.paymentId;
+
+    if (this.isPaymentRetried()) {
+      paymentId = this.tradeSchema.retryPaymentState!.paymentId;
+    }
+
+    return {
+      ncAccountId: this.tradeSchema.fundsMoveState!.accountId,
+      paymentId,
+    };
+  }
+
+  isPaymentRetried(): boolean {
+    return this.tradeSchema.retryPaymentState !== null;
+  }
+
+  setPaymentRetried(retryPaymentState: FundsMoveState): void {
+    this.tradeSchema.retryPaymentState = retryPaymentState;
   }
 }

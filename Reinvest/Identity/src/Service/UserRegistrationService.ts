@@ -42,7 +42,8 @@ export class UserRegistrationService {
         profileId = this.idGenerator.createUuid();
         const id = this.idGenerator.createUuid();
         const userIncentiveToken = await this.incentiveTokenRepository.generateUniqueIncentiveToken();
-        await this.userRepository.registerUser(id, profileId, userIncentiveToken, userId, email, incentiveToken);
+        const label = email.split('@')[0] ?? 'Investor';
+        await this.userRepository.registerUser(id, profileId, userIncentiveToken, userId, email, incentiveToken, label);
         console.log(`User created: ${userId} with profile id ${profileId}`);
       } else {
         console.log(`User ${userId} already exists with profile id ${profile.profileId}`);

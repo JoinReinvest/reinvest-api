@@ -1,10 +1,10 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Property } from 'Portfolio/Domain/Property';
 import { PropertyStatus } from 'Portfolio/Domain/types';
 
 import { GetPropertiesResponse, GetPropertyResponse } from './types';
-import { DateTime } from 'Money/DateTime';
 
 export type DealpathConfig = {
   API_URL: string;

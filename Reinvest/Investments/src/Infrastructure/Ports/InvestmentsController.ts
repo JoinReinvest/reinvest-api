@@ -1,8 +1,7 @@
-import { UUID } from 'HKEKTypes/Generics';
-import { Pagination } from 'Investments/Application/Pagination';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
-import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
+import { CreateInvestment } from 'Investments/Application/UseCases/CreateInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import ListInvestmentsQuery, { InvestmentOverview } from 'Investments/Application/UseCases/ListInvestmentsQuery';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
@@ -69,7 +68,7 @@ export class InvestmentsController {
     return this.transferInvestmentsUseCase.execute(profileId, transferFromAccount, transferToAccount);
   }
 
-  public async getPendingInvestments(): Promise<UUID[]> {
-    return this.listInvestmentsQuery.getPendingInvestmentsIds();
+  public async getPendingInvestments(pagination: Pagination): Promise<UUID[]> {
+    return this.listInvestmentsQuery.getPendingInvestmentsIds(pagination);
   }
 }

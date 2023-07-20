@@ -13,7 +13,12 @@ export interface JSONObjectOf<Type> {
 }
 
 export type UUID = string;
-
+export type IsoDateString = string;
+export type IsoDateTimeString = string;
+export type MoneyView = {
+  formatted: string;
+  value: number;
+};
 export type Pagination = {
   page: number;
   perPage: number;

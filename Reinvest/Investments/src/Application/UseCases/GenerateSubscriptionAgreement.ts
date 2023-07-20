@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { GeneratePdfCommand, PdfKinds } from 'HKEKTypes/Pdf';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { GeneratePdfCommand, PdfKinds } from 'HKEKTypes/Pdf';
 
 export class GenerateSubscriptionAgreement {
   static getClassName = (): string => 'GenerateSubscriptionAgreement';

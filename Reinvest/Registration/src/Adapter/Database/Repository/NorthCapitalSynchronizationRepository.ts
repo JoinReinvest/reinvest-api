@@ -1,4 +1,5 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import {
   northCapitalSynchronizationTable,
   RegistrationDatabaseAdapterProvider,
@@ -16,7 +17,6 @@ import {
 } from 'Registration/Adapter/NorthCapital/NorthCapitalSynchronizationRecord';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 import { NorthCapitalSynchronizationMapping } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalTypes';
-import { DateTime } from 'Money/DateTime';
 
 export class NorthCapitalSynchronizationRepository {
   public static getClassName = (): string => 'NorthCapitalSynchronizationRepository';

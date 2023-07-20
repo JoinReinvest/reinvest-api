@@ -13,6 +13,7 @@ export enum StoredEventKind {
   ArchivingBeneficiaryStarted = 'ArchivingBeneficiaryStarted',
   ArchivingBeneficiaryCompleted = 'ArchivingBeneficiaryCompleted',
   TransferringBeneficiaryToParentCompleted = 'TransferringBeneficiaryToParentCompleted',
+  RecurringInvestmentSuspended = 'RecurringInvestmentSuspended',
 }
 
 export const StoredEvents = <StoredEventsType>{
@@ -41,7 +42,27 @@ export const StoredEvents = <StoredEventsType>{
   UserRegistered: {
     accountActivity: {
       data: () => ({}),
-      name: () => `REINVEST User registered`,
+      name: ({ userName }) => `${userName} joined our platform.`,
+    },
+    push: {
+      title: ({ userName }) => `Welcome to our app, ${userName}!`,
+      body: () => '',
+    },
+
+    inApp: {
+      header: ({ userName }) => `Welcome, ${userName}!`,
+      body: () => ` Let's get started with your investing journey.`,
+      notificationType: NotificationsType.GENERIC_NOTIFICATION,
+    },
+    email: {
+      subject: () => 'Welcome to our app!',
+      body: ({ userName }) => `Dear ${userName}, welcome to our platform. Let's start your financial growth journey.`,
+    },
+    analyticEvent: {
+      eventName: 'UserRegistered',
+      sendIdentity: () => true,
+      identityData: ({ userName }) => ({ userName }),
+      data: ({ userName }) => ({ userName }),
     },
   },
   CorporateAccountOpened: {
@@ -122,6 +143,28 @@ export const StoredEvents = <StoredEventsType>{
     push: {
       title: ({ tradeId }) => `Payment initiated for trade ${tradeId}`,
       body: paymentInitiatedBody,
+    },
+  },
+  RecurringInvestmentSuspended: {
+    accountActivity: {
+      data: ({ recurringId, reason }) => ({
+        recurringId,
+        reason,
+      }),
+      name: ({ reason }) => `Recurring investment suspended. Reason: ${reason}`,
+    },
+    inApp: {
+      header: () => `Recurring investment suspended.`,
+      body: ({ reason }) => `${reason}`,
+      notificationType: NotificationsType.RECURRING_INVESTMENT_FAILED,
+      onObject: ({ recurringId }) => ({
+        onObjectId: recurringId,
+        onObjectType: NotificationObjectType.RECURRING_INVESTMENT,
+      }),
+    },
+    push: {
+      title: () => `Recurring investment suspended.`,
+      body: ({ reason }) => `${reason}`,
     },
   },
 };

@@ -6,14 +6,15 @@ import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierS
 import { MarkAccountAsApproved } from 'Verification/IntegrationLogic/UseCase/MarkAccountAsApproved';
 import { MarkAccountAsDisapproved } from 'Verification/IntegrationLogic/UseCase/MarkAccountAsDisapproved';
 import { MarkAccountAsNeedMoreInfo } from 'Verification/IntegrationLogic/UseCase/MarkAccountAsNeedMoreInfo';
+import { PayFee } from 'Verification/IntegrationLogic/UseCase/PayFee';
 import { VerifyAccount } from 'Verification/IntegrationLogic/UseCase/VerifyAccount';
+import { WithdrawFee } from 'Verification/IntegrationLogic/UseCase/WithdrawFee';
 import { VerifierExecutor } from 'Verification/IntegrationLogic/Verifier/VerifierExecutor';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 import { AdminVerificationActions } from 'Verification/Port/Api/AdminVerificationActions';
 import { NorthCapitalVerificationEvents } from 'Verification/Port/Api/NorthCapitalVerificationEvents';
 import { PrincipalApprovals } from 'Verification/Port/Api/PrincipalApprovals';
 import { UserVerificationActions } from 'Verification/Port/Api/UserVerificationActions';
-import { PayFee } from 'Verification/IntegrationLogic/UseCase/PayFee';
 import { VerificationFeesController } from 'Verification/Port/Api/VerificationFeesController';
 
 export class PortsProvider {
@@ -29,7 +30,7 @@ export class PortsProvider {
     container.addSingleton(MarkAccountAsDisapproved, [VerifierService]);
     container.addSingleton(MarkAccountAsNeedMoreInfo, [VerifierService, SimpleEventBus]);
     container.addSingleton(VerifyAccount, [RegistrationService, VerifierService]);
-    container.addSingleton(VerificationFeesController, [PayFee]);
+    container.addSingleton(VerificationFeesController, [PayFee, WithdrawFee]);
 
     // api
     container.addSingleton(AdminVerificationActions, [VerifierRepository]);

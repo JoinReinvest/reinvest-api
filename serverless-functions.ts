@@ -12,6 +12,8 @@ import {
 } from './devops/functions/cron/dividendsDistribution/cron-dividends-distributions-config';
 import { CronDocumentSyncFunction, CronDocumentSyncResources } from './devops/functions/cron/documentSync/cron-document-sync-config';
 import { CronNotificationsFunction, CronNotificationsResources } from './devops/functions/cron/notifications/cron-notifications-config';
+import { CronPushEveryDayFunction, CronPushEveryDayResources } from './devops/functions/cron/pushEveryDayProcesses/cron-push-config';
+import { CronRecurringInvestmentsFunction, CronRecurringInvestmentsResources } from './devops/functions/cron/recurringInvestments/recurring-investments-config';
 import { CronVendorsSyncFunction, CronVendorsSyncResources } from './devops/functions/cron/vendorsSync/cron-vendors-sync-config';
 import { ExplorerLambdaFunction, ExplorerLambdaResources } from './devops/functions/explorer/explorer-config';
 import { FirebaseFunction, FirebaseResources } from './devops/functions/firebase/queue-config';
@@ -20,12 +22,12 @@ import { PdfGeneratorFunction, PdfGeneratorResources } from './devops/functions/
 import { cognitoPostSignUpFunction, CognitoPostSignUpResources } from './devops/functions/postSignUp/postSignUp-config';
 import { cognitoPreSignUpFunction, CognitoPreSignUpResources } from './devops/functions/preSignUp/preSignUp-config';
 import { QueueFunction, QueueResources } from './devops/functions/queue/queue-config';
+import { SegmentFunction, SegmentResources } from './devops/functions/segment/queue-config';
 import { TestsFunction, TestsLambdaResources } from './devops/functions/tests/tests-config';
 import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } from './devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config';
 import { CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs, CognitoEnvs } from './devops/serverless/cognito';
 import { margeWithApiGatewayUrl, ProviderEnvironment } from './devops/serverless/serverless-common';
 import { getAttribute, importOutput } from './devops/serverless/utils';
-import { CronPushEveryDayFunction, CronPushEveryDayResources } from './devops/functions/cron/pushEveryDayProcesses/cron-push-config';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
@@ -40,8 +42,8 @@ const serverlessConfiguration: AWS = {
       ...ProviderEnvironment,
       ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
       ApiUrl: margeWithApiGatewayUrl('/api'),
-      POSTGRESQL_HOST: importOutput('DatabaseHost'),
-      POSTGRESQL_DB: importOutput('DatabaseName'),
+      POSTGRESQL_HOST: '${env:POSTGRESQL_HOST}',
+      POSTGRESQL_DB: '${env:POSTGRESQL_DB_NAME}',
       CognitoUserPoolID: importOutput('CognitoUserPoolID'),
       S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
       S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
@@ -50,6 +52,7 @@ const serverlessConfiguration: AWS = {
       SQS_QUEUE_URL: getAttribute('SQSNotification', 'QueueUrl'),
       SQS_PDF_GENERATOR_URL: getAttribute('SQSPdfGenerator', 'QueueUrl'),
       SQS_FIREBASE_QUEUE_URL: getAttribute('SQSFirebase', 'QueueUrl'),
+      SQS_SEGMENT_QUEUE_URL: getAttribute('SQSSegment', 'QueueUrl'),
       EMAIL_SEND_FROM: '${env:EMAIL_SEND_FROM}',
       EMAIL_REPLY_TO: '${env:EMAIL_REPLY_TO}',
       WEB_APP_URL: '${env:WEB_APP_URL}',
@@ -100,11 +103,13 @@ const serverlessConfiguration: AWS = {
     cronDividendsDistribution: CronDividendsDistributionFunction,
     cronNotificationsFunction: CronNotificationsFunction,
     cronPushEveryDay: CronPushEveryDayFunction,
+    cronRecurringInvestments: CronRecurringInvestmentsFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     tests: TestsFunction,
     pdfGenerator: PdfGeneratorFunction,
     firebase: FirebaseFunction,
+    segment: SegmentFunction,
   },
   resources: {
     Description: 'REINVEST ${sls:stage} API functions',
@@ -123,8 +128,10 @@ const serverlessConfiguration: AWS = {
       ...CronVendorsSyncResources,
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
+      ...CronRecurringInvestmentsResources,
       ...PdfGeneratorResources,
       ...FirebaseResources,
+      ...SegmentResources,
       ...CronNotificationsResources,
       ...CronPushEveryDayResources,
     },

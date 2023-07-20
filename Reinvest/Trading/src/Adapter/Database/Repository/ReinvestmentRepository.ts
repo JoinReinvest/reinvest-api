@@ -2,7 +2,7 @@ import { Updateable } from 'kysely';
 import { reinvestmentTradesTable, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { ReinvestmentTradesTable } from 'Trading/Adapter/Database/TradingSchema';
 import { ReinvestmentTrade, ReinvestmentTradeConfiguration, ReinvestmentTradeSchema, ReinvestmentVendorsConfiguration } from 'Trading/Domain/ReinvestmentTrade';
-import { SharesTransferState, VendorsConfiguration, VertaloDistributionState, VertaloPaymentState } from 'Trading/Domain/Trade';
+import { SharesTransferState, VertaloDistributionState, VertaloPaymentState } from 'Trading/Domain/Trade';
 
 export class ReinvestmentRepository {
   private databaseAdapterProvider: TradingDatabaseAdapterProvider;

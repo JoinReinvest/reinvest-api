@@ -1,3 +1,4 @@
+import { DateTime } from 'Money/DateTime';
 import {
   ManualVerificationAmlResult,
   ManualVerificationKycResult,
@@ -7,7 +8,6 @@ import {
   VerificationStatus,
 } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { Verifier } from 'Verification/Domain/ValueObject/Verifiers';
-import { DateTime } from 'Money/DateTime';
 
 export class VerificationEventMocks {
   private partyId: string;

@@ -62,6 +62,14 @@ export class UpdateProfile {
           case 'name':
             profile.setName(PersonalName.create(data as PersonalNameInput));
             events.push(sensitiveDataUpdated(UpdatedObjectType.PROFILE, profileId));
+            events.push(<DomainEvent>{
+              kind: 'ProfileNameUpdated',
+              data: {
+                profileId,
+                label: profile.getFullName(),
+              },
+              id: profileId,
+            });
             break;
           case 'address':
             profile.setAddress(Address.create(data as AddressInput));
