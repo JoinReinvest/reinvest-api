@@ -262,9 +262,15 @@ export class Investment {
     this.investmentSchema.dateUpdated = DateTime.now();
   }
 
-  complete(): void {
+  complete(): boolean {
+    if (this.investmentSchema.status === InvestmentStatus.FINISHED) {
+      return false;
+    }
+
     this.investmentSchema.status = InvestmentStatus.FINISHED;
     this.investmentSchema.dateUpdated = DateTime.now();
+
+    return true;
   }
 
   settlingStarted() {
@@ -272,12 +278,41 @@ export class Investment {
     this.investmentSchema.dateUpdated = DateTime.now();
   }
 
-  revert() {
+  revert(): boolean {
+    if (this.investmentSchema.status === InvestmentStatus.REVERTED) {
+      return false;
+    }
+
     this.investmentSchema.status = InvestmentStatus.REVERTED;
     this.investmentSchema.dateUpdated = DateTime.now();
+
+    return true;
   }
 
   getFormattedUnitPrice(): string {
     return this.investmentSchema.unitPrice.getFormattedAmount();
+  }
+
+  private getFeeAmount(): Money {
+    if (!this.fee) {
+      return Money.zero();
+    }
+
+    return this.fee.toObject().amount;
+  }
+
+  forInvestmentEvent() {
+    return {
+      accountId: this.investmentSchema.accountId,
+      tradeId: this.investmentSchema.tradeId,
+      origin: this.investmentSchema.origin,
+      investmentId: this.investmentSchema.id,
+      amount: this.investmentSchema.amount.getAmount(),
+      fee: this.getFeeAmount().getAmount(),
+    };
+  }
+
+  getProfileId(): UUID {
+    return this.investmentSchema.profileId;
   }
 }

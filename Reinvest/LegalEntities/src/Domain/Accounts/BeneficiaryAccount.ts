@@ -100,7 +100,7 @@ export class BeneficiaryAccount {
     return this.individualId;
   }
 
-  private getLabel(): string {
+  getLabel(): string {
     return `${this.name.firstName} ${this.name.lastName}`;
   }
 

@@ -13,6 +13,7 @@ import { NotificationQuery } from 'Notifications/Application/UseCase/Notificatio
 import { ProcessStoredEvent } from 'Notifications/Application/UseCase/ProcessStoredEvent';
 import { TransferNotification } from 'Notifications/Application/UseCase/TransferNotification';
 import { Notifications } from 'Notifications/index';
+import { CreateStoredEvent } from 'Notifications/Application/UseCase/CreateStoredEvent';
 
 export class UseCaseProvider {
   private config: Notifications.Config;
@@ -26,6 +27,7 @@ export class UseCaseProvider {
     container.addSingleton(TransferNotification, [NotificationsRepository]);
     container.addSingleton(DismissNotifications, [NotificationsRepository]);
     container.addSingleton(NotificationQuery, [NotificationsRepository]);
+    container.addSingleton(CreateStoredEvent, [StoredEventRepository, IdGenerator]);
     container.addSingleton(ProcessStoredEvent, [
       StoredEventRepository,
       AccountActivitiesRepository,

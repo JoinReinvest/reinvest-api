@@ -3,6 +3,8 @@ import type { BeneficiaryName } from 'LegalEntities/Domain/Accounts/BeneficiaryA
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { DomainEvent } from 'SimpleAggregator/Types';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
+import { AccountType } from 'LegalEntities/Domain/AccountType';
 
 export type UpdateBeneficiaryAccountInput = {
   avatar?: { id: string };
@@ -77,6 +79,14 @@ export class UpdateBeneficiaryAccount {
           }
         }
       }
+
+      events.push(
+        storeEventCommand(profileId, 'AccountUpdated', {
+          accountId,
+          type: AccountType.BENEFICIARY,
+          updatedFields: inputKeys,
+        }),
+      );
 
       await this.beneficiaryRepository.storeBeneficiary(beneficiaryAccount, events);
     } catch (error: any) {

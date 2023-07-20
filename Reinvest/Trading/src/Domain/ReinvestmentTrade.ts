@@ -192,6 +192,15 @@ export class ReinvestmentTrade {
     return this.tradeSchema.dividendId;
   }
 
+  forDividendReinvestedEvent() {
+    return {
+      profileId: this.tradeSchema.tradeConfiguration.profileId,
+      accountId: this.tradeSchema.tradeConfiguration.accountId,
+      amount: this.tradeSchema.tradeConfiguration.amount,
+      dividendId: this.tradeSchema.dividendId,
+    };
+  }
+
   private calculateShares(amount: Money, unitSharePrice: Money): number {
     const shares = amount.divideByMoney(unitSharePrice);
 

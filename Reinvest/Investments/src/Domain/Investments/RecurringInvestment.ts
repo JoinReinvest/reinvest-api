@@ -119,4 +119,18 @@ export class RecurringInvestment {
   suspend(): void {
     this.schema.status = RecurringInvestmentStatus.SUSPENDED;
   }
+
+  forEvent() {
+    return {
+      accountId: this.schema.accountId,
+      amount: this.schema.amount.getAmount(),
+      dateCreated: this.schema.dateCreated.toIsoDateTime(),
+      frequency: this.schema.frequency,
+      recurringId: this.schema.id,
+      portfolioId: this.schema.portfolioId,
+      subscriptionAgreementId: this.schema.subscriptionAgreementId,
+      startDate: this.schema.startDate.toIsoDate(),
+      status: this.schema.status,
+    };
+  }
 }

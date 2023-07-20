@@ -28,8 +28,8 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(TradingDatabaseAdapterInstanceProvider, createTradingDatabaseAdapterProvider(this.config.database))
-      .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider])
-      .addSingleton(ReinvestmentRepository, [TradingDatabaseAdapterInstanceProvider]);
+      .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(ReinvestmentRepository, [TradingDatabaseAdapterInstanceProvider, SimpleEventBus]);
 
     // modules
     container

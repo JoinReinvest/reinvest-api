@@ -1,5 +1,8 @@
+import { DateTime } from 'Money/DateTime';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
+import { Trade } from 'Trading/Domain/Trade';
 
 export class UnwindTrade {
   private tradesRepository: TradesRepository;
@@ -41,6 +44,7 @@ export class UnwindTrade {
         if (currentTradeState.isUnwindSettled()) {
           trade.setTradeUnwounded();
           await this.tradesRepository.updateTrade(trade);
+          await this.sendCancelEvent(trade);
 
           return { event: 'Unwound' };
         }
@@ -59,6 +63,8 @@ export class UnwindTrade {
       await this.tradesRepository.updateTrade(trade);
 
       if (trade.isCanceled()) {
+        await this.sendCancelEvent(trade);
+
         return { event: 'Unwound' };
       } else if (trade.isTradeUnwinding()) {
         return { event: 'Unwinding' };
@@ -70,5 +76,20 @@ export class UnwindTrade {
 
       return null;
     }
+  }
+
+  private async sendCancelEvent(trade: Trade) {
+    const { amount, fee, userTradeId, investmentId } = trade.getFundsTransferConfiguration();
+
+    await this.tradesRepository.publishEvent(
+      storeEventCommand(trade.getProfileId(), 'TransactionCanceled', {
+        accountId: trade.getReinvestAccountId(),
+        investmentId,
+        amount: amount.getAmount(),
+        fee: fee.getAmount(),
+        tradeId: userTradeId,
+        date: DateTime.now().toIsoDateTime(),
+      }),
+    );
   }
 }

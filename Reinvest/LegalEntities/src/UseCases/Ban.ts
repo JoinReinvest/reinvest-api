@@ -5,6 +5,7 @@ import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 import { BannedType } from 'LegalEntities/Domain/BannedEntity';
 import { SensitiveNumberSchema } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { DateTime } from 'Money/DateTime';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class Ban {
@@ -34,6 +35,7 @@ export class Ban {
     const ein = accountSchema.einHash;
     const einAnonymized = accountSchema.ein.anonymized;
     const profileId = accountSchema.profileId;
+    const reason = Array.isArray(reasons) ? reasons.join(', ') : reasons;
 
     await this.banRepository.addBannedRecord(
       {
@@ -41,7 +43,7 @@ export class Ban {
         accountId,
         stakeholderId: null,
         type: BannedType.COMPANY,
-        reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
+        reasons: reason,
         dateCreated: DateTime.now().toDate(),
         dateCancelled: null,
         sensitiveNumber: ein ?? '',
@@ -57,6 +59,10 @@ export class Ban {
             profileId,
           },
         },
+        storeEventCommand(profileId, 'AccountBanned', {
+          accountId,
+          reason,
+        }),
       ],
     );
 
@@ -86,13 +92,14 @@ export class Ban {
     const ssn = (<SensitiveNumberSchema>stakeholderSchema.ssn).hashed;
     const ssnAnonymized = (<SensitiveNumberSchema>stakeholderSchema.ssn).anonymized;
 
+    const reason = Array.isArray(reasons) ? reasons.join(', ') : reasons;
     await this.banRepository.addBannedRecord(
       {
         profileId,
         accountId,
         stakeholderId,
         type: BannedType.STAKEHOLDER,
-        reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
+        reasons: reason,
         dateCreated: DateTime.now().toDate(),
         dateCancelled: null,
         sensitiveNumber: ssn ?? '',
@@ -108,6 +115,10 @@ export class Ban {
             profileId,
           },
         },
+        storeEventCommand(profileId, 'AccountBanned', {
+          accountId,
+          reason,
+        }),
       ],
     );
 
@@ -128,14 +139,14 @@ export class Ban {
     const profileObject = profile.toObject();
     const ssn = profileObject.ssnObject?.hashed;
     const ssnAnonymized = profileObject.ssnObject?.anonymized;
-
+    const reason = Array.isArray(reasons) ? reasons.join(', ') : reasons;
     await this.banRepository.addBannedRecord(
       {
         profileId,
         accountId: null,
         stakeholderId: null,
         type: BannedType.PROFILE,
-        reasons: Array.isArray(reasons) ? reasons.join(', ') : reasons,
+        reasons: reason,
         dateCreated: DateTime.now().toDate(),
         dateCancelled: null,
         sensitiveNumber: ssn ?? '',
@@ -150,6 +161,7 @@ export class Ban {
             profileId,
           },
         },
+        storeEventCommand(profileId, 'ProfileBanned', { reason }),
       ],
     );
 
@@ -192,6 +204,7 @@ export class Ban {
             profileId,
           },
         },
+        storeEventCommand(profileId, 'ProfileBanned', { reason }),
       ],
     );
 
@@ -236,6 +249,10 @@ export class Ban {
             profileId,
           },
         },
+        storeEventCommand(profileId, 'AccountBanned', {
+          accountId,
+          reason,
+        }),
       ],
     );
 

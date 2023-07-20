@@ -76,9 +76,15 @@ export class BanRepository {
 
     await this.databaseAdapterProvider.provide().insertInto(legalEntitiesBannedListTable).values(values).execute();
 
-    if (events.length > 0) {
-      await this.eventBus.publishMany(events);
+    await this.publishEvents(events);
+  }
+
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
     }
+
+    await this.eventBus.publishMany(events);
   }
 
   async listBanned(pagination: Pagination): Promise<BannedView[]> {

@@ -9,6 +9,7 @@ import { PersonalName, PersonalNameInput } from 'LegalEntities/Domain/ValueObjec
 import { PersonalStatement, PersonalStatementInput } from 'LegalEntities/Domain/ValueObject/PersonalStatements';
 import { SensitiveNumberInput, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
 import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type CompleteProfileInput = {
@@ -152,6 +153,20 @@ export class CompleteProfile {
           id: profileId,
           kind: 'LegalProfileCompleted',
         });
+        const profileData = profile.toObject();
+        events.push(
+          storeEventCommand(profileId, 'ProfileCompleted', {
+            ssn: profile.exposeSSN(),
+            name: profile.getFullName(),
+            label: profile.getFullName(),
+            address: profileData.address,
+            externalId: profileData.externalId,
+            dateOfBirth: profileData.dateOfBirth,
+            domicile: profileData.domicile,
+            investingExperience: profileData.investingExperience,
+            statements: profileData.statements,
+          }),
+        );
       } else {
         errors.push(<ValidationErrorType>{
           type: ValidationErrorEnum.FAILED,

@@ -90,7 +90,7 @@ export class NotificationEventHandler implements EventHandler<DomainEvent> {
         await this.pushNotificationRepository.pushNotification(profileId, pushNotification.title, pushNotification.body);
       }
     } catch (error: any) {
-      console.error('[NotificationEventHandler] createNotification', error);
+      console.error('[NotificationEventHandler] createStoredEvent', error);
     }
   }
 

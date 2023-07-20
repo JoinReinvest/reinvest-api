@@ -1,17 +1,12 @@
-import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import { DateTime } from 'Money/DateTime';
-import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
-import { StoredEvent } from 'Notifications/Domain/StoredEvent';
+import { CreateStoredEvent } from 'Notifications/Application/UseCase/CreateStoredEvent';
 import { EventHandler, STORE_EVENT_COMMAND, StoreEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class StoreEventsHandler implements EventHandler<StoreEventCommand> {
   static getClassName = (): string => 'StoreEventsHandler';
-  private storedEventsRepository: StoredEventRepository;
-  private idGenerator: IdGeneratorInterface;
+  private createStoredEventUseCase: CreateStoredEvent;
 
-  constructor(storedEventsRepository: StoredEventRepository, idGenerator: IdGeneratorInterface) {
-    this.storedEventsRepository = storedEventsRepository;
-    this.idGenerator = idGenerator;
+  constructor(createStoredEventUseCase: CreateStoredEvent) {
+    this.createStoredEventUseCase = createStoredEventUseCase;
   }
 
   public async handle(event: StoreEventCommand): Promise<void> {
@@ -24,9 +19,7 @@ export class StoreEventsHandler implements EventHandler<StoreEventCommand> {
       id: profileId,
     } = event;
 
-    const id = this.idGenerator.createUuid();
-    const storedEvent = StoredEvent.create(id, profileId, kind, payload, DateTime.from(date));
-    await this.storedEventsRepository.store(storedEvent);
+    await this.createStoredEventUseCase.execute(profileId, kind, payload, date);
 
     console.log('store events handler', event);
   }

@@ -5,6 +5,7 @@ import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingServ
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { Trade, TradeConfiguration, TradeSummary } from 'Trading/Domain/Trade';
+import { DateTime } from 'Money/DateTime';
 
 export enum CreateTradeState {
   CREATED = 'CREATED',
@@ -129,6 +130,7 @@ export class CreateTrade {
             amount: amount.getAmount(),
             fee: fee.getAmount(),
             tradeId: userTradeId,
+            date: DateTime.now().toIsoDateTime(),
           }),
         );
       }

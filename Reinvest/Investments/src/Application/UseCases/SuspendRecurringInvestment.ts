@@ -38,11 +38,11 @@ export class SuspendRecurringInvestment {
 
     recurringInvestment.suspend();
 
-    const { profileId, id } = recurringInvestment.toObject();
+    const { profileId } = recurringInvestment.toObject();
     await this.recurringInvestmentRepository.store(recurringInvestment, [
       storeEventCommand(profileId, 'RecurringInvestmentSuspended', {
-        recurringId: id,
         reason: 'Too many consecutive failed payments',
+        ...recurringInvestment.forEvent(),
       }),
     ]);
   }

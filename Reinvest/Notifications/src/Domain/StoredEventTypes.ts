@@ -20,8 +20,8 @@ type PushNotificationType = {
   title: (payload: DictionaryType) => string;
 };
 type AccountActivityType = {
-  data: (payload: DictionaryType) => JSONObject;
   name: (payload: DictionaryType) => string;
+  data?: (payload: DictionaryType) => JSONObject;
 };
 type AnalyticEventType = {
   eventName: string;
