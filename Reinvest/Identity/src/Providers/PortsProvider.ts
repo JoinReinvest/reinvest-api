@@ -7,6 +7,7 @@ import { BanController } from 'Identity/Port/Api/BanController';
 import { IncentiveTokenController } from 'Identity/Port/Api/IncentiveTokenController';
 import { PhoneController } from 'Identity/Port/Api/PhoneController';
 import { ProfileController } from 'Identity/Port/Api/ProfileController';
+import { ProfileHashController } from 'Identity/Port/Api/ProfileHashController'
 import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationController';
 import { PhoneRegistrationService } from 'Identity/Service/PhoneRegistrationService';
 import { UserRegistrationService } from 'Identity/Service/UserRegistrationService';
@@ -22,6 +23,7 @@ export class PortsProvider {
     container.addAsValue('webAppUrl', this.config.webAppUrl);
     //controllers
     container
+      .addSingleton(ProfileHashController)
       .addSingleton(ProfileController, [UserRepository, CognitoService])
       .addSingleton(PhoneController, [PhoneRegistrationService, CognitoService])
       .addSingleton(UserRegistrationController, [UserRegistrationService])

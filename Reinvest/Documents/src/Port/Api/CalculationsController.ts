@@ -1,5 +1,6 @@
 import AddCalculation from 'Documents/UseCases/AddCalculation'
 import GetCalculation from 'Documents/UseCases/GetCalculation'
+import { UUID } from 'HKEKTypes/Generics'
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator'
 
 export class CalculationsController {
@@ -14,11 +15,11 @@ export class CalculationsController {
         this.getCalculation = getCalculation
     }
 
-    public async add (email: string, calculations: string): Promise<boolean | string> {
+    public async add (profileId: UUID, calculations: string): Promise<boolean | string> {
         const newID = this.idGenerator.createUuid()
 
         try {
-            await this.addCalculation.execute(newID, email, calculations)
+            await this.addCalculation.execute(newID, profileId, calculations)
 
             return newID
         } catch (error: any) {

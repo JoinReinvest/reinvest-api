@@ -11,6 +11,6 @@ export interface DocumentsRenderedPagePdfSchema {
 
 export interface CalculationsSchema {
   id: UUID;
-  email: string;
+  profileId: UUID;
   data: string;
 }

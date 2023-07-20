@@ -79,5 +79,6 @@ export const SENTRY_CONFIG = {
 };
 
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
+export const PROFILEID_HASH_KEY = process.env.PROFILEID_HASH_KEY as string;
 
 // export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;

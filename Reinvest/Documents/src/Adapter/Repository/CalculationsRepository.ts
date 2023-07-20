@@ -10,14 +10,14 @@ export class CalculationsRepository {
         this.documentsDatabaseAdapterProvider = documentsDatabaseAdapterProvider
     }
 
-    async create (id: UUID, email: string, data: string) {
+    async create (id: UUID, profileId: UUID, data: string) {
         try {
             await this.documentsDatabaseAdapterProvider
                 .provide()
                 .insertInto(calculationsTable)
                 .values({
                     id,
-                    email,
+                    profileId,
                     data,
                 })
                 .execute()

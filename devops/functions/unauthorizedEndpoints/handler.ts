@@ -87,16 +87,22 @@ app.post('/webhooks/updateTrade', async function (req: any, res: any) {
 
 app.post('/calculations', async function (req: any, res: any) {
     const modules = boot()
-    const { profileId, calculations } = req.body
+    const { token, calculations } = req.body
 
     const documentsApi = modules.getApi<Documents.ApiType>(Documents)
+    const identityApi = modules.getApi<Identity.ApiType>(Identity)
+    console.log(token)
+    const profileId = await identityApi.profileIdDecrypt(token)
+    console.log(profileId)
 
-    if (!documentsApi) {
+    if (!documentsApi || !profileId) {
         return
     }
 
-    const calculationId = await documentsApi.addCalculation(profileId, calculations)
 
+console.log(profileId)
+
+    const calculationId = await documentsApi.addCalculation(profileId as string, calculations)
     await modules.close()
 
     res.json({ status: true, calculationId })
@@ -119,21 +125,22 @@ app.post('/calculations/:id', async function (req: any, res: any) {
     res.json({ status: true, data: calculationData })
 })
 
-app.post('/create-pdf/', async function (req: any, res: any) {
+/*app.post('/create-pdf/', async function (req: any, res: any) {
     const modules = boot()
-    const { url } = req.params
+    const { token, url } = req.params
 
     const documentsApi = modules.getApi<Documents.ApiType>(Documents)
+    const identityApi = modules.getApi<Identity.ApiType>(Identity)
 
     if (!documentsApi) {
         return
     }
 
-    const documentId = await documentsApi.renderPageToPdf(url, 'calculation', url)
+    const profileId = identityApi.profileIdDecrypt(token)
 
     await modules.close()
 
     res.json({ status: true, data: documentId })
-})
+})*/
 
 export const main = serverless(app)

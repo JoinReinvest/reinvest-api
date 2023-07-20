@@ -3,6 +3,7 @@ import { BanController } from 'Identity/Port/Api/BanController';
 import { IncentiveTokenController } from 'Identity/Port/Api/IncentiveTokenController';
 import { PhoneController } from 'Identity/Port/Api/PhoneController';
 import { ProfileController } from 'Identity/Port/Api/ProfileController';
+import { ProfileHashController } from 'Identity/Port/Api/ProfileHashController'
 import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationController';
 
 export type IdentityApiType = {
@@ -22,6 +23,8 @@ export type IdentityApiType = {
   updateEmailAddress: ProfileController['updateEmailAddress'];
 
   verifyPhoneNumber: PhoneController['verifyPhoneNumber'];
+  profileIdEncrypt: ProfileHashController['encrypt']
+  profileIdDecrypt: ProfileHashController['decrypt']
 };
 
 export const identityApi = (container: ContainerInterface): IdentityApiType => ({
@@ -39,4 +42,6 @@ export const identityApi = (container: ContainerInterface): IdentityApiType => (
   addBannedId: container.delegateTo(BanController, 'addBannedId'),
   getPhoneAndEmailData: container.delegateTo(ProfileController, 'getPhoneAndEmailData'),
   getUserInviter: container.delegateTo(ProfileController, 'getUserInviter'),
+  profileIdEncrypt: container.delegateTo(ProfileHashController, 'encrypt'),
+  profileIdDecrypt: container.delegateTo(ProfileHashController, 'decrypt'),
 });
