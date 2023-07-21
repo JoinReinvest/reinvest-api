@@ -89,3 +89,26 @@ Interface `Module`:
 - `SNS` - Simple Notification Service
 - `ACL` - Anti Corruption Layer
 - `VPC` - Virtual Private Cloud
+
+### How to create portfolio locally?
+Run this mutation with dummy data locally. Mutation contains keys to NC and Vertalo sandbox.
+```
+mutation {
+  registerPortfolio(name: "Community REIT", northCapitalOfferingId:"1290029", vertaloAllocationId:"6a03167e-28d1-4378-b881-a5ade307b81b", linkToOfferingCircular:"https://reinvestcommunity.com") {
+    id
+    name
+    vertaloAllocationId
+    currentNav {
+      dateSynchronization
+      unitPrice {
+        value
+        formatted
+      }
+      numberOfShares
+    }
+    assetName
+    offeringName
+    linkToOfferingCircular
+  }
+}
+```
