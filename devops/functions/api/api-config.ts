@@ -22,6 +22,7 @@ export const ApiLambdaFunction = {
         authorizer: {
           name: CognitoAuthorizerName,
         },
+        proxy: true,
       },
     },
   ],
