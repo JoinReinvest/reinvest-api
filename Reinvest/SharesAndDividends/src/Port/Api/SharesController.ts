@@ -1,7 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { SharesOrigin } from 'SharesAndDividends/Domain/Shares';
-import { AccountState, AccountStateQuery } from 'SharesAndDividends/UseCase/AccountStateQuery';
+import { AccountState, AccountStateQuery, SharesOriginalOwner } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { ChangeSharesState, SharesChangeState } from 'SharesAndDividends/UseCase/ChangeSharesState';
 import { CreateShares } from 'SharesAndDividends/UseCase/CreateShares';
 import { TransferredOrigins, TransferredShares, TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
@@ -55,6 +55,10 @@ export class SharesController {
 
   async getAccountState(profileId: UUID, accountId: UUID): Promise<AccountState> {
     return this.accountStateQuery.getAccountState(profileId, accountId);
+  }
+
+  async getSharesOriginalOwners(sharesIds: UUID[]): Promise<SharesOriginalOwner[]> {
+    return this.accountStateQuery.getSharesOriginalOwners(sharesIds);
   }
 
   async transferShares(

@@ -29,6 +29,7 @@ export type SharesAndDividendsApiType = {
   getDividendsReadyForAutomaticReinvestment: DividendsController['getDividendsReadyForAutomaticReinvestment'];
   getEVSChart: StatsController['getEVSChart'];
   getNextSharesToCalculate: DividendsCalculationController['getNextSharesToCalculate'];
+  getSharesOriginalOwners: SharesController['getSharesOriginalOwners'];
   markDividendAsWithdrew: DividendsController['markDividendAsWithdrew'];
   markDividendReinvested: DividendsController['markDividendReinvested'];
   setSharesToFundedState: SharesController['setSharesToFundedState'];
@@ -70,4 +71,5 @@ export const SharesAndDividendsApi = (container: ContainerInterface): SharesAndD
   transferShares: container.delegateTo(SharesController, 'transferShares'),
   transferDividends: container.delegateTo(DividendsController, 'transferDividends'),
   getDividendsReadyForAutomaticReinvestment: container.delegateTo(DividendsController, 'getDividendsReadyForAutomaticReinvestment'),
+  getSharesOriginalOwners: container.delegateTo(SharesController, 'getSharesOriginalOwners'),
 });

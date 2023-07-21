@@ -40,7 +40,7 @@ export const TableHTMLTemplate: HtmlTemplate = `
                 {{#each tableContent.data}}
                   <tr style="border: 1px solid black;">
                   {{#each this}}
-                    <td  style="border: 1px solid black;">
+                    <td  style="border: 1px solid black; padding: 2px; font-size: 12px;">
                       {{this}}
                     </td>
                   {{/each}}

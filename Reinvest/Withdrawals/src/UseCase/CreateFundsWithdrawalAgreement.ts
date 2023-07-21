@@ -41,7 +41,7 @@ export class CreateFundsWithdrawalAgreement {
 
   static getClassName = () => 'CreateFundsWithdrawalAgreement';
 
-  async execute(profileId: UUID, accountId: UUID, portfolioId: UUID): Promise<void | never> {
+  async execute(profileId: UUID, accountId: UUID): Promise<void | never> {
     const pendingFundsRequest = await this.fundsWithdrawalRequestsRepository.getPendingWithdrawalRequest(profileId, accountId);
 
     if (!pendingFundsRequest || !pendingFundsRequest.isDraft()) {
@@ -58,7 +58,7 @@ export class CreateFundsWithdrawalAgreement {
     const fundsWithdrawalRequestId = pendingFundsRequest.getId();
 
     const templateVersion = Template.getLatestTemplateVersion(Templates.SUBSCRIPTION_AGREEMENT);
-    const collectedData = await this.withdrawalDocumentsDataCollector.collectDataForWithdrawalAgreement(portfolioId, profileId, accountId);
+    const collectedData = await this.withdrawalDocumentsDataCollector.collectDataForWithdrawalAgreement(profileId, accountId);
 
     const { date, shareCount, withdrawalAmount } = pendingFundsRequest.getWithdrawalDetails();
 

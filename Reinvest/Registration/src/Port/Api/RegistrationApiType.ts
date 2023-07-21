@@ -14,6 +14,7 @@ export type RegistrationApiType = {
   getAccountMapping: RegistryQuery['getAccountMapping'];
   getBankAccount: BankAccountController['getBankAccount'];
   getBankAccountMapping: BankAccountQuery['getBankAccountMapping'];
+  getInvestorEmails: RegistryQuery['getInvestorEmails'];
   getMappingByPartyId: RegistryQuery['getMappingByPartyId'];
   getNorthCapitalAccountStructure: RegistryQuery['getNorthCapitalAccountStructure'];
   getVertaloConfigurationForAccount: RegistryQuery['getVertaloConfigurationForAccount'];
@@ -23,7 +24,6 @@ export type RegistrationApiType = {
   listObjectsToSync: SynchronizationQuery['listObjectsToSync'];
   mapAccountsToNorthCapitalPayoutData: BankAccountQuery['mapAccountsToNorthCapitalPayoutData'];
   readBankAccount: BankAccountController['readBankAccount'];
-  resynchronizeCompanyAccount: SynchronizationController['resynchronizeCompanyAccount'];
   resynchronizeIndividualAccount: SynchronizationController['resynchronizeIndividualAccount'];
   synchronize: SynchronizationController['synchronize'];
   synchronizeCompany: SynchronizationController['synchronizeCompany'];
@@ -31,6 +31,7 @@ export type RegistrationApiType = {
   synchronizeProfile: SynchronizationController['synchronizeProfile'];
   synchronizeStakeholder: SynchronizationController['synchronizeStakeholder'];
   updateBankAccount: BankAccountController['updateBankAccount'];
+  resynchronizeCompanyAccount: SynchronizationController['resynchronizeCompanyAccount'];
 };
 
 export const registrationApi = (container: ContainerInterface): RegistrationApiType => ({
@@ -56,4 +57,5 @@ export const registrationApi = (container: ContainerInterface): RegistrationApiT
   getMappingByPartyId: container.delegateTo(RegistryQuery, 'getMappingByPartyId'),
   getVertaloConfigurationForAccount: container.delegateTo(RegistryQuery, 'getVertaloConfigurationForAccount'),
   mapAccountsToNorthCapitalPayoutData: container.delegateTo(BankAccountQuery, 'mapAccountsToNorthCapitalPayoutData'),
+  getInvestorEmails: container.delegateTo(RegistryQuery, 'getInvestorEmails'),
 });

@@ -12,7 +12,6 @@ export type SettledShares = {
   id: UUID;
   numberOfShares: number;
   transactionDate: DateTime;
-  transferredFrom: string | null;
   unitPrice: Money;
 };
 

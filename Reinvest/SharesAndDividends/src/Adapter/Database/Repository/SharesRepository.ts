@@ -7,6 +7,7 @@ import { SharesAndTheirPricesSelection, SharesTable } from 'SharesAndDividends/A
 import { NumberOfSharesPerDay } from 'SharesAndDividends/Domain/CalculatingDividends/DividendDeclaration';
 import { Shares, SharesSchema, SharesStatus } from 'SharesAndDividends/Domain/Shares';
 import { SharesAndTheirPrices } from 'SharesAndDividends/Domain/Stats/AccountStatsCalculationService';
+import { SharesOriginalOwner } from 'SharesAndDividends/UseCase/AccountStateQuery';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -220,7 +221,7 @@ export class SharesRepository {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(sadSharesTable)
-      .select(['numberOfShares', 'dateFunding', 'unitPrice', 'id', 'portfolioId', 'transferredFrom'])
+      .select(['numberOfShares', 'dateFunding', 'unitPrice', 'id', 'portfolioId'])
       .where('profileId', '=', profileId)
       .where('accountId', '=', accountId)
       .where('status', '=', SharesStatus.SETTLED)
@@ -322,5 +323,27 @@ export class SharesRepository {
     }
 
     return Money.lowPrecision(parseInt(<string>data.investmentAmount, 10));
+  }
+
+  async getSharesOriginalOwners(sharesIds: UUID[]): Promise<SharesOriginalOwner[]> {
+    if (sharesIds.length === 0) {
+      return [];
+    }
+
+    const results = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadSharesTable)
+      .select(['transferredFrom', 'accountId'])
+      .where('transferredFrom', 'in', sharesIds)
+      .execute();
+
+    if (!results) {
+      return [];
+    }
+
+    return results.map(result => ({
+      sharesId: result.transferredFrom!,
+      originalOwnerId: result.accountId,
+    }));
   }
 }

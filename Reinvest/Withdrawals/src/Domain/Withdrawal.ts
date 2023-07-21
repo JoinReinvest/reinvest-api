@@ -80,7 +80,7 @@ export class Withdrawal {
     return new Withdrawal(schema);
   }
 
-  getRedemptions(): {
+  forRedemptions(): {
     documentId: UUID | null;
     listOfWithdrawals: UUIDsList;
   } {
@@ -90,7 +90,7 @@ export class Withdrawal {
     };
   }
 
-  getPayouts(): {
+  forPayouts(): {
     documentId: UUID | null;
     listOfDividends: UUIDsList;
     listOfWithdrawals: UUIDsList;

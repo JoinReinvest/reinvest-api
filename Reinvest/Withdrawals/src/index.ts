@@ -1,5 +1,4 @@
 import Container, { ContainerInterface } from 'Container/Container';
-import { Documents } from 'Documents/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { Portfolio } from 'Portfolio/index';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
@@ -26,7 +25,6 @@ export namespace Withdrawals {
   };
 
   export type ModulesDependencies = {
-    documents: Documents.Main;
     legalEntities: LegalEntities.Main;
     portfolio: Portfolio.Main;
     registration: Registration.Main;
@@ -81,7 +79,6 @@ export namespace Withdrawals {
       }
 
       this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
-      this.container.addAsValue('Documents', this.modules.documents);
       this.container.addAsValue('Registration', this.modules.registration);
       this.container.addAsValue('Portfolio', this.modules.portfolio);
       this.container.addAsValue('LegalEntities', this.modules.legalEntities);

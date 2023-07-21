@@ -8,7 +8,7 @@ import { Profile } from 'LegalEntities/Domain/Profile';
 import { FINRAMemberStatement, PersonalStatementType, TradingCompanyStakeholderStatement } from 'LegalEntities/Domain/ValueObject/PersonalStatements';
 import { DateTime } from 'Money/DateTime';
 
-export type SubscriptionAgreementData = {
+export type InvestorAgreementsData = {
   address: string;
   companyAddress: string | null;
   companyName: string;
@@ -55,7 +55,7 @@ export class SubscriptionAgreementDataController {
     this.beneficiaryRepository = beneficiaryRepository;
   }
 
-  public async getDataForSubscriptionAgreement(profileId: UUID, accountId: UUID): Promise<SubscriptionAgreementData> {
+  public async getInvestorDataForAgreements(profileId: UUID, accountId: UUID): Promise<InvestorAgreementsData> {
     const { profile, account, isIndividual } = await this.getProfileAndAccount(profileId, accountId);
     const investorData = await this.getInvestorData(profile, account, isIndividual);
     const investorStatements = await this.getInvestorStatements(profile);
@@ -86,7 +86,7 @@ export class SubscriptionAgreementDataController {
     };
   }
 
-  private async getInvestorData(profile: Profile, account: CompanyAccount | null, isIndividual: boolean): Promise<Partial<SubscriptionAgreementData>> {
+  private async getInvestorData(profile: Profile, account: CompanyAccount | null, isIndividual: boolean): Promise<Partial<InvestorAgreementsData>> {
     const { name, dateOfBirth } = profile.toObject();
     const profileAddress = profile.getAddress();
     const companyAddress = account ? account.getAddress() : null;
@@ -104,7 +104,7 @@ export class SubscriptionAgreementDataController {
     };
   }
 
-  private async getInvestorStatements(profile: Profile): Promise<Partial<SubscriptionAgreementData>> {
+  private async getInvestorStatements(profile: Profile): Promise<Partial<InvestorAgreementsData>> {
     let isAccreditedInvestor = false;
     let isFINRAMember = false;
     let isTradedCompanyHolder = false;
@@ -137,7 +137,7 @@ export class SubscriptionAgreementDataController {
     };
   }
 
-  private async getInvestorIdentityData(profileId: UUID): Promise<Partial<SubscriptionAgreementData>> {
+  private async getInvestorIdentityData(profileId: UUID): Promise<Partial<InvestorAgreementsData>> {
     const { phoneNumber, email } = await this.identityService.getPhoneAndEmailData(profileId);
 
     return {

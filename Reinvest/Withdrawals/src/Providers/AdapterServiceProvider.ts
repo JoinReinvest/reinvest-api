@@ -18,7 +18,6 @@ import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/
 import { WithdrawalsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsRepository';
 import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
 import { WithdrawalDocumentsDataCollector } from 'Withdrawals/Adapter/Module/WithdrawalDocumentsDataCollector';
-import { WithdrawalsDocumentService } from 'Withdrawals/Adapter/Module/WithdrawalsDocumentService';
 import { Withdrawals } from 'Withdrawals/index';
 
 export class AdapterServiceProvider {
@@ -54,7 +53,6 @@ export class AdapterServiceProvider {
 
     // modules
     container.addSingleton(SharesAndDividendsService, ['SharesAndDividends']);
-    container.addSingleton(WithdrawalsDocumentService, ['Documents']);
-    container.addSingleton(WithdrawalDocumentsDataCollector, ['LegalEntities', 'Portfolio', 'Registration']);
+    container.addSingleton(WithdrawalDocumentsDataCollector, ['LegalEntities', 'Portfolio', 'Registration', 'SharesAndDividends']);
   }
 }

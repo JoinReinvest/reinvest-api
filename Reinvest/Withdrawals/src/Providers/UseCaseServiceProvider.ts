@@ -61,7 +61,12 @@ export class UseCaseServiceProvider {
       'WithdrawalTransactionalAdapter',
       IdGenerator,
     ]);
-    container.addSingleton(CreateRedemptionFormDocument, [WithdrawalsDocumentsRepository, WithdrawalsRepository, WithdrawalDocumentsDataCollector]);
+    container.addSingleton(CreateRedemptionFormDocument, [
+      WithdrawalsDocumentsRepository,
+      WithdrawalsRepository,
+      WithdrawalDocumentsDataCollector,
+      FundsWithdrawalRequestsRepository,
+    ]);
     container.addSingleton(CreatePayoutDocument, [
       WithdrawalsDocumentsRepository,
       WithdrawalsRepository,

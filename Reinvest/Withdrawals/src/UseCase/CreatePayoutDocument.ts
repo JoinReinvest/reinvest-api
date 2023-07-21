@@ -10,21 +10,6 @@ import { WithdrawalDocumentsDataCollector } from 'Withdrawals/Adapter/Module/Wit
 import { UUIDsList } from 'Withdrawals/Domain/Withdrawal';
 import { WithdrawalsDocuments, WithdrawalsDocumentsEvents } from 'Withdrawals/Domain/WithdrawalsDocuments';
 
-const MOCK_PAYOUT_CONTENT_FIELDS = {
-  data: [
-    {
-      accountId: 'AccountId 1',
-      amount: 'Amount 1',
-      northCapitalAccountNumber: 'North Capital Account Number 1',
-    },
-    {
-      accountId: 'AccountId 2',
-      amount: 'Amount 2',
-      northCapitalAccountNumber: 'North Capital Account Number 2',
-    },
-  ],
-};
-
 class CreatePayoutDocument {
   static getClassName = (): string => 'CreatePayoutDocument';
 
@@ -55,7 +40,7 @@ class CreatePayoutDocument {
       throw new Error(`Withdrawal with id ${withdrawalId} not found`);
     }
 
-    const { documentId, listOfWithdrawals, listOfDividends } = withdrawal.getPayouts();
+    const { documentId, listOfWithdrawals, listOfDividends } = withdrawal.forPayouts();
 
     if (!documentId || (listOfWithdrawals.list.length === 0 && listOfDividends.list.length === 0)) {
       return;

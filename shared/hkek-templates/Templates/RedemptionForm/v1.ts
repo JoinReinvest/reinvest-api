@@ -4,8 +4,8 @@ import { TemplateContentType, TemplateStructureType } from "Templates/Types";
 export type RedemptionFormDataType = {
   securityName: string;
   unitPrice: string;
-  securityholderName: string;
-  securityholderEmail: string;
+  securityHolderName: string;
+  securityHolderEmail: string;
   currentDistributionUnits: number;
   newDistributionUnits: number;
   dateOfRedemption: string;
@@ -13,8 +13,6 @@ export type RedemptionFormDataType = {
 
 export interface RedemptionFormContentFieldsV1 extends TemplateContentType {
   assetName: string;
-  issuerName: string;
-  authorizedRepresentativeName: string;
   date: string;
   data: RedemptionFormDataType[];
 }
@@ -40,8 +38,8 @@ export const redemptionFormTemplateV1: TemplateStructureType<RedemptionFormDataT
       header: [
         'Security Name',
         'Unit Price',
-        'Securityholder Name',
-        'Securityholder Email',
+        'Security holder Name',
+        'Security holder Email',
         'Current Distribution Units',
         'New Distribution Units',
         'Date of Redemption',
@@ -49,8 +47,8 @@ export const redemptionFormTemplateV1: TemplateStructureType<RedemptionFormDataT
       data: content.data.map(item => [
         item.securityName,
         item.unitPrice,
-        item.securityholderName,
-        item.securityholderEmail,
+        item.securityHolderName,
+        item.securityHolderEmail,
         item.currentDistributionUnits,
         item.newDistributionUnits,
         item.dateOfRedemption,
@@ -61,9 +59,9 @@ export const redemptionFormTemplateV1: TemplateStructureType<RedemptionFormDataT
     paragraphs: [
       {
         lines: [
-          '{{Issuer Name}}: {(issuerName)}',
+          '{{Issuer Name}}: REINVEST Corp.',
           '{{Signature}}: ___________________________',
-          '{{Authorized Representative Name}}: {(authorizedRepresentativeName)}',
+          '{{Authorized Representative Name}}: Brandon Rule',
           '{{Date}}: {(date)}',
         ],
       },

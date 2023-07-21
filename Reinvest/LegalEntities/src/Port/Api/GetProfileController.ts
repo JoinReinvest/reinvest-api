@@ -1,6 +1,5 @@
-import { FileLink } from 'Documents/Adapter/S3/FileLinkService';
+import { UUID } from 'HKEKTypes/Generics';
 import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/ProfileRepository';
-import { DocumentsService } from 'LegalEntities/Adapter/Modules/DocumentsService';
 import { AddressInput } from 'LegalEntities/Domain/ValueObject/Address';
 import { DocumentSchema, IdScanInput } from 'LegalEntities/Domain/ValueObject/Document';
 import { DomicileType } from 'LegalEntities/Domain/ValueObject/Domicile';
@@ -42,6 +41,11 @@ export type ProfileForSynchronization = {
   firstName?: string;
   lastName?: string;
   middleName?: string;
+};
+
+export type ProfileName = {
+  name: string;
+  profileId: UUID;
 };
 
 export class GetProfileController {
@@ -112,5 +116,9 @@ export class GetProfileController {
       ssn: profile.exposeSSN(),
       idScan: profileObject.idScan ?? [],
     };
+  }
+
+  public async getProfileNames(profileIds: UUID[]): Promise<ProfileName[]> {
+    return this.profileRepository.getProfileNames(profileIds);
   }
 }

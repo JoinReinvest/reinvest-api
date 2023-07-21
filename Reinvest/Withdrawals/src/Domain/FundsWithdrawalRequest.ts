@@ -9,7 +9,6 @@ export type SettledSharesData = {
   id: UUID;
   numberOfShares: number;
   transactionDate: string;
-  transferredFrom: string | null;
   unitPrice: number;
 };
 
@@ -74,6 +73,15 @@ export enum WithdrawalError {
   WITHDRAWAL_REQUEST_ALREADY_SENT = 'WITHDRAWAL_REQUEST_ALREADY_SENT',
   CANNOT_BE_ABORTED = 'CANNOT_BE_ABORTED',
 }
+
+export type WithdrawalSharesView = {
+  accountId: UUID;
+  numberOfShares: number;
+  profileId: UUID;
+  redemptionDate: DateTime;
+  sharesId: UUID;
+  unitPrice: Money;
+};
 
 export class FundsWithdrawalRequest {
   private accountId: UUID;
@@ -304,6 +312,19 @@ export class FundsWithdrawalRequest {
         formatted: this.totalFee.getFormattedAmount(),
       },
     };
+  }
+
+  getWithdrawalSharesView(): WithdrawalSharesView[] {
+    return this.sharesJson.map(
+      (share): WithdrawalSharesView => ({
+        accountId: this.accountId,
+        profileId: this.profileId,
+        sharesId: share.id,
+        numberOfShares: share.numberOfShares,
+        unitPrice: Money.lowPrecision(share.unitPrice),
+        redemptionDate: DateTime.from(this.dateCreated),
+      }),
+    );
   }
 
   isDraft(): boolean {

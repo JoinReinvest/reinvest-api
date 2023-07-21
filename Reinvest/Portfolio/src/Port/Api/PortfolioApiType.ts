@@ -12,7 +12,7 @@ export type PortfolioApiType = {
   getAllPortfolioAuthors: PortfolioUpdatesController['getAll'];
   getAllPortfolioUpdates: PortfolioUpdatesController['getAll'];
   getCurrentNav: PortfolioController['getCurrentNav'];
-  getDataForSubscriptionAgreement: PortfolioController['getDataForSubscriptionAgreement'];
+  getPortfolioAssetDetails: PortfolioController['getPortfolioAssetDetails'];
   getPortfolioDetails: PortfolioController['getPortfolioDetails'];
   getPortfolioVendorsConfiguration: PortfolioController['getPortfolioVendorsConfiguration'];
   registerPortfolio: PortfolioController['registerPortfolio'];
@@ -28,7 +28,7 @@ export const PortfolioApi = (container: ContainerInterface): PortfolioApiType =>
   getPortfolioDetails: container.delegateTo(PortfolioController, 'getPortfolioDetails'),
   getCurrentNav: container.delegateTo(PortfolioController, 'getCurrentNav'),
   getPortfolioVendorsConfiguration: container.delegateTo(PortfolioController, 'getPortfolioVendorsConfiguration'),
-  getDataForSubscriptionAgreement: container.delegateTo(PortfolioController, 'getDataForSubscriptionAgreement'),
+  getPortfolioAssetDetails: container.delegateTo(PortfolioController, 'getPortfolioAssetDetails'),
   registerPortfolio: container.delegateTo(PortfolioController, 'registerPortfolio'),
   synchronizeNav: container.delegateTo(PortfolioController, 'synchronizeNav'),
   addPortfolioUpdate: container.delegateTo(PortfolioUpdatesController, 'add'),

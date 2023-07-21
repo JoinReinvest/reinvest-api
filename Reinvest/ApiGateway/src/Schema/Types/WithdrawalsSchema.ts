@@ -204,9 +204,8 @@ export const WithdrawalsSchema = {
         return api.getFundsWithdrawalRequest(profileId, accountId);
       },
       createFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        const { portfolioId } = await modules.getApi<Portfolio.ApiType>(Portfolio).getActivePortfolio();
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
-        const error = await api.createFundsWithdrawalAgreement(profileId, accountId, portfolioId);
+        const error = await api.createFundsWithdrawalAgreement(profileId, accountId);
 
         if (error) {
           throw new GraphQLError(error);

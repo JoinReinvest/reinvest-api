@@ -24,14 +24,15 @@ export type LegalEntitiesApiType = {
   getCompanyAccount: ReadAccountController['getCompanyAccount'];
   getCompanyAccountForSynchronization: ReadAccountController['getCompanyAccountForSynchronization'];
   getCompanyForSynchronization: ReadAccountController['getCompanyForSynchronization'];
-  getDataForSubscriptionAgreement: SubscriptionAgreementDataController['getDataForSubscriptionAgreement'];
   getDataForWithdrawalAgreement: SubscriptionAgreementDataController['getDataForWithdrawalAgreement'];
-
   getIndividualAccount: ReadAccountController['getIndividualAccount'];
   getIndividualAccountForSynchronization: ReadAccountController['getIndividualAccountForSynchronization'];
+
+  getInvestorDataForAgreements: SubscriptionAgreementDataController['getInvestorDataForAgreements'];
   getProfile: GetProfileController['getProfile'];
   getProfileAccountStructure: ReadAccountController['getProfileAccountStructure'];
   getProfileForSynchronization: GetProfileController['getProfileForSynchronization'];
+  getProfileNames: GetProfileController['getProfileNames'];
   getStakeholderForSynchronization: ReadAccountController['getStakeholderForSynchronization'];
   listBanned: BanController['listBanned'];
   listDrafts: DraftAccountsController['listDrafts'];
@@ -59,6 +60,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   getProfileForSynchronization: container.delegateTo(GetProfileController, 'getProfileForSynchronization'),
   completeProfile: container.delegateTo(CompleteProfileController, 'completeProfile'),
   getDataForWithdrawalAgreement: container.delegateTo(SubscriptionAgreementDataController, 'getDataForWithdrawalAgreement'),
+  getProfileNames: container.delegateTo(GetProfileController, 'getProfileNames'),
 
   listDrafts: container.delegateTo(DraftAccountsController, 'listDrafts'),
   createDraftAccount: container.delegateTo(DraftAccountsController, 'createDraftAccount'),
@@ -80,7 +82,7 @@ export const LegalEntitiesApi = (container: ContainerInterface): LegalEntitiesAp
   readBeneficiaryAccount: container.delegateTo(ReadAccountController, 'readBeneficiaryAccount'),
   getProfileAccountStructure: container.delegateTo(ReadAccountController, 'getProfileAccountStructure'),
   archiveBeneficiary: container.delegateTo(BeneficiaryAccountController, 'archiveBeneficiary'),
-  getDataForSubscriptionAgreement: container.delegateTo(SubscriptionAgreementDataController, 'getDataForSubscriptionAgreement'),
+  getInvestorDataForAgreements: container.delegateTo(SubscriptionAgreementDataController, 'getInvestorDataForAgreements'),
 
   updateCompanyForVerification: container.delegateTo(UpdateForVerificationController, 'updateCompanyForVerification'),
   updateProfileForVerification: container.delegateTo(UpdateForVerificationController, 'updateProfileForVerification'),

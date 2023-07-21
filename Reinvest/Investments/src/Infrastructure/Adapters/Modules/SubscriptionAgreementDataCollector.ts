@@ -41,8 +41,8 @@ export class SubscriptionAgreementDataCollector {
   }
 
   async collectData(portfolioId: UUID, profileId: UUID, accountId: UUID): Promise<PortfolioData & LegalEntitiesData> {
-    const portfolioData = await this.portfolioModule.api().getDataForSubscriptionAgreement(portfolioId);
-    const legalEntitiesData = await this.legalEntitiesModule.api().getDataForSubscriptionAgreement(profileId, accountId);
+    const portfolioData = await this.portfolioModule.api().getPortfolioAssetDetails(portfolioId);
+    const legalEntitiesData = await this.legalEntitiesModule.api().getInvestorDataForAgreements(profileId, accountId);
 
     return {
       ...portfolioData,
