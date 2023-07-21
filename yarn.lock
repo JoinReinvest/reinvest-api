@@ -14870,6 +14870,11 @@ serverless-bundle@^6.0.0:
     webpack-node-externals "^2.5.2"
     webpack-permissions-plugin "^1.0.8"
 
+serverless-disable-functions@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/serverless-disable-functions/-/serverless-disable-functions-1.0.0.tgz#d93ac66084e829f93542220c2c2a5410a1339c4b"
+  integrity sha512-wUfndxhUlfK8ICqeSWqoAHUtotWlRYGffAeuqwp7iwqkM/utch3XO6i+0H7mkOx3X/Zd1G4A9ivzvZg0Vo9JYw==
+
 serverless-domain-manager@^7.0.2:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/serverless-domain-manager/-/serverless-domain-manager-7.1.0.tgz#21abc34e96797700758145f44ffca32915a6ce3d"

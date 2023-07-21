@@ -33,7 +33,13 @@ const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
   frameworkVersion: '3',
   useDotenv: true,
-  plugins: ['serverless-output-to-env', 'serverless-stack-termination-protection', 'serverless-domain-manager', 'serverless-esbuild'],
+  plugins: [
+    'serverless-output-to-env',
+    'serverless-stack-termination-protection',
+    'serverless-domain-manager',
+    'serverless-esbuild',
+    'serverless-disable-functions',
+  ],
   provider: {
     name: 'aws',
     runtime: 'nodejs18.x',
@@ -113,6 +119,7 @@ const serverlessConfiguration: AWS = {
     pdfGenerator: PdfGeneratorFunction,
     firebase: FirebaseFunction,
     segment: SegmentFunction,
+    tests: TestsFunction,
   },
   resources: {
     Description: 'REINVEST ${sls:stage} API functions',
@@ -136,6 +143,7 @@ const serverlessConfiguration: AWS = {
       ...SegmentResources,
       ...CronNotificationsResources,
       ...CronPushEveryDayResources,
+      ...TestsLambdaResources,
     },
     Outputs: {
       ...CognitoClientsOutputs,
@@ -157,6 +165,12 @@ const serverlessConfiguration: AWS = {
     },
     bundle: {
       ignorePackages: ['pg-native'],
+    },
+    testFunctions: {
+      production: false,
+      development: true,
+      staging: true,
+      integrations: true,
     },
     customDomain: {
       domainName: '${env:API_URL}',
@@ -183,14 +197,5 @@ const serverlessConfiguration: AWS = {
     },
   },
 };
-
-if (process.env.NODE_ENV !== 'production') {
-  serverlessConfiguration.functions['tests'] = TestsFunction;
-  // @ts-ignore
-  serverlessConfiguration.resources.Resources = {
-    ...serverlessConfiguration.resources.Resources,
-    ...TestsLambdaResources,
-  };
-}
 
 module.exports = serverlessConfiguration;
