@@ -76,6 +76,7 @@ const serverlessConfiguration: AWS = {
       ADMIN_EMAIL: '${env:ADMIN_EMAIL}',
       PROFILEID_HASH_KEY: '${env:PROFILEID_HASH_KEY}',
       API_URL: '${env:API_URL}',
+      API_CERTIFICATE_NAME: '${env:API_CERTIFICATE_NAME}',
       // FIREBASE_SERVICE_ACCOUNT_JSON: '${env:FIREBASE_SERVICE_ACCOUNT_JSON}',
     },
     apiGateway: {
@@ -109,7 +110,6 @@ const serverlessConfiguration: AWS = {
     cronRecurringInvestments: CronRecurringInvestmentsFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
-    tests: TestsFunction,
     pdfGenerator: PdfGeneratorFunction,
     firebase: FirebaseFunction,
     segment: SegmentFunction,
@@ -126,7 +126,6 @@ const serverlessConfiguration: AWS = {
       ...MigrationLambdaResources,
       ...QueueResources,
       ...UnauthorizedEndpointsLambdaResources,
-      ...TestsLambdaResources,
       ...CronDocumentSyncResources,
       ...CronVendorsSyncResources,
       ...CronDividendsCalculationResources,
@@ -165,7 +164,7 @@ const serverlessConfiguration: AWS = {
       stage: '${sls:stage}',
       createRoute53Record: true,
       endpointType: 'regional',
-      certificateName: ' *.dev.reinvestcommunity.com',
+      certificateName: '${env:API_CERTIFICATE_NAME}',
     },
     serverlessTerminationProtection: {
       stages: ['production'],
@@ -183,5 +182,13 @@ const serverlessConfiguration: AWS = {
     },
   },
 };
+
+if (process.env.NODE_ENV !== 'production') {
+  serverlessConfiguration.functions.tests = TestsFunction;
+  serverlessConfiguration.resources.Resources.TestsLambdaResources = {
+    ...serverlessConfiguration.resources.Resources.TestsLambdaResources,
+    ...TestsLambdaResources,
+  };
+}
 
 module.exports = serverlessConfiguration;
