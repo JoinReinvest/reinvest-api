@@ -14,3 +14,11 @@ export interface CalculationsSchema {
   id: UUID;
   profileId: UUID;
 }
+
+export interface DocumentsImageCacheSchema {
+  catalog: string;
+  expirationDate: Date;
+  fileName: string;
+  id: UUID;
+  url: string;
+}
