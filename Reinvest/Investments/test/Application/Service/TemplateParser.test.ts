@@ -1,7 +1,9 @@
 import { expect } from 'chai';
-import TemplateParser from 'Reinvest/Investments/src/Application/Service/TemplateParser';
+import { TemplateParser } from 'Templates/TemplateParser';
+import { TemplateStructureType } from 'Templates/Types';
+
 context('Template parser', () => {
-  const template = [
+  const template: TemplateStructureType = [
     {
       paragraphs: [
         {
@@ -13,11 +15,10 @@ context('Template parser', () => {
       ],
     },
   ];
-  const parser = new TemplateParser(template);
 
-  describe('When TemplateParser parse template with given key/value object', () => {
+  describe('When TemplateParser parse subscriptionAgreementTemplate with given key/value object', () => {
     it('Should return lines with correctly parsed values', () => {
-      const parsed = parser.parse({ name: 'New name', surname: 'New surname' });
+      const parsed = TemplateParser.parse(template, { name: 'New name', surname: 'New surname' });
 
       const firstLine = parsed[0]?.paragraphs[0]?.lines[0];
       const secondLine = parsed[0]?.paragraphs[0]?.lines[1];
@@ -27,7 +28,12 @@ context('Template parser', () => {
     });
 
     it('Should all paragraphs parsed correctly', () => {
-      const parsed = parser.parse({ name: 'NewName', surname: 'NewSurname', series: 'A1234', seriesOf: 'B987' });
+      const parsed = TemplateParser.parse(template, {
+        name: 'NewName',
+        surname: 'NewSurname',
+        series: 'A1234',
+        seriesOf: 'B987',
+      });
 
       const firstLinOfFirstParagraph = parsed[0]?.paragraphs[0]?.lines[0];
       const secondLineOfFirstParagraph = parsed[0]?.paragraphs[0]?.lines[1];

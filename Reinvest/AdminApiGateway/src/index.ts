@@ -71,15 +71,15 @@ export const app = (modules: Modules) => {
 
       const userId = authorizer.jwt.claims.sub;
       const api = modules.getApi<Identity.ApiType>(Identity);
-      const profileId = await api.getProfile(userId);
+      const profile = await api.getProfile(userId);
 
-      if (profileId === null) {
+      if (profile === null) {
         throw new GraphQLError('Profile not exist');
       }
 
       return <AdminSessionContext>{
         userId,
-        profileId,
+        profileId: profile.profileId,
         modules,
         isExecutive,
         isAdmin,

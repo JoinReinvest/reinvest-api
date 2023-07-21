@@ -38,6 +38,10 @@ export class EmploymentStatus {
     };
   }
 
+  isUnemployed() {
+    return this.employmentStatus === EmploymentStatusEnum.UNEMPLOYED;
+  }
+
   isEmployed() {
     return this.employmentStatus === EmploymentStatusEnum.EMPLOYED;
   }

@@ -4,6 +4,7 @@ import { ReinvestmentRepositoryInterface } from 'Investments/Application/Reposit
 import { ReinvestmentEvent } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { InvestmentsDatabaseAdapterProvider, reinvestmentEventsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
 import { ReinvestmentEventsTable } from 'Investments/Infrastructure/Adapters/PostgreSQL/InvestmentsSchema';
+import { DateTime } from 'Money/DateTime';
 
 export class ReinvestmentRepository implements ReinvestmentRepositoryInterface {
   private databaseAdapterProvider: InvestmentsDatabaseAdapterProvider;
@@ -38,7 +39,7 @@ export class ReinvestmentRepository implements ReinvestmentRepositoryInterface {
         dividendId: event.id,
         eventKind: event.kind,
         eventStateJson: event.data,
-        dateCreated: new Date(),
+        dateCreated: DateTime.now().toDate(),
         id: this.iGenerator.createUuid(),
       })
       .execute();

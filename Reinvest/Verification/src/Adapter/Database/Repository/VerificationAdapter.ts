@@ -1,4 +1,5 @@
 import { JSONObject } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { VerificationDatabaseAdapterProvider, verifierRecordsTable } from 'Verification/Adapter/Database/DatabaseAdapter';
 import { InsertableVerifierRecord, VerifierRecord } from 'Verification/Adapter/Database/VerificationSchema';
 import { VerificationState, VerifierType } from 'Verification/Domain/ValueObject/Verifiers';
@@ -50,7 +51,7 @@ export class VerificationAdapter {
       accountId,
       eventsJson: {},
       decisionJson: {},
-      updatedDate: new Date(),
+      updatedDate: DateTime.now().toDate(),
     };
   }
 
@@ -67,8 +68,8 @@ export class VerificationAdapter {
         accountId: record.accountId,
         eventsJson: record.events as unknown as JSONObject,
         decisionJson: <JSONObject>record.decision,
-        updatedDate: new Date(),
-        createdDate: new Date(),
+        updatedDate: DateTime.now().toDate(),
+        createdDate: DateTime.now().toDate(),
       };
     });
 

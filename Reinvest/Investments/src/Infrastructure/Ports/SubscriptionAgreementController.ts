@@ -28,22 +28,22 @@ export class SubscriptionAgreementController {
   public static getClassName = (): string => 'SubscriptionAgreementController';
 
   public async createSubscriptionAgreement(profileId: string, investmentId: string) {
-    return await this.createSubscriptionAgreementUseCase.execute(profileId, investmentId);
+    return this.createSubscriptionAgreementUseCase.execute(profileId, investmentId);
   }
 
   public async createRecurringSubscriptionAgreement(profileId: string, accountId: string) {
-    return await this.createRecurringSubscriptionAgreementUseCase.execute(profileId, accountId);
+    return this.createRecurringSubscriptionAgreementUseCase.execute(profileId, accountId);
   }
 
   public async subscriptionAgreementQuery(profileId: string, subscriptionAgreementId: string) {
-    return await this.subscriptionAgreementQueryUseCase.execute(profileId, subscriptionAgreementId);
+    return this.subscriptionAgreementQueryUseCase.execute(profileId, subscriptionAgreementId);
   }
 
   public async signSubscriptionAgreement(profileId: string, investmentId: string, clientIp: string) {
-    return await this.signSubscriptionAgreementUseCase.execute(profileId, investmentId, clientIp);
+    return this.signSubscriptionAgreementUseCase.execute(profileId, investmentId, clientIp);
   }
 
   public async signRecurringSubscriptionAgreement(profileId: string, accountId: string, clientIp: string) {
-    return await this.signRecurringSubscriptionAgreementUseCase.execute(profileId, accountId, clientIp);
+    return this.signRecurringSubscriptionAgreementUseCase.execute(profileId, accountId, clientIp);
   }
 }

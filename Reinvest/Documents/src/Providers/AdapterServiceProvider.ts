@@ -1,9 +1,12 @@
 import { ContainerInterface } from 'Container/Container';
 import { DatabaseAdapterProvider, DocumentsDatabaseAdapterInstance } from 'Documents/Adapter/Database/DatabaseAdapter';
+import { CalculationsRepository } from 'Documents/Adapter/Repository/CalculationsRepository';
+import { DocumentsImageCacheRepository } from 'Documents/Adapter/Repository/DocumentsImageCacheRepository';
 import { DocumentsPdfPageRepository } from 'Documents/Adapter/Repository/DocumentsPdfPageRepository';
 import { FileLinkService } from 'Documents/Adapter/S3/FileLinkService';
 import { S3Adapter } from 'Documents/Adapter/S3/S3Adapter';
 import { Documents } from 'Documents/index';
+import { CacheService } from 'Documents/Service/CacheService';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -27,13 +30,18 @@ export class AdapterServiceProvider {
     // database
     container
       .addAsValue(DocumentsDatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
-      .addSingleton(DocumentsPdfPageRepository, [DocumentsDatabaseAdapterInstance, SimpleEventBus]);
+      .addSingleton(DocumentsPdfPageRepository, [DocumentsDatabaseAdapterInstance, SimpleEventBus])
+      .addSingleton(CalculationsRepository, [DocumentsDatabaseAdapterInstance])
+      .addSingleton(DocumentsPdfPageRepository, [DocumentsDatabaseAdapterInstance, SimpleEventBus])
+      .addSingleton(DocumentsImageCacheRepository, [DocumentsDatabaseAdapterInstance]);
+
+    container.addSingleton(CacheService, [DocumentsImageCacheRepository, IdGenerator]);
 
     // s3
     container
       .addAsValue('S3Config', this.config.s3)
       .addAsValue('chromiumEndpoint', this.config.chromiumEndpoint)
       .addSingleton(S3Adapter, ['S3Config'])
-      .addSingleton(FileLinkService, [S3Adapter, IdGenerator]);
+      .addSingleton(FileLinkService, [S3Adapter, CacheService, IdGenerator]);
   }
 }

@@ -1,4 +1,4 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { FundsWithdrawalRequest, FundsWithdrawalRequestSchema } from 'Reinvest/Withdrawals/src/Domain/FundsWithdrawalRequest';
 import { WithdrawalsFundsRequestsStatuses } from 'Reinvest/Withdrawals/src/Domain/WithdrawalsFundsRequests';
 import { WithdrawalFundsRequestCreate } from 'Reinvest/Withdrawals/src/UseCase/CreateWithdrawalFundsRequest';
@@ -77,6 +77,49 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
+  async accept(fundsWithdrawalRequest: FundsWithdrawalRequest, id: UUID): Promise<boolean> {
+    const { status, dateDecision } = fundsWithdrawalRequest.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(withdrawalsFundsRequestsTable)
+        .set({
+          status,
+          dateDecision,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot create funds withdrawal request: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
+  async reject(fundsWithdrawalRequest: FundsWithdrawalRequest, id: UUID): Promise<boolean> {
+    const { status, dateDecision, adminDecisionReason } = fundsWithdrawalRequest.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(withdrawalsFundsRequestsTable)
+        .set({
+          status,
+          dateDecision,
+          adminDecisionReason,
+        })
+        .where('id', '=', id)
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot create funds withdrawal request: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
   async get(profileId: UUID, accountId: UUID): Promise<FundsWithdrawalRequest | null> {
     try {
       const fundsWithdrawalRequest = await this.databaseAdapterProvider
@@ -102,6 +145,45 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
+  async listPendingWithdrawalRequests(pagination: Pagination): Promise<FundsWithdrawalRequest[]> {
+    const results = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('status', '=', WithdrawalsFundsRequestsStatuses.REQUESTED)
+      .orderBy('dateCreated', 'asc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .castTo<FundsWithdrawalRequestSchema>()
+      .execute();
+
+    if (results.length === 0) {
+      return [];
+    }
+
+    return results.map(result => FundsWithdrawalRequest.create(result));
+  }
+
+  async assignWithdrawalId(fundsWithdrawalRequest: FundsWithdrawalRequest) {
+    const { withdrawalId } = fundsWithdrawalRequest.toObject();
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .updateTable(withdrawalsFundsRequestsTable)
+        .set({
+          withdrawalId,
+        })
+        .where('id', '=', fundsWithdrawalRequest.getId())
+        .execute();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot assign withdrawalId: ${error.message}`, error);
+
+      return false;
+    }
+  }
+
   async publishEvents(events: DomainEvent[] = []): Promise<void> {
     if (events.length === 0) {
       return;
@@ -110,7 +192,7 @@ export class FundsWithdrawalRequestsRepository {
     await this.eventsPublisher.publishMany(events);
   }
 
-  async getPendingWithdrawalRequest(profileId: UUID, accountId: UUID) {
+  async getPendingWithdrawalRequest(profileId: UUID, accountId: UUID): Promise<FundsWithdrawalRequest | null> {
     const fundsWithdrawalRequest = await this.databaseAdapterProvider
       .provide()
       .selectFrom(withdrawalsFundsRequestsTable)
@@ -126,5 +208,59 @@ export class FundsWithdrawalRequestsRepository {
     }
 
     return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
+  }
+
+  async getRequestedFundsWithdrawalRequests(id: UUID): Promise<FundsWithdrawalRequest | null> {
+    const fundsWithdrawalRequest = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('id', '=', id)
+      .where('status', '=', WithdrawalsFundsRequestsStatuses.REQUESTED)
+      .castTo<FundsWithdrawalRequestSchema>()
+      .executeTakeFirst();
+
+    if (!fundsWithdrawalRequest) {
+      return null;
+    }
+
+    return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
+  }
+
+  async getAllAcceptedWithdrawalRequests(): Promise<FundsWithdrawalRequest[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('withdrawalId', 'is', null)
+      .where('status', '=', WithdrawalsFundsRequestsStatuses.ACCEPTED)
+      .castTo<FundsWithdrawalRequestSchema>()
+      .execute();
+
+    if (!data.length) {
+      return [];
+    }
+
+    return data.map(fundsWithdrawalRequest => FundsWithdrawalRequest.create(fundsWithdrawalRequest));
+  }
+
+  async getFundsWithdrawalsRequests(requestIds: UUID[]): Promise<FundsWithdrawalRequest[]> {
+    if (!requestIds.length) {
+      return [];
+    }
+
+    const results = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsTable)
+      .selectAll()
+      .where('id', 'in', requestIds)
+      .castTo<FundsWithdrawalRequestSchema>()
+      .execute();
+
+    if (!results.length) {
+      return [];
+    }
+
+    return results.map(result => FundsWithdrawalRequest.create(result));
   }
 }

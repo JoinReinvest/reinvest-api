@@ -1,4 +1,9 @@
-import { NCAccountStructureMapping, RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
+import { UUID } from 'HKEKTypes/Generics';
+import {
+  NCAccountStructureMapping,
+  RegistryQueryRepository,
+  VertaloMappingConfiguration,
+} from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 import { MappedRecordStatus, MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 
 export type IdToNCId = {
@@ -22,6 +27,11 @@ export type ObjectMapping = {
   profileId: string;
   stakeholderId: string | null;
   type: MappedType;
+};
+
+export type InvestorAccountEmail = {
+  accountId: UUID;
+  email: string;
 };
 
 export class RegistryQuery {
@@ -49,6 +59,10 @@ export class RegistryQuery {
       northCapitalAccountId: northCapitalId,
       accountEmail: email,
     };
+  }
+
+  async getVertaloConfigurationForAccount(profileId: string, accountId: string): Promise<VertaloMappingConfiguration | null> {
+    return this.registryQueryRepository.getVertaloConfigurationForAccount(profileId, accountId);
   }
 
   async getNorthCapitalAccountStructure(profileId: string, accountId: string): Promise<NorthCapitalAccountStructure | null> {
@@ -111,6 +125,10 @@ export class RegistryQuery {
 
   async getMappingByPartyId(partyId: string): Promise<ObjectMapping | null> {
     return this.registryQueryRepository.getMappingByPartyId(partyId);
+  }
+
+  async getInvestorEmails(accountIds: UUID[]): Promise<InvestorAccountEmail[]> {
+    return this.registryQueryRepository.getInvestorEmails(accountIds);
   }
 
   private isValidAccountStructure(accountStructure: NorthCapitalAccountStructure): boolean {

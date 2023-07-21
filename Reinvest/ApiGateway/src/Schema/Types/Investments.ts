@@ -17,7 +17,10 @@ const schema = `
         FAILED
         FINISHED
         CANCELED
-        ABORTED
+        CANCELING
+        TRANSFERRED
+        SETTLING
+        REVERTED
     }
 
     type InvestmentSummary {
@@ -35,6 +38,7 @@ const schema = `
         id: ID!
         tradeId: String!
         createdAt: ISODateTime!
+        status: InvestmentStatus!
         amount: USD!
     }
 
@@ -157,9 +161,7 @@ export const Investments = {
       listInvestments: async (parent: any, { accountId, pagination }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const list = await investmentAccountsApi.listInvestments(profileId, accountId, pagination);
-
-        return list;
+        return investmentAccountsApi.listInvestments(profileId, accountId, pagination);
       },
     },
     Mutation: {

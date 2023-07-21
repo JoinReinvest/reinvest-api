@@ -1,4 +1,4 @@
-import { JSONObjectOf } from 'HKEKTypes/Generics';
+import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { registrationBankAccountTable, RegistrationDatabaseAdapterProvider } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { RegistrationBankAccountTable } from 'Registration/Adapter/Database/RegistrationSchema';
 import { BankAccount, PlaidResult } from 'Registration/Domain/Model/BankAccount';
@@ -154,5 +154,26 @@ export class BankAccountRepository {
       bankAccountType: record.bankAccountType,
       state: record.state,
     });
+  }
+
+  async getBankAccountsForAccounts(accountIds: UUID[]): Promise<BankAccount[]> {
+    if (accountIds.length === 0) {
+      return [];
+    }
+
+    const results = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationBankAccountTable)
+      .selectAll()
+      .where('accountId', 'in', accountIds)
+      .where('state', '=', 'ACTIVE')
+      .orderBy('createdDate', 'desc')
+      .execute();
+
+    if (results.length === 0) {
+      return [];
+    }
+
+    return results.map(result => this.bankAccountRecordToBankAccount(result));
   }
 }

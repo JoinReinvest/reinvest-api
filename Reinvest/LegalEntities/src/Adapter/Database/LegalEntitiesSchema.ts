@@ -1,7 +1,6 @@
 import { JSONObjectOf } from 'HKEKTypes/Generics';
-import { Insertable } from 'kysely';
-import { BannedType } from 'LegalEntities/Adapter/Database/Repository/BanRepository';
 import { BeneficiaryName } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
+import { BannedType } from 'LegalEntities/Domain/BannedEntity';
 import { AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
 
 export interface LegalEntitiesProfile {
@@ -21,11 +20,11 @@ export interface LegalEntitiesProfile {
 }
 
 export interface LegalEntitiesBannedList {
-  id: string;
   accountId: string | null;
   anonymizedSensitiveNumber: string;
   dateCancelled: Date | null;
   dateCreated: Date;
+  id: string;
   profileId: string;
   reasons: string;
   sensitiveNumber: string;
@@ -70,10 +69,11 @@ export interface LegalEntitiesCompanyAccount {
   stakeholders: string | null;
 }
 
-export interface LegalEntitiesBeneficiary {
+export interface LegalEntitiesBeneficiaryTable {
   accountId: string;
   avatarJson: JSONObjectOf<AvatarInput> | null;
   individualId: string;
+  isArchived: boolean;
   label: string;
   nameJson: JSONObjectOf<BeneficiaryName>;
   profileId: string;
@@ -81,7 +81,3 @@ export interface LegalEntitiesBeneficiary {
 }
 
 export const LegalEntitiesJsonFields = ['name', 'dateOfBirth', 'address', 'idScan', 'domicile', 'statements', 'investingExperience', 'ssnObject'];
-
-export type InsertableProfile = Insertable<LegalEntitiesProfile>;
-export type InsertableDraftAccount = Insertable<LegalEntitiesDraftAccount>;
-export type InsertableBeneficiary = Insertable<LegalEntitiesBeneficiary>;

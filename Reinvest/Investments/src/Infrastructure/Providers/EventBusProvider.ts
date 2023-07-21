@@ -1,11 +1,20 @@
 import { ContainerInterface } from 'Container/Container';
+import { PdfKinds } from 'HKEKTypes/Pdf';
+import { AgreementsEventHandler } from 'Investments/Application/DomainEventHandler/AgreementsEventHandler';
 import { CheckIsGracePeriodEndedEventHandler } from 'Investments/Application/DomainEventHandler/CheckIsGracePeriodEndedEventHandler';
 import { FinalizeInvestmentEventHandler } from 'Investments/Application/DomainEventHandler/FinalizeInvestmentEventHandler';
+import { InvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/InvestmentStatusEventHandler';
+import { RecurringInvestmentStatusEventHandler } from 'Investments/Application/DomainEventHandler/RecurringInvestmentStatusEventHandler';
 import { ReinvestmentEventHandler } from 'Investments/Application/DomainEventHandler/ReinvestmentEventHandler';
 import { SharesEventHandler } from 'Investments/Application/DomainEventHandler/SharesEventHandler';
 import { TransactionEventHandler } from 'Investments/Application/DomainEventHandler/TransactionEventHandler';
 import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
+import DeactivateRecurringInvestment from 'Investments/Application/UseCases/DeactivateRecurringInvestment';
+import { GenerateSubscriptionAgreement } from 'Investments/Application/UseCases/GenerateSubscriptionAgreement';
+import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
+import { SuspendRecurringInvestment } from 'Investments/Application/UseCases/SuspendRecurringInvestment';
+import { SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 import { ReinvestmentCommands } from 'Investments/Domain/Reinvestments/ReinvestmentCommands';
 import { ReinvestmentEvents } from 'Investments/Domain/Reinvestments/ReinvestmentEvents';
 import { TransactionCommands } from 'Investments/Domain/Transaction/TransactionCommands';
@@ -14,11 +23,14 @@ import { Investments } from 'Investments/index';
 import { SharesAndDividendService } from 'Investments/Infrastructure/Adapters/Modules/SharesAndDividendService';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
+import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
 import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
-import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
+import { DisableRecurringInvestmentCommandHandler } from 'Investments/Infrastructure/Events/DisableRecurringInvestmentCommandHandler';
+import { PdfGeneratedEventHandler } from 'Investments/Infrastructure/Events/PdfGeneratedEventHandler';
 import { TechnicalToDomainEventsHandler } from 'Investments/Infrastructure/Events/TechnicalToDomainEventsHandler';
 import { EventBus, SimpleEventBus, STORE_EVENT_COMMAND } from 'SimpleAggregator/EventBus/EventBus';
+import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 
 export default class EventBusProvider {
@@ -31,11 +43,16 @@ export default class EventBusProvider {
   public boot(container: ContainerInterface) {
     container
       .addSingleton(SharesEventHandler, [SharesAndDividendService])
+      .addSingleton(InvestmentStatusEventHandler, [InvestmentsRepository])
       .addSingleton(TechnicalToDomainEventsHandler, [SimpleEventBus])
-      .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler])
+      .addSingleton(TransactionEventHandler, [TransactionRepository, TransactionExecutor, SharesEventHandler, InvestmentStatusEventHandler])
       .addSingleton(ReinvestmentEventHandler, [ReinvestmentRepository, ReinvestmentExecutor, SharesEventHandler])
       .addSingleton(CheckIsGracePeriodEndedEventHandler, [InvestmentsRepository, SimpleEventBus])
-      .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus]);
+      .addSingleton(FinalizeInvestmentEventHandler, [InvestmentsQueryRepository, SimpleEventBus])
+      .addSingleton(AgreementsEventHandler, [GenerateSubscriptionAgreement])
+      .addSingleton(PdfGeneratedEventHandler, [MarkSubscriptionAgreementAsGenerated])
+      .addSingleton(RecurringInvestmentStatusEventHandler, [RecurringInvestmentExecutionRepository, SuspendRecurringInvestment])
+      .addSingleton(DisableRecurringInvestmentCommandHandler, [DeactivateRecurringInvestment]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus
@@ -51,9 +68,27 @@ export default class EventBusProvider {
         TransactionEvents.MARKED_AS_READY_TO_DISBURSE,
         TransactionEvents.INVESTMENT_SHARES_TRANSFERRED,
         TransactionEvents.INVESTMENT_CANCELED,
+        TransactionEvents.TRANSACTION_REVERTED,
+        TransactionEvents.TRANSACTION_REVERTED_UNWINDING,
+        TransactionEvents.TRANSACTION_REVERTED_FAILED,
         TransactionEvents.TRANSACTION_CANCELED,
         TransactionEvents.TRANSACTION_CANCELED_UNWINDING,
         TransactionEvents.TRANSACTION_CANCELED_FAILED,
+        TransactionEvents.INVESTMENT_FINISHED,
+        TransactionEvents.VERIFICATION_REJECTED_FOR_INVESTMENT,
+        TransactionEvents.INVESTMENT_REJECTED_BY_PRINCIPAL,
+        TransactionEvents.PAYMENT_MISMATCH,
+        TransactionEvents.PAYMENT_FAILED,
+        TransactionEvents.PAYMENT_RETRIED,
+        TransactionEvents.SECOND_PAYMENT_FAILED,
+      ])
+
+      .subscribeHandlerForKinds(RecurringInvestmentStatusEventHandler.getClassName(), [
+        TransactionEvents.INVESTMENT_FUNDED,
+        TransactionEvents.INVESTMENT_CANCELED,
+        TransactionEvents.TRANSACTION_REVERTED,
+        TransactionEvents.INVESTMENT_FINISHED,
+        TransactionEvents.SECOND_PAYMENT_FAILED,
       ])
 
       .subscribeHandlerForKinds(ReinvestmentEventHandler.getClassName(), [
@@ -75,7 +110,15 @@ export default class EventBusProvider {
         TransactionCommands.TransferSharesWhenTradeSettled,
         ReinvestmentCommands.TransferSharesForReinvestment,
         TransactionCommands.CancelTransaction,
+        TransactionCommands.RevertTransaction,
+        TransactionCommands.RetryPayment,
+        'CreateNotification',
       ])
-      .subscribe('GeneratePdfCommand', GeneratePdfEventHandler.getClassName());
+      .subscribeHandlerForKinds(AgreementsEventHandler.getClassName(), [
+        SubscriptionAgreementEvents.GenerateSubscriptionAgreementCommand,
+        SubscriptionAgreementEvents.RecurringSubscriptionAgreementSigned,
+        SubscriptionAgreementEvents.SubscriptionAgreementSigned,
+      ])
+      .subscribe(PdfKinds.GeneratePdf, GeneratePdfEventHandler.getClassName());
   }
 }

@@ -91,6 +91,18 @@ export class CognitoService {
     return email?.Value;
   }
 
+  async getPhoneNumber(userId: string) {
+    const user = await this.getUserAttributes(userId);
+
+    if (user === null) {
+      return null;
+    }
+
+    const phoneNumber = user.UserAttributes.find((attribute: AttributeType) => attribute.Name === 'phone_number');
+
+    return phoneNumber?.Value ?? null;
+  }
+
   private async sendAttributeUpdateCommand(command: AdminUpdateUserAttributesCommand): Promise<boolean> {
     const client = this.getClient();
     await client.send(command);

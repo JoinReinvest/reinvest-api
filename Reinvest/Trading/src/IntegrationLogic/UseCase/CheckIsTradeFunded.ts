@@ -1,6 +1,12 @@
+import { DateTime } from 'Money/DateTime';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
+
+export type PaymentTransferStatus = {
+  status: 'failed' | 'second-fail' | 'pending' | 'success';
+};
 
 export class CheckIsTradeFunded {
   private tradesRepository: TradesRepository;
@@ -15,7 +21,7 @@ export class CheckIsTradeFunded {
 
   static getClassName = () => 'CheckIsTradeFunded';
 
-  async execute(investmentId: string): Promise<boolean> {
+  async execute(investmentId: string): Promise<PaymentTransferStatus> {
     try {
       const trade = await this.tradesRepository.getTradeByInvestmentId(investmentId);
 
@@ -33,11 +39,58 @@ export class CheckIsTradeFunded {
           trade.setTradeStatusToFunded();
           await this.tradesRepository.updateTrade(trade);
           console.info(`[Trade ${investmentId}]`, 'Trade is funded');
-        } else {
-          // TODO if trade is not funded, we should check the status of payment, as trade status is not changed if payment failed!!!
-          console.info(`[Trade ${investmentId}]`, 'Trade is NOT funded yet:', tradeStatus.toString());
 
-          return false;
+          const { amount, fee, userTradeId } = trade.getFundsTransferConfiguration();
+
+          await this.tradesRepository.publishEvent(
+            storeEventCommand(trade.getProfileId(), 'PaymentFinished', {
+              accountId: trade.getReinvestAccountId(),
+              investmentId,
+              amount: amount.getAmount(),
+              fee: fee.getAmount(),
+              tradeId: userTradeId,
+              date: DateTime.now().toIsoDateTime(),
+            }),
+          );
+        } else {
+          const paymentData = trade.getNorthCapitalPayment();
+
+          if (!paymentData) {
+            // no payment data, so we can't check payment status - it can happen if there was a bug and the transfer was initiated,
+            // but payment data was not saved to the DB, and it retried, but NC returned info that it is already started
+            return {
+              status: 'pending',
+            };
+          }
+
+          const { ncAccountId, paymentId } = paymentData;
+          const paymentState = await this.northCapitalAdapter.getPaymentState(ncAccountId, paymentId);
+
+          if (paymentState.isFailed()) {
+            const { amount, fee, userTradeId } = trade.getFundsTransferConfiguration();
+
+            await this.tradesRepository.publishEvent(
+              storeEventCommand(trade.getProfileId(), 'PaymentFailed', {
+                accountId: trade.getReinvestAccountId(),
+                investmentId,
+                amount: amount.getAmount(),
+                fee: fee.getAmount(),
+                tradeId: userTradeId,
+                date: DateTime.now().toIsoDateTime(),
+              }),
+            );
+
+            return {
+              status: trade.isPaymentRetried() ? 'second-fail' : 'failed',
+            };
+          }
+
+          console.info(
+            `[Trade ${investmentId}]`,
+            `Trade is NOT funded yet. Trade status: ${tradeStatus.toString()}, Payment status: ${paymentState.toString()}`,
+          );
+
+          return { status: 'pending' };
         }
       }
 
@@ -54,11 +107,11 @@ export class CheckIsTradeFunded {
         }
       }
 
-      return true;
+      return { status: 'success' };
     } catch (error) {
       console.error(`[Trade ${investmentId}]`, 'Trade funded process failed', error);
 
-      return false;
+      return { status: 'pending' };
     }
   }
 }

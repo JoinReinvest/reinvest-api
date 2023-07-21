@@ -1,7 +1,5 @@
-import TemplateParser from 'Investments/Application/Service/TemplateParser';
-import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
-import { subscriptionAgreementsTemplate } from 'Investments/Domain/SubscriptionAgreements/subscriptionAgreementsTemplates';
-import { DynamicType, PdfTypes, SubscriptionAgreementTemplateVersions } from 'Investments/Domain/SubscriptionAgreements/types';
+import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
+import { AgreementTypes } from 'Investments/Domain/Investments/Types';
 import { DocumentsService } from 'Investments/Infrastructure/Adapters/Modules/DocumentsService';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
@@ -26,22 +24,24 @@ class SignSubscriptionAgreement {
 
   async execute(profileId: string, investmentId: string, clientIp: string) {
     const events: DomainEvent[] = [];
-    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(profileId, investmentId);
+    const subscriptionAgreement = await this.subscriptionAgreementRepository.getSubscriptionAgreementByInvestmentId(
+      profileId,
+      investmentId,
+      AgreementTypes.DIRECT_DEPOSIT,
+    );
 
     if (!subscriptionAgreement) {
       return false;
     }
 
-    subscriptionAgreement.setSignature(clientIp);
-
-    const isSigned = await this.subscriptionAgreementRepository.signSubscriptionAgreement(subscriptionAgreement);
+    subscriptionAgreement.sign(clientIp);
+    const isSigned = await this.subscriptionAgreementRepository.store(subscriptionAgreement);
 
     if (!isSigned) {
       return false;
     }
 
     const id = subscriptionAgreement.getId();
-
     const investment = await this.investmentsRepository.getInvestmentByProfileAndId(profileId, investmentId);
 
     if (!investment) {
@@ -49,36 +49,16 @@ class SignSubscriptionAgreement {
     }
 
     investment.assignSubscriptionAgreement(id);
-    investment.updateStatus(InvestmentStatus.WAITING_FOR_FEES_APPROVAL);
-
-    const isAssigned = await this.investmentsRepository.assignSubscriptionAgreementAndUpdateStatus(investment);
+    const isAssigned = await this.investmentsRepository.store(investment);
 
     if (isAssigned) {
-      // TODO this is separate use case!
-      const { contentFieldsJson, templateVersion } = subscriptionAgreement.getDataForParser();
-
-      const parser = new TemplateParser(subscriptionAgreementsTemplate[templateVersion as SubscriptionAgreementTemplateVersions]);
-      const parsedTemplated = parser.parse(contentFieldsJson as DynamicType);
-
-      // await this.documentsService.generatePdf(profileId, id, parsedTemplated, PdfTypes.AGREEMENT);
-
-      events.push({
+      events.push(<SubscriptionAgreementEvent>{
         id,
-        kind: 'SubscriptionAgreementSigned',
-      });
-
-      const pdfCommand: DomainEvent = {
-        id,
-        kind: 'GeneratePdfCommand',
+        kind: SubscriptionAgreementEvents.SubscriptionAgreementSigned,
         data: {
-          catalog: profileId,
-          fileName: id,
-          template: parsedTemplated,
-          templateType: PdfTypes.AGREEMENT,
+          profileId,
         },
-      };
-
-      events.push(pdfCommand);
+      });
 
       await this.investmentsRepository.publishEvents(events);
     }

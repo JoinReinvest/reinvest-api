@@ -1,5 +1,6 @@
 import { DictionaryType, JSONObject, UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
+import { AnalyticsCommand } from 'Notifications/Adapter/AnalyticsAdapter';
 import { CreateNewNotificationInput } from 'Notifications/Application/UseCase/CreateNotification';
 import { StoredEventKind, StoredEvents } from 'Notifications/Domain/StoredEventsConfiguration';
 import { StoredEventConfigurationType } from 'Notifications/Domain/StoredEventTypes';
@@ -24,9 +25,15 @@ export type StoredEventSchema = {
   status: StoredEventStatus;
 };
 
+export type GlobalValues = {
+  email: string;
+  userName: string;
+};
+
 export class StoredEvent {
   private storedEventSchema: StoredEventSchema;
   private storedEventConfiguration: StoredEventConfigurationType;
+  private globalValues: GlobalValues | null = null;
 
   constructor(storedEventSchema: StoredEventSchema) {
     this.storedEventSchema = storedEventSchema;
@@ -79,25 +86,6 @@ export class StoredEvent {
     return !!this.storedEventConfiguration.push && this.storedEventSchema.datePushed === null;
   }
 
-  getAccountActivity(): {
-    accountId: UUID | null;
-    data: JSONObject;
-    date: DateTime;
-    name: string;
-    profileId: UUID;
-  } {
-    const accountActivity = this.storedEventConfiguration.accountActivity;
-    const data = accountActivity!.data(this.storedEventSchema.payload);
-
-    return {
-      accountId: <UUID>this.storedEventSchema.payload['accountId'] ?? null,
-      data,
-      date: this.storedEventSchema.dateCreated,
-      name: accountActivity!.name(this.storedEventSchema.payload),
-      profileId: this.storedEventSchema.profileId,
-    };
-  }
-
   markAccountActivityAsProcessed() {
     this.storedEventSchema.dateAccountActivity = DateTime.now();
   }
@@ -110,12 +98,40 @@ export class StoredEvent {
     this.storedEventSchema.dateInApp = DateTime.now();
   }
 
+  markEmailAsProcessed() {
+    this.storedEventSchema.dateEmailed = DateTime.now();
+  }
+
+  markAnalyticEventAsProcessed() {
+    this.storedEventSchema.dateAnalytics = DateTime.now();
+  }
+
   markAsProcessed() {
     this.storedEventSchema.status = StoredEventStatus.PROCESSED;
   }
 
   markAsFailed() {
     this.storedEventSchema.status = StoredEventStatus.FAILED;
+  }
+
+  getAccountActivity(): {
+    accountId: UUID | null;
+    data: JSONObject;
+    date: DateTime;
+    name: string;
+    profileId: UUID;
+  } {
+    const accountActivity = this.storedEventConfiguration.accountActivity;
+    const payload = this.getPayload();
+    const data = accountActivity?.data ? accountActivity.data(payload) : {};
+
+    return {
+      accountId: <UUID>payload['accountId'] ?? null,
+      data,
+      date: this.storedEventSchema.dateCreated,
+      name: accountActivity!.name(payload),
+      profileId: this.storedEventSchema.profileId,
+    };
   }
 
   getNotification(): CreateNewNotificationInput {
@@ -125,22 +141,28 @@ export class StoredEvent {
       throw new Error(`Notification configuration not found for type: ${this.storedEventSchema.kind}`);
     }
 
-    const { onObjectId, onObjectType } = inAppNotificationConfiguration.onObject(this.storedEventSchema.payload);
+    const payload = this.getPayload();
+    const { onObjectId, onObjectType } = inAppNotificationConfiguration.onObject
+      ? inAppNotificationConfiguration.onObject(payload)
+      : {
+          onObjectType: null,
+          onObjectId: null,
+        };
+
+    const uniqueId = payload?.uniqueId ?? this.storedEventSchema.id;
+    const dismissId = payload?.dismissId ?? null;
 
     return {
-      accountId: <UUID>this.storedEventSchema.payload['accountId'] ?? null,
-      body: inAppNotificationConfiguration.body(this.storedEventSchema.payload),
-      header: inAppNotificationConfiguration.header(this.storedEventSchema.payload),
+      accountId: <UUID>payload['accountId'] ?? null,
+      body: inAppNotificationConfiguration.body(payload),
+      header: inAppNotificationConfiguration.header(payload),
       notificationType: inAppNotificationConfiguration.notificationType,
       onObjectId,
       onObjectType,
       profileId: this.storedEventSchema.profileId,
-      uniqueId: this.storedEventSchema.id,
+      uniqueId: uniqueId,
+      dismissId: dismissId,
     };
-  }
-
-  getId(): UUID {
-    return this.storedEventSchema.id;
   }
 
   getPushNotification(): {
@@ -154,10 +176,80 @@ export class StoredEvent {
       throw new Error(`Push notification configuration not found for type: ${this.storedEventSchema.kind}`);
     }
 
+    const payload = this.getPayload();
+
     return {
-      body: pushNotificationConfiguration.body(this.storedEventSchema.payload),
+      body: pushNotificationConfiguration.body(payload),
       profileId: this.storedEventSchema.profileId,
-      title: pushNotificationConfiguration.title(this.storedEventSchema.payload),
+      title: pushNotificationConfiguration.title(payload),
     };
+  }
+
+  getEmailNotification() {
+    const emailConfiguration = this.storedEventConfiguration.email;
+
+    if (!emailConfiguration) {
+      throw new Error(`Email notification configuration not found for type: ${this.storedEventSchema.kind}`);
+    }
+
+    const payload = this.getPayload();
+
+    return {
+      subject: emailConfiguration.subject(payload),
+      body: emailConfiguration.body(payload),
+      toAdmin: emailConfiguration?.toAdmin ?? false,
+    };
+  }
+
+  getAnalyticsCommand(): AnalyticsCommand {
+    const config = this.storedEventConfiguration.analyticEvent;
+
+    if (!config) {
+      throw new Error(`Analytics configuration not found for type: ${this.storedEventSchema.kind}`);
+    }
+
+    const payload = this.getPayload();
+    const eventName = config.eventName;
+    const data = config.data ? config.data(payload) : {};
+    const identityData = config.identityData ? config.identityData(payload) : {};
+    const sendIdentity = config.sendIdentity ? config.sendIdentity(payload) : false;
+
+    if (sendIdentity && !!this.getUserEmail()) {
+      identityData['email'] = this.getUserEmail()!;
+    }
+
+    return {
+      profileId: this.storedEventSchema.profileId,
+      eventName,
+      data,
+      identityData,
+      sendIdentity,
+    };
+  }
+
+  private getPayload(): DictionaryType {
+    const { email, ...globals } = this.globalValues ?? {};
+
+    return { ...(globals ?? { userName: 'Investor' }), ...this.storedEventSchema.payload };
+  }
+
+  getId(): UUID {
+    return this.storedEventSchema.id;
+  }
+
+  getProfileId(): UUID {
+    return this.storedEventSchema.profileId;
+  }
+
+  setGlobalValues(globalValues: GlobalValues | null): void {
+    this.globalValues = globalValues;
+  }
+
+  getUserEmail(): string | null {
+    if (!this.globalValues || !this.globalValues.email) {
+      return null;
+    }
+
+    return this.globalValues.email;
   }
 }

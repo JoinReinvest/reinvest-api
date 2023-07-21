@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { DateTime } from 'Money/DateTime';
 import { VerificationEventMocks } from 'Reinvest/Verification/test/VerificationEventMocks';
 import { VerificationDecisionType } from 'Verification/Domain/ValueObject/VerificationDecision';
 import {
@@ -17,7 +18,7 @@ const verificationId = 1;
 
 const amlEvent = <VerificationAmlResultEvent>{
   kind: VerificationEvents.VERIFICATION_AML_RESULT,
-  date: new Date(),
+  date: DateTime.now().toDate(),
   ncId: partyId,
   reasons: [],
   source: 'DIRECT',
@@ -27,7 +28,7 @@ const amlEvent = <VerificationAmlResultEvent>{
 
 const kycEvent = <VerificationKycResultEvent>{
   kind: VerificationEvents.VERIFICATION_KYC_RESULT,
-  date: new Date(),
+  date: DateTime.now().toDate(),
   ncId: partyId,
   reasons: [],
   source: 'DIRECT',
@@ -36,7 +37,7 @@ const kycEvent = <VerificationKycResultEvent>{
 };
 
 const errorEvent = <VerificationNorthCapitalObjectFailedEvent>{
-  date: new Date(),
+  date: DateTime.now().toDate(),
   kind: VerificationEvents.VERIFICATION_NORTH_CAPITAL_REQUEST_FAILED,
   ncId: partyId,
   reason: 'Error reason',
@@ -51,6 +52,7 @@ const cleanVerifierState = () =>
         id: 'some-uuid',
         type: VerifierType.PROFILE,
       },
+      decisionId: 'some-id',
     },
     events: { list: [] },
     id: 'some-uuid',
@@ -124,7 +126,7 @@ context('Given an investor has completed profile and synchronized with North Cap
       it('Then expect REQUEST_VERIFICATION decision', async () => {
         verifier.handleVerificationEvent(<VerificationRecoveredAdministrativeEvent>{
           kind: VerificationEvents.VERIFICATION_RECOVERED_ADMINISTRATIVE,
-          date: new Date(),
+          date: DateTime.now().toDate(),
           ncId: verifier.getPartyId(),
         });
         const result = verifier.makeDecision();

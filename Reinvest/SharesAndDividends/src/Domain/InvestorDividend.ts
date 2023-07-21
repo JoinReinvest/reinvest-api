@@ -2,6 +2,8 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 
+export const AUTO_REINVESTMENT_DAYS_THRESHOLD = 30;
+
 export type CalculatedDividendsList = {
   list: UUID[];
 };
@@ -19,6 +21,7 @@ export type InvestorDividendSchema = {
   status: InvestorDividendStatus;
   totalDividendAmount: number;
   totalFeeAmount: number;
+  transferredId: UUID | null;
 };
 
 export enum InvestorDividendStatus {
@@ -29,21 +32,23 @@ export enum InvestorDividendStatus {
   ZEROED = 'ZEROED',
   FEES_NOT_COVERED = 'FEES_NOT_COVERED',
   FEES_MOVED_TO_NEXT_DIVIDEND = 'FEES_MOVED_TO_NEXT_DIVIDEND',
+  TRANSFERRED = 'TRANSFERRED',
 }
 
 export class InvestorDividend {
   private readonly id: UUID;
   private readonly createdDate: DateTime;
   private readonly profileId: UUID;
-  private readonly accountId: string;
   private readonly distributionId: UUID;
   private readonly calculatedDividends: CalculatedDividendsList;
   private readonly totalDividendAmount: Money;
+  private accountId: UUID;
   private totalFeeAmount: Money;
   private dividendAmount: Money;
   private status: InvestorDividendStatus = InvestorDividendStatus.AWAITING_ACTION;
   private actionDate: DateTime | null = null;
   private feesCoveredByDividendId: UUID | null = null;
+  private transferredId: UUID | null = null;
 
   constructor(
     schema: null,
@@ -77,6 +82,7 @@ export class InvestorDividend {
       this.dividendAmount = totalDividendAmount!.subtract(totalFeeAmount!);
       this.calculatedDividends = calculatedDividends!;
       this.createdDate = DateTime.now();
+      this.transferredId = null;
       this.status = this.calculateStatus();
     } else {
       this.id = schema.id;
@@ -91,6 +97,7 @@ export class InvestorDividend {
       this.calculatedDividends = schema.calculatedDividends;
       this.feesCoveredByDividendId = schema.feesCoveredByDividendId;
       this.actionDate = schema.actionDate ? DateTime.from(schema.actionDate) : null;
+      this.transferredId = schema.transferredId;
     }
   }
 
@@ -153,6 +160,7 @@ export class InvestorDividend {
       status: this.status,
       feesCoveredByDividendId: this.feesCoveredByDividendId,
       actionDate: this.actionDate ? this.actionDate.toDate() : null,
+      transferredId: this.transferredId,
     };
   }
 
@@ -176,5 +184,32 @@ export class InvestorDividend {
     }
 
     return InvestorDividendStatus.AWAITING_ACTION;
+  }
+
+  isTransferred(): boolean {
+    return this.transferredId !== null && this.status === InvestorDividendStatus.TRANSFERRED;
+  }
+
+  getTransferredFromId(): UUID {
+    if (!this.transferredId) {
+      throw new Error('Dividend is not transferred');
+    }
+
+    return this.transferredId;
+  }
+
+  getId(): UUID {
+    return this.id;
+  }
+
+  transferDividend(newDividendTransferId: UUID, transferToAccountId: UUID): InvestorDividend {
+    const schema = this.toObject();
+
+    schema.id = newDividendTransferId;
+    schema.transferredId = this.id;
+    schema.status = InvestorDividendStatus.TRANSFERRED;
+    this.accountId = transferToAccountId;
+
+    return InvestorDividend.restore(schema);
   }
 }

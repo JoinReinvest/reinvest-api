@@ -1,6 +1,8 @@
 import Container, { ContainerInterface } from 'Container/Container';
 import { PortfolioDatabaseAdapterInstanceProvider, PortfolioDatabaseAdapterProvider } from 'Portfolio/Adapter/Database/DatabaseAdapter';
 import { DealpathConfig } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
+import { NorthCapitalConfig } from 'Portfolio/Adapter/NorthCapital/PortfolioNorthCapitalAdapter';
+import { VertaloConfig } from 'Portfolio/Adapter/Vertalo/ExecutionVertaloAdapter';
 import { PortfolioApi, PortfolioApiType } from 'Portfolio/Port/Api/PortfolioApiType';
 import { PortfolioTechnicalHandler, PortfolioTechnicalHandlerType } from 'Portfolio/Port/Queue/PortfolioTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Portfolio/Providers/AdapterServiceProvider';
@@ -19,7 +21,9 @@ export namespace Portfolio {
   export type Config = {
     database: PostgreSQLConfig;
     dealpathConfig: DealpathConfig;
+    northCapital: NorthCapitalConfig;
     queue: QueueConfig;
+    vertalo: VertaloConfig;
   };
 
   export type ModulesDependencies = {

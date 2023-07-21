@@ -76,6 +76,7 @@ export type BeneficiaryAccountResponse = {
     };
   };
   id: string;
+  parentId: string;
   label?: string;
 };
 
@@ -244,6 +245,7 @@ export class ReadAccountController {
         },
         id: schema.accountId,
         label: schema.label,
+        parentId: schema.individualId,
       };
     } catch (error: any) {
       console.error(error);

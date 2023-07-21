@@ -1,6 +1,5 @@
 import type { PdfGenerator } from './Puppeteer/PdfGenerator';
 import type { S3Adapter } from './S3/S3Adapter';
-import { PdfTypes } from './Types';
 
 export class MakeScreenshotToPdf {
   private adapter: S3Adapter;
@@ -13,7 +12,7 @@ export class MakeScreenshotToPdf {
 
   public static getClassName = (): string => 'MakeScreenshotToPdf';
 
-  async execute(catalog: string, fileName: string, name: string, url: string, type: PdfTypes): Promise<void> {
+  async execute(catalog: string, fileName: string, url: string): Promise<void> {
     const buffer = await this.pdfGenerator.makeScreenshot(url);
 
     if (!buffer) {

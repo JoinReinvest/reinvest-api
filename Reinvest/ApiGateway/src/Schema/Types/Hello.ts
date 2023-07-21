@@ -5,6 +5,7 @@ const schema = `
     type Query {
         """ Just say hello """
         hello: Boolean
+        ip: String
     }
 `;
 
@@ -13,6 +14,7 @@ export const Hello = makeExecutableSchema({
   resolvers: {
     Query: {
       hello: () => true,
+      ip: (_, __, { clientIp }) => clientIp,
     },
   },
 });

@@ -1,12 +1,13 @@
 import { expect } from 'chai';
-import ScheduleInvestmentService from 'Reinvest/Investments/src/Application/Service/ScheduleInvestmentService';
+import ScheduleInvestmentService from 'Investments/Domain/Service/ScheduleInvestmentService';
+import { DateTime } from 'Money/DateTime';
 import { RecurringInvestmentFrequency } from 'Reinvest/Investments/src/Domain/Investments/Types';
 
 context('Schedule investment service', () => {
   describe('When ScheduleInvestmentService got proper schedule object', () => {
     it('Should return array with correct dates with WEEKLY frequency', () => {
       const schedule = {
-        startDate: '2023-06-01',
+        startDate: DateTime.fromIsoDate('2023-06-01'),
         frequency: RecurringInvestmentFrequency.WEEKLY,
       };
       const simulation = new ScheduleInvestmentService(schedule.startDate, schedule.frequency);
@@ -25,7 +26,7 @@ context('Schedule investment service', () => {
 
     it('Should return array with correct dates with BI_WEEKLY frequency', () => {
       const schedule = {
-        startDate: '2023-06-16',
+        startDate: DateTime.fromIsoDate('2023-06-16'),
         frequency: RecurringInvestmentFrequency.BI_WEEKLY,
       };
       const simulation = new ScheduleInvestmentService(schedule.startDate, schedule.frequency);
@@ -44,7 +45,7 @@ context('Schedule investment service', () => {
 
     it('Should return array with correct dates with MONTHLY frequency and started from last day of a month', () => {
       const schedule = {
-        startDate: '2023-01-31',
+        startDate: DateTime.fromIsoDate('2023-01-31'),
         frequency: RecurringInvestmentFrequency.MONTHLY,
       };
       const simulation = new ScheduleInvestmentService(schedule.startDate, schedule.frequency);
@@ -63,7 +64,7 @@ context('Schedule investment service', () => {
 
     it('Should return array with correct dates with QUARTERLY frequency', () => {
       const schedule = {
-        startDate: '2023-04-25',
+        startDate: DateTime.fromIsoDate('2023-04-25'),
         frequency: RecurringInvestmentFrequency.QUARTERLY,
       };
       const simulation = new ScheduleInvestmentService(schedule.startDate, schedule.frequency);
@@ -82,7 +83,7 @@ context('Schedule investment service', () => {
 
     it('Should return array with correct dates with QUARTERLY frequency and startedDate set to end on the month', () => {
       const schedule = {
-        startDate: '2023-08-31',
+        startDate: DateTime.fromIsoDate('2023-08-31'),
         frequency: RecurringInvestmentFrequency.QUARTERLY,
       };
       const simulation = new ScheduleInvestmentService(schedule.startDate, schedule.frequency);

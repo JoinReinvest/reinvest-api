@@ -3,6 +3,7 @@ import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider'
 import type {
   InvestmentsFeesTable,
   InvestmentsTable,
+  RecurringInvestmentsExecutionTable,
   RecurringInvestmentsTable,
   SubscriptionAgreementTable,
   TransactionEventsTable,
@@ -15,10 +16,12 @@ export const reinvestmentEventsTable = 'investments_reinvestment_events';
 export const subscriptionAgreementTable = 'investments_subscription_agreements';
 export const investmentsFeesTable = 'investments_investments_fees';
 export const recurringInvestmentsTable = 'investments_recurring_investments';
+export const recurringInvestmentsExecutionTable = 'investments_recurring_investments_execution';
 
 export interface InvestmentsDatabase {
   [investmentsFeesTable]: InvestmentsFeesTable;
   [investmentsTable]: InvestmentsTable;
+  [recurringInvestmentsExecutionTable]: RecurringInvestmentsExecutionTable;
   [recurringInvestmentsTable]: RecurringInvestmentsTable;
   [reinvestmentEventsTable]: ReinvestmentEventsTable;
   [subscriptionAgreementTable]: SubscriptionAgreementTable;

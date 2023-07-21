@@ -1,12 +1,20 @@
-import { EventHandler } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
-import { CancelTrade } from 'Trading/IntegrationLogic/UseCase/CancelTrade';
+import { UnwindTrade } from 'Trading/IntegrationLogic/UseCase/UnwindTrade';
+
+export enum CancelTradeEvent {
+  TransactionCanceled = 'TransactionCanceled',
+  TransactionUnwinding = 'TransactionUnwinding',
+  TransactionCanceledFailed = 'TransactionCanceledFailed',
+}
 
 export class CancelTradeHandler implements EventHandler<DomainEvent> {
-  private cancelTradeUseCase: CancelTrade;
+  private unwindTradeUseCase: UnwindTrade;
+  private eventBus: EventBus;
 
-  constructor(cancelTradeUseCase: CancelTrade) {
-    this.cancelTradeUseCase = cancelTradeUseCase;
+  constructor(cancelTradeUseCase: UnwindTrade, eventBus: EventBus) {
+    this.unwindTradeUseCase = cancelTradeUseCase;
+    this.eventBus = eventBus;
   }
 
   static getClassName = (): string => 'CancelTradeHandler';
@@ -16,6 +24,40 @@ export class CancelTradeHandler implements EventHandler<DomainEvent> {
       return;
     }
 
-    await this.cancelTradeUseCase.execute(event.id);
+    const actionEvent = await this.unwindTradeUseCase.execute(event.id);
+
+    if (!actionEvent) {
+      return;
+    }
+
+    const reason = actionEvent?.reason ?? '';
+
+    switch (actionEvent.event) {
+      case 'Unwound':
+        await this.eventBus.publish({
+          kind: CancelTradeEvent.TransactionCanceled,
+          id: event.id,
+          data: {},
+        });
+        break;
+      case 'Unwinding':
+        await this.eventBus.publish({
+          kind: CancelTradeEvent.TransactionUnwinding,
+          id: event.id,
+          data: {},
+        });
+        break;
+      case 'Failed':
+        await this.eventBus.publish({
+          kind: CancelTradeEvent.TransactionCanceledFailed,
+          id: event.id,
+          data: {
+            reason,
+          },
+        });
+        break;
+      default:
+        break;
+    }
   }
 }

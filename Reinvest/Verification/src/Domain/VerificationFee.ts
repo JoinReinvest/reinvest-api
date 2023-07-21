@@ -89,6 +89,13 @@ export class VerificationFee {
     }
   }
 
+  withdraw(amount: Money): void {
+    this.verificationFeeSchema.amountAssigned = this.verificationFeeSchema.amountAssigned.subtract(amount);
+    this.verificationFeeSchema.status = this.verificationFeeSchema.amountAssigned.isZero()
+      ? VerificationFeeStatus.NOT_ASSIGNED
+      : VerificationFeeStatus.PARTIALLY_ASSIGNED;
+  }
+
   getId(): UUID {
     return this.verificationFeeSchema.id;
   }

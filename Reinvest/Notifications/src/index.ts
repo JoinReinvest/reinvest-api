@@ -1,5 +1,7 @@
 import Container, { ContainerInterface } from 'Container/Container';
+import { Identity } from 'Identity/index';
 import { NotificationsDatabaseAdapterInstanceProvider, NotificationsDatabaseAdapterProvider } from 'Notifications/Adapter/Database/DatabaseAdapter';
+import { EmailConfiguration } from 'Notifications/Adapter/SES/EmailSender';
 import { NotificationsApi, NotificationsApiType } from 'Notifications/Port/Api/NotificationsApiType';
 import { NotificationsTechnicalHandler } from 'Notifications/Port/Queue/NotificationsTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Notifications/Providers/AdapterServiceProvider';
@@ -15,9 +17,16 @@ import * as NotificationsMigrations from '../migrations';
 export namespace Notifications {
   export const moduleName = 'Notifications';
   export type Config = {
+    adminEmail: string;
     database: PostgreSQLConfig;
+    email: EmailConfiguration;
     firebaseQueue: QueueConfig;
     queue: QueueConfig;
+    segmentQueue: QueueConfig;
+  };
+
+  export type ModulesDependencies = {
+    identity: Identity.Main;
   };
 
   export type ApiType = NotificationsApiType & Api;
@@ -27,9 +36,11 @@ export namespace Notifications {
     private readonly config: Notifications.Config;
     private readonly container: ContainerInterface;
     private booted = false;
+    private modules: Notifications.ModulesDependencies;
 
-    constructor(config: Notifications.Config) {
+    constructor(config: Notifications.Config, modules: Notifications.ModulesDependencies) {
       this.config = config;
+      this.modules = modules;
       this.container = new Container();
     }
 
@@ -65,6 +76,8 @@ export namespace Notifications {
         return;
       }
 
+      this.container.addAsValue('Identity', this.modules.identity);
+
       new AdapterServiceProvider(this.config).boot(this.container);
       new UseCaseProvider(this.config).boot(this.container);
       new PortsProvider(this.config).boot(this.container);
@@ -74,7 +87,7 @@ export namespace Notifications {
     }
   }
 
-  export function create(config: Notifications.Config): Notifications.Main {
-    return new Notifications.Main(config);
+  export function create(config: Notifications.Config, modules: Notifications.ModulesDependencies): Notifications.Main {
+    return new Notifications.Main(config, modules);
   }
 }

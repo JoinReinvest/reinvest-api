@@ -1,7 +1,8 @@
+import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investments/Domain/Investments/SubscriptionAgreement';
 import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { InvestmentFinalized, TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
-import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, EventHandler, storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class FinalizeInvestmentEventHandler implements EventHandler<TransactionEvent> {
   private investmentsQueryRepository: InvestmentsQueryRepository;
@@ -25,36 +26,69 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
       return;
     }
 
-    const { ip, tradeId, status, subscriptionAgreementPdfDateCreated, subscriptionAgreementId, portfolioId, bankAccountId, investmentAmount, feeAmount } =
-      investmentDetails;
+    const {
+      accountId,
+      ip,
+      tradeId,
+      profileId,
+      status,
+      subscriptionAgreementPdfDateCreated,
+      subscriptionAgreementId,
+      portfolioId,
+      bankAccountId,
+      investmentAmount,
+      feeAmount,
+      feeApproveDate,
+      unitPrice,
+    } = investmentDetails;
 
     if (status !== InvestmentStatus.IN_PROGRESS) {
       console.warn(`[FinalizeInvestmentEventHandler] Investment with id ${investmentId} is not in progress. Current status: ${status}`);
     }
 
-    if (!subscriptionAgreementId) {
-      console.error(`[FinalizeInvestmentEventHandler] Subscription agreement id for investment with id ${investmentId} not found or signed`);
+    if (!subscriptionAgreementId || !ip) {
+      console.error(`[FinalizeInvestmentEventHandler] Subscription agreement id for investment with id ${investmentId} not found or signed or ip is not set`);
 
       return;
     }
 
-    // TODO - uncomment it when pdf creation is implemented
-    // if (!subscriptionAgreementPdfDateCreated || !ip) {
-    // console.warn(`[FinalizeInvestmentEventHandler] Subscription agreement PDF date created or ip is not set for investment ${investmentId}}`);
-    //   // TODO - send command to generate pdf
-    // }
+    if (!subscriptionAgreementPdfDateCreated) {
+      console.warn(`[FinalizeInvestmentEventHandler] Subscription agreement PDF not created for investment ${investmentId}}`);
+      await this.eventBus.publish(<SubscriptionAgreementEvent>{
+        id: subscriptionAgreementId,
+        kind: SubscriptionAgreementEvents.GenerateSubscriptionAgreementCommand,
+        data: {
+          profileId,
+        },
+      });
 
-    // TODO add info if the investment is for beneficiary
+      return;
+    }
+
+    if (feeAmount && !feeApproveDate) {
+      const uniqueId = `fee-${investmentId}`;
+      const feesApprovalCommand = storeEventCommand(profileId, 'FeesApprovalRequired', {
+        accountId,
+        uniqueId,
+        feeAmount,
+        investmentId,
+      });
+      await this.eventBus.publish(feesApprovalCommand);
+
+      return;
+    }
+
     await this.eventBus.publish(<InvestmentFinalized>{
       kind: TransactionEvents.INVESTMENT_FINALIZED,
       data: {
         amount: investmentAmount,
         fees: !feeAmount ? 0 : feeAmount,
-        ip: '8.8.8.8', // TODO - get ip from subscription agreement when implemented
+        ip,
         bankAccountId,
         subscriptionAgreementId,
         portfolioId,
         userTradeId: tradeId,
+        unitPrice,
       },
       id: investmentId,
     });

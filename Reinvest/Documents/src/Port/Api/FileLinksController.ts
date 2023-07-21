@@ -31,8 +31,10 @@ export class FileLinksController {
   }
 
   public async getDocumentLink(id: string, catalog: string): Promise<FileLink> {
-    console.log('getDocumentLink', id, catalog);
-
     return this.fileLinkService.getDocumentFileLink(id, catalog);
+  }
+
+  public async getAdminDocumentLink(id: string): Promise<FileLink> {
+    return this.fileLinkService.getDocumentFileLink(id, 'admin');
   }
 }

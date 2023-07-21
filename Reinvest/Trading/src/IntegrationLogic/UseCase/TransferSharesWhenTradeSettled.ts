@@ -1,3 +1,5 @@
+import { DateTime } from 'Money/DateTime';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
@@ -98,6 +100,24 @@ export class TransferSharesWhenTradeSettled {
     await this.tradesRepository.updateTrade(trade);
     console.info(`[Trade ${trade.getInvestmentId()}]`, 'Shares transferred in Vertalo, holdingId:', holdingId);
 
+    await this.sendSharesIssuedEvent(trade);
+
     return true;
+  }
+
+  private async sendSharesIssuedEvent(trade: Trade) {
+    const { amount, fee, userTradeId, investmentId } = trade.getFundsTransferConfiguration();
+    const { shares } = trade.getTradeSummary();
+    await this.tradesRepository.publishEvent(
+      storeEventCommand(trade.getProfileId(), 'SharesIssued', {
+        accountId: trade.getReinvestAccountId(),
+        investmentId,
+        numberOfShares: shares.toString(),
+        amount: amount.getAmount(),
+        fee: fee.getAmount(),
+        tradeId: userTradeId,
+        date: DateTime.now().toIsoDateTime(),
+      }),
+    );
   }
 }

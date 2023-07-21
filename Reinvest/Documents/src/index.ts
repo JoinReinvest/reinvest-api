@@ -3,6 +3,7 @@ import { S3Config } from 'Documents/Adapter/S3/S3Adapter';
 import { DocumentsApi, DocumentsApiType } from 'Documents/Port/Api/DocumentsApi';
 import { documentsTechnicalHandler, DocumentsTechnicalHandlerType } from 'Documents/Port/Queue/DocumentsTechnicalHandlerType';
 import { AdapterServiceProvider } from 'Documents/Providers/AdapterServiceProvider';
+import EventBusProvider from 'Documents/Providers/EventBusProvider';
 import { PortsProvider } from 'Documents/Providers/PortsProvider';
 import { UseCaseProvider } from 'Documents/Providers/UseCaseProvider';
 import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
@@ -10,7 +11,6 @@ import { Api, EventHandler, Module } from 'Reinvest/Modules';
 import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 
 import * as DocumentsMigrations from '../migrations';
-import EventBusProvider from 'Documents/Providers/EventBusProvider';
 
 export namespace Documents {
   export const moduleName = 'Documents';

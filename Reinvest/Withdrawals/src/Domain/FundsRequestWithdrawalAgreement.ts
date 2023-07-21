@@ -1,4 +1,6 @@
-import { JSONObject } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
+import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
+import { Templates } from 'Templates/Types';
 import { WithdrawalsFundsRequestsAgreementsTable } from 'Withdrawals/Adapter/Database/WithdrawalsSchema';
 import { WithdrawalsFundsRequestsAgreementsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequestsAgreement';
 
@@ -6,7 +8,7 @@ type FundsRequestWithdrawalAgreementSchema = WithdrawalsFundsRequestsAgreementsT
 
 export class FundsRequestWithdrawalAgreement {
   private accountId: string;
-  private contentFieldsJson: JSONObject;
+  private contentFieldsJson: LatestTemplateContentFields[Templates.WITHDRAWAL_AGREEMENT];
   private dateCreated: Date;
   private id: string;
   private fundsRequestId: string | null;
@@ -28,7 +30,7 @@ export class FundsRequestWithdrawalAgreement {
     signedByIP: string | null,
     pdfDateCreated: Date | null,
     templateVersion: number,
-    contentFieldsJson: JSONObject,
+    contentFieldsJson: LatestTemplateContentFields[Templates.WITHDRAWAL_AGREEMENT],
   ) {
     this.accountId = accountId;
     this.contentFieldsJson = contentFieldsJson;
@@ -57,7 +59,7 @@ export class FundsRequestWithdrawalAgreement {
       signedByIP,
       pdfDateCreated,
       templateVersion,
-      contentFieldsJson,
+      <LatestTemplateContentFields[Templates.WITHDRAWAL_AGREEMENT]>contentFieldsJson,
     );
   }
 
@@ -72,17 +74,23 @@ export class FundsRequestWithdrawalAgreement {
 
     this.status = WithdrawalsFundsRequestsAgreementsStatuses.SIGNED;
     this.signedByIP = ip;
-    this.signedAt = new Date();
+    const signedAt = DateTime.now();
+    this.signedAt = signedAt.toDate();
+
+    this.contentFieldsJson.ipAddress = ip;
+    this.contentFieldsJson.signingTimestamp = signedAt.toTimestamp().toString();
+    this.contentFieldsJson.signingDate = signedAt.toFormattedDate('MM/DD/YYYY');
   }
 
   isSigned() {
     return this.status === WithdrawalsFundsRequestsAgreementsStatuses.SIGNED;
   }
 
-  getDataForParser() {
+  forParser() {
     return {
-      templateVersion: this.templateVersion,
-      contentFieldsJson: this.contentFieldsJson,
+      version: this.templateVersion,
+      content: this.contentFieldsJson,
+      template: Templates.WITHDRAWAL_AGREEMENT,
     };
   }
 
@@ -100,5 +108,9 @@ export class FundsRequestWithdrawalAgreement {
       templateVersion: this.templateVersion,
       contentFieldsJson: this.contentFieldsJson,
     };
+  }
+
+  markAsGenerated() {
+    this.pdfDateCreated = DateTime.now().toDate();
   }
 }

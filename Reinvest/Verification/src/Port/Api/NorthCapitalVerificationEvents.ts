@@ -21,7 +21,6 @@ export class NorthCapitalVerificationEvents {
     const { accountId, profileId } = partyMapping;
 
     if (accountId) {
-      // todo handle the decision somehow?
       await this.verifyAccountUseCase.verify(profileId, accountId);
     }
   }

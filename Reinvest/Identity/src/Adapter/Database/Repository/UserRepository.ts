@@ -1,15 +1,20 @@
+import { JSONObjectOf, Pagination, UUID } from 'HKEKTypes/Generics';
 import { IdentityDatabaseAdapterProvider, userTable } from 'Identity/Adapter/Database/IdentityDatabaseAdapter';
 import { IdentityUser, InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
 import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/UserException';
 import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
 import { BanList } from 'Identity/Port/Api/BanController';
-import { JSONObjectOf } from 'HKEKTypes/Generics';
+import { User } from 'Identity/Port/Api/UserController';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class UserRepository {
   private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventBus = eventBus;
   }
 
   public static getClassName = (): string => 'UserRepository';
@@ -21,6 +26,7 @@ export class UserRepository {
     cognitoUserId: string,
     email: string,
     invitedByIncentiveToken: IncentiveToken | null,
+    label: string,
   ): Promise<void | never> {
     try {
       await this.databaseAdapterProvider
@@ -33,6 +39,7 @@ export class UserRepository {
           email,
           invitedByIncentiveToken: invitedByIncentiveToken === null ? null : invitedByIncentiveToken.get(),
           userIncentiveToken: userIncentiveToken.get(),
+          label,
         })
         .execute();
     } catch (error: any) {
@@ -49,6 +56,23 @@ export class UserRepository {
       .selectFrom(userTable)
       .select(['profileId', 'bannedIdsJson'])
       .where('cognitoUserId', '=', cognitoUserId)
+      .limit(1)
+      .executeTakeFirst();
+
+    return user ?? null;
+  }
+
+  public async getUserProfileByProfileId(profileId: string): Promise<{
+    bannedIdsJson: JSONObjectOf<BanList>;
+    email: string;
+    label: string;
+    profileId: string;
+  } | null> {
+    const user = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(userTable)
+      .select(['profileId', 'bannedIdsJson', 'email', 'label'])
+      .where('profileId', '=', profileId)
       .limit(1)
       .executeTakeFirst();
 
@@ -91,5 +115,56 @@ export class UserRepository {
       })
       .where('id', '=', id)
       .execute();
+  }
+
+  async getUserInviter(inviteeProfileId: UUID): Promise<UUID | null> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(`${userTable} as invitee`)
+      .fullJoin(`${userTable} as inviter`, `invitee.invitedByIncentiveToken`, 'inviter.userIncentiveToken')
+      .select('inviter.profileId as inviterProfileId')
+      .where('invitee.profileId', '=', inviteeProfileId)
+      .executeTakeFirst();
+
+    return result ? result.inviterProfileId : null;
+  }
+
+  async listUsers(pagination: Pagination): Promise<User[]> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(userTable)
+      .select(['id', 'profileId', 'email', 'createdAt', 'bannedIdsJson'])
+      .orderBy('createdAt', 'desc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .execute();
+
+    if (result.length === 0) {
+      return [];
+    }
+
+    return result.map(user => ({
+      id: user.id,
+      profileId: user.profileId,
+      email: user.email,
+      createdAt: user.createdAt,
+      // @ts-ignore
+      isBanned: user.bannedIdsJson !== null && user.bannedIdsJson.list && user.bannedIdsJson.list.includes(user.profileId),
+    }));
+  }
+
+  async updateUserLabel(profileId: UUID, label: string): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        label,
+      })
+      .where('profileId', '=', profileId)
+      .execute();
+  }
+
+  async publishEvent(event: DomainEvent): Promise<void> {
+    await this.eventBus.publish(event);
   }
 }

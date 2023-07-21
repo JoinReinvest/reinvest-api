@@ -1,4 +1,6 @@
 import { Updateable } from 'kysely';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 import { tradesTable, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { TradesTable } from 'Trading/Adapter/Database/TradingSchema';
 import {
@@ -18,9 +20,11 @@ import {
 
 export class TradesRepository {
   private databaseAdapterProvider: TradingDatabaseAdapterProvider;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: TradingDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: TradingDatabaseAdapterProvider, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventBus = eventBus;
   }
 
   public static getClassName = (): string => 'TradesRepository';
@@ -53,6 +57,7 @@ export class TradesRepository {
         'tradeId',
         'vertaloPaymentJson',
         'cancelTradeJson',
+        'retryPaymentStateJson',
       ])
       .where('investmentId', '=', investmentId)
       .executeTakeFirst();
@@ -82,6 +87,7 @@ export class TradesRepository {
         tradeId: null,
         vertaloPaymentJson: null,
         cancelTradeJson: null,
+        retryPaymentStateJson: null,
       })
       .execute();
 
@@ -114,6 +120,7 @@ export class TradesRepository {
       sharesTransferState: trade.sharesTransferJson as unknown as SharesTransferState,
       vertaloPaymentState: trade.vertaloPaymentJson as unknown as VertaloPaymentState,
       cancelTradeState: trade.cancelTradeJson as unknown as CancelTradeState,
+      retryPaymentState: trade.retryPaymentStateJson as unknown as FundsMoveState,
     };
   }
 
@@ -127,6 +134,7 @@ export class TradesRepository {
       northCapitalTradeStateJson: schema.northCapitalTradeState,
       subscriptionAgreementStateJson: schema.subscriptionAgreementState,
       vertaloDistributionStateJson: schema.vertaloDistributionState,
+      retryPaymentStateJson: schema.retryPaymentState,
       // @ts-ignore
       disbursementJson: schema.disbursementState,
       // @ts-ignore
@@ -136,5 +144,19 @@ export class TradesRepository {
       // @ts-ignore
       cancelTradeJson: schema.cancelTradeState,
     };
+  }
+
+  async getTradeByTradeId(tradeId: string): Promise<Trade | null> {
+    const data = await this.databaseAdapterProvider.provide().selectFrom(tradesTable).selectAll().where('tradeId', '=', tradeId).executeTakeFirst();
+
+    if (!data) {
+      return null;
+    }
+
+    return Trade.create(this.mapToTradeSchema(data));
+  }
+
+  async publishEvent(event: DomainEvent): Promise<void> {
+    await this.eventBus.publish(event);
   }
 }

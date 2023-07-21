@@ -1,7 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { MappingRegistryRepository } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { NorthCapitalDocumentsSynchronizationRepository } from 'Registration/Adapter/Database/Repository/NorthCapitalDocumentsSynchronizationRepository';
-import { RegistryQueryRepository } from 'Registration/Adapter/Database/Repository/RegistryQueryRepository';
 import { NorthCapitalSynchronizer } from 'Registration/Adapter/NorthCapital/NorthCapitalSynchronizer';
 import { Registration } from 'Registration/index';
 import { BankAccountQuery } from 'Registration/IntegrationLogic/UseCase/BankAccount/BankAccountQuery';
@@ -18,14 +17,12 @@ import { SynchronizeStakeholder } from 'Registration/IntegrationLogic/UseCase/Sy
 import { BankAccountController } from 'Registration/Port/Api/BankAccountController';
 import { NorthCapitalDocumentSynchronizationController } from 'Registration/Port/Api/NorthCapitalDocumentSynchronizationController';
 import { NorthCapitalDocumentSynchronizationQuery } from 'Registration/Port/Api/NorthCapitalDocumentSynchronizationQuery';
-import { RegistryQuery } from 'Registration/Port/Api/RegistryQuery';
 import { SynchronizationController } from 'Registration/Port/Api/SynchronizationController';
 import { SynchronizationQuery } from 'Registration/Port/Api/SynchronizationQuery';
 import { BeneficiaryAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/BeneficiaryAccountOpenedEventHandler';
 import { CompanyAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/CompanyAccountOpenedEventHandler';
 import { IndividualAccountOpenedEventHandler } from 'Registration/Port/Queue/EventHandler/IndividualAccountOpenedEventHandler';
 import { ProfileCompletedEventHandler } from 'Registration/Port/Queue/EventHandler/ProfileCompletedEventHandler';
-import { SynchronizeRegistryRecords } from 'Registration/IntegrationLogic/UseCase/SynchronizeRegistryRecords';
 
 export class PortsProvider {
   private config: Registration.Config;
@@ -38,17 +35,6 @@ export class PortsProvider {
     // api
     container
       .addSingleton(SynchronizationQuery, [MappingRegistryRepository])
-      .addSingleton(RegistryQuery, [RegistryQueryRepository])
-      .addSingleton(ImmediateSynchronize, [
-        MappingRegistryRepository,
-        SynchronizeProfile,
-        SynchronizeIndividualAccount,
-        SynchronizeCompanyAccount,
-        SynchronizeCompany,
-        SynchronizeStakeholder,
-        RegistryQuery,
-        SynchronizeRegistryRecords,
-      ])
       .addSingleton(SynchronizationController, [
         MappingRegistryRepository,
         SynchronizeProfile,

@@ -12,7 +12,6 @@ export type NorthCapitalConfig = {
   API_URL: string;
   CLIENT_ID: string;
   DEVELOPER_API_KEY: string;
-  OFFERING_ID: string;
 };
 
 export class NorthCapitalAdapter extends ExecutionNorthCapitalAdapter {

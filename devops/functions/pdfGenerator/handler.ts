@@ -1,6 +1,7 @@
 import { SQSEvent, SQSHandler, SQSRecord } from 'aws-lambda';
-import { PdfTypes } from 'devops/functions/pdfGenerator/src/Types';
-import { CHROMIUM_ENDPOINT, S3_CONFIG, SQS_CONFIG } from 'Reinvest/config';
+import { PdfEvents, PdfKinds } from 'HKEKTypes/Pdf';
+import { logger } from 'Logger/logger';
+import { CHROMIUM_ENDPOINT, S3_CONFIG, SENTRY_CONFIG, SQS_CONFIG } from 'Reinvest/config';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 
 import { GeneratePdf } from './src/GeneratePdf';
@@ -8,27 +9,7 @@ import { MakeScreenshotToPdf } from './src/MakeScreenshotToPdf';
 import { PdfGenerator } from './src/Puppeteer/PdfGenerator';
 import { S3Adapter } from './src/S3/S3Adapter';
 
-export type GeneratePdfCommand = {
-  data: {
-    catalog: string;
-    fileName: string;
-    template: string;
-    templateType: PdfTypes;
-  };
-  id: string;
-  kind: 'GeneratePdf';
-};
-
-export type MakeScreenshotToPdfCommand = {
-  data: {
-    catalog: string;
-    fileName: string;
-    url: string;
-  };
-  id: string;
-  kind: 'MakeScreenshotToPdf';
-};
-
+console = logger(SENTRY_CONFIG);
 export const main: SQSHandler = async (event: SQSEvent) => {
   const record = event.Records.pop() as SQSRecord;
 
@@ -38,35 +19,43 @@ export const main: SQSHandler = async (event: SQSEvent) => {
 
     const { generatePdf, queueSender, makeScreenshotToPdf } = boot();
 
-    if (!kind || kind === 'GeneratePdf') {
+    if (!kind || kind === PdfKinds.GeneratePdf) {
       const {
-        data: { catalog, fileName, template, templateType },
+        data: { catalog, fileName, template, content, version, profileId, fileId },
         id,
       } = data;
 
-      await generatePdf.execute(catalog, fileName, template, templateType);
+      await generatePdf.execute(catalog, fileName, template, version, content);
       await queueSender.send(
         JSON.stringify({
-          kind: 'PdfGenerated',
+          kind: PdfEvents.PdfGenerated,
           id,
           data: {
-            profileId: catalog,
-            fileName,
-            type: templateType,
+            profileId,
+            fileId,
           },
         }),
       );
     }
 
-    if (kind === 'MakeScreenshotToPdf') {
+    if (kind === PdfKinds.MakeScreenshotToPdf) {
       const {
-        data: { catalog, fileName, name, url, templateType },
+        data: { catalog, fileName, url, profileId, fileId },
         id,
       } = data;
 
-      await makeScreenshotToPdf.execute(catalog, fileName, name, url, templateType);
+      await makeScreenshotToPdf.execute(catalog, fileName, url);
+      await queueSender.send(
+        JSON.stringify({
+          kind: PdfEvents.PdfGenerated,
+          id,
+          data: {
+            profileId,
+            fileId,
+          },
+        }),
+      );
     }
-    // send event back
   } catch (error: any) {
     console.log(error);
   }

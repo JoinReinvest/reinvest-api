@@ -1,14 +1,18 @@
 import { Updateable } from 'kysely';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 import { reinvestmentTradesTable, TradingDatabaseAdapterProvider } from 'Trading/Adapter/Database/DatabaseAdapter';
 import { ReinvestmentTradesTable } from 'Trading/Adapter/Database/TradingSchema';
 import { ReinvestmentTrade, ReinvestmentTradeConfiguration, ReinvestmentTradeSchema, ReinvestmentVendorsConfiguration } from 'Trading/Domain/ReinvestmentTrade';
-import { SharesTransferState, VendorsConfiguration, VertaloDistributionState, VertaloPaymentState } from 'Trading/Domain/Trade';
+import { SharesTransferState, VertaloDistributionState, VertaloPaymentState } from 'Trading/Domain/Trade';
 
 export class ReinvestmentRepository {
   private databaseAdapterProvider: TradingDatabaseAdapterProvider;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: TradingDatabaseAdapterProvider) {
+  constructor(databaseAdapterProvider: TradingDatabaseAdapterProvider, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventBus = eventBus;
   }
 
   public static getClassName = (): string => 'ReinvestmentRepository';
@@ -90,5 +94,9 @@ export class ReinvestmentRepository {
       // @ts-ignore
       vertaloPaymentJson: schema.vertaloPaymentState,
     };
+  }
+
+  async publishEvent(event: DomainEvent): Promise<void> {
+    await this.eventBus.publish(event);
   }
 }

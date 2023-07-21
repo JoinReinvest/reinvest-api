@@ -1,4 +1,4 @@
-import DateTime from 'date-and-time';
+import { DateTime } from 'Money/DateTime';
 
 export enum ValidationErrorEnum {
   UNKNOWN_ERROR = 'UNKNOWN_ERROR',
@@ -77,7 +77,7 @@ export class AnyString {
 
 export class IsoDate {
   constructor(date: string) {
-    if (!date || !DateTime.isValid(date, 'YYYY-MM-DD')) {
+    if (!date || !DateTime.isInFormat(date, 'YYYY-MM-DD')) {
       throw new ValidationError(ValidationErrorEnum.INVALID_DATE_FORMAT, 'IsoDate');
     }
   }

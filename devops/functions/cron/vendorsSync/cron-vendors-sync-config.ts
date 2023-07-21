@@ -2,6 +2,7 @@ import { CloudwatchPolicies } from '../../../serverless/cloudwatch';
 import { S3PoliciesWithImport } from '../../../serverless/s3';
 import { getAttribute, getResourceName } from '../../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../../serverless/vpc';
+import { SQSSendPolicy } from '../../queue/queue-config';
 
 export const CronVendorsSyncFunction = {
   handler: `devops/functions/cron/vendorsSync/handler.main`,
@@ -44,6 +45,7 @@ export const CronVendorsSyncResources = {
               ...CloudwatchPolicies,
               ...EniPolicies,
               ...S3PoliciesWithImport,
+              ...SQSSendPolicy,
               {
                 Effect: 'Allow',
                 Action: ['lambda:InvokeFunction'],

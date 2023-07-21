@@ -1,6 +1,8 @@
+import { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
 import { CognitoService } from 'Identity/Adapter/AWS/CognitoService';
 import { UserRepository } from 'Identity/Adapter/Database/Repository/UserRepository';
 import { BanList } from 'Identity/Port/Api/BanController';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export type UserProfile = {
   isBannedAccount: (accountId: string) => boolean;
@@ -27,18 +29,61 @@ export class ProfileController {
         return null;
       }
 
-      const banList = <BanList>(user.bannedIdsJson ?? { list: [] });
+      return this.mapUser(user);
+    } catch (error: any) {
+      console.log(error.message);
+
+      return null;
+    }
+  }
+
+  async getUserData(profileId: UUID): Promise<{ email: string; userName: string } | null> {
+    try {
+      const user = await this.userRepository.getUserProfileByProfileId(profileId);
+
+      if (!user) {
+        return null;
+      }
 
       return {
-        profileId: user.profileId,
-        isBannedAccount: (accountId: string) => banList.list.includes(accountId),
-        isBannedProfile: () => banList.list.includes(user.profileId),
+        email: user.email,
+        userName: user.label,
       };
     } catch (error: any) {
       console.log(error.message);
 
       return null;
     }
+  }
+
+  async setUserLabel(profileId: UUID, label: string): Promise<void> {
+    await this.userRepository.updateUserLabel(profileId, label);
+  }
+
+  async getProfileByProfileId(profileId: string): Promise<UserProfile | null> {
+    try {
+      const user = await this.userRepository.getUserProfileByProfileId(profileId);
+
+      if (!user) {
+        return null;
+      }
+
+      return this.mapUser(user);
+    } catch (error: any) {
+      console.log(error.message);
+
+      return null;
+    }
+  }
+
+  private mapUser(user: { bannedIdsJson: JSONObjectOf<BanList>; profileId: string }): UserProfile {
+    const banList = <BanList>(user.bannedIdsJson ?? { list: [] });
+
+    return {
+      profileId: user.profileId,
+      isBannedAccount: (accountId: string) => banList.list.includes(accountId),
+      isBannedProfile: () => banList.list.includes(user.profileId),
+    };
   }
 
   async getProfileByEmail(email: string): Promise<{ profileId: string } | null> {
@@ -72,6 +117,12 @@ export class ProfileController {
       }
 
       await this.userRepository.updateUserEmail(userId, newEmail);
+      const profile = await this.userRepository.getUserProfile(userId);
+
+      if (profile) {
+        const { profileId } = profile;
+        await this.userRepository.publishEvent(storeEventCommand(profileId, 'EmailUpdated', { email: newEmail }));
+      }
 
       return true;
     } catch (error: any) {
@@ -79,5 +130,25 @@ export class ProfileController {
 
       return null;
     }
+  }
+
+  async getPhoneAndEmailData(profileId: UUID): Promise<{ email: string; phoneNumber: string }> {
+    const user = await this.userRepository.findUserByProfileId(profileId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const { email, cognitoUserId } = user;
+    const phoneNumber = await this.cognitoService.getPhoneNumber(cognitoUserId);
+
+    return {
+      email,
+      phoneNumber: phoneNumber ?? '',
+    };
+  }
+
+  async getUserInviter(profileId: UUID): Promise<UUID | null> {
+    return this.userRepository.getUserInviter(profileId);
   }
 }

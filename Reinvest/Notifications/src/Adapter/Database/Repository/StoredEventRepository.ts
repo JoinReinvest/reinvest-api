@@ -87,7 +87,7 @@ export class StoredEventRepository {
       .selectFrom(storedEventsTable)
       .select(['id'])
       .where('status', 'in', [StoredEventStatus.PENDING, StoredEventStatus.FAILED])
-      .orderBy('dateCreated', 'desc')
+      .orderBy('dateCreated', 'asc')
       .orderBy('status', 'desc') // PENDING first
       .limit(50)
       .execute();
