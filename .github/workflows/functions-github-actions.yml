@@ -75,5 +75,6 @@ jobs:
           PROFILEID_HASH_KEY: ${{ secrets[format('{0}_PROFILEID_HASH_KEY', env.SHARED_ENVIRONMENT)] }}
         run: |
           environment=${{env.ENVIRONMENT}}
+          yarn "${environment,,}:create:domain"
           yarn "${environment,,}:deploy:functions"
           yarn "${environment,,}:invoke:migrateUp"
