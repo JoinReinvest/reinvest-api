@@ -60,7 +60,6 @@ jobs:
           NORTH_CAPITAL_CLIENT_ID: ${{ secrets[format('{0}_NORTH_CAPITAL_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
           NORTH_CAPITAL_DEVELOPER_API_KEY: ${{ secrets[format('{0}_NORTH_CAPITAL_DEVELOPER_API_KEY', env.SHARED_ENVIRONMENT)] }}
           NORTH_CAPITAL_API_URL: ${{ secrets[format('{0}_NORTH_CAPITAL_API_URL', env.SHARED_ENVIRONMENT)] }}
-          NORTH_CAPITAL_OFFERING_ID: ${{ secrets[format('{0}_NORTH_CAPITAL_OFFERING_ID', env.SHARED_ENVIRONMENT)] }}
           VERTALO_API_URL: ${{ secrets[format('{0}_VERTALO_API_URL', env.SHARED_ENVIRONMENT)] }}
           VERTALO_CLIENT_ID: ${{ secrets[format('{0}_VERTALO_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
           VERTALO_CLIENT_SECRET: ${{ secrets[format('{0}_VERTALO_CLIENT_SECRET', env.SHARED_ENVIRONMENT)] }}
