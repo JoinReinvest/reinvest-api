@@ -163,6 +163,7 @@ const serverlessConfiguration: AWS = {
       basePath: '',
       stage: '${sls:stage}',
       createRoute53Record: true,
+      apiType: 'http',
       endpointType: 'regional',
       certificateName: '${env:API_CERTIFICATE_NAME}',
     },
@@ -185,8 +186,9 @@ const serverlessConfiguration: AWS = {
 
 if (process.env.NODE_ENV !== 'production') {
   serverlessConfiguration.functions.tests = TestsFunction;
-  serverlessConfiguration.resources.Resources.TestsLambdaResources = {
-    ...serverlessConfiguration.resources.Resources.TestsLambdaResources,
+  // @ts-ignore
+  serverlessConfiguration.resources.Resources = {
+    ...serverlessConfiguration.resources.Resources,
     ...TestsLambdaResources,
   };
 }
