@@ -168,11 +168,11 @@ const serverlessConfiguration: AWS = {
     customDomain: {
       domainName: '${env:API_URL}',
       basePath: '',
-      stage: '${sls:stage}',
       createRoute53Record: true,
       apiType: 'http',
       endpointType: 'regional',
       certificateName: '${env:API_CERTIFICATE_NAME}',
+      autoDomain: true,
     },
     serverlessTerminationProtection: {
       stages: ['production'],
