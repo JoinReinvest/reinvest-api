@@ -20,6 +20,7 @@ export namespace Identity {
     Cognito: CognitoConfig;
     SNS: SNSConfig;
     database: PostgreSQLConfig;
+    profileIdHashKey: string;
     queue: QueueConfig;
     webAppUrl: string;
   };

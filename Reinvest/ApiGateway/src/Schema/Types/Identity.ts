@@ -19,6 +19,11 @@ const schema = `
         Returns information if user already assigned and verified phone number
         """
         phoneCompleted: Boolean
+
+        """
+        Get encrypted profileId
+        """
+        encrypt: String
     }
     type Mutation {
         """
@@ -60,6 +65,11 @@ export const IdentitySchema = {
         }
 
         return { url: incentiveLink };
+      },
+      encrypt: async (parent: any, data: any, { profileId, modules }: SessionContext) => {
+        const api = modules.getApi<Identity.ApiType>(Identity);
+
+        return api.profileIdEncrypt(profileId);
       },
     },
     Mutation: {

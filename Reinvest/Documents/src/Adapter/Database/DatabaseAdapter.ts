@@ -1,12 +1,14 @@
 import { Kysely } from 'kysely/dist/esm';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 
-import { DocumentsRenderedPagePdfSchema } from './types';
+import { CalculationsSchema, DocumentsRenderedPagePdfSchema } from './types'
 
 export const documentsRenderedPagePdfTable = 'documents_rendered_page_pdf_table';
+export const calculationsTable = 'calculations_table';
 
 export interface DocumentsDatabase {
   [documentsRenderedPagePdfTable]: DocumentsRenderedPagePdfSchema;
+  [calculationsTable]: CalculationsSchema;
 }
 
 export const DocumentsDatabaseAdapterInstance = 'DocumentsDatabaseAdapter';

@@ -24,6 +24,12 @@ export const UnauthorizedEndpointsFunction = {
         path: '/webhooks/{proxy+}',
       },
     },
+    {
+      httpApi: {
+        method: 'POST',
+        path: '/calculations/{proxy+}',
+      },
+    },
   ],
 };
 
