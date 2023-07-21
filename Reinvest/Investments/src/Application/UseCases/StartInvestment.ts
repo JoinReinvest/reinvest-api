@@ -46,13 +46,7 @@ class StartInvestment {
           amount: investmentData.amount.getAmount(),
         },
       },
-      storeEventCommand(profileId, 'InvestmentProcessStarted', {
-        accountId: investmentData.accountId,
-        amount: investmentData.amount.getAmount(),
-        tradeId: investmentData.tradeId,
-        origin: investmentData.origin,
-        investmentId: investmentData.id,
-      }),
+      storeEventCommand(investment.getProfileId(), 'InvestmentProcessStarted', investment.forInvestmentEvent()),
     ];
 
     return this.investmentsRepository.store(investment, events);

@@ -1,5 +1,6 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { ReinvestmentExecutor } from 'Investments/Application/ReinvestmentProcessManager/ReinvestmentExecutor';
 import { TransactionExecutor } from 'Investments/Application/TransactionProcessManager/TransactionExecutor';
 import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
@@ -15,6 +16,7 @@ import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentS
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
 import ListInvestmentsQuery from 'Investments/Application/UseCases/ListInvestmentsQuery';
 import { MarkSubscriptionAgreementAsGenerated } from 'Investments/Application/UseCases/MarkSubscriptionAgreementAsGenerated';
+import { PushReinvestment } from 'Investments/Application/UseCases/PushReinvestment';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
 import RecurringInvestmentQuery from 'Investments/Application/UseCases/RecurringInvestmentQuery';
 import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
@@ -37,6 +39,7 @@ import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/F
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { RecurringInvestmentExecutionRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestmentExecutionRepository';
 import { RecurringInvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/RecurringInvestments';
+import { ReinvestmentRepository } from 'Investments/Infrastructure/Adapters/Repository/ReinvestmentRepository';
 import { SubscriptionAgreementRepository } from 'Investments/Infrastructure/Adapters/Repository/SubscriptionAgreementRepository';
 import { TransactionRepository } from 'Investments/Infrastructure/Adapters/Repository/TransactionRepository';
 import CreateDraftRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
@@ -103,6 +106,7 @@ export default class UseCaseProviders {
     container.addSingleton(UnsuspendRecurringInvestment, [RecurringInvestmentsRepository]);
     container.addSingleton(ReinvestDividend, [SharesAndDividendService, SimpleEventBus]);
     container.addSingleton(PushTransaction, [TransactionRepository, TransactionExecutor]);
+    container.addSingleton(PushReinvestment, [ReinvestmentRepository, ReinvestmentExecutor]);
     container.addSingleton(AbortInvestment, [InvestmentsRepository, InvestmentFeeService, 'InvestmentsTransactionalAdapter']);
     container.addSingleton(CancelInvestment, [InvestmentsRepository, SimpleEventBus, InvestmentFeeService, 'InvestmentsTransactionalAdapter']);
     container.addSingleton(ListInvestmentsQuery, [InvestmentsRepository]);

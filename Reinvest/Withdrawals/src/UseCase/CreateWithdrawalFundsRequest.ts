@@ -1,7 +1,10 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { DateTime } from 'Money/DateTime';
+import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { WithdrawalsDatabase } from 'Withdrawals/Adapter/Database/DatabaseAdapter';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
+import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
 import { DividendData, SettledSharesData, WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
 import { WithdrawalsFundsRequestsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequests';
 import { WithdrawalsQuery } from 'Withdrawals/UseCase/WithdrawalsQuery';
@@ -16,24 +19,33 @@ export type WithdrawalFundsRequestCreate = {
   dividendsJson: DividendData[];
   eligibleFunds: number;
   id: UUID;
-  investorWithdrawalReason: null;
+  investorWithdrawalReason: string | null;
   numberOfShares: number;
-  payoutId: null;
   profileId: UUID;
-  redemptionId: null;
   sharesJson: SettledSharesData[];
   status: WithdrawalsFundsRequestsStatuses;
   totalDividends: number;
   totalFee: number;
   totalFunds: number;
+  withdrawalId: null;
 };
 
 export class CreateWithdrawalFundsRequest {
   private idGenerator: IdGenerator;
   private fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository;
+  private sharesAndDividendsService: SharesAndDividendsService;
+  private transactionAdapter: TransactionalAdapter<WithdrawalsDatabase>;
   private withdrawalsQuery: WithdrawalsQuery;
 
-  constructor(idGenerator: IdGenerator, fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository, withdrawalsQuery: WithdrawalsQuery) {
+  constructor(
+    idGenerator: IdGenerator,
+    fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository,
+    withdrawalsQuery: WithdrawalsQuery,
+    sharesAndDividendsService: SharesAndDividendsService,
+    transactionAdapter: TransactionalAdapter<WithdrawalsDatabase>,
+  ) {
+    this.sharesAndDividendsService = sharesAndDividendsService;
+    this.transactionAdapter = transactionAdapter;
     this.idGenerator = idGenerator;
     this.fundsWithdrawalRequestsRepository = fundsWithdrawalRequestsRepository;
     this.withdrawalsQuery = withdrawalsQuery;
@@ -41,7 +53,7 @@ export class CreateWithdrawalFundsRequest {
 
   static getClassName = () => 'CreateWithdrawalFundsRequest';
 
-  async execute(profileId: UUID, accountId: UUID): Promise<void | never> {
+  async execute(profileId: UUID, accountId: UUID, investorWithdrawalReason: string | null): Promise<void | never> {
     const pendingWithdrawalRequest = await this.fundsWithdrawalRequestsRepository.getPendingWithdrawalRequest(profileId, accountId);
 
     if (pendingWithdrawalRequest && pendingWithdrawalRequest.isRequested()) {
@@ -67,9 +79,8 @@ export class CreateWithdrawalFundsRequest {
       adminDecisionReason: null,
       agreementId: null,
       dateDecision: null,
-      investorWithdrawalReason: null,
-      payoutId: null,
-      redemptionId: null,
+      investorWithdrawalReason: investorWithdrawalReason,
+      withdrawalId: null,
       dateCreated: DateTime.now().toDate(),
       status: WithdrawalsFundsRequestsStatuses.DRAFT,
       dividendsJson: withdrawalsState.formatAwaitingDividends(),
@@ -82,6 +93,16 @@ export class CreateWithdrawalFundsRequest {
       totalFee,
     };
 
-    await this.fundsWithdrawalRequestsRepository.create(withdrawalFundsRequest);
+    const status = await this.transactionAdapter.transaction(`Creating withdrawal requests for account ${accountId}`, async () => {
+      await this.fundsWithdrawalRequestsRepository.create(withdrawalFundsRequest);
+      const sharesIds = withdrawalsState.getSettledSharesIds();
+      await this.sharesAndDividendsService.sharesWithdrawing(sharesIds);
+      const dividendsIds = withdrawalsState.getAwaitingDividendsIds();
+      await this.sharesAndDividendsService.dividendsWithdrawing(dividendsIds);
+    });
+
+    if (!status) {
+      throw new Error(WithdrawalError.CANNOT_CREATED_UNKNOWN_ERROR);
+    }
   }
 }

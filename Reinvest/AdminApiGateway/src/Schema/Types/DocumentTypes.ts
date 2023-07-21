@@ -72,8 +72,7 @@ export const DocumentTypes = {
       ) => {
         const api = modules.getApi<Documents.ApiType>(Documents);
 
-        return null;
-        // return api.getAdminDocumentLink(documentId);
+        return api.getAdminDocumentLink(documentId);
       },
     },
     Mutation: {

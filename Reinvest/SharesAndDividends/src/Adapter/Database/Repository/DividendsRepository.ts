@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import {
@@ -113,13 +114,12 @@ export class DividendsRepository {
     profileId: string,
     accountId: string,
   ): Promise<
-    | {
-        amount: number;
-        createdDate: Date;
-        id: string;
-        status: IncentiveRewardStatus | InvestorDividendStatus;
-      }[]
-    | null
+    {
+      amount: number;
+      createdDate: Date;
+      id: string;
+      status: IncentiveRewardStatus | InvestorDividendStatus;
+    }[]
   > {
     const db = this.databaseAdapterProvider.provide();
     const data = await db
@@ -131,14 +131,14 @@ export class DividendsRepository {
           .selectFrom(sadInvestorIncentiveDividendTable)
           .select(['id', 'amount', 'createdDate', 'status'])
           .where('profileId', '=', <any>profileId)
-          .where('accountId', '=', <any>accountId),
+          .where(eb => eb.where('accountId', '=', <any>accountId).orWhere('accountId', 'is', null)),
       )
       .where('profileId', '=', profileId)
       .where('accountId', '=', accountId)
       .execute();
 
-    if (!data) {
-      return null;
+    if (data.length === 0) {
+      return [];
     }
 
     return data;
@@ -230,5 +230,33 @@ export class DividendsRepository {
         profileId: record.profileId,
         dividendId: record.id,
       }));
+  }
+
+  async markIncentiveDividendsAs(status: IncentiveRewardStatus, dividendsIds: UUID[], isInState: IncentiveRewardStatus): Promise<void> {
+    if (dividendsIds.length === 0) {
+      return;
+    }
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorIncentiveDividendTable)
+      .set({ status })
+      .where('id', 'in', dividendsIds)
+      .where('status', '=', isInState)
+      .execute();
+  }
+
+  async markDividendsAs(status: InvestorDividendStatus, dividendsIds: UUID[], isInState: InvestorDividendStatus): Promise<void> {
+    if (dividendsIds.length === 0) {
+      return;
+    }
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorDividendsTable)
+      .set({ status })
+      .where('id', 'in', dividendsIds)
+      .where('status', '=', isInState)
+      .execute();
   }
 }

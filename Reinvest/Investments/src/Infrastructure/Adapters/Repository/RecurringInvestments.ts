@@ -104,7 +104,7 @@ export class RecurringInvestmentsRepository {
     }
   }
 
-  private async publishEvents(events: DomainEvent[] = []): Promise<void> {
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
     if (events.length === 0) {
       return;
     }

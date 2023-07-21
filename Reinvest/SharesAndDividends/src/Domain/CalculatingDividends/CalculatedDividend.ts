@@ -161,6 +161,7 @@ export class CalculatedDividend {
       case SharesStatus.CREATED:
       case SharesStatus.FUNDING:
       case SharesStatus.FUNDED:
+      case SharesStatus.WITHDRAWING:
         return CalculatedDividendStatus.LOCKED;
       case SharesStatus.SETTLED:
         return CalculatedDividendStatus.AWAITING_DISTRIBUTION;
@@ -172,6 +173,18 @@ export class CalculatedDividend {
   }
 
   unlockDividend(): void {
+    if (this.status === CalculatedDividendStatus.LOCKED) {
+      this.status = CalculatedDividendStatus.AWAITING_DISTRIBUTION;
+    }
+  }
+
+  lockAwaitingDividend(): void {
+    if (this.status === CalculatedDividendStatus.AWAITING_DISTRIBUTION) {
+      this.status = CalculatedDividendStatus.LOCKED;
+    }
+  }
+
+  unlockAwaitingDividend(): void {
     if (this.status === CalculatedDividendStatus.LOCKED) {
       this.status = CalculatedDividendStatus.AWAITING_DISTRIBUTION;
     }

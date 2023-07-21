@@ -17,6 +17,7 @@ import * as NotificationsMigrations from '../migrations';
 export namespace Notifications {
   export const moduleName = 'Notifications';
   export type Config = {
+    adminEmail: string;
     database: PostgreSQLConfig;
     email: EmailConfiguration;
     firebaseQueue: QueueConfig;

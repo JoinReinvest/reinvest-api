@@ -2,7 +2,7 @@ import { SubscriptionAgreementEvent, SubscriptionAgreementEvents } from 'Investm
 import { InvestmentStatus } from 'Investments/Domain/Investments/Types';
 import { InvestmentFinalized, TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
 import { InvestmentsQueryRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsQueryRepository';
-import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, EventHandler, storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class FinalizeInvestmentEventHandler implements EventHandler<TransactionEvent> {
   private investmentsQueryRepository: InvestmentsQueryRepository;
@@ -67,27 +67,13 @@ export class FinalizeInvestmentEventHandler implements EventHandler<TransactionE
 
     if (feeAmount && !feeApproveDate) {
       const uniqueId = `fee-${investmentId}`;
-      const command = {
-        kind: 'CreateNotification',
-        data: {
-          accountId: accountId,
-          profileId: profileId,
-          notificationType: 'FEES_APPROVAL_REQUIRED',
-          header: 'Fees approval required [COPY-TO-UPDATE]',
-          body: 'One of your investment does not have fees approved. Please approve fees to continue investing.',
-          dismissId: null,
-          onObjectId: investmentId,
-          onObjectType: 'INVESTMENT',
-          uniqueId: uniqueId,
-          pushNotification: {
-            title: 'Fees approval required [COPY-TO-UPDATE]',
-            body: 'One of your investment does not have fees approved. Please approve fees to continue investing.',
-          },
-        },
-        id: event.id,
-      };
-
-      await this.eventBus.publish(command);
+      const feesApprovalCommand = storeEventCommand(profileId, 'FeesApprovalRequired', {
+        accountId,
+        uniqueId,
+        feeAmount,
+        investmentId,
+      });
+      await this.eventBus.publish(feesApprovalCommand);
 
       return;
     }

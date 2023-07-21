@@ -14,6 +14,7 @@ import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
 import {
+  ADMIN_EMAIL,
   CHROMIUM_ENDPOINT,
   COGNITO_CONFIG,
   DATABASE_CONFIG,
@@ -112,6 +113,7 @@ export function boot(): Modules {
     Notifications.moduleName,
     Notifications.create(
       {
+        adminEmail: ADMIN_EMAIL,
         database: databaseConfig,
         queue: queueConfig,
         firebaseQueue: firebaseQueue,
@@ -226,11 +228,13 @@ export function boot(): Modules {
       {
         database: databaseConfig,
         queue: queueConfig,
+        pdfGeneratorQueue: pdfGeneratorQueue,
       } as Withdrawals.Config,
       {
-        documents: modules.get(Documents.moduleName) as Documents.Main,
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         registration: modules.get(Registration.moduleName) as Registration.Main,
+        portfolio: modules.get(Portfolio.moduleName) as Portfolio.Main,
+        legalEntities: modules.get(LegalEntities.moduleName) as LegalEntities.Main,
       },
     ),
   );

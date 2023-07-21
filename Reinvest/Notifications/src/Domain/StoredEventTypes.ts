@@ -14,14 +14,15 @@ type InAppNotificationType = {
 type EmailNotificationType = {
   body: (payload: DictionaryType) => string;
   subject: (payload: DictionaryType) => string;
+  toAdmin?: boolean;
 };
 type PushNotificationType = {
   body: (payload: DictionaryType) => string;
   title: (payload: DictionaryType) => string;
 };
 type AccountActivityType = {
-  data: (payload: DictionaryType) => JSONObject;
   name: (payload: DictionaryType) => string;
+  data?: (payload: DictionaryType) => JSONObject;
 };
 type AnalyticEventType = {
   eventName: string;

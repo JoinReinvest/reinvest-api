@@ -8,6 +8,7 @@ import { AccountType } from 'LegalEntities/Domain/AccountType';
 import { Avatar } from 'LegalEntities/Domain/ValueObject/Document';
 import { ValidationErrorEnum, ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export type CreateBeneficiaryInput = {
   avatar?: {
@@ -105,6 +106,14 @@ export class OpenBeneficiary {
           ],
         };
       }
+
+      await this.beneficiaryRepository.publishEvents([
+        storeEventCommand(profileId, 'BeneficiaryAccountOpened', {
+          label: beneficiaryAccount.getLabel(),
+          accountId,
+          individualId,
+        }),
+      ]);
 
       return { accountId, errors: [] };
     } catch (error: any) {

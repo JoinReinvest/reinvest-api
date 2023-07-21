@@ -1,8 +1,11 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { LegalEntitiesDatabaseAdapterProvider, legalEntitiesProfileTable } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { LegalEntitiesJsonFields, LegalEntitiesProfile } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
 import { Profile, ProfileSchema } from 'LegalEntities/Domain/Profile';
-import { SensitiveNumber, SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
+import { PersonalNameInput } from 'LegalEntities/Domain/ValueObject/PersonalName';
+import { SSN } from 'LegalEntities/Domain/ValueObject/SensitiveNumber';
+import { ProfileName } from 'LegalEntities/Port/Api/GetProfileController';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -121,5 +124,33 @@ export class ProfileRepository {
     }
 
     await this.eventsPublisher.publishMany(events);
+  }
+
+  async getProfileNames(profileIds: UUID[]): Promise<ProfileName[]> {
+    if (profileIds.length === 0) {
+      return [];
+    }
+
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(legalEntitiesProfileTable)
+      .select(['profileId', 'name'])
+      .where('profileId', 'in', profileIds)
+      .castTo<{ name: PersonalNameInput; profileId: string }>()
+      .execute();
+
+    if (!data.length) {
+      return [];
+    }
+
+    return data.map((profile: { name: PersonalNameInput; profileId: string }) => {
+      const name = profile.name;
+      const fullName = [name.firstName, name?.middleName, name.lastName].filter((value?: string) => value !== null && value !== '').join(' ');
+
+      return {
+        profileId: profile.profileId,
+        name: fullName,
+      };
+    });
   }
 }

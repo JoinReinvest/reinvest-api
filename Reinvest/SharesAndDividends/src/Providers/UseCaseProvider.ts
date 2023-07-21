@@ -27,7 +27,9 @@ import { FinishDividendsDistribution } from 'SharesAndDividends/UseCase/FinishDi
 import GetConfiguration from 'SharesAndDividends/UseCase/GetConfiguration';
 import { GiveIncentiveRewardIfRequirementsAreMet } from 'SharesAndDividends/UseCase/GiveIncentiveRewardIfRequirementsAreMet';
 import { MarkDividendAsReinvested } from 'SharesAndDividends/UseCase/MarkDividendAsReinvested';
+import { DividendWithdrawing } from 'SharesAndDividends/UseCase/DividendWithdrawing';
 import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividendAsWithdrawn';
+import { SharesWithdrawing } from 'SharesAndDividends/UseCase/SharesWithdrawing';
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 import { TransferDividends } from 'SharesAndDividends/UseCase/TransferDividends';
 import { TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
@@ -66,9 +68,11 @@ export class UseCaseProvider {
     ]);
     container.addSingleton(MarkDividendAsReinvested, [DividendsRepository, NotificationService]);
     container.addSingleton(MarkDividendAsWithdrawn, [DividendsRepository, NotificationService]);
+    container.addSingleton(DividendWithdrawing, [DividendsRepository]);
     container.addSingleton(AccountStateQuery, [DividendsRepository, SharesRepository, PortfolioService]);
     container.addSingleton(CreateConfiguration, [ConfigurationRepository, IdGenerator]).addSingleton(GetConfiguration, [ConfigurationRepository]);
     container.addSingleton(GiveIncentiveRewardIfRequirementsAreMet, [DividendsRepository, IdentityService, SharesRepository, CreateIncentiveReward]);
     container.addSingleton(ChangeLockedCalculatedDividendStatus, [DividendsCalculationRepository]);
+    container.addSingleton(SharesWithdrawing, [SharesRepository, FinancialOperationsRepository, DividendsCalculationRepository]);
   }
 }

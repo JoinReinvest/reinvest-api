@@ -1,3 +1,5 @@
+import { DateTime } from 'Money/DateTime';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
@@ -37,6 +39,19 @@ export class CheckIsTradeFunded {
           trade.setTradeStatusToFunded();
           await this.tradesRepository.updateTrade(trade);
           console.info(`[Trade ${investmentId}]`, 'Trade is funded');
+
+          const { amount, fee, userTradeId } = trade.getFundsTransferConfiguration();
+
+          await this.tradesRepository.publishEvent(
+            storeEventCommand(trade.getProfileId(), 'PaymentFinished', {
+              accountId: trade.getReinvestAccountId(),
+              investmentId,
+              amount: amount.getAmount(),
+              fee: fee.getAmount(),
+              tradeId: userTradeId,
+              date: DateTime.now().toIsoDateTime(),
+            }),
+          );
         } else {
           const paymentData = trade.getNorthCapitalPayment();
 
@@ -52,6 +67,19 @@ export class CheckIsTradeFunded {
           const paymentState = await this.northCapitalAdapter.getPaymentState(ncAccountId, paymentId);
 
           if (paymentState.isFailed()) {
+            const { amount, fee, userTradeId } = trade.getFundsTransferConfiguration();
+
+            await this.tradesRepository.publishEvent(
+              storeEventCommand(trade.getProfileId(), 'PaymentFailed', {
+                accountId: trade.getReinvestAccountId(),
+                investmentId,
+                amount: amount.getAmount(),
+                fee: fee.getAmount(),
+                tradeId: userTradeId,
+                date: DateTime.now().toIsoDateTime(),
+              }),
+            );
+
             return {
               status: trade.isPaymentRetried() ? 'second-fail' : 'failed',
             };

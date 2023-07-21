@@ -78,7 +78,7 @@ export class PortfolioController {
     return this.portfolioQuery.getCurrentNav(portfolioId);
   }
 
-  async getDataForSubscriptionAgreement(portfolioId: UUID): Promise<SubscriptionAgreementPortfolioData> {
+  async getPortfolioAssetDetails(portfolioId: UUID): Promise<SubscriptionAgreementPortfolioData> {
     const portfolio = await this.portfolioQuery.getPortfolio(portfolioId);
     const data = portfolio.toObject();
 

@@ -7,6 +7,7 @@ export type DocumentsApiType = {
   createDocumentsFileLinks: FileLinksController['createDocumentsFileLinks'];
   createImageFileLinks: FileLinksController['createImageFileLinks'];
   generatePdf: PdfController['generatePdf'];
+  getAdminDocumentLink: FileLinksController['getAdminDocumentLink'];
   getAvatarLink: FileLinksController['getAvatarLink'];
   getDocumentLink: FileLinksController['getDocumentLink'];
   getImageLink: FileLinksController['getImageLink'];
@@ -26,4 +27,5 @@ export const DocumentsApi = (container: ContainerInterface): DocumentsApiType =>
   getImageLink: container.delegateTo(FileLinksController, 'getImageLink'),
   getAvatarLink: container.delegateTo(FileLinksController, 'getAvatarLink'),
   getDocumentLink: container.delegateTo(FileLinksController, 'getDocumentLink'),
+  getAdminDocumentLink: container.delegateTo(FileLinksController, 'getAdminDocumentLink'),
 });
