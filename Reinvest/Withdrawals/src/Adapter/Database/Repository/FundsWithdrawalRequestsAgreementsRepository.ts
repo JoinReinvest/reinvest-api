@@ -1,5 +1,4 @@
 import { JSONObject, UUID } from 'HKEKTypes/Generics';
-import { DateTime } from 'Money/DateTime';
 import { FundsRequestWithdrawalAgreement } from 'Reinvest/Withdrawals/src/Domain/FundsRequestWithdrawalAgreement';
 import type { FundsWithdrawalAgreementAgreementCreate } from 'Reinvest/Withdrawals/src/UseCase/CreateFundsWithdrawalAgreement';
 import { WithdrawalsDatabaseAdapterProvider, withdrawalsFundsRequestsAgreementsTable } from 'Withdrawals/Adapter/Database/DatabaseAdapter';
@@ -42,12 +41,17 @@ export class FundsWithdrawalRequestsAgreementsRepository {
 
   async updateFundsWithdrawalRequestAgreement(withdrawalFundsRequestAgreement: FundsRequestWithdrawalAgreement) {
     const id = withdrawalFundsRequestAgreement.getId();
+    const { status, signedByIP, signedAt, pdfDateCreated, contentFieldsJson } = withdrawalFundsRequestAgreement.toObject();
     try {
       await this.databaseAdapterProvider
         .provide()
         .updateTable(withdrawalsFundsRequestsAgreementsTable)
         .set({
-          ...withdrawalFundsRequestAgreement.toObject(),
+          signedByIP,
+          signedAt,
+          pdfDateCreated,
+          status,
+          contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
         })
         .where('id', '=', id)
         .execute();
@@ -76,18 +80,7 @@ export class FundsWithdrawalRequestsAgreementsRepository {
           templateVersion,
           contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
         })
-        .onConflict(oc =>
-          oc.constraint('funds_request_id_unique').doUpdateSet({
-            id,
-            status,
-            dateCreated: DateTime.now().toDate(),
-            signedAt: null,
-            signedByIP: null,
-            pdfDateCreated: null,
-            templateVersion,
-            contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
-          }),
-        )
+        .onConflict(oc => oc.constraint('funds_request_id_unique').doNothing())
         .executeTakeFirst();
 
       return true;
@@ -96,5 +89,20 @@ export class FundsWithdrawalRequestsAgreementsRepository {
 
       return false;
     }
+  }
+
+  async getById(id: UUID) {
+    const fundsRequestWithdrawalAgreement = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsAgreementsTable)
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
+    if (!fundsRequestWithdrawalAgreement) {
+      return null;
+    }
+
+    return FundsRequestWithdrawalAgreement.create(fundsRequestWithdrawalAgreement);
   }
 }

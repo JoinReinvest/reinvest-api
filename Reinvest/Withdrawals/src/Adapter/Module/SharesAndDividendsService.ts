@@ -1,9 +1,9 @@
-import { UUID } from 'HKEKTypes/Generics';
-import { DateTime } from 'Money/DateTime';
-import { Money } from 'Money/Money';
-import { SharesAndDividends } from 'SharesAndDividends/index';
-import { DividendDetails } from 'Withdrawals/Domain/DividendWithdrawalRequest';
-import { CurrentAccountState } from 'Withdrawals/UseCase/WithdrawalsQuery';
+import { UUID } from "HKEKTypes/Generics";
+import { DateTime } from "Money/DateTime";
+import { Money } from "Money/Money";
+import { SharesAndDividends } from "SharesAndDividends/index";
+import { DividendDetails } from "Withdrawals/Domain/DividendWithdrawalRequest";
+import { CurrentAccountState } from "Withdrawals/UseCase/WithdrawalsQuery";
 
 /**
  * SharesAndDividends Module ACL
@@ -67,5 +67,29 @@ export class SharesAndDividendsService {
 
   async markDividendAsWithdrew(profileId: UUID, dividendId: UUID): Promise<void> {
     await this.sharesAndDividendsModule.api().markDividendAsWithdrew(profileId, dividendId);
+  }
+
+  async sharesWithdrawing(sharesIds: UUID[]): Promise<void> {
+    await this.sharesAndDividendsModule.api().setSharesWithdrawing(sharesIds);
+  }
+
+  async dividendsWithdrawing(dividendsIds: UUID[]): Promise<void> {
+    await this.sharesAndDividendsModule.api().markDividendAsWithdrawing(dividendsIds);
+  }
+
+  async abortSharesWithdrawing(sharesIds: UUID[]): Promise<void> {
+    await this.sharesAndDividendsModule.api().abortSharesWithdrawing(sharesIds);
+  }
+
+  async abortDividendsWithdrawing(dividendsIds: UUID[]): Promise<void> {
+    await this.sharesAndDividendsModule.api().abortDividendsWithdrawing(dividendsIds);
+  }
+
+  async completeSharesWithdrawing(sharesIds: UUID[]): Promise<void> {
+    await this.sharesAndDividendsModule.api().completeSharesWithdrawing(sharesIds);
+  }
+
+  async completeDividendsWithdrawing(dividendsIds: UUID[]): Promise<void> {
+    await this.sharesAndDividendsModule.api().completeDividendsWithdrawing(dividendsIds);
   }
 }

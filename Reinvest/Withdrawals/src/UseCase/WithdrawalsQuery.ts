@@ -1,6 +1,8 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
+import { WithdrawalsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsRepository';
 import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
 import { EligibleWithdrawalsState } from 'Withdrawals/Domain/EligibleWithdrawalsState';
+import { WithdrawalView } from 'Withdrawals/Domain/Withdrawal';
 import { AwaitingDividend, SettledShares, WithdrawalsCalculator } from 'Withdrawals/Domain/WithdrawalsCalculator';
 
 export type CurrentAccountState = {
@@ -11,9 +13,11 @@ export type CurrentAccountState = {
 
 export class WithdrawalsQuery {
   private sharesAndDividendsService: SharesAndDividendsService;
+  private withdrawalsRepository: WithdrawalsRepository;
 
-  constructor(sharesAndDividendsService: SharesAndDividendsService) {
+  constructor(sharesAndDividendsService: SharesAndDividendsService, withdrawalsRepository: WithdrawalsRepository) {
     this.sharesAndDividendsService = sharesAndDividendsService;
+    this.withdrawalsRepository = withdrawalsRepository;
   }
 
   static getClassName = () => 'WithdrawalsQuery';
@@ -31,5 +35,11 @@ export class WithdrawalsQuery {
 
       return null;
     }
+  }
+
+  async listWithdrawals(pagination: Pagination): Promise<WithdrawalView[]> {
+    const withdrawals = await this.withdrawalsRepository.listWithdrawals(pagination);
+
+    return withdrawals.map(withdrawal => withdrawal.getView());
   }
 }

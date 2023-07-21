@@ -384,4 +384,16 @@ export class DividendsCalculationRepository {
       (calculatedDividend: CalculatedDividendsTable): CalculatedDividend => CalculatedDividend.restore(<CalculatedDividendSchema>calculatedDividend),
     );
   }
+
+  async getDividendsBySharesId(sharesIds: UUID[]): Promise<CalculatedDividend[]> {
+    if (sharesIds.length === 0) {
+      return [];
+    }
+
+    const data = await this.databaseAdapterProvider.provide().selectFrom(sadCalculatedDividendsTable).selectAll().where('sharesId', 'in', sharesIds).execute();
+
+    return data.map(
+      (calculatedDividend: CalculatedDividendsTable): CalculatedDividend => CalculatedDividend.restore(<CalculatedDividendSchema>calculatedDividend),
+    );
+  }
 }

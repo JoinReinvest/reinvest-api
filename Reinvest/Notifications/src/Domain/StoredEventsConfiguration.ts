@@ -422,9 +422,13 @@ export const StoredEvents = <StoredEventsType>{
     },
     email: {
       subject: () => 'Dividend Withdrawn',
-      body: ({ userName, amount, date }) => `Dear ${userName}, your dividends ${Money.lowPrecision(
+      body: ({
+        userName,
         amount,
-      ).getFormattedAmount()} have been successfully withdrawn to your linked account..<br/>${timeBody(date)}
+        date,
+      }) => `Dear ${userName}, your dividends ${amount} have been successfully withdrawn to your linked account. This may take up to 30 days post withdrawal.<br/>${timeBody(
+        date,
+      )}
       `,
     },
     accountActivity: {
@@ -447,10 +451,8 @@ export const StoredEvents = <StoredEventsType>{
     },
     email: {
       subject: () => 'Funds Withdrawal request status',
-      body: ({ userName, amount }) => `Dear ${userName}, unfortunately, your withdrawal request for ${Money.lowPrecision(
-        amount,
-      ).getFormattedAmount()} has been rejected. Please contact support for further assistance.
-      `,
+      body: ({ userName, amount }) =>
+        `Dear ${userName}, unfortunately, your withdrawal request for ${amount} has been rejected. Please contact support for further assistance.`,
     },
     accountActivity: {
       name: ({ userName }) => `Withdrawal request rejected for ${userName}.`,
@@ -472,7 +474,7 @@ export const StoredEvents = <StoredEventsType>{
     },
     email: {
       subject: () => 'Withdrawal Approved!',
-      body: ({ userName }) => `Dear ${userName}, unfortunately, your withdrawal request has been approved. The funds will be transferred shortly.`,
+      body: ({ userName }) => `Dear ${userName}, your withdrawal request has been approved. The funds will be transferred shortly.`,
     },
     accountActivity: {
       name: ({ userName }) => `Withdrawal request approved for ${userName}.`,
@@ -483,6 +485,13 @@ export const StoredEvents = <StoredEventsType>{
     },
   },
   WithdrawalRequestSent: {
+    email: {
+      subject: ({ type, userName }) => `Investor ${userName} requested withdrawal: ${type}`,
+      body: ({ type, userName, id, amount }) => `Investor ${userName} requested withdrawal: ${type}.<br/>
+        Withdrawal id: ${id}.<br/>
+        Withdrawal amount: ${amount}.`,
+      toAdmin: true,
+    },
     analyticEvent: {
       eventName: 'WithdrawalRequestSent',
       data: data => data,

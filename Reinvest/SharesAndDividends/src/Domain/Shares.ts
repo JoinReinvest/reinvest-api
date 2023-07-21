@@ -8,6 +8,7 @@ export enum SharesStatus {
   FUNDED = 'FUNDED',
   SETTLED = 'SETTLED',
   REVOKED = 'REVOKED',
+  WITHDRAWING = 'WITHDRAWING',
 }
 
 export enum SharesOrigin {
@@ -209,5 +210,23 @@ export class Shares {
 
   getPrice(): number {
     return this.sharesSchema.price;
+  }
+
+  markAsWithdrawing() {
+    if (this.sharesSchema.status === SharesStatus.SETTLED) {
+      this.sharesSchema.status = SharesStatus.WITHDRAWING;
+    }
+  }
+
+  abortWithdrawing() {
+    if (this.sharesSchema.status === SharesStatus.WITHDRAWING) {
+      this.sharesSchema.status = SharesStatus.SETTLED;
+    }
+  }
+
+  completeWithdrawing() {
+    if (this.sharesSchema.status === SharesStatus.WITHDRAWING) {
+      this.sharesSchema.status = SharesStatus.REVOKED;
+    }
   }
 }

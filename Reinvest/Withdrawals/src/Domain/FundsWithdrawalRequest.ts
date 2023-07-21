@@ -1,4 +1,5 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { MoneyView, UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 
 import { WithdrawalsFundsRequestsStatuses } from './WithdrawalsFundsRequests';
@@ -17,7 +18,20 @@ export type DividendData = {
   totalFeeAmount: number;
 };
 
-export type WithdrawalView = {};
+export type WithdrawalRequestView = {
+  accountId: UUID;
+  accountValue: MoneyView;
+  agreementId: UUID | null;
+  createdDate: string;
+  decisionDate: string | null;
+  decisionMessage: string | null;
+  eligibleForWithdrawal: MoneyView;
+  id: UUID;
+  investorWithdrawalReason: string;
+  penaltiesFee: MoneyView;
+  profileId: UUID;
+  status: FundsWithdrawalStatus;
+};
 
 export type FundsWithdrawalRequestSchema = {
   accountId: UUID;
@@ -31,17 +45,16 @@ export type FundsWithdrawalRequestSchema = {
   id: UUID;
   investorWithdrawalReason: string | null;
   numberOfShares: number;
-  payoutId: UUID | null;
   profileId: UUID;
-  redemptionId: UUID | null;
   sharesJson: SettledSharesData[];
   status: WithdrawalsFundsRequestsStatuses;
   totalDividends: number;
   totalFee: number;
   totalFunds: number;
+  withdrawalId: UUID | null;
 };
 
-export enum WithdrawalStatus {
+export enum FundsWithdrawalStatus {
   AWAITING_SIGNING_AGREEMENT = 'AWAITING_SIGNING_AGREEMENT',
   DRAFT = 'DRAFT',
   AWAITING_DECISION = 'AWAITING_DECISION',
@@ -59,7 +72,17 @@ export enum WithdrawalError {
   WITHDRAWAL_AGREEMENT_NOT_SIGNED = 'WITHDRAWAL_AGREEMENT_NOT_SIGNED',
   WITHDRAWAL_REQUEST_ALREADY_SENT = 'WITHDRAWAL_REQUEST_ALREADY_SENT',
   CANNOT_BE_ABORTED = 'CANNOT_BE_ABORTED',
+  CANNOT_CREATED_UNKNOWN_ERROR = 'CANNOT_CREATED_UNKNOWN_ERROR',
 }
+
+export type WithdrawalSharesView = {
+  accountId: UUID;
+  numberOfShares: number;
+  profileId: UUID;
+  redemptionDate: DateTime;
+  sharesId: UUID;
+  unitPrice: Money;
+};
 
 export class FundsWithdrawalRequest {
   private accountId: UUID;
@@ -73,9 +96,8 @@ export class FundsWithdrawalRequest {
   private id: UUID;
   private investorWithdrawalReason: string | null;
   private numberOfShares: number;
-  private payoutId: UUID | null;
   private profileId: UUID;
-  private redemptionId: UUID | null;
+  private withdrawalId: UUID | null;
   private sharesJson: SettledSharesData[];
   private status: WithdrawalsFundsRequestsStatuses;
   private totalDividends: number;
@@ -94,9 +116,8 @@ export class FundsWithdrawalRequest {
     id: UUID,
     investorWithdrawalReason: string | null,
     numberOfShares: number,
-    payoutId: UUID | null,
     profileId: UUID,
-    redemptionId: UUID | null,
+    withdrawalId: UUID | null,
     sharesJson: SettledSharesData[],
     status: WithdrawalsFundsRequestsStatuses,
     totalDividends: number,
@@ -114,9 +135,8 @@ export class FundsWithdrawalRequest {
     this.id = id;
     this.investorWithdrawalReason = investorWithdrawalReason;
     this.numberOfShares = numberOfShares;
-    this.payoutId = payoutId;
     this.profileId = profileId;
-    this.redemptionId = redemptionId;
+    this.withdrawalId = withdrawalId;
     this.sharesJson = sharesJson;
     this.status = status;
     this.totalDividends = totalDividends;
@@ -137,9 +157,8 @@ export class FundsWithdrawalRequest {
       id,
       investorWithdrawalReason,
       numberOfShares,
-      payoutId,
       profileId,
-      redemptionId,
+      withdrawalId,
       sharesJson,
       status,
       totalDividends,
@@ -159,9 +178,8 @@ export class FundsWithdrawalRequest {
       id,
       investorWithdrawalReason,
       numberOfShares,
-      payoutId,
       profileId,
-      redemptionId,
+      withdrawalId,
       sharesJson,
       status,
       totalDividends,
@@ -179,11 +197,34 @@ export class FundsWithdrawalRequest {
   }
 
   abort() {
-    if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
-      throw new Error(WithdrawalError.CANNOT_BE_ABORTED);
-    } else {
+    if ([WithdrawalsFundsRequestsStatuses.DRAFT, WithdrawalsFundsRequestsStatuses.REQUESTED].includes(this.status)) {
       this.status = WithdrawalsFundsRequestsStatuses.ABORTED;
+    } else {
+      throw new Error(WithdrawalError.CANNOT_BE_ABORTED);
     }
+  }
+
+  accept(): boolean {
+    if (this.status === WithdrawalsFundsRequestsStatuses.REQUESTED) {
+      this.status = WithdrawalsFundsRequestsStatuses.ACCEPTED;
+      this.dateDecision = DateTime.now().toDate();
+
+      return true;
+    }
+
+    return false;
+  }
+
+  reject(decisionReason: string): boolean {
+    if (this.status === WithdrawalsFundsRequestsStatuses.REQUESTED) {
+      this.status = WithdrawalsFundsRequestsStatuses.REJECTED;
+      this.dateDecision = DateTime.now().toDate();
+      this.adminDecisionReason = decisionReason;
+
+      return true;
+    }
+
+    return false;
   }
 
   request() {
@@ -198,22 +239,26 @@ export class FundsWithdrawalRequest {
     this.status = WithdrawalsFundsRequestsStatuses.REQUESTED;
   }
 
-  getWithdrawalStatus(): WithdrawalStatus {
+  assignWithdrawalId(id: UUID) {
+    this.withdrawalId = id;
+  }
+
+  getWithdrawalStatus(): FundsWithdrawalStatus {
     switch (this.status) {
       case WithdrawalsFundsRequestsStatuses.REQUESTED:
-        return WithdrawalStatus.AWAITING_DECISION;
+        return FundsWithdrawalStatus.AWAITING_DECISION;
       case WithdrawalsFundsRequestsStatuses.ACCEPTED:
-        return WithdrawalStatus.APPROVED;
+        return FundsWithdrawalStatus.APPROVED;
       case WithdrawalsFundsRequestsStatuses.REJECTED:
-        return WithdrawalStatus.REJECTED;
+        return FundsWithdrawalStatus.REJECTED;
       case WithdrawalsFundsRequestsStatuses.DRAFT:
         if (!this.agreementId) {
-          return WithdrawalStatus.AWAITING_SIGNING_AGREEMENT;
+          return FundsWithdrawalStatus.AWAITING_SIGNING_AGREEMENT;
         } else {
-          return WithdrawalStatus.DRAFT;
+          return FundsWithdrawalStatus.DRAFT;
         }
       default:
-        return WithdrawalStatus.DRAFT;
+        return FundsWithdrawalStatus.DRAFT;
     }
   }
 
@@ -230,9 +275,8 @@ export class FundsWithdrawalRequest {
       id: this.id,
       investorWithdrawalReason: this.investorWithdrawalReason,
       numberOfShares: this.numberOfShares,
-      payoutId: this.payoutId,
       profileId: this.profileId,
-      redemptionId: this.redemptionId,
+      withdrawalId: this.withdrawalId,
       sharesJson: this.sharesJson,
       status: this.status,
       totalDividends: this.totalDividends,
@@ -245,11 +289,16 @@ export class FundsWithdrawalRequest {
     return this.status === WithdrawalsFundsRequestsStatuses.REQUESTED;
   }
 
-  getWithdrawalView(): WithdrawalView {
+  getWithdrawalView(): WithdrawalRequestView {
     return {
+      id: this.id,
+      accountId: this.accountId,
+      profileId: this.profileId,
+      agreementId: this.agreementId,
       status: this.getWithdrawalStatus(),
-      createdDate: this.dateCreated,
-      decisionDate: this.dateDecision,
+      createdDate: DateTime.from(this.dateCreated).toIsoDateTime(),
+      investorWithdrawalReason: this.investorWithdrawalReason ?? '',
+      decisionDate: this.dateDecision ? DateTime.from(this.dateDecision).toIsoDateTime() : null,
       decisionMessage: this.adminDecisionReason,
       eligibleForWithdrawal: {
         value: this.eligibleFunds.getAmount(),
@@ -266,11 +315,70 @@ export class FundsWithdrawalRequest {
     };
   }
 
+  getWithdrawalSharesView(): WithdrawalSharesView[] {
+    return this.sharesJson.map(
+      (share): WithdrawalSharesView => ({
+        accountId: this.accountId,
+        profileId: this.profileId,
+        sharesId: share.id,
+        numberOfShares: share.numberOfShares,
+        unitPrice: Money.lowPrecision(share.unitPrice),
+        redemptionDate: DateTime.from(this.dateCreated),
+      }),
+    );
+  }
+
   isDraft(): boolean {
     return this.status === WithdrawalsFundsRequestsStatuses.DRAFT;
   }
 
   isAgreementAssigned(): boolean {
     return !!this.agreementId;
+  }
+
+  getWithdrawalDetails(): {
+    date: DateTime;
+    shareCount: number;
+    withdrawalAmount: string;
+  } {
+    return {
+      date: DateTime.from(this.dateCreated),
+      shareCount: this.numberOfShares,
+      withdrawalAmount: this.eligibleFunds.getFormattedAmount(),
+    };
+  }
+
+  forEvent() {
+    return {
+      type: 'FUNDS_WITHDRAWAL',
+      id: this.id,
+      profileId: this.profileId,
+      accountId: this.accountId,
+      adminDecisionReason: this.adminDecisionReason,
+      agreementId: this.agreementId,
+      dateCreated: this.dateCreated,
+      dateDecision: this.dateDecision,
+      amount: this.eligibleFunds.getFormattedAmount(),
+    };
+  }
+
+  forPayoutTemplate(): {
+    accountId: UUID;
+    amount: Money;
+    profileId: UUID;
+  } {
+    return {
+      profileId: this.profileId,
+      accountId: this.accountId,
+      amount: this.eligibleFunds,
+    };
+  }
+
+  getShareIds(): UUID[] {
+    return this.sharesJson.map(share => share.id);
+  }
+
+  getDividendIds(): UUID[] {
+    return this.dividendsJson.map(dividend => dividend.id);
   }
 }

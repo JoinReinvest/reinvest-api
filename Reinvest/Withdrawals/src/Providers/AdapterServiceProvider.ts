@@ -1,8 +1,10 @@
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
+import { WithdrawalsDocumentsRepository } from 'Reinvest/Withdrawals/src/Adapter/Database/Repository/WithdrawalsDocumentsRepository';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
 import {
   createWithdrawalsDatabaseAdapterProvider,
@@ -13,8 +15,9 @@ import {
 import { DividendsRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/DividendsRequestsRepository';
 import { FundsWithdrawalRequestsAgreementsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsAgreementsRepository';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
+import { WithdrawalsRepository } from 'Withdrawals/Adapter/Database/Repository/WithdrawalsRepository';
 import { SharesAndDividendsService } from 'Withdrawals/Adapter/Module/SharesAndDividendsService';
-import { WithdrawalsDocumentService } from 'Withdrawals/Adapter/Module/WithdrawalsDocumentService';
+import { WithdrawalDocumentsDataCollector } from 'Withdrawals/Adapter/Module/WithdrawalDocumentsDataCollector';
 import { Withdrawals } from 'Withdrawals/index';
 
 export class AdapterServiceProvider {
@@ -30,7 +33,9 @@ export class AdapterServiceProvider {
     container
       .addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container))
       .addObjectFactory(QueueSender, () => new QueueSender(this.config.queue), [])
-      .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender]);
+      .addObjectFactory(SendToQueueEventHandler, (queueSender: QueueSender) => new SendToQueueEventHandler(queueSender), [QueueSender])
+      .addObjectFactory('PdfGeneratorQueueSender', () => new QueueSender(this.config.pdfGeneratorQueue), [])
+      .addObjectFactory(GeneratePdfEventHandler, (queueSender: QueueSender) => new GeneratePdfEventHandler(queueSender), ['PdfGeneratorQueueSender']);
 
     // db
     container
@@ -42,10 +47,12 @@ export class AdapterServiceProvider {
         'WithdrawalTransactionalAdapter',
         (databaseProvider: WithdrawalsDatabaseAdapterProvider) => new TransactionalAdapter<WithdrawalsDatabase>(databaseProvider),
         [WithdrawalsDatabaseAdapterInstanceProvider],
-      );
+      )
+      .addSingleton(WithdrawalsRepository, [WithdrawalsDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(WithdrawalsDocumentsRepository, [WithdrawalsDatabaseAdapterInstanceProvider, SimpleEventBus]);
 
     // modules
     container.addSingleton(SharesAndDividendsService, ['SharesAndDividends']);
-    container.addSingleton(WithdrawalsDocumentService, ['Documents']);
+    container.addSingleton(WithdrawalDocumentsDataCollector, ['LegalEntities', 'Portfolio', 'Registration', 'SharesAndDividends']);
   }
 }
