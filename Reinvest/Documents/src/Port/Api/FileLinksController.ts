@@ -31,8 +31,6 @@ export class FileLinksController {
   }
 
   public async getDocumentLink(id: string, catalog: string): Promise<FileLink> {
-    console.log('getDocumentLink', id, catalog);
-
     return this.fileLinkService.getDocumentFileLink(id, catalog);
   }
 

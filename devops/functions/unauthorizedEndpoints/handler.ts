@@ -1,4 +1,5 @@
 import * as bodyParser from 'body-parser';
+import { Documents } from 'Documents/index';
 import express from 'express';
 import { Investments } from 'Investments/index';
 import { Portfolio } from 'Portfolio/index';
@@ -82,6 +83,66 @@ app.post('/webhooks/updateTrade', async function (req: any, res: any) {
   await modules.close();
 
   res.json({ status: true });
+});
+
+app.post('/calculations', async function (req: any, res: any) {
+  const modules = boot();
+  const { token, calculations } = req.body;
+
+  const documentsApi = modules.getApi<Documents.ApiType>(Documents);
+  const identityApi = modules.getApi<Identity.ApiType>(Identity);
+  const profileId = await identityApi.profileIdDecrypt(token);
+
+  if (!documentsApi || !profileId) {
+    return;
+  }
+
+  const calculationId = await documentsApi.addCalculation(profileId as string, calculations);
+  await modules.close();
+
+  res.json({ status: true, calculationId });
+});
+
+app.post('/calculations/pdf', async function (req: any, res: any) {
+  const modules = boot();
+  const { token, url } = req.body;
+  const documentsApi = modules.getApi<Documents.ApiType>(Documents);
+  const identityApi = modules.getApi<Identity.ApiType>(Identity);
+
+  const profileId = await identityApi.profileIdDecrypt(token);
+
+  if (!documentsApi || !profileId) {
+    return;
+  }
+
+  const pdfId = await documentsApi.renderPageToPdf(profileId as string, 'calculation', url);
+
+  if (!pdfId) {
+    return;
+  }
+
+  const pdfUrl = await documentsApi.getRenderedPageLink(profileId as string, pdfId);
+
+  await modules.close();
+
+  res.json({ status: true, pdfUrl });
+});
+
+app.post('/calculations/:id', async function (req: any, res: any) {
+  const modules = boot();
+  const { id } = req.params;
+
+  const documentsApi = modules.getApi<Documents.ApiType>(Documents);
+
+  if (!documentsApi) {
+    return;
+  }
+
+  const calculationData = await documentsApi.getCalculation(id);
+
+  await modules.close();
+
+  res.json({ status: true, data: calculationData });
 });
 
 export const main = serverless(app);

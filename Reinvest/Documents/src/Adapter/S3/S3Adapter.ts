@@ -53,7 +53,7 @@ export class S3Adapter {
     return true;
   }
 
-  public async getSignedGetUrl(type: FileType, catalog: string, fileName: string) {
+  public async getSignedGetUrl(expiresIn: number, type: FileType, catalog: string, fileName: string) {
     const client = new S3Client({
       region: this.config.region,
     });
@@ -65,7 +65,7 @@ export class S3Adapter {
       Key: `${catalog}/${fileName}`,
     });
 
-    return getSignedUrl(client, getCommand, { expiresIn: 3600 });
+    return getSignedUrl(client, getCommand, { expiresIn });
   }
 
   public async getRenderedPage(fileName: string, catalog: string) {
@@ -83,7 +83,7 @@ export class S3Adapter {
     return getSignedUrl(client, getCommand, { expiresIn: 527040 });
   }
 
-  public async getImageUrl(fileName: string, catalog: string) {
+  public async getImageUrl(expiresIn: number, fileName: string, catalog: string) {
     const client = new S3Client({
       region: this.config.region,
     });
@@ -95,7 +95,7 @@ export class S3Adapter {
       Key: `${catalog}/${fileName}`,
     });
 
-    return getSignedUrl(client, getCommand, { expiresIn: 527040 });
+    return getSignedUrl(client, getCommand, { expiresIn });
   }
 
   async deleteFile(catalog: string, fileName: string, fileType: FileType): Promise<boolean> {

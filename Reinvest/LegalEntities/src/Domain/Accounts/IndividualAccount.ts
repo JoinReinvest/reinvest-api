@@ -97,7 +97,17 @@ export class IndividualAccount {
   }
 
   setEmploymentStatus(employmentStatus: EmploymentStatus) {
+    const isUnemployed = employmentStatus.isUnemployed();
+
+    if (isUnemployed) {
+      this.removeEmployerData();
+    }
+
     this.employmentStatus = employmentStatus;
+  }
+
+  private removeEmployerData() {
+    this.employer = null;
   }
 
   setAvatarDocument(avatar: Avatar) {

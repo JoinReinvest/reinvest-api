@@ -3,6 +3,7 @@ import { BanController } from 'Identity/Port/Api/BanController';
 import { IncentiveTokenController } from 'Identity/Port/Api/IncentiveTokenController';
 import { PhoneController } from 'Identity/Port/Api/PhoneController';
 import { ProfileController } from 'Identity/Port/Api/ProfileController';
+import { ProfileHashController } from 'Identity/Port/Api/ProfileHashController';
 import { UserController } from 'Identity/Port/Api/UserController';
 import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationController';
 
@@ -21,13 +22,15 @@ export type IdentityApiType = {
 
   listUsers: UserController['listUsers'];
 
+  profileIdDecrypt: ProfileHashController['decrypt'];
+  profileIdEncrypt: ProfileHashController['encrypt'];
   registerUser: UserRegistrationController['registerUser'];
+
   removeBannedId: BanController['removeBannedId'];
   setPhoneNumber: PhoneController['setPhoneNumber'];
 
   setUserLabel: ProfileController['setUserLabel'];
   updateEmailAddress: ProfileController['updateEmailAddress'];
-
   verifyPhoneNumber: PhoneController['verifyPhoneNumber'];
 };
 
@@ -51,4 +54,6 @@ export const identityApi = (container: ContainerInterface): IdentityApiType => (
   removeBannedId: container.delegateTo(BanController, 'removeBannedId'),
   getUserData: container.delegateTo(ProfileController, 'getUserData'),
   setUserLabel: container.delegateTo(ProfileController, 'setUserLabel'),
+  profileIdEncrypt: container.delegateTo(ProfileHashController, 'encrypt'),
+  profileIdDecrypt: container.delegateTo(ProfileHashController, 'decrypt'),
 });

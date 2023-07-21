@@ -85,6 +85,7 @@ export const SENTRY_CONFIG = {
 };
 
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
+export const PROFILEID_HASH_KEY = process.env.PROFILEID_HASH_KEY as string;
 
 export const EMAIL_CONFIG = {
   sourceEmail: process.env.EMAIL_SEND_FROM as string,

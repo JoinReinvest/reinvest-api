@@ -24,6 +24,7 @@ import {
   FIREBASE_SQS_CONFIG,
   NORTH_CAPITAL_CONFIG,
   PDF_GENERATOR_SQS_CONFIG,
+  PROFILEID_HASH_KEY,
   S3_CONFIG,
   SEGMENT_SQS_CONFIG,
   SENTRY_CONFIG,
@@ -101,6 +102,7 @@ export function boot(): Modules {
         SNS: snsConfig,
         Cognito: cognitoConfig,
         webAppUrl: WEB_APP_URL,
+        profileIdHashKey: PROFILEID_HASH_KEY,
         queue: queueConfig,
       } as Identity.Config,
       {
