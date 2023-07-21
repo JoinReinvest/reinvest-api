@@ -14,6 +14,7 @@ type InAppNotificationType = {
 type EmailNotificationType = {
   body: (payload: DictionaryType) => string;
   subject: (payload: DictionaryType) => string;
+  toAdmin?: boolean;
 };
 type PushNotificationType = {
   body: (payload: DictionaryType) => string;

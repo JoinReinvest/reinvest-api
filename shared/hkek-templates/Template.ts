@@ -1,7 +1,7 @@
 import { HTMLParser } from 'Templates/HTMLParser';
 import { TemplateCurrentVersions, TemplateMapping } from 'Templates/TemplateConfiguration';
 import { TemplateParser } from 'Templates/TemplateParser';
-import { HtmlTemplate, TemplateContentType, Templates, TemplateStructureType, TemplateVersion } from 'Templates/Types';
+import { HtmlTemplate, ParsedStructureType, TemplateContentType, Templates, TemplateStructureType, TemplateVersion } from 'Templates/Types';
 
 export class Template {
   private template: Templates;
@@ -22,7 +22,7 @@ export class Template {
     this.version = templateVersion ?? Template.getLatestTemplateVersion(template);
   }
 
-  toArray(): TemplateStructureType {
+  toArray(): ParsedStructureType {
     const template = this.getTemplate();
 
     return TemplateParser.parse(template, this.content);
@@ -31,7 +31,7 @@ export class Template {
   toHtml() {
     const htmlParser = new HTMLParser(this.toArray(), this.getHtmlTemplate());
 
-    return htmlParser.getHTML(this.template);
+    return htmlParser.getHTML();
   }
 
   getVersion(): TemplateVersion {

@@ -197,6 +197,7 @@ export class StoredEvent {
     return {
       subject: emailConfiguration.subject(payload),
       body: emailConfiguration.body(payload),
+      toAdmin: emailConfiguration?.toAdmin ?? false,
     };
   }
 

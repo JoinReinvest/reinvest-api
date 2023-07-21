@@ -13,6 +13,7 @@ import CreatePayoutDocument from 'Withdrawals/UseCase/CreatePayoutDocument';
 import CreateRedemptionFormDocument from 'Withdrawals/UseCase/CreateRedemptionFormDocument';
 import GenerateWithdrawalDocument from 'Withdrawals/UseCase/GenerateWithdrawalDocument';
 import { MarkDocumentAsGenerated } from 'Withdrawals/UseCase/MarkDocumentAsGenerated';
+import { MarkWithdrawalAgreementAsGenerated } from 'Withdrawals/UseCase/MarkWithdrawalAgreementAsGenerated';
 
 export default class EventBusProvider {
   private config: Withdrawals.Config;
@@ -25,12 +26,15 @@ export default class EventBusProvider {
     container
       .addSingleton(CreateDocumentsEventHandler, [CreateRedemptionFormDocument, CreatePayoutDocument])
       .addSingleton(WithdrawalsDocumentsEventHandler, [GenerateWithdrawalDocument])
-      .addSingleton(WithdrawalDocumentPdfGeneratedEventHandler, [MarkDocumentAsGenerated]);
+      .addSingleton(WithdrawalDocumentPdfGeneratedEventHandler, [MarkDocumentAsGenerated, MarkWithdrawalAgreementAsGenerated]);
 
     const eventBus = container.getValue(SimpleEventBus.getClassName()) as EventBus;
     eventBus
       .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [STORE_EVENT_COMMAND, 'GeneratePdfCommand'])
-      .subscribeHandlerForKinds(CreateDocumentsEventHandler.getClassName(), [WithdrawalsEvents.WithdrawalCreated])
+      .subscribeHandlerForKinds(CreateDocumentsEventHandler.getClassName(), [
+        WithdrawalsEvents.WithdrawalCreated,
+        WithdrawalsEvents.PushWithdrawalsDocumentCreation,
+      ])
       .subscribeHandlerForKinds(WithdrawalsDocumentsEventHandler.getClassName(), [WithdrawalsDocumentsEvents.WithdrawalsDocumentCreated])
       .subscribe(PdfKinds.GeneratePdf, GeneratePdfEventHandler.getClassName());
   }

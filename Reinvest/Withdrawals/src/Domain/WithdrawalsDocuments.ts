@@ -2,10 +2,16 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { Template } from 'Templates/Template';
+import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
 import { TemplateContentType, Templates, TemplateVersion } from 'Templates/Types';
 
 export enum WithdrawalsDocumentsEvents {
   WithdrawalsDocumentCreated = 'WithdrawalsDocumentCreated',
+}
+
+export enum WithdrawalsDocumentsTypes {
+  REDEMPTION = 'REDEMPTION',
+  PAYOUT = 'PAYOUT',
 }
 
 export type WithdrawalsDocumentsEvent = DomainEvent & {
@@ -16,25 +22,21 @@ export type WithdrawalsDocumentsEvent = DomainEvent & {
   kind: WithdrawalsDocumentsEvents;
 };
 
-export enum WithdrawalsDocumentsStatuses {
+export enum WithdrawalsDocumentsStatus {
   CREATED = 'CREATED',
-  REDEEMED = 'REDEEMED',
-}
-
-export enum WithdrawalsDocumentsTypes {
-  REDEMPTION = 'REDEMPTION',
-  PAYOUT = 'PAYOUT',
+  COMPLETED = 'COMPLETED',
 }
 
 type WithdrawalDocumentsSchema = {
   contentFieldsJson: TemplateContentType;
-  dateCompleted: DateTime | null;
   dateCreated: DateTime;
   id: UUID;
   pdfDateCreated: DateTime | null;
-  status: WithdrawalsDocumentsStatuses;
+  status: WithdrawalsDocumentsStatus;
+  templateName: Templates;
   templateVersion: TemplateVersion;
   type: WithdrawalsDocumentsTypes;
+  withdrawalId: UUID;
 };
 
 export class WithdrawalsDocuments {
@@ -64,13 +66,53 @@ export class WithdrawalsDocuments {
     return {
       version: this.withdrawalDocumentsSchema.templateVersion,
       content: this.withdrawalDocumentsSchema.contentFieldsJson,
-      template: this.withdrawalDocumentsSchema.type === WithdrawalsDocumentsTypes.REDEMPTION ? Templates.REDEMPTION_FORM : Templates.REDEMPTION_FORM,
+      template: this.withdrawalDocumentsSchema.templateName,
     };
   }
 
-  static create(schema: Omit<WithdrawalDocumentsSchema, 'templateVersion'>): WithdrawalsDocuments {
-    const templateVersion = Template.getLatestTemplateVersion(Templates.REDEMPTION_FORM);
+  static restore(schema: WithdrawalDocumentsSchema) {
+    return new WithdrawalsDocuments(schema);
+  }
 
-    return new WithdrawalsDocuments({ ...schema, templateVersion });
+  static createPayout(id: UUID, withdrawalId: UUID, contentFields: LatestTemplateContentFields[Templates.PAYOUT]): WithdrawalsDocuments {
+    const templateName = Templates.PAYOUT;
+    const templateVersion = Template.getLatestTemplateVersion(templateName);
+
+    return new WithdrawalsDocuments({
+      id,
+      withdrawalId,
+      contentFieldsJson: contentFields,
+      dateCreated: DateTime.now(),
+      pdfDateCreated: null,
+      status: WithdrawalsDocumentsStatus.CREATED,
+      templateName,
+      templateVersion,
+      type: WithdrawalsDocumentsTypes.PAYOUT,
+    });
+  }
+
+  static createRedemptions(id: UUID, withdrawalId: UUID, contentFields: LatestTemplateContentFields[Templates.REDEMPTION_FORM]): WithdrawalsDocuments {
+    const templateName = Templates.REDEMPTION_FORM;
+    const templateVersion = Template.getLatestTemplateVersion(templateName);
+
+    return new WithdrawalsDocuments({
+      id,
+      withdrawalId,
+      contentFieldsJson: contentFields,
+      dateCreated: DateTime.now(),
+      pdfDateCreated: null,
+      status: WithdrawalsDocumentsStatus.CREATED,
+      templateName,
+      templateVersion,
+      type: WithdrawalsDocumentsTypes.REDEMPTION,
+    });
+  }
+
+  isGenerated(): boolean {
+    return !!this.withdrawalDocumentsSchema.pdfDateCreated;
+  }
+
+  getWithdrawalId(): UUID {
+    return this.withdrawalDocumentsSchema.withdrawalId;
   }
 }

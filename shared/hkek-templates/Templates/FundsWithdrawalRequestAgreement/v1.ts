@@ -1,15 +1,20 @@
 /* eslint-disable typescript-sort-keys/interface */
-import { TemplateContentType, TemplateStructureType } from 'Templates/Types';
+import { TemplateContentType, TemplateStructureType } from "Templates/Types";
 
 export interface FundsWithdrawalRequestAgreementContentFieldsV1 extends TemplateContentType {
   date: string;
-  userName: string;
+  authorizedOfficer: string;
+  sharesOwnerName: string;
+  isCompany: boolean;
+  email: string;
+  phoneNumber: string;
   fundSeriesName: string;
   address: string;
-  shareholderName: string; // not sure -> line 251, from docs "[enter shareholder name]"
   shareCount: number;
-  closingDate: number; //closing date (expected transfer date, if available)>
-  withdrawalAmount: number;
+  withdrawalAmount: string;
+  ipAddress: string;
+  signingTimestamp: string;
+  signingDate: string;
 }
 
 /**
@@ -25,7 +30,11 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
     paragraphs: [
       {
         lines: [
-          '{{THIS STOCK REDEMPTION AGREEMENT}} (“{{Agreement}}”) is dated as of {(date)}, by and among REINVEST Community, a xxx corporation (“{{Corporation}}”) and {(userName)} (“Individual/Entity”). The Corporation and Shareholders are sometimes collectively referred to herein as the “{{Parties}}” and individually as a “{{Party}}”.',
+          // @ts-ignore
+          (content: FundsWithdrawalRequestAgreementContentFieldsV1) =>
+            `{{THIS STOCK REDEMPTION AGREEMENT}} (“{{Agreement}}”) is dated as of {(date)}, by and among REINVEST Community${
+              content.isCompany ? ', a ' + content.sharesOwnerName + ' (“{{Corporation}}”)' : ''
+            } and {(authorizedOfficer)} (“Individual/Entity”). The Corporation and Shareholders are sometimes collectively referred to herein as the “{{Parties}}” and individually as a “{{Party}}”.`,
         ],
       },
     ],
@@ -35,7 +44,7 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
     paragraphs: [
       {
         lines: [
-          '{{WHEREAS}}, {(userName)} the record owners of approximately {(shareCount)} of the issued and outstanding common stock of the {(fundSeriesName)} (“{{Shares}}”);',
+          '{{WHEREAS}}, {(sharesOwnerName)} the record owners of approximately {(shareCount)} of the issued and outstanding common stock of the {(fundSeriesName)} (“{{Shares}}”);',
         ],
       },
       {
@@ -76,8 +85,8 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
       },
       {
         lines: [
-          '4. {{The Closing}}. The closing of the redemption and purchase of the Redeemed Shares described in this Agreement (the “{{Closing}}”) will take place through the electronic exchange of documents, and payments. Closing shall occur on or before close of business,\n' +
-            '{(closingDate)}  (Eastern time). The Closing Documents, fully executed by all Parties, shall be released by verbal confirmation of the Parties upon the satisfaction of the conditions set forth in Section 3.',
+          '4. {{The Closing}}. The closing of the redemption and purchase of the Redeemed Shares described in this Agreement (the “{{Closing}}”) will take place through the electronic exchange of documents, and payments.\n' +
+            'The Closing Documents, fully executed by all Parties, shall be released by verbal confirmation of the Parties upon the satisfaction of the conditions set forth in Section 3.',
         ],
       },
       {
@@ -145,13 +154,11 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
         ],
       },
       {
-        // Im not sure what about ***@*** in email field
-        lines: ['If to the Corporation: North Capital', '{(address)}', 'Attn: Finance dept', 'Tel.: (954) 596-1000', 'Email: ***@***'],
+        lines: ['{{If to the Corporation: North Capital}}', '{{North Capital address}}', 'Attn: Finance dept', 'Tel.: (954) 596-1000', 'Email: {{***@***}}'],
       },
       {
-        // Im not sure what about ***@*** in email field
         lines: [
-          'With a copy to: Vertalo',
+          '{{With a copy to: Vertalo}}',
           '350 East Las Olas Blvd, Suite 1750',
           'Ft. Lauderdale FL 33301',
           'Tel.: (954) 991-5425',
@@ -161,18 +168,9 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
         ],
       },
       {
-        // Im not sure what about ***@*** in email field
-        lines: [
-          'If to the Shareholder: {(userName)}',
-          '{(address)}',
-          'Ft. Lauderdale FL 33301',
-          'Attn: {(userName)}',
-          'Tel.: (852) 3471-1315',
-          'Email: ***@***',
-        ],
+        lines: ['{{If to the Shareholder: {(sharesOwnerName)}}}', '{(address)}', 'Tel.: {(phoneNumber)}', 'Email: {(email)}'],
       },
       {
-        // Im not sure what about ***@*** in email field
         lines: ['or to such other person, entity or address as a Party may designate in like manner, from time to time'],
       },
     ],
@@ -210,22 +208,10 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
         lines: ['{{IN WITNESS WHEREOF}}, the Parties have executed this Agreement as of the Effective Date.'],
       },
       {
-        lines: ['{{CORPORATION:}} REINVEST Community.'],
+        lines: ['{{CORPORATION:}} REINVEST Community.', 'By:', 'Name: Brandon Rule', 'Its: CEO'],
       },
       {
-        lines: ['By: ________________________________', 'Name: Brandon Rule', 'Its: CEO'],
-      },
-      {
-        lines: ['{{SHAREHOLDERS:}} {(userName)}.'],
-      },
-      {
-        lines: ['By: ________________________________', 'Name: ________________________________', 'Its: ________________________________'],
-      },
-      {
-        lines: ['Other parties'],
-      },
-      {
-        lines: ['By: ________________________________', 'Name: ________________________________', 'Its: ________________________________'],
+        lines: ['{{SHAREHOLDERS:}}', 'By:', 'Name: {(authorizedOfficer)}', 'Its: Authorized Officer'],
       },
     ],
   },
@@ -233,13 +219,13 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
     header: 'EXHIBIT A\nALLOCATION TABLE',
     paragraphs: [
       {
-        lines: ['{(Shareholders)}.', '_____________', '{(userName)}'],
+        lines: ['{{Shareholders}}:', '{(sharesOwnerName)}'],
       },
       {
-        lines: ['{(Shares Redeemed)}.', '_____________', '{(shareCount)}'],
+        lines: ['{{Shares Redeemed}}:', '{(shareCount)}'],
       },
       {
-        lines: ['{(Redemption Price Allocation)}.', '__________________', '{(withdrawalAmount)}'],
+        lines: ['{{Redemption Price Allocation}}.', '{(withdrawalAmount)}'],
       },
     ],
   },
@@ -248,18 +234,22 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
     paragraphs: [
       {
         lines: [
-          '{{FOR VALUE RECEIVED}}, {{{(shareholderName)}}}, an entity, hereby sells, assigns and transfers to the REINVEST Community inc., a Delaware corporation (the “Corporation”),\n' +
+          '{{FOR VALUE RECEIVED}}, {{{(authorizedOfficer)}}}, an entity, hereby sells, assigns and transfers to the REINVEST Community inc., a Delaware corporation (the “Corporation”),\n' +
             'for good and valuable consideration, [insert number of shares] of the Shares in the Corporation owned by [enter shareholder name] (the “Shares”), free and clear of any and all liens,\n' +
             'claims, equities, security interests and encumbrances whatsoever, and does hereby irrevocably constitute and appoint the Corporation attorney in fact to transfer said Shares on the books of the Corporation\n' +
             'with full power of substitution in the premises.',
         ],
       },
-      { lines: ['Dated as of __________, 2023'] },
+      { lines: ['Dated as of {(signingDate)}'] },
       {
-        lines: ['_____________________________________'],
-      },
-      {
-        lines: ['By: ________________________________', 'Name: ________________________________', 'Its: ________________________________'],
+        lines: [
+          'By:',
+          'Name: {(authorizedOfficer)}',
+          'Its: Authorized Officer',
+          // @ts-ignore
+          (content: FundsWithdrawalRequestAgreementContentFieldsV1) =>
+            content.ipAddress != '' ? 'Signature (IP,timestamp): {{{(ipAddress)},{(signingTimestamp)}}}' : 'Signature (IP,timestamp): ',
+        ],
       },
     ],
   },

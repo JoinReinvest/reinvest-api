@@ -8,7 +8,7 @@ import {
 import { EMPTY_UUID } from 'Registration/Adapter/Database/Repository/MappingRegistryRepository';
 import { MappedType } from 'Registration/Domain/Model/Mapping/MappedType';
 import { VertaloIds } from 'Registration/Domain/VendorModel/Vertalo/VertaloTypes';
-import { ObjectMapping } from 'Registration/Port/Api/RegistryQuery';
+import { InvestorAccountEmail, ObjectMapping } from 'Registration/Port/Api/RegistryQuery';
 
 export type NCAccountStructureMapping = {
   dependentId: string;
@@ -191,5 +191,28 @@ export class RegistryQueryRepository {
 
       return null;
     }
+  }
+
+  async getInvestorEmails(accountIds: UUID[]): Promise<InvestorAccountEmail[]> {
+    if (accountIds.length === 0) {
+      return [];
+    }
+
+    const results = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(registrationMappingRegistryTable)
+      .select([`email`, 'externalId'])
+      .where(`externalId`, 'in', accountIds)
+      .where(`mappedType`, 'in', [MappedType.INDIVIDUAL_ACCOUNT, MappedType.CORPORATE_ACCOUNT, MappedType.TRUST_ACCOUNT, MappedType.BENEFICIARY_ACCOUNT])
+      .execute();
+
+    if (results.length == 0) {
+      return [];
+    }
+
+    return results.map(result => ({
+      email: result.email as string,
+      accountId: result.externalId,
+    }));
   }
 }

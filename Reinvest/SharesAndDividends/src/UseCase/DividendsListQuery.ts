@@ -12,14 +12,10 @@ export class DividendsListQuery {
 
   static getClassName = () => 'DividendsListQuery';
 
-  async getList(profileId: string, accountId: string): Promise<DividendDetails[] | null> {
+  async getList(profileId: string, accountId: string): Promise<DividendDetails[]> {
     const dividends = await this.dividendsRepository.getDividends(profileId, accountId);
 
-    if (!dividends || !dividends?.length) {
-      return null;
-    }
-
-    const list = dividends?.map(dividend => {
+    return dividends.map(dividend => {
       const { amount, createdDate, id, status } = dividend;
       const money = new Money(amount);
 
@@ -43,7 +39,5 @@ export class DividendsListQuery {
         status: dividendStatus,
       };
     });
-
-    return list;
   }
 }

@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import {
   NCAccountStructureMapping,
   RegistryQueryRepository,
@@ -26,6 +27,11 @@ export type ObjectMapping = {
   profileId: string;
   stakeholderId: string | null;
   type: MappedType;
+};
+
+export type InvestorAccountEmail = {
+  accountId: UUID;
+  email: string;
 };
 
 export class RegistryQuery {
@@ -119,6 +125,10 @@ export class RegistryQuery {
 
   async getMappingByPartyId(partyId: string): Promise<ObjectMapping | null> {
     return this.registryQueryRepository.getMappingByPartyId(partyId);
+  }
+
+  async getInvestorEmails(accountIds: UUID[]): Promise<InvestorAccountEmail[]> {
+    return this.registryQueryRepository.getInvestorEmails(accountIds);
   }
 
   private isValidAccountStructure(accountStructure: NorthCapitalAccountStructure): boolean {

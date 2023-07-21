@@ -4,7 +4,7 @@ import { WithdrawalsDocumentsRepository } from 'Reinvest/Withdrawals/src/Adapter
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { WithdrawalsDocumentsTypes } from 'Withdrawals/Domain/WithdrawalsDocuments';
 
-const CATALOG_NAME = 'admin';
+const ADMIN_CATALOG_NAME = 'admin';
 
 class GenerateWithdrawalDocument {
   private readonly withdrawalsDocumentsRepository: WithdrawalsDocumentsRepository;
@@ -31,13 +31,13 @@ class GenerateWithdrawalDocument {
       id,
       kind: PdfKinds.GeneratePdf,
       data: {
-        catalog: CATALOG_NAME,
+        catalog: ADMIN_CATALOG_NAME,
         fileName: id,
         template,
         version,
         content,
         fileId: id,
-        profileId: '',
+        profileId: id, // profile id must be valid uuid, event that we don't have it for this use case
       },
     };
     events.push(pdfCommand);

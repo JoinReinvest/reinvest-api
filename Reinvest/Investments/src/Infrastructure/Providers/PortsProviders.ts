@@ -32,6 +32,7 @@ import { TransactionController } from 'Investments/Infrastructure/Ports/Transact
 import CreateRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { PushReinvestment } from 'Investments/Application/UseCases/PushReinvestment';
 
 export default class PortsProviders {
   private config: Investments.Config;
@@ -69,6 +70,6 @@ export default class PortsProviders {
       CreateInvestmentFromRecurringInvestment,
     ]);
     container.addSingleton(DividendsController, [ReinvestDividend]);
-    container.addSingleton(TransactionController, [PushTransaction]);
+    container.addSingleton(TransactionController, [PushTransaction, PushReinvestment]);
   }
 }

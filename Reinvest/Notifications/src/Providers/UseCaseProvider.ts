@@ -28,6 +28,7 @@ export class UseCaseProvider {
     container.addSingleton(DismissNotifications, [NotificationsRepository]);
     container.addSingleton(NotificationQuery, [NotificationsRepository]);
     container.addSingleton(CreateStoredEvent, [StoredEventRepository, IdGenerator]);
+    container.addAsValue('AdminEmail', this.config.adminEmail);
     container.addSingleton(ProcessStoredEvent, [
       StoredEventRepository,
       AccountActivitiesRepository,
@@ -36,6 +37,7 @@ export class UseCaseProvider {
       IdentityService,
       EmailSender,
       AnalyticsAdapter,
+      'AdminEmail',
     ]);
   }
 }

@@ -221,6 +221,10 @@ export class CompanyAccount {
     return initials;
   }
 
+  getAddress(): Address | null {
+    return this.address;
+  }
+
   setAddress(address: Address) {
     this.address = address;
   }

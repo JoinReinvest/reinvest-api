@@ -1,8 +1,9 @@
-import type { JSONObject, JSONObjectOf, UUID } from 'HKEKTypes/Generics';
-import { TemplateContentType } from 'Templates/Types';
+import type { JSONObjectOf, UUID } from 'HKEKTypes/Generics';
+import { LatestTemplateContentFields } from 'Templates/TemplateConfiguration';
+import { TemplateContentType, Templates, TemplateVersion } from 'Templates/Types';
 import { DividendWithdrawalDecision } from 'Withdrawals/Domain/DividendWithdrawalRequest';
-import { UUIDsList, WithdrawalsStatuses } from 'Withdrawals/Domain/Withdrawal';
-import type { WithdrawalsDocumentsStatuses, WithdrawalsDocumentsTypes } from 'Withdrawals/Domain/WithdrawalsDocuments';
+import { UUIDsList, WithdrawalsStatus } from 'Withdrawals/Domain/Withdrawal';
+import type { WithdrawalsDocumentsStatus, WithdrawalsDocumentsTypes } from 'Withdrawals/Domain/WithdrawalsDocuments';
 import type { WithdrawalsFundsRequestsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequests';
 import type { WithdrawalsFundsRequestsAgreementsStatuses } from 'Withdrawals/Domain/WithdrawalsFundsRequestsAgreement';
 
@@ -29,7 +30,7 @@ export interface WithdrawalsFundsRequestsTable {
 
 export interface WithdrawalsFundsRequestsAgreementsTable {
   accountId: UUID;
-  contentFieldsJson: JSONObject;
+  contentFieldsJson: JSONObjectOf<LatestTemplateContentFields[Templates.WITHDRAWAL_AGREEMENT]>;
   dateCreated: Date;
   fundsRequestId: UUID | null;
   id: string;
@@ -52,6 +53,7 @@ export interface WithdrawalsDividendsRequestsTable {
   status: DividendWithdrawalDecision;
   withdrawalId: UUID | null;
 }
+
 export interface WithdrawalsTable {
   dateCompleted: Date | null;
   dateCreated: Date;
@@ -59,17 +61,18 @@ export interface WithdrawalsTable {
   listOfDividendsJson: JSONObjectOf<UUIDsList>;
   listOfWithdrawalsJson: JSONObjectOf<UUIDsList>;
   payoutId: UUID;
-  redemptionId: UUID;
-  status: WithdrawalsStatuses;
+  redemptionId: UUID | null;
+  status: WithdrawalsStatus;
 }
 
 export interface WithdrawalsDocumentsTable {
   contentFieldsJson: JSONObjectOf<TemplateContentType>;
-  dateCompleted: Date | null;
   dateCreated: Date;
   id: UUID;
   pdfDateCreated: Date | null;
-  status: WithdrawalsDocumentsStatuses;
-  templateVersion: number;
+  status: WithdrawalsDocumentsStatus;
+  templateName: Templates;
+  templateVersion: TemplateVersion;
   type: WithdrawalsDocumentsTypes;
+  withdrawalId: UUID;
 }

@@ -17,6 +17,7 @@ export class ProcessStoredEvent {
   private identityService: IdentityService;
   private emailSender: EmailSender;
   private analyticsAdapter: AnalyticsAdapter;
+  private readonly adminEmail: string;
 
   constructor(
     storedEventRepository: StoredEventRepository,
@@ -26,6 +27,7 @@ export class ProcessStoredEvent {
     identityService: IdentityService,
     emailSender: EmailSender,
     analyticsAdapter: AnalyticsAdapter,
+    adminEmail: string,
   ) {
     this.storedEventRepository = storedEventRepository;
     this.accountActivitiesRepository = accountActivitiesRepository;
@@ -34,6 +36,7 @@ export class ProcessStoredEvent {
     this.identityService = identityService;
     this.emailSender = emailSender;
     this.analyticsAdapter = analyticsAdapter;
+    this.adminEmail = adminEmail;
   }
 
   static getClassName = () => 'ProcessStoredEvent';
@@ -114,8 +117,9 @@ export class ProcessStoredEvent {
     }
 
     try {
-      const { subject, body } = storedEvent.getEmailNotification();
-      await this.emailSender.sendNotificationEmail(email, subject, body);
+      const { subject, body, toAdmin } = storedEvent.getEmailNotification();
+      const emailToSend = toAdmin ? this.adminEmail : email;
+      await this.emailSender.sendNotificationEmail(emailToSend, subject, body);
       storedEvent.markEmailAsProcessed();
 
       return true;
