@@ -185,7 +185,7 @@ const serverlessConfiguration: AWS = {
 };
 
 if (process.env.NODE_ENV !== 'production') {
-  serverlessConfiguration.functions.tests = TestsFunction;
+  serverlessConfiguration.functions['tests'] = TestsFunction;
   // @ts-ignore
   serverlessConfiguration.resources.Resources = {
     ...serverlessConfiguration.resources.Resources,
