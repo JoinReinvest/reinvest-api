@@ -72,6 +72,7 @@ export enum WithdrawalError {
   WITHDRAWAL_AGREEMENT_NOT_SIGNED = 'WITHDRAWAL_AGREEMENT_NOT_SIGNED',
   WITHDRAWAL_REQUEST_ALREADY_SENT = 'WITHDRAWAL_REQUEST_ALREADY_SENT',
   CANNOT_BE_ABORTED = 'CANNOT_BE_ABORTED',
+  CANNOT_CREATED_UNKNOWN_ERROR = 'CANNOT_CREATED_UNKNOWN_ERROR',
 }
 
 export type WithdrawalSharesView = {
@@ -196,34 +197,34 @@ export class FundsWithdrawalRequest {
   }
 
   abort() {
-    if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
-      throw new Error(WithdrawalError.CANNOT_BE_ABORTED);
-    } else {
+    if ([WithdrawalsFundsRequestsStatuses.DRAFT, WithdrawalsFundsRequestsStatuses.REQUESTED].includes(this.status)) {
       this.status = WithdrawalsFundsRequestsStatuses.ABORTED;
+    } else {
+      throw new Error(WithdrawalError.CANNOT_BE_ABORTED);
     }
   }
 
   accept(): boolean {
-    if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
-      return false;
+    if (this.status === WithdrawalsFundsRequestsStatuses.REQUESTED) {
+      this.status = WithdrawalsFundsRequestsStatuses.ACCEPTED;
+      this.dateDecision = DateTime.now().toDate();
+
+      return true;
     }
 
-    this.status = WithdrawalsFundsRequestsStatuses.ACCEPTED;
-    this.dateDecision = DateTime.now().toDate();
-
-    return true;
+    return false;
   }
 
   reject(decisionReason: string): boolean {
-    if (this.status === WithdrawalsFundsRequestsStatuses.REJECTED || this.status === WithdrawalsFundsRequestsStatuses.ACCEPTED) {
-      return false;
+    if (this.status === WithdrawalsFundsRequestsStatuses.REQUESTED) {
+      this.status = WithdrawalsFundsRequestsStatuses.REJECTED;
+      this.dateDecision = DateTime.now().toDate();
+      this.adminDecisionReason = decisionReason;
+
+      return true;
     }
 
-    this.status = WithdrawalsFundsRequestsStatuses.REJECTED;
-    this.dateDecision = DateTime.now().toDate();
-    this.adminDecisionReason = decisionReason;
-
-    return true;
+    return false;
   }
 
   request() {
@@ -349,6 +350,8 @@ export class FundsWithdrawalRequest {
 
   forEvent() {
     return {
+      type: 'FUNDS_WITHDRAWAL',
+      id: this.id,
       profileId: this.profileId,
       accountId: this.accountId,
       adminDecisionReason: this.adminDecisionReason,
@@ -369,5 +372,13 @@ export class FundsWithdrawalRequest {
       accountId: this.accountId,
       amount: this.eligibleFunds,
     };
+  }
+
+  getShareIds(): UUID[] {
+    return this.sharesJson.map(share => share.id);
+  }
+
+  getDividendIds(): UUID[] {
+    return this.dividendsJson.map(dividend => dividend.id);
   }
 }

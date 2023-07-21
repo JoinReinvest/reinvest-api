@@ -93,3 +93,4 @@ export const EMAIL_CONFIG = {
 };
 // export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;
 export const SEGMENT_API_KEY = process.env.SEGMENT_API_KEY as string;
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL as string;

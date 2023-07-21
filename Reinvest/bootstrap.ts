@@ -14,6 +14,7 @@ import { PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
 import { NorthCapitalConfig } from 'Registration/Adapter/NorthCapital/NorthCapitalAdapter';
 import { VertaloConfig } from 'Registration/Adapter/Vertalo/ExecutionVertaloAdapter';
 import {
+  ADMIN_EMAIL,
   CHROMIUM_ENDPOINT,
   COGNITO_CONFIG,
   DATABASE_CONFIG,
@@ -112,6 +113,7 @@ export function boot(): Modules {
     Notifications.moduleName,
     Notifications.create(
       {
+        adminEmail: ADMIN_EMAIL,
         database: databaseConfig,
         queue: queueConfig,
         firebaseQueue: firebaseQueue,

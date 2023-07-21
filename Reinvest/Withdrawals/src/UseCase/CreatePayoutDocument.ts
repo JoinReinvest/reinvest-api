@@ -9,6 +9,8 @@ import { WithdrawalsRepository } from 'Withdrawals/Adapter/Database/Repository/W
 import { WithdrawalDocumentsDataCollector } from 'Withdrawals/Adapter/Module/WithdrawalDocumentsDataCollector';
 import { UUIDsList } from 'Withdrawals/Domain/Withdrawal';
 import { WithdrawalsDocuments, WithdrawalsDocumentsEvents } from 'Withdrawals/Domain/WithdrawalsDocuments';
+import { FundsWithdrawalRequest } from 'Withdrawals/Domain/FundsWithdrawalRequest';
+import { DividendWithdrawalRequest } from 'Withdrawals/Domain/DividendWithdrawalRequest';
 
 class CreatePayoutDocument {
   static getClassName = (): string => 'CreatePayoutDocument';
@@ -129,13 +131,7 @@ class CreatePayoutDocument {
   private retrieveAccounts(
     accountToAmounts: Record<UUID, Record<UUID, Money[]>>,
     profilesToAccounts: Record<UUID, UUID[]>,
-    objects: {
-      forPayoutTemplate(): {
-        accountId: UUID;
-        amount: Money;
-        profileId: UUID;
-      };
-    }[],
+    objects: (FundsWithdrawalRequest | DividendWithdrawalRequest)[],
   ): void {
     for (const object of objects) {
       const { profileId, accountId, amount } = object.forPayoutTemplate();

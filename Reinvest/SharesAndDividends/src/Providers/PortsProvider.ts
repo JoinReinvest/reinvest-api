@@ -26,6 +26,8 @@ import { MarkDividendAsWithdrawn } from 'SharesAndDividends/UseCase/MarkDividend
 import { StatsQuery } from 'SharesAndDividends/UseCase/StatsQuery';
 import { TransferDividends } from 'SharesAndDividends/UseCase/TransferDividends';
 import { TransferShares } from 'SharesAndDividends/UseCase/TransferShares';
+import { SharesWithdrawing } from 'SharesAndDividends/UseCase/SharesWithdrawing';
+import { DividendWithdrawing } from 'SharesAndDividends/UseCase/DividendWithdrawing';
 
 export class PortsProvider {
   private config: SharesAndDividends.Config;
@@ -36,10 +38,17 @@ export class PortsProvider {
 
   public boot(container: ContainerInterface) {
     // api
-    container.addSingleton(SharesController, [CreateShares, ChangeSharesState, AccountStateQuery, TransferShares]);
+    container.addSingleton(SharesController, [CreateShares, ChangeSharesState, AccountStateQuery, TransferShares, SharesWithdrawing]);
     container.addSingleton(StatsController, [StatsQuery]);
     container.addSingleton(IncentiveRewardController, [CreateIncentiveReward]);
-    container.addSingleton(DividendsController, [DividendsQuery, MarkDividendAsReinvested, DividendsListQuery, MarkDividendAsWithdrawn, TransferDividends]);
+    container.addSingleton(DividendsController, [
+      DividendsQuery,
+      MarkDividendAsReinvested,
+      DividendsListQuery,
+      MarkDividendAsWithdrawn,
+      TransferDividends,
+      DividendWithdrawing,
+    ]);
     container.addSingleton(DividendsCalculationController, [
       DividendsCalculationQuery,
       DeclareDividend,

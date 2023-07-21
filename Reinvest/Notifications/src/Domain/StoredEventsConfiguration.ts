@@ -422,9 +422,13 @@ export const StoredEvents = <StoredEventsType>{
     },
     email: {
       subject: () => 'Dividend Withdrawn',
-      body: ({ userName, amount, date }) => `Dear ${userName}, your dividends ${Money.lowPrecision(
+      body: ({
+        userName,
         amount,
-      ).getFormattedAmount()} have been successfully withdrawn to your linked account..<br/>${timeBody(date)}
+        date,
+      }) => `Dear ${userName}, your dividends ${amount} have been successfully withdrawn to your linked account. This may take up to 30 days post withdrawal.<br/>${timeBody(
+        date,
+      )}
       `,
     },
     accountActivity: {
@@ -481,6 +485,13 @@ export const StoredEvents = <StoredEventsType>{
     },
   },
   WithdrawalRequestSent: {
+    email: {
+      subject: ({ type, userName }) => `Investor ${userName} requested withdrawal: ${type}`,
+      body: ({ type, userName, id, amount }) => `Investor ${userName} requested withdrawal: ${type}.<br/>
+        Withdrawal id: ${id}.<br/>
+        Withdrawal amount: ${amount}.`,
+      toAdmin: true,
+    },
     analyticEvent: {
       eventName: 'WithdrawalRequestSent',
       data: data => data,

@@ -41,7 +41,13 @@ export class UseCaseServiceProvider {
 
     container.addSingleton(WithdrawalsQuery, [SharesAndDividendsService, WithdrawalsRepository]);
     container.addSingleton(MarkWithdrawalAsCompleted, [WithdrawalsRepository]);
-    container.addSingleton(CreateWithdrawalFundsRequest, [IdGenerator, FundsWithdrawalRequestsRepository, WithdrawalsQuery]);
+    container.addSingleton(CreateWithdrawalFundsRequest, [
+      IdGenerator,
+      FundsWithdrawalRequestsRepository,
+      WithdrawalsQuery,
+      SharesAndDividendsService,
+      'WithdrawalTransactionalAdapter',
+    ]);
     container.addSingleton(FundsWithdrawalRequestsQuery, [FundsWithdrawalRequestsRepository, WithdrawalsQuery, DividendsRequestsRepository]);
     container.addSingleton(CreateFundsWithdrawalAgreement, [
       IdGenerator,
@@ -50,9 +56,15 @@ export class UseCaseServiceProvider {
       WithdrawalDocumentsDataCollector,
     ]);
     container.addSingleton(GetFundsWithdrawalAgreement, [FundsWithdrawalRequestsAgreementsRepository, FundsWithdrawalRequestsRepository]);
-    container.addSingleton(WithdrawDividend, [SharesAndDividendsService, DividendsRequestsRepository, 'WithdrawalTransactionalAdapter', IdGenerator]);
+    container.addSingleton(WithdrawDividend, [
+      SharesAndDividendsService,
+      DividendsRequestsRepository,
+      'WithdrawalTransactionalAdapter',
+      IdGenerator,
+      SimpleEventBus,
+    ]);
     container.addSingleton(SignFundsWithdrawalRequestAgreement, [FundsWithdrawalRequestsAgreementsRepository, FundsWithdrawalRequestsRepository]);
-    container.addSingleton(AbortFundsWithdrawalRequest, [FundsWithdrawalRequestsRepository]);
+    container.addSingleton(AbortFundsWithdrawalRequest, [FundsWithdrawalRequestsRepository, SharesAndDividendsService, 'WithdrawalTransactionalAdapter']);
     container.addSingleton(RequestFundWithdrawal, [FundsWithdrawalRequestsRepository]);
     container.addSingleton(CreateWithdrawal, [
       WithdrawalsRepository,
@@ -77,8 +89,8 @@ export class UseCaseServiceProvider {
     container.addSingleton(GenerateWithdrawalDocument, [WithdrawalsDocumentsRepository]);
     container.addSingleton(MarkDocumentAsGenerated, [WithdrawalsDocumentsRepository, WithdrawalsRepository]);
     container.addSingleton(MarkWithdrawalAgreementAsGenerated, [FundsWithdrawalRequestsAgreementsRepository]);
-    container.addSingleton(AcceptWithdrawalRequests, [FundsWithdrawalRequestsRepository]);
-    container.addSingleton(RejectWithdrawalRequests, [FundsWithdrawalRequestsRepository]);
+    container.addSingleton(AcceptWithdrawalRequests, [FundsWithdrawalRequestsRepository, SharesAndDividendsService, 'WithdrawalTransactionalAdapter']);
+    container.addSingleton(RejectWithdrawalRequests, [FundsWithdrawalRequestsRepository, SharesAndDividendsService, 'WithdrawalTransactionalAdapter']);
     container.addSingleton(PushWithdrawalsDocumentCreation, [SimpleEventBus]);
   }
 }

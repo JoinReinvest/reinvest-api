@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import {
@@ -229,5 +230,33 @@ export class DividendsRepository {
         profileId: record.profileId,
         dividendId: record.id,
       }));
+  }
+
+  async markIncentiveDividendsAs(status: IncentiveRewardStatus, dividendsIds: UUID[], isInState: IncentiveRewardStatus): Promise<void> {
+    if (dividendsIds.length === 0) {
+      return;
+    }
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorIncentiveDividendTable)
+      .set({ status })
+      .where('id', 'in', dividendsIds)
+      .where('status', '=', isInState)
+      .execute();
+  }
+
+  async markDividendsAs(status: InvestorDividendStatus, dividendsIds: UUID[], isInState: InvestorDividendStatus): Promise<void> {
+    if (dividendsIds.length === 0) {
+      return;
+    }
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorDividendsTable)
+      .set({ status })
+      .where('id', 'in', dividendsIds)
+      .where('status', '=', isInState)
+      .execute();
   }
 }

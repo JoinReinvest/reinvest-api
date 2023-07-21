@@ -97,6 +97,19 @@ export class DividendWithdrawalRequest {
     };
   }
 
+  forEvent() {
+    return {
+      type: 'DIVIDEND_WITHDRAWAL',
+      id: this.dividendRequestSchema.id,
+      accountId: this.dividendRequestSchema.accountId,
+      date: this.dividendRequestSchema.dateDecided
+        ? DateTime.from(this.dividendRequestSchema.dateDecided).toIsoDateTime()
+        : DateTime.from(this.dividendRequestSchema.dateCreated).toIsoDateTime(),
+      dividendId: this.dividendRequestSchema.dividendId,
+      amount: Money.lowPrecision(this.dividendRequestSchema.eligibleAmount).getFormattedAmount(),
+    };
+  }
+
   forPayoutTemplate(): {
     accountId: UUID;
     amount: Money;
