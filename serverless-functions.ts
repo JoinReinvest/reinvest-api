@@ -81,6 +81,7 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
+      stage: '${sls:stage}',
     },
     logs: {
       httpApi: false, // turn on Api Gateway logs
@@ -173,6 +174,7 @@ const serverlessConfiguration: AWS = {
       endpointType: 'regional',
       certificateName: '${env:API_CERTIFICATE_NAME}',
       autoDomain: true,
+      stage: '${sls:stage}',
     },
     serverlessTerminationProtection: {
       stages: ['production'],
