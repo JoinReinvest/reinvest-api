@@ -40,7 +40,7 @@ export const app = (modules: Modules) => {
     // @ts-ignore
     context: async ({ event, context }) => {
       // @ts-ignore
-      const { authorizer } = event.requestContext;
+      const { authorizer, http } = event.requestContext;
 
       if (!authorizer || !authorizer.jwt.claims.sub) {
         throw new GraphQLError('User is not authenticated', {
@@ -51,7 +51,8 @@ export const app = (modules: Modules) => {
         });
       }
 
-      const clientIp = event?.headers?.['X-Forwarded-For'] ?? '127.0.0.1';
+      const clientIp = http?.sourceIp ?? '127.0.0.1';
+;
       const userId = authorizer.jwt.claims.sub;
       const api = modules.getApi<Identity.ApiType>(Identity);
       const userProfile = await api.getProfile(userId);
