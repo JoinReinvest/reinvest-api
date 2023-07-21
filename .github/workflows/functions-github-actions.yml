@@ -47,6 +47,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          API_URL: ${{ secrets[format('{0}_API_URL', env.ENVIRONMENT)] }}
           POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
           POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
           POSTGRESQL_HOST: ${{ secrets[format('{0}_POSTGRESQL_HOST', env.ENVIRONMENT)] }}

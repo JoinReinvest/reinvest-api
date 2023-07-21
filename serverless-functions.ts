@@ -33,7 +33,7 @@ const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
   frameworkVersion: '3',
   useDotenv: true,
-  plugins: ['serverless-output-to-env', 'serverless-stack-termination-protection', 'serverless-esbuild'],
+  plugins: ['serverless-output-to-env', 'serverless-stack-termination-protection', 'serverless-domain-manager', 'serverless-esbuild'],
   provider: {
     name: 'aws',
     runtime: 'nodejs18.x',
@@ -75,6 +75,7 @@ const serverlessConfiguration: AWS = {
       DEALPATH_VERSION_HEADER: '${env:DEALPATH_VERSION_HEADER}',
       ADMIN_EMAIL: '${env:ADMIN_EMAIL}',
       PROFILEID_HASH_KEY: '${env:PROFILEID_HASH_KEY}',
+      API_URL: '${env:API_URL}',
       // FIREBASE_SERVICE_ACCOUNT_JSON: '${env:FIREBASE_SERVICE_ACCOUNT_JSON}',
     },
     apiGateway: {
@@ -157,6 +158,14 @@ const serverlessConfiguration: AWS = {
     },
     bundle: {
       ignorePackages: ['pg-native'],
+    },
+    customDomain: {
+      domainName: '${env:API_URL}',
+      basePath: '',
+      stage: '${sls:stage}',
+      createRoute53Record: true,
+      endpointType: 'regional',
+      certificateName: ' *.dev.reinvestcommunity.com',
     },
     serverlessTerminationProtection: {
       stages: ['production'],
