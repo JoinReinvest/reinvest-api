@@ -14,7 +14,7 @@ export const TestsFunction = {
     securityGroupIds: [getAttribute('TestsSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
   },
-  enabled: '${self:custom.testFunctions.${self:provider.stage}}',
+  // enabled: '${self:custom.testFunctions.${self:provider.stage}}',
   events: [
     {
       httpApi: {

@@ -33,13 +33,7 @@ const serverlessConfiguration: AWS = {
   service: 'reinvest-functions',
   frameworkVersion: '3',
   useDotenv: true,
-  plugins: [
-    'serverless-output-to-env',
-    'serverless-stack-termination-protection',
-    'serverless-domain-manager',
-    'serverless-esbuild',
-    'serverless-disable-functions',
-  ],
+  plugins: ['serverless-output-to-env', 'serverless-stack-termination-protection', 'serverless-domain-manager', 'serverless-esbuild'], //'serverless-disable-functions',
   provider: {
     name: 'aws',
     runtime: 'nodejs18.x',
@@ -166,12 +160,12 @@ const serverlessConfiguration: AWS = {
     bundle: {
       ignorePackages: ['pg-native'],
     },
-    testFunctions: {
-      production: false,
-      development: true,
-      staging: true,
-      integrations: true,
-    },
+    // testFunctions: {
+    //   production: false,
+    //   development: true,
+    //   staging: true,
+    //   integrations: true,
+    // },
     customDomain: {
       domainName: '${env:API_URL}',
       basePath: '',
