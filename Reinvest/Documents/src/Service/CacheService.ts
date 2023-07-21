@@ -3,8 +3,6 @@ import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
 import { DateTime } from 'Money/DateTime';
 
-const DAYS_TO_EXPIRE = 30;
-
 export type ImageCacheCreate = {
   catalog: string;
   expirationDate: Date;
