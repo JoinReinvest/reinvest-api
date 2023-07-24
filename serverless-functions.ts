@@ -83,7 +83,7 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
-      disableDefaultEndpoint: true,
+      // disableDefaultEndpoint: true,
     },
     logs: {
       httpApi: false, // turn on Api Gateway logs
