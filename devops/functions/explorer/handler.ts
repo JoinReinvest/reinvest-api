@@ -119,4 +119,6 @@ app.get('/explorer/admin', (req: any, res: any) => {
   res.send(page(apiEndpoint + '/admin', req.query.access_token, true));
 });
 
-export const main = serverless(app);
+export const main = serverless(app, {
+  basePath: '/',
+});
