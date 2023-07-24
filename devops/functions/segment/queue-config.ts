@@ -7,7 +7,7 @@ import { SQSSendPolicy } from '../queue/queue-config';
 export const SegmentFunction = {
   handler: `devops/functions/segment/handler.main`,
   role: 'SegmentRole',
-  timeout: 30,
+  timeout: 29,
   vpc: {
     securityGroupIds: [getAttribute('SegmentSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
