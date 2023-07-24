@@ -175,13 +175,12 @@ const serverlessConfiguration: AWS = {
     // },
     customDomain: {
       domainName: '${env:API_DOMAIN}',
-      basePath: '(none)',
+      basePath: '',
       createRoute53Record: true,
       apiType: 'http',
       endpointType: 'regional',
       certificateName: '${env:API_CERTIFICATE_NAME}',
       autoDomain: true,
-      stage: '${sls:stage}',
     },
     serverlessTerminationProtection: {
       stages: ['production'],
