@@ -81,7 +81,6 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
-      stage: '${sls:stage}',
     },
     logs: {
       httpApi: false, // turn on Api Gateway logs
@@ -138,6 +137,13 @@ const serverlessConfiguration: AWS = {
       ...CronNotificationsResources,
       ...CronPushEveryDayResources,
       ...TestsLambdaResources,
+    },
+    extensions: {
+      HttpApiStage: {
+        Properties: {
+          StageName: '${sls:stage}',
+        },
+      },
     },
     Outputs: {
       ...CognitoClientsOutputs,
