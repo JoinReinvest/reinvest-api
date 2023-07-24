@@ -4,6 +4,7 @@ import { TemplateContentType, TemplateStructureType } from "Templates/Types";
 export interface FundsWithdrawalRequestAgreementContentFieldsV1 extends TemplateContentType {
   date: string;
   authorizedOfficer: string;
+  closingDate: string;
   sharesOwnerName: string;
   isCompany: boolean;
   email: string;
@@ -85,7 +86,7 @@ export const fundsWithdrawalRequestAgreementTemplateV1: TemplateStructureType = 
       },
       {
         lines: [
-          '4. {{The Closing}}. The closing of the redemption and purchase of the Redeemed Shares described in this Agreement (the “{{Closing}}”) will take place through the electronic exchange of documents, and payments.\n' +
+          '4. {{The Closing}}. The closing of the redemption and purchase of the Redeemed Shares described in this Agreement (the “{{Closing}}”) will take place through the electronic exchange of documents, and payments. Closing shall occur on or before close of business, {(closingDate)} (Eastern time). ' +
             'The Closing Documents, fully executed by all Parties, shall be released by verbal confirmation of the Parties upon the satisfaction of the conditions set forth in Section 3.',
         ],
       },

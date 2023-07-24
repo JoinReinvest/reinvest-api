@@ -2,7 +2,7 @@ import express, { Request } from 'express';
 import serverless from 'serverless-http';
 
 const hostedUI = process.env.ExplorerHostedUI;
-const apiEndpoint = process.env.ApiUrl;
+const apiEndpoint = process.env.API_URL;
 
 const page = (apiUrl: string, token: string, isAdmin: boolean) => `
 <html lang="en">
@@ -119,4 +119,6 @@ app.get('/explorer/admin', (req: any, res: any) => {
   res.send(page(apiEndpoint + '/admin', req.query.access_token, true));
 });
 
-export const main = serverless(app);
+export const main = serverless(app, {
+  basePath: process.env.BASE_PATH,
+});

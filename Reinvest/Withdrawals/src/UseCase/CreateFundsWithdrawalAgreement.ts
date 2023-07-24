@@ -62,9 +62,12 @@ export class CreateFundsWithdrawalAgreement {
 
     const { date, shareCount, withdrawalAmount } = pendingFundsRequest.getWithdrawalDetails();
 
+    const closingDate = date.addDays(30);
+
     const contentFields = <LatestTemplateContentFields[Templates.WITHDRAWAL_AGREEMENT]>{
       ...collectedData,
       date: date.toFormattedDate('MM/DD/YYYY'),
+      closingDate: closingDate.toFormattedDate('MM/DD/YYYY'),
       shareCount,
       withdrawalAmount,
       ipAddress: '',

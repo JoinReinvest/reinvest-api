@@ -26,7 +26,7 @@ import { SegmentFunction, SegmentResources } from './devops/functions/segment/qu
 import { TestsFunction, TestsLambdaResources } from './devops/functions/tests/tests-config';
 import { UnauthorizedEndpointsFunction, UnauthorizedEndpointsLambdaResources } from './devops/functions/unauthorizedEndpoints/unauthorizedEndpoints-config';
 import { CognitoAuthorizer, CognitoClientResources, CognitoClientsOutputs, CognitoEnvs } from './devops/serverless/cognito';
-import { margeWithApiGatewayUrl, ProviderEnvironment } from './devops/serverless/serverless-common';
+import { ProviderEnvironment } from './devops/serverless/serverless-common';
 import { getAttribute, importOutput } from './devops/serverless/utils';
 
 const serverlessConfiguration: AWS = {
@@ -40,10 +40,12 @@ const serverlessConfiguration: AWS = {
     region: 'us-east-1',
     environment: {
       ...ProviderEnvironment,
+      BASE_PATH: '/${sls:stage}',
       ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
-      ApiUrl: margeWithApiGatewayUrl('/api'),
+      BACKEND_URL: '${env:BACKEND_URL}',
+      API_URL: '${env:API_URL}',
       POSTGRESQL_HOST: '${env:POSTGRESQL_HOST}',
-      POSTGRESQL_DB: '${env:POSTGRESQL_DB_NAME}',
+      POSTGRESQL_DB_NAME: '${env:POSTGRESQL_DB_NAME}',
       CognitoUserPoolID: importOutput('CognitoUserPoolID'),
       S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
       S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),
@@ -74,13 +76,14 @@ const serverlessConfiguration: AWS = {
       DEALPATH_VERSION_HEADER: '${env:DEALPATH_VERSION_HEADER}',
       ADMIN_EMAIL: '${env:ADMIN_EMAIL}',
       PROFILEID_HASH_KEY: '${env:PROFILEID_HASH_KEY}',
-      API_URL: '${env:API_URL}',
+      API_DOMAIN: '${env:API_DOMAIN}',
       API_CERTIFICATE_NAME: '${env:API_CERTIFICATE_NAME}',
       // FIREBASE_SERVICE_ACCOUNT_JSON: '${env:FIREBASE_SERVICE_ACCOUNT_JSON}',
     },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
+      // disableDefaultEndpoint: true,
     },
     logs: {
       httpApi: false, // turn on Api Gateway logs
@@ -173,7 +176,7 @@ const serverlessConfiguration: AWS = {
     //   integrations: true,
     // },
     customDomain: {
-      domainName: '${env:API_URL}',
+      domainName: '${env:API_DOMAIN}',
       basePath: '',
       createRoute53Record: true,
       apiType: 'http',

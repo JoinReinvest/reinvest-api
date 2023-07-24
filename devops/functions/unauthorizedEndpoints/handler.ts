@@ -145,4 +145,6 @@ app.post('/calculations/:id', async function (req: any, res: any) {
   res.json({ status: true, data: calculationData });
 });
 
-export const main = serverless(app);
+export const main = serverless(app, {
+  basePath: process.env.BASE_PATH,
+});

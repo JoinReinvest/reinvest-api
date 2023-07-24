@@ -8,7 +8,7 @@ import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgress
 export const QueueFunction = {
   handler: `devops/functions/queue/handler.main`,
   role: 'QueueRole',
-  timeout: 120,
+  timeout: 29,
   vpc: {
     securityGroupIds: [getAttribute('InboxSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],

@@ -40,7 +40,7 @@ export const main: SQSHandler = async (event: SQSEvent) => {
 
     analytics.on('error', err => console.error(err));
 
-    await analytics.closeAndFlush({ timeout: 5000 });
+    await analytics.closeAndFlush({ timeout: 2800 });
   } catch (error: any) {
     console.log(error);
   }
