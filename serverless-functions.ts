@@ -175,7 +175,7 @@ const serverlessConfiguration: AWS = {
     // },
     customDomain: {
       domainName: '${env:API_DOMAIN}',
-      basePath: '/',
+      basePath: '(none)',
       createRoute53Record: true,
       apiType: 'http',
       endpointType: 'regional',
