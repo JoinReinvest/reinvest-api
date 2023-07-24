@@ -1,25 +1,36 @@
-import {Identity} from "Identity/index";
-import {ContainerInterface} from "Container/Container";
-import {PhoneController} from "Identity/Port/Api/PhoneController";
-import {UserRegistrationController} from "Identity/Port/Api/UserRegistrationController";
-import {UserRepository} from "Identity/Adapter/Database/Repository/UserRepository";
-import {UserRegistrationService} from "Identity/Service/UserRegistrationService";
-import {PhoneRegistrationService} from "Identity/Service/PhoneRegistrationService";
-import {ProfileController} from "Identity/Port/Api/ProfileController";
+import { ContainerInterface } from 'Container/Container';
+import { CognitoService } from 'Identity/Adapter/AWS/CognitoService';
+import { IncentiveTokenRepository } from 'Identity/Adapter/Database/Repository/IncentiveTokenRepository';
+import { UserRepository } from 'Identity/Adapter/Database/Repository/UserRepository';
+import { Identity } from 'Identity/index';
+import { BanController } from 'Identity/Port/Api/BanController';
+import { IncentiveTokenController } from 'Identity/Port/Api/IncentiveTokenController';
+import { PhoneController } from 'Identity/Port/Api/PhoneController';
+import { ProfileController } from 'Identity/Port/Api/ProfileController';
+import { ProfileHashController } from 'Identity/Port/Api/ProfileHashController';
+import { UserController } from 'Identity/Port/Api/UserController';
+import { UserRegistrationController } from 'Identity/Port/Api/UserRegistrationController';
+import { PhoneRegistrationService } from 'Identity/Service/PhoneRegistrationService';
+import { UserRegistrationService } from 'Identity/Service/UserRegistrationService';
 
 export class PortsProvider {
-    private config: Identity.Config;
+  private config: Identity.Config;
 
-    constructor(config: Identity.Config) {
-        this.config = config;
-    }
+  constructor(config: Identity.Config) {
+    this.config = config;
+  }
 
-    public boot(container: ContainerInterface) {
-        //controllers
-        container
-            .addClass(ProfileController, [UserRepository])
-            .addClass(PhoneController, [PhoneRegistrationService])
-            .addClass(UserRegistrationController, [UserRegistrationService])
-        ;
-    }
+  public boot(container: ContainerInterface) {
+    container.addAsValue('webAppUrl', this.config.webAppUrl);
+    container.addAsValue('profileIdEncryptToken', this.config.profileIdHashKey);
+    //controllers
+    container
+      .addSingleton(ProfileHashController, ['profileIdEncryptToken'])
+      .addSingleton(ProfileController, [UserRepository, CognitoService])
+      .addSingleton(PhoneController, [PhoneRegistrationService, CognitoService])
+      .addSingleton(UserRegistrationController, [UserRegistrationService])
+      .addSingleton(BanController, [UserRepository])
+      .addSingleton(UserController, [UserRepository])
+      .addSingleton(IncentiveTokenController, [IncentiveTokenRepository, 'webAppUrl']);
+  }
 }

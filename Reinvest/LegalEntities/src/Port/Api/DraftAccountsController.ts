@@ -1,45 +1,108 @@
-import {IdGenerator} from "IdGenerator/IdGenerator";
-
-export type AccountType = "INDIVIDUAL" | "CORPORATE" | "TRUST"
-
-type NetRange = {
-    from: string,
-    to: string
-}
-
-type IndividualDraftAccountInput = {
-    experience?: "NO_EXPERIENCE" | "SOME_EXPERIENCE" | "VERY_EXPERIENCED" | "EXPERT",
-    employmentStatus?: "EMPLOYED" | "UNEMPLOYED" | "RETIRED" | "STUDENT",
-    employer?: {
-        nameOfEmployer: string,
-        occupation: string,
-        industry: string
-    },
-    netWorth?: NetRange,
-    netIncome?: NetRange
-};
+import { CompanyDraftAccountType, DraftAccountType } from 'LegalEntities/Domain/DraftAccount/DraftAccount';
+import { ValidationErrorType } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import { DraftAccountQuery, DraftQuery, DraftsList } from 'LegalEntities/Port/Api/DraftAccountQuery';
+import { CompanyDraftAccountInput, CompleteDraftAccount, IndividualDraftAccountInput } from 'LegalEntities/UseCases/CompleteDraftAccount';
+import { CreateDraftAccount } from 'LegalEntities/UseCases/CreateDraftAccount';
+import { RemoveDraftAccount } from 'LegalEntities/UseCases/RemoveDraftAccount';
+import { TransformDraftAccountIntoRegularAccount } from 'LegalEntities/UseCases/TransformDraftAccountIntoRegularAccount';
 
 export class DraftAccountsController {
-    public static getClassName = (): string => "DraftAccountsController";
+  public static getClassName = (): string => 'DraftAccountsController';
+  private createDraftAccountUseCase: CreateDraftAccount;
+  private completeDraftAccount: CompleteDraftAccount;
+  private draftAccountQuery: DraftAccountQuery;
+  private transformDraftIntoAccount: TransformDraftAccountIntoRegularAccount;
+  private removeDraftUseCase: RemoveDraftAccount;
 
-    public async createDraftAccount(profileId: string, type: AccountType): Promise<{ id: string, type: AccountType }> {
-        return {
-            id: (new IdGenerator()).createUuid(),
-            type
-        }
+  constructor(
+    createDraftAccountUseCase: CreateDraftAccount,
+    completeDraftAccount: CompleteDraftAccount,
+    draftAccountQuery: DraftAccountQuery,
+    transformDraftIntoAccount: TransformDraftAccountIntoRegularAccount,
+    removeDraftUseCase: RemoveDraftAccount,
+  ) {
+    this.createDraftAccountUseCase = createDraftAccountUseCase;
+    this.completeDraftAccount = completeDraftAccount;
+    this.draftAccountQuery = draftAccountQuery;
+    this.transformDraftIntoAccount = transformDraftIntoAccount;
+    this.removeDraftUseCase = removeDraftUseCase;
+  }
+
+  public async createDraftAccount(
+    profileId: string,
+    type: DraftAccountType,
+  ): Promise<{
+    status: boolean;
+    id?: string;
+    message?: string;
+  }> {
+    try {
+      const draftId = await this.createDraftAccountUseCase.execute(profileId, type);
+
+      return {
+        id: draftId,
+        status: true,
+      };
+    } catch (error) {
+      console.error(error);
+
+      return {
+        status: false,
+        message: `Draft account with type ${type} already exists`,
+      };
     }
+  }
 
-    public async completeIndividualDraftAccount(
-        profileId: string,
-        draftAccountId: string,
-        individualInput: IndividualDraftAccountInput
-    ): Promise<{ id: string, type: AccountType }> {
-
-
-        return {
-            id: (new IdGenerator()).createUuid(),
-            type: "INDIVIDUAL",
-            ...individualInput
-        }
+  public async readDraft(profileId: string, draftId: string, accountType: DraftAccountType): Promise<DraftQuery | null> {
+    try {
+      return await this.draftAccountQuery.getDraftDetails(profileId, draftId, accountType);
+    } catch (error: any) {
+      return null;
     }
+  }
+
+  public async removeDraft(profileId: string, draftId: string): Promise<boolean> {
+    try {
+      return await this.removeDraftUseCase.execute(profileId, draftId);
+    } catch (error: any) {
+      return false;
+    }
+  }
+
+  public async listDrafts(profileId: string): Promise<DraftsList> {
+    return this.draftAccountQuery.listDrafts(profileId);
+  }
+
+  public async completeIndividualDraftAccount(
+    profileId: string,
+    draftAccountId: string,
+    individualInput: IndividualDraftAccountInput,
+  ): Promise<ValidationErrorType[]> {
+    try {
+      return await this.completeDraftAccount.completeIndividual(profileId, draftAccountId, individualInput);
+    } catch (error: any) {
+      return [error.message];
+    }
+  }
+
+  public async completeCompanyDraftAccount(
+    profileId: string,
+    draftAccountId: string,
+    accountType: CompanyDraftAccountType,
+    companyInput: CompanyDraftAccountInput,
+  ): Promise<ValidationErrorType[]> {
+    try {
+      return await this.completeDraftAccount.completeCompany(profileId, draftAccountId, accountType, companyInput);
+    } catch (error: any) {
+      return [error.message];
+    }
+  }
+
+  public async transformDraftAccountIntoRegularAccount(profileId: string, draftAccountId: string): Promise<string | null> {
+    try {
+      return await this.transformDraftIntoAccount.execute(profileId, draftAccountId);
+    } catch (error: any) {
+      return error.message;
+    }
+  }
 }

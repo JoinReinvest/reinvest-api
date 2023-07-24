@@ -1,70 +1,170 @@
-import {IdentityDatabaseAdapterProvider, userTable} from "Identity/Adapter/Database/IdentityDatabaseAdapter";
-import {InsertableUser} from "Identity/Adapter/Database/IdentitySchema";
-import {USER_EXCEPTION_CODES, UserException} from "Identity/Adapter/Database/UserException";
-import {IdGeneratorInterface} from "IdGenerator/IdGenerator";
-import {UniqueTokenGenerator, UniqueTokenGeneratorInterface} from "IdGenerator/UniqueTokenGenerator";
-
-const INCENTIVE_TOKEN_SIZE = 8;
+import { JSONObjectOf, Pagination, UUID } from 'HKEKTypes/Generics';
+import { IdentityDatabaseAdapterProvider, userTable } from 'Identity/Adapter/Database/IdentityDatabaseAdapter';
+import { IdentityUser, InsertableUser } from 'Identity/Adapter/Database/IdentitySchema';
+import { USER_EXCEPTION_CODES, UserException } from 'Identity/Adapter/Database/UserException';
+import { IncentiveToken } from 'Identity/Domain/IncentiveToken';
+import { BanList } from 'Identity/Port/Api/BanController';
+import { User } from 'Identity/Port/Api/UserController';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class UserRepository {
-    public static getClassName = (): string => "UserRepository";
-    private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
-    private uniqueTokenGenerator: UniqueTokenGeneratorInterface;
+  private databaseAdapterProvider: IdentityDatabaseAdapterProvider;
+  private eventBus: EventBus;
 
-    constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider, uniqueTokenGenerator: UniqueTokenGeneratorInterface) {
-        this.databaseAdapterProvider = databaseAdapterProvider;
-        this.uniqueTokenGenerator = uniqueTokenGenerator;
+  constructor(databaseAdapterProvider: IdentityDatabaseAdapterProvider, eventBus: EventBus) {
+    this.databaseAdapterProvider = databaseAdapterProvider;
+    this.eventBus = eventBus;
+  }
+
+  public static getClassName = (): string => 'UserRepository';
+
+  async registerUser(
+    id: string,
+    profileId: string,
+    userIncentiveToken: IncentiveToken,
+    cognitoUserId: string,
+    email: string,
+    invitedByIncentiveToken: IncentiveToken | null,
+    label: string,
+  ): Promise<void | never> {
+    try {
+      await this.databaseAdapterProvider
+        .provide()
+        .insertInto(userTable)
+        .values(<InsertableUser>{
+          id,
+          cognitoUserId,
+          profileId,
+          email,
+          invitedByIncentiveToken: invitedByIncentiveToken === null ? null : invitedByIncentiveToken.get(),
+          userIncentiveToken: userIncentiveToken.get(),
+          label,
+        })
+        .execute();
+    } catch (error: any) {
+      throw new UserException(USER_EXCEPTION_CODES.USER_ALREADY_EXISTS, `User already exists: ${cognitoUserId}`);
+    }
+  }
+
+  public async getUserProfile(cognitoUserId: string): Promise<{
+    bannedIdsJson: JSONObjectOf<BanList>;
+    profileId: string;
+  } | null> {
+    const user = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(userTable)
+      .select(['profileId', 'bannedIdsJson'])
+      .where('cognitoUserId', '=', cognitoUserId)
+      .limit(1)
+      .executeTakeFirst();
+
+    return user ?? null;
+  }
+
+  public async getUserProfileByProfileId(profileId: string): Promise<{
+    bannedIdsJson: JSONObjectOf<BanList>;
+    email: string;
+    label: string;
+    profileId: string;
+  } | null> {
+    const user = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(userTable)
+      .select(['profileId', 'bannedIdsJson', 'email', 'label'])
+      .where('profileId', '=', profileId)
+      .limit(1)
+      .executeTakeFirst();
+
+    return user ?? null;
+  }
+
+  public async getUserProfileByEmail(email: string): Promise<string | null> {
+    const user = await this.databaseAdapterProvider.provide().selectFrom(userTable).select('profileId').where('email', '=', email).limit(1).executeTakeFirst();
+
+    return user ? user.profileId : null;
+  }
+
+  public async updateUserEmail(cognitoUserId: string, email: string) {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        email,
+      })
+      .where('cognitoUserId', '=', cognitoUserId)
+      .execute();
+  }
+
+  async findUserByProfileId(profileId: string): Promise<IdentityUser | null> {
+    const user = await this.databaseAdapterProvider.provide().selectFrom(userTable).selectAll().where('profileId', '=', profileId).limit(1).executeTakeFirst();
+
+    if (!user) {
+      return null;
     }
 
-    async registerUser(id: string, profileId: string, userIncentiveToken: string, cognitoUserId: string, email: string, invitedByIncentiveToken: string | null): Promise<void | never> {
-        try {
-            await this.databaseAdapterProvider.provide().insertInto(userTable).values(<InsertableUser>{
-                id,
-                cognitoUserId,
-                profileId,
-                email,
-                invitedByIncentiveToken,
-                userIncentiveToken
-            }).execute();
-        } catch (error: any) {
-            throw new UserException(USER_EXCEPTION_CODES.USER_ALREADY_EXISTS, `User already exists: ${cognitoUserId}`);
-        }
+    return user;
+  }
+
+  async updateUserBanList(id: string, banList: BanList): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        bannedIdsJson: banList,
+      })
+      .where('id', '=', id)
+      .execute();
+  }
+
+  async getUserInviter(inviteeProfileId: UUID): Promise<UUID | null> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(`${userTable} as invitee`)
+      .fullJoin(`${userTable} as inviter`, `invitee.invitedByIncentiveToken`, 'inviter.userIncentiveToken')
+      .select('inviter.profileId as inviterProfileId')
+      .where('invitee.profileId', '=', inviteeProfileId)
+      .executeTakeFirst();
+
+    return result ? result.inviterProfileId : null;
+  }
+
+  async listUsers(pagination: Pagination): Promise<User[]> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(userTable)
+      .select(['id', 'profileId', 'email', 'createdAt', 'bannedIdsJson'])
+      .orderBy('createdAt', 'desc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .execute();
+
+    if (result.length === 0) {
+      return [];
     }
 
-    public async generateUniqueIncentiveToken(tries: number = 1): Promise<string> {
-        const userIncentiveToken = this.uniqueTokenGenerator.generateRandomString(INCENTIVE_TOKEN_SIZE);
-        const doesTokenExist = await this.verifyIncentiveTokenUniqueness(userIncentiveToken);
+    return result.map(user => ({
+      id: user.id,
+      profileId: user.profileId,
+      email: user.email,
+      createdAt: user.createdAt,
+      // @ts-ignore
+      isBanned: user.bannedIdsJson !== null && user.bannedIdsJson.list && user.bannedIdsJson.list.includes(user.profileId),
+    }));
+  }
 
-        if (doesTokenExist) {
-            if (tries >= 10) {
-                throw new UserException(USER_EXCEPTION_CODES.CANNOT_GENERATE_UNIQUE_TOKEN, "Cannot generate unique incentive token");
-            }
+  async updateUserLabel(profileId: UUID, label: string): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(userTable)
+      .set({
+        label,
+      })
+      .where('profileId', '=', profileId)
+      .execute();
+  }
 
-            return this.generateUniqueIncentiveToken(tries + 1);
-        }
-
-        return userIncentiveToken;
-    }
-
-    private async verifyIncentiveTokenUniqueness(userIncentiveToken: string): Promise<boolean> {
-        const doesTokenExist = await this.databaseAdapterProvider.provide()
-            .selectFrom(userTable)
-            .select('cognitoUserId')
-            .where('userIncentiveToken', '=', userIncentiveToken)
-            .limit(1)
-            .executeTakeFirst();
-
-        return !!doesTokenExist;
-    }
-
-    public async getUserProfileId(cognitoUserId: string): Promise<string | null> {
-        const doesUserExist = await this.databaseAdapterProvider.provide()
-            .selectFrom(userTable)
-            .select('profileId')
-            .where('cognitoUserId', '=', cognitoUserId)
-            .limit(1)
-            .executeTakeFirst();
-
-        return !!doesUserExist ? doesUserExist.profileId : null;
-    }
+  async publishEvent(event: DomainEvent): Promise<void> {
+    await this.eventBus.publish(event);
+  }
 }

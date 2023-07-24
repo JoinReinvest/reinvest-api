@@ -1,7 +1,7 @@
-import {DomainEvent} from "SimpleAggregator/Types";
-import {ProfileState} from "InvestmentAccounts/Domain/Profile";
+import { ProfileState } from 'InvestmentAccounts/Domain/ProfileAggregate/Profile';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export type ProfileSnapshotChanged = DomainEvent & {
-    kind: 'ProfileSnapshotChanged',
-    data: ProfileState["state"]
-}
+  data: ProfileState['state'];
+  kind: 'ProfileSnapshotChanged';
+};

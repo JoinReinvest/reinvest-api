@@ -1,0 +1,17 @@
+export * as migration_20230525094800_sad_create_shares from './sad_1_create_shares';
+export * as migration_20230525094801_sad_create_dividends_declaration from './sad_2_create_dividends_declaration';
+export * as migration_20230525094802_sad_create_calculated_dividends from './sad_3_create_calculated_dividends';
+export * as migration_20230525094803_sad_create_dividend_distribution from './sad_4_create_dividend_distribution';
+export * as migration_20230525094804_sad_create_investor_dividends from './sad_5_create_investor_dividends';
+export * as migration_20230525094805_sad_create_unpaid_fees from './sad_6_create_unpaid_fees';
+export * as migration_20230525094806_sad_create_investor_incentive_dividend from './sad_7_create_investor_incentive_dividend';
+export * as migration_20230525094807_sad_create_financial_operations from './sad_8_create_financial_operations';
+export * as migration_20230525094808_sad_create_global_financial_operations from './sad_9_create_global_financial_operations';
+export * as migration_20230525170700_sad_update_shares from './sad_10_update_shares';
+export * as migration_20230529112500_update_incentive_reward from './sad_11_update_incentive_reward';
+export * as migration_20230607101000_update_dividends_declaration from './sad_12_update_dividends_declaration';
+export * as migration_20230609130100_sad_add_indexes from './sad_13_sad_add_indexes';
+export * as migration_20230704134800_sad_add_transferred_id from './sad_14_sad_add_transferred_id';
+export * as migration_20230704160300_sad_add_transferred_id_to_dividend from './sad_15_sad_add_transferred_id_to_dividend';
+export * as migration_20230705093200_sad_add_unique_id_financial_operations from './sad_16_sad_add_unique_id_financial_operations';
+export * as migration_20230714115900_sad_migrate_investment_config_to_sad from './sad_17_sad_migrate_investment_config_to_sad';

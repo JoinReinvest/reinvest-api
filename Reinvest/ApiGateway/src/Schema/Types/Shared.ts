@@ -6,6 +6,20 @@ const schema = `
         lastName: String! @constraint(minLength: 1)
     }
 
+    type PersonNameType {
+        firstName: String
+        middleName: String
+        lastName: String
+    }
+
+    input DateOfBirthInput {
+        dateOfBirth: ISODate!
+    }
+
+    type DateOfBirth {
+        dateOfBirth: ISODate!
+    }
+
     input EmailInput {
         email: EmailAddress!
     }
@@ -48,12 +62,30 @@ const schema = `
         forVisa: VisaInput
     }
 
+    enum SimplifiedDomicileType {
+        CITIZEN
+        RESIDENT
+    }
+
+    input SimplifiedDomicileInput {
+        type: SimplifiedDomicileType!
+    }
+
+    type SimplifiedDomicile {
+        type: SimplifiedDomicileType
+    }
+
     input SSNInput {
-        ssn: String!
+        "The valid SSN is 9 digits in format 'XXX-XX-XXXX'"
+        ssn: String! @constraint(pattern: "^[0-9]{3}-[0-9]{2}-[0-9]{4}$")
     }
 
     input EINInput {
         ein: String!
+    }
+
+    type EIN {
+        ein: String
     }
 
     input AddressInput {
@@ -74,20 +106,17 @@ const schema = `
         state: String
     }
 
-    input DollarInput {
-        inCents: Int! @constraint(min: 0)
-        formatted: String
-    }
-
-    type Dollar {
-        inCents: Int
-        display: String
+    enum DraftAccountType {
+        INDIVIDUAL
+        CORPORATE
+        TRUST
     }
 
     enum AccountType {
         INDIVIDUAL
         CORPORATE
         TRUST
+        BENEFICIARY
     }
 
     enum StatementType {
@@ -95,6 +124,8 @@ const schema = `
         TradingCompanyStakeholder
         Politician
         AccreditedInvestor
+        TermsAndConditions
+        PrivacyPolicy
     }
 
     input TradingCompanyStakeholderInput {
@@ -118,11 +149,30 @@ const schema = `
         statement: AccreditedInvestorStatement!
     }
 
+    enum TermsAndConditionsStatement {
+        I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_TERMS_AND_CONDITIONS
+    }
+
+    input TermsAndConditionsInput {
+        statement: TermsAndConditionsStatement!
+    }
+
+    enum PrivacyPolicyStatement {
+        I_HAVE_READ_AND_AGREE_TO_THE_REINVEST_PRIVACY_POLICY
+    }
+
+    input PrivacyPolicyInput {
+        statement: PrivacyPolicyStatement!
+    }
+
     """
     An investor statements for:
     - being a FINRA member
     - politician
     - public trading company stakeholder
+    - accredited investor
+    - terms and conditions
+    - privacy policy
     Choose type and add details depending on the chosen type
     """
     input StatementInput {
@@ -131,14 +181,61 @@ const schema = `
         forPolitician: PoliticianStatementInput
         forStakeholder: TradingCompanyStakeholderInput
         forAccreditedInvestor: AccreditedInvestorInput
+        forTermsAndConditions: TermsAndConditionsInput
+        forPrivacyPolicy: PrivacyPolicyInput
     }
 
     type Statement {
         type: StatementType,
         details: [String]
     }
+
+    input USDInput {
+        value: Money!,
+    }
+
+    type USD {
+        value: Money!,
+        formatted: String
+    }
+
+    enum AgreementStatus {
+        WAITING_FOR_SIGNATURE
+        SIGNED
+    }
+
+    type AgreementParagraph {
+        lines: [String!]!
+        isCheckedOption: Boolean
+    }
+
+    type AgreementSection {
+        header: String
+        paragraphs: [AgreementParagraph!]!
+    }
+
+    enum SubscriptionAgreementType {
+        DIRECT_DEPOSIT
+        RECURRING_INVESTMENT
+    }
+
+    type SubscriptionAgreement {
+        id: ID!
+        type: SubscriptionAgreementType!
+        status: AgreementStatus!
+        createdAt: ISODateTime!
+        signedAt: ISODateTime
+        content: [AgreementSection!]!
+    }
+
+    """
+    If not provided, default pagination is page: 0, perPage: 10
+    """
+    input Pagination {
+        page: Int! = 0
+        perPage: Int! = 10
+    }
 `;
 export const Shared = {
-    typeDefs: schema,
-}
-
+  typeDefs: schema,
+};

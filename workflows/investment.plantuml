@@ -1,0 +1,49 @@
+@startuml
+
+participant "User" as U
+participant "Process Manager" as PM
+participant "Queue" as Q
+
+opt Investment Process
+U -> PM: investment_created
+PM -> Q: verify_account
+opt verified
+ Q -> PM: account_verified
+ PM -> Q: FinalizeInvestment
+ Q -> PM: investment_finalized(amount: $100, fee: $10, ip: "8.8.8.8")
+ PM -> Q: CreateTrade(amount: $100, fee: $10, ip: "8.8.8.8"))
+    opt success
+     Q -> PM: tradeCreated
+     PM -> Q: CheckIsTradeFunded
+     opt completed
+      Q -> PM: tradeFunded
+      PM -> Q: CheckIsTradeApproved
+      opt verified
+        Q -> PM: investment_verified
+        PM -> Q: CheckIsGracePeriodEnded
+        Q -> PM: grace_period_ended
+        PM -> Q: MarkInvestmentAsReadyToDisburse
+        Q -> PM: investment_disbursed
+        PM -> Q: TransferShares
+        Q -> PM: shares_transferred
+        PM -> Q: MarkInvestmentAsCompleted
+      end
+      opt failure
+       Q -> PM: investment_rejected_by_principle
+      end
+     end
+     opt failure
+      Q -> PM: money_transfer_failed
+     end
+    end
+    opt failure
+     Q -> PM: money_transfer_initiation_failed
+    end
+
+end
+opt aborted by user
+U -> PM: investment_aborted
+end
+end
+
+@enduml

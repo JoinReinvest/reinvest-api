@@ -1,19 +1,18 @@
-import { CloudwatchPolicies } from "../../serverless/cloudwatch";
-import { S3PoliciesWithImport } from "../../serverless/s3";
-import { getAttribute, getResourceName } from "../../serverless/utils";
-import {
-  EniPolicies,
-  getPrivateSubnetRefs,
-  getVpcRef,
-} from "../../serverless/vpc";
+import { CloudwatchPolicies } from '../../serverless/cloudwatch';
+import { CognitoUpdateAttributesPolicyBasedOnOutputArn } from '../../serverless/cognito';
+import { S3PoliciesWithImport } from '../../serverless/s3';
+import { SMSPolicy } from '../../serverless/sns';
+import { getAttribute, getResourceName } from '../../serverless/utils';
+import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
 
 export const QueueFunction = {
   handler: `devops/functions/queue/handler.main`,
-  role: "QueueRole",
-  // vpc: {
-  //   securityGroupIds: [getAttribute("ApiSecurityGroup", "GroupId")],
-  //   subnetIds: [...getPrivateSubnetRefs()],
-  // },
+  role: 'QueueRole',
+  timeout: 120,
+  vpc: {
+    securityGroupIds: [getAttribute('InboxSecurityGroup', 'GroupId')],
+    subnetIds: [...importPrivateSubnetRefs()],
+  },
   events: [
     {
       sqs: {
@@ -24,11 +23,19 @@ export const QueueFunction = {
   ],
 };
 
+export const SQSSendPolicy = [
+  {
+    Effect: 'Allow',
+    Action: ['sqs:SendMessage'],
+    Resource: 'arn:aws:sqs:us-east-1:*:*',
+  },
+];
+
 export const QueueResources = {
   SQSNotification: {
     Type: 'AWS::SQS::Queue',
     Properties: {
-      QueueName: 'notification',
+      QueueName: '${sls:stage}-sqs-notification',
     },
   },
   QueueRole: {
@@ -50,22 +57,31 @@ export const QueueResources = {
           PolicyName: 'QueuePolicy',
           PolicyDocument: {
             Statement: [
-              {
-                Effect: 'Allow',
-                Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
-                Resource: 'arn:aws:logs:*:*:*',
-              },
+              ...CloudwatchPolicies,
+              ...EniPolicies,
+              ...S3PoliciesWithImport,
+              ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
+              SMSPolicy,
+              ...SQSSendPolicy,
               {
                 Effect: 'Allow',
                 Action: ['sqs:ReceiveMessage', 'sqs:DeleteMessage', 'sqs:GetQueueAttributes', 'sqs:SendMessage', 'sqs:SendMessageBatch'],
-                Resource: [
-                  { 'Fn::GetAtt': ['SQSNotification', 'Arn'] }
-                ],
+                Resource: [{ 'Fn::GetAtt': ['SQSNotification', 'Arn'] }],
               },
             ],
           },
         },
       ],
     },
-  }
+  },
+  InboxSecurityGroup: {
+    Type: 'AWS::EC2::SecurityGroup',
+    Properties: {
+      GroupName: getResourceName('sg-inbox-lambda'),
+      GroupDescription: getResourceName('sg-inbox-lambda'),
+      SecurityGroupIngress: SecurityGroupIngressRules,
+      SecurityGroupEgress: SecurityGroupEgressRules,
+      VpcId: importVpcRef(),
+    },
+  },
 };

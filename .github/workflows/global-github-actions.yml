@@ -1,0 +1,23 @@
+name: global-github-actions
+on:
+  push:
+    tags:
+      - GLOBAL_DEPLOYMENT
+jobs:
+  build-check-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Authenticate with private NPM package
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - name: "Install dependencies"
+        run: yarn install
+      - name: "Deploy GLOBAL dependencies"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          yarn "global:deploy"

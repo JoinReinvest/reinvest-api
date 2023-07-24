@@ -1,0 +1,18 @@
+@startuml
+
+actor "User" as U
+participant "API" as A
+database "DB" as DB
+
+U -> A: Withdraw dividend
+A -> DB: dividends_requests(ACCEPTED)
+
+opt if regular dividend
+A -> DB: sad_investor_dividends(WITHDRAWN)
+end
+
+opt if referral reward
+A -> DB: sad_investor_incentive_dividend(WITHDRAWN)
+end
+
+@enduml

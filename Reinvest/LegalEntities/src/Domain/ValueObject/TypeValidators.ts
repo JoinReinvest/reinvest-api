@@ -1,62 +1,108 @@
-import DateTime from 'date-and-time';
+import { DateTime } from 'Money/DateTime';
+
+export enum ValidationErrorEnum {
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  EMPTY_VALUE = 'EMPTY_VALUE',
+  FAILED = 'FAILED',
+  INVALID_DATE_FORMAT = 'INVALID_DATE_FORMAT',
+  INVALID_ID_FORMAT = 'INVALID_ID_FORMAT',
+  INVALID_FORMAT = 'INVALID_FORMAT',
+  INVALID_TYPE = 'INVALID_TYPE',
+  MISSING_MANDATORY_FIELDS = 'MISSING_MANDATORY_FIELDS',
+  ALREADY_COMPLETED = 'ALREADY_COMPLETED',
+  NOT_COMPLETED = 'NOT_COMPLETED',
+  NOT_UNIQUE = 'NOT_UNIQUE',
+  NOT_ACTIVE = 'NOT_ACTIVE',
+  WRONG_TYPE = 'WRONG_TYPE',
+  NOT_FOUND = 'NOT_FOUND',
+  NUMBER_OF_ACCOUNTS_EXCEEDED = 'NUMBER_OF_ACCOUNTS_EXCEEDED',
+  EIN_BANNED = 'EIN_BANNED',
+  SSN_BANNED = 'SSN_BANNED',
+}
+
+export type ValidationErrorType = {
+  field: string;
+  type: ValidationErrorEnum;
+  details?: any;
+};
 
 export class ValidationError extends Error {
+  private validationError: ValidationErrorEnum;
+  private details: any;
+  private fieldName: string;
+
+  constructor(validationError: ValidationErrorEnum, fieldName: string, details: any = []) {
+    super(fieldName + ':' + validationError);
+    this.fieldName = fieldName;
+    this.validationError = validationError;
+    this.details = details;
+  }
+
+  getValidationError(): ValidationErrorType {
+    return {
+      field: this.fieldName,
+      type: this.validationError,
+      details: this.details,
+    };
+  }
 }
 
 export class NonEmptyString {
-    protected value;
+  protected value;
 
-    constructor(value: string, name: string = 'NonEmptyString') {
-        if (value.length === 0) {
-            throw new ValidationError(`Empty value for ${name}`);
-        }
-
-        this.value = value;
+  constructor(value: string, name: string = 'NonEmptyString') {
+    if (value.length === 0) {
+      throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, name);
     }
 
-    toString(): string {
-        return this.value;
-    }
+    this.value = value;
+  }
+
+  toString(): string {
+    return this.value;
+  }
 }
 
 export class AnyString {
-    protected value: string;
+  protected value: string;
 
-    constructor(value: string = "") {
-        this.value = value;
-    }
+  constructor(value: string = '') {
+    this.value = value;
+  }
 
-    toString(): string {
-        return this.value;
-    }
-}
-
-export class Money {
-    constructor() {
-    }
+  toString(): string {
+    return this.value;
+  }
 }
 
 export class IsoDate {
-    constructor(date: string) {
-        if (!DateTime.isValid(date, 'YYYY-MM-DD')) {
-            throw new ValidationError("The value format must be YYYY-MM-DD");
-        }
+  constructor(date: string) {
+    if (!date || !DateTime.isInFormat(date, 'YYYY-MM-DD')) {
+      throw new ValidationError(ValidationErrorEnum.INVALID_DATE_FORMAT, 'IsoDate');
     }
+  }
 }
 
 export class Uuid {
-    protected uuid: string;
+  protected uuid: string;
 
-    constructor(uuid: string) {
-        this.uuid = uuid;
+  constructor(uuid: string) {
+    if (!uuid) {
+      throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, 'uuid');
     }
 
-    toString(): string {
-        return this.uuid;
+    if (uuid.length !== 36) {
+      throw new ValidationError(ValidationErrorEnum.INVALID_ID_FORMAT, 'uuid');
     }
-}
 
-export class Url {
-    constructor() {
-    }
+    this.uuid = uuid;
+  }
+
+  static create(id: string): Uuid {
+    return new Uuid(id);
+  }
+
+  toString(): string {
+    return this.uuid;
+  }
 }

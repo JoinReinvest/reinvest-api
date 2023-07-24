@@ -1,73 +1,99 @@
-import {DomainEvent} from "SimpleAggregator/Types";
-import {ContainerInterface} from "Container/Container";
+import { ContainerInterface } from 'Container/Container';
+import { DateTime } from 'Money/DateTime';
+import { DomainEvent } from 'SimpleAggregator/Types';
+
+export const STORE_EVENT_COMMAND = 'StoreEventCommand';
+
+export type StoreEventCommand = DomainEvent & {
+  data: {
+    date: string;
+    kind: string;
+    payload: any;
+  };
+  kind: 'StoreEventCommand';
+};
+
+export const storeEventCommand = (profileId: string, kind: string, payload: any = {}): StoreEventCommand => ({
+  id: profileId,
+  data: {
+    date: DateTime.now().toIsoDateTime(),
+    kind,
+    payload,
+  },
+  kind: 'StoreEventCommand',
+});
 
 export interface EventHandler<Event extends DomainEvent> {
-    handle(event: Event): Promise<void>;
+  handle(event: Event): Promise<void>;
 }
 
 export interface EventBus {
-    publish(event: DomainEvent): this;
+  publish(event: DomainEvent): Promise<void>;
 
-    publishMany(events: [DomainEvent]): this;
+  publishMany(events: DomainEvent[]): Promise<void>;
 
-    subscribe(forKind: string, handler: string): this;
+  subscribe(forKind: string, handler: string): this;
 
-    subscribeHandlerForKinds(handler: string, forKinds: string[]): this;
+  subscribeHandlerForKinds(handler: string, forKinds: string[]): this;
 }
 
 export class SimpleEventBus implements EventBus {
-    static getClassName = (): string => 'EventBus';
+  private handlers: {
+    [kind: string]: string[];
+  } = {};
+  private container: ContainerInterface;
 
-    private handlers: {
-        [kind: string]: string[]
-    } = {};
-    private container: ContainerInterface;
+  constructor(container: ContainerInterface) {
+    this.container = container;
+  }
 
-    constructor(container: ContainerInterface) {
-        this.container = container;
+  static getClassName = (): string => 'EventBus';
+
+  public async publish(event: DomainEvent): Promise<void> {
+    const kind = event.kind;
+
+    if (!(kind in this.handlers)) {
+      return;
     }
 
-    public publish(event: DomainEvent): this {
-        const kind = event.kind;
-        if (!(kind in this.handlers)) {
-            return this;
-        }
+    const handlersForKind = this.handlers[kind] as string[];
 
-        for (let handlerName of this.handlers[kind]) {
-            const handler = this.container.getValue(handlerName) as EventHandler<any>;
-            handler.handle(event);
-        }
-
-        return this;
+    for (const handlerName of handlersForKind) {
+      const handler = this.container.getValue(handlerName) as EventHandler<any>;
+      await handler.handle(event);
     }
 
-    public publishMany(events: [DomainEvent]): this {
-        for (const event of events) {
-            this.publish(event);
-        }
+    return;
+  }
 
-        return this;
+  public async publishMany(events: DomainEvent[]): Promise<void> {
+    for (const event of events) {
+      await this.publish(event);
     }
 
-    public subscribe(forKind: string, handler: string): this {
-        this.addHandlerForKind(forKind, handler);
+    return;
+  }
 
-        return this;
+  public subscribe(forKind: string, handler: string): this {
+    this.addHandlerForKind(forKind, handler);
+
+    return this;
+  }
+
+  public subscribeHandlerForKinds(handler: string, forKinds: string[]): this {
+    for (const kind of forKinds) {
+      this.addHandlerForKind(kind, handler);
     }
 
-    public subscribeHandlerForKinds(handler: string, forKinds: string[]): this {
-        for (let kind of forKinds) {
-            this.addHandlerForKind(kind, handler);
-        }
+    return this;
+  }
 
-        return this;
+  private addHandlerForKind(forKind: string, handler: string): void {
+    if (!(forKind in this.handlers)) {
+      this.handlers[forKind] = [];
     }
 
-    private addHandlerForKind(forKind: string, handler: string): void {
-        if (!(forKind in this.handlers)) {
-            this.handlers[forKind] = [];
-        }
-
-        this.handlers[forKind].push(handler);
-    }
+    // @ts-ignore
+    this.handlers[forKind].push(handler);
+  }
 }

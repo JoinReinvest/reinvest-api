@@ -1,50 +1,100 @@
-// import {Address, Domicile} from "Reinvest/LegalEntities/src/Domain/ValueObject/Address";
-// import {Documents} from "Reinvest/LegalEntities/src/Domain/ValueObject/Document";
-// import {Id, ProfileId} from "Reinvest/LegalEntities/src/Domain/ValueObject/Id";
-// import {Person} from "Reinvest/LegalEntities/src/Domain/ValueObject/Person";
-// import {NonEmptyString} from "Reinvest/LegalEntities/src/Domain/ValueObject/TypeValidators";
-//
-// export class CompanyName extends NonEmptyString {
-// }
-//
-// export class EIN extends NonEmptyString {
-// }
-//
-// export class Persons {
-//     private persons: Person[];
-//
-//     constructor(persons: Person[]) {
-//         this.persons = persons;
-//     }
-// }
-//
-// export class Company {
-//     private id: Id;
-//     private profileId: ProfileId;
-//     private companyName: CompanyName;
-//     private ein: EIN;
-//     private domicile: Domicile;
-//     private address: Address;
-//     private documents: Documents;
-//     private persons: Persons;
-//
-//     constructor(
-//         id: Id,
-//         profileId: ProfileId,
-//         companyName: CompanyName,
-//         ein: EIN,
-//         domicile: Domicile,
-//         address: Address,
-//         documents: Documents,
-//         persons: Persons
-//     ) {
-//         this.id = id;
-//         this.profileId = profileId;
-//         this.companyName = companyName;
-//         this.ein = ein;
-//         this.domicile = domicile;
-//         this.address = address;
-//         this.documents = documents;
-//         this.persons = persons;
-//     }
-// }
+import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
+import { ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+
+export enum CorporateType {
+  PARTNERSHIP = 'PARTNERSHIP',
+  LLC = 'LLC',
+  CORPORATION = 'CORPORATION',
+}
+
+export enum TrustType {
+  REVOCABLE = 'REVOCABLE',
+  IRREVOCABLE = 'IRREVOCABLE',
+}
+
+export type CompanyType = TrustType | CorporateType;
+
+export type CompanyTypeInput = {
+  type: TrustType | CorporateType;
+};
+
+export class Company implements ToObject {
+  private readonly companyType: CompanyType;
+
+  constructor(companyType: CompanyType) {
+    this.companyType = companyType;
+  }
+
+  static create(companyType: CompanyTypeInput): Company {
+    try {
+      const { type } = companyType;
+
+      // @ts-ignore
+      if (!(Object.values(CorporateType).includes(type) || Object.values(TrustType).includes(type))) {
+        throw new ValidationError(ValidationErrorEnum.INVALID_TYPE, 'companyType');
+      }
+
+      return new Company(type);
+    } catch (error: any) {
+      throw new ValidationError(ValidationErrorEnum.MISSING_MANDATORY_FIELDS, 'companyType');
+    }
+  }
+
+  toObject(): CompanyTypeInput {
+    return {
+      type: this.companyType,
+    };
+  }
+
+  isIrrevocableTrust() {
+    return this.companyType === TrustType.IRREVOCABLE;
+  }
+}
+
+export class CompanyName implements ToObject {
+  private readonly name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  static create(companyNameInput: CompanyNameInput): CompanyName {
+    try {
+      const { name } = companyNameInput;
+
+      return new CompanyName(name);
+    } catch (error: any) {
+      throw new ValidationError(ValidationErrorEnum.EMPTY_VALUE, 'companyName');
+    }
+  }
+
+  toObject(): CompanyNameInput {
+    return {
+      name: this.name,
+    };
+  }
+
+  getInitials(): string {
+    const name = this.name
+      .replace(/\+/g, '')
+      .replace(/[^\w\s]/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    let initials = name.slice(0, 1).toUpperCase();
+    const words = name.split(' ');
+
+    if (words[1]) {
+      initials += words[1].slice(0, 1).toUpperCase();
+    }
+
+    return initials;
+  }
+
+  getLabel(): string {
+    return this.name;
+  }
+}
+
+export type CompanyNameInput = {
+  name: string;
+};

@@ -1,29 +1,47 @@
-import {Documents} from "Documents/index";
-import {ContainerInterface} from "Container/Container";
-import {DatabaseAdapterInstance, DatabaseAdapterProvider} from "Documents/Adapter/Database/DatabaseAdapter";
-import {S3Adapter} from "Documents/Adapter/S3/S3Adapter";
-import {FileLinkService} from "Documents/Adapter/S3/FileLinkService";
-import {IdGenerator} from "IdGenerator/IdGenerator";
+import { ContainerInterface } from 'Container/Container';
+import { DatabaseAdapterProvider, DocumentsDatabaseAdapterInstance } from 'Documents/Adapter/Database/DatabaseAdapter';
+import { CalculationsRepository } from 'Documents/Adapter/Repository/CalculationsRepository';
+import { DocumentsImageCacheRepository } from 'Documents/Adapter/Repository/DocumentsImageCacheRepository';
+import { DocumentsPdfPageRepository } from 'Documents/Adapter/Repository/DocumentsPdfPageRepository';
+import { FileLinkService } from 'Documents/Adapter/S3/FileLinkService';
+import { S3Adapter } from 'Documents/Adapter/S3/S3Adapter';
+import { Documents } from 'Documents/index';
+import { CacheService } from 'Documents/Service/CacheService';
+import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { QueueSender } from 'shared/hkek-sqs/QueueSender';
+import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { GeneratePdfEventHandler } from 'SimpleAggregator/EventBus/GeneratePdfEventHandler';
 
 export class AdapterServiceProvider {
-    private config: Documents.Config;
+  private config: Documents.Config;
 
-    constructor(config: Documents.Config) {
-        this.config = config;
-    }
+  constructor(config: Documents.Config) {
+    this.config = config;
+  }
 
-    public boot(container: ContainerInterface) {
-        container
-            .addClass(IdGenerator)
+  public boot(container: ContainerInterface) {
+    container.addSingleton(IdGenerator);
 
-        // database
-        container
-            .addAsValue(DatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
+    container
+      .addAsValue(SimpleEventBus.getClassName(), new SimpleEventBus(container))
+      .addObjectFactory('PdfGeneratorQueueSender', () => new QueueSender(this.config.pdfGeneratorQueue), [])
+      .addObjectFactory(GeneratePdfEventHandler, (queueSender: QueueSender) => new GeneratePdfEventHandler(queueSender), ['PdfGeneratorQueueSender']);
 
-        // s3
-        container
-            .addAsValue('S3Config', this.config.s3)
-            .addClass(S3Adapter, ['S3Config'])
-            .addClass(FileLinkService, [S3Adapter.getClassName(), IdGenerator.getClassName()])
-    }
+    // database
+    container
+      .addAsValue(DocumentsDatabaseAdapterInstance, DatabaseAdapterProvider(this.config.database))
+      .addSingleton(DocumentsPdfPageRepository, [DocumentsDatabaseAdapterInstance, SimpleEventBus])
+      .addSingleton(CalculationsRepository, [DocumentsDatabaseAdapterInstance])
+      .addSingleton(DocumentsPdfPageRepository, [DocumentsDatabaseAdapterInstance, SimpleEventBus])
+      .addSingleton(DocumentsImageCacheRepository, [DocumentsDatabaseAdapterInstance]);
+
+    container.addSingleton(CacheService, [DocumentsImageCacheRepository, IdGenerator]);
+
+    // s3
+    container
+      .addAsValue('S3Config', this.config.s3)
+      .addAsValue('chromiumEndpoint', this.config.chromiumEndpoint)
+      .addSingleton(S3Adapter, ['S3Config'])
+      .addSingleton(FileLinkService, [S3Adapter, CacheService, IdGenerator]);
+  }
 }

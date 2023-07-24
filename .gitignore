@@ -5,9 +5,14 @@ build
 .env
 .env.*
 !.env.dist
+!.env.saas.dist
+!.env.functions.dist
 test/.env.characterization
 test/artifacts/*
 yarn-error.log
 .serverless
 .esbuild
 .current-aws-profile
+chromium-*.zip
+chromium-*.tar
+reinvest-*.pem

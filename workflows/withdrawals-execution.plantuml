@@ -1,0 +1,27 @@
+@startuml
+
+actor "Admin" as Ad
+participant "Admin API" as AdA
+database "DB" as DB
+participant Vertalo as V
+participant "North Capital" as NC
+
+Ad -> AdA: Generate Redemption Document (PDF)
+DB -> AdA: funds_requests(ACCEPTED, redemptionId == null)
+AdA -> DB: redemptions(CREATED)
+AdA -> DB: funds_requests(redemptionId)
+
+Ad -> V: Send Redemption Document (manually)
+Ad -> AdA: Mark Redemption Document as sent
+AdA -> DB: redemptions(REDEEMED)
+Ad -> AdA: Generate Payout Document (PDF)
+DB -> AdA: funds_requests(ACCEPTED, payoutId == null)
+DB -> AdA: dividends_requests(ACCEPTED, payoutId == null)
+AdA -> DB: payouts(CREATED)
+AdA -> DB: funds_requests(payoutId)
+AdA -> DB: dividends_requests(payoutId)
+Ad -> NC: Send Payout Document (manually)
+Ad -> AdA: Mark as paid
+AdA -> DB: payouts(PAID)
+
+@enduml

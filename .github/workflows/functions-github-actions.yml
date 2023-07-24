@@ -12,8 +12,9 @@ jobs:
     steps:
       - name: Set up environment
         run: |
-          CURRENT_BRANCH=${GITHUB_REF##*/} 
+          CURRENT_BRANCH=${GITHUB_REF##*/}
           echo "Current branch: ${CURRENT_BRANCH}"
+          SHARED_ENVIRONMENT="TEST"
           if [ $CURRENT_BRANCH == "development" ]; then
             ENVIRONMENT="DEVELOPMENT"
           elif [ $CURRENT_BRANCH == "integrations" ]; then
@@ -22,26 +23,58 @@ jobs:
             ENVIRONMENT="STAGING"
           elif [ $CURRENT_BRANCH == "main" ]; then
             ENVIRONMENT="PRODUCTION"
+            SHARED_ENVIRONMENT="PRODUCTION"
           else
             echo "Wrong branch";
             exit 1;
           fi
           echo "Current environment: ${ENVIRONMENT}"
           echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
+          echo "SHARED_ENVIRONMENT=${SHARED_ENVIRONMENT}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
+      - name: Authenticate with private NPM package
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - name: "Install dependencies"
         run: yarn install
+      - name: "Install dependencies for pdf generator"
+        run: cd devops/functions/pdfGenerator && yarn install
       - name: "Run unit tests"
         run: yarn tdd
       - name: "Deploy functions and migrate db"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
-          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
+          API_DOMAIN: ${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}
+          BACKEND_URL: https://${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}
+          API_URL: https://${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}/api
+          API_CERTIFICATE_NAME: ${{ vars[format('{0}_API_CERTIFICATE_NAME', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_USER: ${{ vars[format('{0}_POSTGRESQL_USER', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_HOST: ${{ vars[format('{0}_POSTGRESQL_HOST', env.ENVIRONMENT)] }}
+          POSTGRESQL_DB_NAME: ${{ vars[format('{0}_POSTGRESQL_DB_NAME', env.ENVIRONMENT)] }}
+          WEB_APP_URL: ${{ vars[format('{0}_WEB_APP_URL', env.ENVIRONMENT)] }}
+          EMAIL_SEND_FROM: ${{ vars.EMAIL_SEND_FROM }}
+          EMAIL_REPLY_TO: ${{ vars.EMAIL_REPLY_TO }}
+          EMAIL_DOMAIN: ${{ vars.EMAIL_DOMAIN }}
+          NORTH_CAPITAL_CLIENT_ID: ${{ secrets[format('{0}_NORTH_CAPITAL_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
+          NORTH_CAPITAL_DEVELOPER_API_KEY: ${{ secrets[format('{0}_NORTH_CAPITAL_DEVELOPER_API_KEY', env.SHARED_ENVIRONMENT)] }}
+          NORTH_CAPITAL_API_URL: ${{ vars[format('{0}_NORTH_CAPITAL_API_URL', env.SHARED_ENVIRONMENT)] }}
+          VERTALO_API_URL: ${{ vars[format('{0}_VERTALO_API_URL', env.SHARED_ENVIRONMENT)] }}
+          VERTALO_CLIENT_ID: ${{ secrets[format('{0}_VERTALO_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
+          VERTALO_CLIENT_SECRET: ${{ secrets[format('{0}_VERTALO_CLIENT_SECRET', env.SHARED_ENVIRONMENT)] }}
+          SNS_ORIGINATION_NUMBER: ${{ vars.SNS_ORIGINATION_NUMBER }}
+          SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+          CHROMIUM_ENDPOINT: ${{ vars.CHROMIUM_ENDPOINT }}
+          DEALPATH_API_URL: ${{ vars[format('{0}_DEALPATH_API_URL', env.SHARED_ENVIRONMENT)] }}
+          DEALPATH_AUTHORIZATION_TOKEN: ${{ secrets[format('{0}_DEALPATH_AUTHORIZATION_TOKEN', env.SHARED_ENVIRONMENT)] }}
+          DEALPATH_VERSION_HEADER: ${{ vars[format('{0}_DEALPATH_VERSION_HEADER', env.SHARED_ENVIRONMENT)] }}
+          #          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets[format('{0}_FIREBASE_SERVICE_ACCOUNT_JSON', env.SHARED_ENVIRONMENT)] }}
+          SEGMENT_API_KEY: ${{ secrets[format('{0}_SEGMENT_API_KEY', env.SHARED_ENVIRONMENT)] }}
+          ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
+          PROFILEID_HASH_KEY: ${{ secrets[format('{0}_PROFILEID_HASH_KEY', env.SHARED_ENVIRONMENT)] }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:functions"
