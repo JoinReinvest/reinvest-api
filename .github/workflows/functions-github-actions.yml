@@ -51,12 +51,12 @@ jobs:
           BACKEND_URL: https://${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}
           API_URL: https://${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}/api
           API_CERTIFICATE_NAME: ${{ secrets[format('{0}_API_CERTIFICATE_NAME', env.SHARED_ENVIRONMENT)] }}
-          POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
-          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
+          POSTGRESQL_USER: ${{ vars[format('{0}_POSTGRESQL_USER', env.SHARED)] }}
+          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.SHARED_ENVIRONMENT)] }}
           POSTGRESQL_HOST: ${{ secrets[format('{0}_POSTGRESQL_HOST', env.ENVIRONMENT)] }}
           POSTGRESQL_DB_NAME: ${{ secrets[format('{0}_POSTGRESQL_DB_NAME', env.ENVIRONMENT)] }}
           WEB_APP_URL: ${{ secrets[format('{0}_WEB_APP_URL', env.ENVIRONMENT)] }}
-          EMAIL_SEND_FROM: ${{ secrets.EMAIL_SEND_FROM }}
+          EMAIL_SEND_FROM: ${{ vars.EMAIL_SEND_FROM }}
           EMAIL_REPLY_TO: ${{ secrets.EMAIL_REPLY_TO }}
           EMAIL_DOMAIN: ${{ secrets[format('{0}_EMAIL_DOMAIN', env.SHARED_ENVIRONMENT)] }}
           NORTH_CAPITAL_CLIENT_ID: ${{ secrets[format('{0}_NORTH_CAPITAL_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
@@ -65,15 +65,15 @@ jobs:
           VERTALO_API_URL: ${{ secrets[format('{0}_VERTALO_API_URL', env.SHARED_ENVIRONMENT)] }}
           VERTALO_CLIENT_ID: ${{ secrets[format('{0}_VERTALO_CLIENT_ID', env.SHARED_ENVIRONMENT)] }}
           VERTALO_CLIENT_SECRET: ${{ secrets[format('{0}_VERTALO_CLIENT_SECRET', env.SHARED_ENVIRONMENT)] }}
-          SNS_ORIGINATION_NUMBER: ${{ secrets.SNS_ORIGINATION_NUMBER }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          CHROMIUM_ENDPOINT: ${{ secrets.CHROMIUM_ENDPOINT }}
+          SNS_ORIGINATION_NUMBER: ${{ vars.SNS_ORIGINATION_NUMBER }}
+          SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+          CHROMIUM_ENDPOINT: ${{ vars.CHROMIUM_ENDPOINT }}
           DEALPATH_API_URL: ${{ secrets[format('{0}_DEALPATH_API_URL', env.SHARED_ENVIRONMENT)] }}
           DEALPATH_AUTHORIZATION_TOKEN: ${{ secrets[format('{0}_DEALPATH_AUTHORIZATION_TOKEN', env.SHARED_ENVIRONMENT)] }}
           DEALPATH_VERSION_HEADER: ${{ secrets[format('{0}_DEALPATH_VERSION_HEADER', env.SHARED_ENVIRONMENT)] }}
 #          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets[format('{0}_FIREBASE_SERVICE_ACCOUNT_JSON', env.SHARED_ENVIRONMENT)] }}
           SEGMENT_API_KEY: ${{ secrets[format('{0}_SEGMENT_API_KEY', env.SHARED_ENVIRONMENT)] }}
-          ADMIN_EMAIL: ${{ secrets[format('{0}_ADMIN_EMAIL', env.SHARED_ENVIRONMENT)] }}
+          ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
           PROFILEID_HASH_KEY: ${{ secrets[format('{0}_PROFILEID_HASH_KEY', env.SHARED_ENVIRONMENT)] }}
         run: |
           environment=${{env.ENVIRONMENT}}
