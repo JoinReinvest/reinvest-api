@@ -181,6 +181,7 @@ const serverlessConfiguration: AWS = {
       endpointType: 'regional',
       certificateName: '${env:API_CERTIFICATE_NAME}',
       autoDomain: true,
+      stage: '${sls:stage}',
     },
     serverlessTerminationProtection: {
       stages: ['production'],
