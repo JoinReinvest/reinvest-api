@@ -45,7 +45,7 @@ const serverlessConfiguration: AWS = {
       BACKEND_URL: '${env:BACKEND_URL}',
       API_URL: '${env:API_URL}',
       POSTGRESQL_HOST: '${env:POSTGRESQL_HOST}',
-      POSTGRESQL_DB: '${env:POSTGRESQL_DB_NAME}',
+      POSTGRESQL_DB_NAME: '${env:POSTGRESQL_DB_NAME}',
       CognitoUserPoolID: importOutput('CognitoUserPoolID'),
       S3_BUCKET_AVATARS: importOutput('AvatarsBucketName'),
       S3_BUCKET_DOCUMENTS: importOutput('DocumentsBucketName'),

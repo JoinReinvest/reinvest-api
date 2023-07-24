@@ -28,7 +28,7 @@ export const DATABASE_CONFIG = {
   host: process.env.POSTGRESQL_HOST as string,
   user: process.env.POSTGRESQL_USER as string,
   password: process.env.POSTGRESQL_PASSWORD as string,
-  database: process.env.POSTGRESQL_DB as string,
+  database: process.env.POSTGRESQL_DB_NAME as string,
 };
 
 export const S3_CONFIG = {

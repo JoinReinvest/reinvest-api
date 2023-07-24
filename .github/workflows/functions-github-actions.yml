@@ -51,7 +51,7 @@ jobs:
           BACKEND_URL: https://${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}
           API_URL: https://${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}/api
           API_CERTIFICATE_NAME: ${{ vars[format('{0}_API_CERTIFICATE_NAME', env.SHARED_ENVIRONMENT)] }}
-          POSTGRESQL_USER: ${{ vars[format('{0}_POSTGRESQL_USER', env.SHARED)] }}
+          POSTGRESQL_USER: ${{ vars[format('{0}_POSTGRESQL_USER', env.SHARED_ENVIRONMENT)] }}
           POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.SHARED_ENVIRONMENT)] }}
           POSTGRESQL_HOST: ${{ vars[format('{0}_POSTGRESQL_HOST', env.ENVIRONMENT)] }}
           POSTGRESQL_DB_NAME: ${{ vars[format('{0}_POSTGRESQL_DB_NAME', env.ENVIRONMENT)] }}
