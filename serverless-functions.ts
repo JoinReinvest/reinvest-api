@@ -40,6 +40,7 @@ const serverlessConfiguration: AWS = {
     region: 'us-east-1',
     environment: {
       ...ProviderEnvironment,
+      BASE_PATH: '/${sls:stage}',
       ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
       BACKEND_URL: '${env:BACKEND_URL}',
       API_URL: '${env:API_URL}',
