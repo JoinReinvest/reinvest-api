@@ -18,7 +18,7 @@ export const AdminLambdaFunction = {
     {
       httpApi: {
         method: 'POST',
-        path: '/api/admin',
+        path: '/${sls:stage}/api/admin',
         authorizer: {
           name: CognitoAuthorizerName,
         },
