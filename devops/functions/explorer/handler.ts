@@ -2,7 +2,7 @@ import express, { Request } from 'express';
 import serverless from 'serverless-http';
 
 const hostedUI = process.env.ExplorerHostedUI;
-const apiEndpoint = process.env.ApiUrl;
+const apiEndpoint = process.env.API_URL;
 
 const page = (apiUrl: string, token: string, isAdmin: boolean) => `
 <html lang="en">
