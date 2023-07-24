@@ -48,8 +48,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           API_DOMAIN: ${{ vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)] }}
-          BACKEND_URL: ${{ vars[format('https://{0}_API_DOMAIN', env.ENVIRONMENT)] }}
-          API_URL: ${{ vars[format('https://{0}_API_DOMAIN/api', env.ENVIRONMENT)] }}
+          BACKEND_URL: ${{ join(["https://", vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)]]) }}
+          API_URL: ${{ join(["https://", vars[format('{0}_API_DOMAIN', env.ENVIRONMENT)], "/api"]) }}
           API_CERTIFICATE_NAME: ${{ secrets[format('{0}_API_CERTIFICATE_NAME', env.SHARED_ENVIRONMENT)] }}
           POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
           POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}

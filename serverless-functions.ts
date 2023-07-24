@@ -41,6 +41,8 @@ const serverlessConfiguration: AWS = {
     environment: {
       ...ProviderEnvironment,
       ExplorerHostedUI: CognitoEnvs.WebsiteExplorerHostedUI,
+      BACKEND_URL: '${env:BACKEND_URL}',
+      API_URL: '${env:API_URL}',
       POSTGRESQL_HOST: '${env:POSTGRESQL_HOST}',
       POSTGRESQL_DB: '${env:POSTGRESQL_DB_NAME}',
       CognitoUserPoolID: importOutput('CognitoUserPoolID'),
