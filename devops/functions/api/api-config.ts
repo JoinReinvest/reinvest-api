@@ -18,7 +18,7 @@ export const ApiLambdaFunction = {
     {
       httpApi: {
         method: 'POST',
-        path: '/${sls:stage}/api',
+        path: '/api',
         authorizer: {
           name: CognitoAuthorizerName,
         },

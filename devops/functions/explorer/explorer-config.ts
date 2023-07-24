@@ -14,19 +14,19 @@ export const ExplorerLambdaFunction = {
     {
       httpApi: {
         method: 'GET',
-        path: '/${sls:stage}/explorer/admin',
+        path: '/explorer/admin',
       },
     },
     {
       httpApi: {
         method: 'GET',
-        path: '/${sls:stage}/explorer',
+        path: '/explorer',
       },
     },
     {
       httpApi: {
         method: 'GET',
-        path: '/${sls:stage}/set-header',
+        path: '/set-header',
       },
     },
   ],
