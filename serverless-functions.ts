@@ -82,6 +82,7 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
+      disableDefaultEndpoint: true,
     },
     logs: {
       httpApi: false, // turn on Api Gateway logs
@@ -175,7 +176,7 @@ const serverlessConfiguration: AWS = {
     // },
     customDomain: {
       domainName: '${env:API_DOMAIN}',
-      basePath: '',
+      basePath: '*',
       createRoute53Record: true,
       apiType: 'http',
       endpointType: 'regional',
