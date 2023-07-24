@@ -120,5 +120,5 @@ app.get('/explorer/admin', (req: any, res: any) => {
 });
 
 export const main = serverless(app, {
-  basePath: process.env.BASE_PATH,
+  basePath: '',
 });

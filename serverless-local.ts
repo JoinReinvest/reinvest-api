@@ -49,6 +49,7 @@ const serverlessConfiguration: AWS = {
       ExplorerHostedUI: '${env:LocalHostedUiUrl}',
       BACKEND_URL: '${env:BACKEND_URL}',
       API_URL: '${env:API_URL}',
+      BASE_PATH: '/test',
       SQS_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-notification',
       SQS_PDF_GENERATOR_URL: 'http://localhost:9324/000000000000/development-sqs-pdf-generator',
       SQS_FIREBASE_QUEUE_URL: 'http://localhost:9324/000000000000/development-sqs-firebase',
