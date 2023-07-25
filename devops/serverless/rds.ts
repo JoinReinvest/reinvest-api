@@ -50,7 +50,8 @@ const RdsResourcesConfiguration = {
   },
 };
 
-if (process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER) {
+//@ts-ignore
+if (process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER && process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER != 0) {
   console.log('RDS snapshot identifier is set, so we will restore from snapshot: ', process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER);
   // @ts-ignore
   RdsResourcesConfiguration.RdsPostgresDBInstance.Properties['DBSnapshotIdentifier'] = process.env.POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER;
