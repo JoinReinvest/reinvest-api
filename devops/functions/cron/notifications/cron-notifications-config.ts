@@ -1,4 +1,5 @@
 import { CloudwatchPolicies } from '../../../serverless/cloudwatch';
+import { SESSendPolicy } from '../../../serverless/ses';
 import { getAttribute, getResourceName } from '../../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../../serverless/vpc';
 import { SQSSendPolicy } from '../../queue/queue-config';
@@ -44,6 +45,7 @@ export const CronNotificationsResources = {
               ...CloudwatchPolicies,
               ...EniPolicies,
               ...SQSSendPolicy,
+              ...SESSendPolicy,
               {
                 Effect: 'Allow',
                 Action: ['lambda:InvokeFunction'],

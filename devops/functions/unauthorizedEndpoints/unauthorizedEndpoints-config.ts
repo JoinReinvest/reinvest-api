@@ -1,4 +1,5 @@
 import { CloudwatchPolicies } from '../../serverless/cloudwatch';
+import { SESSendPolicy } from '../../serverless/ses';
 import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
 import { SQSSendPolicy } from '../queue/queue-config';
@@ -53,7 +54,7 @@ export const UnauthorizedEndpointsLambdaResources = {
         {
           PolicyName: 'UnauthorizedEndpointsLambdaPolicy',
           PolicyDocument: {
-            Statement: [...CloudwatchPolicies, ...EniPolicies, ...SQSSendPolicy],
+            Statement: [...CloudwatchPolicies, ...EniPolicies, ...SQSSendPolicy, ...SESSendPolicy],
           },
         },
       ],
