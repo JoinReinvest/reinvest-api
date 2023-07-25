@@ -36,6 +36,6 @@ export class PortsProvider {
     container.addSingleton(AdminVerificationActions, [VerifierRepository]);
     container.addSingleton(PrincipalApprovals, [MarkAccountAsApproved, MarkAccountAsDisapproved, MarkAccountAsNeedMoreInfo]);
     container.addSingleton(UserVerificationActions, [VerifierRepository]);
-    container.addSingleton(NorthCapitalVerificationEvents, [VerifierRepository]);
+    container.addSingleton(NorthCapitalVerificationEvents, [RegistrationService, VerifierRepository]);
   }
 }
