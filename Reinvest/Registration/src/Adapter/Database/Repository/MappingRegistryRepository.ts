@@ -164,8 +164,6 @@ export class MappingRegistryRepository {
 
       return true;
     } catch (error: any) {
-      console.log(error);
-
       return false;
     }
   }
