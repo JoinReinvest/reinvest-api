@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import { AdminLambdaFunction, AdminLambdaResources } from './devops/functions/admin/admin-config';
 import { ApiLambdaFunction, ApiLambdaResources } from './devops/functions/api/api-config';
+import { CronDealpathSyncFunction, CronDealpathSyncResources } from './devops/functions/cron/dealpathSync/cron-dealpath-sync-config';
 import {
   CronDividendsCalculationFunction,
   CronDividendsCalculationResources,
@@ -110,6 +111,7 @@ const serverlessConfiguration: AWS = {
     cronNotificationsFunction: CronNotificationsFunction,
     cronPushEveryDay: CronPushEveryDayFunction,
     cronRecurringInvestments: CronRecurringInvestmentsFunction,
+    cronDealpathSyncFunction: CronDealpathSyncFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     pdfGenerator: PdfGeneratorFunction,
@@ -134,6 +136,7 @@ const serverlessConfiguration: AWS = {
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
       ...CronRecurringInvestmentsResources,
+      ...CronDealpathSyncResources,
       ...PdfGeneratorResources,
       ...FirebaseResources,
       ...SegmentResources,

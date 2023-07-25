@@ -1,6 +1,7 @@
 import { CloudwatchPolicies } from '../../serverless/cloudwatch';
 import { CognitoAuthorizerName, CognitoUpdateAttributesPolicyBasedOnOutputArn } from '../../serverless/cognito';
 import { S3PoliciesWithImport } from '../../serverless/s3';
+import { SESSendPolicy } from '../../serverless/ses';
 import { SMSPolicy } from '../../serverless/sns';
 import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
@@ -53,6 +54,7 @@ export const ApiLambdaResources = {
               ...S3PoliciesWithImport,
               ...CognitoUpdateAttributesPolicyBasedOnOutputArn,
               ...SQSSendPolicy,
+              ...SESSendPolicy,
               SMSPolicy,
             ],
           },

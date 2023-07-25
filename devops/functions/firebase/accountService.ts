@@ -1,6 +1,31 @@
 import admin from 'firebase-admin';
+import { DatabaseProvider } from 'PostgreSQL/DatabaseProvider';
+import { DATABASE_CONFIG } from 'Reinvest/config';
 
-const serviceAccount =
-  '{"type":"service_account","project_id":"reinvest-bb445","private_key_id":"178b718e9266a08e81a20fb2b748486064a2e81c","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQChvD0b2NUffOcJ\\nONdHwrVIjoqpHukn1+3pdD3PXwL3ILxSxV75TfWX7xAfTxuddBO5Tef1MgomIHTc\\naIkT6gBevTi3Lyfp3XjcRHbi/+vRsR1BVyciuqjtEW8UUt1YU4271smfbDNh3UIa\\n0R2GnrOZa+MZRZExp6t4cmI4rKUIO4tZvOUsvjcz+iiOkDRHrhDullvKfS89mnHW\\n7EEVCHs74BFSHmgJpyxHmEhUfhpz7tKUcTMtxfaDs1BOYCtBOqETQ85r5ottUXR4\\nFAcmz6FBQB4ybf2F+qJb2uc37gIzh2sbQ98jF0/idaPzucHnlYNM8HWpz8+C7BaE\\nodzDmxeTAgMBAAECggEALYMVByMLRiMVuIigO/dUoChMaK7kGWwv7MPjKNmpsfUq\\nSXh08162v5xsQwM12Cbz7e84WM1OAdCcUfGwsUPl+sLwlMvWRX8nJYS2l8ZAi+91\\nNg/aWXGBW8TOJz/yPYq1lagpcI04IE/s7DLwRhOeoouzikcDRp/SJsC5Vw1uG1SD\\nqTC1lFaisMfNQW8cFXEvPz6NaUwU4r8ajFkUxn7RczwzYs0gsAVY57YUAsIgkYnt\\nHff+AyH2W52UrvXlF3s22ljNe/Eo83tedpWI6foyw5mqTQVlBW1E/8xZwy2uwKfj\\nQnPwJtEZfoq/mgciDF6/8Zl4eD3LuIUrU7baQA7pwQKBgQDN0c7YQsmNKDh5plqN\\nNqVlHXFBdSwLN0NLZw4CIWSg8L+31pnEyEsvZmjaW800rv2w+eABrYox3hjhGYSx\\npCw/5vIsDv4NLmfj0w70PhpK2sOb1pvF+4NWOYuIh+p9CFrpl6lxIlt9Cw0SrQsM\\n4faOm3tKkNW719s32ZR5o04fsQKBgQDJKutuGLugFlPMQ0tCOYWmOw/+fUZIcB3U\\ndheWjIjzjooBfRDRmmTUzaeI8fhzjuGMGl8N3aCqOP8R8ancw0f7ijeYW6ZgsoMJ\\nvwiUNO3oWgru7dt2G0zQhQP48ZjUO28VAz1VOmElcMQutSr4003F9rS+d0+WJgrY\\n79FrlMbggwKBgQCtuTsDNRRUji9lFvH1obtnJrvSyWj8qo+llH2xdKgwZCUesgem\\nnn0/rAwyyyvhHRdLCw51vBoaT2Hmlhh3rKAg6/lbEOiFDbdpCFvl8olUx2Q2JKXl\\nLY9E91t8SWS2VpgN9RJzSNG6MNq++cqK/CuVYU1muet+GwuRD5kQNrQZcQKBgBtx\\n1I6/pxFPGn2ajLDrQhWMp0Dz/FuzmA49UjiC0chQoPlVA69k3e6+Y+XmBRxW2OSR\\nUHiGzP2MKxhanO72YWKq16zcjBVTJVd2DYiStAZoCmfQYYl6bf9gtksHQu9pcF0w\\nhPSUs141RT6ODt/FjC2+26fEhUIZzI8OIMcJlBxbAoGAdzV11b5vBjV3RFPYwZ79\\nPQIxlo1tV+biliu7pu2sSi29mlnK/+6Zv4LDBcOqR5lXwm78eOWOKi9HKZ4mKimm\\nbcdOGywLPdV3Gyz36LUlbJz9PsQMvmRKkVPsfWbmUfuLoLS0pM+DvIkXp1tnBjwp\\nWA2USAZSM9UROfxCfiDsHVE=\\n-----END PRIVATE KEY-----\\n","client_email":"firebase-adminsdk-ufyw9@reinvest-bb445.iam.gserviceaccount.com","client_id":"102076000867200974716","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ufyw9%40reinvest-bb445.iam.gserviceaccount.com","universe_domain":"googleapis.com"}';
+export interface SystemConfiguration {
+  system_configuration: {
+    id: number;
+    key: string;
+    value: string;
+  };
+}
 
-export const firebaseServiceAccount = <admin.ServiceAccount>JSON.parse(serviceAccount);
+export async function getFirebaseServiceAccount(): Promise<admin.ServiceAccount> {
+  const result = await getDatabaseProvider()
+    .provide()
+    .selectFrom('system_configuration')
+    .select('value')
+    .where('key', '=', 'FIREBASE_SERVICE_ACCOUNT')
+    .executeTakeFirst();
+
+  if (!result) {
+    console.error('FIREBASE_SERVICE_ACCOUNT not found');
+    throw new Error('FIREBASE_SERVICE_ACCOUNT not found');
+  }
+
+  return <admin.ServiceAccount>JSON.parse(result.value);
+}
+
+function getDatabaseProvider() {
+  return new DatabaseProvider<SystemConfiguration>(DATABASE_CONFIG);
+}

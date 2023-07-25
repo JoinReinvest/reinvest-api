@@ -8,6 +8,7 @@ echo "2. Go to the 'Amazon RDS/Snapshots/System' and find the latest snapshot fo
 echo "3. Copy the snapshot ARN"
 echo "4. Enter the ARN below and click 'Enter'"
 echo "5. Wait for the database to be restored"
+echo "5.1 WARNING! The stack deployment should fail as it should not be able to remove old database instance. This is expected. Confirm in the 'reinvest-${NODE_ENV}' stack that the error was caused by the database instance removal."
 echo "6. Go to the 'AWS/Cloudformation/Stacks/reinvest-${NODE_ENV}/Outputs. Find 'DatabaseHost' variable. Copy the value and replace Github Actions '${NODE_ENV}_POSTGRESQL_HOST' variable with it in Github/reinvest-api/Settings/Security/Secrets and variables/Actions"
 echo "7. Run the functions pipeline to deploy the functions with the new database host"
 echo "8. Optional: Delete the old database instance manually"

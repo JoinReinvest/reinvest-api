@@ -1,29 +1,28 @@
 import { CloudwatchPolicies } from '../../../serverless/cloudwatch';
-import { SESSendPolicy } from '../../../serverless/ses';
 import { getAttribute, getResourceName } from '../../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../../serverless/vpc';
 import { SQSSendPolicy } from '../../queue/queue-config';
 
-export const CronNotificationsFunction = {
-  handler: `devops/functions/cron/notifications/handler.main`,
-  role: 'CronNotificationsRole',
+export const CronDealpathSyncFunction = {
+  handler: `devops/functions/cron/dealpathSync/handler.main`,
+  role: 'CronDealpathSyncRole',
   timeout: 60,
   vpc: {
-    securityGroupIds: [getAttribute('CronNotificationsSecurityGroup', 'GroupId')],
+    securityGroupIds: [getAttribute('CronDealpathSyncSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],
   },
   events: [
     {
       schedule: {
-        rate: ['rate(1 minute)'],
+        rate: ['cron(0 13 ? * MON *)'],
         enabled: process.env?.DISABLE_CRON ? false : true,
       },
     },
   ],
 };
 
-export const CronNotificationsResources = {
-  CronNotificationsRole: {
+export const CronDealpathSyncResources = {
+  CronDealpathSyncRole: {
     Type: 'AWS::IAM::Role',
     Properties: {
       AssumeRolePolicyDocument: {
@@ -39,13 +38,12 @@ export const CronNotificationsResources = {
       },
       Policies: [
         {
-          PolicyName: 'NotificationsPolicy',
+          PolicyName: 'CronDealpathSyncPolicy',
           PolicyDocument: {
             Statement: [
               ...CloudwatchPolicies,
               ...EniPolicies,
               ...SQSSendPolicy,
-              ...SESSendPolicy,
               {
                 Effect: 'Allow',
                 Action: ['lambda:InvokeFunction'],
@@ -57,11 +55,11 @@ export const CronNotificationsResources = {
       ],
     },
   },
-  CronNotificationsSecurityGroup: {
+  CronDealpathSyncSecurityGroup: {
     Type: 'AWS::EC2::SecurityGroup',
     Properties: {
-      GroupName: getResourceName('sg-cronNotifications-lambda'),
-      GroupDescription: getResourceName('sg-cronNotifications-lambda'),
+      GroupName: getResourceName('sg-cronDealpathSync-lambda'),
+      GroupDescription: getResourceName('sg-cronDealpathSync-lambda'),
       SecurityGroupIngress: SecurityGroupIngressRules,
       SecurityGroupEgress: SecurityGroupEgressRules,
       VpcId: importVpcRef(),

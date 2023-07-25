@@ -30,6 +30,7 @@ import { S3Resources } from './devops/serverless/s3';
 import { ProviderEnvironment } from './devops/serverless/serverless-common';
 import { SesResources } from './devops/serverless/ses';
 import { VpcResources } from './devops/serverless/vpc';
+import { CronDealpathSyncFunction, CronDealpathSyncResources } from './devops/functions/cron/dealpathSync/cron-dealpath-sync-config';
 
 const serverlessConfiguration: AWS = {
   service: 'reinvest-local',
@@ -84,6 +85,7 @@ const serverlessConfiguration: AWS = {
     cronNotificationsFunction: CronNotificationsFunction,
     cronPushEveryDay: CronPushEveryDayFunction,
     cronRecurringInvestments: CronRecurringInvestmentsFunction,
+    cronDealpathSyncFunction: CronDealpathSyncFunction,
     cognitoPostSignUpFunction,
     cognitoPreSignUpFunction,
     unauthorizedEndpoints: UnauthorizedEndpointsFunction,
@@ -113,6 +115,7 @@ const serverlessConfiguration: AWS = {
       ...CronDividendsCalculationResources,
       ...CronDividendsDistributionResources,
       ...CronRecurringInvestmentsResources,
+      ...CronDealpathSyncResources,
       ...PdfGeneratorResources,
       ...FirebaseResources,
       ...SegmentResources,
