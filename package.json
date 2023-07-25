@@ -63,6 +63,7 @@
     "local:invoke:cronDividendsDistribution": "NODE_ENV=development sls invoke local -s development --function cronDividendsDistribution --config serverless-local.ts",
     "local:invoke:cronRecurringInvestments": "NODE_ENV=development sls invoke local -s development --function cronRecurringInvestments --config serverless-local.ts",
     "local:invoke:cronPushEveryDay": "NODE_ENV=development sls invoke local -s development --function cronPushEveryDay --config serverless-local.ts",
+    "local:invoke:cronDealpathSyncFunction": "NODE_ENV=development sls invoke local -s development --function cronDealpathSyncFunction --config serverless-local.ts",
     "local:invoke:migrateUp": "NODE_ENV=development sls invoke local -s development --function migration --config serverless-local.ts",
     "local:invoke:migrateDown": "NODE_ENV=development sls invoke local -s development --function migration --data 'down' --config serverless-local.ts",
     "local:server": "docker-compose -f docker-compose.yml up",
