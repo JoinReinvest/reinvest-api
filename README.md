@@ -146,20 +146,21 @@ mutation {
 ## Database Snapshot Restore Procedure:
 
 This is a database recovery procedure. This procedure creates a new database instance and restores the
-database from the snapshot. The old database instance is not deleted automatically. 
+database from the snapshot. The old database instance is not deleted automatically.
 The new instance host must be set up in Github Actions manually and redeployed to apply changes
 
 1. Go to the 'Amazon RDS/Snapshots/System' and find the latest snapshot for the database 'reinvest-<environement>-<
    randomized-string>'
 2. Copy the snapshot ARN
 3. Enter the ARN to GitHub Actions variables as `<ENVIRONMENT>POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER`
-   WARNING! Once you set up the snapshot ARN then it must stay there forever. If you remove it, Cloudformation will create new database. Use value `0` to not use snapshot at all
+   WARNING! Once you set up the snapshot ARN then it must stay there forever. If you remove it, Cloudformation will
+   create new database. Use value `0` to not use snapshot at all
 4. Run the `saas` pipeline `yarn <environment>:redeploy:saas`
 5. Wait the Github Actions pipeline to finish
    WARNING! The stack deployment should fail as it should not be able to remove old database instance. This is expected.
    Confirm in the 'reinvest-<environement>' stack that the error was caused by the database instance removal.
 6. Go to the 'AWS/Cloudformation/Stacks/reinvest-<environement>/Outputs. Find 'DatabaseHost' variable. Copy the value
-   and replace Github Actions '<ENVIRONMENT>_POSTGRESQL_HOST' variable with it in
+   and replace Github Actions `<ENVIRONMENT>_POSTGRESQL_HOST` variable with it in
    Github/reinvest-api/Settings/Security/Secrets and variables/Actions
-7. Run the `functions` pipeline to deploy the functions with the new database host
+7. Run the `functions` pipeline to deploy the functions with the new database host (push some change to the repository)
 8. Optional: Delete the old database instance manually
