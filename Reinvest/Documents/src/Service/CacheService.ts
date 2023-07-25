@@ -62,11 +62,12 @@ export class CacheService {
   }
 
   async getCache(fileName: string, catalog: string, expiresIn: number, getUrlCallback: () => Promise<string>) {
-    const imageUrl = await this.getUrl(catalog, fileName);
-
-    if (imageUrl) {
-      return imageUrl;
-    }
+    // TODO - it seems that presigned url is not working properly - must verify why it expires earlier than expected based on the expiresIn parameter
+    // const imageUrl = await this.getUrl(catalog, fileName);
+    //
+    // if (imageUrl) {
+    //   return imageUrl;
+    // }
 
     const url = await getUrlCallback();
     await this.createCache(url, catalog, fileName, expiresIn);

@@ -50,7 +50,7 @@
     "production:invoke:migrateUp": "NODE_ENV=production sls invoke -s production --function migration --config serverless-functions.ts",
     "production:invoke:migrateDown": "NODE_ENV=production sls invoke -s production --function migration --data 'down' --config serverless-functions.ts",
     "local": "NODE_ENV=development DISABLE_CRON=1 SLS_DEBUG=* serverless offline start -s development --ignoreJWTSignature --noTimeout --reloadHandler --config serverless-local.ts",
-    "local:prod": "NODE_ENV=development serverless offline start -s development --ignoreJWTSignature --config serverless-local.ts",
+    "local:prod": "NODE_ENV=development  DISABLE_CRON=1 serverless offline start -s development --ignoreJWTSignature --config serverless-local.ts",
     "local:invoke:postSignUp": "NODE_ENV=development sls invoke local -s development --function cognitoPostSignUpFunction --path ./devops/local/postSignUpRequest.json --config serverless-local.ts",
     "local:invoke:pdfGenerator": "NODE_ENV=development sls invoke local -s development --function pdfGenerator --path ./devops/local/pdfGeneratorEvent.json --config serverless-local.ts",
     "local:invoke:firebase": "NODE_ENV=development sls invoke local -s development --function firebase --path ./devops/local/firebasePushNotificationEvent.json --config serverless-local.ts",
