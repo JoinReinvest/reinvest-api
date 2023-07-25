@@ -1,5 +1,6 @@
 import { ArchivingBeneficiaryRepository } from 'Archiving/Adapter/Database/Repository/ArchivingBeneficiaryRepository';
 import { LegalEntitiesService } from 'Archiving/Adapter/Modules/LegalEntitiesService';
+import { WithdrawalsService } from 'Archiving/Adapter/Modules/WithdrawalsService';
 import { ArchivedBeneficiary } from 'Archiving/Domain/ArchivedBeneficiary';
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
@@ -10,15 +11,26 @@ export class InitArchivingBeneficiary {
   private legalEntitiesService: LegalEntitiesService;
   private archivingRepository: ArchivingBeneficiaryRepository;
   private idGenerator: IdGeneratorInterface;
+  private withdrawalsService: WithdrawalsService;
 
-  constructor(legalEntitiesService: LegalEntitiesService, archivingRepository: ArchivingBeneficiaryRepository, idGenerator: IdGeneratorInterface) {
+  constructor(
+    legalEntitiesService: LegalEntitiesService,
+    archivingRepository: ArchivingBeneficiaryRepository,
+    idGenerator: IdGeneratorInterface,
+    withdrawalsService: WithdrawalsService,
+  ) {
     this.legalEntitiesService = legalEntitiesService;
     this.archivingRepository = archivingRepository;
     this.idGenerator = idGenerator;
+    this.withdrawalsService = withdrawalsService;
   }
 
   async execute(profileId: UUID, accountId: UUID): Promise<boolean> {
     try {
+      if (await this.withdrawalsService.hasPendingWithdrawal(profileId, accountId)) {
+        throw new Error('Archiving Beneficiary has pending withdrawal');
+      }
+
       let beneficiary = await this.archivingRepository.getBy(profileId, accountId);
 
       if (beneficiary) {

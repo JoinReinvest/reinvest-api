@@ -8,6 +8,7 @@ import { ArchiveBeneficiary } from 'Archiving/UseCases/ArchiveBeneficiary';
 import { InitArchivingBeneficiary } from 'Archiving/UseCases/InitArchivingBeneficiary';
 import { ContainerInterface } from 'Container/Container';
 import { IdGenerator } from 'IdGenerator/IdGenerator';
+import { WithdrawalsService } from 'Archiving/Adapter/Modules/WithdrawalsService';
 
 export class UseCaseProvider {
   private config: Archiving.Config;
@@ -17,7 +18,7 @@ export class UseCaseProvider {
   }
 
   public boot(container: ContainerInterface) {
-    container.addSingleton(InitArchivingBeneficiary, [LegalEntitiesService, ArchivingBeneficiaryRepository, IdGenerator]);
+    container.addSingleton(InitArchivingBeneficiary, [LegalEntitiesService, ArchivingBeneficiaryRepository, IdGenerator, WithdrawalsService]);
     container.addSingleton(ArchiveBeneficiary, [
       LegalEntitiesService,
       InvestmentsService,

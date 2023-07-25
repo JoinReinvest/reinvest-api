@@ -10,6 +10,7 @@ import { IdGenerator } from 'IdGenerator/IdGenerator';
 import { QueueSender } from 'shared/hkek-sqs/QueueSender';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { SendToQueueEventHandler } from 'SimpleAggregator/EventBus/SendToQueueEventHandler';
+import { WithdrawalsService } from 'Archiving/Adapter/Modules/WithdrawalsService';
 
 export class AdapterServiceProvider {
   private config: Archiving.Config;
@@ -36,6 +37,7 @@ export class AdapterServiceProvider {
       .addSingleton(LegalEntitiesService, ['LegalEntities'])
       .addSingleton(RegistrationService, ['Registration'])
       .addSingleton(InvestmentsService, ['Investments'])
+      .addSingleton(WithdrawalsService, ['Withdrawals'])
       .addSingleton(SharesAndDividendsService, ['SharesAndDividends']);
   }
 }

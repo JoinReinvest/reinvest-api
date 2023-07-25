@@ -32,6 +32,16 @@ export class FundsWithdrawalRequestsQuery {
     return fundsWithdrawalRequest.getWithdrawalView();
   }
 
+  async getPendingWithdrawalRequest(profileId: UUID, accountId: UUID): Promise<WithdrawalRequestView | null> {
+    const fundsWithdrawalRequest = await this.fundsWithdrawalRequestsRepository.getPending(profileId, accountId);
+
+    if (!fundsWithdrawalRequest) {
+      return null;
+    }
+
+    return fundsWithdrawalRequest.getWithdrawalView();
+  }
+
   async listFundsWithdrawalsPendingRequests(pagination: Pagination): Promise<WithdrawalRequestView[]> {
     const requests = await this.fundsWithdrawalRequestsRepository.listPendingWithdrawalRequests(pagination);
 

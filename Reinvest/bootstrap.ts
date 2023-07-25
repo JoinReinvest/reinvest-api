@@ -253,6 +253,7 @@ export function boot(): Modules {
         investments: modules.get(Investments.moduleName) as Investments.Main,
         sharesAndDividends: modules.get(SharesAndDividends.moduleName) as SharesAndDividends.Main,
         registration: modules.get(Registration.moduleName) as Registration.Main,
+        withdrawals: modules.get(Withdrawals.moduleName) as Withdrawals.Main,
       },
     ),
   );

@@ -14,6 +14,7 @@ import { QueueConfig } from 'shared/hkek-sqs/QueueSender';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 
 import * as ArchivingMigrations from '../migrations';
+import { Withdrawals } from 'Withdrawals/index';
 
 export namespace Archiving {
   export const moduleName = 'Archiving';
@@ -27,6 +28,7 @@ export namespace Archiving {
     legalEntities: LegalEntities.Main;
     registration: Registration.Main;
     sharesAndDividends: SharesAndDividends.Main;
+    withdrawals: Withdrawals.Main;
   };
 
   export type ApiType = ArchivingApiType & Api;
@@ -53,6 +55,7 @@ export namespace Archiving {
       this.container.addAsValue('LegalEntities', this.modules.legalEntities);
       this.container.addAsValue('SharesAndDividends', this.modules.sharesAndDividends);
       this.container.addAsValue('Registration', this.modules.registration);
+      this.container.addAsValue('Withdrawals', this.modules.withdrawals);
 
       new AdapterServiceProvider(this.config).boot(this.container);
       new UseCaseProvider(this.config).boot(this.container);

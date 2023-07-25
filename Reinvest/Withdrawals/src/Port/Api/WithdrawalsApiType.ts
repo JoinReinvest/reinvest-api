@@ -9,6 +9,7 @@ export type WithdrawalsApiType = {
   createWithdrawalFundsRequest: WithdrawalsController['createWithdrawalFundsRequest'];
   getFundsWithdrawalAgreement: WithdrawalsAgreementController['getFundsWithdrawalAgreement'];
   getFundsWithdrawalRequest: WithdrawalsController['getFundsWithdrawalRequest'];
+  getPendingWithdrawalRequest: WithdrawalsController['getPendingWithdrawalRequest'];
   listDividendsWithdrawalsRequests: WithdrawalsController['listDividendsWithdrawalsRequests'];
   listFundsWithdrawalsPendingRequests: WithdrawalsController['listFundsWithdrawalsPendingRequests'];
   listWithdrawalsDocuments: WithdrawalsController['listWithdrawalsDocuments'];
@@ -24,6 +25,7 @@ export type WithdrawalsApiType = {
 
 export const WithdrawalsApi = (container: ContainerInterface): WithdrawalsApiType => ({
   getFundsWithdrawalAgreement: container.delegateTo(WithdrawalsAgreementController, 'getFundsWithdrawalAgreement'),
+  getPendingWithdrawalRequest: container.delegateTo(WithdrawalsController, 'getPendingWithdrawalRequest'),
   createFundsWithdrawalAgreement: container.delegateTo(WithdrawalsAgreementController, 'createFundsWithdrawalAgreement'),
   signFundsWithdrawalAgreement: container.delegateTo(WithdrawalsAgreementController, 'signFundsWithdrawalAgreement'),
   pushWithdrawalDocuments: container.delegateTo(WithdrawalsController, 'pushWithdrawalDocuments'),

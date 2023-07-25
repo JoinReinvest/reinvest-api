@@ -102,6 +102,10 @@ export class WithdrawalsController {
     return this.withdrawalRequestsQuery.getFundsWithdrawalRequest(profileId, accountId);
   }
 
+  async getPendingWithdrawalRequest(profileId: UUID, accountId: UUID) {
+    return this.withdrawalRequestsQuery.getPendingWithdrawalRequest(profileId, accountId);
+  }
+
   async abortFundsWithdrawalRequest(profileId: UUID, accountId: UUID) {
     return this.abortFundsWithdrawalRequestUseCase.execute(profileId, accountId);
   }

@@ -14,7 +14,7 @@ export const CronPushEveryDayFunction = {
   events: [
     {
       schedule: {
-        rate: ['rate(1 day)'],
+        rate: ['rate(3 hours)'],
         enabled: process.env?.DISABLE_CRON ? false : true,
       },
     },

@@ -145,6 +145,31 @@ export class FundsWithdrawalRequestsRepository {
     }
   }
 
+  async getPending(profileId: UUID, accountId: UUID): Promise<FundsWithdrawalRequest | null> {
+    try {
+      const fundsWithdrawalRequest = await this.databaseAdapterProvider
+        .provide()
+        .selectFrom(withdrawalsFundsRequestsTable)
+        .selectAll()
+        .where('profileId', '=', profileId)
+        .where('accountId', '=', accountId)
+        .where('status', 'in', [WithdrawalsFundsRequestsStatuses.REQUESTED, WithdrawalsFundsRequestsStatuses.DRAFT])
+        .orderBy('dateCreated', 'desc')
+        .castTo<FundsWithdrawalRequestSchema>()
+        .executeTakeFirst();
+
+      if (!fundsWithdrawalRequest) {
+        return null;
+      }
+
+      return FundsWithdrawalRequest.create(fundsWithdrawalRequest);
+    } catch (error: any) {
+      console.error('Cannot get funds withdrawal request');
+
+      return null;
+    }
+  }
+
   async listPendingWithdrawalRequests(pagination: Pagination): Promise<FundsWithdrawalRequest[]> {
     const results = await this.databaseAdapterProvider
       .provide()
