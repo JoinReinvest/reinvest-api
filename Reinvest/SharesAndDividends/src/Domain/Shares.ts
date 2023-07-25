@@ -212,14 +212,10 @@ export class Shares {
     return this.sharesSchema.price;
   }
 
-  markAsWithdrawing(): boolean {
+  markAsWithdrawing(): void {
     if (this.sharesSchema.status === SharesStatus.SETTLED) {
       this.sharesSchema.status = SharesStatus.WITHDRAWING;
-
-      return true;
     }
-
-    return false;
   }
 
   abortWithdrawing() {
@@ -228,9 +224,13 @@ export class Shares {
     }
   }
 
-  completeWithdrawing() {
+  completeWithdrawing(): boolean {
     if (this.sharesSchema.status === SharesStatus.WITHDRAWING) {
       this.sharesSchema.status = SharesStatus.REVOKED;
+
+      return true;
     }
+
+    return false;
   }
 }

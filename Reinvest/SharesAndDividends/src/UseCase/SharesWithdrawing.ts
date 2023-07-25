@@ -29,19 +29,11 @@ export class SharesWithdrawing {
         return;
       }
 
-      const withdrawingOperations: FinancialOperation[] = [];
-
       for (const share of shares) {
-        if (share.markAsWithdrawing()) {
-          withdrawingOperations.push({
-            operationType: FinancialOperationType.REVOKED,
-            ...share.forFinancialOperation(),
-          });
-        }
+        share.markAsWithdrawing();
       }
 
       await this.sharesRepository.store(shares);
-      await this.financialOperationRepository.addFinancialOperations(withdrawingOperations);
       const dividends = await this.dividendsCalculationRepository.getDividendsBySharesId(sharesIds);
 
       if (dividends.length === 0) {
@@ -95,11 +87,20 @@ export class SharesWithdrawing {
         return;
       }
 
+      const withdrawingOperations: FinancialOperation[] = [];
+
       for (const share of shares) {
-        share.completeWithdrawing();
+        if (share.completeWithdrawing()) {
+          withdrawingOperations.push({
+            operationType: FinancialOperationType.REVOKED,
+            ...share.forFinancialOperation(),
+          });
+        }
       }
 
       await this.sharesRepository.store(shares);
+      await this.financialOperationRepository.addFinancialOperations(withdrawingOperations);
+
       const dividends = await this.dividendsCalculationRepository.getDividendsBySharesId(sharesIds);
 
       if (dividends.length === 0) {
