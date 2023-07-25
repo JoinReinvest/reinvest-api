@@ -2,6 +2,7 @@ import { UUID } from 'HKEKTypes/Generics';
 import { DividendsCalculationRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsCalculationRepository';
 import { FinancialOperationsRepository } from 'SharesAndDividends/Adapter/Database/Repository/FinancialOperationsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
+import { FinancialOperationType } from 'SharesAndDividends/Domain/Stats/EVSDataPointsCalculatonService';
 
 export class SharesWithdrawing {
   private sharesRepository: SharesRepository;
@@ -28,11 +29,19 @@ export class SharesWithdrawing {
         return;
       }
 
+      const withdrawingOperations = [];
+
       for (const share of shares) {
-        share.markAsWithdrawing();
+        if (share.markAsWithdrawing()) {
+          withdrawingOperations.push({
+            operationType: FinancialOperationType.REVOKED,
+            ...share.forFinancialOperation(),
+          });
+        }
       }
 
       await this.sharesRepository.store(shares);
+      await this.financialOperationRepository.addFinancialOperations(withdrawingOperations);
       const dividends = await this.dividendsCalculationRepository.getDividendsBySharesId(sharesIds);
 
       if (dividends.length === 0) {

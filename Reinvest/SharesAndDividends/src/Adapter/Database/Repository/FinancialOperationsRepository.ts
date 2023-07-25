@@ -31,6 +31,10 @@ export class FinancialOperationsRepository {
   public static getClassName = (): string => 'FinancialOperationsRepository';
 
   async addFinancialOperations(operations: FinancialOperation[]): Promise<void> {
+    if (operations.length === 0) {
+      return;
+    }
+
     const values = operations.map((operation: FinancialOperation) => {
       const financialOperationId = this.idGenerator.createUuid();
 
