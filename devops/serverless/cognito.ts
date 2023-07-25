@@ -121,11 +121,11 @@ export const CognitoResources = {
       AccountTakeoverRiskConfiguration: {
         Actions: {
           HighAction: {
-            EventAction: 'MFA_REQUIRED',
+            EventAction: 'MFA_IF_CONFIGURED',
             Notify: true,
           },
           MediumAction: {
-            EventAction: 'MFA_REQUIRED',
+            EventAction: 'MFA_IF_CONFIGURED',
             Notify: true,
           },
           LowAction: {
