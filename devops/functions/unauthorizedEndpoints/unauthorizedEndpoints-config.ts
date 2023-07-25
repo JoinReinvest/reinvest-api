@@ -28,6 +28,12 @@ export const UnauthorizedEndpointsFunction = {
     {
       httpApi: {
         method: 'POST',
+        path: '/calculations',
+      },
+    },
+    {
+      httpApi: {
+        method: 'POST',
         path: '/calculations/{proxy+}',
       },
     },
