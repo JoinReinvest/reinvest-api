@@ -18,7 +18,9 @@ export class CreateShares {
     const existingShares = await this.sharesRepository.getSharesByOriginId(originId);
 
     if (existingShares) {
-      throw new Error(`Shares with originId ${originId} already exists`);
+      console.log(`Shares with originId ${originId} already exists`);
+
+      return;
     }
 
     const id = this.idGenerator.createUuid();

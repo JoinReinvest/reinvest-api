@@ -14,7 +14,7 @@ export class WithdrawalsService {
     try {
       const request = await api.getPendingWithdrawalRequest(profileId, accountId);
 
-      if (!request) {
+      if (request) {
         return true;
       }
 

@@ -43,7 +43,7 @@ const CorsConfiguration = {
 export const S3Resources = {
   BucketDocuments: {
     Type: 'AWS::S3::Bucket',
-    DeletionPolicy: 'Delete', // TODO change later to Retain!
+    DeletionPolicy: 'Retain',
     Properties: {
       BucketName: getResourceName('documents'),
       AccessControl: 'Private',
@@ -53,7 +53,7 @@ export const S3Resources = {
   },
   BucketAvatars: {
     Type: 'AWS::S3::Bucket',
-    DeletionPolicy: 'Delete', // TODO change later to Retain!
+    DeletionPolicy: 'Retain',
     Properties: {
       BucketName: getResourceName('avatars'),
       AccessControl: 'Private',
@@ -63,7 +63,7 @@ export const S3Resources = {
   },
   BucketPortfolio: {
     Type: 'AWS::S3::Bucket',
-    DeletionPolicy: 'Delete', // TODO change later to Retain!
+    DeletionPolicy: 'Retain',
     Properties: {
       BucketName: getResourceName('portfolio'),
       AccessControl: 'Private',

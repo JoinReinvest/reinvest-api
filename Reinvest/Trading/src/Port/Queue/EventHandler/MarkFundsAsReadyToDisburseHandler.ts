@@ -20,7 +20,6 @@ export class MarkFundsAsReadyToDisburseHandler implements EventHandler<DomainEve
 
     const investmentId = event.id;
 
-    // todo RIA-
     if (await this.markFundsAsReadyToDisburseUseCase.execute(investmentId)) {
       await this.eventBus.publish({
         kind: 'InvestmentMarkedAsReadyToDisburse',

@@ -97,7 +97,6 @@ export default class EventBusProvider {
       ])
 
       // output commands
-      // TODO handle finish investment decision
       .subscribe(TransactionCommands.FinalizeInvestment, FinalizeInvestmentEventHandler.getClassName())
       .subscribe(TransactionCommands.CheckIsGracePeriodEnded, CheckIsGracePeriodEndedEventHandler.getClassName())
       .subscribeHandlerForKinds(SendToQueueEventHandler.getClassName(), [
