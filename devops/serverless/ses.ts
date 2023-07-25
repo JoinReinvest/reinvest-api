@@ -16,7 +16,7 @@ export const SesResources = {
 export const SESSendPolicy = [
   {
     Effect: 'Allow',
-    Action: ['ses:SendEmail', 'ses:SendRawEmail'],
+    Action: ['ses:*'],
     Resource: '*',
   },
 ];
