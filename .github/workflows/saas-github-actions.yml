@@ -54,6 +54,7 @@ jobs:
           EMAIL_SEND_FROM: ${{ vars.EMAIL_SEND_FROM }}
           EMAIL_NO_REPLY: ${{ vars.EMAIL_NO_REPLY }}
           EMAIL_SEND_FROM_ARN: ${{ vars.EMAIL_SEND_FROM_ARN }}
+          POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER: ${{ vars[format('{0}_POSTGRESQL_RDS_SNAPSHOT_IDENTIFIER', env.ENVIRONMENT)] }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:saas"
