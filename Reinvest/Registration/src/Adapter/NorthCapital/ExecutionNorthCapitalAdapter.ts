@@ -27,7 +27,12 @@ export abstract class ExecutionNorthCapitalAdapter {
           data: { statusCode, statusDesc },
         },
       } = error;
-      console.error(`[NC PUT] North capital error: ${endpoint}`, error, data);
+
+      // @ts-ignore
+      if (statusCode != 404) {
+        console.error(`[NC PUT] North capital error: ${endpoint}`, error, data);
+      }
+
       throw new NorthCapitalException(statusCode, statusDesc);
     }
   }
@@ -44,7 +49,12 @@ export abstract class ExecutionNorthCapitalAdapter {
           data: { statusCode, statusDesc },
         },
       } = error;
-      console.error(`[NC POST] North capital error: ${endpoint}`, error, data);
+
+      // @ts-ignore
+      if (statusCode != 404) {
+        console.error(`[NC POST] North capital error: ${endpoint}`, error, data);
+      }
+
       throw new NorthCapitalException(statusCode, statusDesc);
     }
   }

@@ -163,8 +163,8 @@ export class NorthCapitalSynchronizer {
     } catch (error: any) {
       const { reason } = error;
 
-      if (document && reason === 'FILE_NOT_FOUND') {
-        console.error(`Document ${documentId} not found in document service`, error);
+      if (document && (reason === 'FILE_NOT_FOUND' || document.version >= 3)) {
+        console.error(`Document ${documentId} not found in document service or failed too many times`, error);
         await this.northCapitalDocumentSynchronizationRepository.setFailed(document);
       } else {
         console.error(`Document ${documentId} synchronization failed`, error);

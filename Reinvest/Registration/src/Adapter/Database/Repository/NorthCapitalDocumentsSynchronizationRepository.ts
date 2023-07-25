@@ -147,6 +147,7 @@ export class NorthCapitalDocumentsSynchronizationRepository {
         .updateTable(northCapitalDocumentsSynchronizationTable)
         .set({
           updatedDate,
+          version: currentVersion + 1,
         })
         .where('documentId', '=', document.documentId)
         .where('version', '=', currentVersion)
