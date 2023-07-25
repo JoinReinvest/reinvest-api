@@ -5,8 +5,8 @@ export const verifierRecordsTable = 'verifier_records';
 export const verificationFeesTable = 'verification_fees';
 
 export interface VerificationDatabase {
-  [verifierRecordsTable]: VerifierRecordsTable;
   [verificationFeesTable]: VerificationFeesTable;
+  [verifierRecordsTable]: VerifierRecordsTable;
 }
 
 export const VerificationDatabaseAdapterInstanceProvider = 'VerificationDatabaseAdapterProvider';

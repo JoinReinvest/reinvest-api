@@ -1,3 +1,4 @@
+import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 import { PrincipalVerificationEvent, VerificationEvents } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierService } from 'Verification/IntegrationLogic/Service/VerifierService';
@@ -18,7 +19,7 @@ export class MarkAccountAsApproved {
       const { accountVerifier, verifiers } = await this.verifierService.createVerifiersForAccount(profileId, accountId);
       const principalApproved = (partyId: string) =>
         <PrincipalVerificationEvent>{
-          date: new Date(),
+          date: DateTime.now().toDate(),
           kind: VerificationEvents.PRINCIPAL_APPROVED,
           ncId: partyId,
         };

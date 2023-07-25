@@ -1,6 +1,10 @@
 import { PostAuthenticationTriggerHandler } from 'aws-lambda';
 import { Identity } from 'Identity/index';
+import { logger } from 'Logger/logger';
 import { boot } from 'Reinvest/bootstrap';
+import { SENTRY_CONFIG } from 'Reinvest/config';
+
+console = logger(SENTRY_CONFIG);
 
 export const main: PostAuthenticationTriggerHandler = async (event, context, callback) => {
   console.log('[PostSignUp] Profile registration started', event);

@@ -1,6 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { Money } from 'Money/Money';
 import { DateTime } from 'Money/DateTime';
+import { Money } from 'Money/Money';
 
 export type DividendDetails = {
   amount: Money;
@@ -15,7 +15,18 @@ export type DividendRequestSchema = {
 
   eligibleAmount: number;
   id: UUID;
-  payoutId: UUID | null;
+  profileId: UUID;
+  status: DividendWithdrawalDecision;
+  withdrawalId: UUID | null;
+};
+
+export type DividendRequestView = {
+  accountId: UUID;
+  dateCreated: string;
+  dateDecided: string | null;
+  dividendId: UUID;
+  eligibleAmount: string;
+  id: UUID;
   profileId: UUID;
   status: DividendWithdrawalDecision;
 };
@@ -43,8 +54,16 @@ export class DividendWithdrawalRequest {
     this.dividendRequestSchema.dateDecided = DateTime.now().toDate();
   }
 
+  getId(): UUID {
+    return this.dividendRequestSchema.id;
+  }
+
   getObject(): DividendRequestSchema {
     return this.dividendRequestSchema;
+  }
+
+  assignWithdrawalId(id: UUID) {
+    this.dividendRequestSchema.withdrawalId = id;
   }
 
   static restore(dividendRequestSchema: DividendRequestSchema): DividendWithdrawalRequest {
@@ -59,9 +78,47 @@ export class DividendWithdrawalRequest {
       dividendId: dividend.id,
       eligibleAmount: dividend.amount.getAmount(),
       id,
-      payoutId: null,
+      withdrawalId: null,
       profileId,
       status: DividendWithdrawalDecision.REQUESTED,
     });
+  }
+
+  getView(): DividendRequestView {
+    return {
+      accountId: this.dividendRequestSchema.accountId,
+      dateCreated: DateTime.from(this.dividendRequestSchema.dateCreated).toIsoDateTime(),
+      dateDecided: this.dividendRequestSchema.dateDecided ? DateTime.from(this.dividendRequestSchema.dateDecided).toIsoDateTime() : null,
+      dividendId: this.dividendRequestSchema.dividendId,
+      eligibleAmount: Money.lowPrecision(this.dividendRequestSchema.eligibleAmount).getFormattedAmount(),
+      id: this.dividendRequestSchema.id,
+      profileId: this.dividendRequestSchema.profileId,
+      status: this.dividendRequestSchema.status,
+    };
+  }
+
+  forEvent() {
+    return {
+      type: 'DIVIDEND_WITHDRAWAL',
+      id: this.dividendRequestSchema.id,
+      accountId: this.dividendRequestSchema.accountId,
+      date: this.dividendRequestSchema.dateDecided
+        ? DateTime.from(this.dividendRequestSchema.dateDecided).toIsoDateTime()
+        : DateTime.from(this.dividendRequestSchema.dateCreated).toIsoDateTime(),
+      dividendId: this.dividendRequestSchema.dividendId,
+      amount: Money.lowPrecision(this.dividendRequestSchema.eligibleAmount).getFormattedAmount(),
+    };
+  }
+
+  forPayoutTemplate(): {
+    accountId: UUID;
+    amount: Money;
+    profileId: UUID;
+  } {
+    return {
+      profileId: this.dividendRequestSchema.profileId,
+      accountId: this.dividendRequestSchema.accountId,
+      amount: Money.lowPrecision(this.dividendRequestSchema.eligibleAmount),
+    };
   }
 }

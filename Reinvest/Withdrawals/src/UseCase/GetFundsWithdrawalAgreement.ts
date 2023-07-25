@@ -1,10 +1,8 @@
-import { DictionaryType, UUID } from 'HKEKTypes/Generics';
+import { UUID } from 'HKEKTypes/Generics';
+import { Template } from 'Templates/Template';
 import { FundsWithdrawalRequestsAgreementsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsAgreementsRepository';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
-import { fundsWithdrawalAgreementTemplate } from 'Withdrawals/Domain/FundsWithdrawalRequest/agreementsTemplate';
-import { FundsWithdrawalAgreementTemplateVersions } from 'Withdrawals/Domain/FundsWithdrawalRequest/types';
-import TemplateParser from 'Withdrawals/Service/TemplateParser';
 
 class GetFundsWithdrawalAgreement {
   static getClassName = (): string => 'GetFundsWithdrawalAgreement';
@@ -33,16 +31,17 @@ class GetFundsWithdrawalAgreement {
       throw new Error(WithdrawalError.NO_WITHDRAWAL_AGREEMENT);
     }
 
-    const { contentFieldsJson, templateVersion, id, status, dateCreated, signedAt } = agreement.toObject();
-    const parser = new TemplateParser(fundsWithdrawalAgreementTemplate[templateVersion as FundsWithdrawalAgreementTemplateVersions]);
-    const parsed = parser.parse(contentFieldsJson as DictionaryType);
+    const { id, status, dateCreated, signedAt } = agreement.toObject();
+
+    const { template: templateName, content, version } = agreement.forParser();
+    const template = new Template(templateName, content, version);
 
     return {
       id,
       status,
       createdAt: dateCreated,
       signedAt,
-      content: parsed,
+      content: template.toArray(),
     };
   }
 }

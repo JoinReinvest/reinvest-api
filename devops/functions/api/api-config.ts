@@ -9,7 +9,7 @@ import { SQSSendPolicy } from '../queue/queue-config';
 export const ApiLambdaFunction = {
   handler: `devops/functions/api/handler.main`,
   role: 'ApiLambdaRole',
-  timeout: 30,
+  timeout: 29,
   vpc: {
     securityGroupIds: [getAttribute('ApiSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],

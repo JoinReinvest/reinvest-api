@@ -1,5 +1,6 @@
 import { SharesServiceInterface } from 'Investments/Application/DomainEventHandler/SharesServiceInterface';
 import { DividendDetails } from 'Investments/Domain/Reinvestments/Dividends';
+import { SharesOrigin } from 'SharesAndDividends/Domain/Shares';
 import { SharesAndDividends } from 'SharesAndDividends/index';
 
 export class SharesAndDividendService implements SharesServiceInterface {
@@ -11,8 +12,8 @@ export class SharesAndDividendService implements SharesServiceInterface {
 
   public static getClassName = () => 'SharesAndDividendService';
 
-  async createShares(portfolioId: string, profileId: string, accountId: string, investmentId: string, amount: number): Promise<void> {
-    await this.sharesAndDividendsModule.api().createShares(portfolioId, profileId, accountId, investmentId, amount);
+  async createShares(portfolioId: string, profileId: string, accountId: string, originId: string, amount: number, origin: SharesOrigin): Promise<void> {
+    await this.sharesAndDividendsModule.api().createShares(portfolioId, profileId, accountId, originId, amount, origin);
   }
 
   async markDividendReinvested(profileId: string, accountId: string, dividendId: string): Promise<void> {

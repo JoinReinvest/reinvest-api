@@ -1,6 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { VerifierRecord } from 'Verification/Adapter/Database/VerificationSchema';
 import { VerificationAdapter } from 'Verification/Adapter/Database/Repository/VerificationAdapter';
+import { VerifierRecord } from 'Verification/Adapter/Database/VerificationSchema';
 import { RegistrationService } from 'Verification/Adapter/Modules/RegistrationService';
 import { AccountStructure, IdToNCId } from 'Verification/Domain/ValueObject/AccountStructure';
 import { VerificationDecision } from 'Verification/Domain/ValueObject/VerificationDecision';

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Property } from 'Portfolio/Domain/Property';
 import { PropertyStatus } from 'Portfolio/Domain/types';
 
@@ -49,7 +50,7 @@ export class DealpathAdapter {
             location,
           };
 
-          return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: new Date(), dealpathJson });
+          return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: DateTime.now().toDate(), dealpathJson });
         });
 
         return properties;
@@ -78,7 +79,7 @@ export class DealpathAdapter {
           location,
         };
 
-        return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: new Date(), dealpathJson });
+        return Property.create({ id, portfolioId, status: PropertyStatus.ACTIVE, lastUpdate: DateTime.now().toDate(), dealpathJson });
       }
 
       return null;

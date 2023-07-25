@@ -1,5 +1,6 @@
 import { ToObject } from 'LegalEntities/Domain/ValueObject/ToObject';
 import { ValidationError, ValidationErrorEnum } from 'LegalEntities/Domain/ValueObject/TypeValidators';
+import { DateTime } from 'Money/DateTime';
 
 export enum PersonalStatementType {
   FINRAMember = 'FINRAMember',
@@ -87,12 +88,12 @@ export abstract class PersonalStatement implements ToObject {
           return new AccreditedInvestorStatement(statement);
         case PersonalStatementType.TermsAndConditions:
           const { statement: termsAndConditionsStatement, date: termsAndConditionsDate } = forTermsAndConditions as ForTermsAndConditions;
-          const agreeDateOfTC = !termsAndConditionsDate ? new Date() : new Date(termsAndConditionsDate);
+          const agreeDateOfTC = !termsAndConditionsDate ? DateTime.now().toDate() : DateTime.from(termsAndConditionsDate).toDate();
 
           return new TermsAndConditionsStatement(termsAndConditionsStatement, agreeDateOfTC);
         case PersonalStatementType.PrivacyPolicy:
           const { statement: privacyPolicyStatement, date: privacyPolicyDate } = forPrivacyPolicy as ForPrivacyPolicy;
-          const agreeDateOfPP = !privacyPolicyDate ? new Date() : new Date(privacyPolicyDate);
+          const agreeDateOfPP = !privacyPolicyDate ? DateTime.now().toDate() : DateTime.from(privacyPolicyDate).toDate();
 
           return new PrivacyPolicyStatement(privacyPolicyStatement, agreeDateOfPP);
         default:
@@ -141,6 +142,10 @@ export class FINRAMemberStatement extends PersonalStatement implements ToObject 
     };
   }
 
+  getFINRAInstitutionName(): string {
+    return this.name;
+  }
+
   getDetails(): string[] {
     return [this.name];
   }
@@ -161,6 +166,10 @@ export class TradingCompanyStakeholderStatement extends PersonalStatement implem
         tickerSymbols: this.tickerSymbols,
       },
     };
+  }
+
+  getInlinedTickerSymbols(): string {
+    return this.tickerSymbols.join(', ');
   }
 
   getDetails(): string[] {

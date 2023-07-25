@@ -1,5 +1,6 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import { DocumentsPdfPageRepository } from 'Reinvest/Documents/src/Adapter/Repository/DocumentsPdfPageRepository';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
@@ -34,7 +35,7 @@ class RenderPageToPdf {
       profileId,
       name,
       url,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
     };
 
     await this.documentsPdfPageRepository.create(renderedPage);

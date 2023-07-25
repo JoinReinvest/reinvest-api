@@ -11,7 +11,7 @@ const schema = `
         PENDING
         REINVESTED
         PAID_OUT
-        WITHDRAWING
+        PAYING_OUT
     }
 
     type Dividend {
@@ -29,7 +29,7 @@ const schema = `
     }
 
     type DividendsList {
-        dividendsList: [DividendOverview]!
+        dividendsList: [DividendOverview]
     }
 
     type FundsWithdrawalSimulation {
@@ -64,6 +64,7 @@ const schema = `
         investorWithdrawalReason: String
         createdDate: ISODateTime!
         decisionDate: ISODateTime
+        agreementId: ID
     }
 
     type Query {
@@ -72,7 +73,7 @@ const schema = `
         """
         List all dividends
         """
-        listDividends(accountId: ID!): DividendsList!
+        listDividends(accountId: ID!): DividendsList
 
         """
         Simulate funds withdrawal. It returns the simulation of withdrawal without any changes in the system.
@@ -155,9 +156,8 @@ export const WithdrawalsSchema = {
       },
       listDividends: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
-        const list = await api.getDividendsList(profileId, accountId);
 
-        return list;
+        return { dividendsList: await api.getDividendsList(profileId, accountId) };
       },
       getFundsWithdrawalAgreement: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
@@ -183,9 +183,19 @@ export const WithdrawalsSchema = {
         return api.withdrawDividends(profileId, accountId, dividendIds);
       },
 
-      createFundsWithdrawalRequest: async (parent: any, { accountId }: { accountId: string }, { profileId, modules }: SessionContext) => {
+      createFundsWithdrawalRequest: async (
+        parent: any,
+        {
+          accountId,
+          investorWithdrawalReason,
+        }: {
+          accountId: string;
+          investorWithdrawalReason: string | null;
+        },
+        { profileId, modules }: SessionContext,
+      ) => {
         const api = modules.getApi<Withdrawals.ApiType>(Withdrawals);
-        const error = await api.createWithdrawalFundsRequest(profileId, accountId);
+        const error = await api.createWithdrawalFundsRequest(profileId, accountId, investorWithdrawalReason);
 
         if (error) {
           throw new GraphQLError(error);

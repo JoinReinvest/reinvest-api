@@ -1,11 +1,8 @@
-import { DictionaryType } from 'HKEKTypes/Generics';
-import TemplateParser from 'Investments/Application/Service/TemplateParser';
+import { GeneratePdfCommand, PdfKinds } from 'HKEKTypes/Pdf';
 import { DomainEvent } from 'SimpleAggregator/Types';
 import { FundsWithdrawalRequestsAgreementsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsAgreementsRepository';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
-import { fundsWithdrawalAgreementTemplate } from 'Withdrawals/Domain/FundsWithdrawalRequest/agreementsTemplate';
-import { FundsWithdrawalAgreementTemplateVersions, PdfTypes } from 'Withdrawals/Domain/FundsWithdrawalRequest/types';
 
 class SignFundsWithdrawalRequestAgreement {
   static getClassName = (): string => 'SignFundsWithdrawalRequestAgreement';
@@ -55,24 +52,19 @@ class SignFundsWithdrawalRequestAgreement {
     }
 
     // TODO this is separate use case!
-    const { contentFieldsJson, templateVersion } = fundsWithdrawalRequestsAgreement.getDataForParser();
+    const { template, content, version } = fundsWithdrawalRequestsAgreement.forParser();
 
-    const parser = new TemplateParser(fundsWithdrawalAgreementTemplate[templateVersion as FundsWithdrawalAgreementTemplateVersions]);
-    const parsedTemplated = parser.parse(contentFieldsJson as DictionaryType);
-
-    events.push({
+    const pdfCommand: GeneratePdfCommand = {
       id: fundsWithdrawalRequestsAgreement.getId(),
-      kind: 'WithdrawalAgreementSigned',
-    });
-
-    const pdfCommand: DomainEvent = {
-      id: fundsWithdrawalRequestsAgreement.getId(),
-      kind: 'GeneratePdfCommand',
+      kind: PdfKinds.GeneratePdf,
       data: {
         catalog: profileId,
         fileName: fundsWithdrawalRequestsAgreement.getId(),
-        template: parsedTemplated,
-        templateType: PdfTypes.AGREEMENT,
+        template,
+        version,
+        content,
+        profileId,
+        fileId: fundsWithdrawalRequestsAgreement.getId(),
       },
     };
 

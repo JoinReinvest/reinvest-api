@@ -1,4 +1,4 @@
-import { EventBus, EventHandler } from 'SimpleAggregator/EventBus/EventBus';
+import { EventBus, EventHandler, storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class NotifyAccountNotVerifiedEventHandler implements EventHandler<DomainEvent> {
@@ -24,26 +24,11 @@ export class NotifyAccountNotVerifiedEventHandler implements EventHandler<Domain
     const type = ['AccountNotVerifiedForInvestment', 'AccountVerifiedForInvestment'].includes(kind) ? 'verification' : 'principal-verification';
     const uniqueId = `${id}-${type}`;
 
-    const command = {
-      kind: 'CreateNotification',
-      data: {
-        accountId: accountId,
-        profileId: profileId,
-        notificationType: 'VERIFICATION_FAILED',
-        header: 'Verification failed [COPY-TO-UPDATE]',
-        body: 'Update your account information to continue investing.',
-        dismissId: null,
-        onObjectId: accountId,
-        onObjectType: 'ACCOUNT',
-        uniqueId: uniqueId,
-        pushNotification: {
-          title: 'Verification failed [COPY-TO-UPDATE]',
-          body: 'Update your account information to continue investing.',
-        },
-      },
-      id: event.id,
-    };
+    const storedEvent = storeEventCommand(profileId, 'VerificationFailed', {
+      accountId: accountId,
+      uniqueId: uniqueId,
+    });
 
-    await this.eventBus.publish(command);
+    await this.eventBus.publish(storedEvent);
   }
 }

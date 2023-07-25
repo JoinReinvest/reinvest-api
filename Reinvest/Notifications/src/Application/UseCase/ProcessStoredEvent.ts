@@ -1,7 +1,10 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { IdentityService } from 'Identity/Adapter/Module/IdentityService';
+import { AnalyticsAdapter } from 'Notifications/Adapter/AnalyticsAdapter';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
 import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
+import { EmailSender } from 'Notifications/Adapter/SES/EmailSender';
 import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
 import { AccountActivity } from 'Notifications/Domain/AccountActivity';
 import { StoredEvent } from 'Notifications/Domain/StoredEvent';
@@ -11,17 +14,29 @@ export class ProcessStoredEvent {
   private accountActivitiesRepository: AccountActivitiesRepository;
   private createNotificationUseCase: CreateNotification;
   private pushNotificationRepository: PushNotificationRepository;
+  private identityService: IdentityService;
+  private emailSender: EmailSender;
+  private analyticsAdapter: AnalyticsAdapter;
+  private readonly adminEmail: string;
 
   constructor(
     storedEventRepository: StoredEventRepository,
     accountActivitiesRepository: AccountActivitiesRepository,
     createNotificationUseCase: CreateNotification,
     pushNotificationRepository: PushNotificationRepository,
+    identityService: IdentityService,
+    emailSender: EmailSender,
+    analyticsAdapter: AnalyticsAdapter,
+    adminEmail: string,
   ) {
     this.storedEventRepository = storedEventRepository;
     this.accountActivitiesRepository = accountActivitiesRepository;
     this.createNotificationUseCase = createNotificationUseCase;
     this.pushNotificationRepository = pushNotificationRepository;
+    this.identityService = identityService;
+    this.emailSender = emailSender;
+    this.analyticsAdapter = analyticsAdapter;
+    this.adminEmail = adminEmail;
   }
 
   static getClassName = () => 'ProcessStoredEvent';
@@ -32,6 +47,9 @@ export class ProcessStoredEvent {
     if (!storedEvent) {
       return;
     }
+
+    const globalValues = await this.identityService.getUserData(storedEvent.getProfileId());
+    storedEvent.setGlobalValues(globalValues);
 
     const statuses = [];
     statuses.push(await this.processAccountActivity(storedEvent));
@@ -86,7 +104,30 @@ export class ProcessStoredEvent {
   }
 
   private async processEmailNotification(storedEvent: StoredEvent): Promise<boolean> {
-    return true;
+    if (!storedEvent.shouldProcessEmail()) {
+      return true;
+    }
+
+    const email = storedEvent.getUserEmail();
+
+    if (!email) {
+      console.error(`Cannot process email notification for stored event ${storedEvent.getProfileId()}/${storedEvent.getId()}: no email`);
+
+      return false;
+    }
+
+    try {
+      const { subject, body, toAdmin } = storedEvent.getEmailNotification();
+      const emailToSend = toAdmin ? this.adminEmail : email;
+      await this.emailSender.sendNotificationEmail(emailToSend, subject, body);
+      storedEvent.markEmailAsProcessed();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot process email notification for stored event ${storedEvent.getId()}`, error);
+
+      return false;
+    }
   }
 
   private async processPushNotification(storedEvent: StoredEvent): Promise<boolean> {
@@ -110,6 +151,21 @@ export class ProcessStoredEvent {
   }
 
   private async processAnalyticEvent(storedEvent: StoredEvent): Promise<boolean> {
-    return true;
+    if (!storedEvent.shouldProcessAnalyticEvent()) {
+      return true;
+    }
+
+    try {
+      const analyticsCommand = storedEvent.getAnalyticsCommand();
+      await this.analyticsAdapter.send(analyticsCommand);
+
+      storedEvent.markAnalyticEventAsProcessed();
+
+      return true;
+    } catch (error: any) {
+      console.error(`Cannot process analytic event for stored event ${storedEvent.getId()}`, error);
+
+      return false;
+    }
   }
 }

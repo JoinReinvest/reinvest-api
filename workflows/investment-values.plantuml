@@ -1,0 +1,32 @@
+@startuml
+
+actor "User" as U
+participant "REINVEST API" as RA
+participant "North Capital" as NC
+participant "Vertalo" as V
+
+
+U -> RA: Invests $1000 in REIT for $1.00
+RA -> NC: Create new Trade with 1000 units
+opt Payment mismatch
+NC -> RA: Trade created with 1000 units for $1.10 each, so $1100 total
+RA -> NC: Payment mismatch error, reject trade
+end
+
+opt Payment match
+NC -> RA: Trade created with 1000 units for $1.00 each, so $1000 total
+RA -> V: Create new Distribution with 1000 units
+V -> RA: Assign current "Round Price" to the distribution"
+RA -> NC: Create payment for $1000
+RA -> RA: After some time
+NC -> RA: Payment completed
+NC -> RA: Dalmore approved
+RA -> RA: Grace period ended
+NC -> RA: Investment disbursed to the operational account
+RA -> V: Mark $1000 payment as complete
+RA -> V: Create distribution holding (transfer 1000 shares to the investor account)
+RA -> U: Notify user of completed investment
+end
+
+
+@enduml

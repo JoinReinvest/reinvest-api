@@ -1,4 +1,5 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import {
   northCapitalSynchronizationTable,
   RegistrationDatabaseAdapterProvider,
@@ -65,7 +66,7 @@ export class NorthCapitalSynchronizationRepository {
       return;
     }
 
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const nextVersion = synchronizationRecord.getNextVersion();
     const currentVersion = synchronizationRecord.getVersion();
 

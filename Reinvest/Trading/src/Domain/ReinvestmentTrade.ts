@@ -1,3 +1,4 @@
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { SharesTransferState, VertaloDistributionState, VertaloPaymentState } from 'Trading/Domain/Trade';
 
@@ -163,7 +164,7 @@ export class ReinvestmentTrade {
 
   setVertaloPaymentState(paymentId: string) {
     this.tradeSchema.vertaloPaymentState = {
-      paymentMarkedDate: new Date(),
+      paymentMarkedDate: DateTime.now().toDate(),
       paymentId,
     };
   }
@@ -183,12 +184,21 @@ export class ReinvestmentTrade {
   setVertaloSharesTransferState(holdingId: string) {
     this.tradeSchema.sharesTransferState = {
       holdingId,
-      transferDate: new Date(),
+      transferDate: DateTime.now().toDate(),
     };
   }
 
   getDividendId() {
     return this.tradeSchema.dividendId;
+  }
+
+  forDividendReinvestedEvent() {
+    return {
+      profileId: this.tradeSchema.tradeConfiguration.profileId,
+      accountId: this.tradeSchema.tradeConfiguration.accountId,
+      amount: this.tradeSchema.tradeConfiguration.amount,
+      dividendId: this.tradeSchema.dividendId,
+    };
   }
 
   private calculateShares(amount: Money, unitSharePrice: Money): number {

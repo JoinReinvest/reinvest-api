@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { AccountType as InvestmentAccountType } from 'InvestmentAccounts/Domain/ProfileAggregate/AccountType';
 import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { AccountType } from 'LegalEntities/Domain/AccountType';
@@ -17,5 +18,11 @@ export class InvestmentAccountsService {
     const api = this.investmentAccountsModule.api();
 
     return api.openAccount(profileId, accountId, accountType as InvestmentAccountType);
+  }
+
+  async removeBeneficiary(profileId: UUID, accountId: UUID): Promise<boolean> {
+    const api = this.investmentAccountsModule.api();
+
+    return api.removeBeneficiary(profileId, accountId);
   }
 }

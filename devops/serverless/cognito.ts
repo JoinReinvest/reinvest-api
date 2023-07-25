@@ -1,7 +1,5 @@
-import { AwsCfInstruction } from '@serverless/typescript';
-
-import { margeWithApiGatewayUrl } from './serverless-common';
-import { exportOutput, getAttribute, getResourceName, importOutput } from './utils';
+import { AwsCfInstruction } from "@serverless/typescript";
+import { exportOutput, getAttribute, getResourceName, importOutput } from "./utils";
 
 // SAAS Part
 export const CognitoResources = {
@@ -123,11 +121,11 @@ export const CognitoResources = {
       AccountTakeoverRiskConfiguration: {
         Actions: {
           HighAction: {
-            EventAction: 'MFA_REQUIRED',
+            EventAction: 'MFA_IF_CONFIGURED',
             Notify: true,
           },
           MediumAction: {
-            EventAction: 'MFA_REQUIRED',
+            EventAction: 'MFA_IF_CONFIGURED',
             Notify: true,
           },
           LowAction: {
@@ -225,7 +223,8 @@ export const CognitoClientResources = {
       RefreshTokenValidity: 30,
       AllowedOAuthFlows: ['implicit'],
       AllowedOAuthScopes: ['profile', 'openid'],
-      CallbackURLs: [margeWithApiGatewayUrl('/set-header'), margeWithApiGatewayUrl('/set-header?admin=1')],
+      // CallbackURLs: [margeWithApiGatewayUrl('/set-header'), margeWithApiGatewayUrl('/set-header?admin=1')],
+      CallbackURLs: ['${env:BACKEND_URL}/set-header', '${env:BACKEND_URL}/set-header?admin=1'],
       ClientName: 'Website and Mobile Cognito Client',
       EnableTokenRevocation: true,
       PreventUserExistenceErrors: 'ENABLED',
@@ -274,7 +273,8 @@ export const CognitoClientsOutputs = {
     ...exportOutput('LocalClientId'),
   },
   WebsiteHostedUiUrl: {
-    Value: getHostedUI('WebsiteCognito', margeWithApiGatewayUrl('/set-header')),
+    // Value: getHostedUI('WebsiteCognito', margeWithApiGatewayUrl('/set-header')),
+    Value: getHostedUI('WebsiteCognito', '${env:BACKEND_URL}/set-header'),
     Description: 'The hosted UI URL',
     ...exportOutput('WebsiteHostedUiUrl'),
   },
@@ -285,7 +285,8 @@ export const CognitoClientsOutputs = {
   },
 };
 export const CognitoEnvs = {
-  WebsiteExplorerHostedUI: getHostedUI('WebsiteCognito', margeWithApiGatewayUrl('/set-header')),
+  // WebsiteExplorerHostedUI: getHostedUI('WebsiteCognito', margeWithApiGatewayUrl('/set-header')),
+  WebsiteExplorerHostedUI: getHostedUI('WebsiteCognito', '${env:BACKEND_URL}/set-header'),
   LocalExplorerHostedUI: getHostedUI('LocalCognito', localCallbackUrl),
 };
 export const CognitoAuthorizerName = 'CognitoAuthorizer';

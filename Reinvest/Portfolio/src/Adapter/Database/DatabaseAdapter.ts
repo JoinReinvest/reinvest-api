@@ -1,11 +1,25 @@
+import {
+  PortfolioAuthorsTable,
+  PortfolioNavTable,
+  PortfolioTable,
+  PropertyTable
+} from 'Portfolio/Adapter/Database/PropertyTable';
 import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-
-import { PropertySchema } from './PropertySchema';
+import { PortfolioUpdatesTable } from 'Reinvest/Portfolio/src/Adapter/Database/PropertyTable';
 
 export const propertyTable = 'portfolio_property';
+export const portfolioTable = 'portfolio_portfolio';
+export const navTable = 'portfolio_nav';
+
+export const updatesTable = 'portfolio_updates';
+export const portfolioAuthorsTable = 'portfolio_authors';
 
 export interface PortfolioDatabase {
-  [propertyTable]: PropertySchema;
+  [navTable]: PortfolioNavTable;
+  [portfolioTable]: PortfolioTable;
+  [propertyTable]: PropertyTable;
+  [updatesTable]: PortfolioUpdatesTable;
+  [portfolioAuthorsTable]: PortfolioAuthorsTable;
 }
 
 export const PortfolioDatabaseAdapterInstanceProvider = 'PortfolioDatabaseAdapterProvider';

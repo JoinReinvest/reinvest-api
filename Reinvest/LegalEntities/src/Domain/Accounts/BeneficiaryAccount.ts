@@ -12,6 +12,7 @@ export type BeneficiarySchema = {
   accountId: string;
   avatar: AvatarInput | null;
   individualId: string;
+  isArchived: boolean;
   name: BeneficiaryName;
   profileId: string;
   label?: string;
@@ -30,6 +31,7 @@ export class BeneficiaryAccount {
   private accountId: string;
   private name: BeneficiaryName;
   private avatar: Avatar | null = null;
+  private isArchived: boolean = false;
 
   constructor(profileId: string, accountId: string, individualId: string, name: BeneficiaryName) {
     this.profileId = profileId;
@@ -46,6 +48,10 @@ export class BeneficiaryAccount {
       account.setAvatarDocument(Avatar.create(avatar));
     }
 
+    if (beneficiaryData.isArchived) {
+      account.archive();
+    }
+
     return account;
   }
 
@@ -54,6 +60,7 @@ export class BeneficiaryAccount {
       accountId: this.accountId,
       profileId: this.profileId,
       individualId: this.individualId,
+      isArchived: this.isArchived,
       name: this.name,
       avatar: this.get(this.avatar),
       label: this.getLabel(),
@@ -93,7 +100,7 @@ export class BeneficiaryAccount {
     return this.individualId;
   }
 
-  private getLabel(): string {
+  getLabel(): string {
     return `${this.name.firstName} ${this.name.lastName}`;
   }
 
@@ -103,5 +110,9 @@ export class BeneficiaryAccount {
     }
 
     return value.toObject();
+  }
+
+  archive(): void {
+    this.isArchived = true;
   }
 }

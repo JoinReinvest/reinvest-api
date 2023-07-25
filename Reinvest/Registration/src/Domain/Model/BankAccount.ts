@@ -1,3 +1,5 @@
+import { UUID } from 'HKEKTypes/Generics';
+
 export type BankAccountSchema = {
   accountId: string;
   bankAccountId: string;
@@ -33,6 +35,13 @@ export type PlaidResponse = {
 
 export type PlaidLink = {
   link: string;
+};
+
+export type BankAccountMapping = {
+  accountId: UUID;
+  ncAccountId: string;
+  ncAccountNumber: string;
+  profileId: UUID;
 };
 
 export class BankAccount {
@@ -150,5 +159,14 @@ export class BankAccount {
 
   getStatus() {
     return this.state === 'IN_PROGRESS' ? 'DRAFT' : this.state;
+  }
+
+  forBankAccountMapping(): BankAccountMapping {
+    return {
+      accountId: this.accountId,
+      ncAccountId: this.northCapitalId,
+      ncAccountNumber: this.bankAccountNumber || '',
+      profileId: this.profileId,
+    };
   }
 }

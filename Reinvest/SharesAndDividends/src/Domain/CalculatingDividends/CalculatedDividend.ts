@@ -1,4 +1,5 @@
 import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import { SharesStatus } from 'SharesAndDividends/Domain/Shares';
 
@@ -69,7 +70,7 @@ export class CalculatedDividend {
       this.accountId = accountId!;
       this.profileId = profileId!;
       this.sharesId = sharesId!;
-      this.calculationDate = new Date();
+      this.calculationDate = DateTime.now().toDate();
       this.status = this.mapSharesStatusToCalculatedDividendStatus(sharesStatus!);
     } else {
       this.id = schema.id;
@@ -160,6 +161,7 @@ export class CalculatedDividend {
       case SharesStatus.CREATED:
       case SharesStatus.FUNDING:
       case SharesStatus.FUNDED:
+      case SharesStatus.WITHDRAWING:
         return CalculatedDividendStatus.LOCKED;
       case SharesStatus.SETTLED:
         return CalculatedDividendStatus.AWAITING_DISTRIBUTION;
@@ -167,6 +169,30 @@ export class CalculatedDividend {
         return CalculatedDividendStatus.REVOKED;
       default:
         return CalculatedDividendStatus.LOCKED;
+    }
+  }
+
+  unlockDividend(): void {
+    if (this.status === CalculatedDividendStatus.LOCKED) {
+      this.status = CalculatedDividendStatus.AWAITING_DISTRIBUTION;
+    }
+  }
+
+  lockAwaitingDividend(): void {
+    if (this.status === CalculatedDividendStatus.AWAITING_DISTRIBUTION) {
+      this.status = CalculatedDividendStatus.LOCKED;
+    }
+  }
+
+  unlockAwaitingDividend(): void {
+    if (this.status === CalculatedDividendStatus.LOCKED) {
+      this.status = CalculatedDividendStatus.AWAITING_DISTRIBUTION;
+    }
+  }
+
+  revokeDividend(): void {
+    if (this.status === CalculatedDividendStatus.LOCKED) {
+      this.status = CalculatedDividendStatus.REVOKED;
     }
   }
 }

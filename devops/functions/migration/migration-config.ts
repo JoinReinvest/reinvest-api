@@ -5,7 +5,7 @@ import { EniPolicies, importPrivateSubnetRefs, importVpcRef } from '../../server
 export const MigrationLambdaFunction = {
   handler: `devops/functions/migration/handler.main`,
   role: 'MigrationLambdaRole',
-  timeout: 10,
+  timeout: 29,
   vpc: {
     securityGroupIds: [getAttribute('MigrationSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],

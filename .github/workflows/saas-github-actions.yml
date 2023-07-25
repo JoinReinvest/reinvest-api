@@ -1,4 +1,4 @@
-name: functions-github-actions
+name: saas-github-actions
 on:
   push:
     tags:
@@ -14,6 +14,7 @@ jobs:
         run: |
           CURRENT_TAG=${GITHUB_REF##*/}
           echo "Current tag: ${CURRENT_TAG}"
+          SHARED_ENVIRONMENT="TEST"
           if [ $CURRENT_TAG == "DEVELOPMENT_SAAS_DEPLOYMENT" ]; then
             ENVIRONMENT="DEVELOPMENT"
           elif [ $CURRENT_TAG == "INTEGRATIONS_SAAS_DEPLOYMENT" ]; then
@@ -22,12 +23,14 @@ jobs:
             ENVIRONMENT="STAGING"
           elif [ $CURRENT_TAG == "PRODUCTION_SAAS_DEPLOYMENT" ]; then
             ENVIRONMENT="PRODUCTION"
+            SHARED_ENVIRONMENT="PRODUCTION"
           else
             echo "Wrong tag";
             exit 1;
           fi
           echo "Current environment: ${ENVIRONMENT}"
           echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
+          echo "SHARED_ENVIRONMENT=${SHARED_ENVIRONMENT}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -40,17 +43,17 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          POSTGRESQL_USER: ${{ secrets[format('{0}_POSTGRESQL_USER', env.ENVIRONMENT)] }}
-          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.ENVIRONMENT)] }}
-          COGNITO_RETENTION_POLICY: ${{ secrets[format('{0}_COGNITO_RETENTION_POLICY', env.ENVIRONMENT)] }}
-          POSTGRESQL_MAIN_USER: ${{ secrets[format('{0}_POSTGRESQL_MAIN_USER', env.ENVIRONMENT)] }}
-          POSTGRESQL_MAIN_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_MAIN_PASSWORD', env.ENVIRONMENT)] }}
-          POSTGRESQL_AWS_DB_INSTANCE: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_INSTANCE', env.ENVIRONMENT)] }}
-          POSTGRESQL_AWS_DB_RETENTION_POLICY: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_RETENTION_POLICY', env.ENVIRONMENT)] }}
-          POSTGRESQL_AWS_DB_STORAGE_GB: ${{ secrets[format('{0}_POSTGRESQL_AWS_DB_STORAGE_GB', env.ENVIRONMENT)] }}
-          EMAIL_SEND_FROM: ${{ secrets.EMAIL_SEND_FROM }}
-          EMAIL_NO_REPLY: ${{ secrets.EMAIL_NO_REPLY }}
-          EMAIL_SEND_FROM_ARN: ${{ secrets.EMAIL_SEND_FROM_ARN }}
+          POSTGRESQL_USER: ${{ vars[format('{0}_POSTGRESQL_USER', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_PASSWORD', env.SHARED_ENVIRONMENT)] }}
+          COGNITO_RETENTION_POLICY: ${{ vars[format('{0}_COGNITO_RETENTION_POLICY', env.ENVIRONMENT)] }}
+          POSTGRESQL_MAIN_USER: ${{ secrets[format('{0}_POSTGRESQL_MAIN_USER', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_MAIN_PASSWORD: ${{ secrets[format('{0}_POSTGRESQL_MAIN_PASSWORD', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_AWS_DB_INSTANCE: ${{ vars[format('{0}_POSTGRESQL_AWS_DB_INSTANCE', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_AWS_DB_RETENTION_POLICY: ${{ vars[format('{0}_POSTGRESQL_AWS_DB_RETENTION_POLICY', env.SHARED_ENVIRONMENT)] }}
+          POSTGRESQL_AWS_DB_STORAGE_GB: ${{ vars[format('{0}_POSTGRESQL_AWS_DB_STORAGE_GB', env.SHARED_ENVIRONMENT)] }}
+          EMAIL_SEND_FROM: ${{ vars.EMAIL_SEND_FROM }}
+          EMAIL_NO_REPLY: ${{ vars.EMAIL_NO_REPLY }}
+          EMAIL_SEND_FROM_ARN: ${{ vars.EMAIL_SEND_FROM_ARN }}
         run: |
           environment=${{env.ENVIRONMENT}}
           yarn "${environment,,}:deploy:saas"

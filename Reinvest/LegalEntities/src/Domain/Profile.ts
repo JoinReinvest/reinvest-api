@@ -165,6 +165,10 @@ export class Profile {
     }
   }
 
+  getAddress(): Address | null {
+    return this.address;
+  }
+
   toObject(): ProfileSchema {
     return {
       profileId: this.profileId,
@@ -233,5 +237,17 @@ export class Profile {
 
   getCompletionErrors() {
     return this.completionErrors;
+  }
+
+  getRawSSN(): string {
+    try {
+      return this.ssn?.decrypt() ?? 'N/A';
+    } catch (error) {
+      return 'N/A';
+    }
+  }
+
+  getFullName(): string {
+    return this.name?.getLabel() ?? '';
   }
 }

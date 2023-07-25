@@ -1,5 +1,5 @@
 import { legalEntitiesBeneficiaryTable, LegalEntitiesDatabaseAdapterProvider } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
-import { InsertableBeneficiary, LegalEntitiesBeneficiary } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
+import { LegalEntitiesBeneficiaryTable } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
 import { BeneficiaryAccount, BeneficiaryName } from 'LegalEntities/Domain/Accounts/BeneficiaryAccount';
 import { AvatarInput } from 'LegalEntities/Domain/ValueObject/Document';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
@@ -20,32 +20,33 @@ export class BeneficiaryRepository {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(legalEntitiesBeneficiaryTable)
-      .select(['accountId', 'avatarJson', 'nameJson', 'individualId', 'profileId'])
+      .selectAll()
       .where('profileId', '=', profileId)
       .where('accountId', '=', beneficiaryId)
       .limit(1)
-      .castTo<LegalEntitiesBeneficiary>()
+      .castTo<LegalEntitiesBeneficiaryTable>()
       .executeTakeFirst();
 
     if (!data) {
       return null;
     }
 
-    return this.beneficiaryDaoToBeneficiaryAccount(data);
+    return this.castToObject(data);
   }
 
   async storeBeneficiary(beneficiary: BeneficiaryAccount, events: DomainEvent[] = []): Promise<void> {
-    const beneficiaryDAO = this.prepareBeneficiaryForPersisting(beneficiary);
+    const data = this.castToTable(beneficiary);
 
     await this.databaseAdapterProvider
       .provide()
       .insertInto(legalEntitiesBeneficiaryTable)
-      .values({ ...beneficiaryDAO })
+      .values({ ...data })
       .onConflict(oc =>
         oc.column('accountId').doUpdateSet({
           avatarJson: eb => eb.ref(`excluded.avatarJson`),
           nameJson: eb => eb.ref(`excluded.nameJson`),
           label: eb => eb.ref(`excluded.label`),
+          isArchived: eb => eb.ref(`excluded.isArchived`),
         }),
       )
       .execute();
@@ -65,34 +66,41 @@ export class BeneficiaryRepository {
     const data = await this.databaseAdapterProvider
       .provide()
       .selectFrom(legalEntitiesBeneficiaryTable)
-      .select(['accountId', 'avatarJson', 'nameJson', 'individualId', 'profileId'])
+      .selectAll()
       .where('profileId', '=', profileId)
-      .castTo<LegalEntitiesBeneficiary>()
+      .where('isArchived', '=', false)
+      .castTo<LegalEntitiesBeneficiaryTable>()
       .execute();
 
-    return data.map(this.beneficiaryDaoToBeneficiaryAccount);
+    if (!data) {
+      return [];
+    }
+
+    return data.map(this.castToObject);
   }
 
-  private prepareBeneficiaryForPersisting(beneficiary: BeneficiaryAccount): InsertableBeneficiary {
+  private castToTable(beneficiary: BeneficiaryAccount): LegalEntitiesBeneficiaryTable {
     const beneficiarySchema = beneficiary.toObject();
 
-    return <InsertableBeneficiary>{
+    return <LegalEntitiesBeneficiaryTable>{
       accountId: beneficiarySchema.accountId,
       avatarJson: beneficiarySchema.avatar,
       individualId: beneficiarySchema.individualId,
       nameJson: beneficiarySchema.name,
       profileId: beneficiarySchema.profileId,
       label: beneficiarySchema.label,
+      isArchived: beneficiarySchema.isArchived,
     };
   }
 
-  private beneficiaryDaoToBeneficiaryAccount(beneficiaryDao: LegalEntitiesBeneficiary): BeneficiaryAccount {
+  private castToObject(data: LegalEntitiesBeneficiaryTable): BeneficiaryAccount {
     return BeneficiaryAccount.create({
-      accountId: beneficiaryDao.accountId,
-      avatar: beneficiaryDao.avatarJson as AvatarInput | null,
-      individualId: beneficiaryDao.individualId,
-      name: beneficiaryDao.nameJson as BeneficiaryName,
-      profileId: beneficiaryDao.profileId,
+      accountId: data.accountId,
+      avatar: data.avatarJson as AvatarInput | null,
+      individualId: data.individualId,
+      name: data.nameJson as BeneficiaryName,
+      profileId: data.profileId,
+      isArchived: data.isArchived,
     });
   }
 }

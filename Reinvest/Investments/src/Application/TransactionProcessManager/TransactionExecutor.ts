@@ -7,6 +7,8 @@ import {
   createTrade,
   finalizeInvestment,
   markFundsAsReadyToDisburse,
+  retryPayment,
+  revertTransaction,
   transferSharesWhenTradeSettled,
   verifyAccountForInvestment,
 } from 'Investments/Domain/Transaction/TransactionCommands';
@@ -18,10 +20,14 @@ import {
   CreateTradeDecision,
   FinalizeInvestmentDecision,
   MarkFundsAsReadyToDisburseDecision,
+  RetryPaymentDecision,
+  RevertTransactionDecision,
   TransactionDecisions,
   TransferSharesWhenTradeSettledDecision,
   VerifyAccountDecision,
 } from 'Investments/Domain/Transaction/TransactionDecisions';
+import { TransactionEvent, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class TransactionExecutor {
@@ -35,7 +41,6 @@ export class TransactionExecutor {
 
   async execute(transaction: TransactionProcessManager): Promise<void> {
     const decision = transaction.makeDecision();
-    console.log(decision);
 
     if ([TransactionDecisions.VERIFY_ACCOUNT].includes(decision.kind)) {
       await this.eventBus.publish(verifyAccountForInvestment(decision as VerifyAccountDecision));
@@ -57,6 +62,12 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.CHECK_IS_INVESTMENT_FUNDED].includes(decision.kind)) {
       await this.eventBus.publish(checkIsInvestmentFunded(decision as CheckIsInvestmentFundedDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.RETRY_PAYMENT].includes(decision.kind)) {
+      await this.eventBus.publish(retryPayment(decision as RetryPaymentDecision));
 
       return;
     }
@@ -87,6 +98,23 @@ export class TransactionExecutor {
 
     if ([TransactionDecisions.CANCEL_TRANSACTION].includes(decision.kind)) {
       await this.eventBus.publish(cancelTransaction(decision as CancelTransactionDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.REVERT_TRANSACTION].includes(decision.kind)) {
+      await this.eventBus.publish(revertTransaction(decision as RevertTransactionDecision));
+
+      return;
+    }
+
+    if ([TransactionDecisions.FINISH_INVESTMENT].includes(decision.kind)) {
+      await this.eventBus.publish(<TransactionEvent>{
+        id: decision.investmentId,
+        kind: TransactionEvents.INVESTMENT_FINISHED,
+        data: {},
+        date: DateTime.now().toDate(),
+      });
 
       return;
     }

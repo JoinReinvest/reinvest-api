@@ -1,8 +1,8 @@
 import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { AccountActivitiesRepository } from 'Notifications/Adapter/Database/Repository/AccountActivitiesRepository';
+import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 import { StoredEventRepository } from 'Notifications/Adapter/Database/Repository/StoredEventRepository';
 import { ProcessStoredEvent } from 'Notifications/Application/UseCase/ProcessStoredEvent';
-import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
 
 export class StoredEventsController {
   private accountActivitiesRepository: AccountActivitiesRepository;

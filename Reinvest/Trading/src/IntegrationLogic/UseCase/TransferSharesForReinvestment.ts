@@ -1,3 +1,5 @@
+import { DateTime } from 'Money/DateTime';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 import { ReinvestmentRepository } from 'Trading/Adapter/Database/Repository/ReinvestmentRepository';
 import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
@@ -104,6 +106,16 @@ export class TransferSharesForReinvestment {
     trade.setVertaloSharesTransferState(holdingId);
     await this.reinvestmentRepository.updateTrade(trade);
     console.info(`[Reinvestment Trade ${trade.getDividendId()}]`, 'Shares transferred in Vertalo, holdingId:', holdingId);
+
+    const { profileId, amount, accountId, dividendId } = trade.forDividendReinvestedEvent();
+    await this.reinvestmentRepository.publishEvent(
+      storeEventCommand(profileId, 'DividendReinvested', {
+        amount,
+        dividendId,
+        accountId,
+        date: DateTime.now().toIsoDateTime(),
+      }),
+    );
 
     return true;
   }

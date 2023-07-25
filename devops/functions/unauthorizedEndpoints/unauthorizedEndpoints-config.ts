@@ -1,6 +1,7 @@
 import { CloudwatchPolicies } from '../../serverless/cloudwatch';
 import { getAttribute, getResourceName } from '../../serverless/utils';
 import { EniPolicies, importPrivateSubnetRefs, importVpcRef, SecurityGroupEgressRules, SecurityGroupIngressRules } from '../../serverless/vpc';
+import { SQSSendPolicy } from '../queue/queue-config';
 
 export const UnauthorizedEndpointsFunction = {
   handler: `devops/functions/unauthorizedEndpoints/handler.main`,
@@ -21,6 +22,12 @@ export const UnauthorizedEndpointsFunction = {
       httpApi: {
         method: 'POST',
         path: '/webhooks/{proxy+}',
+      },
+    },
+    {
+      httpApi: {
+        method: 'POST',
+        path: '/calculations/{proxy+}',
       },
     },
   ],
@@ -46,7 +53,7 @@ export const UnauthorizedEndpointsLambdaResources = {
         {
           PolicyName: 'UnauthorizedEndpointsLambdaPolicy',
           PolicyDocument: {
-            Statement: [...CloudwatchPolicies, ...EniPolicies],
+            Statement: [...CloudwatchPolicies, ...EniPolicies, ...SQSSendPolicy],
           },
         },
       ],

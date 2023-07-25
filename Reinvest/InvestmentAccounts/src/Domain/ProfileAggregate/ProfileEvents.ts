@@ -37,3 +37,10 @@ export type BeneficiaryAccountOpened = DomainEvent & {
   };
   kind: 'BeneficiaryAccountOpened';
 };
+
+export type BeneficiaryAccountRemoved = DomainEvent & {
+  data: {
+    beneficiaryAccountId: string;
+  };
+  kind: 'BeneficiaryAccountRemoved';
+};

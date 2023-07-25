@@ -1,4 +1,5 @@
 import { InvestmentCreated, TransactionEvents } from 'Investments/Domain/Transaction/TransactionEvents';
+import { DateTime } from 'Money/DateTime';
 import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
 
 export class TempController {
@@ -17,7 +18,7 @@ export class TempController {
     await this.eventBus.publish(<InvestmentCreated>{
       id: investmentId,
       kind: TransactionEvents.INVESTMENT_CREATED,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       data: {
         profileId,
         accountId,

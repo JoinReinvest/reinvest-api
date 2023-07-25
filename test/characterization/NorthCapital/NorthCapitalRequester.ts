@@ -21,7 +21,7 @@ export default class NorthCapitalRequester {
       const response: AxiosResponse = await axios.put(`${this.url}/${endpoint}`, putData);
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       // @ts-ignore
       const {
         response: {
@@ -38,7 +38,7 @@ export default class NorthCapitalRequester {
       const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       // @ts-ignore
       const {
         response: {
@@ -517,5 +517,36 @@ export default class NorthCapitalRequester {
     const { statusCode, statusDesc, 'Financial Escrow Details': details } = response;
 
     return details;
+  }
+
+  async updateOffering(
+    offeringId: string,
+    params: {
+      endDate: string;
+      issueName: string;
+      issueType: string;
+      maxAmount: string;
+      minAmount: string;
+      offeringStatus: string;
+      offeringText: string;
+      startDate: string;
+      targetAmount: string;
+      unitPrice: string;
+    },
+  ): Promise<any> {
+    const endpoint = 'tapiv3/index.php/v3/updateOffering';
+    const data = {
+      offeringId,
+      ...params,
+    };
+
+    const response = await this.postRequest(endpoint, data);
+    const {
+      statusCode,
+      statusDesc,
+      offeringDetails: [status, details],
+    } = response;
+
+    return status;
   }
 }

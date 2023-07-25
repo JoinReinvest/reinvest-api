@@ -1,6 +1,7 @@
 import { UUID } from 'HKEKTypes/Generics';
 import { FundsWithdrawalRequestsRepository } from 'Withdrawals/Adapter/Database/Repository/FundsWithdrawalRequestsRepository';
 import { WithdrawalError } from 'Withdrawals/Domain/FundsWithdrawalRequest';
+import { storeEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class RequestFundWithdrawal {
   private fundsWithdrawalRequestsRepository: FundsWithdrawalRequestsRepository;
@@ -21,5 +22,7 @@ export class RequestFundWithdrawal {
     fundsWithdrawalRequest.request();
 
     await this.fundsWithdrawalRequestsRepository.updateStatus(fundsWithdrawalRequest);
+
+    await this.fundsWithdrawalRequestsRepository.publishEvents([storeEventCommand(profileId, 'WithdrawalRequestSent', fundsWithdrawalRequest.forEvent())]);
   }
 }

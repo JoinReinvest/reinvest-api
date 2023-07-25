@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { DateTime } from 'Money/DateTime';
 import { DividendsRepository } from 'SharesAndDividends/Adapter/Database/Repository/DividendsRepository';
 import { SharesRepository } from 'SharesAndDividends/Adapter/Database/Repository/SharesRepository';
@@ -19,6 +20,8 @@ export type AccountState = {
     unitPrice: number;
   }[];
 };
+
+export type SharesOriginalOwner = { originalOwnerId: UUID; sharesId: UUID };
 
 export class AccountStateQuery {
   private dividendsRepository: DividendsRepository;
@@ -69,5 +72,9 @@ export class AccountStateQuery {
       awaitingDividends: [...awaitingInvestorDividends, ...referralDividends],
       settledShares: shares,
     };
+  }
+
+  async getSharesOriginalOwners(sharesIds: UUID[]): Promise<SharesOriginalOwner[]> {
+    return this.sharesRepository.getSharesOriginalOwners(sharesIds);
   }
 }

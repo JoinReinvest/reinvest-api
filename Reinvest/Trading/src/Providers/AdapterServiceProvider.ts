@@ -7,10 +7,10 @@ import { ReinvestmentRepository } from 'Trading/Adapter/Database/Repository/Rein
 import { TradesRepository } from 'Trading/Adapter/Database/Repository/TradesRepository';
 import { TradingDocumentService } from 'Trading/Adapter/Module/TradingDocumentService';
 import { VendorsMappingService } from 'Trading/Adapter/Module/VendorsMappingService';
+import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
 import { TradingNorthCapitalAdapter } from 'Trading/Adapter/NorthCapital/TradingNorthCapitalAdapter';
 import { TradingVertaloAdapter } from 'Trading/Adapter/Vertalo/TradingVertaloAdapter';
 import { Trading } from 'Trading/index';
-import { VerificationService } from 'Trading/Adapter/Module/VerificationService';
 
 export class AdapterServiceProvider {
   private config: Trading.Config;
@@ -28,8 +28,8 @@ export class AdapterServiceProvider {
     // db
     container
       .addAsValue(TradingDatabaseAdapterInstanceProvider, createTradingDatabaseAdapterProvider(this.config.database))
-      .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider])
-      .addSingleton(ReinvestmentRepository, [TradingDatabaseAdapterInstanceProvider]);
+      .addSingleton(TradesRepository, [TradingDatabaseAdapterInstanceProvider, SimpleEventBus])
+      .addSingleton(ReinvestmentRepository, [TradingDatabaseAdapterInstanceProvider, SimpleEventBus]);
 
     // modules
     container

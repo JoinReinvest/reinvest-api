@@ -123,8 +123,7 @@ export const RecurringInvestments = {
     Query: {
       getActiveRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-        // TODO protect it with profileId!
-        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.ACTIVE);
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.ACTIVE);
 
         if (!recurringInvestment) {
           return null;
@@ -133,10 +132,8 @@ export const RecurringInvestments = {
         return recurringInvestment;
       },
       getDraftRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
-        // TODO protect it with profileId!
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-
-        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
+        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
 
         if (!recurringInvestment) {
           return null;
@@ -146,11 +143,9 @@ export const RecurringInvestments = {
       },
       getScheduleSimulation: async (parent: any, { schedule }: GetScheduleSimulation, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
-
         const { startDate, frequency } = schedule;
-        const simulation = await investmentAccountsApi.getScheduleSimulation(startDate, frequency);
 
-        return simulation;
+        return investmentAccountsApi.getScheduleSimulation(startDate, frequency);
       },
     },
     Mutation: {
@@ -170,9 +165,7 @@ export const RecurringInvestments = {
           throw new JsonGraphQLError('COULDNT_CREATE_RECURRING_INVESTMENT');
         }
 
-        const recurringInvestment = await investmentAccountsApi.getRecurringInvestment(accountId, RecurringInvestmentStatus.DRAFT);
-
-        return recurringInvestment;
+        return investmentAccountsApi.getRecurringInvestment(profileId, accountId, RecurringInvestmentStatus.DRAFT);
       },
       createRecurringSubscriptionAgreement: async (parent: any, { accountId }: any, { profileId, modules, throwIfBanned }: SessionContext) => {
         throwIfBanned(accountId);
@@ -207,14 +200,14 @@ export const RecurringInvestments = {
         throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const status = await investmentAccountsApi.initiateRecurringInvestment(accountId);
+        const status = await investmentAccountsApi.initiateRecurringInvestment(profileId, accountId);
 
         return status;
       },
       deactivateRecurringInvestment: async (parent: any, { accountId }: any, { profileId, modules }: SessionContext) => {
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const status = await investmentAccountsApi.deactivateRecurringInvestment(accountId);
+        const status = await investmentAccountsApi.deactivateRecurringInvestment(profileId, accountId);
 
         return status;
       },
@@ -222,7 +215,7 @@ export const RecurringInvestments = {
         throwIfBanned(accountId);
         const investmentAccountsApi = modules.getApi<InvestmentsModule.ApiType>(InvestmentsModule);
 
-        const status = await investmentAccountsApi.unsuspendRecurringInvestment(accountId);
+        const status = await investmentAccountsApi.unsuspendRecurringInvestment(profileId, accountId);
 
         return status;
       },

@@ -1,13 +1,18 @@
+import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 import {
+  sadAccountsConfiguration,
   sadInvestorDividendsTable,
   sadInvestorIncentiveDividendTable,
   SharesAndDividendsDatabaseAdapterProvider,
 } from 'SharesAndDividends/Adapter/Database/DatabaseAdapter';
 import { DividendsSelection, InvestorIncentiveDividendTable } from 'SharesAndDividends/Adapter/Database/SharesAndDividendsSchema';
+import { ConfigurationTypes } from 'SharesAndDividends/Domain/Configuration/ConfigurationTypes';
 import { IncentiveReward, IncentiveRewardSchema, IncentiveRewardStatus, RewardType } from 'SharesAndDividends/Domain/IncentiveReward';
-import { InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
+import { AUTO_REINVESTMENT_DAYS_THRESHOLD, InvestorDividendStatus } from 'SharesAndDividends/Domain/InvestorDividend';
 import { UnpaidDividendsAndFees } from 'SharesAndDividends/Domain/Stats/StatsDividendsCalculationService';
+import { AutoReinvestDividend } from 'SharesAndDividends/UseCase/DividendsQuery';
 
 export class DividendsRepository {
   private databaseAdapterProvider: SharesAndDividendsDatabaseAdapterProvider;
@@ -109,13 +114,12 @@ export class DividendsRepository {
     profileId: string,
     accountId: string,
   ): Promise<
-    | {
-        amount: number;
-        createdDate: Date;
-        id: string;
-        status: IncentiveRewardStatus | InvestorDividendStatus;
-      }[]
-    | null
+    {
+      amount: number;
+      createdDate: Date;
+      id: string;
+      status: IncentiveRewardStatus | InvestorDividendStatus;
+    }[]
   > {
     const db = this.databaseAdapterProvider.provide();
     const data = await db
@@ -127,14 +131,14 @@ export class DividendsRepository {
           .selectFrom(sadInvestorIncentiveDividendTable)
           .select(['id', 'amount', 'createdDate', 'status'])
           .where('profileId', '=', <any>profileId)
-          .where('accountId', '=', <any>accountId),
+          .where(eb => eb.where('accountId', '=', <any>accountId).orWhere('accountId', 'is', null)),
       )
       .where('profileId', '=', profileId)
       .where('accountId', '=', accountId)
       .execute();
 
-    if (!data) {
-      return null;
+    if (data.length === 0) {
+      return [];
     }
 
     return data;
@@ -144,7 +148,7 @@ export class DividendsRepository {
     await this.databaseAdapterProvider
       .provide()
       .updateTable(sadInvestorIncentiveDividendTable)
-      .set({ status, accountId: accountId, actionDate: new Date() })
+      .set({ status, accountId: accountId, actionDate: DateTime.now().toDate() })
       .where('profileId', '=', profileId)
       .where('id', '=', dividendId)
       .execute();
@@ -154,7 +158,7 @@ export class DividendsRepository {
     await this.databaseAdapterProvider
       .provide()
       .updateTable(sadInvestorDividendsTable)
-      .set({ status, actionDate: new Date() })
+      .set({ status, actionDate: DateTime.now().toDate() })
       .where('profileId', '=', profileId)
       .where('id', '=', dividendId)
       .execute();
@@ -192,5 +196,67 @@ export class DividendsRepository {
     }
 
     return data;
+  }
+
+  async findDividendsReadyForAutomaticReinvestment(): Promise<AutoReinvestDividend[]> {
+    const data = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(sadInvestorDividendsTable)
+      .select(eb => [
+        `${sadInvestorDividendsTable}.id`,
+        `${sadInvestorDividendsTable}.accountId`,
+        `${sadInvestorDividendsTable}.profileId`,
+        eb
+          .selectFrom(sadAccountsConfiguration)
+          .select(`${sadAccountsConfiguration}.configValueJson`)
+          .whereRef(`${sadAccountsConfiguration}.accountId`, '=', `${sadInvestorDividendsTable}.accountId`)
+          .where(`${sadAccountsConfiguration}.configType`, '=', ConfigurationTypes.AUTOMATIC_DIVIDEND_REINVESTMENT_OPT_IN_OUT)
+          .orderBy(`${sadAccountsConfiguration}.dateUpdated`, 'desc')
+          .limit(1)
+          .as('configValueJson'),
+      ])
+      .where(`${sadInvestorDividendsTable}.status`, '=', [InvestorDividendStatus.AWAITING_ACTION])
+      .where(`${sadInvestorDividendsTable}.createdDate`, '<=', DateTime.now().subtractDays(AUTO_REINVESTMENT_DAYS_THRESHOLD).toDate())
+      .execute();
+
+    if (data.length === 0) {
+      return [];
+    }
+
+    return data
+      .filter(record => !!record.configValueJson && record.configValueJson.value === true)
+      .map(record => ({
+        accountId: record.accountId,
+        profileId: record.profileId,
+        dividendId: record.id,
+      }));
+  }
+
+  async markIncentiveDividendsAs(status: IncentiveRewardStatus, dividendsIds: UUID[], isInState: IncentiveRewardStatus): Promise<void> {
+    if (dividendsIds.length === 0) {
+      return;
+    }
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorIncentiveDividendTable)
+      .set({ status })
+      .where('id', 'in', dividendsIds)
+      .where('status', '=', isInState)
+      .execute();
+  }
+
+  async markDividendsAs(status: InvestorDividendStatus, dividendsIds: UUID[], isInState: InvestorDividendStatus): Promise<void> {
+    if (dividendsIds.length === 0) {
+      return;
+    }
+
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(sadInvestorDividendsTable)
+      .set({ status })
+      .where('id', 'in', dividendsIds)
+      .where('status', '=', isInState)
+      .execute();
   }
 }

@@ -1,7 +1,8 @@
-import HTMLParser from './HTMLParser';
+import { Template } from 'Templates/Template';
+import { TemplateContentType, Templates, TemplateVersion } from 'Templates/Types';
+
 import type { PdfGenerator } from './Puppeteer/PdfGenerator';
 import type { S3Adapter } from './S3/S3Adapter';
-import { PdfTypes, Template } from './Types';
 
 export class GeneratePdf {
   private adapter: S3Adapter;
@@ -14,10 +15,9 @@ export class GeneratePdf {
 
   public static getClassName = (): string => 'GeneratePdf';
 
-  async execute(catalog: string, fileName: string, template: Template, type: PdfTypes): Promise<void> {
-    const htmlParser = new HTMLParser(type, template);
-
-    const html = htmlParser.getHTML();
+  async execute(catalog: string, fileName: string, templateName: Templates, version: TemplateVersion, content: TemplateContentType): Promise<void> {
+    const template = new Template(templateName, content, version);
+    const html = template.toHtml();
     const buffer = await this.pdfGenerator.generatePdfFromHtml(html);
 
     if (!buffer) {

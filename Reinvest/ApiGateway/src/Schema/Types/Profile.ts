@@ -3,8 +3,8 @@ import { InvestmentAccounts } from 'InvestmentAccounts/index';
 import { LegalEntities } from 'LegalEntities/index';
 import { ProfileResponse } from 'LegalEntities/Port/Api/GetProfileController';
 import { CompleteProfileInput } from 'LegalEntities/UseCases/CompleteProfile';
-import type { UpdateProfileInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfile';
 import { Registration } from 'Registration/index';
+import type { UpdateProfileInput } from 'Reinvest/LegalEntities/src/UseCases/UpdateProfile';
 
 const schema = `
     #graphql

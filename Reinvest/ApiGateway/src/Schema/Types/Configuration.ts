@@ -1,5 +1,5 @@
 import { SessionContext } from 'ApiGateway/index';
-import { InvestmentAccounts } from 'Reinvest/InvestmentAccounts/src';
+import { SharesAndDividends } from 'SharesAndDividends/index';
 
 const schema = `
     #graphql
@@ -41,8 +41,8 @@ export const Configuration = {
   resolvers: {
     Query: {
       getAccountConfiguration: async (parent: any, { accountId }: GetAccountConfiguration, { profileId, modules }: SessionContext) => {
-        const investmentAccountsApi = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
-        const configuration = await investmentAccountsApi.getConfiguration(profileId, accountId);
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+        const configuration = await api.getConfiguration(profileId, accountId);
 
         if (!configuration) {
           return null;
@@ -58,8 +58,8 @@ export const Configuration = {
         { profileId, modules, throwIfBanned }: SessionContext,
       ) => {
         throwIfBanned(accountId);
-        const investmentAccountsApi = modules.getApi<InvestmentAccounts.ApiType>(InvestmentAccounts);
-        const status = await investmentAccountsApi.createConfiguration(profileId, accountId, automaticDividendReinvestmentAgreement);
+        const api = modules.getApi<SharesAndDividends.ApiType>(SharesAndDividends);
+        const status = await api.createConfiguration(profileId, accountId, automaticDividendReinvestmentAgreement);
 
         return status;
       },

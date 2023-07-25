@@ -1,67 +1,43 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { Pagination } from 'Notifications/Application/Pagination';
-import { CreateNotification } from 'Notifications/Application/UseCase/CreateNotification';
+import { CreateStoredEvent } from 'Notifications/Application/UseCase/CreateStoredEvent';
 import { DismissNotifications } from 'Notifications/Application/UseCase/DismissNotifications';
 import { NotificationFilter, NotificationQuery, NotificationsStats } from 'Notifications/Application/UseCase/NotificationQuery';
-import { NotificationObjectType, NotificationsType, NotificationView } from 'Notifications/Domain/Notification';
-import { PushNotificationRepository } from 'Notifications/Adapter/Database/Repository/PushNotificationRepository';
+import { TransferNotification } from 'Notifications/Application/UseCase/TransferNotification';
+import { NotificationView } from 'Notifications/Domain/Notification';
+import { StoreEventCommand } from 'SimpleAggregator/EventBus/EventBus';
 
 export class NotificationsController {
-  private createNotificationUseCase: CreateNotification;
   private dismissNotificationsUseCase: DismissNotifications;
   private notificationQuery: NotificationQuery;
-  private pushNotificationRepository: PushNotificationRepository;
+  private transferNotificationUseCase: TransferNotification;
+  private createStoredEventUseCase: CreateStoredEvent;
 
   constructor(
-    createNotificationUseCase: CreateNotification,
     dismissNotificationsUseCase: DismissNotifications,
     notificationQuery: NotificationQuery,
-    pushNotificationRepository: PushNotificationRepository,
+    transferNotificationUseCase: TransferNotification,
+    createStoredEventUseCase: CreateStoredEvent,
   ) {
-    this.createNotificationUseCase = createNotificationUseCase;
     this.dismissNotificationsUseCase = dismissNotificationsUseCase;
     this.notificationQuery = notificationQuery;
-    this.pushNotificationRepository = pushNotificationRepository;
+    this.transferNotificationUseCase = transferNotificationUseCase;
+    this.createStoredEventUseCase = createStoredEventUseCase;
   }
 
   static getClassName = () => 'NotificationsController';
 
-  async createNotification(
-    profileId: string,
-    accountId: string | null,
-    notificationType: string,
-    header: string,
-    body: string,
-    dismissId: string | null,
-    onObjectId: string | null,
-    onObjectType: NotificationObjectType | null,
-    uniqueId: string | null,
-    pushNotification?: { body: string; title: string },
-  ): Promise<boolean> {
+  async createStoredEvent(storedEvent: StoreEventCommand): Promise<boolean> {
     try {
-      if (!Object.keys(NotificationsType).includes(notificationType)) {
-        throw new Error(`Invalid notification type: ${notificationType}`);
-      }
-
-      const doesNotificationAlreadyStored = uniqueId ? await this.notificationQuery.doesNotificationExists(uniqueId) : false;
-      await this.createNotificationUseCase.execute({
-        accountId,
-        body,
-        dismissId,
-        header,
-        notificationType: <NotificationsType>notificationType,
-        onObjectId,
-        onObjectType,
-        profileId,
-        uniqueId,
-      });
-
-      if (pushNotification && !doesNotificationAlreadyStored) {
-        await this.pushNotificationRepository.pushNotification(profileId, pushNotification.title, pushNotification.body);
-      }
+      const {
+        data: { kind, payload, date },
+        id: profileId,
+      } = storedEvent;
+      await this.createStoredEventUseCase.execute(profileId, kind, payload, date);
 
       return true;
     } catch (error: any) {
-      console.error('[NotificationsController] createNotification', error);
+      console.error('[NotificationsController] createStoredEvent', error);
 
       return false;
     }
@@ -92,5 +68,9 @@ export class NotificationsController {
 
   async getNotificationsStats(profileId: string, accountId: string): Promise<NotificationsStats> {
     return this.notificationQuery.getNotificationsStats(profileId, accountId);
+  }
+
+  async transferNotificationToAccount(profileId: UUID, newAccountId: UUID, notificationUniqueId: UUID): Promise<void> {
+    await this.transferNotificationUseCase.execute(profileId, newAccountId, notificationUniqueId);
   }
 }

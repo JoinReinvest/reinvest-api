@@ -1,12 +1,12 @@
 import { UUID } from 'HKEKTypes/Generics';
-import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
+import { PropertyRepository } from 'Portfolio/Adapter/Database/Repository/PropertyRepository';
 import { DealpathAdapter } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
 
 class SynchronizePortfolio {
-  private portfolioRepository: PortfolioRepository;
+  private portfolioRepository: PropertyRepository;
   private dealpathAdapter: DealpathAdapter;
 
-  constructor(portfolioRepository: PortfolioRepository, dealpathAdapter: DealpathAdapter) {
+  constructor(portfolioRepository: PropertyRepository, dealpathAdapter: DealpathAdapter) {
     this.portfolioRepository = portfolioRepository;
     this.dealpathAdapter = dealpathAdapter;
   }

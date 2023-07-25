@@ -2,14 +2,15 @@ import { ContainerInterface } from 'Container/Container';
 import AbortInvestment from 'Investments/Application/UseCases/AbortInvestment';
 import ApproveFees from 'Investments/Application/UseCases/ApproveFees';
 import { CancelInvestment } from 'Investments/Application/UseCases/CancelInvestment';
-import CreateInvestment from 'Investments/Application/UseCases/CreateInvestment';
+import { CreateInvestment } from 'Investments/Application/UseCases/CreateInvestment';
+import { CreateInvestmentFromRecurringInvestment } from 'Investments/Application/UseCases/CreateInvestmentFromRecurringInvestment';
 import CreateRecurringSubscriptionAgreement from 'Investments/Application/UseCases/CreateRecurringSubscriptionAgreement';
 import CreateSubscriptionAgreement from 'Investments/Application/UseCases/CreateSubscriptionAgreement';
 import DeactivateRecurringInvestment from 'Investments/Application/UseCases/DeactivateRecurringInvestment';
 import InitiateRecurringInvestment from 'Investments/Application/UseCases/InitiateRecurringInvestment';
 import InvestmentSummaryQuery from 'Investments/Application/UseCases/InvestmentSummaryQuery';
 import IsFeeApproved from 'Investments/Application/UseCases/IsFeeApproved';
-import ListInvestments from 'Investments/Application/UseCases/ListInvestments';
+import ListInvestmentsQuery from 'Investments/Application/UseCases/ListInvestmentsQuery';
 import { PushTransaction } from 'Investments/Application/UseCases/PushTransaction';
 import { ReinvestDividend } from 'Investments/Application/UseCases/ReinvestDividend';
 import ScheduleSimulationQuery from 'Investments/Application/UseCases/ScheduleSimulationQuery';
@@ -17,6 +18,7 @@ import SignRecurringSubscriptionAgreement from 'Investments/Application/UseCases
 import SignSubscriptionAgreement from 'Investments/Application/UseCases/SignSubscriptionAgreement';
 import StartInvestment from 'Investments/Application/UseCases/StartInvestment';
 import SubscriptionAgreementQuery from 'Investments/Application/UseCases/SubscriptionAgreementQuery';
+import { TransferInvestments } from 'Investments/Application/UseCases/TransferInvestments';
 import UnsuspendRecurringInvestment from 'Investments/Application/UseCases/UnsuspendRecurringInvestment';
 import { Investments } from 'Investments/index';
 import { DividendsController } from 'Investments/Infrastructure/Ports/DividendsController';
@@ -30,6 +32,7 @@ import { TransactionController } from 'Investments/Infrastructure/Ports/Transact
 import CreateRecurringInvestment from 'Reinvest/Investments/src/Application/UseCases/CreateDraftRecurringInvestment';
 import RecurringInvestmentQuery from 'Reinvest/Investments/src/Application/UseCases/RecurringInvestmentQuery';
 import { SimpleEventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { PushReinvestment } from 'Investments/Application/UseCases/PushReinvestment';
 
 export default class PortsProviders {
   private config: Investments.Config;
@@ -45,8 +48,9 @@ export default class PortsProviders {
       InvestmentSummaryQuery,
       StartInvestment,
       AbortInvestment,
-      ListInvestments,
+      ListInvestmentsQuery,
       CancelInvestment,
+      TransferInvestments,
     ]);
     container.addSingleton(SubscriptionAgreementController, [
       CreateSubscriptionAgreement,
@@ -63,8 +67,9 @@ export default class PortsProviders {
       InitiateRecurringInvestment,
       DeactivateRecurringInvestment,
       UnsuspendRecurringInvestment,
+      CreateInvestmentFromRecurringInvestment,
     ]);
     container.addSingleton(DividendsController, [ReinvestDividend]);
-    container.addSingleton(TransactionController, [PushTransaction]);
+    container.addSingleton(TransactionController, [PushTransaction, PushReinvestment]);
   }
 }

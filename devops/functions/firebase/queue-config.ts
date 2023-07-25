@@ -7,7 +7,7 @@ import { SQSSendPolicy } from '../queue/queue-config';
 export const FirebaseFunction = {
   handler: `devops/functions/firebase/handler.main`,
   role: 'FirebaseRole',
-  timeout: 30,
+  timeout: 29,
   vpc: {
     securityGroupIds: [getAttribute('FirebaseSecurityGroup', 'GroupId')],
     subnetIds: [...importPrivateSubnetRefs()],

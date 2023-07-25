@@ -1,16 +1,20 @@
+import { InvestmentFeeService } from 'Investments/Domain/Service/InvestmentFeeService';
 import { InvestmentsDatabase } from 'Investments/Infrastructure/Adapters/PostgreSQL/DatabaseAdapter';
-import { FeesRepository } from 'Investments/Infrastructure/Adapters/Repository/FeesRepository';
 import { InvestmentsRepository } from 'Investments/Infrastructure/Adapters/Repository/InvestmentsRepository';
 import { TransactionalAdapter } from 'PostgreSQL/TransactionalAdapter';
 
 class AbortInvestment {
   private readonly investmentsRepository: InvestmentsRepository;
-  private readonly feesRepository: FeesRepository;
-  private readonly transactionAdapter: TransactionalAdapter<InvestmentsDatabase>;
+  private investmentFeeService: InvestmentFeeService;
+  private transactionAdapter: TransactionalAdapter<InvestmentsDatabase>;
 
-  constructor(investmentsRepository: InvestmentsRepository, feesRepository: FeesRepository, transactionAdapter: TransactionalAdapter<InvestmentsDatabase>) {
+  constructor(
+    investmentsRepository: InvestmentsRepository,
+    investmentFeeService: InvestmentFeeService,
+    transactionAdapter: TransactionalAdapter<InvestmentsDatabase>,
+  ) {
     this.investmentsRepository = investmentsRepository;
-    this.feesRepository = feesRepository;
+    this.investmentFeeService = investmentFeeService;
     this.transactionAdapter = transactionAdapter;
   }
 
@@ -24,18 +28,11 @@ class AbortInvestment {
         return false;
       }
 
-      investment.abort();
-
-      const status = await this.transactionAdapter.transaction(`Abort investment ${investmentId} with related fee if exist`, async () => {
-        await this.investmentsRepository.updateStatus(investment);
-        const fee = investment.getFee();
-
-        if (fee) {
-          await this.feesRepository.storeFee(fee);
-        }
+      return await this.transactionAdapter.transaction(`Abort transaction ${investmentId}`, async () => {
+        investment.abort();
+        await this.investmentFeeService.withdrawFee(investment.getFee());
+        await this.investmentsRepository.store(investment);
       });
-
-      return status;
     } catch (e) {
       console.log(e);
 

@@ -8,7 +8,6 @@ export const NORTH_CAPITAL_CONFIG = {
   CLIENT_ID: process.env.NORTH_CAPITAL_CLIENT_ID as string,
   DEVELOPER_API_KEY: process.env.NORTH_CAPITAL_DEVELOPER_API_KEY as string,
   API_URL: process.env.NORTH_CAPITAL_API_URL as string,
-  OFFERING_ID: process.env.NORTH_CAPITAL_OFFERING_ID as string,
 };
 
 export const VERTALO_CONFIG = {
@@ -29,7 +28,7 @@ export const DATABASE_CONFIG = {
   host: process.env.POSTGRESQL_HOST as string,
   user: process.env.POSTGRESQL_USER as string,
   password: process.env.POSTGRESQL_PASSWORD as string,
-  database: process.env.POSTGRESQL_DB as string,
+  database: process.env.POSTGRESQL_DB_NAME as string,
 };
 
 export const S3_CONFIG = {
@@ -67,6 +66,12 @@ export const FIREBASE_SQS_CONFIG = {
   isLocal: process.env.IT_IS_LOCAL === 'true',
 };
 
+export const SEGMENT_SQS_CONFIG = {
+  region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+  queueUrl: process.env.SQS_SEGMENT_QUEUE_URL as string,
+  isLocal: process.env.IT_IS_LOCAL === 'true',
+};
+
 export const LAMBDA_CONFIG = {
   region: process.env.INFRASTRUCTURE_AWS_REGION as string,
   isLocal: process.env.IT_IS_LOCAL === 'true',
@@ -79,5 +84,13 @@ export const SENTRY_CONFIG = {
 };
 
 export const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN as string;
+export const PROFILEID_HASH_KEY = process.env.PROFILEID_HASH_KEY as string;
 
+export const EMAIL_CONFIG = {
+  sourceEmail: process.env.EMAIL_SEND_FROM as string,
+  replyToEmail: process.env.EMAIL_REPLY_TO as string,
+  region: process.env.INFRASTRUCTURE_AWS_REGION as string,
+};
 // export const FIREBASE_SERVICE_ACCOUNT_JSON = process.env.FIREBASE_SERVICE_ACCOUNT_JSON as string;
+export const SEGMENT_API_KEY = process.env.SEGMENT_API_KEY as string;
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL as string;

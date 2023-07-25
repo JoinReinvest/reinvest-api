@@ -1,21 +1,27 @@
-import { UUID } from 'HKEKTypes/Generics';
+import { Pagination, UUID } from 'HKEKTypes/Generics';
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
-import { legalEntitiesBannedListTable, LegalEntitiesDatabaseAdapterProvider } from 'LegalEntities/Adapter/Database/DatabaseAdapter';
+import {
+  legalEntitiesBannedListTable,
+  legalEntitiesCompanyAccountTable,
+  LegalEntitiesDatabaseAdapterProvider,
+  legalEntitiesProfileTable,
+} from 'LegalEntities/Adapter/Database/DatabaseAdapter';
 import { LegalEntitiesBannedList } from 'LegalEntities/Adapter/Database/LegalEntitiesSchema';
-
-export enum BannedType {
-  PROFILE = 'PROFILE',
-  COMPANY = 'COMPANY',
-  STAKEHOLDER = 'STAKEHOLDER',
-}
+import { BannedEntity, BannedType } from 'LegalEntities/Domain/BannedEntity';
+import { BannedView } from 'LegalEntities/Port/Api/BanController';
+import { DateTime } from 'Money/DateTime';
+import { EventBus } from 'SimpleAggregator/EventBus/EventBus';
+import { DomainEvent } from 'SimpleAggregator/Types';
 
 export class BanRepository {
   private databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider;
   private idGenerator: IdGeneratorInterface;
+  private eventBus: EventBus;
 
-  constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, idGenerator: IdGeneratorInterface) {
+  constructor(databaseAdapterProvider: LegalEntitiesDatabaseAdapterProvider, idGenerator: IdGeneratorInterface, eventBus: EventBus) {
     this.databaseAdapterProvider = databaseAdapterProvider;
     this.idGenerator = idGenerator;
+    this.eventBus = eventBus;
   }
 
   public static getClassName = (): string => 'BanRepository';
@@ -53,7 +59,7 @@ export class BanRepository {
     return bannedRecord;
   }
 
-  async addBannedRecord(bannedRecord: Partial<LegalEntitiesBannedList>): Promise<void> {
+  async addBannedRecord(bannedRecord: Partial<LegalEntitiesBannedList>, events: DomainEvent[] = []): Promise<void> {
     const activeBannedRecord = await this.getActiveBannedRecord(
       bannedRecord.type!,
       bannedRecord.profileId!,
@@ -69,5 +75,81 @@ export class BanRepository {
     const values = <LegalEntitiesBannedList>{ ...bannedRecord, id };
 
     await this.databaseAdapterProvider.provide().insertInto(legalEntitiesBannedListTable).values(values).execute();
+
+    await this.publishEvents(events);
+  }
+
+  async publishEvents(events: DomainEvent[] = []): Promise<void> {
+    if (events.length === 0) {
+      return;
+    }
+
+    await this.eventBus.publishMany(events);
+  }
+
+  async listBanned(pagination: Pagination): Promise<BannedView[]> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(`${legalEntitiesBannedListTable} as banned`)
+      .leftJoin(`${legalEntitiesCompanyAccountTable}`, `banned.accountId`, `${legalEntitiesCompanyAccountTable}.accountId`)
+      .leftJoin(`${legalEntitiesProfileTable}`, `banned.profileId`, `${legalEntitiesProfileTable}.profileId`)
+      .select([
+        'banned.id',
+        'banned.type',
+        'banned.dateCreated',
+        'banned.profileId',
+        'banned.reasons',
+        'banned.anonymizedSensitiveNumber',
+        'banned.status',
+        'banned.accountId',
+        `${legalEntitiesProfileTable}.name`,
+        `${legalEntitiesCompanyAccountTable}.companyName`,
+      ])
+      .orderBy('dateCreated', 'desc')
+      .limit(pagination.perPage)
+      .offset(pagination.perPage * pagination.page)
+      .execute();
+
+    return result.map((row): BannedView => {
+      return {
+        banId: row.id,
+        bannedObject: row.type,
+        dateCreated: DateTime.from(row.dateCreated).toIsoDateTime(),
+        profileId: row.profileId,
+        reason: row.reasons,
+        ssnEin: row.anonymizedSensitiveNumber,
+        status: row.status,
+        banType: row.type === BannedType.PROFILE ? 'PROFILE' : 'ACCOUNT',
+        accountId: row.accountId ?? null,
+        // @ts-ignore
+        label: !row?.companyName ? `${row?.name?.firstName ?? ''} ${row?.name?.lastName ?? ''}` : row?.companyName?.name ?? '',
+      };
+    });
+  }
+
+  async findBannedEntityById(banId: UUID): Promise<BannedEntity | null> {
+    const result = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(legalEntitiesBannedListTable)
+      .selectAll()
+      .where('id', '=', banId)
+      .castTo<BannedEntity>()
+      .limit(1)
+      .executeTakeFirst();
+
+    if (!result) {
+      return null;
+    }
+
+    return result;
+  }
+
+  async unban(banId: UUID): Promise<void> {
+    await this.databaseAdapterProvider
+      .provide()
+      .updateTable(legalEntitiesBannedListTable)
+      .set({ status: 'CANCELLED', dateCancelled: DateTime.now().toDate() })
+      .where('id', '=', banId)
+      .execute();
   }
 }

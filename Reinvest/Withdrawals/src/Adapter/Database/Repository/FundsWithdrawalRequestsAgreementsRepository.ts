@@ -41,12 +41,17 @@ export class FundsWithdrawalRequestsAgreementsRepository {
 
   async updateFundsWithdrawalRequestAgreement(withdrawalFundsRequestAgreement: FundsRequestWithdrawalAgreement) {
     const id = withdrawalFundsRequestAgreement.getId();
+    const { status, signedByIP, signedAt, pdfDateCreated, contentFieldsJson } = withdrawalFundsRequestAgreement.toObject();
     try {
       await this.databaseAdapterProvider
         .provide()
         .updateTable(withdrawalsFundsRequestsAgreementsTable)
         .set({
-          ...withdrawalFundsRequestAgreement.toObject(),
+          signedByIP,
+          signedAt,
+          pdfDateCreated,
+          status,
+          contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
         })
         .where('id', '=', id)
         .execute();
@@ -75,18 +80,7 @@ export class FundsWithdrawalRequestsAgreementsRepository {
           templateVersion,
           contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
         })
-        .onConflict(oc =>
-          oc.constraint('funds_request_id_unique').doUpdateSet({
-            id,
-            status,
-            dateCreated: new Date(),
-            signedAt: null,
-            signedByIP: null,
-            pdfDateCreated: null,
-            templateVersion,
-            contentFieldsJson: <JSONObject>{ ...contentFieldsJson },
-          }),
-        )
+        .onConflict(oc => oc.constraint('funds_request_id_unique').doNothing())
         .executeTakeFirst();
 
       return true;
@@ -95,5 +89,20 @@ export class FundsWithdrawalRequestsAgreementsRepository {
 
       return false;
     }
+  }
+
+  async getById(id: UUID) {
+    const fundsRequestWithdrawalAgreement = await this.databaseAdapterProvider
+      .provide()
+      .selectFrom(withdrawalsFundsRequestsAgreementsTable)
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
+    if (!fundsRequestWithdrawalAgreement) {
+      return null;
+    }
+
+    return FundsRequestWithdrawalAgreement.create(fundsRequestWithdrawalAgreement);
   }
 }

@@ -1,3 +1,4 @@
+import { DateTime } from 'Money/DateTime';
 import { VerificationEvents, VerificationRequestedObjectUpdatedEvent } from 'Verification/Domain/ValueObject/VerificationEvents';
 import { VerifierRepository } from 'Verification/IntegrationLogic/Verifier/VerifierRepository';
 
@@ -28,7 +29,7 @@ export class UserVerificationActions {
 
     verifier.handleVerificationEvent(<VerificationRequestedObjectUpdatedEvent>{
       kind: VerificationEvents.VERIFICATION_REQUESTED_OBJECT_UPDATED,
-      date: new Date(),
+      date: DateTime.now().toDate(),
       ncId: verifier.getPartyId(),
     });
 

@@ -1,3 +1,4 @@
+import { UUID } from 'HKEKTypes/Generics';
 import { Money } from 'Money/Money';
 import { AwaitingDividend, EligibleWithdrawals, SettledShares } from 'Withdrawals/Domain/WithdrawalsCalculator';
 
@@ -82,5 +83,13 @@ export class EligibleWithdrawalsState {
         transactionDate: transactionDate.toIsoDate(),
       };
     });
+  }
+
+  getSettledSharesIds(): UUID[] {
+    return this.settledShares.map(({ id }) => id);
+  }
+
+  getAwaitingDividendsIds(): UUID[] {
+    return this.awaitingDividends.map(({ id }) => id);
   }
 }

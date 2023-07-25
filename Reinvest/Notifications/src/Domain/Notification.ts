@@ -1,21 +1,19 @@
+import { UUID } from 'HKEKTypes/Generics';
+import { DateTime } from 'Money/DateTime';
+
 export enum NotificationsType {
   DIVIDEND_RECEIVED = 'DIVIDEND_RECEIVED',
   REWARD_DIVIDEND_RECEIVED = 'REWARD_DIVIDEND_RECEIVED',
-  DIVIDEND_REINVESTED = 'DIVIDEND_REINVESTED',
-  DIVIDEND_REINVESTED_AUTOMATICALLY = 'DIVIDEND_REINVESTED_AUTOMATICALLY',
-  DIVIDEND_PAYOUT_INITIATED = 'DIVIDEND_PAYOUT_INITIATED',
-  INVESTMENT_FAILED = 'INVESTMENT_FAILED',
-  INVESTMENT_FUNDS_RECEIVED = 'INVESTMENT_FUNDS_RECEIVED',
   RECURRING_INVESTMENT_FAILED = 'RECURRING_INVESTMENT_FAILED',
   VERIFICATION_FAILED = 'VERIFICATION_FAILED',
-  FUNDS_WITHDRAWAL_REJECTED = 'FUNDS_WITHDRAWAL_REJECTED',
-  FUNDS_WITHDRAWAL_ACCEPTED = 'FUNDS_WITHDRAWAL_ACCEPTED',
+  FEES_APPROVAL_REQUIRED = 'FEES_APPROVAL_REQUIRED',
   GENERIC_NOTIFICATION = 'GENERIC_NOTIFICATION',
 }
 
 export enum NotificationObjectType {
   ACCOUNT = 'ACCOUNT',
   INVESTMENT = 'INVESTMENT',
+  RECURRING_INVESTMENT = 'RECURRING_INVESTMENT',
   DIVIDEND = 'DIVIDEND',
 }
 
@@ -73,7 +71,7 @@ export class Notification {
   static create(notificationInput: NotificationInput) {
     const notificationSchema = <NotificationSchema>{
       ...notificationInput,
-      dateCreated: new Date(),
+      dateCreated: DateTime.now().toDate(),
       dateRead: null,
       isRead: false,
       isDismissible: notificationInput.dismissId === notificationInput.id,
@@ -92,7 +90,7 @@ export class Notification {
     }
 
     this.notificationSchema.isRead = true;
-    this.notificationSchema.dateRead = new Date();
+    this.notificationSchema.dateRead = DateTime.now().toDate();
   }
 
   toObject() {
@@ -116,5 +114,9 @@ export class Notification {
           }
         : null,
     };
+  }
+
+  transferToAccount(accountId: UUID): void {
+    this.notificationSchema.accountId = accountId;
   }
 }

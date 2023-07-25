@@ -62,3 +62,42 @@ export class TradeStatus {
     return this.orderStatus === OrderStatus.UNWIND_SETTLED;
   }
 }
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  SUBMITTED = 'submitted',
+  SETTLED = 'settled',
+  RETURNED = 'returned',
+  VOIDED = 'voided',
+  DECLINED = 'declined',
+}
+
+export class TradePaymentStatus {
+  private readonly paymentStatus: PaymentStatus;
+
+  constructor(paymentStatus: PaymentStatus) {
+    this.paymentStatus = paymentStatus;
+  }
+
+  static fromResponse(paymentStatus: string | null): TradePaymentStatus {
+    if (!paymentStatus) {
+      return new TradePaymentStatus(PaymentStatus.PENDING);
+    }
+
+    const status = paymentStatus.toLowerCase() as PaymentStatus;
+
+    if (!Object.values(PaymentStatus).includes(status)) {
+      throw new Error(`Invalid payment status: ${paymentStatus}`);
+    }
+
+    return new TradePaymentStatus(status);
+  }
+
+  toString(): PaymentStatus {
+    return this.paymentStatus;
+  }
+
+  isFailed(): boolean {
+    return [PaymentStatus.RETURNED, PaymentStatus.VOIDED, PaymentStatus.DECLINED].includes(this.paymentStatus);
+  }
+}

@@ -11,6 +11,10 @@ export class DateTime {
     return new DateTime(dayjs());
   }
 
+  static nowIsoDate(): DateTime {
+    return DateTime.fromIsoDate(DateTime.now().toDate());
+  }
+
   static from(date: Date | string): DateTime {
     return new DateTime(dayjs(date));
   }
@@ -63,11 +67,31 @@ export class DateTime {
     return this.date.isAfter(dayjs(), 'day');
   }
 
-  private subtractDays(days: number): DateTime {
+  subtractDays(days: number): DateTime {
     return new DateTime(this.date.subtract(days, 'day'));
   }
 
   toFormattedDate(dateFormat: string) {
     return this.date.format(dateFormat);
+  }
+
+  addSeconds(numberOfSeconds: number): DateTime {
+    return new DateTime(this.date.add(numberOfSeconds, 'second'));
+  }
+
+  addMinutes(expirationInMinutes: number): DateTime {
+    return new DateTime(this.date.add(expirationInMinutes, 'minute'));
+  }
+
+  static isInFormat(date: string, format: string): boolean {
+    return dayjs(date, format).isValid();
+  }
+
+  toTimestamp(): number {
+    return this.date.unix();
+  }
+
+  add(value: number, type: 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second'): DateTime {
+    return new DateTime(this.date.add(value, type));
   }
 }

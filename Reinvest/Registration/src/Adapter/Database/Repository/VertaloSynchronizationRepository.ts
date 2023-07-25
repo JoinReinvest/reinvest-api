@@ -1,4 +1,5 @@
 import { IdGeneratorInterface } from 'IdGenerator/IdGenerator';
+import { DateTime } from 'Money/DateTime';
 import { RegistrationDatabaseAdapterProvider, vertaloSynchronizationTable } from 'Registration/Adapter/Database/DatabaseAdapter';
 import { InsertableVertaloSynchronization, SelectableVertaloSynchronizationRecord } from 'Registration/Adapter/Database/RegistrationSchema';
 import { VertaloSynchronizationRecord } from 'Registration/Adapter/Vertalo/VertaloSynchronizationRecord';
@@ -54,7 +55,7 @@ export class VertaloSynchronizationRepository {
       return;
     }
 
-    const updatedDate = new Date();
+    const updatedDate = DateTime.now().toDate();
     const nextVersion = synchronizationRecord.getNextVersion();
     const currentVersion = synchronizationRecord.getVersion();
 
