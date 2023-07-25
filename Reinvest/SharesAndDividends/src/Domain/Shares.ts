@@ -215,6 +215,7 @@ export class Shares {
   markAsWithdrawing(): boolean {
     if (this.sharesSchema.status === SharesStatus.SETTLED) {
       this.sharesSchema.status = SharesStatus.WITHDRAWING;
+
       return true;
     }
 
