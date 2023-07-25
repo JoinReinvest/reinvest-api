@@ -5,7 +5,12 @@ import { ProfileRepository } from 'LegalEntities/Adapter/Database/Repository/Pro
 import { IdentityService } from 'LegalEntities/Adapter/Modules/IdentityService';
 import { CompanyAccount } from 'LegalEntities/Domain/Accounts/CompanyAccount';
 import { Profile } from 'LegalEntities/Domain/Profile';
-import { FINRAMemberStatement, PersonalStatementType, TradingCompanyStakeholderStatement } from 'LegalEntities/Domain/ValueObject/PersonalStatements';
+import {
+  AccreditedInvestorStatement,
+  FINRAMemberStatement,
+  PersonalStatementType,
+  TradingCompanyStakeholderStatement,
+} from 'LegalEntities/Domain/ValueObject/PersonalStatements';
 import { DateTime } from 'Money/DateTime';
 
 export type InvestorAgreementsData = {
@@ -118,7 +123,7 @@ export class SubscriptionAgreementDataController {
         FINRAInstitutionName = (<FINRAMemberStatement>statement).getFINRAInstitutionName();
       }
 
-      if (statement.isType(PersonalStatementType.AccreditedInvestor)) {
+      if (statement.isType(PersonalStatementType.AccreditedInvestor) && (<AccreditedInvestorStatement>statement).isAccreditedInvestor()) {
         isAccreditedInvestor = true;
       }
 

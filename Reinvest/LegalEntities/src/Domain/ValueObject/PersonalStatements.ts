@@ -219,6 +219,10 @@ export class AccreditedInvestorStatement extends PersonalStatement implements To
   getDetails(): string[] {
     return [this.statement];
   }
+
+  isAccreditedInvestor(): boolean {
+    return this.statement === AccreditedInvestorStatements.I_AM_AN_ACCREDITED_INVESTOR;
+  }
 }
 
 class TermsAndConditionsStatement extends PersonalStatement implements ToObject {
