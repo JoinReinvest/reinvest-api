@@ -9,6 +9,7 @@ export type EmailConfiguration = {
 
 export enum EmailTemplate {
   NOTIFICATION = 'NotificationTemplate',
+  SHARE_CALCULATION = 'ShareCalculationTemplate',
 }
 
 export class EmailSender {
@@ -39,5 +40,9 @@ export class EmailSender {
 
   async sendNotificationEmail(toEmail: string, subject: string, body: string): Promise<void> {
     await this.sendTemplateEmail(EmailTemplate.NOTIFICATION, toEmail, { subject, body });
+  }
+
+  async sendShareCalculationEmail(toEmail: string, subject: string, body: string): Promise<void> {
+    await this.sendTemplateEmail(EmailTemplate.SHARE_CALCULATION, toEmail, { subject, body });
   }
 }
