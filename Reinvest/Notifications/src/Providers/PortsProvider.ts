@@ -10,6 +10,8 @@ import { Notifications } from 'Notifications/index';
 import { NotificationsController } from 'Notifications/Port/Api/NotificationsController';
 import { StoredEventsController } from 'Notifications/Port/Api/StoredEventsController';
 import { CreateStoredEvent } from 'Notifications/Application/UseCase/CreateStoredEvent';
+import { EmailController } from 'Notifications/Port/Api/EmailController';
+import { EmailSender } from 'Notifications/Adapter/SES/EmailSender';
 
 export class PortsProvider {
   private config: Notifications.Config;
@@ -22,5 +24,6 @@ export class PortsProvider {
     // api
     container.addSingleton(NotificationsController, [DismissNotifications, NotificationQuery, TransferNotification, CreateStoredEvent]);
     container.addSingleton(StoredEventsController, [StoredEventRepository, ProcessStoredEvent, AccountActivitiesRepository, PushNotificationRepository]);
+    container.addSingleton(EmailController, [EmailSender]);
   }
 }
