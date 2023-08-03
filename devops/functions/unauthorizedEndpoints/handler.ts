@@ -9,6 +9,8 @@ import { IdentityApiType } from 'Reinvest/Identity/src/Port/Api/IdentityApi';
 import serverless from 'serverless-http';
 import { Trading } from 'Trading/index';
 import { Verification } from 'Verification/index';
+import { Notifications } from 'Notifications/index';
+import { EmailSender, EmailTemplate } from 'Notifications/Adapter/SES/EmailSender';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }) as any);
@@ -143,6 +145,16 @@ app.post('/calculations/:id', async function (req: any, res: any) {
   await modules.close();
 
   res.json({ status: true, data: calculationData });
+});
+
+app.post('/calculations/:id/share', async function (req: any, res: any) {
+  const modules = boot();
+  const { email } = req.body;
+  const { id } = req.params;
+  const notificationApi = modules.getApi<Notifications.ApiType>(Notifications);
+  const data = await notificationApi.sendEmail(email, `${process.env.BACKEND_URL}/calculations/${id}`);
+
+  res.json({ status: true, data });
 });
 
 export const main = serverless(app, {
