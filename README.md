@@ -149,6 +149,7 @@ This is a database recovery procedure. This procedure creates a new database ins
 database from the snapshot. The old database instance is not deleted automatically.
 The new instance host must be set up in Github Actions manually and redeployed to apply changes
 
+
 1. Go to the 'Amazon RDS/Snapshots/System' and find the latest snapshot for the database 'reinvest-<environement>-<
    randomized-string>'
 2. Copy the snapshot ARN
