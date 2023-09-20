@@ -33,19 +33,43 @@ ReInvest API
 
 1. Don't touch `REINVEST - clean scenarious` - it's for tester
 2. `REINVEST - raw requests` is correct collection for developers
+3. You should have setupped local environment in Postman like:
+   - `cognitoAuthUrl` - link to cognito
+   - `cognitoAppId` - id for app in cognito
+   - `apiUrl` - local api url
+   - `cognitoCallbackUrl` - local cognito callback url to set headers in request
+   - `restApi` - endpoint to api
+   - `testsApi` - endpoint to tests api
+   - `initialIncrementalValue` - number responsible for incrementing `userIncrementalNumber` in Postman env
+   - `userIncrementalNumber` - part of new email for user, it is incremented by `initialIncrementalValue` after each
+     call of `[TEST] Create and login user` request
 
 ### How to create user?
 
 1. Create and login user by calling `[TEST] Create and login user` request in `Set up tests/Create profile` folder in
    Postman collection. Each call will create new user with new `userIncrementalNumber` in Postman env.
-2. Create profile by calling `Complete Profile details Copy` request in `Onboarding user fot tests/Create profile`
+2. Right now you should be able to have access to `/explorer/admin` endpoint in borwser for example
+   `http://localhost:3000/explorer/admin`. Created user always has `ThisTestUserPassword123!` password, and `reinvest-test-user-<userIncrementalNumber>@devkick.pl` email.
+3. Create profile by calling `Complete Profile details Copy` request in `Onboarding user fot tests/Create profile`
    folder in Postman collection
-3. Create individual account by calling `Add Individual draft account` in `Onboarding user fot tests/Individual` folder
+4. Create individual account by calling `Add Individual draft account` in `Onboarding user fot tests/Individual` folder
    in Postman collection
-4. Fill individual account by calling `Fill individual draft` in `Onboarding user fot tests/Individual`
-5. Open individual account by calling `Open individual account` in `Onboarding user fot tests/Individual`
-6. Connect account with Plaid by calling `Create Plaid link` in `Onboarding user fot tests/Individual`
-7. Complete Plaid data by calling `Fulfill bank account Copy 2` in `Onboarding user fot tests/Individual`
+5. Fill individual account by calling `Fill individual draft` in `Onboarding user fot tests/Individual`
+6. Open individual account by calling `Open individual account` in `Onboarding user fot tests/Individual`
+7. Connect account with Plaid by calling `Create Plaid link` in `Onboarding user fot tests/Individual`
+8. Complete Plaid data by calling `Fulfill bank account Copy 2` in `Onboarding user fot tests/Individual`
+
+### How to generate documentation?
+
+1. Do all steps from `Postman` section
+2. Do all steps from `How to create user?` section or create user using web app or `<environment>/explorer/admin` url
+3. After login to api explorer, open dev tools by click right mouse button and choose `Inspect`. Refresh page.
+4. Go to `Network` tab and click `Fetch/XHR` filter, you should see `admin` request name in all requests
+5. Select `admin` request and go to `Headers` tab, copy `Authorization` header (without `Bearer `)
+6. Back to API terminal.
+7. Run `export API_URL=<paste api url>`
+8. Run `export API_TOKEN=<paste Authorization header>`
+9. In terminal run `yarn api-docs`
 
 ### Infrastructure
 

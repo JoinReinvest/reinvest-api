@@ -82,7 +82,9 @@
     "development:redeploy:saas": "tag=DEVELOPMENT_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
     "integrations:redeploy:saas": "tag=INTEGRATIONS_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
     "staging:redeploy:saas": "tag=STAGING_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
-    "production:redeploy:saas": "tag=PRODUCTION_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} "
+    "production:redeploy:saas": "tag=PRODUCTION_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "api-doc": "yarn codegen && yarn magidoc generate && yarn magidoc preview"
   },
   "dependencies": {
     "@apollo/server": "^4.5.0",
@@ -95,10 +97,12 @@
     "@aws-sdk/client-sqs": "^3.303.0",
     "@aws-sdk/lib-storage": "^3.350.0",
     "@aws-sdk/s3-request-presigner": "^3.303.0",
+    "@graphql-codegen/schema-ast": "^4.0.0",
     "@graphql-tools/delegate": "^9.0.28",
     "@graphql-tools/merge": "^8.4.0",
     "@graphql-tools/schema": "^9.0.17",
     "@graphql-tools/stitch": "^8.7.44",
+    "@magidoc/cli": "^4.1.0",
     "@segment/analytics-node": "^1.0.0",
     "@sentry/node": "^7.47.0",
     "@sentry/serverless": "^7.47.0",
@@ -111,7 +115,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "firebase-admin": "^11.9.0",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.0",
     "graphql-constraint-directive": "^5.0.0",
     "handlebars": "^4.7.7",
     "kysely": "0.25.0",
@@ -122,6 +126,11 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/introspection": "4.0.0",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@graphql-codegen/typescript-document-nodes": "4.0.1",
+    "@graphql-codegen/typescript-resolvers": "4.0.1",
     "@hookooekoo/configs-tsconfig": "0.0.16",
     "@hookooekoo/eslint-config": "0.2.1",
     "@serverless/typescript": "3.29.0",
@@ -148,7 +157,7 @@
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "ts-sinon": "^2.0.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.2.2"
   },
   "eslintConfig": {
     "extends": "@hookooekoo/eslint-config",

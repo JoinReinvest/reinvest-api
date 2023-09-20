@@ -21,6 +21,7 @@ import { Shared } from 'ApiGateway/Schema/Types/Shared';
 import { VerificationSchema } from 'ApiGateway/Schema/Types/Verification';
 import { WithdrawalsSchema } from 'ApiGateway/Schema/Types/WithdrawalsSchema';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
+import * as fs from 'fs';
 
 const executableSchemas = [EmailAddress, FileName, DateScalar, Money, Hello];
 
@@ -69,5 +70,5 @@ const stitches = [constraintDirective(), ProfileStitcher];
 for (const stitch of stitches) {
   schema = stitch(schema);
 }
-
+console.log("2222222222222222222222222222222", schema);
 export default schema;
