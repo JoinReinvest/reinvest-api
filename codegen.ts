@@ -4,7 +4,7 @@ const config: CodegenConfig = {
   overwrite: true,
   schema: [
     {
-      [`http://localhost:3000/api`]: {
+      [`${process.env.API_URL}`]: {
         headers: {
           Authorization: `Bearer ${process.env.API_TOKEN}`,
         },
