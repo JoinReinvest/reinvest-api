@@ -126,17 +126,17 @@ const schema = `
 
     type Query {
         """
-        [MOCK] returns all information about properties in the portfolio
+        Returns all information about properties in the portfolio
         """
         getPortfolioDetails: PortfolioDetails
         
         """
-        [MOCK] returns all portfolio updates
+        Returns all portfolio updates
         """
         getAllPortfolioUpdates: [PortfolioUpdate]
         
         """
-        [MOCK] returns all portfolio authors
+        Returns all portfolio authors
         """
         getAllPortfolioAuthors: [PortfolioAuthor]
     }
@@ -148,7 +148,7 @@ const schema = `
         synchronizePortfolioPropertiesFromDealpath: Boolean
 
         """
-        [MVP] Currently we can have only one portfolio in the system. This mutation will create a new portfolio and set it as active and disallow to create another one.
+        Currently we can have only one portfolio in the system. This mutation will create a new portfolio and set it as active and disallow to create another one.
         """
         registerPortfolio(name: String!, northCapitalOfferingId: String!, vertaloAllocationId: String!, linkToOfferingCircular: String!): PortfolioDetails
 

@@ -1,4 +1,5 @@
 import { NotificationTemplate } from './emailTemplates/notification';
+import { ShareCalculationTemplate } from './emailTemplates/shareCalculationTemplate';
 
 export const SesResources = {
   NotificationTemplate: {
@@ -8,6 +9,16 @@ export const SesResources = {
         TemplateName: 'NotificationTemplate',
         SubjectPart: '{{subject}}',
         HtmlPart: NotificationTemplate,
+      },
+    },
+  },
+  ShareCalculationTemplate: {
+    Type: 'AWS::SES::Template',
+    Properties: {
+      Template: {
+        TemplateName: 'ShareCalculationTemplate',
+        SubjectPart: '{{subject}}',
+        HtmlPart: ShareCalculationTemplate,
       },
     },
   },

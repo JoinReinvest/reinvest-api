@@ -15,7 +15,7 @@ const schema = `
         "Returns document link by id"
         getUserDocument(profileId: ID!, documentId: ID!): GetDocumentLink
 
-        "[MOCK] Returns admin document link by id "
+        "Returns admin document link by id "
         getAdminDocument(documentId: ID!): GetDocumentLink
     }
 
