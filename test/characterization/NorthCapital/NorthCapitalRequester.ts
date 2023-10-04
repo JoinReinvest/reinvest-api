@@ -128,9 +128,7 @@ export default class NorthCapitalRequester {
     accreditedStatus: 'Pending' | 'Self Accredited' | 'Verified Accredited' | 'Not Accredited',
     principalApprovalStatus: 'Pending' | 'Approved' | 'Not Approve',
     email: string,
-    phoneNumber: number,
   ): Promise<string> {
-    console.log("create account function !!!!!!!!!!!!!!!!!!!!")
     const endpoint = 'tapiv3/index.php/v3/createAccount';
     const data = {
       accountRegistration: investorAccountName,
@@ -146,7 +144,6 @@ export default class NorthCapitalRequester {
       AccreditedStatus: accreditedStatus,
       approvalStatus: principalApprovalStatus,
       email,
-      phone: phoneNumber,
     };
 
     const response = await this.putRequest(endpoint, data);
