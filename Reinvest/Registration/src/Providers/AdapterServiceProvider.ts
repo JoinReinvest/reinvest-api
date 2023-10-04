@@ -21,7 +21,6 @@ import { VertaloAdapter } from 'Registration/Adapter/Vertalo/VertaloAdapter';
 import { VertaloSynchronizer } from 'Registration/Adapter/Vertalo/VertaloSynchronizer';
 import { EmailCreator } from 'Registration/Domain/EmailCreator';
 import { Registration } from 'Registration/index';
-import { IdentityService } from "LegalEntities/Adapter/Modules/IdentityService";
 
 export class AdapterServiceProvider {
   private config: Registration.Config;
@@ -42,8 +41,6 @@ export class AdapterServiceProvider {
       .addSingleton(VertaloSynchronizationRepository, [RegistrationDatabaseAdapterInstanceProvider, IdGenerator])
       .addSingleton(RegistryQueryRepository, [RegistrationDatabaseAdapterInstanceProvider])
       .addSingleton(BankAccountRepository, [RegistrationDatabaseAdapterInstanceProvider]);
-
-    container.addSingleton(IdentityService, ['Identity']);
 
     container.addObjectFactory(
       'RegistrationTransactionalAdapter',
