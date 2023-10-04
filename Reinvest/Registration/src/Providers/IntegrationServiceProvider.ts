@@ -21,6 +21,7 @@ import { SynchronizeRegistryRecords } from 'Registration/IntegrationLogic/UseCas
 import { SynchronizeStakeholder } from 'Registration/IntegrationLogic/UseCase/SynchronizeStakeholder';
 import { ImmediateSynchronize } from 'Registration/IntegrationLogic/UseCase/ImmediateSynchronize';
 import { RegistryQuery } from 'Registration/Port/Api/RegistryQuery';
+import { IdentityService } from "LegalEntities/Adapter/Modules/IdentityService";
 
 export class IntegrationServiceProvider {
   private config: Registration.Config;
@@ -30,11 +31,13 @@ export class IntegrationServiceProvider {
   }
 
   public boot(container: ContainerInterface) {
+      container.addSingleton(IdentityService, ['Identity']);
+
     container
       .addSingleton(RegistryQuery, [RegistryQueryRepository])
       .addSingleton(SynchronizeRegistryRecords, [MappingRegistryRepository, LegalEntitiesService])
       .addSingleton(SynchronizeProfile, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer])
-      .addSingleton(SynchronizeIndividualAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer])
+      .addSingleton(SynchronizeIndividualAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer, IdentityService])
       .addSingleton(SynchronizeBeneficiaryAccount, [MappingRegistryRepository, LegalEntitiesService, VertaloSynchronizer])
       .addSingleton(SynchronizeCompanyAccount, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer, VertaloSynchronizer])
       .addSingleton(SynchronizeCompany, [MappingRegistryRepository, LegalEntitiesService, NorthCapitalSynchronizer])
@@ -47,7 +50,7 @@ export class IntegrationServiceProvider {
         SynchronizeCompany,
         SynchronizeStakeholder,
         RegistryQuery,
-        SynchronizeRegistryRecords,
+        SynchronizeRegistryRecords
       ])
       .addSingleton(InitializeBankAccount, [BankAccountRepository, RegistryQueryRepository, NorthCapitalAdapter, IdGenerator, ImmediateSynchronize])
       .addSingleton(FulfillBankAccount, [BankAccountRepository, 'RegistrationTransactionalAdapter', NorthCapitalAdapter])

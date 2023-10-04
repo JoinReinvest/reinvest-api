@@ -6,6 +6,7 @@ import { MappedRecord } from 'Registration/Domain/Model/Mapping/MappedRecord';
 import { NorthCapitalMapper } from 'Registration/Domain/VendorModel/NorthCapital/NorthCapitalMapper';
 import { VertaloMapper } from 'Registration/Domain/VendorModel/Vertalo/VertaloMapper';
 import { AbstractSynchronize } from 'Registration/IntegrationLogic/UseCase/AbstractSynchronize';
+import { IdentityService } from "LegalEntities/Adapter/Modules/IdentityService";
 
 import { NorthCapitalSynchronizer } from '../../Adapter/NorthCapital/NorthCapitalSynchronizer';
 
@@ -14,17 +15,20 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
   private legalEntitiesService: LegalEntitiesService;
   private northCapitalSynchronizer: NorthCapitalSynchronizer;
   private vertaloSynchronizer: VertaloSynchronizer;
+  private identityService: IdentityService;
 
   constructor(
     mappingRegistryRepository: MappingRegistryRepository,
     legalEntitiesService: LegalEntitiesService,
     northCapitalSynchronizer: NorthCapitalSynchronizer,
     vertaloSynchronizer: VertaloSynchronizer,
+    identityService: IdentityService,
   ) {
     super(mappingRegistryRepository);
     this.legalEntitiesService = legalEntitiesService;
     this.northCapitalSynchronizer = northCapitalSynchronizer;
     this.vertaloSynchronizer = vertaloSynchronizer;
+    this.identityService = identityService;
   }
 
   async execute(record: MappedRecord): Promise<boolean> {
@@ -34,6 +38,9 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
 
     try {
       console.log(`[START] Individual account synchronization, recordId: ${record.getRecordId()}`);
+      console.log("########################", this.identityService)
+      const test = await this.identityService.getPhoneAndEmailData(record.getProfileId())
+      console.log("########################", test)
       const individualAccount = await this.legalEntitiesService.getIndividualAccount(record.getProfileId(), record.getExternalId());
 
       const northCapitalStatus = await this.synchronizeNorthCapital(record, individualAccount);
