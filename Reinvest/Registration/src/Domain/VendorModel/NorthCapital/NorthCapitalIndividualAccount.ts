@@ -28,7 +28,6 @@ export class NorthCapitalIndividualAccount {
     }
 
     const fullName = [data.name.firstName, data.name?.middleName, data.name.lastName].filter((value?: string) => value !== null && value !== '').join(' ');
-    const phoneNumber = data.phoneNumber ? parseInt(data.phoneNumber.replace('+', '').replace(/\s+/g, '')) : undefined;
 
     return new NorthCapitalIndividualAccount({
       profileId: data.profileId,
@@ -49,7 +48,6 @@ export class NorthCapitalIndividualAccount {
         zip: data.address.zip,
         country: data.address.country,
         email: data.email,
-        phoneNumber,
       },
       links: [
         {

@@ -63,10 +63,8 @@ export class NorthCapitalSynchronizer {
     try {
       const mainPartyId = await this.northCapitalSynchronizationRepository.getMainPartyIdByProfile(northCapitalIndividualAccount.getProfileId());
       const synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
-      console.log('synchronizationRecord @@@@@@@@@@@@@@@@@@@@@@')
+
       if (synchronizationRecord === null) {
-        console.log('Creating new account');
-        console.log(northCapitalIndividualAccount.getAccountData())
         const individualAccountId = await this.northCapitalAdapter.createAccount(northCapitalIndividualAccount.getAccountData());
         await this.northCapitalAdapter.updateParty(mainPartyId, northCapitalIndividualAccount.getPartyData());
         await this.northCapitalSynchronizationRepository.createSynchronizationRecord(

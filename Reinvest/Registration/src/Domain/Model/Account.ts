@@ -22,7 +22,6 @@ export type IndividualAccountForSynchronization = {
   netWorth?: string;
   title?: string;
   email?: string;
-  phoneNumber?: string;
 };
 
 export type BeneficiaryAccountForSynchronization = {

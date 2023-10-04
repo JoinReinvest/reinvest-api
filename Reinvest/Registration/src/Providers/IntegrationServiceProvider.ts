@@ -47,7 +47,7 @@ export class IntegrationServiceProvider {
         SynchronizeCompany,
         SynchronizeStakeholder,
         RegistryQuery,
-        SynchronizeRegistryRecords,
+        SynchronizeRegistryRecords
       ])
       .addSingleton(InitializeBankAccount, [BankAccountRepository, RegistryQueryRepository, NorthCapitalAdapter, IdGenerator, ImmediateSynchronize])
       .addSingleton(FulfillBankAccount, [BankAccountRepository, 'RegistrationTransactionalAdapter', NorthCapitalAdapter])
