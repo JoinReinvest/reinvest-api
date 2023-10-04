@@ -65,9 +65,7 @@ export class NorthCapitalSynchronizer {
       const synchronizationRecord = await this.northCapitalSynchronizationRepository.getSynchronizationRecord(recordId);
 
       if (synchronizationRecord === null) {
-        const individualAccountId = await this.northCapitalAdapter.createAccount({
-          ...northCapitalIndividualAccount.getAccountData()
-        });
+        const individualAccountId = await this.northCapitalAdapter.createAccount(northCapitalIndividualAccount.getAccountData());
         await this.northCapitalAdapter.updateParty(mainPartyId, northCapitalIndividualAccount.getPartyData());
         await this.northCapitalSynchronizationRepository.createSynchronizationRecord(
           recordId,
