@@ -74,6 +74,8 @@ export type NorthCapitalIndividualAccountStructure = {
   type: 'Individual';
   zip: string;
   streetAddress2?: string;
+  email?: string;
+  phoneNumber?: number;
 };
 
 export type NorthCapitalCompanyAccountStructure = {

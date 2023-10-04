@@ -29,6 +29,8 @@ context('Given I am an individual person and I want to create an account in the 
         'Manually Approved',
         'Self Accredited',
         'Approved',
+        'test@pl.pl',
+        1234567890,
       );
 
       expect(accountId).to.be.a('string');
@@ -99,6 +101,8 @@ context('Given I am an individual person and I want to create an account in the 
         'Manually Approved',
         'Self Accredited',
         'Approved',
+        'test@pl.pl',
+        1234567890,
       );
 
       expect(accountId).to.be.a('string');
