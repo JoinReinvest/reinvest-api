@@ -84,7 +84,8 @@
     "staging:redeploy:saas": "tag=STAGING_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
     "production:redeploy:saas": "tag=PRODUCTION_SAAS_DEPLOYMENT && git tag -d ${tag} && git push --delete origin ${tag}  && git tag ${tag}  && git push origin ${tag} ",
     "codegen": "graphql-codegen --config codegen.ts",
-    "api-doc": "yarn codegen && yarn magidoc generate && yarn magidoc preview"
+    "api-doc": "yarn codegen && yarn magidoc generate && yarn magidoc preview",
+    "admin-api-doc": "yarn codegen && yarn magidoc generate -f magidoc-admin.mjs && yarn magidoc preview -f magidoc-admin.mjs"
   },
   "dependencies": {
     "@apollo/server": "^4.5.0",

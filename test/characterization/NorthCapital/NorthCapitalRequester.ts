@@ -127,6 +127,7 @@ export default class NorthCapitalRequester {
     AmlStatus: 'Pending' | 'Auto Approved' | 'Manually Approved' | 'Disapproved',
     accreditedStatus: 'Pending' | 'Self Accredited' | 'Verified Accredited' | 'Not Accredited',
     principalApprovalStatus: 'Pending' | 'Approved' | 'Not Approve',
+    email: string,
   ): Promise<string> {
     const endpoint = 'tapiv3/index.php/v3/createAccount';
     const data = {
@@ -142,6 +143,7 @@ export default class NorthCapitalRequester {
       AMLstatus: AmlStatus,
       AccreditedStatus: accreditedStatus,
       approvalStatus: principalApprovalStatus,
+      email,
     };
 
     const response = await this.putRequest(endpoint, data);

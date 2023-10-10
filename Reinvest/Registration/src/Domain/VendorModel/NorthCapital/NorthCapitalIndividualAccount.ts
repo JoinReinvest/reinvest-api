@@ -47,6 +47,7 @@ export class NorthCapitalIndividualAccount {
         state: data.address.state,
         zip: data.address.zip,
         country: data.address.country,
+        email: data.email,
       },
       links: [
         {
