@@ -199,3 +199,13 @@ To access the Admin API, you should follow these steps:
 5. Repeat step 3
 6. Select `Executives` group and click `Add`
 7. Right now you should be able to access Admin API
+
+## How to generate Admin API documentation?
+1. In terminal run `export API_URL=<paste api url>`
+2. In terminal run `export API_TOKEN=<paste Authorization header>`
+3. In terminal run `yarn admin-api-doc`
+
+## How to generate API documentation?
+1. In terminal run `export API_URL=<paste api url>`
+2. In terminal run `export API_TOKEN=<paste Authorization header>`
+3. In terminal run `yarn api-doc`
