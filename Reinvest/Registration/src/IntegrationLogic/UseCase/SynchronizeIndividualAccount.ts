@@ -36,7 +36,7 @@ export class SynchronizeIndividualAccount extends AbstractSynchronize {
       console.log(`[START] Individual account synchronization, recordId: ${record.getRecordId()}`);
       const individualAccount = await this.legalEntitiesService.getIndividualAccount(record.getProfileId(), record.getExternalId());
 
-      const northCapitalStatus = await this.synchronizeNorthCapital(record, individualAccount);
+      const northCapitalStatus = await this.synchronizeNorthCapital(record, {...individualAccount, email: record.getEmail()});
       const vertaloStatus = await this.synchronizeVertalo(record, individualAccount);
 
       if (northCapitalStatus && vertaloStatus) {

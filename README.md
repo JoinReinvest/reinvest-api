@@ -188,3 +188,24 @@ The new instance host must be set up in Github Actions manually and redeployed t
    Github/reinvest-api/Settings/Security/Secrets and variables/Actions
 7. Run the `functions` pipeline to deploy the functions with the new database host (push some change to the repository)
 8. Optional: Delete the old database instance manually
+
+## Add admin role for your account
+To access the Admin API, you should follow these steps:
+
+1. Create new user
+2. Go to AWS Cognito and find the user you created and select it
+3. In `Group memberships` and on right side click `Add user to group`
+4. Select `Administrators` group and click `Add`
+5. Repeat step 3
+6. Select `Executives` group and click `Add`
+7. Right now you should be able to access Admin API
+
+## How to generate Admin API documentation?
+1. In terminal run `export API_URL=<paste api url>`
+2. In terminal run `export API_TOKEN=<paste Authorization header>`
+3. In terminal run `yarn admin-api-doc`
+
+## How to generate API documentation?
+1. In terminal run `export API_URL=<paste api url>`
+2. In terminal run `export API_TOKEN=<paste Authorization header>`
+3. In terminal run `yarn api-doc`
