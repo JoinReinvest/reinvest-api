@@ -20,10 +20,7 @@ export class VerifierExecutor {
 
   async executeDecision(verifier: Verifier): Promise<VerificationDecision> {
     let decision = verifier.makeDecision();
-console.log('executeDecision')
-console.log(verifier)
-console.log(verifier.getPartyId())
-    console.log('executeDecision-end')
+
     // parties aml + kyc
     if ([VerificationDecisionType.REQUEST_VERIFICATION].includes(decision.decision)) {
       const verificationResult = await this.northCapitalAdapter.verifyParty(verifier.getPartyId());

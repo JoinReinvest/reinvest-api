@@ -17,7 +17,7 @@ export class VerifyAccount {
     try {
       console.log('verify account id ' + accountId);
       const { accountVerifier, verifiers } = await this.verifierService.createVerifiersForAccount(profileId, accountId);
-
+console.log('verifiers', verifiers)
       return this.verifierService.executeVerifiersDecisions(accountVerifier, verifiers);
     } catch (error: any) {
       console.error(`[Verify Account: ${accountId}]`, error);

@@ -135,7 +135,7 @@ export class VerifierRepository {
     verifiers: Verifier[];
   }> {
     const accountStructure = await this.registrationService.getNorthCapitalAccountStructure(profileId, accountId);
-
+console.log('accountStructure', accountStructure)
     const verifiers = await this.createVerifiersFromAccountStructure(accountStructure);
     const accountVerifier = new AccountVerifier(profileId, accountId, accountStructure.type);
 
