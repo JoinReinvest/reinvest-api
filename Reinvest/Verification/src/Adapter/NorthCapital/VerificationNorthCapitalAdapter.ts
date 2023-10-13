@@ -23,6 +23,7 @@ export class VerificationNorthCapitalAdapter extends ExecutionNorthCapitalAdapte
 
   async verifyParty(partyId: string): Promise<VerificationEvent[]> {
     const endpoint = 'tapiv3/index.php/v3/performKycAmlBasic';
+    console.log('partyId', partyId)
     const response = await this.postRequest(endpoint, { partyId });
 
     try {

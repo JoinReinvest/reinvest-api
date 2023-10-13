@@ -57,6 +57,9 @@ export abstract class ExecutionNorthCapitalAdapter {
   }
 
   private transformToFormData(data: any): FormData {
+    console.log('123--------')
+    console.log(data)
+    console.log('1234--------')
     const extendedData = this.extendWithCredentials(data);
     const formData = new FormData();
 
