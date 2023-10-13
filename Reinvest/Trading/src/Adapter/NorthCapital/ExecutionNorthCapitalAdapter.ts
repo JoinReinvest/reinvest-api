@@ -19,7 +19,12 @@ export abstract class ExecutionNorthCapitalAdapter {
     try {
       const formData = this.transformToFormData(data);
       const response: AxiosResponse = await axios.post(`${this.url}/${endpoint}`, formData);
-
+console.log('1-------------------')
+console.log(`${this.url}/${endpoint}`)
+console.log(formData)
+console.log('1.5---------')
+console.log(response)
+console.log('2-------------------')
       return response.data;
     } catch (error: any) {
       const {
@@ -27,6 +32,9 @@ export abstract class ExecutionNorthCapitalAdapter {
           data: { statusCode, statusDesc },
         },
       } = error;
+
+      console.log(error)
+
       throw new NorthCapitalException(statusCode, statusDesc);
     }
   }
