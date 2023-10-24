@@ -1,7 +1,13 @@
 const schema = `
     #graphql
     scalar FileName
-    
+
+    "Link id"
+    type DocumentFileLinkId {
+        id: ID
+        fileName: String
+    }
+
     "Avatar link id input"
     input DocumentFileLinkInput {
         "This 'id' comes usually from @PutFileLink.id"
