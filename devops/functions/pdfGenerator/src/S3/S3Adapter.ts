@@ -26,7 +26,7 @@ export class S3Adapter {
         Key: `${catalog}/${fileName}`,
         Body: buffer,
         ContentType: 'application/pdf',
-        ACL: 'private',
+        ACL: 'public',
       },
     });
 
