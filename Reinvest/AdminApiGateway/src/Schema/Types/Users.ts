@@ -184,7 +184,7 @@ const schema = `
         Update profile fields
         Important Note: Some fields can trigger KYC/AML reverification
         """
-        updateProfile(input: UpdateProfileInput): Profile
+        updateProfile(profileId: ID!, data: UpdateProfileInput): Profile
         """
         Ban user profile/individual account
         """
@@ -283,7 +283,11 @@ export const UsersSchema = {
 
         return api.unban(banId);
       },
-        updateProfile: async (parent: any, data: UpdateProfileForDetailsInput, { profileId, modules }: SessionContext): Promise<ProfileResponse> => {
+        updateProfile: async (parent: any, {profileId, data: UpdateProfileForDetailsInput}: any, { isAdmin, modules }: AdminSessionContext): Promise<ProfileResponse> => {
+            if (!isAdmin) {
+                throw new GraphQLError('Access denied');
+            }
+
             const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
             const { input } = data;
             const errors = await api.updateProfile(input, profileId);
