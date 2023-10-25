@@ -152,7 +152,7 @@ app.post('/calculations/:id/share', async function (req: any, res: any) {
   const { email } = req.body;
   const { id } = req.params;
   const notificationApi = modules.getApi<Notifications.ApiType>(Notifications);
-  const data = await notificationApi.sendEmail(email, `${process.env.BACKEND_URL}/calculations/${id}`);
+  const data = await notificationApi.sendEmail(email, `${process.env.WEB_URL}/calculation/${id}`);
 
   res.json({ status: true, data });
 });
