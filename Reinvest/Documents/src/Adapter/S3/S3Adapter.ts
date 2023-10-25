@@ -44,7 +44,7 @@ export class S3Adapter {
         Key: `${catalog}/${fileName}`,
         Body: buffer,
         ContentType: 'application/pdf',
-        ACL: 'public',
+        ACL: 'private',
       },
     });
 
@@ -123,7 +123,7 @@ export class S3Adapter {
     const putInput: PutObjectCommandInput = {
       Bucket: bucketName,
       Key: `${catalog}/${fileName}`,
-      ACL: 'public',
+      ACL: 'private',
     };
     const putCommand = new PutObjectCommand(putInput);
 
