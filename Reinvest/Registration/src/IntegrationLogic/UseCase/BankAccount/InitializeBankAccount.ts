@@ -50,6 +50,7 @@ export class InitializeBankAccount {
         await this.immediateSynchronizeUseCase.immediatelySynchronizeAccount(profileId, accountId);
         northCapitalId = await this.registryQueryRepository.findNorthCapitalAccountId(profileId, accountId);
 
+
         if (!northCapitalId) {
           throw new Error('North Capital account not synchronized');
         }

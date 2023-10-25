@@ -22,7 +22,10 @@ It is official Reinvest Admin API documentation.
         'ISODate': 'YYYY-MM-DD',
         'Money': '1000',
         'numberOfLinks_Int_NotNull_min_1_max_10': '3',
-        'EmailAddress': 'test@gmail.com'
+        'EmailAddress': 'test@gmail.com',
+        'FileName': 'test.jpg',
+        'firstName_String_NotNull_minLength_1': 'John',
+        'lastName_String_NotNull_minLength_1': 'Doe',
       }
     },
   },

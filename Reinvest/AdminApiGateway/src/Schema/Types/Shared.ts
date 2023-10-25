@@ -1,5 +1,21 @@
 const schema = `
     #graphql
+    scalar FileName
+
+    "Link id"
+    type DocumentFileLinkId {
+        id: ID
+        fileName: String
+    }
+
+    "Avatar link id input"
+    input DocumentFileLinkInput {
+        "This 'id' comes usually from @PutFileLink.id"
+        id: ID!
+        "File name should be in format: .pdf, .jpeg, .jpg, .png"
+        fileName: FileName!
+    }
+    
     """
     If not provided, default pagination is page: 0, perPage: 10
     """
