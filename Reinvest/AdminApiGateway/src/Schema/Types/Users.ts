@@ -283,14 +283,13 @@ export const UsersSchema = {
 
         return api.unban(banId);
       },
-        updateProfile: async (parent: any, {profileId, data: UpdateProfileForDetailsInput}: any, { isAdmin, modules }: AdminSessionContext): Promise<ProfileResponse> => {
+        updateProfile: async (parent: any, {profileId, data}: any, { isAdmin, modules }: AdminSessionContext): Promise<ProfileResponse> => {
             if (!isAdmin) {
                 throw new GraphQLError('Access denied');
             }
 
             const api = modules.getApi<LegalEntities.ApiType>(LegalEntities);
-            const { input } = data;
-            const errors = await api.updateProfile(input, profileId);
+            const errors = await api.updateProfile(data, profileId);
 
             if (errors.length > 0) {
                 throw new JsonGraphQLError(errors);
