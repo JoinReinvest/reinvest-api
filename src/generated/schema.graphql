@@ -461,7 +461,7 @@ type Mutation {
   Update profile fields
   Important Note: Some fields can trigger KYC/AML reverification
   """
-  updateProfile(input: UpdateProfileInput): Profile
+  updateProfile(data: UpdateProfileInput, profileId: ID!): Profile
   updateProperty(input: PropertyInput!, propertyId: Int): Boolean
 }
 
