@@ -74,6 +74,7 @@ jobs:
           #          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets[format('{0}_FIREBASE_SERVICE_ACCOUNT_JSON', env.SHARED_ENVIRONMENT)] }}
           SEGMENT_API_KEY: ${{ secrets[format('{0}_SEGMENT_API_KEY', env.SHARED_ENVIRONMENT)] }}
           ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
+          WEB_URL: ${{ vars.WEB_URL }}
           PROFILEID_HASH_KEY: ${{ secrets[format('{0}_PROFILEID_HASH_KEY', env.SHARED_ENVIRONMENT)] }}
         run: |
           environment=${{env.ENVIRONMENT}}
