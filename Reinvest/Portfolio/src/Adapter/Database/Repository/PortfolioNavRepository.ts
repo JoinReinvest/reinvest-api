@@ -23,7 +23,7 @@ export class PortfolioNavRepository {
       .selectFrom(navTable)
       .selectAll()
       .where('portfolioId', '=', portfolioId)
-      .orderBy('dateSynchronization', 'desc')
+      .orderBy('dateUpdated', 'desc')
       .limit(1)
       .executeTakeFirst();
 
@@ -54,9 +54,9 @@ export class PortfolioNavRepository {
   private castToObject(tableData: PortfolioNavTable): Nav {
     return Nav.restore(<NavSchema>{
       ...tableData,
-      dateSynchronization: DateTime.from(tableData.dateSynchronization),
+      dateUpdated: DateTime.from(tableData.dateUpdated),
       // @ts-ignore
-      unitPrice: Money.lowPrecision(parseInt(tableData.unitPrice, 10)),
+      unitNav: Money.lowPrecision(parseInt(tableData.unitNav, 10)),
     });
   }
 
@@ -65,8 +65,8 @@ export class PortfolioNavRepository {
 
     return <PortfolioNavTable>{
       ...data,
-      dateSynchronization: data.dateSynchronization.toDate(),
-      unitPrice: data.unitPrice.getAmount(),
+      dateUpdated: data.dateUpdated.toDate(),
+      unitNav: data.unitNav.getAmount(),
     };
   }
 
@@ -76,7 +76,7 @@ export class PortfolioNavRepository {
       .selectFrom(navTable)
       .selectAll()
       .where('portfolioId', '=', portfolioId)
-      .orderBy('dateSynchronization', 'desc')
+      .orderBy('dateUpdated', 'desc')
       .execute();
 
     if (data.length === 0) {

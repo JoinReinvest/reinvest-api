@@ -1,27 +1,29 @@
-import { ContainerInterface } from 'Container/Container';
-import { IdGenerator } from 'IdGenerator/IdGenerator';
-import { PortfolioNavRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioNavRepository';
-import { PortfolioRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioRepository';
-import { PortfolioUpdatesRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioUpdatesRepository';
-import { PropertyRepository } from 'Portfolio/Adapter/Database/Repository/PropertyRepository';
-import { DealpathAdapter } from 'Portfolio/Adapter/Dealpath/DealpathAdapter';
-import { PortfolioNorthCapitalAdapter } from 'Portfolio/Adapter/NorthCapital/PortfolioNorthCapitalAdapter';
-import { PortfolioVertaloAdapter } from 'Portfolio/Adapter/Vertalo/PortfolioVertaloAdapter';
-import { Portfolio } from 'Portfolio/index';
-import { GetPortfolioUpdates } from 'Portfolio/UseCase/GetPortfolioUpdates';
-import { PortfolioQuery } from 'Portfolio/UseCase/PortfolioQuery';
-import { RegisterPortfolio } from 'Portfolio/UseCase/RegisterPortfolio';
-import { SynchronizeNav } from 'Portfolio/UseCase/SynchronizeNav';
-import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
-import { UpdateProperty } from 'Portfolio/UseCase/UpdateProperty';
-import { DocumentsService } from 'Reinvest/Portfolio/src/Adapter/Documents/DocumentsService';
-import { CreatePortfolioUpdate } from 'Reinvest/Portfolio/src/UseCase/CreatePortfolioUpdate';
-import { DeletePortfolioUpdate } from 'Reinvest/Portfolio/src/UseCase/DeletePortfolioUpdate';
-import { AddPortfolioAuthor } from 'Portfolio/UseCase/AddPortfolioAuthor';
-import { PortfolioAuthorsRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioAuthors';
-import { DeletePortfolioAuthor } from 'Portfolio/UseCase/DeletePortfolioAuthor';
-import { GetPortfolioAuthors } from 'Portfolio/UseCase/GetPortfolioAuthors';
-import { PortfolioAuthorByIdQuery } from 'Portfolio/UseCase/PortfolioAuthorByIdQuery';
+import { ContainerInterface } from "Container/Container";
+import { IdGenerator } from "IdGenerator/IdGenerator";
+import { PortfolioNavRepository } from "Portfolio/Adapter/Database/Repository/PortfolioNavRepository";
+import { PortfolioRepository } from "Portfolio/Adapter/Database/Repository/PortfolioRepository";
+import { PortfolioUpdatesRepository } from "Portfolio/Adapter/Database/Repository/PortfolioUpdatesRepository";
+import { PropertyRepository } from "Portfolio/Adapter/Database/Repository/PropertyRepository";
+import { DealpathAdapter } from "Portfolio/Adapter/Dealpath/DealpathAdapter";
+import { PortfolioNorthCapitalAdapter } from "Portfolio/Adapter/NorthCapital/PortfolioNorthCapitalAdapter";
+import { PortfolioVertaloAdapter } from "Portfolio/Adapter/Vertalo/PortfolioVertaloAdapter";
+import { Portfolio } from "Portfolio/index";
+import { GetPortfolioUpdates } from "Portfolio/UseCase/GetPortfolioUpdates";
+import { PortfolioQuery } from "Portfolio/UseCase/PortfolioQuery";
+import { RegisterPortfolio } from "Portfolio/UseCase/RegisterPortfolio";
+import { SynchronizeUnitPrice } from "Portfolio/UseCase/SynchronizeUnitPrice";
+import SynchronizePortfolio from "Portfolio/UseCase/SynchronizePortfolio";
+import { UpdateProperty } from "Portfolio/UseCase/UpdateProperty";
+import { DocumentsService } from "Reinvest/Portfolio/src/Adapter/Documents/DocumentsService";
+import { CreatePortfolioUpdate } from "Reinvest/Portfolio/src/UseCase/CreatePortfolioUpdate";
+import { DeletePortfolioUpdate } from "Reinvest/Portfolio/src/UseCase/DeletePortfolioUpdate";
+import { AddPortfolioAuthor } from "Portfolio/UseCase/AddPortfolioAuthor";
+import { PortfolioAuthorsRepository } from "Portfolio/Adapter/Database/Repository/PortfolioAuthors";
+import { DeletePortfolioAuthor } from "Portfolio/UseCase/DeletePortfolioAuthor";
+import { GetPortfolioAuthors } from "Portfolio/UseCase/GetPortfolioAuthors";
+import { PortfolioAuthorByIdQuery } from "Portfolio/UseCase/PortfolioAuthorByIdQuery";
+import { SetCurrentNav } from "Portfolio/UseCase/SetCurrentNav";
+import { PortfolioUnitPriceRepository } from "Portfolio/Adapter/Database/Repository/PortfolioUnitPriceRepository";
 
 export class UseCaseProvider {
   private config: Portfolio.Config;
@@ -33,11 +35,13 @@ export class UseCaseProvider {
   public boot(container: ContainerInterface) {
     container.addSingleton(SynchronizePortfolio, [PropertyRepository, DealpathAdapter]);
     container.addSingleton(UpdateProperty, [PropertyRepository]);
-    container.addSingleton(PortfolioQuery, [PortfolioRepository, PortfolioNavRepository, PropertyRepository, DocumentsService]);
-    container.addSingleton(SynchronizeNav, [PortfolioNavRepository, PortfolioRepository, PortfolioNorthCapitalAdapter, IdGenerator]);
+    container.addSingleton(PortfolioQuery, [PortfolioRepository, PortfolioNavRepository, PortfolioUnitPriceRepository, PropertyRepository, DocumentsService]);
+    container.addSingleton(SynchronizeUnitPrice, [PortfolioUnitPriceRepository, PortfolioRepository, PortfolioNorthCapitalAdapter, IdGenerator]);
+    container.addSingleton(SetCurrentNav, [PortfolioNavRepository, PortfolioRepository, IdGenerator]);
     container.addSingleton(RegisterPortfolio, [
       PortfolioRepository,
       PortfolioNavRepository,
+      PortfolioUnitPriceRepository,
       PortfolioNorthCapitalAdapter,
       PortfolioVertaloAdapter,
       IdGenerator,

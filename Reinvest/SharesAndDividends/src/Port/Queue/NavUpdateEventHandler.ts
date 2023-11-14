@@ -17,13 +17,13 @@ export class NavUpdateEventHandler implements EventHandler<TransactionEvent> {
       return;
     }
 
-    const { portfolioId, unitPrice, numberOfShares } = event.data;
+    const { portfolioId, unitNav, numberOfShares } = event.data;
     const lastNavChanged = await this.financialOperationRepository.getLastNavChanged();
 
-    if (lastNavChanged && lastNavChanged.unitPrice === unitPrice && lastNavChanged.numberOfShares === numberOfShares) {
+    if (lastNavChanged && lastNavChanged.unitPrice === unitNav && lastNavChanged.numberOfShares === numberOfShares) {
       return;
     }
 
-    await this.financialOperationRepository.navChangedOperation(numberOfShares, unitPrice, portfolioId);
+    await this.financialOperationRepository.navChangedOperation(numberOfShares, unitNav, portfolioId);
   }
 }

@@ -75,8 +75,8 @@ export class AccountStats {
     return this;
   }
 
-  setCurrentNAVPerShare(unitSharePrice: Money) {
-    this.currentNAVPerShare = unitSharePrice;
+  setCurrentNAVPerShare(unitNav: Money) {
+    this.currentNAVPerShare = unitNav;
 
     return this;
   }

@@ -1,16 +1,15 @@
-import * as bodyParser from 'body-parser';
-import { Documents } from 'Documents/index';
-import express from 'express';
-import { Investments } from 'Investments/index';
-import { Portfolio } from 'Portfolio/index';
-import { boot } from 'Reinvest/bootstrap';
-import { Identity } from 'Reinvest/Identity/src';
-import { IdentityApiType } from 'Reinvest/Identity/src/Port/Api/IdentityApi';
-import serverless from 'serverless-http';
-import { Trading } from 'Trading/index';
-import { Verification } from 'Verification/index';
-import { Notifications } from 'Notifications/index';
-import { EmailSender, EmailTemplate } from 'Notifications/Adapter/SES/EmailSender';
+import * as bodyParser from "body-parser";
+import { Documents } from "Documents/index";
+import express from "express";
+import { Investments } from "Investments/index";
+import { Portfolio } from "Portfolio/index";
+import { boot } from "Reinvest/bootstrap";
+import { Identity } from "Reinvest/Identity/src";
+import { IdentityApiType } from "Reinvest/Identity/src/Port/Api/IdentityApi";
+import serverless from "serverless-http";
+import { Trading } from "Trading/index";
+import { Verification } from "Verification/index";
+import { Notifications } from "Notifications/index";
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }) as any);
@@ -63,7 +62,7 @@ app.post('/webhooks/updateOffering', async function (req: any, res: any) {
   const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
   const { portfolioId } = await api.getActivePortfolio();
-  await api.synchronizeNav(portfolioId);
+  await api.synchronizePortfolioUnitPrice(portfolioId);
 
   await modules.close();
 

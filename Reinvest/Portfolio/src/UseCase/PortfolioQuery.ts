@@ -6,6 +6,8 @@ import { PropertyRepository } from 'Portfolio/Adapter/Database/Repository/Proper
 import { NavView } from 'Portfolio/Domain/Nav';
 import { Portfolio } from 'Portfolio/Domain/Portfolio';
 import { DocumentsService } from 'Reinvest/Portfolio/src/Adapter/Documents/DocumentsService';
+import { PortfolioUnitPriceRepository } from 'Portfolio/Adapter/Database/Repository/PortfolioUnitPriceRepository';
+import { UnitPriceView } from 'Portfolio/Domain/UnitPrice';
 
 export type PortfolioDetails = {
   assetName: string;
@@ -18,6 +20,8 @@ export type PortfolioDetails = {
   offeringName: string;
   properties: any[];
   vertaloAllocationId: string;
+  currentUnitPrice: UnitPriceView | null;
+  unitPriceHistory: UnitPriceView[];
 };
 
 export class PortfolioQuery {
@@ -25,15 +29,18 @@ export class PortfolioQuery {
 
   private propertyRepository: PropertyRepository;
   private documents: DocumentsService;
+  private unitPriceRepository: PortfolioUnitPriceRepository;
   private portfolioRepository: PortfolioRepository;
   private navRepository: PortfolioNavRepository;
 
   constructor(
     portfolioRepository: PortfolioRepository,
     navRepository: PortfolioNavRepository,
+    unitPriceRepository: PortfolioUnitPriceRepository,
     propertyRepository: PropertyRepository,
     documents: DocumentsService,
   ) {
+    this.unitPriceRepository = unitPriceRepository;
     this.portfolioRepository = portfolioRepository;
     this.navRepository = navRepository;
     this.propertyRepository = propertyRepository;
@@ -49,6 +56,7 @@ export class PortfolioQuery {
 
     const properties = await this.getProperties(portfolioId);
     const navs = await this.navRepository.getNavHistory(portfolioId);
+    const unitPrices = await this.unitPriceRepository.getUnitPriceHistory(portfolioId);
     const portfolioData = portfolio.toObject();
 
     return {
@@ -62,6 +70,8 @@ export class PortfolioQuery {
       properties,
       currentNav: navs[0] ? navs[0].forView() : null,
       navHistory: navs.map(nav => nav.forView()),
+      currentUnitPrice: unitPrices[0] ? unitPrices[0].forView() : null,
+      unitPriceHistory: unitPrices.map(unitPrice => unitPrice.forView()),
     };
   }
 
@@ -164,6 +174,16 @@ export class PortfolioQuery {
     }
 
     return nav.forView();
+  }
+
+  async getCurrentUnitPrice(portfolioId: UUID): Promise<UnitPriceView> {
+    const unitPrice = await this.unitPriceRepository.getTheLatestUnitPrice(portfolioId);
+
+    if (!unitPrice) {
+      throw new Error('No unit price found');
+    }
+
+    return unitPrice.forView();
   }
 
   async getPortfolio(portfolioId: UUID): Promise<Portfolio> {

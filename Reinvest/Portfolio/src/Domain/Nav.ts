@@ -3,17 +3,17 @@ import { DateTime } from 'Money/DateTime';
 import { Money } from 'Money/Money';
 
 export type NavView = {
-  dateSynchronization: IsoDateTimeString;
+  dateUpdated: IsoDateTimeString;
   numberOfShares: number;
-  unitPrice: MoneyView;
+  unitNav: MoneyView;
 };
 
 export type NavSchema = {
-  dateSynchronization: DateTime;
+  dateUpdated: DateTime;
   id: UUID;
   numberOfShares: number;
   portfolioId: UUID;
-  unitPrice: Money;
+  unitNav: Money;
 };
 
 export class Nav {
@@ -23,13 +23,13 @@ export class Nav {
     this.schema = schema;
   }
 
-  static create(id: UUID, portfolioId: UUID, unitPrice: Money, numberOfShares: number) {
+  static create(id: UUID, portfolioId: UUID, unitNav: Money, numberOfShares: number) {
     return new Nav({
       id,
       numberOfShares,
       portfolioId,
-      unitPrice,
-      dateSynchronization: DateTime.now(),
+      unitNav,
+      dateUpdated: DateTime.now(),
     });
   }
 
@@ -43,11 +43,11 @@ export class Nav {
 
   forView(): NavView {
     return {
-      dateSynchronization: this.schema.dateSynchronization.toIsoDateTime(),
+      dateUpdated: this.schema.dateUpdated.toIsoDateTime(),
       numberOfShares: this.schema.numberOfShares,
-      unitPrice: {
-        value: this.schema.unitPrice.getAmount(),
-        formatted: this.schema.unitPrice.getFormattedAmount(),
+      unitNav: {
+        value: this.schema.unitNav.getAmount(),
+        formatted: this.schema.unitNav.getFormattedAmount(),
       },
     };
   }
@@ -59,6 +59,6 @@ export class Nav {
 
     const data = latestNav.toObject();
 
-    return this.schema.numberOfShares === data.numberOfShares && this.schema.unitPrice.isEqual(data.unitPrice);
+    return this.schema.numberOfShares === data.numberOfShares && this.schema.unitNav.isEqual(data.unitNav);
   }
 }
