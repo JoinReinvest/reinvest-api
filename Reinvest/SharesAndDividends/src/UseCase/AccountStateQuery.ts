@@ -56,14 +56,14 @@ export class AccountStateQuery {
         currentNavs[share.portfolioId] = await this.portfolioService.getCurrentNav(share.portfolioId);
       }
 
-      const { unitSharePrice } = currentNavs[share.portfolioId]!;
+      const { unitNav } = currentNavs[share.portfolioId]!;
 
       shares.push({
         id: share.id,
         numberOfShares: share.numberOfShares!,
         transactionDate: DateTime.from(share.dateFunding!).toDate(),
         unitPrice: share.unitPrice!,
-        currentNavPerShare: unitSharePrice.getAmount(),
+        currentNavPerShare: unitNav.getAmount(),
       });
     }
 

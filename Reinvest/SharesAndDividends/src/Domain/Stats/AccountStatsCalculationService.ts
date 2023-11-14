@@ -14,7 +14,7 @@ export type UnpaidDividendsAndFees = {
 
 export type CurrentNav = {
   numberOfShares: number;
-  unitSharePrice: Money;
+  unitNav: Money;
 };
 
 export class AccountStatsCalculationService {
@@ -31,12 +31,12 @@ export class AccountStatsCalculationService {
 
   calculateAccountStats(): AccountStats {
     const accountStats = new AccountStats();
-    const { unitSharePrice } = this.currentNav;
+    const { unitNav } = this.currentNav;
 
     for (const record of this.shares) {
       const { numberOfShares, price } = record;
       this.costOfSharesOwned = this.costOfSharesOwned.add(price);
-      const unitEVS = !numberOfShares ? price : unitSharePrice.multiplyBy(numberOfShares);
+      const unitEVS = !numberOfShares ? price : unitNav.multiplyBy(numberOfShares);
       this.EVS = this.EVS.add(unitEVS);
 
       if (numberOfShares) {
@@ -48,6 +48,6 @@ export class AccountStatsCalculationService {
       .setEVS(this.EVS)
       .setCostOfSharesOwned(this.costOfSharesOwned)
       .setQuantityOfShares(this.quantityOfShares)
-      .setCurrentNAVPerShare(unitSharePrice);
+      .setCurrentNAVPerShare(unitNav);
   }
 }

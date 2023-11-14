@@ -3,9 +3,11 @@ import { NavView } from 'Portfolio/Domain/Nav';
 import { DataJson } from 'Portfolio/Domain/types';
 import { PortfolioQuery } from 'Portfolio/UseCase/PortfolioQuery';
 import { RegisterPortfolio } from 'Portfolio/UseCase/RegisterPortfolio';
-import { SynchronizeNav } from 'Portfolio/UseCase/SynchronizeNav';
+import { SynchronizeUnitPrice } from 'Portfolio/UseCase/SynchronizeUnitPrice';
 import SynchronizePortfolio from 'Portfolio/UseCase/SynchronizePortfolio';
 import { UpdateProperty, UpdatePropertyInput } from 'Portfolio/UseCase/UpdateProperty';
+import { SetCurrentNav } from 'Portfolio/UseCase/SetCurrentNav';
+import { Money } from 'Money/Money';
 
 type PortfolioDetails = {
   id: string;
@@ -27,20 +29,23 @@ export class PortfolioController {
   private updatePropertyUseCase: UpdateProperty;
   private portfolioQuery: PortfolioQuery;
   private registerPortfolioUseCase: RegisterPortfolio;
-  private synchronizeNavUseCase: SynchronizeNav;
+  private synchronizeUnitPriceUseCase: SynchronizeUnitPrice;
+  private setCurrentNavUseCase: SetCurrentNav;
 
   constructor(
     synchronizePortfolioUseCase: SynchronizePortfolio,
     updatePropertyUseCase: UpdateProperty,
     portfolioQuery: PortfolioQuery,
     registerPortfolioUseCase: RegisterPortfolio,
-    synchronizeNavUseCase: SynchronizeNav,
+    synchronizeNavUseCase: SynchronizeUnitPrice,
+    setCurrentNavUseCase: SetCurrentNav,
   ) {
     this.synchronizePortfolioUseCase = synchronizePortfolioUseCase;
     this.updatePropertyUseCase = updatePropertyUseCase;
     this.portfolioQuery = portfolioQuery;
     this.registerPortfolioUseCase = registerPortfolioUseCase;
-    this.synchronizeNavUseCase = synchronizeNavUseCase;
+    this.synchronizeUnitPriceUseCase = synchronizeNavUseCase;
+    this.setCurrentNavUseCase = setCurrentNavUseCase;
   }
 
   static getClassName = (): string => 'PortfolioController';
@@ -74,10 +79,6 @@ export class PortfolioController {
     };
   }
 
-  async getCurrentNav(portfolioId: string): Promise<NavView> {
-    return this.portfolioQuery.getCurrentNav(portfolioId);
-  }
-
   async getPortfolioAssetDetails(portfolioId: UUID): Promise<SubscriptionAgreementPortfolioData> {
     const portfolio = await this.portfolioQuery.getPortfolio(portfolioId);
     const data = portfolio.toObject();
@@ -94,12 +95,21 @@ export class PortfolioController {
     northCapitalOfferingId: string,
     vertaloAllocationId: string,
     linkToOfferingCircular: string,
+    initUnitNav: number,
+    initNumberOfSharesForNav: number,
   ): Promise<{
     errors: string[];
     portfolioId: string | null;
   }> {
     try {
-      const portfolioId = await this.registerPortfolioUseCase.execute(name, northCapitalOfferingId, vertaloAllocationId, linkToOfferingCircular);
+      const portfolioId = await this.registerPortfolioUseCase.execute(
+        name,
+        northCapitalOfferingId,
+        vertaloAllocationId,
+        linkToOfferingCircular,
+        initUnitNav,
+        initNumberOfSharesForNav,
+      );
 
       return {
         errors: [],
@@ -113,7 +123,24 @@ export class PortfolioController {
     }
   }
 
-  async synchronizeNav(portfolioId: UUID): Promise<boolean> {
-    return this.synchronizeNavUseCase.execute(portfolioId);
+  async getCurrentNav(portfolioId: string): Promise<NavView> {
+    return this.portfolioQuery.getCurrentNav(portfolioId);
+  }
+
+  async getCurrentUnitPrice(portfolioId: string): Promise<any> {
+    return this.portfolioQuery.getCurrentUnitPrice(portfolioId);
+  }
+
+  async setPortfolioNav(portfolioId: UUID, unitNav: number, numberOfSharesForNav: number): Promise<boolean> {
+    const unitNavMoney = Money.lowPrecision(unitNav);
+    if (numberOfSharesForNav <= 0) {
+      return false;
+    }
+
+    return this.setCurrentNavUseCase.execute(portfolioId, unitNavMoney, numberOfSharesForNav);
+  }
+
+  async synchronizePortfolioUnitPrice(portfolioId: UUID): Promise<boolean> {
+    return this.synchronizeUnitPriceUseCase.execute(portfolioId);
   }
 }

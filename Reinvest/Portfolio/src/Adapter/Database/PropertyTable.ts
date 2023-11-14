@@ -1,5 +1,5 @@
-import { UUID } from 'HKEKTypes/Generics';
-import { PropertyStatus } from 'Portfolio/Domain/types';
+import { UUID } from "HKEKTypes/Generics";
+import { PropertyStatus } from "Portfolio/Domain/types";
 
 export interface PropertyTable {
   adminJson: string;
@@ -23,9 +23,17 @@ export interface PortfolioTable {
 }
 
 export interface PortfolioNavTable {
-  dateSynchronization: Date;
+  dateUpdated: Date;
   id: UUID;
   numberOfShares: number;
+  portfolioId: UUID;
+  unitNav: number;
+}
+
+export interface PortfolioUnitPriceTable {
+  dateSynchronization: Date;
+  id: UUID;
+  numberOfSharesInOffering: number;
   portfolioId: UUID;
   unitPrice: number;
 }

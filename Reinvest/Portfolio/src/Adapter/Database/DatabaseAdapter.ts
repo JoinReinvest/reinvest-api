@@ -2,20 +2,23 @@ import {
   PortfolioAuthorsTable,
   PortfolioNavTable,
   PortfolioTable,
+  PortfolioUnitPriceTable,
   PropertyTable
-} from 'Portfolio/Adapter/Database/PropertyTable';
-import { DatabaseProvider, PostgreSQLConfig } from 'PostgreSQL/DatabaseProvider';
-import { PortfolioUpdatesTable } from 'Reinvest/Portfolio/src/Adapter/Database/PropertyTable';
+} from "Portfolio/Adapter/Database/PropertyTable";
+import { DatabaseProvider, PostgreSQLConfig } from "PostgreSQL/DatabaseProvider";
+import { PortfolioUpdatesTable } from "Reinvest/Portfolio/src/Adapter/Database/PropertyTable";
 
 export const propertyTable = 'portfolio_property';
 export const portfolioTable = 'portfolio_portfolio';
 export const navTable = 'portfolio_nav';
+export const unitPriceTable = 'portfolio_unit_price';
 
 export const updatesTable = 'portfolio_updates';
 export const portfolioAuthorsTable = 'portfolio_authors';
 
 export interface PortfolioDatabase {
   [navTable]: PortfolioNavTable;
+  [unitPriceTable]: PortfolioUnitPriceTable;
   [portfolioTable]: PortfolioTable;
   [propertyTable]: PropertyTable;
   [updatesTable]: PortfolioUpdatesTable;

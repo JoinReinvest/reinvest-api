@@ -105,10 +105,16 @@ const schema = `
         POIs: [POIInput]
     }
 
-    type Nav {
+    type UnitPrice {
         dateSynchronization: ISODateTime
         unitPrice: USD
+        numberOfSharesInOffering: Float
+    }
+    
+    type Nav {
+        dateUpdated: ISODateTime
         numberOfShares: Float
+        unitNav: USD
     }
 
     type PortfolioDetails {
@@ -122,6 +128,8 @@ const schema = `
         properties: [Property]
         currentNav: Nav
         navHistory: [Nav]
+        currentUnitPrice: UnitPrice
+        unitPriceHistory: [UnitPrice]
     }
 
     type Query {
@@ -149,10 +157,19 @@ const schema = `
 
         """
         Currently we can have only one portfolio in the system. This mutation will create a new portfolio and set it as active and disallow to create another one.
+        Provide initial NAV per share and number of shares in portfolio.
         """
-        registerPortfolio(name: String!, northCapitalOfferingId: String!, vertaloAllocationId: String!, linkToOfferingCircular: String!): PortfolioDetails
+        registerPortfolio(name: String!, northCapitalOfferingId: String!, vertaloAllocationId: String!, linkToOfferingCircular: String!, initNavPerShareInCents: Money!, initNumberOfSharesForNav: Float!): PortfolioDetails
 
-        synchronizePortfolioNav: Nav
+        """
+        Set current portfolio NAV per share and number of shares in portfolio
+        """
+        setPortfolioNav(navPerShareInCents: Money!, numberOfSharesForNav: Float!): Nav
+        
+        """
+        Synchronize share unit price from North Capital
+        """
+        synchronizePortfolioUnitPrice: UnitPrice
         
         """
         Create portfolio update.
@@ -329,7 +346,7 @@ export const PortfolioSchema = {
       },
       registerPortfolio: async (
         parent: any,
-        { name, northCapitalOfferingId, vertaloAllocationId, linkToOfferingCircular }: any,
+        { name, northCapitalOfferingId, vertaloAllocationId, linkToOfferingCircular, initNavPerShareInCents, initNumberOfSharesForNav }: any,
         { modules, isAdmin }: AdminSessionContext,
       ) => {
         if (!isAdmin) {
@@ -337,7 +354,14 @@ export const PortfolioSchema = {
         }
 
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
-        const result = await api.registerPortfolio(name, northCapitalOfferingId, vertaloAllocationId, linkToOfferingCircular);
+        const result = await api.registerPortfolio(
+          name,
+          northCapitalOfferingId,
+          vertaloAllocationId,
+          linkToOfferingCircular,
+          initNavPerShareInCents,
+          initNumberOfSharesForNav,
+        );
 
         if (result.errors.length > 0) {
           throw new JsonGraphQLError(result.errors);
@@ -345,7 +369,7 @@ export const PortfolioSchema = {
 
         return api.getPortfolioDetails(result.portfolioId!);
       },
-      synchronizePortfolioNav: async (parent: any, data: any, { modules, isAdmin }: AdminSessionContext) => {
+      synchronizePortfolioUnitPrice: async (parent: any, data: any, { modules, isAdmin }: AdminSessionContext) => {
         if (!isAdmin) {
           throw new GraphQLError('Access denied');
         }
@@ -353,7 +377,19 @@ export const PortfolioSchema = {
         const api = modules.getApi<Portfolio.ApiType>(Portfolio);
 
         const { portfolioId } = await api.getActivePortfolio();
-        await api.synchronizeNav(portfolioId);
+        await api.synchronizePortfolioUnitPrice(portfolioId);
+
+        return api.getCurrentUnitPrice(portfolioId);
+      },
+      setPortfolioNav: async (parent: any, { navPerShareInCents, numberOfSharesForNav }: any, { modules, isAdmin }: AdminSessionContext) => {
+        if (!isAdmin) {
+          throw new GraphQLError('Access denied');
+        }
+
+        const api = modules.getApi<Portfolio.ApiType>(Portfolio);
+
+        const { portfolioId } = await api.getActivePortfolio();
+        await api.setPortfolioNav(portfolioId, navPerShareInCents, numberOfSharesForNav);
 
         return api.getCurrentNav(portfolioId);
       },

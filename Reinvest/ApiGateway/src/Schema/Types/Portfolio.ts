@@ -59,7 +59,7 @@ const schema = `
     }
 
     type Nav {
-        unitPrice: USD
+        unitNav: USD
     }
 
     type PortfolioDetails {

@@ -80,7 +80,6 @@ export class EVSDataPointsCalculationService {
       switch (financialOperation.operationType) {
         case FinancialOperationType.INVESTMENT:
           portfolio[portfolioId]!.numberOfShares += numberOfShares;
-          portfolio[portfolioId]!.pricePerShare = pricePerShare;
           break;
         case FinancialOperationType.TRANSFER_IN:
           portfolio[portfolioId]!.numberOfShares += numberOfShares;

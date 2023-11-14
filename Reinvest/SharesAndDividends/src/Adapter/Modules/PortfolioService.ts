@@ -13,12 +13,12 @@ export class PortfolioService {
 
   async getCurrentNav(portfolioId: string): Promise<CurrentNav> {
     const {
-      unitPrice: { value },
+      unitNav: { value },
       numberOfShares,
     } = await this.portfolioModule.api().getCurrentNav(portfolioId);
 
     return <CurrentNav>{
-      unitSharePrice: new Money(value),
+      unitNav: new Money(value),
       numberOfShares: numberOfShares,
     };
   }

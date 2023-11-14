@@ -40,10 +40,10 @@ export class VendorsMappingService {
   }
 
   async getAbsoluteCurrentNav(portfolioId: string): Promise<number> {
-    await this.portfolio.api().synchronizeNav(portfolioId);
+    await this.portfolio.api().synchronizePortfolioUnitPrice(portfolioId);
     const {
       unitPrice: { value },
-    } = await this.portfolio.api().getCurrentNav(portfolioId);
+    } = await this.portfolio.api().getCurrentUnitPrice(portfolioId);
 
     return value;
   }
@@ -52,7 +52,7 @@ export class VendorsMappingService {
     const { allocationId } = await this.getPortfolioMapping(portfolioId);
     const {
       unitPrice: { value },
-    } = await this.portfolio.api().getCurrentNav(portfolioId);
+    } = await this.portfolio.api().getCurrentUnitPrice(portfolioId);
     const { accountEmail } = await this.getAccountMapping(accountId);
 
     return {
